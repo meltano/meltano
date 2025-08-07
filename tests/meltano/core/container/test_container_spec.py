@@ -32,7 +32,7 @@ class TestContainerService:
                                 "8000": [
                                     {
                                         "HostPort": "8080",
-                                        "HostIP": "0.0.0.0",  # noqa: S104v
+                                        "HostIP": "0.0.0.0",  # noqa: S104
                                     },
                                 ],
                             },
@@ -61,7 +61,7 @@ class TestContainerService:
         ),
         ids=["port-mapping", "custom-entrypoint"],
     )
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_docker_config(self, spec: ContainerSpec, payload: dict) -> None:
         """Check Docker container config from container spec."""
         if platform.system() == "Windows":

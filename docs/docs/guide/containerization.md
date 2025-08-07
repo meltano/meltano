@@ -52,7 +52,7 @@ docker build --tag meltano-demo-project:dev .
 
 Files added to your project include a `Dockerfile` inheriting `FROM` the public [`meltano/meltano:latest`](https://hub.docker.com/r/meltano/meltano/tags) image available on [Docker Hub](https://hub.docker.com).
 
-This can be customized to use another public mirror, a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v2.15-python3.10`), or Python 3.9 or 3.10 (e.g. `meltano/meltano:latest-python3.10` or `meltano/meltano:v2.15-python3.10`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). We currently publish release images to [Docker Hub](https://hub.docker.com/r/meltano/meltano). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
+This can be customized to use another public mirror, a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v3.5-python3.12`), or Python 3.11 or 3.12 (e.g. `meltano/meltano:latest-python3.12` or `meltano/meltano:v3.5-python3.12`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). We currently publish release images to [Docker Hub](https://hub.docker.com/r/meltano/meltano). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
 
 The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/reference/command-line-interface),
@@ -82,13 +82,13 @@ you can add the appropriate `docker-compose.prod.yml` file to your project by ad
 ```bash
 # For these examples to work, ensure that
 # Docker Compose has been installed
-docker-compose --version
+docker compose --version
 
 # Add Docker Compose files to your project
 meltano add files files-docker-compose
 
 # Start the `meltano-system-db` service in the background
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.

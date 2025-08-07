@@ -8,30 +8,31 @@ import click
 import structlog
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd
-from meltano.core.block.parser import BlockParser
+from meltano.cli.utils import (
+    CliError,
+    PartialInstrumentedCmd,
+    PluginTypeArg,
+    validate_plugin_type_args,
+)
+from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import install_plugins
+from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
-
-ANY = "-"
 
 logger = structlog.getLogger(__name__)
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
-@click.argument(
-    "plugin_type",
-    type=click.Choice((*PluginType.cli_arguments(), ANY)),
-    required=False,
-)
-@click.argument("plugin_name", nargs=-1, required=False)
+@click.argument("plugin", nargs=-1, required=False)
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--clean",
     is_flag=True,
@@ -66,8 +67,8 @@ async def install(
     project: Project,
     ctx: click.Context,
     *,
-    plugin_type: str,
-    plugin_name: str,
+    plugin: tuple[str, ...],
+    plugin_type: PluginType | None,
     clean: bool,
     parallelism: int,
     force: bool,
@@ -79,15 +80,21 @@ async def install(
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
+    plugin_names, plugin_type = validate_plugin_type_args(
+        plugin,
+        plugin_type,
+        ctx,
+        support_any=True,
+    )
+
     try:
-        if plugin_type and plugin_type != ANY:
-            plugin_type = PluginType.from_cli_argument(plugin_type)
+        if plugin_type:
             plugins = project.plugins.get_plugins_of_type(plugin_type)
         else:
             plugins = [p for p in project.plugins.plugins() if not p.is_mapping()]
 
-        if plugin_name:
-            plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
+        if plugin_names:
+            plugins = [plugin for plugin in plugins if plugin.name in plugin_names]
 
         if schedule_name:
             schedule_plugins = _get_schedule_plugins(
@@ -118,21 +125,25 @@ async def install(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
+def _get_schedule_plugins(project: Project, schedule_name: str) -> set[ProjectPlugin]:
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()
-    if schedule_obj.elt_schedule:
+    if isinstance(schedule_obj, ELTSchedule):
         for plugin_name in (schedule_obj.extractor, schedule_obj.loader):
             schedule_plugins.add(project.plugins.find_plugin(plugin_name))
-    else:
+    elif isinstance(schedule_obj, JobSchedule):
         task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
         for blocks in task_sets.flat_args_per_set:
             parser = BlockParser(logger, project, blocks)
             for plugin in parser.plugins:
                 schedule_plugins.add(
-                    project.plugins.find_plugin(plugin.info.get("name"))
+                    project.plugins.find_plugin(plugin.info["name"])
                     if plugin.type == PluginType.MAPPERS
                     else plugin,
                 )
+    else:  # pragma: no cover
+        msg = f"Invalid schedule type: {type(schedule_obj)}"
+        raise ValueError(msg)
+
     return schedule_plugins

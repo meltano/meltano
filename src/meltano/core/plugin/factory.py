@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import importlib
+import typing as t
 
 from . import BasePlugin, PluginDefinition, PluginType, Variant
 
 
-def lazy_import(module: str, classname: str):  # noqa: ANN201
+def lazy_import(module: str, classname: str) -> t.Callable[[], type[BasePlugin]]:
     """Lazily import a class.
 
     Args:
@@ -18,7 +19,7 @@ def lazy_import(module: str, classname: str):  # noqa: ANN201
         Function for lazily importing the given class.
     """
 
-    def lazy():  # noqa: ANN202
+    def lazy() -> type[BasePlugin]:
         return getattr(
             importlib.import_module(module, "meltano.core.plugin"),
             classname,

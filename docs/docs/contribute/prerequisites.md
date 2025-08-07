@@ -10,9 +10,10 @@ sidebar_class_name: hidden
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.8+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
-2. [Node 16](https://nodejs.org/)
-3. [Yarn](https://yarnpkg.com/)
+1. [Python 3.9+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
+2. [uv](https://docs.astral.sh/uv/)
+3. [Node 18+](https://nodejs.org/)
+4. [Yarn](https://yarnpkg.com/)
 
 ## Setting Up Your Environment
 
@@ -23,31 +24,27 @@ git clone git@github.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
-# Install the Poetry tool for managing dependencies and packaging
-pip3 install poetry
+# Install the, Nox and pre-commit tools
+uv tool install nox
+uv tool install pre-commit
 
 # Install all the dependencies
-poetry install
+uv sync
 
 # Install the pre-commit hook
-poetry run pre-commit install --install-hooks
+pre-commit install --install-hooks
 
-# Obtain a shell in the poetry created virtual environment
-poetry shell
+# Obtain a shell in the uv-managed virtual environment
+source .venv/bin/activate
 ```
 
-Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment that you access
-via `poetry shell`! Most editor's like [VSCode](https://code.visualstudio.com/) or [PyCharm](https://www.jetbrains.com/pycharm/)
-can also be configured to detect and make use of virtualenv's, or even be configured to use poetry directly. That allows
+Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment! Most editor's like [VSCode](https://code.visualstudio.com/) or [PyCharm](https://www.jetbrains.com/pycharm/)
+can also be configured to detect and make use of virtualenv's. That allows
 meltano commands to work as you expect in editor based terminals, and is also typically required to enable advanced
 editors features (debugging, code hints, etc).
 
-You can also run meltano outside of an activated virtualenv by prefixing all commands with `poetry run` , e.g.
-`poetry run meltano...`.
-
-Note that for users who are using pyenv with the [virtualenv plugin](https://github.com/pyenv/pyenv-virtualenv) you will
-likely not need to prefix the commands with `poetry` as poetry will default to using the pyenv activated virtual
-environment.
+You can also run meltano outside of an activated virtualenv by prefixing all commands with `uv run` , e.g.
+`uv run meltano...`.
 
 This means that you're ready to start Meltano CLI development.
 
@@ -87,8 +84,8 @@ To run the migrations, use `meltano upgrade` inside a Meltano project.
 
 ## Resources
 
-- [Managing Multiple Python Versions With pyenv](https://realpython.com/intro-to-pyenv/)
-- [Managing environments with poetry](https://python-poetry.org/docs/managing-environments/)
+- [Managing Multiple Python Versions With uv](https://docs.astral.sh/uv/guides/install-python/)
+- [Managing environments with uv](https://docs.astral.sh/uv/pip/environments/)
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
 
 [accepting pull requests]: https://github.com/meltano/meltano/labels/accepting%20pull%20requests

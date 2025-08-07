@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from typing import NoReturn  # noqa: ICN003
+from unittest import mock
 
-import mock
 import pytest
 
 from meltano.core.behavior.hookable import HookObject, hook
@@ -49,7 +49,7 @@ class Hooked2(HookObject):
 
 
 class TestHookable:
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_trigger_hook(self) -> None:
         subject = Hooked()
         process = mock.MagicMock()
@@ -64,7 +64,7 @@ class TestHookable:
         ]
         process.assert_called_once()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_trigger_hook_raise(self) -> NoReturn:
         subject = Hooked()
         with pytest.raises(Exception):  # noqa: B017, PT011
@@ -73,7 +73,7 @@ class TestHookable:
 
         assert subject.calls == ["before_test", "before_test_2"]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_trigger_derived_hook(self) -> None:
         subject = DerivedHooked()
 

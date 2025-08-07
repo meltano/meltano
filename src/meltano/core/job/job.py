@@ -6,11 +6,9 @@ import asyncio
 import os
 import signal
 import typing as t
-import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta, timezone
-from enum import Enum
-from enum import IntFlag as EnumIntFlag
+from enum import Enum, IntEnum
 
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -26,6 +24,13 @@ from meltano.core.sqlalchemy import (
     IntPK,
     JSONEncodedDict,
 )
+from meltano.core.utils import new_run_id
+
+if t.TYPE_CHECKING:
+    from collections.abc import AsyncGenerator, Generator
+
+    from sqlalchemy.orm import Session
+
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
@@ -49,7 +54,7 @@ class State(Enum):
     DEAD = (4, ())
     STATE_EDIT = (5, ())
 
-    def transitions(self):  # noqa: ANN201
+    def transitions(self) -> tuple[str, ...]:
         """Get possible next States for a job of this State.
 
         Returns:
@@ -66,10 +71,10 @@ class State(Enum):
         return self.name
 
 
-class StateComparator(Comparator):
+class StateComparator(Comparator[State]):
     """Compare Job._state to State enums."""
 
-    def __eq__(self, other):  # noqa: ANN001, ANN204
+    def __eq__(self, other: State) -> t.Any:  # type: ignore[override] # noqa: ANN401
         """Enable SQLAlchemy to directly compare Job.state values with State.
 
         Args:
@@ -81,7 +86,7 @@ class StateComparator(Comparator):
         return self.__clause_element__() == literal(other.name)
 
 
-def current_trigger():  # noqa: ANN201
+def current_trigger() -> str | None:
     """Get the trigger for running job.
 
     Returns:
@@ -90,7 +95,7 @@ def current_trigger():  # noqa: ANN201
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
-class Payload(EnumIntFlag):
+class Payload(IntEnum):
     """Flag indicating whether a Job has state in its payload field."""
 
     STATE = 1
@@ -98,7 +103,7 @@ class Payload(EnumIntFlag):
 
 
 class Job(SystemModel):
-    """Model class that represents a `meltano elt` run in the system database.
+    """Model class that represents a `meltano el` run in the system database.
 
     Includes State.STATE_EDIT rows which represent CLI invocations of the
     `meltano state` command which wrote state to the db. Queries that are
@@ -109,21 +114,17 @@ class Job(SystemModel):
     __tablename__ = "runs"
 
     id: Mapped[IntPK]
-    job_name: Mapped[t.Optional[str]]  # noqa: UP007
+    job_name: Mapped[str]
     run_id: Mapped[GUIDType]
-    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP007
-    started_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP007
-    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP007
-        DateTimeUTC,
-    )
-    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP007
+    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP045
+    started_at: Mapped[datetime] = mapped_column(DateTimeUTC)
+    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
+    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
     payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
-    trigger: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP007
-        default=current_trigger,
-    )
+    trigger: Mapped[t.Optional[str]] = mapped_column(default=current_trigger)  # noqa: UP045
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+    def __init__(self, **kwargs: t.Any) -> None:
         """Construct a Job.
 
         Args:
@@ -131,7 +132,7 @@ class Job(SystemModel):
         """
         kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
-        kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
+        kwargs["run_id"] = kwargs.get("run_id") or new_run_id()
         super().__init__(**kwargs)
 
     @hybrid_property
@@ -143,8 +144,8 @@ class Job(SystemModel):
         """
         return State[self._state]
 
-    @state.setter
-    def state(self, value) -> None:  # noqa: ANN001
+    @state.setter  # type: ignore[no-redef]
+    def state(self, value: State) -> None:
         """Set the _state value for this Job from a State enum.
 
         Args:
@@ -152,8 +153,8 @@ class Job(SystemModel):
         """
         self._state = str(value)
 
-    @state.comparator
-    def state(cls):  # noqa: ANN201, N805
+    @state.comparator  # type: ignore[no-redef]
+    def state(cls) -> StateComparator:  # noqa: N805
         """Use this comparison to compare Job.state to State.
 
         See:
@@ -164,7 +165,7 @@ class Job(SystemModel):
         """
         return StateComparator(cls._state)
 
-    def is_running(self):  # noqa: ANN201
+    def is_running(self) -> bool:
         """Return whether Job is running.
 
         Returns:
@@ -172,7 +173,18 @@ class Job(SystemModel):
         """
         return self.state is State.RUNNING
 
-    def is_stale(self):  # noqa: ANN201
+    def valid_intil(self) -> datetime:
+        """Return the datetime when this job goes stale.
+
+        Returns:
+            datetime when this job goes stale
+        """
+        if self.last_heartbeat_at:
+            return self.last_heartbeat_at + timedelta(minutes=HEARTBEAT_VALID_MINUTES)
+
+        return self.started_at + timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
+
+    def is_stale(self) -> bool:
         """Return whether Job has gone stale.
 
         Running jobs with a heartbeat are considered stale after no heartbeat
@@ -186,16 +198,9 @@ class Job(SystemModel):
         if not self.is_running():
             return False
 
-        if self.last_heartbeat_at:
-            timestamp = self.last_heartbeat_at
-            valid_for = timedelta(minutes=HEARTBEAT_VALID_MINUTES)
-        else:
-            timestamp = self.started_at
-            valid_for = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
+        return datetime.now(timezone.utc) > self.valid_intil()
 
-        return datetime.now(timezone.utc) - timestamp > valid_for
-
-    def has_error(self):  # noqa: ANN201
+    def has_error(self) -> bool:
         """Return whether a job has failed.
 
         Returns:
@@ -203,7 +208,7 @@ class Job(SystemModel):
         """
         return self.state is State.FAIL
 
-    def is_complete(self):  # noqa: ANN201
+    def is_complete(self) -> bool:
         """Return whether a job has completed.
 
         Returns:
@@ -211,7 +216,7 @@ class Job(SystemModel):
         """
         return self.state in {State.SUCCESS, State.FAIL}
 
-    def is_success(self):  # noqa: ANN201
+    def is_success(self) -> bool:
         """Return whether a job has succeeded.
 
         Returns:
@@ -251,12 +256,12 @@ class Job(SystemModel):
         if self.state is state:
             return transition
 
-        self.state = state
+        self.state = state  # type: ignore[method-assign]
 
         return transition
 
     @asynccontextmanager
-    async def run(self, session):  # noqa: ANN001, ANN201
+    async def run(self, session: Session) -> AsyncGenerator[None, None]:
         """Run wrapped code in context of a job.
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and
@@ -290,9 +295,10 @@ class Job(SystemModel):
     def start(self) -> None:
         """Mark the job has having started."""
         self.started_at = datetime.now(timezone.utc)
+        self._heartbeat()
         self.transit(State.RUNNING)
 
-    def fail(self, error=None) -> None:  # noqa: ANN001
+    def fail(self, error: t.Any | None = None) -> None:  # noqa: ANN401
         """Mark the job as having failed.
 
         Args:
@@ -301,7 +307,7 @@ class Job(SystemModel):
         self.ended_at = datetime.now(timezone.utc)
         self.transit(State.FAIL)
         if error:
-            self.payload.update({"error": str(error)})
+            self.payload["error"] = str(error)
 
     def success(self) -> None:
         """Mark the job as having succeeded."""
@@ -338,7 +344,7 @@ class Job(SystemModel):
             f"ended_at='{self.ended_at}')>"
         )
 
-    def save(self, session):  # noqa: ANN001, ANN201
+    def save(self, session: Session) -> Job:
         """Save the job in the db.
 
         Args:
@@ -356,7 +362,7 @@ class Job(SystemModel):
         """Update last_heartbeat_at for this job in the db."""
         self.last_heartbeat_at = datetime.now(timezone.utc)
 
-    async def _heartbeater(self, session) -> None:  # noqa: ANN001
+    async def _heartbeater(self, session: Session) -> None:
         """Heartbeat to the db every second.
 
         Args:
@@ -369,7 +375,7 @@ class Job(SystemModel):
             await asyncio.sleep(1)
 
     @asynccontextmanager
-    async def _heartbeating(self, session):  # noqa: ANN001, ANN202
+    async def _heartbeating(self, session: Session) -> AsyncGenerator[None, None]:
         """Provide a context for heartbeating jobs.
 
         Args:
@@ -386,10 +392,10 @@ class Job(SystemModel):
                 await heartbeat_future
 
     @contextmanager
-    def _handling_sigterm(  # noqa: ANN202
+    def _handling_sigterm(
         self,
-        session,  # noqa: ANN001, ARG002
-    ):
+        session: Session,  # noqa: ARG002
+    ) -> Generator[None, None, None]:
         def handler(*_) -> t.NoReturn:
             sigterm_status = 143
             raise SystemExit(sigterm_status)
@@ -401,7 +407,7 @@ class Job(SystemModel):
         finally:
             signal.signal(signal.SIGTERM, original_termination_handler)
 
-    def _error_message(self, err):  # noqa: ANN001, ANN202
+    def _error_message(self, err: BaseException) -> str:
         if isinstance(err, SystemExit):
             return "The process was terminated"
 

@@ -6,13 +6,18 @@ import platform
 import sys
 import tempfile
 import typing as t
+from unittest import mock
 
-import mock
+import anyio
 import pytest
 import structlog
 from structlog.testing import LogCapture
 
 from meltano.core.logging.output_logger import Out, OutputLogger
+
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
+    from pathlib import Path
 
 
 def assert_lines(output, *lines) -> None:
@@ -21,13 +26,12 @@ def assert_lines(output, *lines) -> None:
 
 
 class TestOutputLogger:
-    @pytest.fixture()
-    def log(self, tmp_path):
-        file = tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
-        yield file
-        file.close()
+    @pytest.fixture
+    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
+            yield file
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, log):
         return OutputLogger(log.name)
 
@@ -52,7 +56,7 @@ class TestOutputLogger:
     def redirect_handler(
         self,
         subject: OutputLogger,
-    ) -> t.Generator[logging.Handler, None, None]:
+    ) -> Generator[logging.Handler, None, None]:
         formatter = structlog.stdlib.ProcessorFormatter(
             # use a json renderer so output is easier to verify
             processor=structlog.processors.JSONRenderer(),
@@ -62,7 +66,7 @@ class TestOutputLogger:
         yield handler
         handler.close()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log")
     async def test_stdio_capture(self, subject, log_output) -> None:
         if platform.system() == "Windows":
@@ -111,7 +115,7 @@ class TestOutputLogger:
             },
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log")
     async def test_out_writers(self, subject, log_output) -> None:
         if platform.system() == "Windows":
@@ -165,7 +169,7 @@ class TestOutputLogger:
             },
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log")
     async def test_set_custom_logger(self, subject, log_output) -> None:
         if platform.system() == "Windows":
@@ -191,7 +195,7 @@ class TestOutputLogger:
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log", "log_output")
     async def test_logging_redirect(
         self,
@@ -205,17 +209,20 @@ class TestOutputLogger:
 
         logging_out = subject.out("logging")
 
-        with mock.patch.object(
-            Out,
-            "redirect_log_handler",
-            redirect_handler,
-        ), logging_out.redirect_logging():
-            logging.info("info")  # noqa: TID251
-            logging.warning("warning")  # noqa: TID251
-            logging.error("error")  # noqa: TID251
+        with (
+            mock.patch.object(
+                Out,
+                "redirect_log_handler",
+                redirect_handler,
+            ),
+            logging_out.redirect_logging(),
+        ):
+            logging.info("info")
+            logging.warning("warning")
+            logging.error("error")
 
-        with open(subject.file) as logf:  # noqa: PTH123
-            log_file_contents = [json.loads(line) for line in logf.readlines()]
+        async with await anyio.open_file(subject.file) as logf:
+            log_file_contents = [json.loads(line) for line in await logf.readlines()]
 
         assert_lines(
             log_file_contents,
@@ -239,11 +246,15 @@ class TestOutputLogger:
         # it raises logs unhandled exceptions
         exception = Exception("exception")
 
-        with pytest.raises(Exception) as exc, mock.patch.object(  # noqa: PT011
-            Out,
-            "redirect_log_handler",
-            redirect_handler,
-        ), logging_out.redirect_logging():
+        with (
+            pytest.raises(Exception) as exc,  # noqa: PT011
+            mock.patch.object(
+                Out,
+                "redirect_log_handler",
+                redirect_handler,
+            ),
+            logging_out.redirect_logging(),
+        ):
             raise exception
 
         # make sure it let the exception through

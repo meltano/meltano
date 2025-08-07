@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.meta()
+@pytest.mark.meta
 def test_pushd(tmp_path: Path, pushd):
     tmp_path.joinpath("a").mkdir(parents=True)
     tmp_path.joinpath("a", "b").mkdir(parents=True)

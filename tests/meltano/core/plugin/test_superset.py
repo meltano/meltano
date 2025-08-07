@@ -4,9 +4,10 @@ import platform
 import sys
 import typing as t
 from importlib.util import module_from_spec, spec_from_file_location
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallService
@@ -44,7 +45,7 @@ class TestSuperset:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.filterwarnings(
         "ignore:Unknown setting 'SUPERSET_WEBSERVER_PORT':RuntimeWarning",
     )
@@ -87,12 +88,13 @@ class TestSuperset:
                 return original_exec(cmd, *popen_args, **kwargs)
             return handle_mock
 
-        with mock.patch.object(
-            asyncio,
-            "create_subprocess_exec",
-            side_effect=popen_mock,
-        ) as popen, mock.patch(
-            "meltano.core.plugin_invoker.PluginConfigService.configure",
+        with (
+            mock.patch.object(
+                asyncio,
+                "create_subprocess_exec",
+                side_effect=popen_mock,
+            ) as popen,
+            mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure"),
         ):
             invoker: SupersetInvoker = plugin_invoker_factory(subject)
             # This ends up calling the hooks
@@ -117,7 +119,7 @@ class TestSuperset:
                 config_keys = dir(config_module)
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert (
-                    f'sqlite:///{project.plugin_dir(subject, "superset.db")}'
+                    f"sqlite:///{project.plugin_dir(subject, 'superset.db')}"
                     == config_module.SQLALCHEMY_DATABASE_URI
                 )
                 assert "SECRET_KEY" in config_keys
@@ -153,7 +155,7 @@ class TestSuperset:
 
             assert not run_dir.joinpath("superset_config.py").exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 

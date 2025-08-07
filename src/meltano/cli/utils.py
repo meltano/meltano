@@ -6,6 +6,7 @@ import os
 import signal
 import sys
 import typing as t
+import warnings
 from contextlib import contextmanager
 from enum import Enum, auto
 
@@ -18,19 +19,19 @@ from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin.base import PluginDefinition, PluginType
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
-from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
-if sys.version_info < (3, 11):
-    ReprEnum = Enum
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
 else:
-    from enum import ReprEnum
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
@@ -46,7 +47,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class CliError(Exception):
     """CLI Error."""
 
-    def __init__(self, *args, exit_code: int = 1, **kwargs) -> None:  # noqa: ANN002, ANN003
+    def __init__(self, *args: t.Any, exit_code: int = 1, **kwargs: t.Any) -> None:
         """Instantiate custom CLI Error exception."""
         super().__init__(*args, **kwargs)
 
@@ -58,8 +59,7 @@ class CliError(Exception):
         if self.printed:
             return
 
-        logger.debug(str(self), exc_info=True)
-        click.secho(str(self), fg="red", err=True)
+        logger.error(str(self), exc_info=self.__cause__)
 
         self.printed = True
 
@@ -68,7 +68,7 @@ def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
     *,
-    update: bool = False,
+    flags: AddedPluginFlags = AddedPluginFlags.ADDED,
 ) -> None:
     """Print added plugin."""
     descriptor = plugin.type.descriptor
@@ -77,17 +77,14 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    action, preposition = (
-        (
-            "Updated" if plugin.should_add_to_file() else "Updating",
-            "in",
-        )
-        if update
-        else (
-            "Added" if plugin.should_add_to_file() else "Adding",
-            "to",
-        )
-    )
+    if flags == AddedPluginFlags.ADDED:
+        action, preposition = "Added", "to"
+    elif flags == AddedPluginFlags.UPDATED:
+        action, preposition = "Updated", "in"
+    elif flags == AddedPluginFlags.NOT_ADDED:
+        action, preposition = "Initialized", "in"
+    else:  # pragma: no cover
+        t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",
@@ -240,7 +237,7 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
         "\nDefault: no settings\n",
     )
 
-    settings = None
+    settings: list | None = None
     while settings is None:  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
@@ -310,10 +307,8 @@ def add_plugin(  # noqa: ANN201
         plugin_name = plugin_attrs.pop("name")
         variant = plugin_attrs.pop("variant", variant)
 
-    plugin: ProjectContext | PluginRef
-
     try:
-        plugin = add_service.add(
+        plugin, flags = add_service.add_with_flags(
             plugin_type,
             plugin_name,
             variant=variant,
@@ -323,9 +318,9 @@ def add_plugin(  # noqa: ANN201
             python=python,
             **plugin_attrs,
         )
-        print_added_plugin(plugin, update=update)
+        print_added_plugin(plugin, flags=flags)
     except PluginAlreadyAddedException as err:
-        plugin = err.plugin
+        plugin = err.plugin  # type: ignore[assignment]
         click.secho(
             (
                 f"{plugin_type.descriptor.capitalize()} '{plugin_name}' "
@@ -369,17 +364,6 @@ def add_plugin(  # noqa: ANN201
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new "
                 f"--inherit-from {plugin.name}",
             )
-    except LockfileAlreadyExistsError as exc:
-        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method
-        # should return! Results in `KeyError: venv_name`
-        plugin = exc.plugin
-        click.secho(
-            f"Plugin definition is already locked at {exc.path}.",
-            fg="yellow",
-        )
-        click.echo(
-            "You can remove the file manually to avoid using a stale definition.",
-        )
 
     click.echo()
 
@@ -631,10 +615,92 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         super().invoke(ctx)
 
 
-# TODO: Use StrEnum (and its backport) when we can drop Python 3.8 support
-class AutoInstallBehavior(str, ReprEnum):
+class AutoInstallBehavior(StrEnum):
     """Enum of the different behaviors for automatic plugin installation."""
 
-    install = "install"
-    no_install = "no_install"
-    only_install = "only_install"
+    install = auto()
+    no_install = auto()
+    only_install = auto()
+
+
+class PluginTypeArg(click.Choice):
+    """A click parameter that converts a string to a PluginType."""
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
+        """Initialize the PluginTypeArg."""
+        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
+
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,  # noqa: ARG002
+        ctx: click.Context | None,  # noqa: ARG002
+    ) -> PluginType:
+        """Convert the value to a PluginType."""
+        return PluginType.from_cli_argument(value)
+
+
+def infer_plugin_type(plugin_name: str) -> PluginType:
+    """Infer the plugin type from the plugin name."""
+    if plugin_name.startswith("tap-"):
+        return PluginType.EXTRACTORS
+    if plugin_name.startswith("target-"):
+        return PluginType.LOADERS
+
+    return PluginType.UTILITIES
+
+
+def validate_plugin_type_args(
+    plugin: tuple[str, ...],
+    plugin_type: PluginType | None,
+    ctx: click.Context,
+    *,
+    support_any: bool = False,
+) -> tuple[tuple[str, ...], PluginType | None]:
+    """Validate plugin type arguments and return processed values.
+
+    Raises click.UsageError if both positional plugin type and --plugin-type flag
+    are provided. Returns tuple of (plugin_names, plugin_type).
+
+    Args:
+        plugin: The plugin arguments tuple
+        plugin_type: The plugin type from --plugin-type flag
+        ctx: Click context
+        support_any: Whether to support the "-" (ANY) argument for install command
+    """
+    if not plugin:
+        return plugin, plugin_type
+
+    if plugin[0] in PluginType.cli_arguments():
+        if plugin_type is not None:
+            msg = "Use only --plugin-type to specify plugin type"
+            raise click.UsageError(msg, ctx=ctx)
+
+        plugin_names = plugin[1:]
+        plugin_type = PluginType.from_cli_argument(plugin[0])
+        warnings.warn(
+            "Passing the plugin type as the first positional argument is deprecated "
+            "and will be removed in Meltano v4. "
+            "Please use the --plugin-type option instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return plugin_names, plugin_type
+
+    if support_any and plugin[0] == "-":
+        if plugin_type is not None:
+            msg = "Use only --plugin-type to specify plugin type"
+            raise click.UsageError(msg, ctx=ctx)
+
+        plugin_names = plugin[1:]
+        plugin_type = None
+        warnings.warn(
+            'Using "-" to specify plugins of any type is '
+            "deprecated and will be removed in Meltano v4. "
+            "It is no longer necessary to use this argument.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return plugin_names, plugin_type
+
+    return plugin, plugin_type

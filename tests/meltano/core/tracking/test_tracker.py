@@ -8,8 +8,8 @@ from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
 from time import sleep
+from unittest import mock
 
-import mock
 import pytest
 from snowplow_tracker import Emitter, SelfDescribing
 
@@ -17,11 +17,11 @@ from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
 from meltano.core.tracking.contexts.project import ProjectContext
-from meltano.core.tracking.tracker import TelemetrySettings, Tracker
-from meltano.core.utils import hash_sha256
+from meltano.core.tracking.tracker import TelemetrySettings, Tracker, new_client_id
+from meltano.core.utils import hash_sha256, new_project_id
 
 if t.TYPE_CHECKING:
-    import pytest_structlog
+    from collections.abc import Generator
 
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
@@ -44,7 +44,7 @@ def check_analytics_json(project: Project) -> None:
 
 
 @contextmanager
-def delete_analytics_json(project: Project) -> t.Generator[None, None, None]:
+def delete_analytics_json(project: Project) -> Generator[None, None, None]:
     (project.meltano_dir() / "analytics.json").unlink(missing_ok=True)
     try:
         yield
@@ -75,10 +75,13 @@ class TestTracker:
             ) = original_config_override
 
     def test_telemetry_state_change_check(self, project: Project) -> None:
-        with mock.patch.object(
-            Tracker,
-            "save_telemetry_settings",
-        ) as mocked, delete_analytics_json(project):
+        with (
+            mock.patch.object(
+                Tracker,
+                "save_telemetry_settings",
+            ) as mocked,
+            delete_analytics_json(project),
+        ):
             Tracker(project)
             assert mocked.call_count == 1
 
@@ -140,7 +143,8 @@ class TestTracker:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
-        project.settings.set("project_id", str(uuid.uuid4()))
+        project.settings.set("project_id", new_project_id())
+
         Tracker(project).save_telemetry_settings()
 
         project.settings.set("send_anonymous_usage_stats", value=False)
@@ -148,7 +152,7 @@ class TestTracker:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 1
 
-        project.settings.set("project_id", str(uuid.uuid4()))
+        project.settings.set("project_id", new_project_id())
         with mock.patch.object(Tracker, method_name) as mocked:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 0
@@ -160,11 +164,11 @@ class TestTracker:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
-        project.settings.set("project_id", str(uuid.uuid4()))
+        project.settings.set("project_id", new_project_id())
         Tracker(project).save_telemetry_settings()
 
         with delete_analytics_json(project):
-            project.settings.set("project_id", str(uuid.uuid4()))
+            project.settings.set("project_id", new_project_id())
             with mock.patch.object(Tracker, method_name) as mocked:
                 Tracker(project)
                 assert mocked.call_count == 0
@@ -179,11 +183,11 @@ class TestTracker:
     @pytest.mark.parametrize(
         "analytics_json_content",
         (
-            f'{{"clientId":"{uuid.uuid4()!s}","project_id":"{uuid.uuid4()!s}","send_anonymous_usage_stats":true}}',
-            f'{{"client_id":"{uuid.uuid4()!s}","projectId":"{uuid.uuid4()!s}","send_anonymous_usage_stats":true}}',
-            f'{{"client_id":"{uuid.uuid4()!s}","project_id":"{uuid.uuid4()!s}","send_anon_usage_stats":true}}',
-            f'["{uuid.uuid4()!s}","{uuid.uuid4()!s}", true]',
-            f'client_id":"{uuid.uuid4()!s}","project_id":"{uuid.uuid4()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"clientId":"{new_client_id()!s}","project_id":"{new_project_id()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"client_id":"{new_client_id()!s}","projectId":"{new_project_id()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"client_id":"{new_client_id()!s}","project_id":"{new_project_id()!s}","send_anon_usage_stats":true}}',
+            f'["{new_client_id()!s}","{new_project_id()!s}", true]',
+            f'client_id":"{new_client_id()!s}","project_id":"{new_project_id()!s}","send_anonymous_usage_stats":true}}',
         ),
         ids=(0, 1, 2, 3, 4),
     )
@@ -338,8 +342,8 @@ class TestTracker:
 
         tracker.track_telemetry_state_change_event(
             "project_id",
-            uuid.uuid4(),
-            uuid.uuid4(),
+            from_value=new_project_id(),
+            to_value=new_project_id(),
         )
         assert passed
 
@@ -379,36 +383,36 @@ class TestTracker:
         """
 
         class HTTPRequestHandler(server_lib.SimpleHTTPRequestHandler):
-            def do_POST(self) -> None:  # noqa: N802
+            def do_POST(self) -> None:
                 sleep(sleep_duration)
                 self.send_response(200, "OK")
                 self.end_headers()
 
-        server = server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler)
-        server_thread = Thread(
-            target=server.serve_forever,
-            kwargs={"poll_interval": 0.1},
-        )
+        with server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler) as server:
+            server_thread = Thread(
+                target=server.serve_forever,
+                kwargs={"poll_interval": 0.1},
+            )
 
-        project.settings.set(
-            "snowplow.collector_endpoints",
-            f'["http://localhost:{server.server_port}"]',
-        )
+            project.settings.set(
+                "snowplow.collector_endpoints",
+                f'["http://localhost:{server.server_port}"]',
+            )
 
-        tracker = Tracker(project)
-        assert len(tracker.snowplow_tracker.emitters) == 1
-        tracker.snowplow_tracker.emitters[0].on_failure = mock.MagicMock()
+            tracker = Tracker(project)
+            assert len(tracker.snowplow_tracker.emitters) == 1
+            tracker.snowplow_tracker.emitters[0].on_failure = mock.MagicMock()
 
-        server_thread.start()
-        tracker.track_command_event(CliEvent.started)
-        tracker.snowplow_tracker.flush()
-        server.shutdown()
-        server_thread.join()
+            server_thread.start()
+            tracker.track_command_event(CliEvent.started)
+            tracker.snowplow_tracker.flush()
+            server.shutdown()
+            server_thread.join()
 
-        timeout_occurred = (
-            tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
-        )
-        assert timeout_occurred is timeout_should_occur
+            timeout_occurred = (
+                tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
+            )
+            assert timeout_occurred is timeout_should_occur
 
     def test_project_context_send_anonymous_usage_stats_source(
         self,
@@ -416,7 +420,7 @@ class TestTracker:
         monkeypatch,
     ) -> None:
         def get_source():
-            return ProjectContext(project, uuid.uuid4()).to_json()["data"][
+            return ProjectContext(project, new_project_id()).to_json()["data"][
                 "send_anonymous_usage_stats_source"
             ]
 
@@ -436,7 +440,6 @@ class TestTracker:
         self,
         project: Project,
         monkeypatch: pytest.MonkeyPatch,
-        log: pytest_structlog.StructuredLogCapture,
     ) -> None:
         endpoints = """
             [
@@ -448,33 +451,27 @@ class TestTracker:
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
 
-        tracker = Tracker(project)
+        with pytest.warns(
+            (UserWarning, UserWarning),
+            match="Invalid Snowplow endpoint",
+        ) as warnings:
+            tracker = Tracker(project)
 
-        try:
-            assert log.events[0]["level"] == "warning"
-            assert log.events[0]["event"] == "invalid_snowplow_endpoint"
-            assert log.events[0]["endpoint"] == "notvalid:8080"
+        assert warnings[0].message.args[0] == "Invalid Snowplow endpoint: notvalid:8080"
+        assert (
+            warnings[1].message.args[0]
+            == "Invalid Snowplow endpoint: file://bad.scheme"
+        )
 
-            assert log.events[1]["level"] == "warning"
-            assert log.events[1]["event"] == "invalid_snowplow_endpoint"
-            assert log.events[1]["endpoint"] == "file://bad.scheme"
+        assert len(tracker.snowplow_tracker.emitters) == 2
 
-            assert len(tracker.snowplow_tracker.emitters) == 2
+        emitter = tracker.snowplow_tracker.emitters[0]
+        assert isinstance(emitter, Emitter)
+        assert emitter.endpoint.startswith("https://valid.endpoint:8080/")
 
-            emitter = tracker.snowplow_tracker.emitters[0]
-            assert isinstance(emitter, Emitter)
-            assert emitter.endpoint.startswith(
-                "https://valid.endpoint:8080/",
-            )
-
-            emitter = tracker.snowplow_tracker.emitters[1]
-            assert isinstance(emitter, Emitter)
-            assert emitter.endpoint.startswith(
-                "https://other.endpoint/path/to/collector/",
-            )
-        finally:
-            # Remove the seemingly valid emitters to prevent a logging error on exit.
-            tracker.snowplow_tracker.emitters = []
+        emitter = tracker.snowplow_tracker.emitters[1]
+        assert isinstance(emitter, Emitter)
+        assert emitter.endpoint.startswith("https://other.endpoint/path/to/collector/")
 
     def test_client_id_from_env_var(
         self,
@@ -487,7 +484,7 @@ class TestTracker:
                 # Ensure it generated a random UUID as a fallback
                 uuid.UUID(str(Tracker(project).client_id))
 
-            ctx_id = uuid.uuid4()
+            ctx_id = new_client_id()
             monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id))
             # Ensure it takes the client ID from the env var
             assert Tracker(project).client_id == ctx_id
@@ -496,7 +493,7 @@ class TestTracker:
             # Ensure it uses the client ID stored in `analytics.json`
             assert Tracker(project).client_id == ctx_id
 
-            ctx_id_2 = uuid.uuid4()
+            ctx_id_2 = new_client_id()
             monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id_2))
             # Ensure the env var takes priority over `analytics.json`
             assert Tracker(project).client_id == ctx_id_2

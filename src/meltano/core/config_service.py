@@ -11,6 +11,7 @@ import structlog
 import yaml
 
 from meltano.core import bundle
+from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.setting_definition import SettingDefinition
 
 if t.TYPE_CHECKING:
@@ -22,6 +23,8 @@ logger = structlog.stdlib.get_logger(__name__)
 
 class ConfigService:
     """Service to manage meltano.yml."""
+
+    addon: MeltanoAddon[SettingDefinition] = MeltanoAddon("meltano.settings")
 
     def __init__(self, project: Project):
         """Create a new project configuration service.
@@ -39,8 +42,11 @@ class ConfigService:
             The project settings.
         """
         with bundle.root.joinpath("settings.yml").open() as settings_yaml:
-            settings_yaml_content = yaml.safe_load(settings_yaml)
-        return [SettingDefinition.parse(x) for x in settings_yaml_content["settings"]]
+            content = yaml.safe_load(settings_yaml)
+
+        builtin = [SettingDefinition.parse(x) for x in content["settings"]]
+        addons = list(self.addon.get_all())
+        return builtin + addons
 
     @cached_property
     def current_meltano_yml(self) -> MeltanoFile:

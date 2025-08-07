@@ -13,7 +13,7 @@ from meltano.core.project_settings_service import SettingValueStore
 from meltano.core.tracking import Tracker
 
 if t.TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Iterable, Mapping
 
     from meltano.core.project import Project
 
@@ -34,11 +34,11 @@ class MeltanoInvoker:
 
     def invoke(
         self,
-        args: t.Iterable[str],
+        args: Iterable[str],
         command: str = MELTANO_COMMAND,
         env: dict[str, str] | None = None,
         **kwargs: t.Any,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """Invoke meltano or other provided command.
 
         Args:

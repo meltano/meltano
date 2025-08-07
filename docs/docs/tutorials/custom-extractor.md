@@ -5,6 +5,11 @@ layout: doc
 sidebar_position: 2
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
 
 ## What Are Custom Extractors?
@@ -28,41 +33,28 @@ The following steps will demonstrate how to implement a custom extractor to extr
 There a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
 
 1. [Python3](https://www.python.org/downloads/) for running Python-based scripts
-2. [Pip3](https://pypi.org/project/pip/#files) for installing pipx
-3. [Poetry](https://python-poetry.org/) for dependency management in your custom extractor
+3. [uv] for dependency management in your custom extractor
 4. [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) for installing the template repository
 
 ## 1. Installing the Dependencies
 
-You can install Python3 from the [official website](https://www.python.org/downloads/). Python usually comes packaged with a package installer known as pip.
+You can install Python 3 from the [official website](https://www.python.org/downloads/). You can also install Python using [`uv`] (version 0.3.0 or higher) by running the command below:
 
-You can verify that pip is installed by running the below command:
-
-```
-pip3 --version
+```bash
+uv python install 3.13
 ```
 
-Any version number above 20 should be able to install pipx. You can then run the command below to install pipx, meltano, cookiecutter, and poetry.
+You can then run the command below to install Meltano and Cookiecutter.
 
 ```
-pip3 install pipx
+uv tool install meltano
 
-pipx ensurepath
-
-source ~/.bashrc
-
-pipx install meltano
-
-pipx install cookiecutter
-
-pipx install poetry
+uv tool install cookiecutter
 ```
 
 Pipx is a wrapper around pip that simplifies the process of installing Python programs that need to be added to path (e.g., Meltano).
 
-You will use cookiecutter to clone the Meltano SDK template repo for implementing a custom extractor.
-
-Poetry serves as the dependency manager for the project. If you have used npm before, poetry serves a similar purpose but for Python projects.
+You will use Cookiecutter to clone the Meltano SDK template repo for implementing a custom extractor.
 
 ## 2. Create a Project Using the Cookiecutter Template
 
@@ -125,20 +117,17 @@ The result of the above command is a new directory `tap-jsonplaceholder` that co
 
 You can view the cookiecutter template in [cookiecutter directory in the Meltano SDK repository](https://github.com/meltano/sdk/tree/main/cookiecutter).
 
-## 3. Install the Custom Extractor Python dependencies Using Poetry
+## 3. Install the Custom Extractor Python dependencies
 
-Change directory into the json-placeholder tap directory, and install the python dependencies using poetry:
+Change directory into the json-placeholder tap directory, and install the python dependencies using uv:
 
 ```bash
 cd tap-jsonplaceholder
 
-# [Optional] but useful if you need to debug your custom extractor
-poetry config virtualenvs.in-project true
-
-poetry install
+uv sync
 ```
 
-See [Debug A Custom Extractor](https://docs.meltano.com/guide/debugging-custom-extractor) to learn more about the optional Poetry step above.
+See [Debug A Custom Extractor](/guide/debugging-custom-extractor) to learn more about setting up an interpreter for the local venv in your IDE.
 
 ## 4. Configure the Custom Extractor to Consume Data from the Source
 
@@ -224,8 +213,36 @@ Navigate to your project root directory on your shell and run the following comm
 
 ```bash
 meltano install
+```
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
 meltano add loader target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 This command installs your newly created tap, tap-jsonplaceholder, and a loader, target-jsonl, to the default Meltano project. It also creates an output directory where the extracted data will be loaded.
@@ -309,8 +326,34 @@ There are two ways you can do this:
 
 Run the command below to add the extractor as a custom extractor not hosted on MeltanoHub registry:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --custom tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --custom extractor tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 You will be prompted to input the namespace URL. Choose `tap-jsonplaceholder`.
@@ -342,8 +385,34 @@ Alternatively, you can create a [plugin definition](/concepts/project#custom-plu
 
 </details>
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 :::info
@@ -357,16 +426,68 @@ As you develop your custom extractor, it is possible that its settings will chan
 
 In this case, you will need to update the extractor in your project - by maintaining your plugin definiton YAML file in line with changes to the tap as you go, this is a simple process of running the previous command along with the `--update` flag:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --update --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --update --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 ### Add a JSONL target
 
 Run the command below to add the JSONL loader that will contain the extracted data stream:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add loader target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 ### Run an ELT Pipeline That Loads Data into a JSONL File
@@ -487,28 +608,30 @@ the form of pull requests.
 ### Publish to PyPI
 
 If you've built your tap using the SDK, you can take advantage of the streamlined
-[`poetry publish`](https://python-poetry.org/docs/cli/#publish) command to publish
+[`uv publish`](https://docs.astral.sh/uv/reference/cli/#uv-publish) command to publish
 your tap directly to PyPI.
 
 1. Create an account with [PyPI](https://pypi.org).
-2. Create a PyPI API token for use in automated publishing. (Optional but recommended.)
-3. Run `poetry build` from within your repo to build.
-4. Run `poetry publish` to push your latest version to the PyPI servers.
+
+2. Set up credentials for publishing to PyPI.
+
+   i. If you want to deploy from GitHub Actions, consider setting up a [Trusted Publisher](https://docs.pypi.org/trusted-publishers/) for your project.
+
+   ii. Otherwise, create a PyPI API token for use in automated publishing.
+
+3. Run `uv build` from within your repo to build.
+4. Run `uv publish` to push your latest version to the PyPI servers, with one of the following options:
+
+   - `--trusted-publishing=automatic` to publish as a Trusted Publisher, from GitHub Actions, or
+   - `--token=<token>` to publish using a PyPI API token
+
 
 ### Test a `pip` install
 
-We recommend using pipx to avoid dependency conflicts:
+We recommend using [`uv`][uv] to avoid dependency conflicts:
 
 ```bash
-pip3 install pipx
-pipx ensurepath
-python -m pipx install tap-my-custom-source
-```
-
-After restarting your terminal, this should also work without the `python -m` prefix:
-
-```bash
-pipx install tap-my-custom-source
+uv tool install tap-my-custom-source
 ```
 
 Or if you don't want to use pipx:
@@ -540,3 +663,5 @@ Once your repo is installable with pip, you can reference this in your `meltano.
 - [SDK for Singer Taps and Targets](https://sdk.meltano.com)
 - [Singer Spec](https://hub.meltano.com/singer/spec)
 - [Meltano Blog - How to Build a Custom Extractor](https://meltano.com/blog/how-to-build-a-custom-extractor-with-meltano/)
+
+[uv]: https://docs.astral.sh/uv/

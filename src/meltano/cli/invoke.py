@@ -29,7 +29,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
-    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -91,8 +91,8 @@ async def invoke(
     plugin_name: str,
     plugin_args: tuple[str, ...],
     install_plugins: InstallPlugins,
-    containers: bool = False,
-    print_var: str | None = None,
+    containers: bool,
+    print_var: tuple[str, ...],
 ) -> None:
     """Invoke a plugin's executable with specified arguments.
 
@@ -106,14 +106,14 @@ async def invoke(
     except ValueError:
         command_name = None
 
-    plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
+    ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         plugin = project.plugins.find_plugin(
             plugin_name,
-            plugin_type=plugin_type,
+            plugin_type=ptype,
             invokable=True,
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
@@ -158,12 +158,12 @@ async def invoke(
 async def _invoke(  # noqa: ANN202
     *,
     invoker: PluginInvoker,
-    plugin_args: str,
-    session: sessionmaker,
+    plugin_args: tuple[str, ...],
+    session: Session,
     dump: str,
-    command_name: str,
+    command_name: str | None,
     containers: bool,
-    print_var: list | None = None,
+    print_var: tuple[str, ...],
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
@@ -193,7 +193,7 @@ async def _invoke(  # noqa: ANN202
                     exit_code = await handle.wait()
 
     except UnknownCommandError as err:
-        raise click.BadArgumentUsage(err) from err
+        raise click.BadArgumentUsage(str(err)) from err
     except AsyncSubprocessError as err:
         logger.error(await err.stderr)
         raise

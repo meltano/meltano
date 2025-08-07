@@ -2,7 +2,7 @@ plugins:
   utilities:
   - name: airflow
     variant: apache
-    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3
+    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.10.5
       --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
       pytest kubernetes==23.6.0 apache-airflow-providers-cncf-kubernetes==4.4.0
     commands:

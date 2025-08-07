@@ -16,7 +16,7 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
 
     assert EnvironmentContext().data["notable_flag_env_vars"] == {}
 
-    def check(env_var_values: tuple[str, ...], expected: bool | None) -> None:
+    def check(env_var_values: tuple[str, ...], *, expected: bool | None) -> None:
         for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
             monkeypatch.setenv(
                 notable_flag_env_var,

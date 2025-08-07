@@ -6,13 +6,14 @@ import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
 )
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
     from mypy_boto3_s3 import S3Client
 
@@ -35,7 +36,7 @@ class MissingBoto3Error(Exception):
 
 
 @contextmanager
-def requires_boto3():  # noqa: ANN201
+def requires_boto3() -> Generator[None, None, None]:
     """Raise MissingBoto3Error if boto3 is required but missing in context.
 
     Raises:
@@ -47,6 +48,33 @@ def requires_boto3():  # noqa: ANN201
     if not BOTO_INSTALLED:
         raise MissingBoto3Error
     yield
+
+
+AWS_ACCESS_KEY_ID = SettingDefinition(
+    name="state_backend.s3.aws_access_key_id",
+    label="AWS Access Key ID",
+    description="AWS Access Key ID",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+AWS_SECRET_ACCESS_KEY = SettingDefinition(
+    name="state_backend.s3.aws_secret_access_key",
+    label="AWS Secret Access Key",
+    description="AWS Secret Access Key",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+ENDPOINT_URL = SettingDefinition(
+    name="state_backend.s3.endpoint_url",
+    label="Endpoint URL",
+    description="URL for the AWS S3 or S3-compatible storage service",
+    kind=SettingKind.STRING,
+    env_specific=True,
+)
 
 
 class S3StateStoreManager(CloudStateStoreManager):
@@ -61,7 +89,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         endpoint_url: str | None = None,
-        **kwargs,  # noqa: ANN003
+        **kwargs: t.Any,
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -92,11 +120,24 @@ class S3StateStoreManager(CloudStateStoreManager):
         Returns:
             True if error represents file not being found, else False
         """
-        return (
-            isinstance(err, OSError)
-            and "NoSuchKey" in err.args[0]
-            or (isinstance(err, KeyError) and "ActualObjectSize" in err.args[0])
+        return (isinstance(err, OSError) and "NoSuchKey" in err.args[0]) or (
+            isinstance(err, KeyError) and "ActualObjectSize" in err.args[0]
         )
+
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``.
+
+        Returns:
+            A dictionary of extra transport params.
+        """
+        return {
+            "client_kwargs": {
+                "S3.Client.create_multipart_upload": {
+                    "ContentType": "application/json",
+                },
+            },
+        }
 
     @cached_property
     def client(self) -> S3Client:
@@ -127,7 +168,7 @@ class S3StateStoreManager(CloudStateStoreManager):
             session = boto3.Session()
             return session.client("s3")
 
-    def delete(self, file_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
@@ -138,7 +179,7 @@ class S3StateStoreManager(CloudStateStoreManager):
             Delete={"Objects": [{"Key": file_path}]},
         )
 
-    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
         """List all files in the backend.
 
         Args:

@@ -685,7 +685,7 @@ CATALOG_PROPERTIES = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def select_all_executor():
     return SelectExecutor(["*.*"])
 
@@ -914,7 +914,7 @@ class TestMetadataRule:
 
 
 class TestLegacyCatalogSelectVisitor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self):
         return json.loads(LEGACY_CATALOG)
 
@@ -963,7 +963,7 @@ class TestLegacyCatalogSelectVisitor:
 
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
 
@@ -1337,7 +1337,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "breadcrumb": ["properties", "a"],
                     "metadata": {"inclusion": "unsupported"},
                 },
-                SelectionType.EXCLUDED,
+                SelectionType.UNSUPPORTED,
             ),
             (
                 {
@@ -1397,6 +1397,7 @@ class TestSelectionType:
         assert st.AUTOMATIC + st.EXCLUDED == st.EXCLUDED
         assert st.SELECTED + st.AUTOMATIC == st.AUTOMATIC
         assert st.SELECTED + st.SELECTED == st.SELECTED
+        assert st.UNSUPPORTED + st.UNSUPPORTED == st.UNSUPPORTED
 
     def test_selection_type_repr(self) -> None:
         assert f"{SelectionType.EXCLUDED}" == "excluded"
@@ -1405,7 +1406,7 @@ class TestSelectionType:
 
 
 class TestMetadataExecutor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
 
@@ -1467,7 +1468,7 @@ class TestMetadataExecutor:
 
 
 class TestSchemaExecutor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
 
@@ -1538,7 +1539,7 @@ class TestSchemaExecutor:
 
 
 class TestListExecutor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self):
         return json.loads(CATALOG)
 

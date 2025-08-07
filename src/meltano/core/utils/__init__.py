@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import collections
 import functools
 import hashlib
 import math
@@ -11,9 +10,12 @@ import os
 import platform
 import re
 import sys
+import time as _time
 import traceback
 import typing as t
 import unicodedata
+import uuid
+from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from copy import copy, deepcopy
 from datetime import date, datetime, time, timezone
@@ -22,24 +24,70 @@ from functools import reduce
 from operator import setitem
 from pathlib import Path
 
+import dateparser
 import flatten_dict
 import structlog
 from requests.auth import HTTPBasicAuth
 
 from meltano.core.error import MeltanoError
 
+if sys.version_info >= (3, 14):
+    from uuid import uuid7
+else:
+
+    def uuid7() -> uuid.UUID:
+        """Generate a UUIDv7 with time-ordering capability.
+
+        UUIDv7 encodes a timestamp in the first 48 bits, making them lexicographically
+        sortable by creation time. This is useful for job run IDs that need to be
+        ordered chronologically. Sourced from https://github.com/nalgeon/uuidv7/blob/main/src/uuidv7.py
+
+        Returns:
+            A UUID object with version 7 encoding.
+        """
+        # Get current timestamp in milliseconds
+        timestamp = int(_time.time() * 1000)
+
+        # Generate 16 random bytes
+        value = bytearray(os.urandom(16))
+
+        # Encode timestamp into first 6 bytes (48 bits)
+        value[0] = (timestamp >> 40) & 0xFF
+        value[1] = (timestamp >> 32) & 0xFF
+        value[2] = (timestamp >> 24) & 0xFF
+        value[3] = (timestamp >> 16) & 0xFF
+        value[4] = (timestamp >> 8) & 0xFF
+        value[5] = timestamp & 0xFF
+
+        # Set version (7) in bits 12-15 of the time_hi_and_version field
+        value[6] = (value[6] & 0x0F) | 0x70
+
+        # Set variant bits to '10' in the clock_seq_hi_and_reserved field
+        value[8] = (value[8] & 0x3F) | 0x80
+
+        # Create UUID from bytes
+        return uuid.UUID(bytes=bytes(value))
+
+
+if t.TYPE_CHECKING:
+    from collections.abc import Callable, Coroutine, Iterable, MutableMapping
+
 logger = structlog.stdlib.get_logger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-
-
-try:
-    # asyncio.Task.all_tasks() is fully moved to asyncio.all_tasks() starting
-    # with Python 3.9. Also applies to current_task.
-    asyncio_all_tasks = asyncio.all_tasks
-except AttributeError:
-    asyncio_all_tasks = asyncio.Task.all_tasks
+REGEX_ISO8601 = (
+    r"^(\d{4})-"
+    r"(0[1-9]|1[0-2])-"
+    r"(0[1-9]|[12]\d|3[01])"
+    r"(?:[ T]"
+    r"([01]\d|2[0-3]):"
+    r"([0-5]\d):"
+    r"([0-5]\d)"
+    r"(?:\.(\d+))?"
+    r")?"
+    r"(Z|[+-](?:0\d|1[0-2]):(?:00|30))?$"
+)
 
 
 class NotFound(Exception):
@@ -58,7 +106,7 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
+def run_async(func: Callable[..., Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
     """Run the given async function using `asyncio.run`.
 
     Args:
@@ -76,7 +124,7 @@ def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):  # noqa:
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs: t.Callable[[t.Any], t.Any]):  # noqa: ANN201
+def compose(*fs: Callable[[t.Any], t.Any]):  # noqa: ANN201
     """Create a composition of unary functions.
 
     Args:
@@ -175,7 +223,14 @@ def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):  # noqa: ANN001, ANN201
+def nest(
+    d: dict[str, t.Any],
+    path: str,
+    value: t.Any = None,  # noqa: ANN401
+    maxsplit: int = -1,
+    *,
+    force: bool = False,
+) -> dict[str, dict[str, t.Any]]:
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -227,7 +282,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):  # noqa: 
     return cursor[tail]
 
 
-def nest_object(flat_object):  # noqa: ANN001, ANN201, D103
+def nest_object(flat_object: dict[str, t.Any]):  # noqa: ANN201, D103
     obj = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
@@ -251,10 +306,10 @@ def to_env_var(*xs: str) -> str:
         >>> to_env_var("foo.bar")
         'FOO_BAR'
     """
-    return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
+    return "_".join(re.sub(r"[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
+def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper around `flatten_dict.flatten`.
@@ -275,7 +330,7 @@ def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):  # noqa: AN
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
-def compact(xs: t.Iterable) -> t.Iterable:
+def compact(xs: Iterable) -> Iterable:
     """Remove None values from an iterable.
 
     Args:
@@ -370,7 +425,7 @@ class _GetItemProtocol(t.Protocol):
 _G = t.TypeVar("_G", bound=_GetItemProtocol)
 
 
-def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _G:
+def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -390,7 +445,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201, D103
+def makedirs(func: Callable[..., Path]):  # noqa: ANN201, D103
     @functools.wraps(func)
     def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
@@ -479,8 +534,8 @@ ENV_VAR_PATTERN = re.compile(
 Expandable = t.TypeVar(
     "Expandable",
     str,
-    t.Mapping[str, "Expandable"],
-    t.Sequence["Expandable"],
+    Mapping[str, "Expandable"],
+    Sequence["Expandable"],
 )
 
 
@@ -494,7 +549,7 @@ class EnvVarMissingBehavior(IntEnum):
 
 def expand_env_vars(
     raw_value: Expandable,
-    env: t.Mapping[str, str],
+    env: Mapping[str, str],
     *,
     if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
     flat: bool = False,
@@ -527,7 +582,7 @@ def expand_env_vars(
     """
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, t.Mapping, list)):
+    if not isinstance(raw_value, (str, Mapping, list)):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -559,16 +614,16 @@ def expand_env_vars(
 # `raw_value` is a dict, as opposed to once per key-value pair.
 def _expand_env_vars(
     raw_value: Expandable,
-    replacer: t.Callable[[re.Match], str],
+    replacer: Callable[[re.Match], str],
     *,
     flat: bool,
 ) -> Expandable:
-    if isinstance(raw_value, t.Mapping):
+    if isinstance(raw_value, Mapping):
         if flat:
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, t.Mapping, list))
+            if isinstance(v, (str, Mapping, list))
             else v
             for k, v in raw_value.items()
         }
@@ -577,7 +632,7 @@ def _expand_env_vars(
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, t.Mapping, list))
+            if isinstance(v, (str, Mapping, list))
             else v
             for v in raw_value
         ]
@@ -587,7 +642,7 @@ def _expand_env_vars(
 T = t.TypeVar("T")
 
 
-def uniques_in(original: t.Sequence[T]) -> list[T]:
+def uniques_in(original: Sequence[T]) -> list[T]:
     """Get unique elements from an iterable while preserving order.
 
     Args:
@@ -596,7 +651,7 @@ def uniques_in(original: t.Sequence[T]) -> list[T]:
     Returns:
         A list of unique values from the provided sequence in the order they appeared.
     """
-    return list(collections.OrderedDict.fromkeys(original))
+    return list(dict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
@@ -610,7 +665,7 @@ def human_size(num, suffix="B") -> str:  # noqa: ANN001
     Returns:
         File size in human-readable format
     """
-    magnitude = int(math.floor(math.log(num, 1024)))
+    magnitude = math.floor(math.log(num, 1024))
     val = num / math.pow(1024, magnitude)
 
     if magnitude == 0:
@@ -749,8 +804,8 @@ class MergeStrategy(t.NamedTuple):
     """
 
     applicable_for_instance_of: type | tuple[type, ...]
-    behavior: t.Callable[
-        [t.MutableMapping[str, t.Any], str, t.Any, tuple[MergeStrategy, ...] | None],
+    behavior: Callable[
+        [MutableMapping[str, t.Any], str, t.Any, tuple[MergeStrategy, ...] | None],
         None,
     ]
 
@@ -769,7 +824,7 @@ class Extendable(t.Protocol):
 
 default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
     MergeStrategy(
-        t.Mapping,
+        Mapping,
         lambda x, k, v, s: setitem(
             x,
             k,
@@ -784,7 +839,7 @@ default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
 )
 
 
-TMapping = t.TypeVar("TMapping", bound=t.Mapping)
+TMapping = t.TypeVar("TMapping", bound=Mapping)
 
 
 def deep_merge(
@@ -821,25 +876,6 @@ def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
             ):
                 break
     return base
-
-
-def remove_suffix(string: str, suffix: str) -> str:
-    """Remove suffix from string.
-
-    Compatible with Python 3.8
-
-    Args:
-        string: the string to remove suffix from
-        suffix: the suffix to remove
-
-    Returns:
-        The changed string
-    """
-    if sys.version_info >= (3, 9):
-        return string.removesuffix(suffix)
-    if string.endswith(suffix):
-        return string[: -len(suffix)]
-    return string
 
 
 _filename_restriction_pattern = re.compile(r"[^\w.-]")
@@ -898,3 +934,42 @@ def sanitize_filename(filename: str) -> str:
         _sanitize_filename_transformations,
         filename,
     )
+
+
+def parse_date(date_string: str) -> str:
+    """Parse a relative date string into a datetime object.
+
+    Args:
+        date_string: A relative date string that can be parsed by `dateparser`.
+
+    Returns:
+        The datetime object corresponding to the parsed date string.
+    """
+    if re.match(REGEX_ISO8601, date_string):
+        return date_string
+
+    if _parsed := dateparser.parse(
+        date_string,
+        settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},
+    ):
+        return _parsed.isoformat()
+
+    return date_string
+
+
+def new_project_id() -> uuid.UUID:
+    """Generate a new project ID.
+
+    Returns:
+        A new project ID.
+    """
+    return uuid7()
+
+
+def new_run_id() -> uuid.UUID:
+    """Generate a new run ID.
+
+    Returns:
+        A new run ID.
+    """
+    return uuid7()

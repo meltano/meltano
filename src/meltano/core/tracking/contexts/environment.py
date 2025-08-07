@@ -10,7 +10,7 @@ from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timezone
 from functools import cached_property
-from pathlib import Path
+from importlib import resources
 from warnings import warn
 
 import psutil
@@ -21,10 +21,15 @@ import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
 
+from .base import new_context_uuid
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
 logger = get_logger(__name__)
 
 # This file is only ever created in CI when building a release
-release_marker_path = Path(__file__).parent / ".release_marker"
+release_marker_path = resources.files("meltano.core.tracking") / ".release_marker"
 
 
 def _get_parent_context_uuid_str() -> str | None:
@@ -63,14 +68,14 @@ class EnvironmentContext(SelfDescribingJson):
     }
 
     @classmethod
-    def _notable_hashed_env_vars(cls) -> t.Iterable[str]:
+    def _notable_hashed_env_vars(cls) -> Iterable[tuple[str, str]]:
         for env_var_name in cls.notable_hashed_env_vars:
             with suppress(KeyError):  # Skip unset env vars
                 env_var_value = os.environ[env_var_name]
                 yield env_var_name, hash_sha256(env_var_value)
 
     @classmethod
-    def _notable_flag_env_vars(cls) -> t.Iterable[str]:
+    def _notable_flag_env_vars(cls) -> Iterable[tuple[str, bool | None]]:
         for env_var_name in cls.notable_flag_env_vars:
             with suppress(KeyError):  # Skip unset env vars
                 env_var_value = os.environ[env_var_name]
@@ -84,10 +89,10 @@ class EnvironmentContext(SelfDescribingJson):
         super().__init__(
             EnvironmentContextSchema.url,
             {
-                "context_uuid": str(uuid.uuid4()),
+                "context_uuid": str(new_context_uuid()),
                 "parent_context_uuid": _get_parent_context_uuid_str(),
                 "meltano_version": meltano.__version__,
-                "is_dev_build": not release_marker_path.exists(),
+                "is_dev_build": not release_marker_path.is_file(),
                 "is_ci_environment": any(
                     get_boolean_env_var(marker) for marker in self.ci_markers
                 ),

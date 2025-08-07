@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import typing as t
-from collections import OrderedDict
 
 import pytest
 
@@ -16,7 +15,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 @pytest.mark.usefixtures("tap")
 async def test_select_service_list_all(
     project: Project,
@@ -60,46 +59,40 @@ async def test_select_service_list_all(
             selection=SelectionType.SELECTED,
         ),
     }
-    assert list_all.properties == OrderedDict(
-        {
-            "users": {
-                SelectedNode(
-                    key="id",
-                    selection=SelectionType.AUTOMATIC,
-                ),
-            },
+    assert list_all.properties == {
+        "users": {
+            SelectedNode(
+                key="id",
+                selection=SelectionType.AUTOMATIC,
+            ),
         },
-    )
+    }
 
     # Update the catalog to include a new property
     catalog["streams"][0]["schema"]["properties"]["name"] = {"type": "string"}
 
     # Without refreshing the catalog, the new property should not be included
     list_all = await service.list_all(session, refresh=False)
-    assert list_all.properties == OrderedDict(
-        {
-            "users": {
-                SelectedNode(
-                    key="id",
-                    selection=SelectionType.AUTOMATIC,
-                ),
-            },
+    assert list_all.properties == {
+        "users": {
+            SelectedNode(
+                key="id",
+                selection=SelectionType.AUTOMATIC,
+            ),
         },
-    )
+    }
 
     # Refreshing the catalog should include the new property
     list_all = await service.list_all(session, refresh=True)
-    assert list_all.properties == OrderedDict(
-        {
-            "users": {
-                SelectedNode(
-                    key="id",
-                    selection=SelectionType.AUTOMATIC,
-                ),
-                SelectedNode(
-                    key="name",
-                    selection=SelectionType.AUTOMATIC,
-                ),
-            },
+    assert list_all.properties == {
+        "users": {
+            SelectedNode(
+                key="id",
+                selection=SelectionType.AUTOMATIC,
+            ),
+            SelectedNode(
+                key="name",
+                selection=SelectionType.AUTOMATIC,
+            ),
         },
-    )
+    }

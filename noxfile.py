@@ -10,57 +10,46 @@
 from __future__ import annotations
 
 import os
-import sys
-import typing as t
 from pathlib import Path
 from random import randint
 
-if t.TYPE_CHECKING:
-    from nox import Session
-
-try:
-    from nox_poetry import session as nox_session
-except ImportError:
-    raise SystemExit(
-        "Nox failed to import the 'nox-poetry' package. Please install it "  # noqa: EM102
-        f"using the following command: {sys.executable} -m pip install nox-poetry",
-    ) from None
+import nox
 
 # NOTE: The module docstring above is printed when `nox -l` is run.
 
-# Dependencies for tests and type checking are defined in `pyproject.toml`, and
-# locked in `poetry.lock`. The various Nox sessions defined here install the
-# subset of them they require.
+# Dependencies for tests and type checking are defined in `pyproject.toml`,
+# locked in `uv.lock`.
+# The various Nox sessions defined here install the subset of them they require.
 
-# We use `nox-poetry` to ensure the version installed is consistent with
-# `poetry.lock`. The single source of truth for our Python test and type checking
+# The single source of truth for our Python test and type checking
 # dependencies is `pyproject.toml`. Other linting and checks are performed by
 # `pre-commit`, where each check specifies its own dependencies. There should be
 # no duplicated dependencies between `pyproject.toml` and
 # `.pre-commit-config.yaml`.
 
-root_path = Path(__file__).parent
-python_versions = ("3.8", "3.9", "3.10", "3.11", "3.12")
-main_python_version = "3.12"
-pytest_deps = (
-    "backoff",
-    "colorama",  # colored output in Windows
-    "mock",
-    "moto",
+nox.needs_version = ">=2025.2.9"
+nox.options.default_venv_backend = "uv"
+nox.options.sessions = [
+    "mypy",
+    "pre-commit",
     "pytest",
-    "pytest-asyncio",
-    "pytest-cov",
-    "pytest-docker",
-    "pytest-order",
-    "pytest-randomly",
-    "pytest-structlog",
-    "pytest-xdist",
-    "requests-mock",
-    "time-machine",
+]
+
+root_path = Path(__file__).parent
+pyproject = nox.project.load_toml()
+python_versions = nox.project.python_versions(pyproject)
+
+main_python_version = "3.13"
+
+UV_SYNC_COMMAND = (
+    "uv",
+    "sync",
+    "--locked",
+    "--no-dev",
 )
 
 
-def _run_pytest(session: Session) -> None:
+def _run_pytest(session: nox.Session) -> None:
     random_seed = randint(0, 2**32 - 1)  # noqa: S311
     args = session.posargs or ("tests/",)
     try:
@@ -73,10 +62,17 @@ def _run_pytest(session: Session) -> None:
                 "NOX_CURRENT_SESSION": "tests",
             },
         )
+
         session.run(
+            "coverage",
+            "run",
+            "-m",
             "pytest",
-            "--cov=meltano",
-            "--cov=tests",
+            "--durations=10",
+            "--order-scope=module",
+            "--timeout=300",
+            "-n=auto",
+            "--dist=loadfile",
             f"--randomly-seed={random_seed}",
             *args,
         )
@@ -85,19 +81,19 @@ def _run_pytest(session: Session) -> None:
             session.notify("coverage", posargs=[])
 
 
-@nox_session(
+@nox.session(
     name="pytest",
     python=python_versions,
     tags=("test", "pytest"),
 )
-def pytest_meltano(session: Session) -> None:
+def pytest_meltano(session: nox.Session) -> None:
     """Run pytest to test Meltano.
 
     Args:
         session: Nox session.
     """
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
-    extras = ["azure", "gcs", "s3", "uv"]
+    extras = ["azure", "gcs", "s3"]
 
     if backend_db == "mssql":
         extras.append("mssql")
@@ -106,15 +102,17 @@ def pytest_meltano(session: Session) -> None:
     elif backend_db == "postgresql_psycopg3":
         extras.append("postgres")
 
-    session.install(
-        f".[{','.join(extras)}]",
-        *pytest_deps,
+    session.run_install(
+        *UV_SYNC_COMMAND,
+        "--group=testing",
+        *(f"--extra={extra}" for extra in extras),
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
     _run_pytest(session)
 
 
-@nox_session(python=main_python_version)
-def coverage(session: Session) -> None:
+@nox.session(python=main_python_version)
+def coverage(session: nox.Session) -> None:
     """Combine and report previously generated coverage data.
 
     Args:
@@ -122,7 +120,11 @@ def coverage(session: Session) -> None:
     """
     args = session.posargs or ("report",)
 
-    session.install("coverage[toml]")
+    session.run_install(
+        *UV_SYNC_COMMAND,
+        "--group=coverage",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
 
     if not session.posargs and any(Path().glob(".coverage.*")):
         session.run("coverage", "combine")
@@ -130,40 +132,43 @@ def coverage(session: Session) -> None:
     session.run("coverage", *args)
 
 
-@nox_session(
+@nox.session(
     name="pre-commit",
     python=main_python_version,
     tags=("lint",),
 )
-def pre_commit(session: Session) -> None:
+def pre_commit(session: nox.Session) -> None:
     """Run pre-commit linting and auto-fixes.
 
     Args:
         session: Nox session.
     """
     args = session.posargs or ("run", "--all-files")
-    session.install("pre-commit")
+    session.run_install(
+        *UV_SYNC_COMMAND,
+        "--group=pre-commit",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
     session.run("pre-commit", *args)
 
 
-@nox_session(
+@nox.session(
     python=main_python_version,
     tags=("lint",),
 )
-def mypy(session: Session) -> None:
+def mypy(session: nox.Session) -> None:
     """Run mypy type checking.
 
     Args:
         session: Nox session.
     """
-    session.install(
-        ".[mssql,azure,gcs,s3,uv]",
-        "boto3-stubs[essential]",
-        "mypy",
-        "types-croniter",
-        "types-jsonschema",
-        "types-psutil",
-        "types-PyYAML",
-        "types-requests",
+    session.run_install(
+        *UV_SYNC_COMMAND,
+        "--group=typing",
+        "--extra=mssql",
+        "--extra=azure",
+        "--extra=gcs",
+        "--extra=s3",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
     session.run("mypy", *session.posargs)

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from collections import OrderedDict
-
 import pytest
 
 from meltano.core.utils import (
@@ -11,8 +9,8 @@ from meltano.core.utils import (
     makedirs,
     nest,
     pop_at_path,
-    remove_suffix,
     set_at_path,
+    uuid7,
 )
 
 
@@ -44,14 +42,14 @@ def test_nest() -> None:
     assert subject == {"a": {"b": "not_a_dict", "list": [], "value": {"value": 1}}}
 
     # make sure existing values aren't cleared when `value=None` and `force=True`
-    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)
+    _ = nest(subject, "a.b", {"d": "d_value"}, force=True)
     assert subject == {
-        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
+        "a": {"b": {"d": "d_value"}, "list": [], "value": {"value": 1}},
     }
     similar_b = nest(subject, "a.b", force=True)
-    assert similar_b == OrderedDict({"d": "d_value"})
+    assert similar_b == {"d": "d_value"}
     assert subject == {
-        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
+        "a": {"b": {"d": "d_value"}, "list": [], "value": {"value": 1}},
     }
 
 
@@ -269,12 +267,6 @@ def test_expand_env_vars_array_nested(input_array, env, expected_output) -> None
     assert expand_env_vars(input_array, env) == expected_output
 
 
-def test_remove_suffix() -> None:
-    assert remove_suffix("a_string", "ing") == "a_str"
-    assert remove_suffix("a_string", "in") == "a_string"
-    assert remove_suffix("a_string", "gni") == "a_string"
-
-
 def test_makedirs_decorator(tmp_path) -> None:
     def root(*paths):
         return tmp_path.joinpath(*paths)
@@ -292,3 +284,53 @@ def test_makedirs_decorator(tmp_path) -> None:
 
     wolf = species("canis", "lupus", make_dirs=False)
     assert not wolf.exists()
+
+
+def test_uuidv7() -> None:
+    """Test UUIDv7 generation and properties."""
+    import time
+    import uuid
+
+    # Generate multiple UUIDs
+    uuid1 = uuid7()
+    time.sleep(0.001)  # Wait 1ms to ensure different timestamps
+    uuid2 = uuid7()
+
+    # Test that they are valid UUIDs
+    assert isinstance(uuid1, uuid.UUID)
+    assert isinstance(uuid2, uuid.UUID)
+
+    # Test that they have version 7
+    assert uuid1.version == 7
+    assert uuid2.version == 7
+
+    # Test that they are time-ordered (lexicographically sortable)
+    assert str(uuid1) < str(uuid2)
+
+    # Test that they are different
+    assert uuid1 != uuid2
+
+    # Test timestamp encoding (first 48 bits should be timestamp)
+    uuid1_bytes = uuid1.bytes
+    uuid2_bytes = uuid2.bytes
+
+    # Extract timestamps from first 6 bytes
+    timestamp1 = int.from_bytes(uuid1_bytes[:6], byteorder="big")
+    timestamp2 = int.from_bytes(uuid2_bytes[:6], byteorder="big")
+
+    # timestamp2 should be greater than timestamp1
+    assert timestamp2 > timestamp1
+
+
+def test_uuidv7_time_ordering() -> None:
+    """Test that UUIDv7s generated in sequence are time-ordered."""
+    import time
+
+    uuids = []
+    for _ in range(10):
+        uuids.append(uuid7())
+        time.sleep(0.001)
+
+    # Convert to strings and verify they are in ascending order
+    uuid_strings = [str(u) for u in uuids]
+    assert uuid_strings == sorted(uuid_strings)

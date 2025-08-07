@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+import typing as t
 from datetime import datetime, timedelta, timezone
 
 from .job import HEARTBEAT_VALID_MINUTES, HEARTBEATLESS_JOB_VALID_HOURS, Job, State
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Query, Session
 
 
 class JobFinder:
     """Query builder for the `Job` model for a certain `elt_uri`."""
 
-    def __init__(self, state_id: str):
+    def __init__(self, state_id: str) -> None:
         """Initialize the JobFinder.
 
         Args:
@@ -18,7 +22,7 @@ class JobFinder:
         """
         self.state_id = state_id
 
-    def latest(self, session):  # noqa: ANN001, ANN201
+    def latest(self, session: Session) -> Job | None:
         """Get the latest state for this instance's state ID.
 
         Args:
@@ -34,7 +38,7 @@ class JobFinder:
             .first()
         )
 
-    def successful(self, session):  # noqa: ANN001, ANN201
+    def successful(self, session: Session) -> Query[Job]:
         """Get all successful jobs for this instance's state ID.
 
         Args:
@@ -49,7 +53,7 @@ class JobFinder:
             & Job.ended_at.isnot(None),
         )
 
-    def running(self, session):  # noqa: ANN001, ANN201
+    def running(self, session: Session) -> Query[Job]:
         """Find states in the running state.
 
         Args:
@@ -62,7 +66,7 @@ class JobFinder:
             (Job.job_name == self.state_id) & (Job.state == State.RUNNING),
         )
 
-    def latest_success(self, session):  # noqa: ANN001, ANN201
+    def latest_success(self, session: Session) -> Job | None:
         """Get the latest successful state for this instance's state ID.
 
         Args:
@@ -73,7 +77,7 @@ class JobFinder:
         """
         return self.successful(session).order_by(Job.ended_at.desc()).first()
 
-    def latest_running(self, session):  # noqa: ANN001, ANN201
+    def latest_running(self, session: Session) -> Job | None:
         """Find the most recent state in the running state, if any.
 
         Args:
@@ -84,7 +88,13 @@ class JobFinder:
         """
         return self.running(session).order_by(Job.started_at.desc()).first()
 
-    def with_payload(self, session, flags=0, since=None, state=None):  # noqa: ANN001, ANN201
+    def with_payload(
+        self,
+        session: Session,
+        flags: int = 0,
+        since: datetime | None = None,
+        state: State | None = None,
+    ) -> Query[Job]:
         """Get all states for this instance's state ID matching the given args.
 
         Args:
@@ -110,10 +120,10 @@ class JobFinder:
         if since:
             query = query.filter(Job.ended_at > since)
         if state:
-            query = query.filter(Job.state == state)
+            query = query.filter(Job.state == state)  # type: ignore[arg-type]
         return query
 
-    def latest_with_payload(self, session, **kwargs):  # noqa: ANN001, ANN003, ANN201
+    def latest_with_payload(self, session: Session, **kwargs: t.Any) -> Job | None:
         """Return the latest state matching the given kwargs.
 
         Args:
@@ -131,7 +141,7 @@ class JobFinder:
         )
 
     @classmethod
-    def all_stale(cls, session):  # noqa: ANN001, ANN206
+    def all_stale(cls, session: Session) -> Query[Job]:
         """Return all stale states.
 
         Args:
@@ -145,7 +155,7 @@ class JobFinder:
         last_valid_started_at = now - timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
 
         return session.query(Job).filter(
-            (Job.state == State.RUNNING)
+            (Job.state == State.RUNNING)  # type: ignore[operator]
             & (
                 (
                     Job.last_heartbeat_at.isnot(None)
@@ -158,7 +168,7 @@ class JobFinder:
             ),
         )
 
-    def stale(self, session):  # noqa: ANN001, ANN201
+    def stale(self, session: Session) -> Query[Job]:
         """Return stale states with the instance's state ID.
 
         Args:
@@ -169,7 +179,7 @@ class JobFinder:
         """
         return self.all_stale(session).filter(Job.job_name == self.state_id)
 
-    def get_all(self, session: object, since=None):  # noqa: ANN001, ANN201
+    def get_all(self, session: Session, since: datetime | None = None) -> Query[Job]:
         """Return all state with the instance's state ID.
 
         Args:

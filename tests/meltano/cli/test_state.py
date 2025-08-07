@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 import platform
+import re
 import typing as t
+from unittest import mock
 
-import mock
 import pytest
 
 from asserts import assert_cli_runner
@@ -13,6 +14,10 @@ from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
     from pathlib import Path
+
+    from click.testing import CliRunner
+
+    from meltano.core.state_service import StateService
 
 unconventional_state_ids = [
     "unconventional",
@@ -68,7 +73,7 @@ class TestCliState:
         assert_cli_runner(result)
         assert self.get_result_set(result) == set(state_ids)
 
-    @pytest.fixture()
+    @pytest.fixture
     def patterns_with_expected_results(self, state_ids):
         return [
             (
@@ -280,6 +285,43 @@ class TestCliState:
                 assert_cli_runner(result)
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
+
+    def test_clear_all(
+        self,
+        state_service: StateService,
+        cli_runner: CliRunner,
+    ) -> None:
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            assert len(state_service.list_state()) > 0
+            result = cli_runner.invoke(
+                cli,
+                ["state", "clear", "--force", "--all"],
+            )
+            assert_cli_runner(result)
+            pattern = r"[1-9] state\(s\) were successfully cleared"
+            assert re.search(pattern, result.stderr) is not None
+            assert len(state_service.list_state()) == 0
+
+    @pytest.mark.parametrize(
+        "args",
+        (
+            pytest.param(("my-state-id", "--all"), id="both"),
+            pytest.param((), id="neither"),
+        ),
+    )
+    def test_clear_all_conflict_error(
+        self,
+        state_service: StateService,
+        cli_runner: CliRunner,
+        args: tuple[str, ...],
+    ) -> None:
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            assert len(state_service.list_state()) > 0
+            result = cli_runner.invoke(cli, ["state", "clear", "--force", *args])
+            assert result.exit_code == 2
+
+            message = "A state ID or the --all flag must be provided, but not both"
+            assert message in result.stderr
 
     def test_clear_prompt(self, state_service, cli_runner, state_ids) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):

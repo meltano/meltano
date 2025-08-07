@@ -45,12 +45,13 @@
     "HUB_METRICS_S3_PATH": "s3://devtest-meltano-bucket-01/hub_metrics/",
     "MELTANO_AUTO_INSTALL": "true",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
+    "MELTANO_CLI_LOG_FORMAT": "colored",
     "MELTANO_CLI_LOG_LEVEL": "info",
     "MELTANO_DATABASE_MAX_RETRIES": "3",
     "MELTANO_DATABASE_RETRY_TIMEOUT": "5",
     "MELTANO_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/meltano.db",
     "MELTANO_DEFAULT_ENVIRONMENT": "userdev",
-    "MELTANO_ELT_BUFFER_SIZE": "10485760",
+    "MELTANO_ELT_BUFFER_SIZE": "104857600",
     "MELTANO_EXPERIMENTAL": "false",
     "MELTANO_FF_PLUGIN_LOCKS_REQUIRED": "false",
     "MELTANO_FF_STRICT_ENV_VAR_MODE": "false",
@@ -62,7 +63,7 @@
     "MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS": "1",
     "MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS": "10",
     "MELTANO_STATE_BACKEND_URI": "systemdb",
-    "MELTANO_VENV_BACKEND": "virtualenv"
+    "MELTANO_VENV_BACKEND": "uv"
   },
   "jobs": [
     {
@@ -2379,7 +2380,7 @@
         ],
         "name": "meltano-map-transformer",
         "namespace": "meltano_map_transformer",
-        "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
+        "pip_url": "meltano-map-transform",
         "plugin_type": "mappers",
         "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
         "settings": [
@@ -2471,7 +2472,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
         "name": "airflow",
         "namespace": "airflow",
-        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
         "plugin_type": "utilities",
         "repo": "https://github.com/apache/airflow",
         "settings": [

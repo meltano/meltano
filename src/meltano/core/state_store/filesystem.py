@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import glob
 import os
+import platform
 import re
 import shutil
 import typing as t
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 from base64 import b64decode, b64encode
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -18,15 +19,13 @@ from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
 
+import smart_open
 import structlog
-from smart_open import open
 
-from meltano.core.job_state import JobState
-from meltano.core.state_store.base import StateStoreManager
-from meltano.core.utils import remove_suffix
+from meltano.core.state_store.base import MeltanoState, StateStoreManager
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator, Iterable, Iterator
     from io import TextIOWrapper
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -41,7 +40,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
 
     delimiter = "/"
 
-    def __init__(self, uri: str, lock_timeout_seconds: int, **kwargs):  # noqa: ANN003
+    def __init__(self, uri: str, lock_timeout_seconds: int, **kwargs: t.Any) -> None:
         """Initialize the BaseFilesystemStateStoreManager.
 
         Args:
@@ -69,7 +68,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             lambda comp1, comp2: f"{comp1}{comp2}"
             if (comp1.endswith(self.delimiter) or comp2.startswith(self.delimiter))
             else f"{comp1}{self.delimiter}{comp2}",
-            components,
+            filter(None, components),
         )
 
     @staticmethod
@@ -82,6 +81,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``.
+
+        Returns:
+            The default transport params for filesystem-based backends.
+        """
+        return {}
+
     def uri_with_path(self, path: str) -> str:
         """Build uri with the given path included.
 
@@ -91,7 +99,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Returns:
             Full URI with path included
         """
-        return self.join_path(remove_suffix(self.uri, (self.state_dir)), path)
+        return self.join_path(self.uri.removesuffix(self.state_dir), path)
 
     @contextmanager
     def get_reader(self, path: str) -> Iterator[TextIOWrapper]:
@@ -103,17 +111,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Yields:
             A TextIOWrapper to read the file/blob.
         """
-        if self.client:
-            with open(
-                self.uri_with_path(path),
-                transport_params={"client": self.client},
-            ) as reader:
-                yield reader
-        else:
-            with open(
-                self.uri_with_path(path),
-            ) as reader:
-                yield reader
+        transport_params = {"client": self.client} if self.client else {}
+        transport_params.update(self.extra_transport_params)
+        with smart_open.open(
+            self.uri_with_path(path),
+            "r",
+            transport_params=transport_params,
+        ) as reader:
+            yield reader
 
     @contextmanager
     def get_writer(self, path: str) -> Iterator[TextIOWrapper]:
@@ -125,30 +130,34 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Yields:
             A TextIOWrapper to read the file/blob.
         """
+        transport_params = {"client": self.client} if self.client else {}
+        transport_params.update(self.extra_transport_params)
         try:
-            with open(
+            with smart_open.open(
                 self.uri_with_path(path),
                 "w+",
-                transport_params={"client": self.client} if self.client else {},
+                transport_params=transport_params,
             ) as writer:
                 yield writer
         except NotImplementedError:
-            with open(
+            with smart_open.open(
                 self.uri_with_path(path),
                 "w",
-                transport_params={"client": self.client} if self.client else {},
+                transport_params=transport_params,
             ) as writer:
                 yield writer
 
-    @abstractproperty
-    def client(self):  # noqa: ANN201
+    @property
+    @abstractmethod
+    def client(self) -> t.Any:  # noqa: ANN401
         """Get a client for performing fs operations.
 
         Used for cloud backends, particularly in deleting and listing blobs.
         """
         ...
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def state_dir(self) -> str:
         """Get the path (either filepath or prefix) that state should be stored at."""
         ...
@@ -221,13 +230,13 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                     float(reader.read()),
                     tz=timezone.utc,
                 )
-                if locked_at and locked_at < (
+                if locked_at < (
                     datetime.now(timezone.utc)
                     - timedelta(
                         seconds=self.lock_timeout_seconds,
                     )
                 ):
-                    self.delete(lock_path)
+                    self.delete_file(lock_path)
                     return False
                 return True
         except Exception as e:
@@ -246,7 +255,12 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
 
     @contextmanager
-    def acquire_lock(self, state_id: str, retry_seconds: int = 1) -> Iterator[None]:
+    def acquire_lock(
+        self,
+        state_id: str,
+        *,
+        retry_seconds: int,
+    ) -> Generator[None, None, None]:
         """Context manager for locking state_id during reads and writes.
 
         Args:
@@ -266,10 +280,10 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                 writer.write(str(datetime.now(timezone.utc).timestamp()))
             yield
         finally:
-            self.delete(lock_path)
+            self.delete_file(lock_path)
 
     @abstractmethod
-    def get_state_ids(self, pattern: str | None = None) -> list[str]:
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -280,7 +294,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
-    def get(self, state_id: str) -> JobState | None:
+    def get(self, state_id: str) -> MeltanoState | None:
         """Get current state for the given state_id.
 
         Args:
@@ -292,18 +306,17 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Reading state from {self.label}")  # noqa: G004
-        with self.acquire_lock(state_id):
-            try:
-                with self.get_reader(self.get_state_path(state_id)) as reader:
-                    return JobState.from_file(state_id, reader)
-            except Exception as e:
-                if self.is_file_not_found_error(e):
-                    logger.info(f"No state found for {state_id}.")  # noqa: G004
-                    return None
-                raise e
+        logger.info("Reading state from %s", self.label)
+        try:
+            with self.get_reader(self.get_state_path(state_id)) as reader:
+                return MeltanoState.from_file(state_id, reader)
+        except Exception as e:
+            if self.is_file_not_found_error(e):
+                logger.info("No state found for %s.", state_id)
+                return None
+            raise e
 
-    def set(self, state: JobState) -> None:
+    def set(self, state: MeltanoState) -> None:
         """Set state for the given state_id.
 
         Args:
@@ -312,30 +325,12 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Writing state to {self.label}")  # noqa: G004
-        filepath = self.get_state_path(state.state_id)
-        with self.acquire_lock(state.state_id):
-            if state.is_complete():
-                state_to_write = state
-            else:
-                try:
-                    with self.get_reader(filepath) as current_state_reader:
-                        current_state = JobState.from_file(
-                            state.state_id,
-                            current_state_reader,
-                        )
-                        current_state.merge_partial(state)
-                        state_to_write = current_state
-                except Exception as e:
-                    if self.is_file_not_found_error(e):
-                        state_to_write = state
-                    else:
-                        raise e
-            with self.get_writer(filepath) as writer:
-                writer.write(state_to_write.json())
+        logger.info("Writing state to %s", self.label)
+        with self.get_writer(self.get_state_path(state.state_id)) as writer:
+            writer.write(state.json())
 
     @abstractmethod
-    def delete(self, file_or_dir_path: str):  # noqa: ANN201
+    def delete_file(self, file_or_dir_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path.
 
         Args:
@@ -343,22 +338,21 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
-    def clear(self, state_id: str) -> None:
+    def delete(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
             state_id: the state_id to clear state for.
         """
-        with self.acquire_lock(state_id):
-            self.delete(self.get_state_path(state_id))
+        self.delete_file(self.get_state_path(state_id))
 
 
-class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
+class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
     label: str = "Local Filesystem"
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+    def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
         Args:
@@ -420,7 +414,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -441,7 +435,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
             )
         ]
 
-    def delete(self, file_or_dir_path: str) -> None:
+    def delete_file(self, file_or_dir_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path, if it exists.
 
         Args:
@@ -458,23 +452,23 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
             if not self.is_file_not_found_error(e):
                 raise e
 
-    def clear(self, state_id: str) -> None:
+    def delete(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
             state_id: the state_id to clear state for.
         """
-        super().clear(state_id)
+        super().delete(state_id)
         shutil.rmtree(self.get_state_dir(state_id))
 
 
-class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
+class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
     """State backend for local Windows filesystem."""
 
     label: str = "Local Windows Filesystem"
     delimiter = "\\"
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+    def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
         Args:
@@ -501,7 +495,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             else self.join_path(self.state_dir, state_id)
         )
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> set[str]:
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -527,10 +521,18 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
         return state_ids
 
 
+LocalFilesystemStateStoreManager: type[BaseFilesystemStateStoreManager]
+
+if "Windows" in platform.system():
+    LocalFilesystemStateStoreManager = _WindowsFilesystemStateStoreManager
+else:
+    LocalFilesystemStateStoreManager = _LocalFilesystemStateStoreManager
+
+
 class CloudStateStoreManager(BaseFilesystemStateStoreManager):
     """Base class for cloud storage state store managers."""
 
-    def __init__(self, prefix: str | None = None, **kwargs):  # noqa: ANN003
+    def __init__(self, prefix: str | None = None, **kwargs: t.Any) -> None:
         """Initialize the CloudStateStoreManager.
 
         Args:
@@ -558,7 +560,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             Full URI with path included
         """
-        return self.join_path(remove_suffix(self.uri, self.prefix), path)
+        return self.join_path(self.uri.removesuffix(self.prefix), path)
 
     @abstractmethod
     def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
@@ -582,7 +584,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         """
         ...
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> list[str]:
         """Get list of state_ids stored in the backend.
 
         Args:

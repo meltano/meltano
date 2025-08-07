@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import errno
+import importlib.metadata
 import os
 import sys
 import threading
@@ -31,16 +32,12 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import makedirs, sanitize_filename, truthy
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from meltano.core._types import StrPath
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
     from meltano.core.plugin.base import PluginRef
 
-    if sys.version_info < (3, 10):
-        from typing import TypeAlias  # noqa: ICN003
-    else:
-        from typing_extensions import TypeAlias
-
-
-StrPath: TypeAlias = t.Union[str, os.PathLike]
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -49,9 +46,10 @@ PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_ENVIRONMENT_ENV = "MELTANO_ENVIRONMENT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 PROJECT_SYS_DIR_ROOT_ENV = "MELTANO_SYS_DIR_ROOT"
+MELTANO_USER_AGENT_ENV = "MELTANO_USER_AGENT"
 
 
-def walk_parent_directories() -> t.Generator[Path, None, None]:
+def walk_parent_directories() -> Generator[Path, None, None]:
     """Yield each directory starting with the current up to the root.
 
     Yields:
@@ -74,7 +72,7 @@ class Project(Versioned):
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
-    _default = None
+    _default: t.ClassVar[Project | None] = None
 
     def __init__(
         self,
@@ -97,7 +95,7 @@ class Project(Versioned):
             os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
 
-    def refresh(self, **kwargs) -> None:  # noqa: ANN003
+    def refresh(self, **kwargs: t.Any) -> None:
         """Refresh the project instance to reflect external changes.
 
         This should be called whenever env vars change, project files change,
@@ -126,7 +124,7 @@ class Project(Versioned):
         self.__dict__.update(cls(**kwargs).__dict__)
 
     @cached_property
-    def config_service(self):  # noqa: ANN201
+    def config_service(self) -> ConfigService:
         """Get the project config service.
 
         Returns:
@@ -144,7 +142,7 @@ class Project(Versioned):
         return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
     @cached_property
-    def settings(self):  # noqa: ANN201
+    def settings(self) -> ProjectSettingsService:
         """Get the project settings.
 
         Returns:
@@ -153,7 +151,7 @@ class Project(Versioned):
         return ProjectSettingsService(self)
 
     @cached_property
-    def plugins(self):  # noqa: ANN201
+    def plugins(self) -> ProjectPluginsService:
         """Get the project plugins.
 
         Returns:
@@ -162,7 +160,7 @@ class Project(Versioned):
         return ProjectPluginsService(self)
 
     @cached_property
-    def hub_service(self):  # noqa: ANN201
+    def hub_service(self) -> MeltanoHubService:
         """Get the Meltano Hub service.
 
         Returns:
@@ -171,11 +169,20 @@ class Project(Versioned):
         return MeltanoHubService(self)
 
     @cached_property
-    def _meltano_interprocess_lock(self):  # noqa: ANN202
+    def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
         return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
 
+    @cached_property
+    def user_agent(self) -> str:
+        """Get the user agent for this project.
+
+        Returns:
+            the user agent string for this project
+        """
+        return f"Meltano/{importlib.metadata.version('meltano')}"
+
     @property
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str]:
         """Get environment variables for this project.
 
         Returns:
@@ -186,6 +193,7 @@ class Project(Versioned):
             PROJECT_ROOT_ENV: str(self.root),
             PROJECT_ENVIRONMENT_ENV: environment_name,
             PROJECT_SYS_DIR_ROOT_ENV: str(self.sys_dir_root),
+            MELTANO_USER_AGENT_ENV: self.user_agent,
         }
 
     @classmethod
@@ -248,7 +256,7 @@ class Project(Versioned):
         cls._default = None
 
     @property
-    def file_version(self):  # noqa: ANN201
+    def file_version(self) -> int:
         """Get the version of Meltano found in this project's meltano.yml.
 
         Returns:
@@ -258,7 +266,12 @@ class Project(Versioned):
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Path | str | None = None, *, activate=True):  # noqa: ANN001, ANN206
+    def find(
+        cls,
+        project_root: Path | str | None = None,
+        *,
+        activate: bool = True,
+    ) -> Project:
         """Find a Project.
 
         Args:
@@ -322,7 +335,7 @@ class Project(Versioned):
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
-    def meltano_update(self):  # noqa: ANN201
+    def meltano_update(self) -> Generator[MeltanoFileTypeHint, None, None]:
         """Yield the current meltano configuration.
 
         Update the meltanofile if the context ends gracefully.
@@ -343,8 +356,8 @@ class Project(Versioned):
             meltano_config = MeltanoFile.parse(self.project_files.load())
             yield meltano_config
             try:
-                self.project_files.update(meltano_config.canonical())
-            except Exception as err:
+                self.project_files.update(meltano_config.canonical())  # type: ignore[arg-type]
+            except Exception as err:  # pragma: no cover
                 logger.critical("Could not update meltano.yml: %s", err)
                 raise
 
@@ -406,7 +419,7 @@ class Project(Versioned):
             self.refresh(environment=None)
 
     @contextmanager
-    def dotenv_update(self):  # noqa: ANN201
+    def dotenv_update(self) -> Generator[Path, None, None]:
         """Raise error if project is readonly.
 
         Used in context where .env files would be updated.
@@ -502,7 +515,12 @@ class Project(Versioned):
         return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, state_id, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ANN001
+    def job_dir(
+        self,
+        state_id: str,
+        *joinpaths: StrPath,
+        make_dirs: bool = True,
+    ) -> Path:
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
@@ -523,7 +541,7 @@ class Project(Versioned):
     @makedirs
     def job_logs_dir(
         self,
-        state_id,  # noqa: ANN001
+        state_id: str,
         *joinpaths: StrPath,
         make_dirs: bool = True,
     ) -> Path:
@@ -582,14 +600,14 @@ class Project(Versioned):
         return self.root_dir("plugins", *joinpaths)
 
     @makedirs
-    def plugin_lock_path(  # noqa: ANN201
+    def plugin_lock_path(
         self,
         plugin_type: str,
         plugin_name: str,
         *,
         variant_name: str | None = None,
         make_dirs: bool = True,
-    ):
+    ) -> Path:
         """Path to the project lock file.
 
         Args:
@@ -612,7 +630,7 @@ class Project(Versioned):
             make_dirs=make_dirs,
         )
 
-    def __eq__(self, other):  # noqa: ANN001, ANN204
+    def __eq__(self, other: object) -> bool:
         """Project equivalence check.
 
         Args:
@@ -623,7 +641,7 @@ class Project(Versioned):
         """
         return self.root == getattr(other, "root", object())
 
-    def __hash__(self):  # noqa: ANN204
+    def __hash__(self) -> int:
         """Project hash.
 
         Returns:

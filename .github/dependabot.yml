@@ -1,4 +1,5 @@
 version: 2
+enable-beta-ecosystems: true
 updates:
   - package-ecosystem: pip
     directory: "/.github/workflows"
@@ -7,8 +8,7 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
-    labels: [deps]
+    labels: [dependencies]
     groups:
       default:
         update-types:
@@ -23,24 +23,22 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
-    labels: [deps]
+    labels: [dependencies]
     groups:
       actions:
         patterns:
           - "*"
     commit-message:
       prefix: "ci: "
-  - package-ecosystem: pip
-    versioning-strategy: increase
+  - package-ecosystem: uv
+    versioning-strategy: increase-if-necessary
     directory: "/"
     schedule:
       interval: weekly
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
-    labels: [deps]
+    labels: [dependencies]
     groups:
       development-dependencies:
         dependency-type: development
@@ -60,8 +58,7 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
-    labels: [deps]
+    labels: [dependencies]
     groups:
       development-dependencies:
         dependency-type: development
@@ -73,3 +70,9 @@ updates:
     commit-message:
       prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
+  - package-ecosystem: "docker-compose"
+    directory: "tests/fixtures/docker/"
+    schedule:
+      interval: "monthly"
+      time: "12:00"
+      timezone: "Etc/UTC"

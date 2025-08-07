@@ -16,6 +16,8 @@ from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from . import PluginType, SingerPlugin
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin_invoker import PluginInvoker
@@ -31,15 +33,15 @@ class BookmarkWriter:
 
     def __init__(
         self,
-        job: Job,
+        job: Job | None,
         session: Session,
-        payload_flag: int = Payload.STATE,
+        payload_flag: Payload = Payload.STATE,
         state_service: StateService | None = None,
     ):
         """Initialize the `BookmarkWriter`.
 
         Args:
-            job: meltano elt job associated with this invocation and whose
+            job: meltano el or meltano elt job associated with this invocation and whose
                 state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: A payload flag.
@@ -70,22 +72,28 @@ class BookmarkWriter:
             logger.warning(
                 "Received state is invalid, incremental state has not been updated",
             )
+            return
 
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
-        job.payload_flags |= self.payload_flag
+        job.payload_flags = Payload(max(self.payload_flag, job.payload_flags))
+
         try:
             job.save(self.session)
+        except Exception as e:  # pragma: no cover
+            logger.warning("Failed to persist job to the system database: %s", e)
+
+        try:
             self.state_service.add_state(
                 job,
                 json.dumps(job.payload),
                 job.payload_flags,
             )
         except Exception:  # pragma: no cover
-            logger.debug("Failed to persist state", exc_info=True)
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated",
+                "incremental state has not been updated: %s",
+                exc_info=True,
             )
         else:
             logger.info(
@@ -103,7 +111,7 @@ class SingerTarget(SingerPlugin):
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 
-    def exec_args(self, plugin_invoker):  # noqa: ANN001, ANN201
+    def exec_args(self, plugin_invoker: PluginInvoker) -> list[str | Path]:
         """Get command-line args to pass to the plugin.
 
         Args:
@@ -115,16 +123,20 @@ class SingerTarget(SingerPlugin):
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, str]:
         """Get config files for this target.
 
         Returns:
             The config_files for this target.
         """
-        return {"config": f"target.{self.instance_uuid}.config.json"}
+        return {
+            "config": f"target.{self.instance_uuid}.config.json",
+            "singer_sdk_logging": "target.singer_sdk_logging.json",
+            "pipelinewise_singer_logging": "target.pipelinewise_logging.conf",
+        }
 
     @property
-    def output_files(self):  # noqa: ANN201
+    def output_files(self) -> dict[str, str]:
         """Get output files for this target.
 
         Returns:
@@ -136,7 +148,7 @@ class SingerTarget(SingerPlugin):
     async def setup_bookmark_writer_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: list[str],
+        exec_args: list[str] | None,
     ) -> None:
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
@@ -144,8 +156,7 @@ class SingerTarget(SingerPlugin):
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
-        if exec_args is None:
-            exec_args = []
+        exec_args = exec_args or []
 
         if "--discover" in exec_args or "--help" in exec_args:
             return
@@ -171,10 +182,11 @@ class SingerTarget(SingerPlugin):
         if not elt_context or not elt_context.job or not elt_context.session:
             return
 
-        incomplete_state = (
-            elt_context.full_refresh and elt_context.select_filter
-        ) or elt_context.merge_state
-        payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
+        payload_flag = (
+            Payload.INCOMPLETE_STATE
+            if elt_context.should_merge_states()
+            else Payload.STATE
+        )
 
         plugin_invoker.add_output_handler(
             plugin_invoker.StdioSource.STDOUT,

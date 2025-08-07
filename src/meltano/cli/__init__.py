@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import typing as t
+import warnings
 
 import structlog
 
@@ -25,7 +27,7 @@ from meltano.cli import (
     run,
     schedule,
     schema,
-    select,
+    select_entities,
     state,
     upgrade,
     validate,
@@ -55,7 +57,7 @@ cli.add_command(lock.lock)
 cli.add_command(remove.remove)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
-cli.add_command(select.select)
+cli.add_command(select_entities.select)
 cli.add_command(state.meltano_state)
 cli.add_command(upgrade.upgrade)
 cli.add_command(run.run)
@@ -64,7 +66,7 @@ cli.add_command(job.job)
 
 # Holds the exit code for error reporting during process exiting. In
 # particular, a function registered by the `atexit` module uses this value.
-exit_code: None | int = None
+exit_code: int | None = None
 
 atexit_handler_registered = False
 exit_code_reported = False
@@ -75,7 +77,7 @@ setup_logging()
 logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to
+Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to \
 join our friendly Slack community.
 """
 
@@ -119,6 +121,8 @@ def _run_cli() -> None:
 def main() -> None:
     """Entry point for the meltano CLI."""
     # Mark the current process as executed via the CLI
+    logging.captureWarnings(capture=True)
+    warnings.filterwarnings("once", category=DeprecationWarning)
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
     try:
         _run_cli()

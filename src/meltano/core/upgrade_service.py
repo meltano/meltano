@@ -3,24 +3,68 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
+import pathlib
 import subprocess
 import sys
 import typing as t
+from importlib.metadata import distribution
 
 import click
 
-import meltano
 from meltano.core.error import MeltanoError
 from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_plugins_service import PluginType
 from meltano.core.state_service import StateService
-from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
     from sqlalchemy.engine import Engine
 
     from meltano.core.project import Project
+
+
+def _get_pep610_data() -> dict[str, t.Any] | None:
+    dist = distribution("meltano")
+    if contents := dist.read_text("direct_url.json"):
+        return json.loads(contents)
+
+    return None
+
+
+def _check_editable_installation(*, force: bool) -> None:
+    if (pep610_data := _get_pep610_data()) is None:
+        return
+    url: str | None = pep610_data.get("url")
+    dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
+    if (  # pragma: no branch
+        url and dir_info and dir_info.get("editable", False) and not force
+    ):
+        meltano_dir = url.removeprefix("file://")
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed from source",
+            instructions=f"navigate to `{meltano_dir}` and run `git pull`",
+        )
+
+
+def _check_docker_installation() -> None:
+    if pathlib.Path("/.dockerenv").exists():
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed inside Docker",
+            instructions=(
+                "pull the latest Docker image using "
+                "`docker pull meltano/meltano` and recreate any containers "
+                "you may have created"
+            ),
+        )
+
+
+def _check_in_nox_session() -> None:
+    if os.getenv("NOX_CURRENT_SESSION"):  # pragma: no branch
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed inside a Nox session",
+            instructions="",
+        )
 
 
 class UpgradeError(Exception):
@@ -34,7 +78,7 @@ class AutomaticPackageUpgradeError(Exception):
         """Initialize the `AutomaticPackageUpgradeError`.
 
         Args:
-            reason: The reason the exception occured.
+            reason: The reason the exception occurred.
             instructions: Instructions for how to manually resolve the exception.
         """
         self.reason = reason
@@ -55,33 +99,9 @@ class UpgradeService:
         self.engine = engine
 
     def _upgrade_package(self, pip_url: str | None, *, force: bool) -> bool:
-        fail_reason = None
-        instructions = ""
-
-        meltano_file_path = "/src/meltano/__init__.py"
-        editable = meltano.__file__.endswith(meltano_file_path)
-        if editable and not force:
-            meltano_dir = meltano.__file__[: -len(meltano_file_path)]
-            fail_reason = "it is installed from source"
-            instructions = f"navigate to `{meltano_dir}` and run `git pull`"
-
-        elif os.path.exists("/.dockerenv"):  # noqa: PTH110
-            fail_reason = "it is installed inside Docker"
-            instructions = (
-                "pull the latest Docker image using "
-                "`docker pull meltano/meltano` and recreate any containers "
-                "you may have created"
-            )
-
-        elif os.getenv("NOX_CURRENT_SESSION") == "tests":
-            fail_reason = "it is installed inside a Nox test session"
-            instructions = ""
-
-        if fail_reason:
-            raise AutomaticPackageUpgradeError(
-                reason=fail_reason,
-                instructions=instructions,
-            )
+        _check_editable_installation(force=force)
+        _check_docker_installation()
+        _check_in_nox_session()
 
         pip_url = pip_url or "meltano"
         run = subprocess.run(
@@ -172,6 +192,8 @@ class UpgradeService:
 
         See: https://github.com/meltano/meltano/issues/7938
         """
+        from meltano.core.state_store.filesystem import CloudStateStoreManager
+
         state_service = StateService(project=self.project)
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):

@@ -2,16 +2,21 @@
 
 from __future__ import annotations
 
-import json
-import os
-import subprocess
+import logging
 import typing as t
-from urllib.request import urlopen
 
-import backoff
 import pytest
+import urllib3
+from urllib3.util.retry import Retry
 
 from meltano.core.project_settings_service import ProjectSettingsService
+
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from pytest_docker.plugin import Services
+
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class SnowplowMicro:
@@ -27,10 +32,19 @@ class SnowplowMicro:
         self.url = f"{collector_endpoint}/micro"
         self.all()  # Wait until a connection is established
 
-    @backoff.on_exception(backoff.expo, ConnectionError, max_tries=5)
     def get(self, endpoint: str) -> t.Any:
-        with urlopen(f"{self.url}/{endpoint}") as response:
-            return json.load(response)
+        retries = Retry(total=5, backoff_factor=0.5)
+        with urllib3.PoolManager(retries=retries) as http:
+            return http.request("GET", f"{self.url}/{endpoint}").json()
+
+    def ping(self) -> bool:
+        """Ping the Snowplow Micro service."""
+        try:
+            self.get("all")
+        except Exception:  # pragma: no cover
+            return False
+
+        return True
 
     def all(self) -> dict[str, int]:
         """Get a dict counting the # of good/bad events, and the total # of events."""
@@ -50,7 +64,9 @@ class SnowplowMicro:
 
 
 @pytest.fixture(scope="session")
-def snowplow_session(request) -> SnowplowMicro | None:
+def snowplow_session(
+    request: pytest.FixtureRequest,
+) -> Generator[SnowplowMicro | None, None, None]:
     """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance.
 
     The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to
@@ -65,21 +81,28 @@ def snowplow_session(request) -> SnowplowMicro | None:
     try:
         # Getting the `docker_services` fixture essentially causes
         # `docker-compose up` to be run
-        request.getfixturevalue("docker_services")
-        args = ("docker", "port", f"pytest{os.getpid()}-snowplow-1")
-        proc = subprocess.run(args, capture_output=True, text=True)
-        address_and_port = proc.stdout.strip().split(" -> ")[1]
-        collector_endpoint = f"http://{address_and_port}"
+        services: Services = request.getfixturevalue("docker_services")
+        docker_ip: str = request.getfixturevalue("docker_ip")
+        port = services.port_for("snowplow", 9090)
+        collector_endpoint = f"http://{docker_ip}:{port}"
+
+        client = SnowplowMicro(collector_endpoint)
+        services.wait_until_responsive(
+            timeout=30,
+            pause=0.1,
+            check=client.ping,
+        )
         yield SnowplowMicro(collector_endpoint)
     except Exception:  # pragma: no cover
+        logger.exception("Failed to start Snowplow Micro")
         yield None
 
 
-@pytest.fixture()
+@pytest.fixture
 def snowplow_optional(
     snowplow_session: SnowplowMicro | None,
     monkeypatch,
-) -> SnowplowMicro | None:
+) -> Generator[SnowplowMicro | None, None, None]:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the
@@ -90,25 +113,26 @@ def snowplow_optional(
     """
     if snowplow_session is None:  # pragma: no cover
         yield None
-    else:
-        if isinstance(ProjectSettingsService.config_override, dict):
-            monkeypatch.delitem(
-                ProjectSettingsService.config_override,
-                "send_anonymous_usage_stats",
-                raising=False,
-            )
-        monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
-        monkeypatch.setenv(
-            "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS",
-            f'["{snowplow_session.collector_endpoint}"]',
+        return
+
+    if isinstance(ProjectSettingsService.config_override, dict):  # pragma: no branch
+        monkeypatch.delitem(
+            ProjectSettingsService.config_override,
+            "send_anonymous_usage_stats",
+            raising=False,
         )
-        try:
-            yield snowplow_session
-        finally:
-            snowplow_session.reset()
+    monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
+    monkeypatch.setenv(
+        "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS",
+        f'["{snowplow_session.collector_endpoint}"]',
+    )
+    try:
+        yield snowplow_session
+    finally:
+        snowplow_session.reset()
 
 
-@pytest.fixture()
+@pytest.fixture
 def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     """Provide a clean `SnowplowMicro` instance.
 

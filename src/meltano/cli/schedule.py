@@ -7,7 +7,6 @@ import sys
 import typing as t
 
 import click
-from croniter import croniter
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -17,7 +16,12 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.schedule import CRON_INTERVALS
+from meltano.core.schedule import (
+    CRON_INTERVALS,
+    ELTSchedule,
+    JobSchedule,
+    is_valid_cron,
+)
 from meltano.core.schedule_service import (
     BadCronError,
     ScheduleAlreadyExistsError,
@@ -44,7 +48,7 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def schedule(project, ctx) -> None:  # noqa: ANN001
+def schedule(project: Project, ctx: click.Context) -> None:
     """Manage pipeline schedules.
 
     \b
@@ -89,7 +93,7 @@ def _add_elt(
         session.close()
 
 
-def _add_job(ctx, name: str, job: str, interval: str) -> None:  # noqa: ANN001
+def _add_job(ctx: click.Context, name: str, job: str, interval: str) -> None:
     """Add a new scheduled job."""
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -112,9 +116,9 @@ class CronParam(click.ParamType):
 
     name = "cron"
 
-    def convert(self, value, *_):  # noqa: ANN001, ANN201
+    def convert(self, value: str, *_) -> str:
         """Validate and con interval."""
-        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+        if value not in CRON_INTERVALS and not is_valid_cron(value):
             raise BadCronError(value)
 
         return value
@@ -187,7 +191,7 @@ def add(
     _add_job(ctx, name, job, interval)
 
 
-def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
+def _format_job_list_output(entry: JobSchedule, job: TaskSets) -> dict:
     return {
         "name": entry.name,
         "interval": entry.interval,
@@ -200,14 +204,14 @@ def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
     }
 
 
-def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
+def _format_elt_list_output(entry: ELTSchedule, session: Session) -> dict:
     start_date = coerce_datetime(entry.start_date)
     start_date_str = start_date.date().isoformat() if start_date else None
 
     last_successful_run = entry.last_successful_run(session)
     last_successful_run_ended_at = (
         last_successful_run.ended_at.isoformat()
-        if last_successful_run.ended_at
+        if last_successful_run and last_successful_run.ended_at
         else None
     )
 
@@ -256,35 +260,43 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:
             }
 
             for txt_schedule in schedule_service.schedules():
-                if txt_schedule.job:
+                if isinstance(txt_schedule, JobSchedule):
                     click.echo(
                         f"[{txt_schedule.interval}] job {txt_schedule.name}: "
                         f"{txt_schedule.job} → "
                         f"{task_sets_service.get(txt_schedule.job).tasks}",
                     )
-                else:
-                    markers = transform_elt_markers[txt_schedule.transform]  # type: ignore[index]
+                elif isinstance(txt_schedule, ELTSchedule):
+                    markers = transform_elt_markers[txt_schedule.transform]
                     click.echo(
                         f"[{txt_schedule.interval}] elt {txt_schedule.name}: "
                         f"{txt_schedule.extractor} {markers[0]} "
                         f"{txt_schedule.loader} {markers[1]} transforms",
                     )
+                else:  # pragma: no cover
+                    msg = f"Invalid schedule type: {type(txt_schedule)}"
+                    raise ValueError(msg)
 
         elif list_format == "json":
             job_schedules = []
             elt_schedules = []
             for json_schedule in schedule_service.schedules():
-                if json_schedule.job:
+                # if json_schedule.job:
+                if isinstance(json_schedule, JobSchedule):
                     job_schedules.append(
                         _format_job_list_output(
                             json_schedule,
                             task_sets_service.get(json_schedule.job),
                         ),
                     )
-                else:
+                elif isinstance(json_schedule, ELTSchedule):
                     elt_schedules.append(
                         _format_elt_list_output(json_schedule, session),
                     )
+                else:  # pragma: no cover
+                    msg = f"Invalid schedule type: {type(json_schedule)}"
+                    raise ValueError(msg)
+
             click.echo(
                 json.dumps(
                     {"schedules": {"job": job_schedules, "elt": elt_schedules}},
@@ -318,7 +330,7 @@ def run(ctx: click.Context, name: str, elt_options: tuple[str]) -> None:
 )
 @click.argument("name", required=True)
 @click.pass_context
-def remove(ctx, name) -> None:  # noqa: ANN001
+def remove(ctx: click.Context, name: str) -> None:
     """Remove a schedule.
 
     Usage:
@@ -328,7 +340,7 @@ def remove(ctx, name) -> None:  # noqa: ANN001
 
 
 def _update_job_schedule(
-    candidate: Schedule,
+    candidate: JobSchedule,
     job: str | None,
     interval: str | None = None,
 ) -> Schedule:
@@ -345,11 +357,6 @@ def _update_job_schedule(
     Returns:
         The updated schedule.
     """
-    if not candidate.job:
-        raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with job only flags as "  # noqa: EM102
-            "its a elt schedule",
-        )
     if job:
         candidate.job = job
     if interval:
@@ -358,7 +365,7 @@ def _update_job_schedule(
 
 
 def _update_elt_schedule(
-    candidate: Schedule,
+    candidate: ELTSchedule,
     extractor: str | None,
     loader: str | None,
     transform: str | None,
@@ -379,12 +386,6 @@ def _update_elt_schedule(
     Returns:
         The updated schedule.
     """
-    if candidate.job:
-        raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with elt only flags as "  # noqa: EM102
-            "its a scheduled job",
-        )
-
     if extractor:
         candidate.extractor = extractor
     if loader:
@@ -437,13 +438,13 @@ def set_cmd(
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     candidate = schedule_service.find_schedule(name)
 
-    if candidate.job:
+    if isinstance(candidate, JobSchedule):
         if extractor or loader or transform:
             raise click.ClickException(
                 "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
             )
         updated = _update_job_schedule(candidate, job, interval)
-    else:
+    elif isinstance(candidate, ELTSchedule):
         if job:
             raise click.ClickException(
                 "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
@@ -455,6 +456,9 @@ def set_cmd(
             transform,
             interval,
         )
+    else:  # pragma: no cover
+        msg = f"Invalid schedule type: {type(candidate)}"
+        raise ValueError(msg)
 
     schedule_service.update_schedule(updated)
     click.echo(f"Updated schedule '{name}'")

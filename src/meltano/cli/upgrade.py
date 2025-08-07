@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import typing as t
 
 import click
 
@@ -11,6 +12,9 @@ from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 @click.group(
@@ -21,7 +25,7 @@ from meltano.core.upgrade_service import UpgradeService
 )
 @pass_project()
 @click.pass_context
-def upgrade(ctx, project) -> None:  # noqa: ANN001
+def upgrade(ctx: click.Context, project: Project) -> None:
     """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
@@ -63,7 +67,7 @@ def upgrade(ctx, project) -> None:  # noqa: ANN001
     help="Skip updating the Meltano package.",
 )
 @click.pass_context
-def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
+def all_(ctx: click.Context, pip_url: str, force: bool, skip_package: bool) -> None:  # noqa: FBT001
     """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
@@ -75,7 +79,7 @@ def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """  # noqa: D301
-    upgrade_service = ctx.obj["upgrade_service"]
+    upgrade_service: UpgradeService = ctx.obj["upgrade_service"]
 
     if skip_package:
         upgrade_service.update_files()
@@ -128,7 +132,7 @@ def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
     help="Force upgrade.",
 )
 @click.pass_context
-def package(ctx, **kwargs) -> None:  # noqa: ANN001, ANN003
+def package(ctx: click.Context, **kwargs: t.Any) -> None:
     """Upgrade the Meltano package only."""
     ctx.obj["upgrade_service"].upgrade_package(**kwargs)
 
@@ -138,7 +142,7 @@ def package(ctx, **kwargs) -> None:  # noqa: ANN001, ANN003
     short_help="Update files managed by file bundles only.",
 )
 @click.pass_context
-def files(ctx) -> None:  # noqa: ANN001
+def files(ctx: click.Context) -> None:
     """Update files managed by file bundles only."""
     ctx.obj["upgrade_service"].update_files()
 
@@ -148,6 +152,6 @@ def files(ctx) -> None:  # noqa: ANN001
     short_help="Apply migrations to system database only.",
 )
 @click.pass_context
-def database(ctx) -> None:  # noqa: ANN001
+def database(ctx: click.Context) -> None:
     """Apply migrations to system database only."""
     ctx.obj["upgrade_service"].migrate_database()

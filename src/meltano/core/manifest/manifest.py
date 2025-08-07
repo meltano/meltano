@@ -7,18 +7,20 @@ import re
 import subprocess
 import typing as t
 from collections import defaultdict
+from collections.abc import Mapping
 from contextlib import suppress
 from functools import cached_property, reduce
+from importlib import resources
 from operator import getitem
-from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import flatten_dict
 import structlog
 import yaml
 
-from meltano import __file__ as package_root_path
+from meltano import schemas
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
+from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_lock_service import PluginLock
 from meltano.core.utils import (
@@ -32,9 +34,9 @@ from meltano.core.utils import (
 
 if t.TYPE_CHECKING:
     import sys
-    from collections.abc import Iterable
+    from collections.abc import Iterable, MutableMapping
+    from pathlib import Path
 
-    from meltano.core.plugin.base import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -56,13 +58,11 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
-MANIFEST_SCHEMA_PATH = (
-    Path(package_root_path).parent / "schemas" / "meltano.schema.json"
-)
+MANIFEST_SCHEMA_PATH = resources.files(schemas) / "meltano.schema.json"
 
-Trie: TypeAlias = t.Dict[str, "Trie"]
-PluginsByType: TypeAlias = t.Mapping[str, t.List[t.Mapping[str, t.Any]]]
-PluginsByNameByType: TypeAlias = t.Mapping[str, t.Mapping[str, t.Mapping[str, t.Any]]]
+Trie: TypeAlias = dict[str, "Trie"]
+PluginsByType: TypeAlias = Mapping[str, list[Mapping[str, t.Any]]]
+PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, t.Any]]]
 
 
 # Ruamel doesn't have this problem where YAML tags like timestamps are
@@ -193,18 +193,12 @@ class Manifest:
             deep_merge(
                 yaml.load(
                     self._meltano_file,
-                    t.cast(  # noqa: S506
-                        t.Type[yaml.SafeLoader],
-                        YamlNoTimestampSafeLoader,
-                    ),
+                    t.cast("type[yaml.SafeLoader]", YamlNoTimestampSafeLoader),  # noqa: S506
                 ),
                 *(
                     yaml.load(
                         x.read_text(),
-                        t.cast(  # noqa: S506
-                            t.Type[yaml.SafeLoader],
-                            YamlNoTimestampSafeLoader,
-                        ),
+                        t.cast("type[yaml.SafeLoader]", YamlNoTimestampSafeLoader),  # noqa: S506
                     )
                     for x in self.project.project_files.include_paths
                 ),
@@ -225,7 +219,7 @@ class Manifest:
         manifest: dict[str, t.Any],
     ) -> None:
         locked_plugins = t.cast(
-            t.Dict[str, t.List[t.Mapping[str, t.Any]]],
+            "dict[str, list[Mapping[str, t.Any]]]",
             {
                 plugin_type.value: [
                     PluginLock(self.project, plugin).load(create=True, loader=json.load)
@@ -241,7 +235,7 @@ class Manifest:
             _plugins_by_name_by_type(locked_plugins),
         )
 
-    def sanitize_env_vars(self, env: t.Mapping[str, str]) -> dict[str, str]:
+    def sanitize_env_vars(self, env: Mapping[str, str]) -> dict[str, str]:
         """Sanitize environment variables.
 
         Sanitization is performed by:
@@ -260,9 +254,9 @@ class Manifest:
             for k, v in env.items()
         }
 
-    def env_aware_merge_mappings(
+    def env_aware_merge_mappings(  # noqa: RET503
         self,
-        data: t.MutableMapping[str, t.Any],
+        data: MutableMapping[str, t.Any],
         key: str,
         value: t.Any,  # noqa: ANN401
         _: tuple[t.Any, ...] | None = None,
@@ -279,8 +273,8 @@ class Manifest:
             `NotImplemented` if the key is not "env"; `None` otherwise.
         """
         if key != "env":
-            return NotImplemented  # type: ignore[return-value]
-        data[key] = self.sanitize_env_vars(  # noqa: RET503
+            return NotImplemented
+        data[key] = self.sanitize_env_vars(
             {
                 **expand_env_vars(
                     data[key],
@@ -392,7 +386,7 @@ class Manifest:
         # `meltano.yml` or in manifest files. For more details, refer to:
         # https://gitlab.com/meltano/meltano/-/merge_requests/2481#note_832478775
         with suppress(KeyError):
-            del plugins["mappings"]
+            del plugins[PluginType.MAPPINGS]
 
         # NOTE: `self._merge_plugin_lockfiles` restructures the plugins into a
         #       map from plugin types to maps of plugin IDs to their values.

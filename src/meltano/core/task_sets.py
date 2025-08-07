@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+import typing as t
+from collections.abc import Generator, Iterable
 
 import structlog
 import yaml
@@ -45,7 +46,7 @@ class InvalidTasksError(Exception):
         super().__init__(f"Job '{name}' has invalid tasks. {message}")
 
 
-def _flat_split(items):  # noqa: ANN001, ANN202
+def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)
@@ -67,8 +68,18 @@ class TaskSets(NameEq, Canonical):
         """
         super().__init__()
 
-        self.name = name
-        self.tasks = tasks
+        self.name: str = name
+        self.tasks: list[str] | list[list[str]] = tasks
+
+    @t.overload
+    def _as_args(self) -> list[str]: ...
+
+    @t.overload
+    def _as_args(
+        self,
+        *,
+        preserve_top_level: bool = True,
+    ) -> list[list[str]]: ...
 
     def _as_args(
         self,
@@ -96,7 +107,7 @@ class TaskSets(NameEq, Canonical):
         return flattened
 
     @property
-    def flat_args(self) -> list[str] | list[list[str]]:
+    def flat_args(self) -> list[str]:
         """Convert job's tasks to a single invocable representations.
 
         For passing as a cli argument or as block names.
@@ -111,7 +122,7 @@ class TaskSets(NameEq, Canonical):
         return self._as_args()
 
     @property
-    def flat_args_per_set(self) -> list[str] | list[list[str]]:
+    def flat_args_per_set(self) -> list[list[str]]:
         """Convert the job's tasks into perk task representations.
 
         Preserves top level list hierarchy.
@@ -142,7 +153,7 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
         InvalidTasksError: If the yaml string failed to parse or failed to
             validate against the `TASKS_JSON_SCHEMA`.
     """
-    tasks = []
+    tasks: list[str] | str = []
     try:
         tasks = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:

@@ -17,7 +17,7 @@ from meltano import (
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
-from meltano.core.logging import LEVELS, setup_logging
+from meltano.core.logging import LEVELS, LogFormat, setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
@@ -56,7 +56,16 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     # NOTE: This CLI option normalization applies to all subcommands.
     context_settings={"token_normalize_func": lambda x: x.replace("_", "-")},
 )
-@click.option("--log-level", type=click.Choice(tuple(LEVELS)))
+@click.option(
+    "--log-level",
+    type=click.Choice(tuple(LEVELS)),
+    help="Set the log level. 'disabled' will suppress all logging output.",
+)
+@click.option(
+    "--log-format",
+    type=click.Choice(tuple(LogFormat)),
+    help="A shortcut for setting the format of the log output.",
+)
 @click.option(
     "--log-config",
     type=str,
@@ -79,8 +88,9 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 def cli(
     ctx: click.Context,
     *,
-    log_level: str,
-    log_config: str,
+    log_level: str | None,
+    log_format: str | None,
+    log_config: str | None,
     environment: str,
     no_environment: bool,
     cwd: Path | None,
@@ -98,6 +108,9 @@ def cli(
     if log_config:
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
+    if log_format:
+        ProjectSettingsService.config_override["cli.log_format"] = log_format
+
     ctx.obj["explicit_no_environment"] = no_environment
     no_color = get_no_color_flag()
     if no_color:
@@ -112,7 +125,13 @@ def cli(
     try:
         project = Project.find()
         setup_logging(project)
-        logger.debug("meltano %s, %s", __version__, platform.system())
+        logger.debug(
+            "Meltano %s, Python %s, %s (%s)",
+            __version__,
+            platform.python_version(),
+            platform.system(),
+            platform.machine(),
+        )
         if project.readonly:
             logger.debug("Project is read-only.")
 

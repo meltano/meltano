@@ -5,6 +5,7 @@ labels:
   - kind/Bug
   - flow::triage
   - valuestream/Meltano
+type: Fix
 assignees:
   - edgarrmondragon
 
@@ -18,24 +19,24 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.5.4"
+      placeholder: "3.9.0"
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: python_version
     attributes:
       label: Python Version
       description: Version of Python you are using
       options:
+        - "3.13"
         - "3.12"
         - "3.11"
         - "3.10"
         - "3.9"
-        - "3.8"
-        - "3.7 (deprecated)"
+        - "3.8 or earlier (unsupported)"
         - "NA"
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: scope
     attributes:
@@ -43,7 +44,9 @@ body:
       description: Functionality this bug affects
       options:
         - CLI (options, error messages, logging, etc.)
+        - State management (`meltano state`, state backends, etc.)
         - Configuration (settings parsing, validation, etc.)
+        - Documentation
         - Other
     validations:
       required: true
@@ -54,7 +57,7 @@ body:
       description: What operating system you are using
       placeholder: "Linux - Ubuntu 20.04"
     validations:
-      required: true
+      required: false
   - type: textarea
     id: what-happened
     attributes:
@@ -64,11 +67,19 @@ body:
     validations:
       required: true
   - type: textarea
-    id: failing-code
+    id: meltano-yml
     attributes:
       label: Code
-      description: Paste the failing code and traceback, if applicable
-      render: python
+      description: Paste the contents of your `meltano.yml` file, omitting any sensitive information
+      render: yaml
+      placeholder: |
+        venv:
+          backend: ...
+        plugins:
+          extractors:
+          - name: tap-my-extractor
+            variant: my-variant
+            pip_url: ...
     validations:
       required: false
   - type: input

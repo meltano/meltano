@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import re
 import typing as t
 from datetime import datetime, timezone
 
@@ -24,9 +25,24 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
+    import sys
+    from collections.abc import Callable, Generator
+
+    from sqlalchemy.orm import Session
+
     from meltano.core.environment import Environment
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
+
+    if sys.version_info < (3, 10):
+        from typing_extensions import TypeAlias
+    else:
+        from typing import TypeAlias  # noqa: ICN003
+
+    PluginSettingsServiceFactory: TypeAlias = Callable[
+        [ProjectPlugin],
+        PluginSettingsService,
+    ]
 
 
 @pytest.mark.order(0)
@@ -55,7 +71,7 @@ def env_var():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project: Project):
     expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -69,13 +85,13 @@ def custom_tap(project):
         return err.plugin
 
 
-@pytest.fixture()
+@pytest.fixture
 def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
-@pytest.fixture()
-def environment(project: Project) -> t.Generator[Environment, None, None]:
+@pytest.fixture
+def environment(project: Project) -> Generator[Environment, None, None]:
     project.activate_environment("dev")
     try:
         yield project.environment
@@ -201,6 +217,53 @@ class TestPluginSettingsService:
             False,
             SettingValueStore.ENV,
         )
+
+    def test_get_expandable_inherited(
+        self,
+        session: Session,
+        monkeypatch: pytest.MonkeyPatch,
+        plugin_settings_service_factory: PluginSettingsServiceFactory,
+        inherited_tap,
+    ) -> None:
+        """Casting is disabled for expandable strings."""
+        monkeypatch.setenv("PORT", "4444")
+        service = plugin_settings_service_factory(inherited_tap)
+        parent = service.inherited_settings_service
+        parent.set(
+            "port",
+            "5555",
+            store=SettingValueStore.MELTANO_YML,
+            cast_value=False,
+        )
+        value, metadata = service.get_with_metadata("port", session=session)
+        assert value == 5555
+        assert metadata["source"] is SettingValueStore.INHERITED
+        assert metadata["uncast_value"] == "5555"
+        assert "unexpanded_value" not in metadata
+        assert not metadata["expandable"]
+
+        parent.set(
+            "port",
+            "$PORT",
+            store=SettingValueStore.MELTANO_YML,
+            cast_value=False,
+        )
+        value, metadata = parent.get_with_metadata("port", session=session)
+        assert value == 4444
+        assert metadata["source"] is SettingValueStore.MELTANO_YML
+        assert metadata["uncast_value"] == "4444"
+        assert metadata["expanded"]
+        assert metadata["unexpanded_value"] == "$PORT"
+        assert not metadata["expandable"]
+
+        value, metadata = service.get_with_metadata("port", session=session)
+        assert value == 4444
+        assert metadata["source"] is SettingValueStore.INHERITED
+        assert metadata["inherited_source"] is SettingValueStore.MELTANO_YML
+        assert metadata["uncast_value"] == "4444"
+        assert metadata["expanded"]
+        assert metadata["unexpanded_value"] == "$PORT"
+        assert not metadata["expandable"]
 
     def test_definitions(self, subject) -> None:
         subject.show_hidden = False
@@ -591,6 +654,7 @@ class TestPluginSettingsService:
             "multiple": "$A ${B} $C",
             "info": "$MELTANO_EXTRACTOR_NAME",
             "password": "foo$r$6$bar",
+            "user_agent": "$MELTANO_USER_AGENT",
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
@@ -606,6 +670,7 @@ class TestPluginSettingsService:
         assert config["missing"] is None
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
+        assert re.match(r"Meltano/\d+\.\d+\.\d+\S*", config["user_agent"])
 
         # Only `$ALL_CAPS` env vars are supported
         assert config["password"] == yml_config["password"]
@@ -952,7 +1017,7 @@ class TestPluginSettingsService:
         subject.set(
             "_vars",
             {"dev_setting": "from_dev_env"},
-            store=SettingValueStore.MELTANO_ENV,
+            store=SettingValueStore.MELTANO_ENVIRONMENT,
         )
         assert subject.get_with_source("_vars") == (
             {
@@ -960,7 +1025,7 @@ class TestPluginSettingsService:
                 "other": "from_meltano_yml",
                 "dev_setting": "from_dev_env",
             },
-            SettingValueStore.MELTANO_ENV,
+            SettingValueStore.MELTANO_ENVIRONMENT,
         )
 
         subject.project.deactivate_environment()

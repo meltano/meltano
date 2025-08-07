@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
-from enum import Enum
+import enum
+import sys
+
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 
-class InteractionStatus(str, Enum):
+class InteractionStatus(StrEnum):
     """Interaction status constants."""
 
-    EXIT = "exit"
-    SKIP = "skip"
-    START = "start"
-    RETRY = "retry"
+    EXIT = enum.auto()
+    SKIP = enum.auto()
+    START = enum.auto()
+    RETRY = enum.auto()

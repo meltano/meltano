@@ -14,12 +14,17 @@ import typing as t
 import structlog
 
 from meltano.core.job import Job, Payload, State
-from meltano.core.job_state import SINGER_STATE_KEY, JobState
+from meltano.core.job_state import SINGER_STATE_KEY
 from meltano.core.project import Project
-from meltano.core.state_store import state_store_manager_from_project_settings
+from meltano.core.state_store import (
+    MeltanoState,
+    state_store_manager_from_project_settings,
+)
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
+
+    from meltano.core.state_store.base import StateStoreManager
 
 logger = structlog.getLogger(__name__)
 
@@ -43,9 +48,9 @@ class StateService:
         """
         self.project = project or Project.find()
         self.session = session
-        self._state_store_manager = None
+        self._state_store_manager: StateStoreManager | None = None
 
-    def list_state(self, state_id_pattern: str | None = None):  # noqa: ANN201
+    def list_state(self, state_id_pattern: str | None = None) -> dict:
         """List all state found in the db.
 
         Args:
@@ -84,7 +89,7 @@ class StateService:
         raise TypeError("job must be of type Job or of type str")  # noqa: EM101
 
     @property
-    def state_store_manager(self):  # noqa: ANN201
+    def state_store_manager(self) -> StateStoreManager:
         """Initialize and return the correct StateStoreManager.
 
         Returns:
@@ -135,7 +140,7 @@ class StateService:
         state_to_add_to = self._get_or_create_job(job)
         state_to_add_to.payload = json.loads(new_state)
         state_to_add_to.payload_flags = payload_flags
-        state_to_add_to.save(self.session)
+        state_to_add_to.save(self.session)  # type: ignore[arg-type]
         logger.debug(
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",  # noqa: G004
         )
@@ -143,14 +148,14 @@ class StateService:
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
         )
         completed_state = new_state_dict if payload_flags == Payload.STATE else {}
-        job_state = JobState(
+        job_state = MeltanoState(
             state_id=state_to_add_to.job_name,
             partial_state=partial_state,
             completed_state=completed_state,
         )
-        self.state_store_manager.set(job_state)
+        self.state_store_manager.update(job_state)
 
-    def get_state(self, state_id: str):  # noqa: ANN201
+    def get_state(self, state_id: str) -> dict:
         """Get state for the given state_id.
 
         Args:
@@ -192,6 +197,10 @@ class StateService:
             save: Whether to immediately save the state
         """
         self.state_store_manager.clear(state_id)
+
+    def clear_all_states(self) -> int:
+        """Clear all states."""
+        return self.state_store_manager.clear_all()
 
     def merge_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Merge state from state_id_src into state_id_dst.

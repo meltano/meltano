@@ -11,7 +11,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
-where your [project](project) and pipelines are composed of plugins of [different types](#types), most notably
+where your [project](/concepts/project) and pipelines are composed of plugins of [different types](#types), most notably
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
 [**utilities**](#utilities) ([dbt](https://www.getdbt.com) for transformation, [Airflow](https://airflow.apache.org/)/[Dagster](https://dagster.io/)/etc. for orchestration, and much more on [MeltanoHub](https://hub.meltano.com/utilities/)).
@@ -22,7 +22,7 @@ To learn how to manage your project's plugins, refer to the [Plugin Management g
 
 ## Project Plugins
 
-In order to use a given package as a plugin in a [project](project),
+In order to use a given package as a plugin in a [project](/concepts/project),
 assuming it meets the requirements of the [plugin type](#types) in question, Meltano needs to know:
 
 1. where to find the package, typically a [pip package](https://pip.pypa.io/en/stable/) identified by its name on [PyPI](https://pypi.org/), public or private Git repository URL, or local directory path,
@@ -55,7 +55,7 @@ making them supported out of the box.
 
 To find discoverable plugins refer to the lists of [Extractors](https://hub.meltano.com/extractors/), [Loaders](https://hub.meltano.com/loaders/), etc., on [Meltano Hub](https://hub.meltano.com/).
 
-To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](project#shadowing-plugin-definitions) or [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
+To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) or [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
 ### Variants
 
@@ -158,11 +158,11 @@ Extractors support the following [extras](/guide/configuration#plugin-extras):
 
 - Setting: `_catalog`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__CATALOG`, e.g. `TAP_GITLAB__CATALOG`
-- [`meltano elt`](/reference/command-line-interface#elt) CLI option: `--catalog`
+- [`meltano el`](/reference/command-line-interface#el) CLI option: `--catalog`
 - Default: None
 
-An extractor's `catalog` [extra](/guide/configuration#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](project)) to be provided to the extractor
-when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+An extractor's `catalog` [extra](/guide/configuration#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](/concepts/project)) to be provided to the extractor
+when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano el`](/reference/command-line-interface#el) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 If a catalog path is not set, the catalog will be [generated on the fly](/guide/integration#extractor-catalog-generation)
 by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec#discovery-mode) and applying the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules to the discovered file.
@@ -170,7 +170,7 @@ by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec
 [Selection filter rules](#select-filter-extra) are always applied to manually provided catalogs as well as discovered ones.
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
-a catalog file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--catalog` option.
+a catalog file is typically provided using [`meltano el`](/reference/command-line-interface#el)'s `--catalog` option.
 
 If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/guide/integration#validate-tap-capabilities).
 
@@ -193,12 +193,12 @@ extractors:
 ```bash
 meltano config <extractor> set _catalog <path>
 
-meltano elt <extractor> <loader> --catalog <path>
+meltano el <extractor> <loader> --catalog <path>
 
 # For example:
 meltano config tap-gitlab set _catalog extract/tap-gitlab.catalog.json
 
-meltano elt tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
+meltano el tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
 
 ```
 
@@ -275,7 +275,7 @@ export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 An extractor's `metadata` [extra](/guide/configuration#plugin-extras) holds an object describing
 [Singer stream and property metadata](https://hub.meltano.com/singer/spec#metadata)
 rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
-when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano elt`](/reference/command-line-interface#elt).
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
@@ -338,6 +338,12 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_KEY=created_at
   </TabItem>
 </Tabs>
 
+Common metadata keys that can be set include:
+
+- `key-properties`: A list of properties that together uniquely identify a record in the stream. For example, `["id"]`.
+- `replication-key`: The name of a property in the source to use as a bookmark. For example, this will often be an `"updated_at"` field or an auto-incrementing primary key (requires `replication-method`).
+- `replication-method`: The replication method to use for a stream. Either `FULL_TABLE` or `INCREMENTAL`. Some extractors also support `LOG_BASED`, so check the extractor's documentation for details.
+
 #### `schema` extra
 
 - Setting: `_schema`
@@ -347,7 +353,7 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_KEY=created_at
 An extractor's `schema` [extra](/guide/configuration#plugin-extras) holds an object describing
 [Singer stream schema](https://hub.meltano.com/singer/spec#schemas) override
 rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
-when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+when the extractor is run using [`meltano el`](/reference/command-line-interface#el) or [`meltano invoke`](/reference/command-line-interface#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 [JSON Schema](https://json-schema.org/) descriptions for specific properties (attributes) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values, and second-level attribute identifiers that correspond to Singer stream property names.
@@ -414,7 +420,7 @@ export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 
 An extractor's `select` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection rules](/reference/command-line-interface#select)
 that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
-when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano elt`](/reference/command-line-interface#elt).
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 A selection rule is comprised of an entity identifier that corresponds to a Singer stream's `tap_stream_id` value, and an attribute identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an entity or attribute should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
@@ -508,12 +514,12 @@ export TAP_SMOKE_TEST__SELECT='["animals\\.data.id","animals\\.data.verified"]'
 
 - Setting: `_select_filter`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
-- [`meltano elt`](/reference/command-line-interface#elt) CLI options: `--select` and `--exclude`
+- [`meltano el`](/reference/command-line-interface#el) CLI options: `--select` and `--exclude`
 - Default: `[]`
 
 An extractor's `select_filter` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
 that are applied to the extractor's [discovered](/guide/integration#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
-when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano elt`](/reference/command-line-interface#elt),
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el),
 after [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
 
 It can be used to only extract records for specific matching entities, or to extract records for all entities _except_ for those specified, by letting you apply filters on top of configured [entity selection rules](#select-extra).
@@ -523,7 +529,7 @@ Selection filter rules use entity identifiers that correspond to Singer stream `
 Entity names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
-selection filers are typically specified using [`meltano elt`](/reference/command-line-interface#elt)'s `--select` and `--exclude` options.
+selection filers are typically specified using [`meltano el`](/reference/command-line-interface#el)'s `--select` and `--exclude` options.
 
 ##### How to use
 
@@ -549,15 +555,15 @@ extractors:
 meltano config <extractor> set _select_filter '["<entity>", ...]'
 meltano config <extractor> set _select_filter '["!<entity>", ...]'
 
-meltano elt <extractor> <loader> --select <entity>
-meltano elt <extractor> <loader> --exclude <entity>
+meltano el <extractor> <loader> --select <entity>
+meltano el <extractor> <loader> --exclude <entity>
 
 # For example:
 meltano config tap-gitlab set _select_filter '["commits"]'
 meltano config tap-gitlab set _select_filter '["!project_members"]'
 
-meltano elt tap-gitlab target-jsonl --select commits
-meltano elt tap-gitlab target-jsonl --exclude project_members
+meltano el tap-gitlab target-jsonl --select commits
+meltano el tap-gitlab target-jsonl --exclude project_members
 
 ```
 
@@ -579,16 +585,16 @@ export TAP_GITLAB__SELECT_FILTER='["commits","!project_members"]'
 
 - Setting: `_state`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__STATE`, e.g. `TAP_GITLAB__STATE`
-- [`meltano elt`](/reference/command-line-interface#elt) CLI option: `--state`
+- [`meltano el`](/reference/command-line-interface#el) CLI option: `--state`
 - Default: None
 
-An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](project)) to be provided to the extractor
-when it is run as part of a pipeline using [`meltano elt`](/reference/command-line-interface#elt).
+An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](/concepts/project)) to be provided to the extractor
+when it is run as part of a pipeline using [`meltano el`](/reference/command-line-interface#el).
 
 If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's State ID.
 
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
-a state file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option.
+a state file is typically provided using [`meltano el`](/reference/command-line-interface#el)'s `--state` option.
 
 ##### How to use
 
@@ -609,12 +615,12 @@ extractors:
 ```bash
 meltano config <extractor> set _state <path>
 
-meltano elt <extractor> <loader> --state <path>
+meltano el <extractor> <loader> --state <path>
 
 # For example:
 meltano config tap-gitlab set _state extract/tap-gitlab.state.json
 
-meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
+meltano el tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 ```
 
   </TabItem>
@@ -678,7 +684,7 @@ export TAP_GITLAB__USE_CACHED_CATALOG=false
 
 ### Loaders
 
-Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data integration](/guide/integration).
+Loaders are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano el`](/reference/command-line-interface#el) as part of [data integration](/guide/integration).
 They are responsible for loading [extracted](#extractors) data into arbitrary data destinations: databases, SaaS APIs, or file formats.
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
@@ -750,7 +756,7 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 :::
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),
-that are used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/guide/transformation).
+that are used by [`meltano el`](/reference/command-line-interface#el) as part of [data transformation](/guide/transformation).
 
 Together with the [dbt](https://www.getdbt.com) [transformer](#transformers), they are responsible for transforming data that has been loaded into a database (data warehouse) into a different format, usually one more appropriate for [analysis](/guide/analysis).
 
@@ -909,7 +915,7 @@ File bundles are [pip packages](https://pip.pypa.io/en/stable/) bundling files y
 
 When a file bundle is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the bundled files will automatically be added as well.
-The file bundle itself will not be added to your [`meltano.yml` project file](project#meltano-yml-project-file) unless it contains files that are
+The file bundle itself will not be added to your [`meltano.yml` project file](/concepts/project#meltanoyml-project-file) unless it contains files that are
 [managed by the file bundle](#update-extra) and to be updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
 
 #### `update` extra

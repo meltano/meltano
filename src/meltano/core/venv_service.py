@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
 import hashlib
-import os
+import json
 import platform
 import shlex
 import shutil
@@ -13,36 +12,42 @@ import subprocess
 import sys
 import typing as t
 from asyncio.subprocess import Process
-from functools import cached_property, lru_cache
-from numbers import Number
-from pathlib import Path
+from collections.abc import Awaitable, Callable
+from functools import cache, cached_property
 
 import structlog
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
+    from pathlib import Path
 
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeAlias
-else:
+if sys.version_info >= (3, 10):
     from typing import TypeAlias  # noqa: ICN003
-
-if sys.version_info < (3, 12):
-    from typing_extensions import override
 else:
+    from typing_extensions import TypeAlias
+
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
+
+if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: TypeAlias = t.Callable[[Process], t.Awaitable[t.Union[str, None]]]
+StdErrExtractor: TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
 
 
-@lru_cache(maxsize=None)
+@cache
 def find_uv() -> str:
     """Find the `uv` executable.
 
@@ -72,46 +77,9 @@ def find_uv() -> str:
     Raises:
         MeltanoError: The `uv` executable could not be found.
     """
-    logger.warning("The uv backend is experimental")
+    from uv import find_uv_bin
 
-    with contextlib.suppress(ImportError, FileNotFoundError):
-        from uv import find_uv_bin
-
-        return find_uv_bin()
-
-    # Fall back to PATH.
-    uv = shutil.which("uv")
-
-    if not uv:
-        error = "Could not find the 'uv' executable"
-        instruction = "Please install 'meltano[uv]' or install 'uv' globally."
-        raise MeltanoError(error, instruction)
-
-    return uv
-
-
-def _resolve_python_path(python: Path | str | None) -> str:
-    python_path: str | None = None
-
-    if python is None:
-        python_path = sys.executable
-    elif isinstance(python, Path):
-        python_path = str(python.resolve())
-    elif isinstance(python, Number):
-        raise MeltanoError(
-            "Python must be specified as an executable name or path, "  # noqa: EM102
-            f"not the number {python!r}",
-        )
-    else:
-        python_path = python if os.path.exists(python) else shutil.which(python)  # noqa: PTH110
-
-    if python_path is None:
-        raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102
-
-    if not os.access(python_path, os.X_OK):
-        raise MeltanoError(f"{python_path!r} is not executable")  # noqa: EM102
-
-    return python_path
+    return find_uv_bin()
 
 
 class VirtualEnv:
@@ -126,7 +94,7 @@ class VirtualEnv:
     def __init__(
         self,
         root: Path,
-        python: Path | str | None = None,
+        python: str | None = None,
     ):
         """Initialize the `VirtualEnv` instance.
 
@@ -142,7 +110,7 @@ class VirtualEnv:
         if self._system not in self._SUPPORTED_PLATFORMS:
             raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
-        self.python_path = _resolve_python_path(python)
+        self.python_path = python or sys.executable
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
 
     @cached_property
@@ -207,7 +175,7 @@ class VirtualEnv:
         if self.python_path == sys.executable:
             return sys.version_info[:3]
         return t.cast(
-            tuple[int, int, int],
+            "tuple[int, int, int]",
             tuple(
                 int(x)
                 for x in subprocess.run(
@@ -232,13 +200,15 @@ class VirtualEnv:
             return None
         return self.plugin_fingerprint_path.read_text()
 
-    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
+    def write_fingerprint(self, pip_install_args: Sequence[str]) -> None:
         """Save the fingerprint for this installation.
 
         Args:
             pip_install_args: The arguments being passed to `pip install`.
         """
-        self.plugin_fingerprint_path.write_text(fingerprint(pip_install_args))
+        self.plugin_fingerprint_path.write_text(
+            fingerprint(pip_install_args, self.python_path)
+        )
 
 
 async def _extract_stderr(_) -> None:
@@ -278,18 +248,24 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
     return run
 
 
-def fingerprint(pip_install_args: Iterable[str]) -> str:
-    """Generate a hash identifying pip install args.
+def fingerprint(pip_install_args: Iterable[str], interpreter: str | None = None) -> str:
+    """Generate a hash identifying pip install args and Python interpreter.
 
     Arguments are sorted and deduplicated before the hash is generated.
 
     Args:
         pip_install_args: Arguments for `pip install`.
+        interpreter: Python interpreter (path or command name).
 
     Returns:
-        The SHA256 hash hex digest of the sorted set of pip install args.
+        The SHA256 hash hex digest of the sorted set of pip install args and Python.
     """
-    return hashlib.sha256(" ".join(sorted(set(pip_install_args))).encode()).hexdigest()
+    components = sorted(set(pip_install_args))
+    # Only include Python interpreter in fingerprint if it's different from default
+    # This ensures backward compatibility while detecting Python version changes
+    if interpreter and interpreter != sys.executable:
+        components.append(f"python:{interpreter}")
+    return hashlib.sha256(" ".join(components).encode()).hexdigest()
 
 
 class VenvService:
@@ -302,7 +278,7 @@ class VenvService:
         self,
         *,
         project: Project,
-        python: Path | str | None = None,
+        python: str | None = None,
         namespace: str = "",
         name: str = "",
     ):
@@ -329,9 +305,27 @@ class VenvService:
             "pip.log",
         ).resolve()
 
+    @classmethod
+    def from_plugin(cls, project: Project, plugin: ProjectPlugin) -> Self:
+        """Create a service instance from a project and plugin.
+
+        Args:
+            project: The Meltano project.
+            plugin: The plugin to create a service instance for.
+
+        Returns:
+            A service instance.
+        """
+        return cls(
+            project=project,
+            python=plugin.python,
+            namespace=plugin.type,
+            name=plugin.plugin_dir_name,
+        )
+
     async def install(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         clean: bool = False,
         env: dict[str, str | None] | None = None,
@@ -355,7 +349,7 @@ class VenvService:
         await self._pip_install(pip_install_args=pip_install_args, clean=clean, env=env)
         self.venv.write_fingerprint(pip_install_args)
 
-    def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
+    def requires_clean_install(self, pip_install_args: Sequence[str]) -> bool:
         """Determine whether a clean install is needed.
 
         Args:
@@ -373,7 +367,9 @@ class VenvService:
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.venv.read_fingerprint()
             yield existing_fingerprint is None
-            yield existing_fingerprint != fingerprint(pip_install_args)
+            yield existing_fingerprint != fingerprint(
+                pip_install_args, self.venv.python_path
+            )
 
         return any(checks())
 
@@ -406,7 +402,7 @@ class VenvService:
     async def create_venv(
         self,
         *,
-        extract_stderr: StdErrExtractor,
+        extract_stderr: StdErrExtractor = _extract_stderr,
     ) -> Process:
         """Create a new virtual environment.
 
@@ -421,8 +417,7 @@ class VenvService:
             sys.executable,
             "-m",
             "virtualenv",
-            "--python",
-            self.venv.python_path,
+            f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
         )
@@ -439,7 +434,7 @@ class VenvService:
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
 
         async def extract_stderr(proc: Process):  # noqa: ANN202
-            return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
+            return (await t.cast("asyncio.StreamReader", proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",
             )
@@ -502,7 +497,7 @@ class VenvService:
 
     async def install_pip_args(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         env: dict[str, str | None] | None = None,
@@ -573,7 +568,7 @@ class VenvService:
 
     async def _pip_install(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         clean: bool = False,
         env: dict[str, str | None] | None = None,
@@ -621,6 +616,19 @@ class VenvService:
         except AsyncSubprocessError as err:
             raise await self.handle_installation_error(err) from err
 
+    async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
+        """List the installed dependencies."""
+        proc = await exec_async(
+            str(self.exec_path("python")),
+            "-m",
+            "pip",
+            "list",
+            "--format=json",
+            *args,
+        )
+        stdout, _ = await proc.communicate()
+        return json.loads(stdout)
+
 
 class UvVenvService(VenvService):
     """Manages virtual environments using `uv`."""
@@ -651,7 +659,7 @@ class UvVenvService(VenvService):
     @override
     async def install_pip_args(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         env: dict[str, str | None] | None = None,
@@ -671,8 +679,7 @@ class UvVenvService(VenvService):
             self.uv,
             "pip",
             "install",
-            "--python",
-            str(self.exec_path("python")),
+            f"--python={self.exec_path('python')}",
             *pip_install_args,
             extract_stderr=extract_stderr,
             env=env,
@@ -692,8 +699,7 @@ class UvVenvService(VenvService):
             self.uv,
             "pip",
             "uninstall",
-            "--python",
-            str(self.exec_path("python")),
+            f"--python={self.exec_path('python')}",
             package,
         )
 
@@ -710,17 +716,45 @@ class UvVenvService(VenvService):
         Returns:
             The error that occurred during installation with additional context.
         """
+        self.pip_log_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            await self._write_error_log(err)
+        except OSError as log_err:
+            logger.debug(
+                "Failed to write installation error to log file %s: %s",
+                self.pip_log_path,
+                log_err,
+            )
+        else:
+            logger.info(
+                "Logged uv pip install output to %s",
+                self.pip_log_path,
+            )
         return AsyncSubprocessError(
             f"Failed to install plugin '{self.name}'.",
             err.process,
             stderr=await err.stderr,
         )
 
+    async def _write_error_log(self, err: AsyncSubprocessError) -> None:
+        """Write error details to the log file."""
+        import anyio
+
+        stderr_content = await err.stderr
+
+        async with await anyio.open_file(
+            self.pip_log_path,
+            "a",
+            encoding="utf-8",
+        ) as log_file:
+            if stderr_content:
+                await log_file.write(stderr_content)
+
     @override
     async def create_venv(
         self,
         *,
-        extract_stderr: StdErrExtractor,
+        extract_stderr: StdErrExtractor = _extract_stderr,
     ) -> Process:
         """Create a new virtual environment using `uv`.
 
@@ -734,8 +768,22 @@ class UvVenvService(VenvService):
         return await exec_async(
             self.uv,
             "venv",
-            "--python",
-            self.venv.python_path,
+            f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
         )
+
+    @override
+    async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
+        """List the installed dependencies."""
+        proc = await exec_async(
+            self.uv,
+            "pip",
+            "list",
+            "--quiet",
+            "--format=json",
+            f"--python={self.exec_path('python')}",
+            *args,
+        )
+        stdout, _ = await proc.communicate()
+        return json.loads(stdout)

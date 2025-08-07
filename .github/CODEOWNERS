@@ -6,11 +6,11 @@
 
 # Default owners
 
-* @edgarrmondragon @WillDaSilva
+* @edgarrmondragon
 
 # CI
-.github/actions/ @WillDaSilva @meltano/engineering
-.github/workflows/ @WillDaSilva @meltano/engineering
+.github/actions/ @meltano/engineering
+.github/workflows/ @meltano/engineering
 
 # Docs (General)
 /docs/ @tayloramurphy @meltano/engineering @meltano/marketing

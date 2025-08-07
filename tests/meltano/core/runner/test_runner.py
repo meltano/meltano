@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock
 
-import mock
 import pytest
-from mock import AsyncMock
 
+from meltano.core._state import StateStrategy
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output
 from meltano.core.plugin_invoker import PluginInvoker
@@ -38,7 +39,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 
 
 class TestSingerRunner:
-    @pytest.fixture()
+    @pytest.fixture
     def elt_context(
         self,
         project,  # noqa: ARG002
@@ -57,17 +58,17 @@ class TestSingerRunner:
             .context()
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.extractor.plugin)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.loader.plugin)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, session, elt_context):
         Job(
             job_name=TEST_STATE_ID,
@@ -78,7 +79,7 @@ class TestSingerRunner:
 
         return SingerRunner(elt_context)
 
-    @pytest.fixture()
+    @pytest.fixture
     def process_mock_factory(self):
         def _factory(name):
             process_mock = mock.Mock()
@@ -88,17 +89,17 @@ class TestSingerRunner:
 
         return _factory
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")
         return tap
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_process(self, process_mock_factory, target):
         return process_mock_factory(target)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("subject")
     async def test_prepare_job(
         self,
@@ -124,7 +125,7 @@ class TestSingerRunner:
 
         assert not target_invoker.files["config"].exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_invoke(
         self,
         session,
@@ -139,9 +140,10 @@ class TestSingerRunner:
     ) -> None:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
-        async with tap_invoker.prepared(
-            session,
-        ), target_invoker.prepared(session):
+        async with (
+            tap_invoker.prepared(session),
+            target_invoker.prepared(session),
+        ):
             invoke_async = AsyncMock(side_effect=(tap_process, target_process))
             with mock.patch.object(
                 PluginInvoker,
@@ -158,81 +160,64 @@ class TestSingerRunner:
                 tap_process.wait.assert_awaited()
                 target_process.wait.assert_awaited()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
-        ("full_refresh", "merge_state", "select_filter", "payload_flag"),
+        (
+            "full_refresh",
+            "state_strategy",
+            "payload_flag",
+        ),
         (
             pytest.param(
+                True,
+                StateStrategy.AUTO,
+                Payload.INCOMPLETE_STATE,
+                id="full-refresh-auto--incomplete-state",
+            ),
+            pytest.param(
                 False,
-                False,
-                [],
+                StateStrategy.AUTO,
                 Payload.STATE,
-                id="incremental-no-merge-no-select--complete-state",
+                id="incremental-auto--complete-state",
             ),
             pytest.param(
                 True,
-                False,
-                [],
+                StateStrategy.OVERWRITE,
                 Payload.STATE,
-                id="full-refresh-no-merge-no-select--complete-state",
+                id="full-refresh-overwrite--complete-state",
             ),
             pytest.param(
                 False,
-                False,
-                ["entity"],
+                StateStrategy.OVERWRITE,
                 Payload.STATE,
-                id="incremental-no-merge-select--complete-state",
+                id="incremental-overwrite--complete-state",
             ),
             pytest.param(
                 True,
-                False,
-                ["entity"],
+                StateStrategy.MERGE,
                 Payload.INCOMPLETE_STATE,
-                id="full-refresh-no-merge-select--incomplete-state",
-            ),
-            pytest.param(
-                False,
-                True,
-                [],
-                Payload.INCOMPLETE_STATE,
-                id="incremental-merge-no-select--incomplete-state",
-            ),
-            pytest.param(
-                True,
-                True,
-                [],
-                Payload.INCOMPLETE_STATE,
-                id="full-refresh-merge-no-select--incomplete-state",
+                id="full-refresh-merge--incomplete-state",
             ),
             pytest.param(
                 False,
-                True,
-                ["entity"],
+                StateStrategy.MERGE,
                 Payload.INCOMPLETE_STATE,
-                id="incremental-merge-select--incomplete-state",
-            ),
-            pytest.param(
-                True,
-                True,
-                ["entity"],
-                Payload.INCOMPLETE_STATE,
-                id="full-refresh-merge-select--incomplete-state",
+                id="incremental-merge--incomplete-state",
             ),
         ),
     )
     async def test_bookmark(
         self,
-        subject,
+        subject: SingerRunner,
         session,
         target,
         target_config_dir,
         target_process,
         plugin_invoker_factory,
         full_refresh,
-        select_filter,
         payload_flag,
         elt_context,
-        merge_state,
+        state_strategy,
     ) -> None:
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -243,8 +228,7 @@ class TestSingerRunner:
         target_process.stdout.readline = AsyncMock(side_effect=lines)
 
         subject.context.full_refresh = full_refresh
-        subject.context.select_filter = select_filter
-        subject.context.merge_state = merge_state
+        subject.context.state_strategy = state_strategy
 
         target_invoker = plugin_invoker_factory(
             target,
@@ -253,15 +237,18 @@ class TestSingerRunner:
         )
 
         async with subject.context.job.run(session):
-            with mock.patch.object(
-                session,
-                "add",
-                side_effect=session.add,
-            ) as add_mock, mock.patch.object(
-                session,
-                "commit",
-                side_effect=session.commit,
-            ) as commit_mock:
+            with (
+                mock.patch.object(
+                    session,
+                    "add",
+                    side_effect=session.add,
+                ) as add_mock,
+                mock.patch.object(
+                    session,
+                    "commit",
+                    side_effect=session.commit,
+                ) as commit_mock,
+            ):
                 target.setup_bookmark_writer(target_invoker)
                 bookmark_writer = target_invoker.output_handlers.get(
                     target_invoker.StdioSource.STDOUT,
@@ -276,7 +263,7 @@ class TestSingerRunner:
             assert job.payload["singer_state"] == {"line": 3}
             assert job.payload_flags == payload_flag
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run(self, subject) -> None:
         async def invoke_mock(*args, **kwargs) -> None:
             pass

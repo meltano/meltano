@@ -9,11 +9,11 @@ from meltano.core.sqlalchemy import DateTimeUTC
 
 
 class TestSQLAlchemyModels:
-    @pytest.fixture()
+    @pytest.fixture
     def engine(self) -> sa.Engine:
         return sa.create_engine("sqlite:///:memory:")
 
-    @pytest.fixture()
+    @pytest.fixture
     def table(self, engine: sa.Engine) -> sa.Table:
         metadata = sa.MetaData()
         test = sa.Table(

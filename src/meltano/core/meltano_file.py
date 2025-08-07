@@ -9,14 +9,23 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.schedule import Schedule
+from meltano.core.schedule import ELTSchedule, JobSchedule, Schedule
 from meltano.core.task_sets import TaskSets
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
 
 VERSION = 1
 
 
 class MeltanoFile(Canonical):
     """Data and loading methods for meltano.yml files."""
+
+    version: int
+    schedules: list[Schedule]
+    environments: list[Environment]
+    jobs: list[TaskSets]
+    env: dict[str, str | None]
 
     def __init__(
         self,
@@ -25,8 +34,8 @@ class MeltanoFile(Canonical):
         schedules: list[dict] | None = None,
         environments: list[dict] | None = None,
         jobs: list[dict] | None = None,
-        env: dict[str, str] | None = None,
-        **extras,  # noqa: ANN003
+        env: dict | None = None,
+        **extras: t.Any,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 
@@ -47,7 +56,7 @@ class MeltanoFile(Canonical):
             schedules=self.load_schedules(schedules or []),
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
-            env=env or {},
+            env=self.load_env(env or {}),
         )
 
     def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
@@ -91,10 +100,16 @@ class MeltanoFile(Canonical):
         Returns:
             List of new Schedule instances.
         """
-        return [Schedule.parse(obj) for obj in schedules]
+        result: list[Schedule] = []
+        for schedule in schedules:
+            if schedule.get("job"):
+                result.append(JobSchedule(**schedule))
+            else:
+                result.append(ELTSchedule(**schedule))
+        return result
 
     @staticmethod
-    def load_environments(environments: t.Iterable[dict]) -> list[Environment]:
+    def load_environments(environments: Iterable[dict]) -> list[Environment]:
         """Parse `Environment` objects from python objects.
 
         Args:
@@ -106,7 +121,7 @@ class MeltanoFile(Canonical):
         return [Environment.parse(obj) for obj in environments]
 
     @staticmethod
-    def load_job_tasks(jobs: t.Iterable[dict]) -> list[TaskSets]:
+    def load_job_tasks(jobs: Iterable[dict]) -> list[TaskSets]:
         """Parse `TaskSets` objects from python objects.
 
         Args:
@@ -116,6 +131,21 @@ class MeltanoFile(Canonical):
             A list of `Job` objects.
         """
         return [TaskSets.parse(obj) for obj in jobs]
+
+    @staticmethod
+    def load_env(env: dict) -> dict[str, str | None]:
+        """Parse `EnvVars` objects from python objects.
+
+        Args:
+            env: Dictionary of environment variables.
+
+        Returns:
+            A new `EnvVars` object.
+        """
+        return {
+            str(key): str(value) if value is not None else None
+            for key, value in env.items()
+        }
 
     @staticmethod
     def get_plugins_for_mappings(mapper_config: dict) -> list[ProjectPlugin]:

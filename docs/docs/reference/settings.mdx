@@ -223,6 +223,8 @@ that takes the shape of a SQLite database stored inside the [`.meltano` director
 You can choose to use a different system database backend or configuration using the `--database-uri`
 option of [`meltano` subcommands](/reference/command-line-interface), or the `MELTANO_DATABASE_URI` environment variable.
 
+The database URI should be a valid [SQLAlchemy database URL](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls), and can be used to connect to [a variety of database backends](/concepts/project/#support-for-other-database-types).
+
 :::caution
 Because internal database migrations make of use of the <code>ALTER TABLE table RENAME COLUMN oldname TO newname</code> syntax starting with Meltano <code>v2.2.0</code>, the minimum required SQLite version is now <a href="https://sqlite.org/releaselog/3_25_1.html"><code>3.25.1</code></a>.
 
@@ -285,6 +287,76 @@ meltano run --database-uri=mssql+pymssql://<username>:<password>@<host>:<port>/<
 :::info
 Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
 :::
+
+#### PostgreSQL Database Privileges and Requirements
+
+When using PostgreSQL as your system database, the database user must have sufficient privileges to create and manage the tables that Meltano uses for storing metadata, job execution history, and incremental state.
+
+##### Minimum PostgreSQL Version
+- **PostgreSQL 13 or higher** is recommended
+
+##### Installation with PostgreSQL Support
+See the guide for how to install [optional components](/guide/advanced-topics/#installing-optional-components).
+
+##### Required Database Privileges
+
+The PostgreSQL user specified in your `database_uri` must have the following privileges:
+
+**Database-level privileges:**
+- `CONNECT` - To connect to the database
+- `CREATE` - To create schemas during initialization
+- `TEMPORARY` - To create temporary tables during operations
+
+**Schema-level privileges** (on the target schema, typically `public`):
+- `CREATE` - To create tables and other database objects
+- `USAGE` - To access and use the schema
+
+**Object-level privileges:**
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` on all Meltano tables
+- `USAGE`, `SELECT` on all sequences used by Meltano tables
+
+##### Setting Up Database Privileges
+
+To grant the necessary privileges to your Meltano database user:
+
+```sql
+-- Connect as a superuser or database owner
+-- Replace 'meltano_user' with your actual username
+-- Replace 'your_database' with your actual database name
+
+-- Grant database-level privileges
+GRANT CONNECT, CREATE, TEMPORARY ON DATABASE your_database TO meltano_user;
+
+-- Grant schema-level privileges (assuming 'public' schema)
+GRANT CREATE, USAGE ON SCHEMA public TO meltano_user;
+
+-- Grant privileges on existing tables and sequences
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO meltano_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO meltano_user;
+
+-- Set default privileges for future objects created by other users
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO meltano_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO meltano_user;
+```
+
+##### Tables Created by Meltano
+
+Meltano will automatically create several tables in your PostgreSQL database:
+- `runs` - Stores job execution history and metadata
+- `state` - Stores incremental state for pipeline runs
+- `plugin_settings` - Stores plugin configuration
+- `alembic_version` - Tracks database schema version for migrations
+
+##### Database Migration Support
+
+Meltano uses [Alembic](https://alembic.sqlalchemy.org/) to manage database schema changes. The system will automatically run migrations when needed, which requires the user to have `ALTER TABLE` privileges on existing tables.
+
+##### Security Considerations
+
+- Use a dedicated database user for Meltano operations, granting it only the minimum privileges required to function. This follows the principle of least privilege and helps reduce security risks.
+- Consider using environment variables or a `.env` file to store database credentials securely
+- Enable SSL connections by adding appropriate parameters to your `database_uri`
+- Regularly review and audit database access logs
 
 #### Targeting a PostgreSQL Schema
 
@@ -524,10 +596,12 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/refere
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`.
 - `meltano` CLI option: `--log-level`
-- Options: `debug`, `info`, `warning`, `error`, `critical`
+- Options: `debug`, `info`, `warning`, `error`, `critical`, `disabled`
 - Default: `info`
 
 The granularity of CLI logging. Ignored if a local logging config is found.
+
+The `disabled` option completely suppresses all logging output, which is useful for scripts that need to parse Meltano output or for running commands in completely silent mode.
 
 #### How to use
 
@@ -555,13 +629,48 @@ meltano --log-level=debug ...
   </TabItem>
 </Tabs>
 
+### `cli.log_format`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_FORMAT`.
+- `meltano` CLI option: `--log-format`
+- Options: `colored`, `uncolored`, `json`, `key_value`, `plain`
+- Default: `colored`
+
+A shortcut for setting the format of the log output. Ignored if a local logging config is found.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set cli log_format json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_CLI_LOG_FORMAT=json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="command" label="command" default>
+
+```bash
+meltano --log-format=json ...
+```
+
+  </TabItem>
+</Tabs>
+
 ### `cli.log_config`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_CONFIG`.
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
-The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_.
+The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_. Supports both `.yaml` and `.yml` file extensions.
 
 #### How to use
 
@@ -570,6 +679,8 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
 
 ```bash
 meltano config meltano set cli log_config /path/to/logging.yaml
+# or
+meltano config meltano set cli log_config /path/to/logging.yml
 ```
 
   </TabItem>
@@ -577,6 +688,8 @@ meltano config meltano set cli log_config /path/to/logging.yaml
 
 ```bash
 export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
+# or
+export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yml
 ```
 
   </TabItem>
@@ -584,6 +697,8 @@ export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
 
 ```bash
 meltano --log-config=/path/to/logging.yaml ...
+# or
+meltano --log-config=/path/to/logging.yml ...
 ```
 
   </TabItem>
@@ -650,7 +765,7 @@ These settings can be used to modify the behavior of [`meltano el`](/reference/c
 ### `elt.buffer_size`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_ELT_BUFFER_SIZE`
-- Default: `10485760` (10MiB in bytes)
+- Default: `104857600` (100MiB in bytes)
 
 Size (in bytes) of the buffer between extractor and loader (Singer tap and target) that stores
 [messages](https://hub.meltano.com/singer/spec#messages)
@@ -661,7 +776,7 @@ at which point the extractor will be blocked until the loader has worked through
 of the buffer size available again for new extractor output.
 
 The length of a single line of extractor output is limited to half the buffer size.
-With a default buffer size of 10MiB, the maximum message size would therefore be 5MiB.
+With a default buffer size of 100MiB, the maximum message size would therefore be 50MiB.
 
 #### How to use
 
@@ -910,10 +1025,87 @@ export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 
 ---
 
-### <a name="state-backend-uri"></a>`state_backend.gcs.application_credentials`
+### <a name="state_backendgcsapplication_credentials_json"></a>`state_backend.gcs.application_credentials_json`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_APPLICATION_CREDENTIALS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_JSON`
 - Default: None
+
+JSON string containing the service account credentials for Google Cloud Storage. This is the recommended approach for production deployments, especially in containerized environments.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set state_backend.gcs.application_credentials_json '{
+  "type": "service_account",
+  "project_id": "my-project",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "..."
+}'
+```
+
+Or set it from a file:
+
+```bash
+meltano config meltano set state_backend.gcs.application_credentials_json --from-file service-account-key.json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_JSON='{"type":"service_account","project_id":"my-project",...}'
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+### <a name="state_backendgcsapplication_credentials_path"></a>`state_backend.gcs.application_credentials_path`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_PATH`
+- Default: None
+
+Path to the [credential file](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) to use in authenticating to Google Cloud Storage
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set state_backend.gcs.application_credentials_path "path/to/creds.json"
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_PATH="path/to/creds.json"
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+### <a name="state_backendgcsapplication_credentials"></a>`state_backend.gcs.application_credentials` (deprecated)
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS`
+- Default: None
+
+:::warning
+This setting is deprecated. Use [`state_backend.gcs.application_credentials_path`](#state_backendgcsapplication_credentials_path) instead.
+:::
 
 Path to the [credential file](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) to use in authenticating to Google Cloud Storage
 
@@ -942,13 +1134,13 @@ export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_VENV_BACKEND`
 - Options: `virtualenv`, `uv`
-- Default: `virtualenv`
+- Default: `uv`
 
 <Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set venv.backend uv
+meltano config meltano set venv.backend virtualenv
 meltano install --clean
 ```
 
@@ -956,11 +1148,17 @@ meltano install --clean
   <TabItem className="meltano-tab-content" value="env" label="env" default>
 
 ```bash
-MELTANO_VENV_BACKEND=uv meltano install --clean
+MELTANO_VENV_BACKEND=virtualenv meltano install --clean
 ```
 
   </TabItem>
 </Tabs>
+
+:::info
+  <p>
+  After you switch to a different virtual environment backend, it's recommended to reinstall all plugins with `meltano install --clean`.
+  </p>
+:::
 
 ## Snowplow Tracking
 

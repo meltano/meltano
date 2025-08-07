@@ -3,9 +3,9 @@ from __future__ import annotations
 import asyncio
 import platform
 import signal
+import typing as t
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import NoReturn  # noqa: ICN003
 
 import pytest
 
@@ -15,6 +15,9 @@ from meltano.core.job.job import (
     Job,
     State,
 )
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 class TestJob:
@@ -50,7 +53,7 @@ class TestJob:
         assert transition == (State.RUNNING, State.SUCCESS)
         subject.ended_at = datetime.now(timezone.utc)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run(self, session) -> None:
         subject = self.sample_job().save(session)
 
@@ -76,8 +79,8 @@ class TestJob:
         # Allow one additional second of delay:
         assert subject.ended_at - subject.last_heartbeat_at < timedelta(seconds=2)
 
-    @pytest.mark.asyncio()
-    async def test_run_failed(self, session) -> NoReturn:
+    @pytest.mark.asyncio
+    async def test_run_failed(self, session) -> None:
         # A failed run will mark the subject as FAILED an set the payload['error']
         subject = self.sample_job({"original_state": 1}).save(session)
         exception = Exception("This is a test.")
@@ -94,7 +97,7 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "This is a test."
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run_interrupted(self, session) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
@@ -110,7 +113,7 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was interrupted"
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run_terminated(self, session) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
@@ -135,6 +138,42 @@ class TestJob:
         job.save(session)
         assert job.run_id == run_id
 
+    def test_run_id_is_uuidv7(self, session) -> None:
+        """Test that job run_id uses UUIDv7 format."""
+        import time
+
+        # Create two jobs with a small time gap
+        job1 = Job()
+        time.sleep(0.001)  # Wait 1ms to ensure different timestamps
+        job2 = Job()
+
+        # Both should have UUIDv7 version
+        assert job1.run_id.version == 7
+        assert job2.run_id.version == 7
+
+        # They should be time-ordered (lexicographically sortable)
+        assert str(job1.run_id) < str(job2.run_id)
+
+        # Save and verify UUIDs persist correctly
+        job1.save(session)
+        job2.save(session)
+
+        assert job1.run_id.version == 7
+        assert job2.run_id.version == 7
+        assert str(job1.run_id) < str(job2.run_id)
+
+    def test_legacy_uuidv4_run_id(self, session: Session) -> None:
+        """Test that a Job with a legacy UUIDv4 run_id is processed correctly."""
+        legacy_run_id = uuid.uuid4()  # Simulate a legacy UUIDv4
+        job = Job(run_id=legacy_run_id)
+        job.save(session)
+
+        # Reload the job from the database
+        loaded_job = session.query(Job).filter_by(run_id=legacy_run_id).one()
+        assert loaded_job.run_id == legacy_run_id
+        assert isinstance(loaded_job.run_id, uuid.UUID)
+        assert loaded_job.run_id.version == 4
+
     def test_is_stale(self) -> None:
         job = Job()
 
@@ -146,6 +185,7 @@ class TestJob:
         assert not job.is_stale()
 
         # Jobs started more than 25 hours ago without a heartbeat are stale
+        job.last_heartbeat_at = None
         offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
         job.started_at = datetime.now(timezone.utc) - offset
         assert job.is_stale()
@@ -172,6 +212,7 @@ class TestJob:
 
         # Fails a stale job without a heartbeat
         job.start()
+        job.last_heartbeat_at = None
         offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
         job.started_at = datetime.now(timezone.utc) - offset
 

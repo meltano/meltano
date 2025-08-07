@@ -20,10 +20,10 @@ As always, we highly recommend git versioning your Meltano project prior to foll
 Add your adapter-specific dbt variant (e.g. dbt-postgres) that can be found on [MeltanoHub](https://hub.meltano.com/utilities/).
 
 ```
-meltano add utility dbt-<adapter_name>
+meltano add dbt-<adapter_name>
 
 # For example
-meltano add utility dbt-postgres
+meltano add dbt-postgres
 ```
 
 Next configure your transformer to include database names, connection credentials, etc.

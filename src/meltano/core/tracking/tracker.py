@@ -30,7 +30,7 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
-from meltano.core.utils import format_exception
+from meltano.core.utils import format_exception, uuid7
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
@@ -73,6 +73,15 @@ def check_url(url: str) -> bool:
         True if the URL is valid, False otherwise.
     """
     return bool(re.match(URL_REGEX, url))
+
+
+def new_client_id() -> uuid.UUID:
+    """Generate a new client ID.
+
+    Returns:
+        A new client ID.
+    """
+    return uuid7()
 
 
 class TelemetrySettings(t.NamedTuple):
@@ -125,7 +134,11 @@ class Tracker:  # - too many (public) methods
         emitters: list[Emitter] = []
         for endpoint in endpoints:
             if not check_url(endpoint):
-                logger.warning("invalid_snowplow_endpoint", endpoint=endpoint)
+                warn(
+                    f"Invalid Snowplow endpoint: {endpoint}",
+                    UserWarning,
+                    stacklevel=2,
+                )
                 continue
             parsed_url = urlparse(endpoint)
             emitters.append(
@@ -202,7 +215,7 @@ class Tracker:  # - too many (public) methods
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
-        return uuid.uuid4()
+        return new_client_id()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
@@ -235,8 +248,8 @@ class Tracker:  # - too many (public) methods
             # Project ID has changed
             self.track_telemetry_state_change_event(
                 "project_id",
-                stored_telemetry_settings.project_id,
-                self.project_id,
+                from_value=stored_telemetry_settings.project_id,
+                to_value=self.project_id,
             )
 
         if (
@@ -247,8 +260,8 @@ class Tracker:  # - too many (public) methods
             # Telemetry state has changed
             self.track_telemetry_state_change_event(
                 "send_anonymous_usage_stats",
-                stored_telemetry_settings.send_anonymous_usage_stats,
-                self.send_anonymous_usage_stats,
+                from_value=stored_telemetry_settings.send_anonymous_usage_stats,
+                to_value=self.send_anonymous_usage_stats,
             )
 
     @cached_property
@@ -344,6 +357,7 @@ class Tracker:  # - too many (public) methods
     def track_telemetry_state_change_event(
         self,
         setting_name: str,
+        *,
         from_value: uuid.UUID | str | bool | None,
         to_value: uuid.UUID | str | bool | None,
     ) -> None:

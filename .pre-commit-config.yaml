@@ -6,23 +6,15 @@ ci:
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: weekly
+  skip:
+    - uv-lock
+    - check-github-issue-templates
+    - check-github-issue-config
+    - check-github-discussion-templates
 
 repos:
-  - repo: local
-    hooks:
-      - id: check-poetry-lock
-        # `pre-commit autoupdate` will update to older Poetry versions, so we
-        # use a local hook to avoid that bug:
-        # https://github.com/meltano/meltano/pull/7238#issuecomment-1409434351
-        name: check that `poetry.lock` conforms to `pyproject.toml`
-        entry: sh -c 'find . -type f -name poetry.lock -print0 | xargs -0 -n 1 -P 0 sh -c 'cd "$(dirname "$1")" && echo "$(pwd)/poetry.lock" && poetry lock --check' _ {} \;'
-        language: python
-        pass_filenames: false
-        additional_dependencies:
-          - "poetry==1.8.3"
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
@@ -33,24 +25,41 @@ repos:
       - id: pretty-format-json
         args: ["--autofix", "--indent=2", "--no-sort-keys"]
       - id: check-added-large-files
+        exclude: ^uv\.lock$
       - id: check-merge-conflict
       - id: check-toml
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.3
+    rev: 0.33.2
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
-        files: ^schemas?/.*\.json$
+        files: ^src/meltano/schemas?/.*\.json$
       - id: check-jsonschema
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
       - id: check-jsonschema
-        name: validate 'discovery.yml' with jsonschema
-        files: ^src/meltano/core/bundle/discovery.yml$
-        args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
+        alias: check-github-issue-templates
+        name: validate GitHub issue templates
+        files: ^\.github/ISSUE_TEMPLATE/.*\.yml$
+        exclude: ^\.github/ISSUE_TEMPLATE/config\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-issue-forms.json"]
+      - id: check-jsonschema
+        alias: check-github-issue-config
+        name: validate GitHub issue config
+        files: ^\.github/ISSUE_TEMPLATE/config\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
+      - id: check-jsonschema
+        alias: check-github-discussion-templates
+        name: validate GitHub discussion templates
+        files: ^.github/DISCUSSION_TEMPLATE/.*\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-discussion.json"]
+      - id: check-compose-spec
+      - id: check-dependabot
+      - id: check-github-actions
+      - id: check-github-workflows
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
@@ -74,8 +83,13 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.8
+    rev: v0.12.7
     hooks:
-    - id: ruff
+    - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.8.4
+    hooks:
+      - id: uv-lock

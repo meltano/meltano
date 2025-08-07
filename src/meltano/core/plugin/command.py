@@ -10,13 +10,14 @@ from meltano.core.container.container_spec import ContainerSpec
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
 
-TCommand = t.TypeVar("TCommand")
+if t.TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class UndefinedEnvVarError(Error):
     """An environment variable is used as a command argument but is not set."""
 
-    def __init__(self, command_name, var) -> None:  # noqa: ANN001
+    def __init__(self, command_name: str, var: str) -> None:
         """Initialize UndefinedEnvVarError.
 
         Args:
@@ -33,9 +34,14 @@ class UndefinedEnvVarError(Error):
 class Command(Canonical):
     """This class represents stored command arguments for plugins."""
 
+    args: str
+    description: str | None
+    executable: str | None
+    container_spec: ContainerSpec | None
+
     def __init__(
         self,
-        args: str,
+        args: str = "",
         description: str | None = None,
         executable: str | None = None,
         container_spec: dict | None = None,
@@ -53,12 +59,11 @@ class Command(Canonical):
             description=description,
             executable=executable,
         )
-        if container_spec is not None:
-            self.container_spec = ContainerSpec(**container_spec)
-        else:
-            self.container_spec = None
+        self.container_spec = (
+            ContainerSpec(**container_spec) if container_spec else None
+        )
 
-    def expanded_args(self, name, env):  # noqa: ANN001, ANN201
+    def expanded_args(self, name: str, env: Mapping[str, str]) -> list[str]:
         """Replace any env var arguments with their values.
 
         Args:
@@ -95,12 +100,12 @@ class Command(Canonical):
         # if there are only args, flatten the object
         # to the short form
         if "args" in canonical and len(canonical) == 1:
-            return canonical["args"]
+            return canonical["args"]  # type: ignore[call-overload]
 
         return canonical
 
     @classmethod
-    def parse(cls, obj):  # noqa: ANN001, ANN206
+    def parse(cls, obj: str | dict) -> Command:
         """Deserialize data into a Command.
 
         Args:
@@ -117,7 +122,7 @@ class Command(Canonical):
         return super().parse(obj)
 
     @classmethod
-    def parse_all(cls: type[TCommand], obj: dict | None) -> dict[str, TCommand]:
+    def parse_all(cls: type[Command], obj: dict | None) -> dict[str, Command]:
         """Deserialize commands data into a dict of Commands.
 
         Args:

@@ -1,0 +1,46 @@
+---
+slug: 2024-q4-updates-and-changes
+title: 2024 Q4 Updates and Changes
+date: 2024-12-31
+---
+
+## Meltano
+
+We've released version [3.6.0](https://github.com/meltano/meltano/releases/tag/v3.6.0) of Meltano!
+
+This release includes, among other things, the following changes:
+
+* The default value of [`elt.buffer_size`](https://docs.meltano.com/reference/settings#eltbuffer_size) was bumped from 10 MiB to 100 MiB. This should reduce the number of broken pipelines you may encounter when taps emit hefty records.
+* [Logs emitted with the `meltano.core.logging.json_log_formatter`](https://docs.meltano.com/guide/logging/) now include an `exceptions` key containing a structured array of exception objects to aid in log parsing and debugging.
+* Mappings are now correctly [auto-installed](https://docs.meltano.com/reference/command-line-interface/#auto-install-behavior).
+* Python 3.8 (EOL 2024/10) is no longer supported.
+* Python 3.13 is now supported.
+
+You can read the complete release notes [on GitHub](https://github.com/meltano/meltano/releases/tag/v3.6.0).
+
+Meltano has now reached over 190k monthly downloads from [PyPI](https://pypi.org/project/meltano/)! 🎉
+
+## MeltanoHub
+
+### Extractors
+
+* Added the Emil Klindt Sørensen variant of tap-formbricks - [Hub Link](https://hub.meltano.com/extractors/tap-formbricks--emilklindt/)
+* Added the Ella6882 variant of tap-sproutsocial - [Hub Link](https://hub.meltano.com/extractors/tap-sproutsocial--ella6882/)
+* Added the MeltanoLabs variant of tap-google-search-console - [Hub Link](https://hub.meltano.com/extractors/tap-google-search-console--meltanolabs/)
+
+## SDK
+
+We shipped three minor releases of the SDK:
+
+* [v0.41.0](https://github.com/meltano/sdk/releases/tag/v0.41.0)
+* [v0.42.0](https://github.com/meltano/sdk/releases/tag/v0.42.0)
+* [v0.43.0](https://github.com/meltano/sdk/releases/tag/v0.43.0)
+
+Among other things, these releases shipped the following changes:
+
+* It's easier now for SQL tap developers to customize the mapping from SQL column types to JSON schema. See [the guide](https://sdk.meltano.com/en/v0.41.0/guides/sql-tap.html#custom-type-mapping) for details.
+* For SQL target developers, there is now [a public and official API](https://sdk.meltano.com/en/v0.42.0/guides/sql-target.html) for overriding how JSON schema types are mapped into SQL types. Let us know if there's any improvements we can make to it to better suit your use case!
+* The name of the stream [is now available in stream maps](https://sdk.meltano.com/en/v0.42.0/stream_maps.html#built-in-variable-names) as `__stream_name__`, including in the context of [`__alias__`](https://sdk.meltano.com/en/v0.42.0/stream_maps.html#built-in-alias-variable-names) expressions.
+* This is last minor version to support Python 3.8, which reached its EOL on 2024-10-07, the next release will only support Python 3.9+.
+
+The SDK has now reached over 3 million monthly downloads from [PyPI](https://pypi.org/project/singer-sdk/)! 🎉

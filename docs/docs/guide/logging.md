@@ -7,9 +7,15 @@ sidebar_position: 19
 
 ## Logging
 
-Logging in meltano can be controlled via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
+A quick way to change the log format of the command line output is [the `--log-format` global option](/reference/settings/#clilog_format). For example:
 
-By default, meltano will look for this in a `logging.yaml` file in the project root. However, you can override this by
+```bash
+meltano --log-format=json run my-job
+```
+
+Logging in meltano can also be controlled in more detail via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
+
+By default, meltano will look for this in a `logging.yaml` file in the project root. Both `.yaml` and `.yml` file extensions are supported. However, you can override this by
 setting the [environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or by using the
 `meltano` CLI option `--log-config`. e.g. `meltano --log-config=my-prod-logging.yaml ...`.
 
@@ -23,11 +29,13 @@ A logging.yaml contains a few key sections that you should be aware of.
 A few key points to note:
 
 1. Different handlers can use different formats. Meltano ships with [3 formatters](https://github.com/meltano/meltano/blob/main/src/meltano/core/logging/formatters.py):
-   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library.
+   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library. Supports `colors` (bool), `show_locals` (bool), `max_frames` (int, default: 2), and `utc` (bool) parameters.
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
+   - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
 2. Different loggers can use different handlers and log at different log levels.
 3. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
+4. If a logging config file is found, it will take precedence over the `--log-format` and `--log-level` CLI options.
 
 Here's an annotated example of a logging.yaml file:
 
@@ -40,20 +48,24 @@ formatters:
     format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
   structured_colored:
     (): meltano.core.logging.console_log_formatter
-    colors: True
+    colors: true
   structured_plain_no_locals: # log format for structured plain text logs without colored output and without local variables
     (): meltano.core.logging.console_log_formatter
-    colors: False # also disables `rich` traceback formatting
-    show_locals: False # disables local variable logging in tracebacks (which be very verbose and leak sensitive data)
+    colors: false # also disables `rich` traceback formatting
+    show_locals: false # disables local variable logging in tracebacks (which be very verbose and leak sensitive data)
   structured_locals: # log format for structured plain text logs WITH local variables
     (): meltano.core.logging.console_log_formatter
-    colors: True # also enables traceback formatting with `rich`
-    show_locals: True # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
+    colors: true # also enables traceback formatting with `rich`
+    show_locals: true # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
+    max_frames: 5 # maximum number of frames to show in tracebacks (default: 2)
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
-    sort_keys: False
+    sort_keys: false
   json: # log format for json formatted logs
     (): meltano.core.logging.json_formatter
+    callsite_parameters: true # adds `pathname`, `lineno`, `func_name` and `process` to each log entry
+    dict_tracebacks: false # removes the `exception` object that is added to each log entry
+    show_locals: true # enables local variable logging in tracebacks
 
 handlers:
   console: # log to the console (stderr) using structured_colored formatter, logging everything at DEBUG level and up
@@ -248,7 +260,7 @@ See https://docs.datadoghq.com/logs/log_collection/python/?tab=jsonlogformatter 
 ## Google Cloud logging config
 
 For Google Cloud Logging (stackdriver) the default json log format is sufficient. That means when capturing `meltano run`,
-`meltano invoke` and `meltano elt` console output directly via something like CloudRun the built-in json format is
+`meltano invoke` and `meltano el` console output directly via something like CloudRun the built-in json format is
 sufficient:
 
 ```yaml
@@ -289,8 +301,27 @@ and ones that are useful for filter or grouping:
 
 ## Tips and tricks
 
+### Filter logs
+
 Use [jq](https://stedolan.github.io/jq/) to filter the output of JSON formatted Meltano logs to only show the lines you're interested in.
 
 ```bash
 cat meltano.log | jq -c 'select(.string_id == "tap-gitlab" and .stdio == "stderr") | .event'
+```
+
+### Exclude plugin stdout logs
+
+When DEBUG level logging is enabled, a plugin's stdout logs can be very verbose. For extractors, these can include the raw [Singer](/reference/glossary/#singer) messages. To exclude them, you can set the `meltano.core.block.extract_load` logger to `INFO` level.
+
+```yaml
+version: 1
+disable_existing_loggers: no
+
+loggers:
+  # Disable logging of tap and target stdout
+  meltano.core.block.extract_load:
+    level: INFO
+  root:
+    level: DEBUG
+    handlers: [console]
 ```

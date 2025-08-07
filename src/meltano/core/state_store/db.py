@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import typing as t
+from contextlib import contextmanager
 
 from sqlalchemy import select
 
 from meltano.core.job_state import JobState
-from meltano.core.state_store.base import StateStoreManager
+from meltano.core.state_store.base import MeltanoState, StateStoreManager
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator, Iterator
+
     from sqlalchemy.orm import Session
 
 
@@ -19,7 +22,7 @@ class DBStateStoreManager(StateStoreManager):
 
     label = "Database"
 
-    def __init__(self, session: Session, **kwargs):  # noqa: ANN003
+    def __init__(self, session: Session, **kwargs: t.Any):
         """Initialize the DBStateStoreManager.
 
         Args:
@@ -29,7 +32,7 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(**kwargs)
         self.session = session
 
-    def set(self, state: JobState) -> None:
+    def set(self, state: MeltanoState) -> None:
         """Set the job state for the given state_id.
 
         Args:
@@ -60,7 +63,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, state_id):  # noqa: ANN001, ANN201
+    def get(self, state_id: str) -> MeltanoState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -69,11 +72,16 @@ class DBStateStoreManager(StateStoreManager):
         Returns:
             The current state for the given job
         """
-        return (
-            self.session.query(JobState).filter(JobState.state_id == state_id).first()
-        )
+        if job_state := self.session.get(JobState, state_id):
+            return MeltanoState(
+                state_id=state_id,
+                partial_state=job_state.partial_state,
+                completed_state=job_state.completed_state,
+            )
 
-    def clear(self, state_id) -> None:  # noqa: ANN001
+        return None
+
+    def delete(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -85,7 +93,17 @@ class DBStateStoreManager(StateStoreManager):
             self.session.delete(job_state)
             self.session.commit()
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def clear_all(self) -> int:
+        """Clear all states.
+
+        Returns:
+            The number of states cleared from the store.
+        """
+        count = self.session.query(JobState).delete()
+        self.session.commit()
+        return count
+
+    def get_state_ids(self, pattern: str | None = None) -> Iterator[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -106,7 +124,13 @@ class DBStateStoreManager(StateStoreManager):
             for record in self.session.execute(select(JobState.state_id)).all()
         )
 
-    def acquire_lock(self, state_id) -> None:  # noqa: ANN001
+    @contextmanager
+    def acquire_lock(
+        self,
+        state_id: str,  # noqa: ARG002
+        *,
+        retry_seconds: int = 1,  # noqa: ARG002
+    ) -> Generator[None, None, None]:
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
@@ -114,9 +138,11 @@ class DBStateStoreManager(StateStoreManager):
 
         Args:
             state_id: the state_id to lock
+            retry_seconds: the number of seconds to wait before retrying
         """
+        yield
 
-    def release_lock(self, state_id) -> None:  # noqa: ANN001
+    def release_lock(self, state_id: str) -> None:
         """Release the lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.

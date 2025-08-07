@@ -7,11 +7,10 @@ import shutil
 import typing as t
 from pathlib import Path
 from platform import system
+from unittest import mock
 
-import mock
 import pytest
 
-from meltano import __file__ as meltano_init_file
 from meltano.cli import cli
 from meltano.core.manifest import manifest
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
@@ -22,7 +21,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
-schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
+schema_path = manifest.MANIFEST_SCHEMA_PATH
 
 SECURE_VALUE = "a-very-secure-value"
 
@@ -36,7 +35,7 @@ def check_indent(json_path: Path, indent: int) -> None:
 
 
 class TestCompile:
-    @pytest.fixture()
+    @pytest.fixture
     def manifest_dir(self, project: Project) -> Path:
         return project.sys_dir_root / "manifests"
 
@@ -129,7 +128,7 @@ class TestCompile:
             # check is good enough:
             assert len(log.events) == 2
             return
-        assert log.events == [
+        assert log.events[-2:] == [
             {
                 "event": (
                     f"Failed to validate project files against Meltano "

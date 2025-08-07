@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import os
+import platform
+import re
+import sys
 import typing as t
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -34,7 +39,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                    "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
@@ -45,7 +50,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "target-csv",
                                     "namespace": "target_csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                                    "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
                                 },
                             ],
                         },
@@ -55,7 +60,7 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap(self, project_add_service):
         try:
             return project_add_service.add(
@@ -66,7 +71,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def inherited_tap(self, project_add_service, tap):
         try:
             return project_add_service.add(
@@ -77,7 +82,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def inherited_inherited_tap(self, project_add_service, inherited_tap):
         try:
             return project_add_service.add(
@@ -88,7 +93,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapper(self, project_add_service):
         try:
             return project_add_service.add(
@@ -125,7 +130,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapping(self, project: Project, mapper: ProjectPlugin):
         name: str = mapper.extra_config["_mappings"][0]["name"]
         return project.plugins.find_plugin(name)
@@ -149,7 +154,17 @@ class TestPluginInstallService:
             "target-csv",
         ]
 
-    @pytest.mark.slow()
+    @pytest.mark.xfail(
+        platform.system() == "Windows"
+        and sys.version_info >= (3, 13, 4)
+        and sys.version_info < (3, 13, 5),
+        reason=(
+            "The test fails on Windows with Python 3.13.4 because the build "
+            "is broken and points to a free-threaded binary."
+            "See https://github.com/python/cpython/issues/135151."
+        ),
+    )
+    @pytest.mark.slow
     async def test_install_all(self, subject) -> None:
         all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3
@@ -182,7 +197,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "'tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git' python-json-logger",  # noqa: E501
+                                    "pip_url": "'tap-gitlab @ git+https://github.com/MeltanoLabs/tap-gitlab.git' python-json-logger",  # noqa: E501
                                 },
                             ],
                         },
@@ -192,11 +207,11 @@ class TestPluginInstallService:
         project.refresh()
         plugin = next(project.plugins.plugins())
         assert get_pip_install_args(project, plugin) == [
-            "tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git",
+            "tap-gitlab @ git+https://github.com/MeltanoLabs/tap-gitlab.git",
             "python-json-logger",
         ]
 
-    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @patch("meltano.core.venv_service.UvVenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install(
         self,
@@ -221,9 +236,9 @@ class TestPluginInstallService:
             reason=PluginInstallReason.AUTO,
         )
 
-        assert (
-            state.skipped
-        ), "Expected plugin with venv and matching fingerprint to not be installed"
+        assert state.skipped, (
+            "Expected plugin with venv and matching fingerprint to not be installed"
+        )
 
         state = await subject.install_plugin_async(
             inherited_plugin,
@@ -251,9 +266,9 @@ class TestPluginInstallService:
             reason=PluginInstallReason.AUTO,
         )
 
-        assert (
-            not state.skipped
-        ), "Expected plugin with venv and non-matching fingerprint to be installed"
+        assert not state.skipped, (
+            "Expected plugin with venv and non-matching fingerprint to be installed"
+        )
 
         plugin.pip_url = "$MISSING_ENV_VAR"
         state = await subject.install_plugin_async(
@@ -261,11 +276,34 @@ class TestPluginInstallService:
             reason=PluginInstallReason.AUTO,
         )
 
-        assert (
-            state.skipped
-        ), "Expected plugin with missing env var in pip URL to not be installed"
+        assert state.skipped, (
+            "Expected plugin with missing env var in pip URL to not be installed"
+        )
 
-    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_plugin_installation_env(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(os, "environ", {"EXTERNAL_VAR": "value"})
+
+        service = PluginInstallService(project)
+        env = service.plugin_installation_env(tap)
+        assert re.match(r"\d+\.\d+", env.pop("MELTANO__PYTHON_VERSION"))
+        assert re.match(r"Meltano/.*", env.pop("MELTANO_USER_AGENT"))
+        assert Path(env.pop("MELTANO_PROJECT_ROOT")).is_dir()
+        assert Path(env.pop("MELTANO_SYS_DIR_ROOT")).is_dir()
+        assert env == {
+            "MELTANO_ENVIRONMENT": "",
+            "MELTANO_EXTRACTOR_NAME": "tap-mock",
+            "MELTANO_EXTRACTOR_NAMESPACE": "tap_mock",
+            "MELTANO_EXTRACTOR_VARIANT": "meltano",
+            "EXTERNAL_VAR": "value",
+        }
+
+    @patch("meltano.core.venv_service.UvVenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install_mapper_by_mapping(
         self,

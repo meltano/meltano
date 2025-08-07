@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import typing as t
-
-import mock
+from unittest import mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli

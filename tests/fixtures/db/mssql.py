@@ -84,11 +84,11 @@ def engine_uri(worker_id: str):
     return testing_engine_uri.render_as_string(hide_password=False)
 
 
-@pytest.fixture()
+@pytest.fixture
 def pg_stats(request, session):
     yield
 
     from meltano.core.job import Job
 
     jobs = session.query(Job).all()
-    logging.info("%s created %d Job.", request.node.name, len(jobs))  # noqa: TID251
+    logging.info("%s created %d Job.", request.node.name, len(jobs))

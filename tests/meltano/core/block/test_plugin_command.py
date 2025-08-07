@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+from unittest.mock import AsyncMock
+
 import pytest
-from mock import AsyncMock
 
 from meltano.core.block.plugin_command import plugin_command_invoker
 
 
 class TestInvokerCommand:
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session")
     async def test_run_passes_command_args_when_required(self, project, dbt) -> None:
         cmd = plugin_command_invoker(

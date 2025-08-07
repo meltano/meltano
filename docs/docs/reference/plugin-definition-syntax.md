@@ -137,7 +137,7 @@ For Singer connectors, declares the ability to perform inline transformations or
 A string with the plugin's [`pip install`](https://pip.pypa.io/en/stable/cli/pip_install/#options) argument. Can point to multiple packages and include any of the pip install options.
 
 ```yaml
-pip_url: apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt
+pip_url: apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.10.5/constraints-${MELTANO__PYTHON_VERSION}.txt
 ```
 
 ## `maintenance_status`
@@ -416,13 +416,19 @@ settings:
 
 Optional. An array of aliases for the setting.
 
+An alias is an alternative setting name that can be used in 'meltano.yml' and 'meltano config set'. For example,
+
 ```yaml
-settings:
-- name: setting_name
-  aliases:
-  - setting_name_alias
-  - setting_name_alias_2
+plugins:
+- name: target-rdbms
+  settings:
+  - name: dbname
+    aliases:
+    - database
+    - database_name
 ```
+
+means that, along with the `TARGET_RDBMS_DBNAME` environment variable, the `target-rdbms` plugin also supports the `TARGET_RDBMS_DATABASE` and `TARGET_RDBMS_DATABASE_NAME` environment variables for the same setting. It also means that the `dbname` setting can be used in `meltano.yml` and `meltano config set` using the `database` and `database_name` aliases.
 
 ### `settings[*].description`
 
@@ -447,7 +453,17 @@ settings:
 
 ### `settings[*].env`
 
-Use to delegate to an environment variable for overriding this setting's value.
+Meltano takes the value of the setting and injects it into the plugin's runtime environment as this environment variable, in addition to the default environment variable (of the form `<PLUGIN_NAME>_<SETTING_NAME>`, etc.).
+
+For example, the following setting definition:
+
+```yaml
+settings:
+- name: setting_name
+  env: SOME_API_KEY
+```
+
+will result in the plugin being able to access the value of the setting via the `SOME_API_KEY` environment variable.
 
 ### `settings[*].hidden`
 Optional. Use to hide a setting.
@@ -460,7 +476,7 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `options`, `file`, `array`, and `object`.
+Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `decimal`, `date_iso8601`, `options`, `file`, `array`, and `object`.
 
 ```yaml
 settings:
@@ -474,11 +490,13 @@ settings:
   env: SOME_API_KEY
 ```
 
-<br/>
-
 :::caution
-  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden</code></a>.</p>
-  <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive</code></a>.</p>
+  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden: true</code></a>.</p>
+  <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive: true</code></a>.</p>
+:::
+
+:::tip
+  <p>Starting with Meltano v3.7, settings of kind `date_iso8601` can have relative date values, like `3 days ago`, `yesterday`, `last week`, etc.</p>
 :::
 
 ### `settings[*].label`

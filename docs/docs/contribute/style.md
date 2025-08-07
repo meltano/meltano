@@ -17,7 +17,7 @@ Python:
 - [Ruff](https://docs.astral.sh/ruff/)
 - [MyPy](https://mypy.readthedocs.io/en/stable/)
 
-To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files ruff` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
+To lint your Python code, install the project using `uv sync`, then run `uvx pre-commit run --all-files ruff` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
 
 Javascript:
 

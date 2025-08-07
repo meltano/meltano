@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 import platform
 import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock, Mock, patch
 
-import mock
 import pytest
-from mock import AsyncMock, Mock, patch
 
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
@@ -28,37 +28,45 @@ def project_tap_mock(project_add_service):
 
 @pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
-    @pytest.fixture()
+    @pytest.fixture
     def mock_invoke(self, utility, plugin_invoker_factory):
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=0)
 
-        with patch(
-            "meltano.core.plugin_invoker.invoker_factory",
-            return_value=plugin_invoker_factory,
-        ), patch.object(
-            ProjectPluginsService,
-            "find_plugin",
-            return_value=utility,
-        ), patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            patch(
+                "meltano.core.plugin_invoker.invoker_factory",
+                return_value=plugin_invoker_factory,
+            ),
+            patch.object(
+                ProjectPluginsService,
+                "find_plugin",
+                return_value=utility,
+            ),
+            patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             invoke_async = AsyncMock(return_value=process_mock)
             asyncio_mock.create_subprocess_exec = invoke_async
             yield invoke_async
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
-        with patch(
-            "meltano.core.plugin_invoker.invoker_factory",
-            return_value=plugin_invoker_factory,
-        ), patch.object(
-            ProjectPluginsService,
-            "find_plugin",
-            return_value=utility,
-        ), mock.patch(
-            "aiodocker.Docker",
-            autospec=True,
-        ) as invoke_async:
+        with (
+            patch(
+                "meltano.core.plugin_invoker.invoker_factory",
+                return_value=plugin_invoker_factory,
+            ),
+            patch.object(
+                ProjectPluginsService,
+                "find_plugin",
+                return_value=utility,
+            ),
+            mock.patch(
+                "aiodocker.Docker",
+                autospec=True,
+            ) as invoke_async,
+        ):
             yield invoke_async
 
     def test_invoke(self, cli_runner, mock_invoke) -> None:
@@ -182,16 +190,11 @@ class TestCliInvoke:
         project: Project,
         tap: ProjectPlugin,
     ) -> None:
-        with patch.object(
-            SingerTap,
-            "discover_catalog",
-        ) as discover_catalog, patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ) as apply_catalog_rules, patch.object(
-            SingerTap,
-            "look_up_state",
-        ) as look_up_state:
+        with (
+            patch.object(SingerTap, "discover_catalog") as discover_catalog,
+            patch.object(SingerTap, "apply_catalog_rules") as apply_catalog_rules,
+            patch.object(SingerTap, "look_up_state") as look_up_state,
+        ):
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
             assert discover_catalog.call_count == 0
@@ -227,9 +230,9 @@ class TestCliInvoke:
     ) -> None:
         settings_service = plugin_settings_service_factory(tap)
 
-        with patch.object(SingerTap, "discover_catalog"), patch.object(
-            SingerTap,
-            "apply_catalog_rules",
+        with (
+            patch.object(SingerTap, "discover_catalog"),
+            patch.object(SingerTap, "apply_catalog_rules"),
         ):
             result = cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
 
@@ -247,15 +250,15 @@ class TestCliInvoke:
         assert "description of utility command" in res.output
 
     def test_invoke_only_install(self, cli_runner, project: Project, utility) -> None:
-        with patch.object(
-            ProjectPluginsService,
-            "find_plugin",
-            return_value=utility,
-        ), patch(
-            "meltano.cli.params.install_plugins",
-        ) as mock_install, patch(
-            "meltano.cli.invoke._invoke",
-        ) as mock_invoke:
+        with (
+            patch.object(
+                ProjectPluginsService,
+                "find_plugin",
+                return_value=utility,
+            ),
+            patch("meltano.cli.params.install_plugins") as mock_install,
+            patch("meltano.cli.invoke._invoke") as mock_invoke,
+        ):
             res = cli_runner.invoke(cli, ["invoke", "--only-install", "utility-mock"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"

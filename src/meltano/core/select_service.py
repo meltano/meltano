@@ -12,7 +12,7 @@ from meltano.core.plugin_invoker import invoker_factory
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
 
-    from meltano.core.plugin.base import PluginRef
+    from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -28,7 +28,7 @@ class SelectService:  # noqa: D101
         self.project = project
         self._extractor = self.project.plugins.find_plugin(
             extractor,
-            PluginType.EXTRACTORS,
+            plugin_type=PluginType.EXTRACTORS,
         )
 
     @property
@@ -92,32 +92,40 @@ class SelectService:  # noqa: D101
         remove: bool = False,
     ) -> None:
         """Update plugins' select patterns."""
-        plugin: PluginRef
-
-        if self.project.environment is None:
-            plugin = self.extractor
-        else:
-            plugin = self.project.environment.get_plugin_config(
-                self.extractor.type,
-                self.extractor.name,
-            )
-
         this_pattern = self._get_pattern_string(
             entities_filter,
             attributes_filter,
             exclude,
         )
-        patterns = plugin.extras.get("select", [])
-        if remove:
-            patterns.remove(this_pattern)
-        else:
-            patterns.append(this_pattern)
-        plugin.extras["select"] = patterns
 
+        plugin: ProjectPlugin | EnvironmentPluginConfig
         if self.project.environment is None:
+            plugin = self.extractor
+            self._update_plugin_select(plugin, this_pattern, remove=remove)
             self.project.plugins.update_plugin(plugin)
         else:
+            plugin = self.project.environment.get_plugin_config(
+                self.extractor.type,
+                self.extractor.name,
+            )
+            self._update_plugin_select(plugin, this_pattern, remove=remove)
             self.project.plugins.update_environment_plugin(plugin)
+
+    def _update_plugin_select(
+        self,
+        plugin: ProjectPlugin | EnvironmentPluginConfig,
+        pattern: str,
+        *,
+        remove: bool = False,
+    ) -> None:
+        """Update the plugin's select patterns."""
+        patterns = plugin.extras.get("select", [])
+        if remove:
+            patterns.remove(pattern)
+        else:
+            patterns.append(pattern)
+
+        plugin.extras["select"] = patterns
 
     @staticmethod
     def _get_pattern_string(

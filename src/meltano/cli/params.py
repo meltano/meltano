@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import functools
 import typing as t
+import uuid
+from collections.abc import Callable, Coroutine
 
 import click
 
@@ -17,10 +19,10 @@ from meltano.core.utils import async_noop
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-_AnyCallable = t.Callable[..., t.Any]
+_AnyCallable = Callable[..., t.Any]
 FC = t.TypeVar("FC", bound=_AnyCallable)
 
-InstallPlugins = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
+InstallPlugins = Callable[..., Coroutine[t.Any, t.Any, bool]]
 
 
 def _install_plugins_fn(
@@ -51,12 +53,11 @@ def _install_plugins_fn(
     return install_plugins
 
 
-async def _install_plugins_and_exit(*args, **kwargs) -> bool:  # noqa: ANN002, ANN003
+async def _install_plugins_and_exit(*args: t.Any, **kwargs: t.Any) -> t.NoReturn:
     kwargs.pop("reason", None)
     await install_plugins(*args, **kwargs, reason=PluginInstallReason.INSTALL)
     context = click.get_current_context()
     context.exit(code=0)
-    return True  # pragma: no cover
 
 
 def database_uri_option(func):  # noqa: ANN001, ANN201
@@ -79,7 +80,7 @@ def database_uri_option(func):  # noqa: ANN001, ANN201
 def get_install_options(
     *,
     include_only_install: bool,
-) -> tuple[t.Callable[[FC], FC], ...]:
+) -> tuple[Callable[[FC], FC], ...]:
     """Return install options for CLI commands.
 
     Args:
@@ -164,3 +165,21 @@ class pass_project:  # noqa: N801
             func(project, *args, **kwargs)
 
         return functools.update_wrapper(decorate, func)
+
+
+class UUIDParamType(click.ParamType):
+    """A custom click parameter type for UUIDs."""
+
+    name = "uuid"
+
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,
+        ctx: click.Context | None,
+    ) -> uuid.UUID:
+        """Convert an input value to a UUID."""
+        try:
+            return uuid.UUID(value)
+        except ValueError:
+            self.fail(f"{value} is not a valid UUID.", param, ctx)

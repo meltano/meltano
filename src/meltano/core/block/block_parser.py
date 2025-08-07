@@ -9,6 +9,7 @@ import typing as t
 
 import click
 
+from meltano.core._state import StateStrategy
 from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
 from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
@@ -19,10 +20,12 @@ from meltano.core.task_sets_service import TaskSetsService
 
 if t.TYPE_CHECKING:
     import uuid
+    from collections.abc import Generator
 
     import structlog
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
@@ -55,7 +58,7 @@ def validate_block_sets(
         True if all blocks are valid, False otherwise.
     """
     for idx, blk in enumerate(blocks):
-        if blk == BlockSet:
+        if isinstance(blk, BlockSet):
             log.debug("validating ExtractLoadBlock.", set_number=idx)
             try:
                 blk.validate_set()
@@ -69,7 +72,7 @@ class BlockParser:  # noqa: D101
     def __init__(
         self,
         log: structlog.BoundLogger,
-        project,  # noqa: ANN001
+        project: Project,
         blocks: list[str],
         *,
         full_refresh: bool | None = False,
@@ -77,7 +80,7 @@ class BlockParser:  # noqa: D101
         no_state_update: bool | None = False,
         force: bool | None = False,
         state_id_suffix: str | None = None,
-        merge_state: bool | None = False,
+        state_strategy: StateStrategy = StateStrategy.AUTO,
         run_id: uuid.UUID | None = None,
     ):
         """Parse a meltano run command invocation into a list of blocks.
@@ -93,7 +96,7 @@ class BlockParser:  # noqa: D101
             force: Whether to force a run if a job is already running (applies
                 to all found sets).
             state_id_suffix: State ID suffix to use.
-            merge_state: Whether to merge state at end of run.
+            state_strategy: Strategy to use for state evolution.
             run_id: Custom run ID to use.
 
         Raises:
@@ -110,7 +113,7 @@ class BlockParser:  # noqa: D101
         self._plugins: list[ProjectPlugin] = []
         self._commands: dict[int, str] = {}
         self._mappings_ref: dict[int, str] = {}
-        self._merge_state = merge_state
+        self._state_strategy = state_strategy
         self._run_id = run_id
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
@@ -189,7 +192,7 @@ class BlockParser:  # noqa: D101
     def find_blocks(
         self,
         offset: int = 0,
-    ) -> t.Generator[BlockSet | PluginCommandBlock | ExtractLoadBlocks, None, None]:
+    ) -> Generator[BlockSet | PluginCommandBlock | ExtractLoadBlocks, None, None]:
         """Find all blocks in the invocation.
 
         Args:
@@ -247,12 +250,12 @@ class BlockParser:  # noqa: D101
 
         builder = (
             ELBContextBuilder(self.project)
-            .with_force(force=self._force)
+            .with_force(force=self._force)  # type: ignore[arg-type]
             .with_full_refresh(full_refresh=self._full_refresh)
             .with_refresh_catalog(refresh_catalog=self._refresh_catalog)
             .with_no_state_update(no_state_update=self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
-            .with_merge_state(merge_state=self._merge_state)
+            .with_state_strategy(state_strategy=self._state_strategy)
             .with_run_id(self._run_id)
         )
 
@@ -323,4 +326,4 @@ class BlockParser:  # noqa: D101
                 raise BlockSetValidationError(
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",  # noqa: EM102
                 )
-        raise BlockSetValidationError("Found no end in block set!")  # noqa: EM101
+        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101

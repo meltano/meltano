@@ -96,7 +96,7 @@ async def test(
     *,
     all_tests: bool,
     install_plugins: InstallPlugins,
-    plugin_tests: tuple[str, ...] = (),
+    plugin_tests: tuple[str, ...],
 ) -> None:
     """Run validations using plugins' tests.
 

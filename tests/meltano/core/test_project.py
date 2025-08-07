@@ -13,14 +13,14 @@ from meltano.core.error import ProjectNotFound
 from meltano.core.project import PROJECT_ROOT_ENV, Project
 
 
-@pytest.fixture()
+@pytest.fixture
 def deactivate_project(project):
     Project.deactivate()
     yield
     Project.activate(project)
 
 
-def update(payload) -> None:
+def update(payload: dict) -> None:
     project = Project.find()
 
     with project.meltano_update() as meltano:
@@ -96,27 +96,30 @@ class TestProject:
         assert Project.find() is project
 
     def test_find_threadsafe(self, project, concurrency) -> None:
-        workers = ThreadPool(concurrency["threads"])
-        projects = workers.map(Project.find, range(concurrency["cases"]))
-        assert all(x is project for x in projects)
+        with ThreadPool(concurrency["threads"]) as workers:
+            projects = workers.map(Project.find, range(concurrency["cases"]))
+            assert all(x is project for x in projects)
 
-    @pytest.mark.concurrent()
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="Fails on Windows: https://github.com/meltano/meltano/issues/3444",
+        run=True,
+        strict=True,
+    )
+    @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency) -> None:
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
-
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]
 
         reader = ProjectReader(project)
         reader.start()
 
-        workers = Pool(concurrency["processes"])
-        workers.map(update, payloads)
+        with Pool(concurrency["processes"]) as pool:
+            pool.map(update, payloads)
+            reader.stop()
+            reader.join()
 
-        reader.stop()
-        reader.join()
+            pool.close()
+            pool.join()
 
         meltano = project.meltano
         unpacked_items = (item for payload in payloads for item in payload.items())
@@ -138,7 +141,7 @@ class TestProject:
 
 
 class TestIncompatibleProject:
-    @pytest.fixture()
+    @pytest.fixture
     def increase_version(self, project):
         with project.meltano_update() as meltano:
             meltano["version"] += 1

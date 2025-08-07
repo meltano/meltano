@@ -5,7 +5,6 @@ import fnmatch
 import re
 import sys
 import typing as t
-from collections import OrderedDict
 from enum import Enum, auto
 from functools import singledispatch
 
@@ -13,15 +12,19 @@ import structlog
 
 from meltano.core.behavior.visitor import visit_with
 
-if sys.version_info < (3, 11):
-    ReprEnum = Enum
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+    from typing import Self  # noqa: ICN003
 else:
-    from enum import ReprEnum
+    from backports.strenum import StrEnum
+    from typing_extensions import Self
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
 
 logger = structlog.stdlib.get_logger(__name__)
 
-Node = t.Dict[str, t.Any]
-T = t.TypeVar("T", bound="CatalogRule")
+Node = dict[str, t.Any]
 
 
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
@@ -41,12 +44,12 @@ class _CatalogRuleProtocol(t.Protocol):
     negated: bool
 
     @classmethod
-    def matching(  # noqa: ANN206
-        cls: type[T],
-        rules: list[T],
+    def matching(
+        cls,
+        rules: list[Self],
         tap_stream_id: str,
         breadcrumb: list[str] | None = None,
-    ):
+    ) -> list[Self]:
         """Filter rules that match a given breadcrumb."""
         return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
 
@@ -121,7 +124,7 @@ class SelectPattern(t.NamedTuple):
     raw: str
 
     @classmethod
-    def parse(cls, pattern: str):  # noqa: ANN206
+    def parse(cls, pattern: str) -> SelectPattern:
         """Parse a SelectPattern instance from a string pattern.
 
         Args:
@@ -160,7 +163,7 @@ class SelectPattern(t.NamedTuple):
         )
 
 
-def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
+def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
     Args:
@@ -169,21 +172,21 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
     Returns:
         A list of corresponding metadata rule objects.
     """
-    include_rules = []
-    exclude_rules = []
+    include_rules: list[MetadataRule] = []
+    exclude_rules: list[MetadataRule] = []
 
     for pattern in patterns:
-        pattern = SelectPattern.parse(pattern)
+        parsed_pattern = SelectPattern.parse(pattern)
 
-        prop_pattern = pattern.property_pattern
-        selected = not pattern.negated
+        prop_pattern = parsed_pattern.property_pattern
+        selected = not parsed_pattern.negated
 
         rules = include_rules if selected else exclude_rules
 
         if selected or not prop_pattern or prop_pattern == "*":
             rules.append(
                 MetadataRule(
-                    tap_stream_id=pattern.stream_pattern,
+                    tap_stream_id=parsed_pattern.stream_pattern,
                     breadcrumb=[],
                     key="selected",
                     value=selected,
@@ -195,7 +198,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
 
             rules.append(
                 MetadataRule(
-                    tap_stream_id=pattern.stream_pattern,
+                    tap_stream_id=parsed_pattern.stream_pattern,
                     breadcrumb=property_breadcrumb(props),
                     key="selected",
                     value=selected,
@@ -218,7 +221,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
     return include_rules + exclude_rules
 
 
-def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
+def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
     Args:
@@ -245,10 +248,10 @@ def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule
     )
 
     for pattern in patterns:
-        pattern = SelectPattern.parse(pattern)
+        parsed_pattern = SelectPattern.parse(pattern)
 
-        rule = exclude_rule if pattern.negated else include_rule
-        rule.tap_stream_id.append(pattern.stream_pattern)
+        rule = exclude_rule if parsed_pattern.negated else include_rule
+        rule.tap_stream_id.append(parsed_pattern.stream_pattern)  # type: ignore[union-attr]
 
     rules = []
     if include_rule.tap_stream_id:
@@ -274,6 +277,7 @@ def path_property(path: str) -> str:
     Examples:
       stream[0].properties.list_items.properties.account → list_items.account
       stream[0].properties.name                          → name
+      stream[0].properties.properties.properties.amount  → properties.amount
     """
     prop_regex = r"properties\.([^.]+)+"
     components = re.findall(prop_regex, path)
@@ -293,12 +297,9 @@ def property_breadcrumb(props: list[str]) -> list[str]:
     >>> property_breadcrumb(["payload", "content"])
     ['properties', 'payload', 'properties', 'content']
     """
-    if len(props) >= 2 and props[0] == "properties":
-        breadcrumb = props
-    else:
-        breadcrumb = []
-        for prop in props:
-            breadcrumb.extend(["properties", prop])
+    breadcrumb = []
+    for prop in props:
+        breadcrumb.extend(["properties", prop])
 
     return breadcrumb
 
@@ -309,23 +310,26 @@ class CatalogNode(Enum):  # noqa: D101
     METADATA = auto()
 
 
-# TODO: Move to `enum.StrEnum` when support for Python 3.8 is dropped
-class SelectionType(str, ReprEnum):
+class SelectionType(StrEnum):
     """A valid stream or property selection type."""
 
-    SELECTED = "selected"
-    EXCLUDED = "excluded"
-    AUTOMATIC = "automatic"
+    SELECTED = auto()
+    EXCLUDED = auto()
+    AUTOMATIC = auto()
+    UNSUPPORTED = auto()
 
     def __bool__(self) -> bool:  # noqa: D105
-        return self is not self.__class__.EXCLUDED
+        return self not in {self.__class__.EXCLUDED, self.__class__.UNSUPPORTED}
 
-    def __add__(self, other):  # noqa: ANN001, ANN204, D105
+    def __add__(self, other: SelectionType) -> SelectionType:  # type: ignore[override] # noqa: D105
         if self is SelectionType.EXCLUDED or other is SelectionType.EXCLUDED:
             return SelectionType.EXCLUDED
 
         if self is SelectionType.AUTOMATIC or other is SelectionType.AUTOMATIC:
             return SelectionType.AUTOMATIC
+
+        if self is SelectionType.UNSUPPORTED or other is SelectionType.UNSUPPORTED:
+            return SelectionType.UNSUPPORTED
 
         return SelectionType.SELECTED
 
@@ -340,7 +344,7 @@ def visit(  # noqa: D103
 
 
 @visit.register(dict)
-def _(node: dict, executor, path="") -> None:  # noqa: ANN001
+def _(node: dict, executor, path: str = "") -> None:  # noqa: ANN001
     node_type = None
 
     if re.search(r"streams\[\d+\]$", path):
@@ -365,7 +369,7 @@ def _(node: dict, executor, path="") -> None:  # noqa: ANN001
 
 
 @visit.register(list)
-def _(node: list, executor, path="") -> None:  # noqa: ANN001
+def _(node: list, executor, path: str = "") -> None:  # noqa: ANN001
     for index, child_node in enumerate(node):
         executor.visit(child_node, path=f"{path}[{index}]")
 
@@ -411,12 +415,12 @@ class CatalogExecutor:  # noqa: D101
 
 class MetadataExecutor(CatalogExecutor):  # noqa: D101
     def __init__(self, rules: list[MetadataRule]):  # noqa: D107
-        self._stream = None
+        self._stream: Node | None = None
         self._rules = rules
 
     def ensure_metadata(self, breadcrumb: list[str]) -> None:
         """Handle missing metadata entries."""
-        metadata_list: list[dict] = self._stream["metadata"]
+        metadata_list: list[dict] = self._stream["metadata"]  # type: ignore[index]
         match = next(
             (
                 metadata
@@ -470,7 +474,7 @@ class MetadataExecutor(CatalogExecutor):  # noqa: D101
 
     def metadata_node(self, node: Node, path: str) -> None:
         """Process metadata node."""
-        tap_stream_id = self._stream["tap_stream_id"]
+        tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]
         breadcrumb = node["breadcrumb"]
 
         logger.debug(
@@ -508,12 +512,12 @@ class SelectExecutor(MetadataExecutor):  # noqa: D101
 
 class SchemaExecutor(CatalogExecutor):  # noqa: D101
     def __init__(self, rules: list[SchemaRule]):  # noqa: D107
-        self._stream = None
+        self._stream: Node | None = None
         self._rules = rules
 
     def ensure_property(self, breadcrumb: list[str]) -> None:
         """Create nodes for the breadcrumb and schema extra that matches."""
-        next_node: dict[str, t.Any] = self._stream["schema"]
+        next_node: dict[str, t.Any] = self._stream["schema"]  # type: ignore[index]
 
         for idx, key in enumerate(breadcrumb):
             # If the key contains shell-style wildcards,
@@ -551,7 +555,7 @@ class SchemaExecutor(CatalogExecutor):  # noqa: D101
 
     def property_node(self, node: Node, path: str) -> None:
         """Process property schema node."""
-        tap_stream_id = self._stream["tap_stream_id"]
+        tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]
 
         breadcrumb_idx = path.index("properties")
         breadcrumb = path[breadcrumb_idx:].split(".")
@@ -569,7 +573,7 @@ class SchemaExecutor(CatalogExecutor):  # noqa: D101
 class ListExecutor(CatalogExecutor):  # noqa: D101
     def __init__(self) -> None:  # noqa: D107
         # properties per stream
-        self.properties: dict[str, set[str]] = OrderedDict()
+        self.properties: dict[str, set[str]] = {}
 
         super().__init__()
 
@@ -605,25 +609,25 @@ class SelectedNode(t.NamedTuple):
 class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
     def __init__(self) -> None:  # noqa: D107
         self.streams: set[SelectedNode] = set()
-        self.properties: dict[str, set[SelectedNode]] = OrderedDict()
+        self.properties: dict[str, set[SelectedNode]] = {}
         super().__init__()
 
     @property
-    def selected_properties(self):  # noqa: ANN201
+    def selected_properties(self) -> dict[str, set[str]]:
         """Get selected streams and properties."""
         # we don't want to mutate the visitor result
-        selected_properties = self.properties.copy()
+        properties = self.properties.copy()
 
         # remove all non-selected streams
-        for name, selected in self.streams:
+        for stream, selected in self.streams:
             if not selected:
-                del selected_properties[name]
+                del properties[stream]
 
-        # remove all non-selected properties
-        for stream, props in selected_properties.items():
-            selected_properties[stream] = {name for name, selected in props if selected}
-
-        return selected_properties
+        # return with all non-selected properties removed
+        return {
+            stream: {prop for prop, selected in props if selected}
+            for stream, props in properties.items()
+        }
 
     @staticmethod
     def node_selection(node: Node) -> SelectionType:
@@ -642,6 +646,8 @@ class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
 
         if metadata.get("inclusion") == "automatic":
             return SelectionType.AUTOMATIC
+        if metadata.get("inclusion") == "unsupported":
+            return SelectionType.UNSUPPORTED
         if metadata.get("selected") is True or (
             metadata.get("selected") is None
             and metadata.get("selected-by-default", False)

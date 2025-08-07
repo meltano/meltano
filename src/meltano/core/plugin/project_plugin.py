@@ -14,7 +14,21 @@ from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import flatten, uniques_in
 
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from meltano.core.plugin.base import BasePlugin
+    from meltano.core.plugin_invoker import PluginInvoker
+
 logger = structlog.stdlib.get_logger(__name__)
+
+
+class PluginInfo(t.TypedDict):
+    """Plugin info dictionary."""
+
+    name: str
+    namespace: str | None
+    variant: str | None
 
 
 class CyclicInheritanceError(Exception):
@@ -50,8 +64,12 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     VARIANT_ATTR = "variant"
 
+    invoker_class: type[PluginInvoker]
+
     name: str
     variant: str | None
+    executable: str
+    python: str | None
 
     config_files: dict[str, str]
 
@@ -65,13 +83,13 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         pip_url: str | None = None,
         python: str | None = None,
         executable: str | None = None,
-        capabilities: list | None = None,
-        settings_group_validation: list | None = None,
+        capabilities: list[str] | None = None,
+        settings_group_validation: list[list[str]] | None = None,
         settings: list | None = None,
-        commands: dict | None = None,
-        requires: dict[PluginType, list] | None = None,
-        config: dict | None = None,
-        default_variant=Variant.ORIGINAL_NAME,  # noqa: ANN001
+        commands: dict[str, Command] | None = None,
+        requires: dict[PluginType, list[PluginRequirement]] | None = None,
+        config: dict[str, t.Any] | None = None,
+        default_variant: str = Variant.DEFAULT_NAME,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):
@@ -144,7 +162,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
-        self.python = python
+        self.python = str(python) if python else None
         self.executable = executable
         self.capabilities = capabilities
         self.settings_group_validation = settings_group_validation
@@ -194,8 +212,19 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
             )
 
+    def __repr__(self) -> str:
+        """Return a string representation of the project plugin."""
+        return (
+            "ProjectPlugin("
+            f"name={self.name}, "
+            f"type={self.type}, "
+            f"variant={self.variant}, "
+            f"namespace={self.namespace}"
+            ")"
+        )
+
     @property
-    def parent(self) -> ProjectPlugin | None:
+    def parent(self) -> ProjectPlugin | BasePlugin | None:
         """Plugins parent.
 
         Returns:
@@ -204,7 +233,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self._parent
 
     @parent.setter
-    def parent(self, new_parent) -> None:  # noqa: ANN001
+    def parent(self, new_parent: ProjectPlugin | BasePlugin | None) -> None:
         ancestor = new_parent
         while isinstance(ancestor, self.__class__):
             if ancestor == self:
@@ -225,7 +254,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
-    def info(self) -> dict[str, str | None]:
+    def info(self) -> PluginInfo:
         """Plugin info dict.
 
         Returns:
@@ -408,7 +437,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     def get_requirements(
         self,
-        plugin_types: t.Iterable[PluginType] | None = None,
+        plugin_types: Iterable[PluginType] | None = None,
     ) -> dict[PluginType, list[PluginRequirement]]:
         """Return the requirements for this plugin.
 
@@ -467,5 +496,5 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             `PluginType.MAPPERS`).
         """
         return self.type is PluginType.MAPPERS and bool(
-            self.extra_config.get("_mapping")
+            self.extra_config.get("_mapping"),
         )

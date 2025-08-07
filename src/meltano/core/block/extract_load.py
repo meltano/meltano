@@ -9,11 +9,13 @@ from contextlib import asynccontextmanager, closing
 
 import structlog
 
+from meltano.core._protocols.el_context import ELContextProtocol
+from meltano.core._state import StateStrategy
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -27,6 +29,7 @@ from .singer import SingerBlock
 
 if t.TYPE_CHECKING:
     import uuid
+    from collections.abc import AsyncIterator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -43,7 +46,7 @@ class BlockSetHasNoStateError(Exception):
     """Block has no state."""
 
 
-class ELBContext:
+class ELBContext(ELContextProtocol):
     """ELBContext holds the context for ELB BlockSets."""
 
     def __init__(
@@ -58,7 +61,7 @@ class ELBContext:
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        merge_state: bool | None = False,
+        state_strategy: StateStrategy = StateStrategy.AUTO,
         run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -73,7 +76,7 @@ class ELBContext:
             update_state: Whether to update the state of the job.
             state_id_suffix: The state ID suffix to use.
             base_output_logger: The base logger to use.
-            merge_state: Whether to merge state at the end of run.
+            state_strategy: Strategy to use for state updates.
             run_id: The run ID to use.
         """
         self.project = project
@@ -84,7 +87,7 @@ class ELBContext:
         self.force = force
         self.update_state = update_state
         self.state_id_suffix = state_id_suffix
-        self.merge_state = merge_state
+        self.state_strategy = state_strategy
         self.run_id = run_id
 
         # not yet used but required to satisfy the interface
@@ -94,16 +97,6 @@ class ELBContext:
         self.catalog = None
 
         self.base_output_logger = base_output_logger
-
-    @property
-    def elt_run_dir(self) -> Path | None:
-        """Obtain the run directory for the current job.
-
-        Returns:
-            The run directory for the current job.
-        """
-        if self.job:  # noqa: RET503
-            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
 class ELBContextBuilder:
@@ -130,7 +123,7 @@ class ELBContextBuilder:
         self._state_id_suffix = None
         self._env = {}
         self._blocks = []
-        self._merge_state = False
+        self._state_strategy = StateStrategy.AUTO
         self._run_id: uuid.UUID | None = None
 
         self._base_output_logger = None
@@ -147,17 +140,17 @@ class ELBContextBuilder:
         self._job = job
         return self
 
-    def with_merge_state(self, *, merge_state: bool):  # noqa: ANN201
+    def with_state_strategy(self, *, state_strategy: StateStrategy):  # noqa: ANN201
         """Set whether the state is to be merged or overwritten.
 
         Args:
-            merge_state : merge the state for the context
+            state_strategy : strategy to use for state updates
 
         Returns:
             self
 
         """
-        self._merge_state = merge_state
+        self._state_strategy = state_strategy
         return self
 
     def with_full_refresh(self, *, full_refresh: bool):  # noqa: ANN201
@@ -312,8 +305,10 @@ class ELBContextBuilder:
         Returns:
             The run directory for the current job.
         """
-        if self._job:  # noqa: RET503
+        if self._job:  # pragma: no cover
             return self.project.job_dir(self._job.job_name, str(self._job.run_id))
+
+        return None
 
     def context(self) -> ELBContext:
         """Create an ELBContext object from the current builder state.
@@ -331,18 +326,18 @@ class ELBContextBuilder:
             update_state=self._state_update,
             state_id_suffix=self._state_id_suffix,
             base_output_logger=self._base_output_logger,
-            merge_state=self._merge_state,
+            state_strategy=self._state_strategy,
             run_id=self._run_id,
         )
 
 
-class ExtractLoadBlocks(BlockSet):
+class ExtractLoadBlocks(BlockSet[SingerBlock]):
     """`BlockSet` that supports basic EL (extract, load) patterns."""
 
     def __init__(
         self,
         context: ELBContext,
-        blocks: tuple[IOBlock, ...],
+        blocks: t.Sequence[SingerBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
@@ -410,17 +405,23 @@ class ExtractLoadBlocks(BlockSet):
                 raise BlockSetHasNoStateError
         return self._state_service
 
-    def index_last_input_done(self) -> int | None:
+    # TODO: This doesn't seem to be used anywhere. Remove?
+    def index_last_input_done(self) -> int | None:  # pragma: no cover
         """Return index of the block furthest from the start that has exited and required input.
 
         Returns:
             The index of the block furthest from the start that has exited and required input.
         """  # noqa: E501
-        for idx, block in reversed(list(enumerate(self.blocks))):  # noqa: RET503
-            if block.requires_input and block.proxy_stderr.done():
-                return idx
+        return next(
+            (
+                idx
+                for idx, block in reversed(list(enumerate(self.blocks)))
+                if block.consumer and block.proxy_stderr().done()
+            ),
+            None,
+        )
 
-    def upstream_complete(self, index: int) -> bool | None:
+    def upstream_complete(self, index: int) -> bool:
         """Return whether blocks upstream from a given block index are already done.
 
         Args:
@@ -429,12 +430,7 @@ class ExtractLoadBlocks(BlockSet):
         Returns:
             True if all upstream blocks are done, False otherwise.
         """
-        for idx, block in enumerate(self.blocks):  # noqa: RET503
-            if idx >= index:
-                return True
-            if block.process_future.done():
-                continue
-            return False
+        return all(block.process_future.done() for block in self.blocks[:index])
 
     async def upstream_stop(self, index) -> None:  # noqa: ANN001
         """Stop all blocks upstream of a given index.
@@ -522,16 +518,24 @@ class ExtractLoadBlocks(BlockSet):
         """
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
+        if self.context.force:
+            logger.warning(
+                "Force option is enabled, ignoring stale job check.",
+            )
+
         if not self.context.force and (
             existing := JobFinder(job.job_name).latest_running(
                 self.context.session,
             )
         ):
-            raise RunnerError(
-                f"Another '{job.job_name}' pipeline is already running "  # noqa: EM102
-                f"which started at {existing.started_at}. To ignore this "
-                "check use the '--force' option.",
+            msg = (
+                f"Another '{job.job_name}' pipeline is already running "
+                f"which started at {existing.started_at}. "
+                f"Wait until {existing.valid_intil()} when the job will be "
+                "automatically cancelled if stale, or ignore this check using the "
+                "'--force' option."
             )
+            raise RunnerError(msg)
 
         with closing(self.context.session) as session:
             async with job.run(session):
@@ -615,7 +619,7 @@ class ExtractLoadBlocks(BlockSet):
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> t.AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Yields:
@@ -648,7 +652,6 @@ class ExtractLoadBlocks(BlockSet):
                 producer=block.producer,
                 string_id=block.string_id,
                 cmd_type="elb",
-                run_id=str(self.context.job.run_id) if self.context.job else None,
                 job_name=self.context.job.job_name if self.context.job else None,
             )
             if logger.isEnabledFor(logging.DEBUG):
@@ -664,7 +667,7 @@ class ExtractLoadBlocks(BlockSet):
                     logger_base.bind(stdio="stderr"),
                 ),
             )
-            if block.consumer:
+            if block.consumer and block.stdin is not None:
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
                         block.stdin,

@@ -5,6 +5,7 @@ from __future__ import annotations
 import configparser
 import os
 import subprocess
+import typing as t
 from contextlib import suppress
 
 import structlog
@@ -16,13 +17,16 @@ from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
 
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
 logger = structlog.stdlib.get_logger(__name__)
 
 
 class AirflowInvoker(PluginInvoker):
     """Invoker that prepares env for Airflow."""
 
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str]:
         """Environment variables for Airflow.
 
         Returns:
@@ -44,7 +48,7 @@ class Airflow(BasePlugin):
     invoker_class = AirflowInvoker
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, str]:
         """Return the configuration files required by the plugin.
 
         Returns:
@@ -52,7 +56,7 @@ class Airflow(BasePlugin):
         """
         return {"config": "airflow.cfg"}
 
-    def process_config(self, flat_config):  # noqa: ANN001, ANN201
+    def process_config(self, flat_config: dict[str, str]) -> dict[str, dict[str, str]]:
         """Unflatten the config.
 
         Args:
@@ -61,7 +65,7 @@ class Airflow(BasePlugin):
         Returns:
             unflattened config
         """
-        config = {}
+        config: dict[str, dict[str, str]] = {}
         for key, value in flat_config.items():
             nest(config, key, str(value))
         return config
@@ -94,7 +98,7 @@ class Airflow(BasePlugin):
             logger.debug(f"Saved '{airflow_cfg_path!s}'")  # noqa: G004
 
     @hook("before_install")
-    async def setup_env(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
+    async def setup_env(self, *args: t.Any, **kwargs: t.Any) -> None:  # noqa: ARG002
         """Configure the env to make airflow installable without GPL deps.
 
         Args:
@@ -104,7 +108,7 @@ class Airflow(BasePlugin):
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
     @hook("before_configure")
-    async def before_configure(self, invoker: AirflowInvoker, session) -> None:  # noqa: ANN001
+    async def before_configure(self, invoker: AirflowInvoker, session: Session) -> None:
         """Generate config file and keep metadata database up-to-date.
 
         Args:
@@ -116,20 +120,22 @@ class Airflow(BasePlugin):
         """
         # generate the default `airflow.cfg`
         handle = await invoker.invoke_async(
-            "--help",
+            "config",
+            "list",
+            "--defaults",
             require_preparation=False,
-            stdout=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        exit_code = await handle.wait()
-
-        if exit_code:
+        stdout, stderr = await handle.communicate()
+        if handle.returncode:
             raise AsyncSubprocessError(
-                "Command `airflow --help` failed",  # noqa: EM101
+                "Command `airflow config generate` failed",  # noqa: EM101
                 process=handle,
             )
-
-        # Read and update airflow.cfg
+        config_file_path = invoker.files["config"]
+        with config_file_path.open("wb") as config_file:
+            config_file.write(stdout)
         self.update_config_file(invoker)
 
         # we've changed the configuration here, so we need to call

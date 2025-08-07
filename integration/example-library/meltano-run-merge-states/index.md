@@ -13,7 +13,7 @@ meltano install
 ### Extract all streams
 
 ```shell
-TAP_WITH_STATE_TS='2023-01-01T00:00:00Z' \
+TAP_WITH_STATE_TS='2023-01-01T00:00:00+00:00' \
 meltano run tap-with-state target-jsonl --state-id-suffix=no-merge
 ```
 
@@ -22,9 +22,9 @@ meltano run tap-with-state target-jsonl --state-id-suffix=no-merge
 Run a 'full refresh' pipeline of a single stream.
 
 ```shell
-TAP_WITH_STATE_TS='2023-01-01T01:00:00Z' \
+TAP_WITH_STATE_TS='2023-01-01T01:00:00+00:00' \
 TAP_WITH_STATE__SELECT_FILTER='["stream_1"]' \
-meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=no-merge
+meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=no-merge --state-strategy=overwrite
 ```
 
 Note that the state will only contain the bookmark for `stream_1`.
@@ -38,7 +38,7 @@ meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:no-merge
   "singer_state": {
     "bookmarks": {
       "stream_1": {
-        "created_at": "2023-01-01T01:00:00Z"
+        "created_at": "2023-01-01T01:00:00+00:00"
       }
     }
   }
@@ -50,7 +50,7 @@ meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:no-merge
 ### Extract all streams
 
 ```shell
-TAP_WITH_STATE_TS='2023-01-01T00:00:00Z' \
+TAP_WITH_STATE_TS='2023-01-01T00:00:00+00:00' \
 meltano run tap-with-state target-jsonl --state-id-suffix=merge
 ```
 
@@ -59,9 +59,9 @@ meltano run tap-with-state target-jsonl --state-id-suffix=merge
 Run a 'full refresh' pipeline of a single stream, but merge the current pipelines state with the latest stored state.
 
 ```shell
-TAP_WITH_STATE_TS='2023-01-01T01:00:00Z' \
+TAP_WITH_STATE_TS='2024-01-01T00:00:00+00:00' \
 TAP_WITH_STATE__SELECT_FILTER='["stream_1"]' \
-meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=merge --merge-state
+meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=merge --state-strategy=merge
 ```
 
 Note that the state will now contain both the new bookmark for `stream_1` and the old bookmarks for the other streams.
@@ -75,13 +75,13 @@ meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:merge
   "singer_state": {
     "bookmarks": {
       "stream_1": {
-        "created_at": "2023-01-01T01:00:00Z"
+        "created_at": "2024-01-01T00:00:00+00:00"
       },
       "stream_2": {
-        "created_at": "2023-01-01T00:00:00Z"
+        "created_at": "2023-01-01T00:00:00+00:00"
       },
       "stream_3": {
-        "created_at": "2023-01-01T00:00:00Z"
+        "created_at": "2023-01-01T00:00:00+00:00"
       }
     }
   }

@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
+import enum
 import re
 import typing as t
 from collections import defaultdict
 
-import yaml
+import ruamel.yaml as yaml
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
@@ -73,23 +74,15 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 class PluginType(YAMLEnum):
     """The type of a plugin."""
 
-    EXTRACTORS = "extractors"
-    LOADERS = "loaders"
-    TRANSFORMS = "transforms"
-    ORCHESTRATORS = "orchestrators"
-    TRANSFORMERS = "transformers"
-    FILES = "files"
-    UTILITIES = "utilities"
-    MAPPERS = "mappers"
-    MAPPINGS = "mappings"
-
-    def __str__(self) -> str:
-        """Return a string representation of the plugin type.
-
-        Returns:
-            The string representation of the plugin type.
-        """
-        return self.value
+    EXTRACTORS = enum.auto()
+    LOADERS = enum.auto()
+    TRANSFORMS = enum.auto()
+    ORCHESTRATORS = enum.auto()
+    TRANSFORMERS = enum.auto()
+    FILES = enum.auto()
+    UTILITIES = enum.auto()
+    MAPPERS = enum.auto()
+    MAPPINGS = enum.auto()
 
     @property
     def descriptor(self) -> str:
@@ -273,6 +266,7 @@ class Variant(NameEq, Canonical):
     def __init__(
         self,
         name: str | None = None,
+        *,
         original: bool | None = None,
         deprecated: bool | None = None,
         docs: str | None = None,
@@ -535,7 +529,7 @@ class BasePlugin(HookObject):
         self._plugin_def = plugin_def
         self._variant = variant
 
-    def __eq__(self, other: BasePlugin):  # noqa: ANN204
+    def __eq__(self, other: BasePlugin) -> bool:
         """Compare two plugins.
 
         Args:
@@ -720,22 +714,36 @@ class BasePlugin(HookObject):
         """
         return True
 
-    def exec_args(  # noqa: D417
+    def exec_args(
         self,
         plugin_invoker: PluginInvoker,  # noqa: ARG002
     ) -> list[str | Path]:
         """Return the arguments to pass to the plugin runner.
 
         Args:
-            files: The files to pass to the plugin runner.
+            plugin_invoker: The plugin invoker running this plugin.
 
         Returns:
             The arguments to pass to the plugin runner.
         """
         return []
 
+    def exec_env(
+        self,
+        plugin_invoker: PluginInvoker,  # noqa: ARG002
+    ) -> dict[str, str]:
+        """Return the environment variables to pass to the plugin runner.
+
+        Args:
+            plugin_invoker: The plugin invoker running this plugin.
+
+        Returns:
+            The environment variables to pass to the plugin runner.
+        """
+        return {}
+
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, str]:
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -744,7 +752,7 @@ class BasePlugin(HookObject):
         return {}
 
     @property
-    def output_files(self):  # noqa: ANN201
+    def output_files(self) -> dict[str, str]:
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -752,7 +760,7 @@ class BasePlugin(HookObject):
         """
         return {}
 
-    def process_config(self, config):  # noqa: ANN001, ANN201
+    def process_config(self, config: dict) -> dict:
         """Process the config for this plugin.
 
         Args:

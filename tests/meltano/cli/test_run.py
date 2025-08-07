@@ -4,15 +4,14 @@ import asyncio
 import json
 import re
 import typing as t
-import uuid
+from unittest import mock
+from unittest.mock import AsyncMock
 
-import click
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.cli import cli
-from meltano.cli.run import UUIDParamType
 from meltano.core.block.ioblock import IOBlock
+from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -39,7 +38,7 @@ def tap_mock_transform(project_add_service):
         return err.plugin
 
 
-@pytest.fixture()
+@pytest.fixture
 def process_mock_factory():
     def _factory(name):
         process_mock = mock.Mock()
@@ -52,7 +51,7 @@ def process_mock_factory():
     return _factory
 
 
-@pytest.fixture()
+@pytest.fixture
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
@@ -64,7 +63,7 @@ def tap_process(process_mock_factory, tap):
     return tap
 
 
-@pytest.fixture()
+@pytest.fixture
 def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
 
@@ -86,7 +85,7 @@ def target_process(process_mock_factory, target):
     return target
 
 
-@pytest.fixture()
+@pytest.fixture
 def mapper_process(process_mock_factory, mapper):
     mapper = process_mock_factory(mapper)
 
@@ -109,7 +108,7 @@ def mapper_process(process_mock_factory, mapper):
     return mapper
 
 
-@pytest.fixture()
+@pytest.fixture
 def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
 
@@ -151,10 +150,12 @@ class EventMatcher:
         Returns:
             True if the event was found, False otherwise.
         """
-        for line in self.seen_events:  # noqa: RET503
+        for line in self.seen_events:
             matches = line["event"] == event
             if matches:
                 return True
+
+        return False
 
     def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
@@ -195,19 +196,21 @@ class TestCliRunScratchpadOne:
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
         # check that the various ELB validation checks actually run and fail as expected
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
-            with pytest.raises(Exception, match="Found no end in block set!"):
+            with pytest.raises(Exception, match="Loader missing in block set!"):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, tap.name, target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -219,10 +222,11 @@ class TestCliRunScratchpadOne:
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, target.name, target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock3:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock3,
+        ):
             asyncio_mock3.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -235,10 +239,11 @@ class TestCliRunScratchpadOne:
 
         # Verify that a vanilla ELB run works
         args = ["run", tap.name, target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock4:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock4,
+        ):
             asyncio_mock4.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=False)
             assert result.exit_code == 0
@@ -248,7 +253,9 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "All ExtractLoadBlocks validated, starting execution.",
             )
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -275,10 +282,11 @@ class TestCliRunScratchpadOne:
 
         # Verify that a vanilla ELB run works
         args = ["run", tap.name, "mock-mapping-0", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
@@ -293,7 +301,9 @@ class TestCliRunScratchpadOne:
             assert target_stop_event[0]["name"] == target.name
             assert target_stop_event[0]["cmd_type"] == "elb"
             assert target_stop_event[0]["stdio"] == "stderr"
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
         # Verify that a vanilla command plugin (dbt:run) run works
         invoke_async = AsyncMock(side_effect=(dbt_process,))  # dbt run
@@ -314,7 +324,9 @@ class TestCliRunScratchpadOne:
             assert dbt_start_event[0]["name"] == "dbt"
             assert dbt_start_event[0]["cmd_type"] == "command"
             assert dbt_start_event[0]["stdio"] == "stderr"
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
@@ -334,16 +346,19 @@ class TestCliRunScratchpadOne:
         # generated for an ELB run
         args = ["run", tap.name, target.name, "--state-id-suffix", "test-suffix"]
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:test-suffix",
@@ -404,12 +419,14 @@ class TestCliRunScratchpadOne:
 
         args = ["run", tap.name, target.name]
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch(
-            "meltano.core.plugin_invoker.asyncio",
-        ) as asyncio_mock, pytest.MonkeyPatch().context() as mp:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch(
+                "meltano.core.plugin_invoker.asyncio",
+            ) as asyncio_mock,
+            pytest.MonkeyPatch().context() as mp,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             for env in suffix_env:
@@ -419,11 +436,56 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:${expected_suffix}",
             )
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("use_test_log_config")
+    def test_run_no_state_update(
+        self,
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service: JobLoggingService,
+        worker_id: str,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        # Verify that no logs are created when `--no-state-update` is passed
+        args = [
+            "run",
+            tap.name,
+            target.name,
+            "--no-state-update",
+            "--state-id-suffix",
+            worker_id,
+        ]
+        state_id = f"dev:{tap.name}-to-{target.name}:{worker_id}"
+
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
+
+            with pytest.raises(MissingJobLogException):
+                job_logging_service.get_latest_log(state_id)
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -467,8 +529,12 @@ class TestCliRunScratchpadOne:
             assert command_add_events[1]["command_name"] == "run"
             assert invoke_async.mock_calls[1][2]["command"] == "run"
 
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
-            assert matcher.find_by_event("Block run completed.")[1]["success"]
+            completion_events = matcher.find_by_event("Block run completed")
+            assert len(completion_events) == 2
+            assert completion_events[0]["success"]
+            assert completion_events[0]["duration_seconds"] > 0
+            assert completion_events[1]["success"]
+            assert completion_events[1]["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -511,10 +577,11 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 2
             for event in completed_events:
                 assert event["success"]
+                assert event["duration_seconds"] > 0
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
@@ -576,13 +643,15 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 2
             for event in completed_events:
                 if event["block_type"] == "ExtractLoadBlocks":
                     assert event["success"]
+                    assert event["duration_seconds"] > 0
                 elif event["block_type"] == "InvokerCommand":
                     assert event["success"] is False
+                    assert event["duration_seconds"] > 0
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
@@ -647,9 +716,10 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert completed_events[0]["err"] == "RunnerError('Extractor failed')"
             assert completed_events[0]["exit_codes"]["extractors"] == 1
@@ -742,10 +812,11 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert completed_events[0]["err"] == "RunnerError('Loader failed')"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
@@ -813,12 +884,13 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
             assert completed_events[0]["err"] == "RunnerError('Loader failed')"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
+            assert completed_events[0]["duration_seconds"] > 0
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
@@ -889,9 +961,10 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert (
                 completed_events[0]["err"]
@@ -973,11 +1046,12 @@ class TestCliRunScratchpadOne:
             # tap/target pair
             assert matcher.event_matches("found ExtractLoadBlocks set")
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
 
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert (
                 completed_events[0]["err"]
@@ -1010,10 +1084,11 @@ class TestCliRunScratchpadOne:
 
         # no mapper should be found
         args = ["run", tap.name, "not-a-valid-mapping-name", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
@@ -1027,10 +1102,11 @@ class TestCliRunScratchpadOne:
             inherit_from=mapper.name,
         )
         args = ["run", tap.name, "mapper-collision-01", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -1063,10 +1139,11 @@ class TestCliRunScratchpadOne:
             ],
         )
         args = ["run", tap.name, "mapper-collision-02", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -1118,10 +1195,11 @@ class TestCliRunScratchpadOne:
         )
 
         args = ["run", tap.name, "mock-mapping-dupe", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 AmbiguousMappingName,
@@ -1178,9 +1256,10 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             # the tap should have completed successfully
             matcher.event_matches("tap done")
@@ -1232,10 +1311,11 @@ class TestCliRunScratchpadOne:
         )
 
         args = ["run", "--dry-run", tap.name, "mock-mapping-0", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
@@ -1253,7 +1333,7 @@ class TestCliRunScratchpadOne:
             # completion log lines
             assert not matcher.find_by_event("tap done")
             assert not matcher.find_by_event("target done")
-            assert not matcher.find_by_event("Block run completed.")
+            assert not matcher.find_by_event("Block run completed")
             assert create_subprocess_exec.call_count == 0
             assert asyncio_mock.call_count == 0
 
@@ -1293,10 +1373,13 @@ class TestCliRunScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
 
-        with mock.patch(
-            "meltano.core.logging.utils.default_config",
-            return_value=logging_config,
-        ), mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+        with (
+            mock.patch(
+                "meltano.core.logging.utils.default_config",
+                return_value=logging_config,
+            ),
+            mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async),
+        ):
             result = cli_runner.invoke(cli, args)
             ansi_color_escape = re.compile(r"\x1b\[[0-9;]+m")
             match = ansi_color_escape.search(result.stderr)
@@ -1304,22 +1387,3 @@ class TestCliRunScratchpadOne:
                 assert match
             else:
                 assert not match
-
-
-class TestUUIDParamType:
-    @pytest.mark.parametrize(
-        "value",
-        (
-            pytest.param("123e4567-e89b-12d3-a456-426614174000", id="with hyphens"),
-            pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
-        ),
-    )
-    def test_valid_uuid(self, value: str) -> None:
-        param = UUIDParamType()
-        assert param.convert(value, None, None) == uuid.UUID(value)
-
-    def test_invalid_uuid(self) -> None:
-        param = UUIDParamType()
-        value = "zzz"
-        with pytest.raises(click.BadParameter, match="is not a valid UUID"):
-            param.convert(value, None, None)

@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 import typing as t
 
+import anyio
 import pytest
 
 from meltano.core.plugin import PluginType
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -60,31 +63,31 @@ class TestSingerMapper:
             mapping_name="mock-mapping-0",
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_exec_args(
         self,
         subject: ProjectPlugin,
         session: Session,
-        plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
     ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_merged_config(
         self,
         subject: ProjectPlugin,
         session: Session,
-        plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
     ) -> None:
         invoker = plugin_invoker_factory(subject)
 
         async with invoker.prepared(session):
             config_path = invoker.files["config"]
 
-            with config_path.open() as config_file:
-                config = json.load(config_file)
+            async with await anyio.open_file(config_path, "r") as config_file:
+                config = json.loads(await config_file.read())
 
             assert config == {
                 "transformations": [

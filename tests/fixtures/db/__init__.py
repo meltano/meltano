@@ -12,11 +12,13 @@ from sqlalchemy.orm import close_all_sessions, sessionmaker
 from sqlalchemy.pool import NullPool
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.project import Project
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri: str) -> t.Generator:
+def engine_uri_env(engine_uri: str) -> Generator:
     """Use the correct meltano database URI for these tests."""
     # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
     monkeypatch = pytest.MonkeyPatch()
@@ -27,7 +29,7 @@ def engine_uri_env(engine_uri: str) -> t.Generator:
         monkeypatch.undo()
 
 
-@pytest.fixture()
+@pytest.fixture
 def un_engine_uri(monkeypatch) -> None:
     """When we want to test functionality that doesn't use the current DB URI.
 
@@ -42,7 +44,7 @@ def vacuum_db(engine_sessionmaker):
     try:
         yield
     finally:
-        logging.debug("Cleaning system database...")  # noqa: TID251
+        logging.debug("Cleaning system database...")
         engine, _ = engine_sessionmaker
         close_all_sessions()
         metadata = MetaData()
@@ -56,7 +58,7 @@ def engine_sessionmaker(engine_uri):
     return (engine, sessionmaker(bind=engine, future=True))
 
 
-@pytest.fixture()
+@pytest.fixture
 def connection(engine_sessionmaker):
     engine, _ = engine_sessionmaker
     connection = engine.connect()
@@ -76,7 +78,7 @@ def connection(engine_sessionmaker):
         connection.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(
     project: Project,  # noqa: ARG001
     engine_sessionmaker,

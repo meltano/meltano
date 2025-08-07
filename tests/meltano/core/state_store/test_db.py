@@ -4,12 +4,11 @@ import json
 
 import pytest
 
-from meltano.core.job_state import JobState
-from meltano.core.state_store import DBStateStoreManager
+from meltano.core.state_store import DBStateStoreManager, MeltanoState
 
 
 class TestDBStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         job_history_session,
@@ -27,7 +26,7 @@ class TestDBStateStoreManager:
 
     def test_set_state(self, subject: DBStateStoreManager) -> None:
         # New partial is set
-        partial_only = JobState(
+        partial_only = MeltanoState(
             state_id="partial_only",
             partial_state={"singer_state": {"partial": 1}},
         )
@@ -35,7 +34,7 @@ class TestDBStateStoreManager:
         assert subject.get(partial_only.state_id) == partial_only
 
         # Partial merges onto existing partial
-        new_partial = JobState(
+        new_partial = MeltanoState(
             state_id="partial_only",
             partial_state={"singer_state": {"partial": 2}},
         )
@@ -43,7 +42,7 @@ class TestDBStateStoreManager:
         assert subject.get(partial_only.state_id) == new_partial
 
         # New complete is set
-        complete_only = JobState(
+        complete_only = MeltanoState(
             state_id="complete_only",
             completed_state={"singer_state": {"complete": 1}},
         )
@@ -51,7 +50,7 @@ class TestDBStateStoreManager:
         assert subject.get(complete_only.state_id) == complete_only
 
         # Complete overwrites partial
-        new_complete = JobState(
+        new_complete = MeltanoState(
             state_id="partial_only",
             completed_state={"singer_state": {"complete": 1}},
         )
@@ -59,7 +58,7 @@ class TestDBStateStoreManager:
         assert subject.get(partial_only.state_id) == new_complete
 
         # Complete overwrites complete
-        new_complete_overwritten = JobState(
+        new_complete_overwritten = MeltanoState(
             state_id="complete_only",
             completed_state={"singer_state": {"complete": 1}},
         )
@@ -67,12 +66,12 @@ class TestDBStateStoreManager:
         assert subject.get(complete_only.state_id) == new_complete_overwritten
 
         # Partial merges onto complete
-        complete_with_partial = JobState(
+        complete_with_partial = MeltanoState(
             state_id="complete_only",
             partial_state={"singer_state": {"partial": 1}},
         )
         subject.set(complete_with_partial)
-        assert subject.get(complete_only.state_id) == JobState(
+        assert subject.get(complete_only.state_id) == MeltanoState(
             state_id="complete_only",
             partial_state={"singer_state": {"partial": 1}},
             completed_state={"singer_state": {"complete": 1}},
@@ -84,3 +83,10 @@ class TestDBStateStoreManager:
         state_ids_with_jobs,
     ) -> None:
         assert set(subject.get_state_ids()) == set(state_ids_with_jobs.keys())
+
+    def test_clear_all(self, subject: DBStateStoreManager) -> None:
+        state_ids = list(subject.get_state_ids())
+        initial_count = len(state_ids)
+        assert initial_count > 0
+        assert subject.clear_all() == initial_count
+        assert next(subject.get_state_ids(), None) is None

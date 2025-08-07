@@ -3,17 +3,24 @@
 from __future__ import annotations
 
 import copy
+import sys
 import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
 
-TEnv = t.TypeVar("TEnv", bound="Environment")
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class NoActiveEnvironment(Exception):
@@ -100,7 +107,7 @@ class EnvironmentPluginConfig(PluginRef):
 
     def get_orphan_settings(
         self,
-        existing: t.Iterable[SettingDefinition],
+        existing: Iterable[SettingDefinition],
     ) -> list[SettingDefinition]:
         """Get orphan settings for this plugin.
 
@@ -155,11 +162,13 @@ class EnvironmentConfig(Canonical):
 class Environment(NameEq, Canonical):
     """Runtime environment for Meltano runs."""
 
+    env: dict[str, str]
+
     def __init__(
         self,
         name: str,
         config: dict | None = None,
-        env: dict | None = None,
+        env: dict[str, str] | None = None,
         state_id_suffix: str | None = None,
     ) -> None:
         """Create a new environment object.
@@ -185,7 +194,7 @@ class Environment(NameEq, Canonical):
         self.state_id_suffix = state_id_suffix
 
     @classmethod
-    def find(cls: type[TEnv], objects: t.Iterable[TEnv], name: str) -> TEnv:
+    def find(cls, objects: Iterable[Self], name: str) -> Self:
         """Lookup an environment by name from an iterable.
 
         Args:

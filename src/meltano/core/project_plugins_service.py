@@ -16,7 +16,10 @@ from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundE
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.environment import EnvironmentPluginConfig
+    from meltano.core.plugin.base import BasePlugin
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -33,11 +36,28 @@ class DefinitionSource(enum.Flag):
     INHERITED = enum.auto()
 
     ANY = HUB | CUSTOM | LOCKFILE | INHERITED
-    LOCAL = ~HUB
+    LOCAL = ~HUB  # type: ignore[operator]  # https://github.com/python/mypy/issues/18410
+
+
+class AddedPluginFlags(enum.Flag):
+    """Flags for added plugins."""
+
+    ADDED = enum.auto()
+    NOT_ADDED = enum.auto()
+    UPDATED = enum.auto()
 
 
 class PluginAlreadyAddedException(Exception):
-    """Raised when a plugin is already added to the project."""
+    """Raised when a plugin is already added to the project.
+
+    This exception is raised in two scenarios:
+    1. When attempting to add a plugin that already exists (update=False)
+    2. When attempting to update a plugin with a different variant (update=True)
+
+    The second scenario prevents accidental variant changes that could lead to
+    incompatible plugin configurations. Users must explicitly remove the old plugin
+    before adding a new variant.
+    """
 
     def __init__(self, plugin: PluginRef, new_plugin: PluginRef):
         """Create a new Plugin Already Added Exception.
@@ -79,7 +99,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
         else:
             instruction = (
                 "Try running `meltano lock --update --all` to ensure your plugins are "
-                "up to date"
+                "up to date, or add a `namespace` to your plugin if it is a custom one"
             )
 
         super().__init__(reason=reason, instruction=instruction)
@@ -117,7 +137,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
-    def current_plugins(self):  # noqa: ANN201
+    def current_plugins(self) -> dict[PluginType, list[ProjectPlugin]]:
         """Return the current plugins.
 
         Returns:
@@ -126,7 +146,9 @@ class ProjectPluginsService:  # (too many methods, attributes)
         return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
-    def update_plugins(self):  # noqa: ANN201
+    def update_plugins(
+        self,
+    ) -> Generator[dict[PluginType, list[ProjectPlugin]], None, None]:
         """Update the current plugins.
 
         Yields:
@@ -135,17 +157,48 @@ class ProjectPluginsService:  # (too many methods, attributes)
         with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
-    def add_to_file(self, plugin: ProjectPlugin):  # noqa: ANN201
+    def add_to_file_with_flags(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        update: bool = False,
+    ) -> tuple[ProjectPlugin, AddedPluginFlags]:
         """Add plugin to `meltano.yml`.
+
+        This method handles adding plugins to the project configuration with the
+        following logic:
+
+        1. **Plugin Variant Handling**: When a plugin with the same name already exists,
+           the behavior depends on the `update` parameter and variant comparison:
+
+           - If `update=False` (default): Always raises `PluginAlreadyAddedException`
+           - If `update=True` and variants match: Updates the existing plugin
+           - If `update=True` but variants differ: Raises `PluginAlreadyAddedException`
+
+           This design prevents accidental variant changes, which could lead to
+           incompatible plugin configurations. To change variants, users must
+           explicitly remove the old plugin first.
+
+        2. **Update Process**: When updating (same variant), the method preserves
+           existing configuration via `keep_config=True` to maintain user settings.
+
+        3. **New Plugin Addition**: If no existing plugin is found, the plugin is
+           added to the appropriate plugin type list in the configuration.
 
         Args:
             plugin: The plugin to add.
+            update: Whether to update the plugin if it already exists in the file
+                and it is the same variant. Note: Updates are only allowed for
+                plugins with matching variants to prevent configuration conflicts.
 
         Raises:
-            PluginAlreadyAddedException: If the plugin is already added.
+            PluginAlreadyAddedException: If the plugin is already added and either:
+                - `update=False` (default behavior)
+                - `update=True` but the new plugin has a different variant than
+                  the existing plugin (prevents accidental variant changes)
 
         Returns:
-            The added plugin.
+            The added plugin and flags indicating the operation result.
         """
         # FIXME: `should_add_to_file` is a method from `BasePlugin`, which is
         #        not a subclass of `ProjectPlugin`. I've left this call to it
@@ -153,11 +206,16 @@ class ProjectPluginsService:  # (too many methods, attributes)
         #        that relies on it, but something is definitely wrong here.
         #        We default to `True` for `ProjectPlugin` objects.
         if not getattr(plugin, "should_add_to_file", lambda: True)():
-            return plugin
+            return plugin, AddedPluginFlags.NOT_ADDED
 
         with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
-            raise PluginAlreadyAddedException(existing_plugin, plugin)
+            # Prevent updates when variants differ to avoid configuration conflicts
+            if not update or existing_plugin.variant != plugin.variant:
+                raise PluginAlreadyAddedException(existing_plugin, plugin)
+
+            updated, _ = self.update_plugin(plugin, keep_config=True)
+            return updated, AddedPluginFlags.UPDATED
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
@@ -165,9 +223,27 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
             plugins[plugin.type].append(plugin)
 
-        return plugin
+        return plugin, AddedPluginFlags.ADDED
 
-    def remove_from_file(self, plugin: ProjectPlugin):  # noqa: ANN201
+    def add_to_file(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        update: bool = False,
+    ) -> ProjectPlugin:
+        """Add plugin to `meltano.yml`.
+
+        Args:
+            plugin: The plugin to add.
+            update: Whether to update the plugin if it already exists in the file
+                and it is the same variant.
+
+        Returns:
+            The added plugin.
+        """
+        return self.add_to_file_with_flags(plugin, update=update)[0]
+
+    def remove_from_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Remove plugin from `meltano.yml`.
 
         Args:
@@ -202,9 +278,10 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def find_plugin(
         self,
         plugin_name: str,
+        *,
         plugin_type: PluginType | None = None,
-        invokable=None,  # noqa: ANN001
-        configurable=None,  # noqa: ANN001
+        invokable: bool | None = None,
+        configurable: bool | None = None,
     ) -> ProjectPlugin:
         """Find a plugin.
 
@@ -250,13 +327,19 @@ class ProjectPluginsService:  # (too many methods, attributes)
             PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
         )
 
-    def _find_mapping(self, plugin_name: str, plugin: ProjectPlugin) -> ProjectPlugin:
+    def _find_mapping(
+        self,
+        plugin_name: str,
+        plugin: ProjectPlugin,
+    ) -> ProjectPlugin | None:
         mapping_name = plugin.extra_config.get("_mapping_name")
-        if mapping_name == plugin_name:  # noqa: RET503
+        if mapping_name == plugin_name:
             all_mappings = self.find_plugins_by_mapping_name(mapping_name)
             if len(all_mappings) > 1:
                 raise AmbiguousMappingName(mapping_name)
             return self.ensure_parent(plugin)
+
+        return None
 
     def find_plugin_by_namespace(
         self,
@@ -341,7 +424,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self,
         plugin_type: PluginType,
         *,
-        ensure_parent=True,  # noqa: ANN001
+        ensure_parent: bool = True,
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
@@ -360,7 +443,11 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         return plugins
 
-    def plugins_by_type(self, *, ensure_parent=True):  # noqa: ANN001, ANN201
+    def plugins_by_type(
+        self,
+        *,
+        ensure_parent: bool = True,
+    ) -> dict[PluginType, list[ProjectPlugin]]:
         """Return plugins grouped by type.
 
         Args:
@@ -377,7 +464,11 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin_type in PluginType
         }
 
-    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:  # noqa: ANN001
+    def plugins(
+        self,
+        *,
+        ensure_parent: bool = True,
+    ) -> Generator[ProjectPlugin, None, None]:
         """Return all plugins.
 
         Args:
@@ -392,7 +483,12 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin, *, keep_config: bool = False):  # noqa: ANN201
+    def update_plugin(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        keep_config: bool = False,
+    ) -> tuple[ProjectPlugin, ProjectPlugin]:
         """Update a plugin.
 
         Args:
@@ -449,7 +545,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             else:
                 environment.config.plugins[plugin.type][p_idx] = plugin
 
-    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
+    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> BasePlugin:
         """Get the parent plugin from the hub.
 
         Args:
@@ -474,7 +570,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def find_parent(
         self,
         plugin: ProjectPlugin,
-    ) -> tuple[ProjectPlugin, DefinitionSource]:
+    ) -> tuple[ProjectPlugin | BasePlugin, DefinitionSource]:
         """Find the parent plugin of a plugin.
 
         Args:
@@ -486,7 +582,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         Raises:
             PluginDefinitionNotFoundError: If the parent plugin is not found.
         """
-        error = None
+        error: Exception | None = None
         if (
             plugin.inherit_from
             and not plugin.is_variant_set
@@ -495,8 +591,8 @@ class ProjectPluginsService:  # (too many methods, attributes)
             try:
                 return (
                     self.find_plugin(
+                        plugin.inherit_from,
                         plugin_type=plugin.type,
-                        plugin_name=plugin.inherit_from,
                     ),
                     DefinitionSource.INHERITED,
                 )
@@ -527,7 +623,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             self._prefer_source,
         ) from error
 
-    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
+    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | BasePlugin:
         """Get plugin's parent plugin.
 
         Args:
@@ -577,7 +673,10 @@ class ProjectPluginsService:  # (too many methods, attributes)
         raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101
 
     @contextmanager
-    def use_preferred_source(self, source: DefinitionSource) -> None:
+    def use_preferred_source(
+        self,
+        source: DefinitionSource,
+    ) -> Generator[None, None, None]:
         """Prefer a source of definition.
 
         Args:

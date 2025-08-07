@@ -16,13 +16,16 @@ from sqlalchemy.sql import text
 from meltano.core.error import MeltanoError
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from sqlalchemy.engine import Connection, Engine
+    from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
-_engines = {}
+_engines: dict[Project, tuple[Engine, sessionmaker[Session]]] = {}
 logger = structlog.stdlib.get_logger(__name__)
 
 
@@ -79,7 +82,7 @@ def project_engine(
     if existing_engine := _engines.get(project):
         return existing_engine
 
-    database_uri = project.settings.get("database_uri")
+    database_uri: str = project.settings.get("database_uri")
     parsed_db_uri = urlparse(database_uri)
     sanitized_db_uri = parsed_db_uri._replace(
         netloc=(
@@ -157,7 +160,7 @@ def connect(
             time.sleep(retry_timeout)
 
 
-init_hooks: dict[str, t.Callable[[Connection], None]] = {
+init_hooks: dict[str, Callable[[Connection], t.Any]] = {
     "sqlite": lambda x: x.execute(text("PRAGMA journal_mode=WAL")),
 }
 
@@ -186,7 +189,7 @@ def init_hook(engine: Engine) -> None:
 def ensure_schema_exists(
     engine: Engine,
     schema_name: str,
-    grant_roles: tuple[str] = (),
+    grant_roles: tuple[str, ...] = (),
 ) -> None:
     """Ensure the specified `schema_name` exists in the database.
 
@@ -231,7 +234,7 @@ def check_database_compatibility(engine: Engine) -> None:
     dialect = engine.dialect.name
     version = engine.dialect.server_version_info
 
-    if dialect == "sqlite" and version < (3, 25, 1):
+    if dialect == "sqlite" and version and version < (3, 25, 1):
         version_string = ".".join(map(str, version))
         reason = (
             f"Detected SQLite {version_string}, but Meltano requires at least 3.25.1"

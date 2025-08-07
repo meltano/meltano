@@ -7,13 +7,17 @@ from meltano.core.plugin.command import Command, UndefinedEnvVarError
 
 
 class TestCommand:
-    @pytest.fixture()
+    @pytest.fixture
     def commands(self):
         return {
             "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},
             "bar": {"args": "bar"},
             "baz": "baz",
             "test": {"args": "--test", "description": "Run tests"},
+            "no_args": {
+                "description": "No args command",
+                "executable": "my-executable",
+            },
         }
 
     def test_serialize(self, commands) -> None:
@@ -21,6 +25,7 @@ class TestCommand:
         assert Command.parse(commands["bar"]).args == "bar"
         assert Command.parse(commands["baz"]).args == "baz"
         assert Command.parse(commands["test"]).args == "--test"
+        assert Command.parse(commands["no_args"]).args == ""
 
         serialized = Command.parse_all(commands)
         assert serialized["foo"].args == "foo"
@@ -35,6 +40,9 @@ class TestCommand:
         assert serialized["test"].args == "--test"
         assert serialized["test"].description == "Run tests"
         assert serialized["test"].executable is None
+        assert serialized["no_args"].args == ""
+        assert serialized["no_args"].description == "No args command"
+        assert serialized["no_args"].executable == "my-executable"
 
     def test_deserialize(self, commands) -> None:
         serialized = Command.parse_all(commands)
@@ -43,6 +51,7 @@ class TestCommand:
         assert serialized["bar"].canonical() == "bar"
         assert serialized["baz"].canonical() == "baz"
         assert serialized["test"].canonical() == commands["test"]
+        assert serialized["no_args"].canonical() == commands["no_args"]
 
         assert Canonical.as_canonical(serialized) == {**commands, "bar": "bar"}
 

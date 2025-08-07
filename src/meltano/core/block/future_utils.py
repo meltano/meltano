@@ -39,7 +39,7 @@ def first_failed_future(exception_future: Task, done: set[Task]) -> Task | None:
 
 
 def handle_producer_line_length_limit_error(
-    exception: Exception,
+    exception: BaseException,
     line_length_limit: int,
     stream_buffer_size: int,
 ) -> None:
@@ -56,12 +56,12 @@ def handle_producer_line_length_limit_error(
     """
     # TODO: reuse from runner/singer.py
     # StreamReader.readline can raise a ValueError wrapping a LimitOverrunError:
-    # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
+    # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L577
     if not isinstance(exception, ValueError):
         return
 
-    exception = exception.__context__
-    if not isinstance(exception, asyncio.LimitOverrunError):
+    contextual_exception = exception.__context__
+    if not isinstance(contextual_exception, asyncio.LimitOverrunError):
         return
 
     logger.error(
@@ -78,4 +78,4 @@ def handle_producer_line_length_limit_error(
         "To learn more, visit "
         "https://docs.meltano.com/reference/settings#eltbuffer_size",
     )
-    raise RunnerError("Output line length limit exceeded") from exception  # noqa: EM101
+    raise RunnerError("Output line length limit exceeded") from contextual_exception  # noqa: EM101

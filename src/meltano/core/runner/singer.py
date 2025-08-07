@@ -49,8 +49,8 @@ class SingerRunner(Runner):  # noqa: D101
 
         # The StreamReader line length limit also acts as half the buffer size,
         # which cannot be set directly:
-        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L395-L396
-        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L482
+        # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L423-L424
+        # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L510
         stream_buffer_size = self.context.project.settings.get("elt.buffer_size")
         line_length_limit = stream_buffer_size // 2
 
@@ -209,23 +209,25 @@ class SingerRunner(Runner):  # noqa: D101
         logger.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
         logger.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
-    async def run(  # noqa: ANN201, D102
+    async def run(  # noqa: D102
         self,
         extractor_log=None,  # noqa: ANN001
         loader_log=None,  # noqa: ANN001
         extractor_out=None,  # noqa: ANN001
         loader_out=None,  # noqa: ANN001
-    ):
+    ) -> None:
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
 
         if self.context.dry_run:
-            return self.dry_run(tap, target)
+            self.dry_run(tap, target)
+            return
 
-        async with tap.prepared(self.context.session), target.prepared(
-            self.context.session,
+        async with (
+            tap.prepared(self.context.session),
+            target.prepared(self.context.session),
         ):
-            await self.invoke(  # noqa: RET503
+            await self.invoke(
                 tap,
                 target,
                 extractor_log=extractor_log,
@@ -241,7 +243,7 @@ class SingerRunner(Runner):  # noqa: D101
         stream_buffer_size,  # noqa: ANN001
     ) -> None:
         # StreamReader.readline can raise a ValueError wrapping a LimitOverrunError:
-        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
+        # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L577
         if not isinstance(exception, ValueError):
             return
 

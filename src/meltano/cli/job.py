@@ -15,7 +15,7 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
-from meltano.core.block.parser import BlockParser, validate_block_sets
+from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
     JobAlreadyExistsError,
@@ -307,7 +307,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
             blocks=blocks,
         )
         try:
-            block_parser = BlockParser(logger, project, blocks)  # type: ignore[arg-type]
+            block_parser = BlockParser(logger, project, blocks)
             parsed_blocks = list(block_parser.find_blocks(0))
             tracker.add_contexts(PluginsTrackingContext.from_blocks(parsed_blocks))
         except Exception as err:

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import typing as t
+from unittest import mock
 
-import mock
 import pytest
 
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
 from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -20,7 +20,7 @@ if t.TYPE_CHECKING:
 
 
 class TestProjectAddService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project_add_service):
         return project_add_service
 

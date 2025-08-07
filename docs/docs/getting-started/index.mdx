@@ -5,6 +5,9 @@ layout: getting_started
 sidebar_position: 5
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
@@ -22,47 +25,84 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.8, 3.9, 3.10, 3.11, 3.12 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.9, 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
-1.  Create and navigate to a directory to hold your Meltano projects:
+<Tabs>
+  <TabItem value="linux-macos" label="Linux & macOS" default>
+
+1. Create and navigate to a directory to hold your Meltano projects:
 
     ```bash
     mkdir meltano-projects
     cd meltano-projects
     ```
 
-1.  Install the [pipx](https://pypa.github.io/pipx/) package manager:
+1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
     ```bash
-    #For Windows (PowerShell): New-Alias Python3 Python
     python3 -m pip install --user pipx
     python3 -m pipx ensurepath
-    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
     source ~/.bashrc
     ```
 
-:::info
-
-<p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
-:::
-
-1.  Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
+1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
 
     ```bash
     pipx install meltano
     ```
 
-    If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
+    If you have multiple versions of Python installed, you can use a specific one with the `--python` argument:
 
     ```bash
     pipx install meltano --python <path to desired Python executable>
     ```
 
-1.  Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
+1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
 
     ```bash
     meltano --version
     ```
+
+  </TabItem>
+  <TabItem value="windows" label="Windows">
+
+1. Create and navigate to a directory to hold your Meltano projects:
+
+    ```powershell
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
+
+1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
+
+    ```powershell
+    New-Alias Python3 Python
+    python3 -m pip install --user pipx
+    python3 -m pipx ensurepath
+    ```
+
+    Open a new PowerShell instance to load your new path variables.
+
+1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
+
+    ```powershell
+    pipx install meltano
+    ```
+
+    If you have multiple versions of Python installed, you can use a specific one with the `--python` argument:
+
+    ```powershell
+    pipx install meltano --python <path to desired Python executable>
+    ```
+
+1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
+
+    ```powershell
+    meltano --version
+    ```
+
+  </TabItem>
+</Tabs>
 
 If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation-guide#local-installation) of the [Installation guide](/guide/installation-guide) for more details.
 
@@ -388,7 +428,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
 
   <p><strong>What if I already have a catalog file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have already generated a <a href="https://hub.meltano.com/singer/spec#catalog-files">catalog file</a>.</p>
-  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
+  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#el">`meltano el`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
 :::
 
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/reference/command-line-interface#select):
@@ -797,7 +837,7 @@ If that doesn't get you closer to a solution, [feel free to ask for assistance f
 
 If you run `meltano run` at another time, it will automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state) and you have an active environment.
 Behind the scenes Meltano is tracking state using a State ID that's auto-generated based on the extractor name, loader name, and active environment name.
-To override the state and extract all data from the beginning again you can use the `--full-refresh` argument.
+To override the state and extract all data from the beginning again you can use the `--full-refresh` flag or the `MELTANO_RUN_FULL_REFRESH=1` environment variable.
 
 :::info
 
@@ -813,7 +853,7 @@ meltano state get dev:tap-gitlab-to-target-postgres
 
 :::
 
-There is also the [`meltano elt`](/reference/command-line-interface#elt) command which is a more rigid command for running only EL pipelines.
+There is also the [`meltano el`](/reference/command-line-interface#el) command which is a more rigid command for running only EL pipelines.
 
 Or directly using the `meltano invoke`, which only executes a single plugin at a time.
 This can be useful for debugging a failing extractor or loader.
@@ -846,7 +886,7 @@ meltano schedule add <pipeline name> --extractor <extractor> --loader <loader> -
 meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval @daily
 ```
 
-The `pipeline name` argument corresponds to the `--state-id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
+The `pipeline name` argument corresponds to the `--state-id` option on `meltano el`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
 To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
 
@@ -872,6 +912,12 @@ schedules:
    meltano schedule list
    ```
 
+1. Run the schedule manually to confirm it works as expected:
+
+   ```bash
+   meltano schedule run
+   ```
+
 1. Add the [Apache Airflow](https://airflow.apache.org/) orchestrator to your project using [`meltano add`](/reference/command-line-interface#add), which will be responsible for managing the schedule and executing the appropriate `meltano run` commands:
 
    ```bash
@@ -884,15 +930,15 @@ schedules:
    plugins:
      utilities:
        - name: airflow
-         pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
+         pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
    ```
 
    It will also automatically add a
    [`meltano run` DAG generator](https://github.com/meltano/files-airflow/blob/main/bundle/orchestrate/dags/meltano.py)
    to your project's `orchestrate/dags` directory, where Airflow
-   will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
+   will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/2.10.5/core-concepts/dags.html) by default.
 
-1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html) using [`meltano invoke`](/reference/command-line-interface#invoke):
+1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/2.10.5/administration-and-deployment/scheduler.html) using [`meltano invoke`](/reference/command-line-interface#invoke):
 
    ```bash
    meltano invoke airflow scheduler
@@ -903,7 +949,7 @@ schedules:
 
    As long as the scheduler is running, your scheduled pipelines will run at the appropriate times.
 
-1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/1.10.14/cli-ref.html#webserver):
+1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/2.10.5/core-concepts/dags.html) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/2.10.5/cli-and-env-variables-ref.html#webserver):
 
    ```bash
    meltano invoke airflow webserver

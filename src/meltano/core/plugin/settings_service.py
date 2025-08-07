@@ -11,7 +11,7 @@ from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
-    from meltano.core.setting_definition import SettingDefinition
+    from meltano.core.setting_definition import EnvVar, SettingDefinition
 
 
 class PluginSettingsService(SettingsService):
@@ -94,7 +94,7 @@ class PluginSettingsService(SettingsService):
         self.env_override.update(environment_plugin_env)
 
     @property
-    def project_settings_service(self):  # noqa: ANN201
+    def project_settings_service(self) -> SettingsService:
         """Get the settings service for the active project.
 
         Returns:
@@ -112,7 +112,7 @@ class PluginSettingsService(SettingsService):
         return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
 
     @property
-    def docs_url(self):  # noqa: ANN201
+    def docs_url(self) -> str:
         """Get the documentation URL for this plugin.
 
         Returns:
@@ -120,7 +120,12 @@ class PluginSettingsService(SettingsService):
         """
         return self.plugin.docs
 
-    def setting_env_vars(self, setting_def: SettingDefinition, *, for_writing=False):  # noqa: ANN001, ANN201
+    def setting_env_vars(
+        self,
+        setting_def: SettingDefinition,
+        *,
+        for_writing: bool = False,
+    ) -> list[EnvVar]:
         """Get environment variables for a setting.
 
         Args:
@@ -204,7 +209,7 @@ class PluginSettingsService(SettingsService):
         self.project.plugins.update_environment_plugin(self.environment_plugin_config)
 
     @cached_property
-    def inherited_settings_service(self):  # noqa: ANN201
+    def inherited_settings_service(self) -> PluginSettingsService | None:
         """Return settings service to inherit configuration from.
 
         Returns:
@@ -220,7 +225,7 @@ class PluginSettingsService(SettingsService):
             else None
         )
 
-    def process_config(self, config):  # noqa: ANN001, ANN201
+    def process_config(self, config: dict[str, t.Any]) -> dict[str, t.Any]:
         """Process configuration dictionary to be passed to plugin.
 
         Args:

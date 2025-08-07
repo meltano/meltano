@@ -11,7 +11,6 @@ from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry
 
-import meltano
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import (
     BasePlugin,
@@ -114,7 +113,7 @@ class MeltanoHubService(PluginRepository):
         self.session.headers.update(
             {
                 "Accept": "application/json",
-                "User-Agent": f"Meltano/{meltano.__version__}",
+                "User-Agent": project.user_agent,
             },
         )
 
@@ -156,7 +155,7 @@ class MeltanoHubService(PluginRepository):
         return hub_api_root or f"{hub_url}/meltano/api/v1"
 
     @property
-    def hub_url_auth(self):  # noqa: ANN201
+    def hub_url_auth(self) -> str:
         """Return the `hub_url_auth` setting.
 
         Returns:
@@ -260,10 +259,8 @@ class MeltanoHubService(PluginRepository):
             HubPluginVariantNotFoundError: If the plugin variant could not be found.
             HubConnectionError: If the Hub API could not be reached.
         """
-        plugins = self.get_plugins_of_type(plugin_type)
-
         try:
-            plugin = plugins[plugin_name]
+            plugin = self.get_plugins_of_type(plugin_type)[plugin_name]
         except KeyError as plugins_key_err:
             raise PluginNotFoundError(
                 PluginRef(plugin_type, plugin_name),

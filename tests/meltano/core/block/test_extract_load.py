@@ -7,10 +7,10 @@ import tempfile
 import typing as t
 import uuid
 from pathlib import Path
+from unittest import mock
+from unittest.mock import AsyncMock
 
-import mock
 import pytest
-from mock import AsyncMock
 
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import (
@@ -21,9 +21,9 @@ from meltano.core.block.extract_load import (
 )
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.singer import SingerBlock
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.environment import Environment
 from meltano.core.job import Job, Payload, State
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
@@ -47,7 +47,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     return config_dir
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_job(session) -> Job:
     return Job(
         job_name=TEST_STATE_ID,
@@ -57,12 +57,12 @@ def test_job(session) -> Job:
     ).save(session)
 
 
-@pytest.fixture()
+@pytest.fixture
 def output_logger() -> OutputLogger:
     return OutputLogger("test.log")
 
 
-@pytest.fixture()
+@pytest.fixture
 def elb_context(project, session, test_job, output_logger) -> ELBContext:
     ctx = ELBContext(
         project=project,
@@ -73,19 +73,8 @@ def elb_context(project, session, test_job, output_logger) -> ELBContext:
     return ctx
 
 
-class TestELBContext:
-    def test_elt_run_dir_is_returned(
-        self,
-        project,
-        test_job,
-        elb_context: ELBContext,
-    ) -> None:
-        expected_path = project.job_dir(test_job.job_name, str(test_job.run_id))
-        assert elb_context.elt_run_dir == Path(expected_path)
-
-
 class TestELBContextBuilder:
-    @pytest.fixture()
+    @pytest.fixture
     def target_postgres(self, project_add_service):
         try:
             return project_add_service.add(PluginType.LOADERS, "target-postgres")
@@ -137,7 +126,7 @@ class TestELBContextBuilder:
         assert builder._env.items() >= block.context.env.items()
         assert builder._env.items() >= block2.context.env.items()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_validate_envs(self, project, session, tap, target_postgres) -> None:
         """Ensure that expected environment variables are present."""
         builder = ELBContextBuilder(project)
@@ -180,7 +169,7 @@ class TestELBContextBuilder:
 
 
 class TestExtractLoadBlocks:
-    @pytest.fixture()
+    @pytest.fixture
     def log_level_debug(self):
         root_logger = logging.getLogger()  # noqa: TID251
         log_level = root_logger.level
@@ -190,26 +179,27 @@ class TestExtractLoadBlocks:
         finally:
             root_logger.setLevel(log_level)
 
-    @pytest.fixture()
-    def log(self, tmp_path: Path):
-        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+    @pytest.fixture
+    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
+            yield file
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_config_dir(self, tmp_path: Path, tap) -> Path:
         create_plugin_files(tmp_path, tap)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapper_config_dir(self, tmp_path: Path, tap) -> Path:
         create_plugin_files(tmp_path, tap)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_config_dir(self, tmp_path: Path, target) -> Path:
         create_plugin_files(tmp_path, target)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, session, elb_context):
         Job(
             job_name=TEST_STATE_ID,
@@ -220,7 +210,7 @@ class TestExtractLoadBlocks:
 
         return SingerRunner(elb_context)
 
-    @pytest.fixture()
+    @pytest.fixture
     def process_mock_factory(self):
         def _factory(name):
             process_mock = mock.Mock()
@@ -230,28 +220,28 @@ class TestExtractLoadBlocks:
 
         return _factory
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")
         tap.wait = AsyncMock(return_value=0)
         return tap
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapper_process(self, process_mock_factory, mapper):
         mapper = process_mock_factory(mapper)
         mapper.stdout.readline = AsyncMock(return_value="{}")
         mapper.wait = AsyncMock(return_value=0)
         return mapper
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
         target.stdout.readline = AsyncMock(return_value="{}")
         target.wait = AsyncMock(return_value=0)
         return target
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "subject", "log", "log_level_debug")
     async def test_link_io(
         self,
@@ -337,7 +327,7 @@ class TestExtractLoadBlocks:
             # block2 should write output to logger and no where else
             assert len(elb.blocks[2].outputs) == 1
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "subject", "log")
     async def test_extract_load_block(
         self,
@@ -418,7 +408,7 @@ class TestExtractLoadBlocks:
             first_write = target_process.stdin.writeline.call_args_list[0]
             assert "mapper" in first_write[0][0]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "subject")
     async def test_elb_validation(
         self,
@@ -510,7 +500,7 @@ class TestExtractLoadBlocks:
             ):
                 elb.validate_set()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "subject")
     async def test_elb_with_job_context(
         self,

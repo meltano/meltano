@@ -12,6 +12,20 @@ Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework fo
 
 We recommend you familiarize yourself with [Pytest fixtures](https://docs.pytest.org/en/latest/explanation/fixtures.html), [Pytest parametrization](https://docs.pytest.org/en/latest/how-to/parametrize.html), and [`unittest.mock`](https://docs.python.org/dev/library/unittest.mock.html).
 
+### Running Pytest
+
+To run Pytest, you can use the following command:
+
+```bash
+nox -rs pytest -p 3.11
+```
+
+Or, if you want to run a specific test file, for example:
+
+```bash
+nox -rs pytest -p 3.11 -- tests/meltano/core/test_task_sets.py
+```
+
 ### Pytest Best Practices
 
 When possible, ensure Pytest is reporting no errors, failures, warnings, xpasses (i.e. tests that we expected would fail passing instead), or unexpected skips. Additionally, the execution time should be consistent and short. Consider gating a test behind an optional `slow` or similar Pytest marker if it is slow or resource-hungry.
@@ -24,7 +38,7 @@ If a test needs a particular environment in which to execute, do not rely on oth
 
 If you'd like to add tests that rely on a Docker container running, you can do that by using `pytest-docker`. A session-scoped fixture for the service running under Docker should be added within the directory `tests/fixtures/docker`. The Docker service itself should be defined in `tests/fixtures/docker/docker-compose.yml`.
 
-Take care to ensure that if `docker-compose` is not available, tests that rely on it are skipped, as we cannot rely on it being present, but that is not sufficient reason to have those tests fail. Refer to how the fixtures currently implemented in `tests/fixtures/docker` handle this for guidance.
+Take care to ensure that if `docker compose` is not available, tests that rely on it are skipped, as we cannot rely on it being present, but that is not sufficient reason to have those tests fail. Refer to how the fixtures currently implemented in `tests/fixtures/docker` handle this for guidance.
 
 ## Integration Tests
 

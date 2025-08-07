@@ -11,6 +11,7 @@ from structlog.stdlib import get_logger
 from meltano.core.plugin.base import PluginRef, StandalonePlugin
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -61,12 +62,13 @@ class PluginLock:
 
         with self.path.open("w") as lockfile:
             json.dump(locked_def.canonical(), lockfile, indent=2)
+            lockfile.write("\n")
 
     def load(
         self,
         *,
         create: bool = False,
-        loader: t.Callable = lambda x: StandalonePlugin(**json.load(x)),
+        loader: Callable = lambda x: StandalonePlugin(**json.load(x)),
     ) -> StandalonePlugin:
         """Load the plugin lockfile.
 

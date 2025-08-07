@@ -7,7 +7,6 @@ called before or after given trigger.
 
 from __future__ import annotations
 
-from collections import OrderedDict
 from contextlib import asynccontextmanager
 
 import structlog
@@ -55,7 +54,7 @@ class Hookable(type):
         return new_type
 
     def __prepare__(cls, bases, **kwds):  # noqa: ANN001, ANN003, ANN204, D105
-        return OrderedDict()
+        return {}
 
 
 class HookObject(metaclass=Hookable):

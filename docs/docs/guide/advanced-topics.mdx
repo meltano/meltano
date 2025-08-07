@@ -5,9 +5,33 @@ layout: doc
 sidebar_position: 10
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Installing Optional Components
 
 Most of Meltano's features are available without installing any additional packages. However, some niche or environment-specific features require the installation of [Python extras](https://peps.python.org/pep-0508/#extras).
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="uv" label="uv" default>
+
+  For example, to install Meltano with the `postgres` component, you can use the following command:
+
+  ```
+  uv tool install --from "meltano[postgres]" meltano
+  ```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="pipx" label="pipx">
+
+  For example, to install Meltano with the `postgres` component, you can use the following command:
+
+  ```
+  pipx install "meltano[postgres]"
+  ```
+
+  </TabItem>
+</Tabs>
 
 ### System Database
 
@@ -17,6 +41,8 @@ The following extras add support for different [system database](/concepts/proje
 - `psycopg2` - PostgreSQL. It uses the legacy `psycopg2` driver.
 - `postgres` - PostgreSQL. It uses the modern `psycopg` driver.
 
+To use these system databases, Meltano must be installed with the matching [optional component](#installing-optional-components)
+
 ### State backends
 
 The following extras add support for other [state backends](/concepts/state_backends):
@@ -24,18 +50,6 @@ The following extras add support for other [state backends](/concepts/state_back
 - `s3` - AWS S3.
 - `gcs` - Google Cloud Storage.
 - `azure` - Azure Blob Storage.
-
-### Virtual Environment backends
-
-The following extras add support for different [virtual environment backends](/concepts/python_virtual_environments#how-does-meltano-use-virtual-environments-internally):
-
-- `uv` - Manage virtual environments with [astral.sh/uv](https://github.com/astral-sh/uv/).
-
-:::info
-  <p>
-  After you switch to a different virtual environment backend, it's recommended to reinstall all plugins with `meltano install --clean`.
-  </p>
-:::
 
 ## Extension Developer Kit (EDK)
 
@@ -228,9 +242,9 @@ There are tradeoffs for both of these methods and you would have to determine wh
 
 If you have other ways to make this transition easier, we’d love to discuss them in Slack or Office Hours with you!
 
-### Do these connectors work with `meltano run` and `meltano elt`?
+### Do these connectors work with `meltano run` and `meltano el`?
 
-Yes! Since the wrapper is based on the Meltano Singer SDK these connectors work just as they would a python-based Singer connector. You can [run](https://docs.meltano.com/reference/command-line-interface#run), [elt](https://docs.meltano.com/reference/command-line-interface#elt), [invoke](https://docs.meltano.com/reference/command-line-interface#invoke), [test](https://docs.meltano.com/reference/command-line-interface#test), and [configure](https://docs.meltano.com/reference/command-line-interface#config) them as you normally would.
+Yes! Since the wrapper is based on the Meltano Singer SDK these connectors work just as they would a python-based Singer connector. You can [run](https://docs.meltano.com/reference/command-line-interface#run), [el](https://docs.meltano.com/reference/command-line-interface#el), [invoke](https://docs.meltano.com/reference/command-line-interface#invoke), [test](https://docs.meltano.com/reference/command-line-interface#test), and [configure](https://docs.meltano.com/reference/command-line-interface#config) them as you normally would.
 
 ### Does this integration support stream maps for PII filtering/hashing?
 

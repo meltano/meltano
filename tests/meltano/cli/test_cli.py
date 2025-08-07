@@ -6,11 +6,12 @@ import re
 import shutil
 import subprocess
 import typing as t
+import uuid
 from pathlib import Path
 from time import perf_counter_ns
+from unittest import mock
 
 import click
-import mock
 import pytest
 import yaml
 from structlog.stdlib import get_logger
@@ -19,10 +20,12 @@ import meltano
 from asserts import assert_cli_runner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
+from meltano.cli.params import UUIDParamType
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
+from meltano.core.project_settings_service import ProjectSettingsService
 
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
@@ -31,7 +34,7 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
-    @pytest.fixture()
+    @pytest.fixture
     def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
         os.chdir(tmp_path)
@@ -43,11 +46,11 @@ class TestCli:
             Project.deactivate()
             shutil.rmtree(project.root)
 
-    @pytest.fixture()
+    @pytest.fixture
     def deactivate_project(self) -> None:
         Project.deactivate()
 
-    @pytest.fixture()
+    @pytest.fixture
     def empty_project(
         self,
         empty_meltano_yml_dir,
@@ -328,6 +331,49 @@ class TestCli:
             ).stderr
         )
 
+    @pytest.mark.parametrize(
+        ("option_name", "setting_name", "value"),
+        (
+            pytest.param(
+                "--log-level",
+                "cli.log_level",
+                "warning",
+                id="log-level-warning",
+            ),
+            pytest.param(
+                "--log-level",
+                "cli.log_level",
+                "disabled",
+                id="log-level-disabled",
+            ),
+            pytest.param(
+                "--log-config",
+                "cli.log_config",
+                "path/to/logging.yml",
+                id="log-config-path",
+            ),
+            pytest.param(
+                "--log-format",
+                "cli.log_format",
+                "json",
+                id="log-format-json",
+            ),
+        ),
+    )
+    def test_project_settings_overrides(
+        self,
+        cli_runner: MeltanoCliRunner,
+        option_name: str,
+        setting_name: str,
+        value: str,
+    ) -> None:
+        # Mock `ProjectSettingsService.config_override` to avoid side effects
+        # for other tests
+        with mock.patch.object(ProjectSettingsService, "config_override", {}):
+            result = cli_runner.invoke(cli, [option_name, value, "dragon"])
+            assert result.exit_code == 0, result.exception
+            assert ProjectSettingsService.config_override[setting_name] == value
+
 
 def _get_dummy_logging_config(*, colors=True):
     return {
@@ -476,7 +522,7 @@ class TestCliColors:
         with cli_runner.isolated_filesystem():
             result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
             assert result.exit_code == 0, result.exception
-            assert result.output.strip() == expected_text
+            assert result.stdout.strip() == expected_text
             assert bool(ANSI_RE.match(result.stderr)) is log_colors_expected
             assert result.exception is None
 
@@ -495,3 +541,22 @@ class TestLargeConfigProject:
         duration_ns = perf_counter_ns() - start
         # Ensure the large config can be processed in less than 25 seconds
         assert duration_ns < 25000000000
+
+
+class TestUUIDParamType:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            pytest.param("123e4567-e89b-12d3-a456-426614174000", id="with hyphens"),
+            pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
+        ),
+    )
+    def test_valid_uuid(self, value: str):
+        param = UUIDParamType()
+        assert param.convert(value, None, None) == uuid.UUID(value)
+
+    def test_invalid_uuid(self):
+        param = UUIDParamType()
+        value = "zzz"
+        with pytest.raises(click.BadParameter, match="is not a valid UUID"):
+            param.convert(value, None, None)

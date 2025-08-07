@@ -1,0 +1,32 @@
+# chore: Enable type checking in `meltano.core.state_service`
+742d088956a4b2b604d7888fe5235b82decce265
+
+# chore: Add more type annotations to `meltano.core.settings_service`
+1c132427977fa54ff38f8cfa4b84d1b119e01b89
+
+# chore: Enable type checking in `meltano.cli.add`
+3469dbc8af6fafe02cb930470638705de6a85b34
+
+# chore: Enable type checking in `meltano.cli.invoke`
+3b76eaa420512b2e0984c8f33cab9b7b9e096424
+
+# chore: make mypy check untyped definitions
+817ca8672099eb5083f9ee698843a6eea14cfc80
+
+# chore: Run type checks on `meltano.core.block.blockset`, `meltano.core.block.future_utils` and `meltano.core.block.ioblock`
+2b1bd1f3891284acbed9f769907f7467fed86756
+
+# chore: Add missing type annotations to `meltano.cli.elt`
+c8a92a48f02ab848426544e16f180f0c2594f194
+
+# chore: Run type checks on `meltano.core.block.singer`
+3842cc8313fae8139e805f8308624bce30f15881
+
+# chore: Enable type checking in `meltano.cli.install`
+dcdd9f09c105baf2f10d3214a730aa3f6c535726
+
+# chore: Enable type checking in `meltano.core.behavior.addon`
+30d70e5462bea855243714614ec2151961cae5e4
+
+# feat(core): Support emitting logs with timestamps in local time
+4560c05ada3d3e462ceeeae728455c4943e0a5c5

@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
+import uuid
 from dataclasses import dataclass
+from decimal import Decimal
 from pathlib import Path
 
-from ruamel.yaml import YAML, CommentedMap
+from ruamel.yaml import YAML
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
@@ -16,12 +19,28 @@ from meltano.core.utils import hash_sha256
 if t.TYPE_CHECKING:
     import os
 
+    from ruamel.yaml import CommentedMap, Dumper, ScalarNode
+
 yaml = YAML()
 yaml.default_flow_style = False
+yaml.width = sys.maxsize  # Prevent line wrapping entirely
+
+
+def _represent_decimal(dumper: Dumper, node: Decimal) -> ScalarNode:
+    """Represent a decimal.Decimal instance in YAML."""
+    return dumper.represent_scalar("tag:yaml.org,2002:float", str(node))
+
+
+def _represent_uuid(dumper: Dumper, node: uuid.UUID) -> ScalarNode:
+    """Represent a uuid.UUID instance in YAML."""
+    return dumper.represent_scalar("tag:yaml.org,2002:str", str(node))
+
 
 yaml.register_class(Canonical)
 yaml.register_class(PluginType)
 yaml.register_class(SettingKind)
+yaml.representer.add_representer(Decimal, _represent_decimal)
+yaml.representer.add_representer(uuid.UUID, _represent_uuid)
 
 
 @dataclass
@@ -32,10 +51,10 @@ class CachedCommentedMap:
     data: CommentedMap
 
 
-cache: dict[os.PathLike, CachedCommentedMap] = {}
+cache: dict[os.PathLike[str], CachedCommentedMap] = {}
 
 
-def load(path: os.PathLike) -> CommentedMap:
+def load(path: os.PathLike[str]) -> CommentedMap:
     """Load the specified YAML file with caching.
 
     The cache is used if both the file path and its content hash match what is stored.

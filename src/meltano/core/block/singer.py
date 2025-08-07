@@ -13,6 +13,7 @@ from meltano.core.runner import RunnerError
 
 if t.TYPE_CHECKING:
     from asyncio.subprocess import Process
+    from collections.abc import Sequence
 
     from meltano.core.elt_context import PluginContext
     from meltano.core.logging.utils import SubprocessOutputWriter
@@ -27,8 +28,8 @@ class IOLinkError(Exception):
     """Raised when an IO link is not possible."""
 
 
-class ProcessWaitError(Exception):
-    """Raised when a process can be waited on."""
+class ProcessNotRunningError(Exception):
+    """Raised when a process is not running."""
 
 
 class InvokerBase:
@@ -56,13 +57,26 @@ class InvokerBase:
         self.invoker: PluginInvoker = plugin_invoker
         self._command: str | None = command
 
-        self.outputs = []
-        self.err_outputs = []
+        self.outputs: list[SubprocessOutputWriter] = []
+        self.err_outputs: list[SubprocessOutputWriter] = []
 
-        self.process_handle: Process | None = None
+        self._process_handle: Process | None = None
         self._process_future: asyncio.Task | None = None
         self._stdout_future: asyncio.Task | None = None
         self._stderr_future: asyncio.Task | None = None
+
+    @property
+    def process_handle(self) -> Process:
+        """Get the process handle for the underlying plugin.
+
+        Returns:
+            The process handle for the underlying plugin.
+        """
+        if self._process_handle is None:
+            msg = f"Process is not running for {self.string_id}"
+            raise ProcessNotRunningError(msg)
+
+        return self._process_handle
 
     @property
     def command(self) -> str | None:
@@ -82,6 +96,9 @@ class InvokerBase:
         """
         return self.invoker.plugin.name
 
+    @property
+    def consumer(self) -> bool: ...  # type: ignore[empty-body]  # noqa: D102
+
     async def start(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Invoke the process asynchronously.
 
@@ -93,7 +110,7 @@ class InvokerBase:
             RunnerError: If the plugin process can not start.
         """
         try:
-            self.process_handle = await self.invoker.invoke_async(
+            self._process_handle = await self.invoker.invoke_async(
                 *args,
                 command=self.command,
                 **kwargs,
@@ -109,9 +126,6 @@ class InvokerBase:
         Args:
             kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
-        if self.process_handle is None:
-            return
-
         with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
@@ -128,14 +142,7 @@ class InvokerBase:
 
         Returns:
             The stdout proxy future.
-
-        Raises:
-            IOLinkError: If the processes is not running and so there is no IO
-                to proxy.
         """
-        if self.process_handle is None:
-            raise IOLinkError("No IO to proxy, process not running")  # noqa: EM101
-
         if self._stdout_future is None:
             outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
             self._stdout_future = asyncio.ensure_future(
@@ -149,14 +156,7 @@ class InvokerBase:
 
         Returns:
             The stderr proxy future.
-
-        Raises:
-            IOLinkError: If the processes is not running and so there is no IO
-                to proxy.
         """
-        if self.process_handle is None:
-            raise IOLinkError("No IO to proxy, process not running")  # noqa: EM101
-
         if self._stderr_future is None:
             err_outputs = self._merge_outputs(
                 self.invoker.StdioSource.STDERR,
@@ -181,15 +181,8 @@ class InvokerBase:
 
         Returns:
             The future of the underlying process wait() calls.
-
-        Raises:
-            ProcessWaitError: If the process is not running.
         """
         if self._process_future is None:
-            if self.process_handle is None:
-                raise ProcessWaitError(
-                    "No process to wait, process not running running",  # noqa: EM101
-                )
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
 
@@ -200,11 +193,11 @@ class InvokerBase:
         Returns:
             The stdin of the underlying process.
         """
-        return None if self.process_handle is None else self.process_handle.stdin
+        return self.process_handle.stdin
 
     async def close_stdin(self) -> None:
         """Close the underlying process stdin if the block is a consumer."""
-        if self.consumer:
+        if self.consumer and self.process_handle.stdin is not None:
             self.process_handle.stdin.close()
             await self.process_handle.stdin.wait_closed()
 
@@ -252,7 +245,11 @@ class InvokerBase:
             # The invoker prepared context manager was able to clean up the configs
             await self.invoker.cleanup()
 
-    def _merge_outputs(self, source: str, outputs: list) -> list:
+    def _merge_outputs(
+        self,
+        source: str,
+        outputs: list[SubprocessOutputWriter],
+    ) -> list[SubprocessOutputWriter]:
         if not self.invoker.output_handlers:
             return outputs
 
@@ -269,7 +266,7 @@ class SingerBlock(InvokerBase, IOBlock):
         block_ctx: PluginContext,
         project: Project,
         plugin_invoker: PluginInvoker,
-        plugin_args: t.Sequence[str],
+        plugin_args: Sequence[str],
     ):
         """Configure and return a Singer plugin wrapped as an IOBlock.
 
@@ -329,7 +326,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
         stdin = asyncio.subprocess.PIPE if self.consumer else None
         try:
-            self.process_handle = await self.invoker.invoke_async(
+            self._process_handle = await self.invoker.invoke_async(
                 limit=line_length_limit,
                 stdin=stdin,  # Singer messages
                 stdout=asyncio.subprocess.PIPE,  # Singer state
@@ -344,9 +341,6 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
-        if self.process_handle is None:
-            return
-
         with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()

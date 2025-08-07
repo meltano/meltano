@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 import typing as t
-import uuid
 from contextlib import suppress
 from pathlib import Path
 
@@ -13,13 +12,15 @@ from snowplow_tracker import SelfDescribingJson
 from meltano.core.tracking.schemas import ExceptionContextSchema
 from meltano.core.utils import hash_sha256
 
+from .base import new_context_uuid
+
 if t.TYPE_CHECKING:
     from types import TracebackType
 
 BASE_PATHS = (sys.prefix, sys.exec_prefix, sys.base_prefix, sys.base_exec_prefix)
 
-TracebackLevelsJSON = t.List[t.Dict[str, t.Union[str, int]]]
-ExceptionContextJSON = t.Dict[
+TracebackLevelsJSON = list[dict[str, t.Union[str, int]]]
+ExceptionContextJSON = dict[
     str,
     t.Union[str, TracebackLevelsJSON, "ExceptionContextJSON"],
 ]
@@ -34,7 +35,7 @@ class ExceptionContext(SelfDescribingJson):
         super().__init__(
             ExceptionContextSchema.url,
             {
-                "context_uuid": str(uuid.uuid4()),
+                "context_uuid": str(new_context_uuid()),
                 "exception": None if ex is None else get_exception_json(ex),
             },
         )

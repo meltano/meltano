@@ -62,7 +62,7 @@ When a plugin is added using `meltano add`, the `pip_url` is automatically repea
 
 In order to support version-specific pip constraint files, the pip_url value can optionally be parameterized using the
 `${MELTANO__PYTHON_VERSION}` variable. This is a special variable populated by Meltano with the specific version of Python used to
-install the plugin and will inject the major and minor versions (e.g. 3.8, 3.9, etc.).
+install the plugin and will inject the major and minor versions (e.g. 3.9, 3.10, etc.).
 
 #### Inheriting plugin definitions
 
@@ -395,14 +395,17 @@ Meltano's CLI utilizes the following tables:
 
 ### Support for other database types
 
-Meltano currently supports the following databases as backends for state and configuration:
+Meltano is currently tested with the following databases as backends for state and configuration:
 
-- SQLite (supported out of the box)
-- PostgreSQL (requires the [`postgres` or `psycopg2` Python extra](/guide/advanced-topics#installing-optional-components))
-- MS SQL Server (requires the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components)
+| Database      | Supported Versions                      | Extra Requirement                                                                 | Example URL                                                     |
+| :------------ | :-------------------------------------- | :-------------------------------------------------------------------------------- | :-------------------------------------------------------------- |
+| SQLite        | Version `3.25.0` or higher is required. | None                                                                              | `sqlite:///$MELTANO_SYS_DIR_ROOT/meltano.db` (default)          |
+| PostgreSQL    | Version `13` or higher is required.     | [`postgres` or `psycopg2`](/guide/advanced-topics#installing-optional-components) | `postgresql+psycopg://<user>:<password>@<host>:<port>/<dbname>` |
+| MS SQL Server | Version `2019` or higher is required.   | [`mssql`](/guide/advanced-topics#installing-optional-components)                  | `mssql+pymssql://<user>:<password@<freetds_name>/?charset=utf8` |
 
-Support for other databases is planned:
+Support for other databases has been requested and is being tracked in the following issues:
 
 - [MySQL](https://github.com/meltano/meltano/issues/6529)
+- [Snowflake](https://github.com/meltano/meltano/issues/8761)
 
 If you would like to see support for a specific database, please [open an issue](https://github.com/meltano/meltano/issues/new?assignees=meltano%2Fengineering&labels=kind%2FFeature%2Cvaluestream%2FMeltano&template=feature.yml&title=feature%3A+%3Ctitle%3E)

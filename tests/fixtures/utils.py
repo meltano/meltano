@@ -11,9 +11,12 @@ from pathlib import Path
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
 
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 @contextmanager
-def cd(path: Path) -> t.Generator[Path, None, None]:
+def cd(path: Path) -> Generator[Path, None, None]:
     prev_dir = Path.cwd()
     os.chdir(path)
     try:
@@ -27,10 +30,10 @@ def tmp_project(
     name: str,
     source: Path,
     compatible_copy_tree,
-) -> t.Generator[Project, None, None]:
+) -> Generator[Project, None, None]:
     project_init_service = ProjectInitService(name)
     blank_project = project_init_service.init()
-    logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004, TID251
+    logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004
     blank_project.meltanofile.unlink()
     compatible_copy_tree(source, blank_project.root)
     Project._default = None
@@ -41,4 +44,4 @@ def tmp_project(
             yield project
         finally:
             Project.deactivate()
-            logging.debug(f"Cleaned project at {project.root}")  # noqa: G004, TID251
+            logging.debug(f"Cleaned project at {project.root}")  # noqa: G004

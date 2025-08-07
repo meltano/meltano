@@ -33,7 +33,7 @@ class MeltanoFilePlugin(FilePlugin):  # noqa: D101
         Returns:
             A mapping.
         """
-        with (bundle.root / "initialize.yml").open() as f:
+        with bundle.root.joinpath("initialize.yml").open() as f:
             return {
                 Path(relative_path): content
                 for relative_path, content in yaml.safe_load(f).items()

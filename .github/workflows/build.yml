@@ -1,10 +1,24 @@
-name: Build and Publish to PyPI
+name: Build
 
 on:
+  push:
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/build.yml
+    - docker/meltano/Dockerfile
+    - src/meltano/migrations/**
+    - scripts/**
+    - pyproject.toml
   workflow_dispatch:
-    inputs: {}
+  schedule:
+  # Weekly on Sunday at 04:45 UTC
+  - cron: '45 4 * * 0'
   release:
     types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 permissions:
   contents: write  # Needed to upload artifacts to the release
@@ -12,82 +26,166 @@ permissions:
 
 jobs:
   build:
-    name: Build artifacts
+    name: Wheel and SDist
     runs-on: ubuntu-latest
-    environment: publishing
+    outputs:
+      name: ${{ steps.baipp.outputs.package_name }}
+      version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.0
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
+    - name: Setup uv
+      uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+      with:
+        version: ">=0.6.15"
 
     - name: Set up Python
-      uses: actions/setup-python@v5.2.0
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
-        python-version: 3.9
-        architecture: x64
-        cache: 'poetry'
+        python-version: 3.x
 
     - name: Check version
-      if: ${{ github.event.release }}
+      if: github.event_name == 'release' && github.event.action == 'published'
       run: |
-        version=$(poetry version | awk '{print $2}')
-        tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
-        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and poetry version ('v$version') do not match!"; exit 1; fi;
+        version=$(uvx --from toml-cli toml get --toml-path=pyproject.toml project.version)
+        tag=$(echo "${GITHUB_REF}" | awk '{split($0,p,"/"); print p[3]}')
+        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and package version ('v$version') do not match!"; exit 1; fi;
 
-    - name: Poetry install
+    - name: uv install
       # Required to run `alembic_freeze.py`
       run: |
-        poetry install
+        uv sync
 
     - name: Freeze DB
       run: |
-        poetry run scripts/alembic_freeze.py
+        uv run scripts/alembic_freeze.py
 
     - name: Release Marker
-      if: ${{ github.event.release }}
+      if: github.event_name == 'release' && github.event.action == 'published'
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      run: |
-        poetry build --format sdist
-        poetry run pip wheel --no-deps . --wheel-dir dist/
+      uses: hynek/build-and-inspect-python-package@c52c3a4710070b50470d903818a7b25115dcd076 # v2.13.0
+      id: baipp
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+  build_docker:
+    name: Docker Images
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+      security-events: write
+    env:
+      DEFAULT_PYTHON: "3.9"  # will be used in 'latest' images
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+        - "3.13"
+
+    steps:
+    - name: Set the workflow inputs
+      id: set-inputs
+      # This step makes it so that the same workflow inputs can be accessed
+      # regardless of what event triggered it.
+      run: |
+        echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
-        name: python-artifacts
-        path: 'dist/*'
+        persist-credentials: false
+    - name: Setup uv
+      uses: astral-sh/setup-uv@e92bafb6253dcd438e0484186d7669ea7a8ca1cc # v6.4.3
+      with:
+        version: ">=0.6"
+
+    - name: Generate tags
+      id: generate-tags
+      run: >
+        python scripts/generate_docker_tags.py
+        --git-sha ${{ github.sha }}
+        -v ${NEEDS_BUILD_OUTPUTS_VERSION}
+        -p ${{ matrix.python-version }}
+        -d ${{ env.DEFAULT_PYTHON }}
+        -r ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
+        > tags
+      env:
+        NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
+        STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
+
+    - name: Assemble image tags
+      id: assemble-tags
+      run: |
+        echo "If this is not a dry run, the image will be published with the following tags:"
+        cat tags
+
+        echo 'IMAGE_TAGS<<EOF' >> $GITHUB_ENV
+        echo "$(cat tags)" >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Set registry username and password
+      id: user-and-pass
+      run: |
+        if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "ghcr.io" ]]; then
+          echo "username=${GITHUB_ACTOR}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+        fi
+        if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "docker.io" ]]; then
+          echo "username=meltano" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
+        fi
+      env:
+        STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
+
+    - name: Build, scan, then conditionally push the Docker image for a given Python version
+      uses: ./.github/actions/docker-build-scan-push
+      with:
+        # Push to the container registry if
+        # - The trigger is a push to the main branch
+        # - The trigger is a workflow dispatch
+        # - The trigger is a release and the action is 'published'
+        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' )}}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tags: ${{ env.IMAGE_TAGS }}
+        registry: ${{ steps.set-inputs.outputs.registry }}
+        username: ${{ steps.user-and-pass.outputs.username }}
+        password: ${{ steps.user-and-pass.outputs.password }}
+        python-version: ${{ matrix.python-version }}
 
   pypi_release:
     name: Publish to PyPI
-    needs: [build]
+    if: github.event_name == 'release' && github.event.action == 'published'
+    needs: [build, build_docker]
     runs-on: ubuntu-latest
-    environment: publishing
+    environment:
+      name: publishing
+      url: https://pypi.org/project/${{ needs.build.outputs.name }}/${{ needs.build.outputs.version }}
+
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.0
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
-        name: python-artifacts
-        path: dist/
-
-    - name: Verify artifacts
-      run: |
-        ls dist/
+        name: Packages
+        path: dist
 
     - name: Upload wheel to release
-      if: ${{ github.event.release }}
-      uses: svenstaro/upload-release-action@v2
+      uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: dist/*.whl
@@ -96,5 +194,4 @@ jobs:
         file_glob: true
 
     - name: Publish
-      if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.10.2
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4

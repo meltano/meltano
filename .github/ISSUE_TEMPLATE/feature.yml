@@ -2,8 +2,7 @@ name: Feature request
 description: Request a new feature
 title: "feature: <title>"
 labels: ["kind/Feature", "valuestream/Meltano"]
-assignees:
-  - meltano/engineering
+type: Feat
 
 body:
   - type: markdown

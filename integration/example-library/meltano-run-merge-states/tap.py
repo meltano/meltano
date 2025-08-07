@@ -2,8 +2,6 @@
 
 """Simple Singer tap."""
 
-# flake8: noqa
-
 from __future__ import annotations
 
 import argparse

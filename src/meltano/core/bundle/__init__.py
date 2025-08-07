@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import importlib.resources
 
-root = Path(__file__).resolve().parent
+root = importlib.resources.files(__package__)

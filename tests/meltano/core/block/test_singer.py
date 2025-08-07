@@ -2,24 +2,29 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
+import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock, Mock
 
-import mock
 import pytest
 import structlog
-from mock import AsyncMock, Mock
 from structlog.testing import capture_logs
 
 from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job
 from meltano.core.logging import OutputLogger
 
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
 
 class TestSingerBlocks:
-    @pytest.fixture()
-    def log(self, tmp_path):
-        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+    @pytest.fixture
+    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
+            yield file
 
-    @pytest.fixture()
+    @pytest.fixture
     def elt_context(
         self,
         project,  # noqa: ARG002
@@ -38,7 +43,7 @@ class TestSingerBlocks:
             .context()
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def process_mock_factory(self):
         def _factory(name):
             process_mock = Mock()
@@ -48,7 +53,7 @@ class TestSingerBlocks:
 
         return _factory
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_tap_plugin_invoker(self, process_mock_factory, tap):
         stdout_lines = (b"out1\n", b"out2\n", b"out3\n")
         stderr_lines = (b"err1\n", b"err2\n", b"err3\n")
@@ -72,7 +77,7 @@ class TestSingerBlocks:
         invoker.cleanup = AsyncMock()
         return invoker
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_target_plugin_invoker(self, process_mock_factory, target):
         target_process = process_mock_factory(target)
         target_process.stdin = mock.MagicMock()
@@ -84,7 +89,7 @@ class TestSingerBlocks:
         invoker.cleanup = AsyncMock()
         return invoker
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_singer_block_start(
         self,
         elt_context,
@@ -132,7 +137,7 @@ class TestSingerBlocks:
             == asyncio.subprocess.PIPE
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_singer_block_stop(
         self,
         elt_context,
@@ -162,7 +167,7 @@ class TestSingerBlocks:
         assert block.process_handle.terminate.called
         assert block.invoker.cleanup.called
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_singer_block_io(
         self,
         elt_context,
@@ -208,7 +213,7 @@ class TestSingerBlocks:
 
             assert cap_logs == expected_lines
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_singer_block_close_stdin(
         self,
         elt_context,

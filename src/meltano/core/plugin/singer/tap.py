@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import logging
 import shutil
@@ -14,8 +15,8 @@ from hashlib import sha1
 from io import StringIO
 from itertools import takewhile
 
+import anyio
 import structlog
-from jsonschema import Draft4Validator
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
@@ -41,13 +42,13 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin_invoker import PluginInvoker
 
-logger = structlog.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 async def _stream_redirect(
     stream: asyncio.StreamReader | None,
     *file_like_objs,  # noqa: ANN002
-    write_str=False,  # noqa: ANN001
+    write_str: bool = False,
 ) -> None:
     """Redirect stream to a file like obj.
 
@@ -60,7 +61,10 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            file_like_obj.write(data.decode(encoding) if write_str else data)
+            if inspect.iscoroutinefunction(file_like_obj.write):
+                await file_like_obj.write(data.decode(encoding) if write_str else data)
+            else:
+                file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
 def _debug_logging_handler(
@@ -68,7 +72,7 @@ def _debug_logging_handler(
     plugin_invoker: PluginInvoker,
     stderr: StreamReader,
     *other_dsts,  # noqa: ANN002
-) -> asyncio.Task:
+) -> asyncio.Task[None]:
     """Route debug log lines.
 
     Routes to stderr, or an `OutputLogger` if one is present in our invocation
@@ -109,7 +113,7 @@ def _debug_logging_handler(
         )
 
 
-def config_metadata_rules(config):  # noqa: ANN001, ANN201
+def config_metadata_rules(config: dict[str, t.Any]) -> list[MetadataRule]:
     """Get metadata rules from config.
 
     Args:
@@ -118,9 +122,9 @@ def config_metadata_rules(config):  # noqa: ANN001, ANN201
     Returns:
         a list of MetadataRule
     """
-    flat_config = flatten(config, "dot")
+    flat_config: dict[str, t.Any] = flatten(config, "dot")
 
-    rules = []
+    rules: list[MetadataRule] = []
     for key, value in flat_config.items():
         # <tap_stream_id>.<key>
         # <tap_stream_id>.<prop>.<key>
@@ -141,7 +145,7 @@ def config_metadata_rules(config):  # noqa: ANN001, ANN201
     return rules
 
 
-def config_schema_rules(config):  # noqa: ANN001, ANN201
+def config_schema_rules(config: dict[str, t.Any]) -> list[SchemaRule]:
     """Get schema rules from config.
 
     Args:
@@ -236,6 +240,8 @@ class SingerTap(SingerPlugin):
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
+            "singer_sdk_logging": "tap.singer_sdk_logging.json",
+            "pipelinewise_singer_logging": "tap.pipelinewise_logging.conf",
         }
 
     @property
@@ -336,8 +342,9 @@ class SingerTap(SingerPlugin):
 
         if state:
             if state.get(SINGER_STATE_KEY):
-                with state_path.open("w") as state_file:
-                    json.dump(state.get(SINGER_STATE_KEY), state_file, indent=2)
+                async with await anyio.open_file(state_path, "w") as state_file:
+                    content = json.dumps(state.get(SINGER_STATE_KEY), indent=2)
+                    await state_file.write(content)
         else:
             logger.warning("No state was found, complete import.")
 
@@ -363,17 +370,14 @@ class SingerTap(SingerPlugin):
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(  # ,
-        self,
-        plugin_invoker: PluginInvoker,
-    ) -> None:
-        """Perform catalog discovery.
+    async def _get_catalog(self, plugin_invoker: PluginInvoker) -> Path:
+        """Get the user-provided or discovered catalog file.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
 
         Returns:
-            None
+            Path to the catalog file.
 
         Raises:
             PluginExecutionError: if discovery could not be performed
@@ -382,53 +386,65 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
         elt_context = plugin_invoker.context
 
-        use_catalog_cache = True
-        if (
-            elt_context
-            and elt_context.refresh_catalog
-            or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]
-        ):
-            use_catalog_cache = False
+        if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
+            custom_catalog_path = plugin_invoker.project.root / custom_catalog_filename
+            try:
+                shutil.copy(custom_catalog_path, catalog_path)
+            except OSError as err:
+                msg = f"Failed to copy catalog file: {err.strerror}"
+                raise PluginExecutionError(msg) from err
 
-        if catalog_path.exists() and use_catalog_cache:
+            logger.info("Using custom catalog in %s", custom_catalog_path)
+            return catalog_path
+
+        use_cached_catalog = (
+            not (elt_context and elt_context.should_refresh_catalog())
+            and plugin_invoker.plugin_config_extras["_use_cached_catalog"]
+        )
+
+        if catalog_path.exists() and use_cached_catalog:
             with suppress(FileNotFoundError):
                 cached_key = catalog_cache_key_path.read_text()
                 new_cache_key = self.catalog_cache_key(plugin_invoker)
 
                 if cached_key == new_cache_key:
                     logger.debug("Using cached catalog file")
-                    return
+                    return catalog_path
             logger.debug("Cached catalog is outdated, running discovery...")
 
         # We're gonna generate a new catalog, so delete the cache key.
         with suppress(FileNotFoundError):
             catalog_cache_key_path.unlink()
 
-        if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
-            custom_catalog_path = plugin_invoker.project.root.joinpath(
-                custom_catalog_filename,
-            )
+        await self.run_discovery(plugin_invoker, catalog_path)
+        return catalog_path
 
-            try:
-                shutil.copy(custom_catalog_path, catalog_path)
-                logger.info(f"Found catalog in {custom_catalog_path}")  # noqa: G004
-            except FileNotFoundError as err:
-                raise PluginExecutionError(
-                    f"Could not find catalog file {custom_catalog_path}",  # noqa: EM102
-                ) from err
-        else:
-            await self.run_discovery(plugin_invoker, catalog_path)
+    async def discover_catalog(self, plugin_invoker: PluginInvoker) -> None:
+        """Perform catalog discovery.
+
+        Args:
+            plugin_invoker: The invocation handler of the plugin instance.
+
+        Returns:
+            None
+        """
+        catalog_path = await self._get_catalog(plugin_invoker)
 
         # test for the result to be a valid catalog
         try:
-            with catalog_path.open("r") as catalog_file:
-                catalog = json.load(catalog_file)
-                Draft4Validator.check_schema(catalog)
+            async with await anyio.open_file(catalog_path) as catalog_file:
+                json.loads(await catalog_file.read())
         except Exception as err:
             catalog_path.unlink()
-            raise PluginExecutionError(
-                f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
-            ) from err
+            msg = f"Catalog discovery failed: {err}"
+            if isinstance(err, json.JSONDecodeError):
+                logger.error(
+                    "Invalid JSON: %s [...]",
+                    err.doc[max(err.pos - 9, 0) : err.pos + 10],
+                )
+                msg = "Invalid catalog"
+
+            raise PluginExecutionError(msg) from err
 
     async def run_discovery(
         self,
@@ -454,7 +470,7 @@ class SingerTap(SingerPlugin):
             )
         with StringIO("") as stderr_buff:
             try:
-                with catalog_path.open(mode="wb") as catalog:
+                async with await anyio.open_file(catalog_path, mode="wb") as catalog:
                     handle = await plugin_invoker.invoke_async(
                         "--discover",
                         stdout=asyncio.subprocess.PIPE,
@@ -528,9 +544,9 @@ class SingerTap(SingerPlugin):
             return
 
         with suppress(PluginLacksCapabilityError):
-            self.apply_catalog_rules(plugin_invoker, exec_args)
+            await self.apply_catalog_rules(plugin_invoker, exec_args)
 
-    def apply_catalog_rules(
+    async def apply_catalog_rules(
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),  # noqa: ARG002
@@ -570,7 +586,7 @@ class SingerTap(SingerPlugin):
             metadata_rules.extend(select_metadata_rules(config["_select"]))
             metadata_rules.extend(config_metadata_rules(config["_metadata"]))
 
-        # Always apply select filters (`meltano elt` `--select` and `--exclude` options)
+        # Always apply select filters (`meltano el` `--select` and `--exclude` options)
         metadata_rules.extend(select_filter_metadata_rules(config["_select_filter"]))
 
         if not schema_rules and not metadata_rules:
@@ -580,8 +596,8 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
 
         try:
-            with catalog_path.open() as catalog_file:
-                catalog = json.load(catalog_file)
+            async with await anyio.open_file(catalog_path) as catalog_file:
+                catalog = json.loads(await catalog_file.read())
 
             if schema_rules:
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
@@ -590,8 +606,8 @@ class SingerTap(SingerPlugin):
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
-            with catalog_path.open("w") as catalog_f:
-                json.dump(catalog, catalog_f, indent=2)
+            async with await anyio.open_file(catalog_path, "w") as catalog_f:
+                await catalog_f.write(json.dumps(catalog, indent=2))
 
             if cache_key := self.catalog_cache_key(plugin_invoker):
                 catalog_cache_key_path.write_text(cache_key)
@@ -687,7 +703,7 @@ class SingerTap(SingerPlugin):
         stream_dict = {
             stream.get("tap_stream_id"): stream
             for stream in catalog.get("streams", [])
-            if isinstance(stream, dict)
+            if isinstance(stream, dict)  # type: ignore[redundant-expr]
         }
 
         def is_not_star(x):  # noqa: ANN001, ANN202

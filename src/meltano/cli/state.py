@@ -16,7 +16,7 @@ import structlog
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
-from meltano.core.block.parser import BlockParser
+from meltano.core.block.block_parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.state_service import InvalidJobStateError, StateService
@@ -94,10 +94,10 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             project.activate_environment(match["env"])
             blocks = [match["tap"], match["target"]]
             parser = BlockParser(logger, project, blocks)
-            return next(parser.find_blocks()).state_service
+            return next(parser.find_blocks()).state_service  # type: ignore[union-attr]
         except Exception:
             logger.warning("No plugins found for provided state_id.")
-    # If provided state_id does not match convention (i.e., run via "meltano elt"),
+    # If provided state_id does not match convention (i.e., run via "meltano el"),
     # use the standalone StateService in the CLI context.
     return None
 
@@ -134,7 +134,7 @@ def list_state(ctx: click.Context, pattern: str | None) -> None:
         for state_id, state in states.items():
             if state:
                 try:
-                    state_service.validate_state(json.dumps(state))
+                    state_service.validate_state(state)
                 except (InvalidJobStateError, json.decoder.JSONDecodeError):
                     click.secho(state_id, fg="red")
                 else:
@@ -309,13 +309,35 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
-@prompt_for_confirmation(prompt="This will clear state for the job. Continue?")
-@click.argument("state-id")
+@prompt_for_confirmation(prompt="This will clear state for the job(s). Continue?")
+@click.argument("state-id", required=False)
+@click.option(
+    "--all",
+    "clear_all",
+    is_flag=True,
+    required=False,
+    help="Clear all states IDs.",
+)
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str) -> None:
+def clear_state(
+    ctx: click.Context,
+    project: Project,
+    state_id: str | None,
+    clear_all: bool,  # noqa: FBT001
+) -> None:
     """Clear state."""
-    state_service: StateService = (
-        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
-    state_service.clear_state(state_id)
+    # Case where neither or both have been provided
+    if bool(state_id) == clear_all:
+        msg = "A state ID or the --all flag must be provided, but not both"
+        raise click.UsageError(msg)
+    if state_id:
+        state_service: StateService = (
+            state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+        )
+        state_service.clear_state(state_id)
+    if clear_all:
+        state_service = ctx.obj[STATE_SERVICE_KEY]
+        count = state_service.clear_all_states()
+        msg = f"{count} state(s) were successfully cleared"
+        logger.info(msg)

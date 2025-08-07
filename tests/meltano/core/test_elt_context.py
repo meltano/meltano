@@ -61,21 +61,21 @@ def assert_transformer_env(transformer, env) -> None:
 
 
 class TestELTContext:
-    @pytest.fixture()
+    @pytest.fixture
     def target_postgres(self, project_add_service):
         try:
             return project_add_service.add(PluginType.LOADERS, "target-postgres")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_mock_transform(self, project_add_service):
         try:
             return project_add_service.add(PluginType.TRANSFORMS, "tap-mock-transform")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def elt_context(
         self,
         elt_context_builder,
@@ -94,7 +94,7 @@ class TestELTContext:
             .context()
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_extractor(self, elt_context, session, tap) -> None:
         extractor = elt_context.extractor
         assert extractor.type == PluginType.EXTRACTORS
@@ -106,7 +106,7 @@ class TestELTContext:
 
         assert_extractor_env(extractor, env)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_loader(self, elt_context, session, target_postgres) -> None:
         loader = elt_context.loader
         assert loader.type == PluginType.LOADERS
@@ -119,7 +119,7 @@ class TestELTContext:
         assert_extractor_env(elt_context.extractor, env)
         assert_loader_env(loader, env)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("target_postgres")
     async def test_transformer(
         self,
@@ -146,7 +146,7 @@ class TestELTContext:
         assert_transform_env(transform, env)
         assert_transformer_env(transformer, env)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_select_filter(self, elt_context, session) -> None:
         assert elt_context.select_filter
 

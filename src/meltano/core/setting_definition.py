@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import ast
+import enum
 import json
+import sys
 import typing as t
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
-from enum import Enum
+from decimal import Decimal
 from functools import cached_property
 
 from meltano.core import utils
@@ -15,13 +17,21 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
 
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
+
 if t.TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
     from ruamel.yaml import Node, Representer, ScalarNode
 
 VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
     "upcase_string": lambda vlu: vlu.upper(),
     "stringify": lambda vlu: vlu if isinstance(vlu, str) else json.dumps(vlu),
+    "parse_date": utils.parse_date,
 }
 
 
@@ -79,16 +89,8 @@ class SettingMissingError(Error):
         super().__init__(f"Cannot find setting {name}")
 
 
-class YAMLEnum(str, Enum):
+class YAMLEnum(StrEnum):
     """Serializable Enum class."""
-
-    def __str__(self) -> str:
-        """Return as string.
-
-        Returns:
-            This enum in string form.
-        """
-        return self.value
 
     @staticmethod
     def yaml_representer(dumper, obj) -> str:  # noqa: ANN001
@@ -137,18 +139,19 @@ class YAMLEnum(str, Enum):
 class SettingKind(YAMLEnum):
     """Supported setting kinds."""
 
-    STRING = "string"
-    INTEGER = "integer"
-    BOOLEAN = "boolean"
-    DATE_ISO8601 = "date_iso8601"
-    EMAIL = "email"
-    PASSWORD = "password"  # noqa: S105
-    OAUTH = "oauth"
-    OPTIONS = "options"
-    FILE = "file"
-    ARRAY = "array"
-    OBJECT = "object"
-    HIDDEN = "hidden"
+    STRING = enum.auto()
+    INTEGER = enum.auto()
+    BOOLEAN = enum.auto()
+    DECIMAL = enum.auto()
+    DATE_ISO8601 = enum.auto()
+    EMAIL = enum.auto()
+    PASSWORD = enum.auto()
+    OAUTH = enum.auto()
+    OPTIONS = enum.auto()
+    FILE = enum.auto()
+    ARRAY = enum.auto()
+    OBJECT = enum.auto()
+    HIDDEN = enum.auto()
 
     @cached_property
     def is_sensitive(self) -> bool:
@@ -170,15 +173,18 @@ class SettingDefinition(NameEq, Canonical):
     """Meltano SettingDefinition class."""
 
     name: str
+    aliases: list[str]
+    env: str | None
     kind: SettingKind | None
     hidden: bool
     sensitive: bool
+    value_post_processor: str | Callable | None
     _custom: bool
 
     def __init__(
         self,
         *,
-        name: str | None = None,
+        name: str,
         aliases: list[str] | None = None,
         env: str | None = None,
         env_aliases: list[str] | None = None,
@@ -196,7 +202,7 @@ class SettingDefinition(NameEq, Canonical):
         sensitive: bool | None = None,
         custom: bool = False,
         value_processor=None,  # noqa: ANN001
-        value_post_processor=None,  # noqa: ANN001
+        value_post_processor: str | Callable | None = None,
         **attrs,  # noqa: ANN003
     ):
         """Instantiate new SettingDefinition.
@@ -288,7 +294,7 @@ class SettingDefinition(NameEq, Canonical):
     @classmethod
     def from_missing(
         cls,
-        defs: t.Iterable[SettingDefinition],
+        defs: Iterable[SettingDefinition],
         config: dict,
         **kwargs,  # noqa: ANN003
     ) -> list[SettingDefinition]:
@@ -338,19 +344,14 @@ class SettingDefinition(NameEq, Canonical):
             kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
             kind = SettingKind.INTEGER
+        elif isinstance(value, (Decimal, float)):
+            kind = SettingKind.DECIMAL
         elif isinstance(value, dict):
             kind = SettingKind.OBJECT
         elif isinstance(value, list):
             kind = SettingKind.ARRAY
 
-        attrs = {
-            "name": key,
-            "kind": kind,
-            "custom": custom,
-            "value": value if default else None,
-        }
-
-        return cls(**attrs)
+        return cls(name=key, kind=kind, custom=custom, value=value if default else None)
 
     @property
     def is_extra(self) -> bool:
@@ -483,6 +484,8 @@ class SettingDefinition(NameEq, Canonical):
                 return utils.truthy(value)
             if self.kind == SettingKind.INTEGER:
                 return int(value)
+            if self.kind == SettingKind.DECIMAL:
+                return Decimal(value)
             if self.kind == SettingKind.OBJECT:
                 value = dict(
                     self._parse_value(value, "object", Mapping),  # type: ignore[type-abstract]
@@ -519,10 +522,14 @@ class SettingDefinition(NameEq, Canonical):
             setting definition.
         """
         processor = self.value_post_processor
-        if value is not None and processor:
+        if value is not None:
             if isinstance(processor, str):
                 processor = VALUE_PROCESSORS[processor]
-            value = processor(value)
+                value = processor(value)
+            elif processor is not None:
+                value = processor(value)
+            elif self.kind == SettingKind.DATE_ISO8601:
+                value = utils.parse_date(value)
 
         return value
 
@@ -538,7 +545,7 @@ class SettingDefinition(NameEq, Canonical):
         if isinstance(value, str):
             return value
 
-        if not self.kind or self.kind == SettingKind.STRING:
+        if not self.kind or self.kind in (SettingKind.STRING, SettingKind.DECIMAL):
             return str(value)
 
         return json.dumps(value)

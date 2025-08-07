@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import importlib.resources
 import inspect
 import json
 import platform
+import sys
 import typing as t
 import uuid
 import warnings
@@ -12,14 +14,14 @@ from platform import python_version_tuple
 import pytest
 from jsonschema import ValidationError, validate
 
-from meltano.core.tracking import __file__ as tracking_module_path
+from meltano.core import tracking
 from meltano.core.tracking.contexts import ExceptionContext
 from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name
 
 with (
-    Path(tracking_module_path).parent
+    importlib.resources.files(tracking)
     / "iglu-client-embedded"
     / "schemas"
     / "com.meltano"
@@ -135,7 +137,17 @@ def test_complex_exception_context() -> None:
         "file": f".../{THIS_FILE_BASENAME}",
         "line_number": line_nums[1],
     }
-    assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/pathlib.py"
+
+    if sys.version_info < (3, 13):
+        pathlib_loc = "pathlib.py"
+    elif sys.version_info < (3, 14):
+        # https://github.com/python/cpython/pull/118582
+        pathlib_loc = "pathlib/_local.py"
+    else:
+        # https://github.com/python/cpython/pull/130748
+        pathlib_loc = "pathlib/__init__.py"
+
+    assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/{pathlib_loc}"
     assert cause["cause"] is None
     assert cause["context"] is None
 

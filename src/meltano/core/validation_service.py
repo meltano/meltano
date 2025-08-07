@@ -2,12 +2,21 @@
 
 from __future__ import annotations
 
+import enum
+import sys
 import typing as t
 from abc import ABCMeta, abstractmethod
-from enum import Enum
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+    from typing import Self  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Self
+
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
@@ -16,14 +25,12 @@ if t.TYPE_CHECKING:
 
 EXIT_CODE_OK = 0
 
-T = t.TypeVar("T", bound="ValidationsRunner")
 
-
-class ValidationOutcome(str, Enum):
+class ValidationOutcome(StrEnum):
     """Data validation outcome options."""
 
-    SUCCESS = "SUCCESS"
-    FAILURE = "FAILURE"
+    SUCCESS = enum.auto()
+    FAILURE = enum.auto()
 
     @property
     def color(self) -> str:
@@ -32,7 +39,7 @@ class ValidationOutcome(str, Enum):
         Returns:
             The string name of a color for this outcome.
         """
-        return "green" if self == self.SUCCESS else "red"
+        return "green" if self == ValidationOutcome.SUCCESS else "red"
 
     @classmethod
     def from_exit_code(cls, exit_code: int):  # noqa: ANN206
@@ -115,11 +122,11 @@ class ValidationsRunner(metaclass=ABCMeta):
 
     @classmethod
     def collect(
-        cls: type[T],
+        cls,
         project: Project,
         *,
         select_all: bool = True,
-    ) -> dict[str, T]:
+    ) -> dict[str, Self]:
         """Collect all tests for CLI invocation.
 
         Args:
@@ -132,9 +139,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         return {
             plugin.name: cls(
                 invoker=invoker_factory(project, plugin),
-                tests_selection={
-                    test_name: select_all for test_name in plugin.test_commands
-                },
+                tests_selection=dict.fromkeys(plugin.test_commands, select_all),
             )
             for plugin in project.plugins.plugins()
             if plugin.type is not PluginType.FILES

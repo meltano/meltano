@@ -7,73 +7,66 @@ settings:
 - name: send_anonymous_usage_stats
   kind: boolean
   value: true
+  description: Whether to share anonymous usage data with the Meltano team using Snowplow. This helps determine high impact changes for future releases and provides usage data on MeltanoHub.
   # Previously:
   # env_aliases: ["!MELTANO_DISABLE_TRACKING"]
 - name: disable_tracking
   kind: boolean
   # Replaces negated env_alias from `send_anonymous_usage_stats`
 - name: project_id
+  description: Used to uniquely identify your project if send_anonymous_usage_stats is enabled.
 - name: database_uri
   value: sqlite:///$MELTANO_SYS_DIR_ROOT/meltano.db
   env_specific: true
+  description: URI for the system database that stores Meltano metadata. Should be a valid SQLAlchemy database URL.
 - name: database_max_retries
   kind: integer
   value: 3
+  description: Maximum number of reconnection attempts for initial database connection.
 - name: database_retry_timeout
   kind: integer
   value: 5
+  description: Retry interval in seconds for initial database connection attempts.
 - name: project_readonly
   kind: boolean
   value: false
   env_specific: true
+  description: When enabled, blocks modifications to project files through the CLI in this environment.
 - name: hub_api_root
+  description: Root URL for the hub API. If provided, this overrides the hub_url setting.
 - name: hub_url
   value: https://hub.meltano.com
+  description: URL where Meltano can find the Hub that lists all discoverable plugins.
 - name: hub_url_auth
+  description: Value of the Authorization header sent when making requests to hub_url.
 - name: elt.buffer_size
   kind: integer
-  value: 10485760 # 10 MiB
+  value: 104_857_600 # 100 MiB
+  description: Size in bytes of the buffer between extractor and loader that stores Singer messages.
 - name: python
+  description: Python version to use for plugins, specified as a path or executable name. Can be overridden per-plugin.
 - name: auto_install
   kind: boolean
   value: true
+  description: Whether to automatically install required plugins on command invocation.
 
 # State backend settings
 - name: state_backend.uri
   value: systemdb
   env_specific: true
+  description: URI for the state backend where you'd like Meltano to store state.
 
 ## Filesystem state backends
 - name: state_backend.lock_timeout_seconds
   value: 10
   kind: integer
   env_specific: true
+  description: Number of seconds that a lock for a state ID should be considered valid in a state backend
 - name: state_backend.lock_retry_seconds
   value: 1
   kind: integer
   env_specific: true
-
-## Azure state backend
-- name: state_backend.azure.connection_string
-  sensitive: true
-  env_specific: true
-- name: state_backend.azure.storage_account_url
-  env_specific: true
-
-## AWS S3 state backend
-- name: state_backend.s3.aws_access_key_id
-  sensitive: true
-  env_specific: true
-- name: state_backend.s3.aws_secret_access_key
-  sensitive: true
-  env_specific: true
-- name: state_backend.s3.endpoint_url
-  env_specific: true
-
-## GCS state backend
-- name: state_backend.gcs.application_credentials
-  sensitive: true
-  env_specific: true
+  description: Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is locked
 
 # CLI
 - name: cli.log_level
@@ -89,35 +82,58 @@ settings:
     value: error
   - label: Critical
     value: critical
+  - label: Disabled
+    value: disabled
   value: info
   env_specific: true
+  description: Log level for the CLI
 - name: cli.log_config
   value: logging.yaml
+  description: Path to a logging configuration file for the CLI
+- name: cli.log_format
+  kind: options
+  options:
+  - label: Colored
+    value: colored
+  - label: Uncolored
+    value: uncolored
+  - label: JSON
+    value: json
+  - label: Key-Value
+    value: key_value
+  - label: Plain
+    value: plain
+  value: colored
+  description: Short-hand for the log format to use
 
 # Snowplow Tracking
 - name: snowplow.collector_endpoints
   kind: array
   value: ["https://sp.meltano.com"]
+  description: Endpoints for the Snowplow collector
 
 # venv
 - name: venv.backend
-  value: virtualenv
+  value: uv
   kind: options
   options:
   - label: virtualenv
     value: virtualenv
   - label: uv
     value: uv
+  description: Backend to use for creating virtual environments
 
 # Feature Flags
 # Global "experimental" flag.
 - name: experimental
   kind: boolean
   value: False
+  description: Whether to enable experimental features
 # Control whether references to undefined env vars causes hard fail.
 - name: ff.strict_env_var_mode
   kind: boolean
   value: False
+  description: Whether to fail if an environment variable is not defined
 # Whether invoke, and run operations if a plugin is not custom or it is not locked.
 # Deprecated since 3.0
 - name: ff.plugin_locks_required

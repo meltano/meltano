@@ -3,8 +3,8 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const {themes} = require('prism-react-renderer');
-const lightCodeTheme = themes.github;
-const darkCodeTheme = themes.dracula;
+const lightCodeTheme = themes.oneLight;
+const darkCodeTheme = themes.oneDark;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -44,11 +44,15 @@ const config = {
           blogTitle: 'Changelog',
           blogSidebarTitle: 'All Releases',
           blogDescription: '',
-          postsPerPage: 5,
+          postsPerPage: 20,
+          blogSidebarCount: 'ALL',
           showReadingTime: false,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        gtag: {
+          trackingID: ['G-Z3RR2S48WN'],
         },
       }),
     ],
@@ -203,7 +207,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ['yaml', 'json', 'bash'],
+        additionalLanguages: ['yaml', 'json', 'bash', 'toml'],
       },
       docs: {
         sidebar: {

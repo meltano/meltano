@@ -7,12 +7,13 @@ from contextlib import contextmanager
 from functools import cached_property
 
 from meltano.core.error import MeltanoError
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
 )
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
 AZURE_INSTALLED = True
 
@@ -33,7 +34,7 @@ class MissingAzureError(Exception):
 
 
 @contextmanager
-def requires_azure():  # noqa: ANN201
+def requires_azure() -> Generator[None, None, None]:
     """Raise MissingAzureError if azure is required but missing in context.
 
     Raises:
@@ -47,6 +48,24 @@ def requires_azure():  # noqa: ANN201
     yield
 
 
+CONNECTION_STRING = SettingDefinition(
+    name="state_backend.azure.connection_string",
+    label="Connection String",
+    description="Connection string for the Azure Blob Storage account",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+STORAGE_ACCOUNT_URL = SettingDefinition(
+    name="state_backend.azure.storage_account_url",
+    label="Storage Account URL",
+    description="URL for the Azure Blob Storage account",
+    kind=SettingKind.STRING,
+    env_specific=True,
+)
+
+
 class AZStorageStateStoreManager(CloudStateStoreManager):
     """State backend for Azure Blob Storage."""
 
@@ -57,7 +76,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         connection_string: str | None = None,
         prefix: str | None = None,
         storage_account_url: str | None = None,
-        **kwargs,  # noqa: ANN003
+        **kwargs: t.Any,
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -129,7 +148,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
             )
 
-    def delete(self, file_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
@@ -148,7 +167,11 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             if not self.is_file_not_found_error(e):
                 raise e
 
-    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
+    def list_all_files(
+        self,
+        *,
+        with_prefix: bool = True,
+    ) -> t.Generator[str, None, None]:
         """List all files in the backend.
 
         Args:
