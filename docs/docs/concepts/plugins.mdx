@@ -418,18 +418,18 @@ export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT`, e.g. `TAP_GITLAB__SELECT`
 - Default: `["*.*"]`
 
-An extractor's `select` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection rules](/reference/command-line-interface#select)
+An extractor's `select` [extra](/guide/configuration#plugin-extras) holds an array of [stream and property selection rules](/reference/command-line-interface#select)
 that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
 when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
-The `select` extra defines **what properties within each stream** should be included in data extraction. It operates at the property level and determines which specific attributes of your data streams are selected for replication.
+The `select` extra defines what streams and properties within each stream should be included in the extraction.
 
 A selection rule can be either:
 - **Stream-only pattern** (e.g., `"users"`): Selects the stream and all its properties, equivalent to `"users.*"`
 - **Stream.property pattern** (e.g., `"users.id"`, `"orders.total"`): Selects specific properties within a stream
 
-Rules indicating that an entity or property should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and property identifiers to match multiple entities and/or properties at once.
+Rules indicating that an stream or property should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream and property identifiers to match multiple entities and/or properties at once.
 
 Entity and property names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
@@ -532,28 +532,27 @@ export TAP_SMOKE_TEST__SELECT='["animals\\.data.id","animals\\.data.verified"]'
 
 - Setting: `_select_filter`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
-- [`meltano el`](/reference/command-line-interface#el) CLI options: `--select` and `--exclude`
+- Equivalent to using [`meltano el`](/reference/command-line-interface#el) CLI options: `--select` and `--exclude`
 - Default: `[]`
 
 An extractor's `select_filter` [extra](/guide/configuration#plugin-extras) holds an array of stream-level filter rules
 that are applied to the extractor's [discovered](/guide/integration#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
-when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el),
-**after** [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el). These are always applied
+_after_ the [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
 
-The `select_filter` extra operates at the **stream level** and determines **which entire streams** should be included or excluded from extraction. It preserves any property-level selections you've made with the [`select` extra](#select-extra).
+The `select_filter` extra operates at the **stream level** and determines which entire streams should be included or excluded from extraction. It preserves any property-level selections you've made with the [`select` extra](#select-extra).
 
 ## Key Differences: `select` vs `select_filter`
 
 | `select` | `select_filter` |
 |----------|----------------|
-| **Property-level**: Controls which properties within streams are included | **Stream-level**: Controls which entire streams are included/excluded |
-| **Configuration-time**: Set during project configuration | **Runtime**: Typically set via CLI options (`--select`, `--exclude`) |
-| **Purpose**: Define what data fields you want | **Purpose**: Filter which streams to process in a specific run |
+| **Stream & Property-level**: Controls which streams and properties within those streams are included | **Stream-level**: Filters which entire streams are included/excluded |
+| **Purpose**: Define what data fields you want | **Purpose**: Filter streams defined in `select` to process in a specific run |
 | **Preserves existing selections**: No, defines the selection | **Preserves existing selections**: Yes, filters on top of existing `select` configuration |
 
 ## When to Use `select_filter`
 
-- **Runtime filtering**: When you want to process only certain streams for a specific pipeline run
+- **Parallelization**: Run an instance of Meltano for a specific stream with other different configuration options
 - **Testing/debugging**: Temporarily include/exclude streams without changing your base configuration
 - **Conditional processing**: Different runs need different subsets of your configured streams
 - **CLI operations**: Via [`meltano el --select`](#el) or [`meltano el --exclude`](#el)
