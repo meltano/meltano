@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### 🐛 Fixes
 
-- [#9435](https://github.com/meltano/meltano/issues/9435) Disallow uv 0.8.7 since `find_uv` is broken on Python 3.9
+- [#9435](https://github.com/meltano/meltano/issues/9435) Disallow uv 0.8.7 since `find_uv_bin` is broken on Python 3.9
 
 ## v3.9.0 (2025-08-04)
 
