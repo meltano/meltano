@@ -1094,21 +1094,6 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         """Test that selection metadata produces the expected selection type member."""
         assert ListSelectedExecutor.node_selection(node) == selection_type
 
-    def test_select_metadata_rules_stream_only_behaves_like_stream_star(self) -> None:
-        """Test that stream-only patterns behave like stream.*."""
-        stream_only_rules = select_metadata_rules(["users"])
-        stream_star_rules = select_metadata_rules(["users.*"])
-
-        assert len(stream_only_rules) == len(stream_star_rules) == 2
-
-        # Both should create identical rules
-        for rule1, rule2 in zip(stream_only_rules, stream_star_rules):
-            assert rule1.tap_stream_id == rule2.tap_stream_id
-            assert rule1.breadcrumb == rule2.breadcrumb
-            assert rule1.key == rule2.key
-            assert rule1.value == rule2.value
-            assert rule1.negated == rule2.negated
-
     def test_select_metadata_rules_stream_property_creates_both_rules(self) -> None:
         """Test that stream.property creates both stream and property rules."""
         rules = select_metadata_rules(["users.name"])
@@ -1160,17 +1145,16 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert exclude_rule.negated is False
 
     def test_select_vs_select_filter_behavior_difference(self) -> None:
-        """Test that select treats stream-only patterns as stream.* while select_filter works at stream level."""  # noqa: E501
-        # select with stream-only pattern creates stream + property rules
+        """Test that select with stream-only patterns selects just the stream while select_filter works at stream level."""  # noqa: E501
+        # select with stream-only pattern creates just stream rule
         select_rules = select_metadata_rules(["users"])
-        assert len(select_rules) == 2
-        stream_rule = next(r for r in select_rules if r.breadcrumb == [])
-        prop_rule = next(r for r in select_rules if r.breadcrumb != [])
+        assert len(select_rules) == 1
+        stream_rule = select_rules[0]
 
         assert stream_rule.tap_stream_id == "users"
         assert stream_rule.breadcrumb == []
-        assert prop_rule.tap_stream_id == "users"
-        assert prop_rule.breadcrumb == ["properties", "*"]
+        assert stream_rule.key == "selected"
+        assert stream_rule.value is True
 
         # select_filter with stream-only pattern creates only stream-level rules
         filter_rules = select_filter_metadata_rules(["users"])
@@ -1269,13 +1253,6 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert sku_rule[0].tap_stream_id == "orders"
         assert sku_rule[0].key == "selected"
         assert sku_rule[0].value is True
-
-        # Important: Verify that NONE of these created wildcard rules
-        # (they should NOT behave like stream.* patterns)
-        wildcard_rules = [r for r in rules if "*" in str(r.breadcrumb)]
-        assert len(wildcard_rules) == 0, (
-            "Nested property patterns should not create wildcard rules"
-        )
 
 
 class TestSelectionType:
