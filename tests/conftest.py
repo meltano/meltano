@@ -13,6 +13,7 @@ import requests
 from requests.adapters import BaseAdapter
 
 from meltano.core.plugin.base import PluginType
+from meltano.core.user_config import _reset_user_config_service
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
@@ -46,6 +47,8 @@ BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
 def pytest_runtest_setup(item) -> None:
+    _reset_user_config_service()
+
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database
