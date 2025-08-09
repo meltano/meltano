@@ -426,8 +426,8 @@ These rules are not applied when a catalog is [provided manually](#catalog-extra
 The `select` extra defines what streams and properties within each stream should be included in the extraction.
 
 A selection rule can be either:
-- **Stream-only pattern** (e.g., `"users"`): Selects the stream and all its properties, equivalent to `"users.*"`
-- **Stream.property pattern** (e.g., `"users.id"`, `"orders.total"`): Selects specific properties within a stream
+- **Stream-only pattern** (e.g., `"users"`): Selects the stream and all automatically included properties (see the [Singer Spec](https://hub.meltano.com/singer/spec/#metadata) for information about _available_ vs _automatically_ included fields.). Additional properties must be explicitly included or included via the `stream.*` pattern.
+- **Stream.property pattern** (e.g., `"users.id"`, `"orders.total"`): Selects specific properties within a stream. The stream is automatically included when a property is selected.
 
 Rules indicating that an stream or property should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream and property identifiers to match multiple entities and/or properties at once.
 
@@ -447,7 +447,7 @@ Manage this extra:
 extractors:
 - name: tap-gitlab
   select:
-  - project_members      # Stream-only: includes all properties (same as project_members.*)
+  - project_members      # Stream-only: includes all "automatic" properties
   - commits.id           # Specific property: only the id field from commits
   - commits.author_name  # Specific property: only the author_name field from commits
   - issues.*             # Explicit wildcard: all properties from issues stream
