@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "3.9.0"
+version = "3.9.1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.9,<3.15"
@@ -58,7 +58,7 @@ dependencies = [
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
-  "uv>=0.1.24,<0.9",
+  "uv>=0.1.24,<0.9,!=0.8.7",
   "virtualenv>=20.26.6,<21",
 ]
 
@@ -247,13 +247,12 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "3.9.0"
+version = "3.9.1"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
 version_files = [
   "pyproject.toml:^version =",
-  "src/meltano/__init__.py:^__version__ =",
   'docs/package.json:^  "version":',
   ".github/ISSUE_TEMPLATE/bug.yml:^      placeholder:",
 ]
