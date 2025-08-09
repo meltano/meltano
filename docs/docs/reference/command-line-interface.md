@@ -1369,7 +1369,7 @@ Use the `select` command to add select patterns to a specific extractor in your 
 
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
-Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra), which defines the streams and properties within each stream that should be included during data extraction. Note that this is different from the [`select_filter` extra](/concepts/plugins#select-filter-extra), which is primarily used for further filtering of stream stream selections..
+Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra), which defines the streams and properties within each stream that should be included during data extraction. Note that this is different from the [`select_filter` extra](/concepts/plugins#select-filter-extra), which is primarily used for further filtering of stream selections.
 
 :::caution
 
