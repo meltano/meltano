@@ -3,7 +3,7 @@ name = "meltano"
 version = "3.9.1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
-requires-python = ">=3.9,<3.15"
+requires-python = ">=3.10,<3.15"
 readme = "README.md"
 license = "MIT"
 license-files = [
@@ -425,3 +425,6 @@ ignore = [
 
 [tool.uv]
 required-version = ">=0.6.15"
+
+[tool.uv.sources]
+click = { git = "https://github.com/kdeldycke/click.git", rev = "fix-flag-none-value" }
