@@ -1139,7 +1139,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
@@ -1469,7 +1469,7 @@ requires-dist = [
     { name = "backports-strenum", marker = "python_full_version < '3.11'", specifier = ">=1.3.1,<2" },
     { name = "boto3", marker = "extra == 's3'", specifier = ">=1.35,<1.41" },
     { name = "check-jsonschema", specifier = "~=0.33.0" },
-    { name = "click", specifier = ">=8.1,!=8.2.2,<9" },
+    { name = "click", specifier = ">=8.1,!=8.2.2,<8.3" },
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
     { name = "click-didyoumean", specifier = ">=0.3.1,<0.4" },
     { name = "dateparser", specifier = ">=1.2.1" },
@@ -1492,7 +1492,7 @@ requires-dist = [
     { name = "ruamel-yaml", specifier = ">=0.18.6,<0.19" },
     { name = "smart-open", specifier = ">=7.0.5,<8" },
     { name = "snowplow-tracker", specifier = ">=1.0.4,<2" },
-    { name = "sqlalchemy", specifier = ">=2.0.35,<3" },
+    { name = "sqlalchemy", specifier = ">=2.0.35,<2.1" },
     { name = "structlog", specifier = ">=25.1.0,<26" },
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
     { name = "tzlocal", specifier = "~=5.3" },
