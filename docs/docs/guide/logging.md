@@ -13,6 +13,24 @@ A quick way to change the log format of the command line output is [the `--log-f
 meltano --log-format=json run my-job
 ```
 
+## Viewing Job Logs
+
+Meltano stores logs for all job runs in the `.meltano/logs` directory. You can use the [`meltano logs`](/reference/command-line-interface#logs) command to easily view these logs without navigating the file system.
+
+To list recent job runs:
+```bash
+meltano logs list
+```
+
+To view the log for a specific run:
+```bash
+meltano logs show <log_id>
+```
+
+The logs command provides options for viewing partial logs with `--tail`, outputting in JSON format with `--format json`, and more. See the [CLI reference](/reference/command-line-interface#logs) for full details.
+
+## Configuring Logging
+
 Logging in meltano can also be controlled in more detail via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
 
 By default, meltano will look for this in a `logging.yaml` file in the project root. Both `.yaml` and `.yml` file extensions are supported. However, you can override this by
