@@ -1337,7 +1337,6 @@ name = "meltano"
 version = "3.9.1"
 source = { editable = "." }
 dependencies = [
-    { name = "aiodocker" },
     { name = "alembic" },
     { name = "anyio" },
     { name = "backports-strenum", marker = "python_full_version < '3.11'" },
@@ -1378,6 +1377,9 @@ azure = [
     { name = "azure-core" },
     { name = "azure-identity" },
     { name = "azure-storage-blob" },
+]
+containers = [
+    { name = "aiodocker" },
 ]
 gcs = [
     { name = "google-cloud-storage" },
@@ -1459,7 +1461,7 @@ typing = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiodocker", specifier = ">=0.24.0,<0.25" },
+    { name = "aiodocker", marker = "extra == 'containers'", specifier = ">=0.24.0,<0.25" },
     { name = "alembic", specifier = ">=1.14.0,<2" },
     { name = "anyio", specifier = ">=4.4.0,<5" },
     { name = "azure-common", marker = "extra == 'azure'", specifier = ">=1.1.28,<2" },
@@ -1500,7 +1502,7 @@ requires-dist = [
     { name = "uv", specifier = ">=0.1.24,!=0.8.7,<0.9" },
     { name = "virtualenv", specifier = ">=20.26.6,<21" },
 ]
-provides-extras = ["azure", "gcs", "mssql", "postgres", "psycopg2", "s3"]
+provides-extras = ["azure", "containers", "gcs", "mssql", "postgres", "psycopg2", "s3"]
 
 [package.metadata.requires-dev]
 coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.10" }]
