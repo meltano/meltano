@@ -1,6 +1,6 @@
-"""Meltano."""
+"""Meltano."""  # noqa: I002
 
-from __future__ import annotations
+import importlib.metadata
 
 # Managed by commitizen
-__version__ = "3.9.0"
+__version__ = importlib.metadata.version("meltano")
