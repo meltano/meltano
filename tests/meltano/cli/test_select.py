@@ -109,9 +109,9 @@ class TestCliSelect:
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
-        # After clearing, the select extra should be removed entirely,
-        # which means it falls back to the default ["*.*"] behavior
-        assert "_select" not in json_config
+        # After clearing, custom patterns are removed and we revert to default behavior
+        # The config command shows resolved config, so _select will be ["*.*"]
+        assert json_config["_select"] == ["*.*"]
 
     @pytest.mark.usefixtures("project")
     def test_select_list(
