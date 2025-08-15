@@ -60,6 +60,59 @@ class TestCliSelect:
         json_config = json.loads(result.stdout)
         assert "mock.*" not in json_config["_select"]
 
+    @pytest.mark.parametrize(
+        "environment",
+        (
+            pytest.param(None, id="no-environment"),
+            pytest.param("dev", id="dev"),
+        ),
+    )
+    @pytest.mark.usefixtures("project")
+    def test_clear_select_patterns(self, cli_runner, tap, environment) -> None:
+        environment_flag = () if environment is None else ("--environment", environment)
+        # add multiple select patterns
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "users", "*"],
+        )
+        assert_cli_runner(result)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "posts", "id"],
+        )
+        assert_cli_runner(result)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "--exclude", "posts", "secret"],
+        )
+        assert_cli_runner(result)
+        # verify patterns were added
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "--extras", tap.name],
+        )
+        assert_cli_runner(result)
+        json_config = json.loads(result.stdout)
+        assert "users.*" in json_config["_select"]
+        assert "posts.id" in json_config["_select"]
+        assert "!posts.secret" in json_config["_select"]
+        # clear all select patterns
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "--clear"],
+        )
+        assert_cli_runner(result)
+        # verify all select patterns were removed (reverted to default)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "--extras", tap.name],
+        )
+        assert_cli_runner(result)
+        json_config = json.loads(result.stdout)
+        # After clearing, the select extra should be removed entirely,
+        # which means it falls back to the default ["*.*"] behavior
+        assert "_select" not in json_config
+
     @pytest.mark.usefixtures("project")
     def test_select_list(
         self,
