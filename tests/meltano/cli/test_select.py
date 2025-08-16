@@ -29,8 +29,20 @@ class TestCliSelect:
         ),
     )
     @pytest.mark.usefixtures("project")
-    def test_update_select_pattern(self, cli_runner, tap, environment) -> None:
+    def test_update_select_pattern(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        environment: str | None,
+    ) -> None:
         environment_flag = () if environment is None else ("--environment", environment)
+        # first, reset to defaults
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", tap.name, "reset"],
+            input="y\n",
+        )
+        assert_cli_runner(result)
         # add select pattern
         result = cli_runner.invoke(
             cli,
@@ -68,8 +80,20 @@ class TestCliSelect:
         ),
     )
     @pytest.mark.usefixtures("project")
-    def test_clear_select_patterns(self, cli_runner, tap, environment) -> None:
+    def test_clear_select_patterns(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        environment: str | None,
+    ) -> None:
         environment_flag = () if environment is None else ("--environment", environment)
+        # first, reset to defaults
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", tap.name, "reset"],
+            input="y\n",
+        )
+        assert_cli_runner(result)
         # add multiple select patterns
         result = cli_runner.invoke(
             cli,
