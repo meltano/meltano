@@ -94,6 +94,19 @@ class TestCliSelect:
             input="y\n",
         )
         assert_cli_runner(result)
+        # clearing leaves defaults as they were
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "--clear"],
+        )
+        assert_cli_runner(result)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "--extras", tap.name],
+        )
+        assert_cli_runner(result)
+        json_config = json.loads(result.stdout)
+        assert json_config["_select"] == ["*.*"]
         # add multiple select patterns
         result = cli_runner.invoke(
             cli,
