@@ -64,6 +64,7 @@ def selection_mark(selection) -> str:  # noqa: ANN001
     "--list",
     "list_format",
     flag_value="text",
+    default=None,
     help="List the current selected tap attributes in plain text format.",
 )
 @click.option(
@@ -127,7 +128,7 @@ async def select(
     try:
         if clear:
             clear_selections(project, extractor)
-        elif list_format:
+        elif list_format is not None:
             await show(
                 project,
                 extractor,
