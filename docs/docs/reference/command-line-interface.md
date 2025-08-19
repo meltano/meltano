@@ -1367,7 +1367,7 @@ meltano schedule set gitlab-to-jsonl --loader target-csv
 
 Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
-- `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
+- `meltano select [--list] [--all] [--clear] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
 Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra), which defines the streams and properties within each stream that should be included during data extraction. Note that this is different from the [`select_filter` extra](/concepts/plugins#select-filter-extra), which is primarily used for further filtering of stream selections.
 
@@ -1390,6 +1390,8 @@ Use `--list` or `--json` to list the currently selected tap attributes.
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
 Use `--rm` or `--remove` to remove previously added select patterns.
+
+Use `--clear` to remove all select patterns for the extractor, reverting to the default behavior of the extractor.
 
 ### Using `select` with Environments
 
@@ -1469,6 +1471,13 @@ Remove patterns (`--rm` or `--remove`):
 meltano select tap-gitlab --rm tags "*"
 meltano select tap-gitlab --rm --exclude "*" "*_url"
 meltano select tap-gitlab --rm commits id
+```
+
+Clear all select patterns (`--clear`):
+
+```bash
+# Remove all select patterns and revert to default behavior
+meltano select tap-gitlab --clear
 ```
 
 :::info
