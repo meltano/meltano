@@ -64,6 +64,7 @@ def selection_mark(selection) -> str:  # noqa: ANN001
     "--list",
     "list_format",
     flag_value="text",
+    default=None,
     help="List the current selected tap attributes in plain text format.",
 )
 @click.option(
@@ -95,6 +96,11 @@ def selection_mark(selection) -> str:  # noqa: ANN001
     is_flag=True,
     help="Exclude all attributes that match specified pattern.",
 )
+@click.option(
+    "--clear",
+    is_flag=True,
+    help="Clear all select patterns for the extractor.",
+)
 @install
 @no_install
 @only_install
@@ -112,6 +118,7 @@ async def select(
     refresh_catalog: bool,
     remove: bool,
     exclude: bool,
+    clear: bool,
 ) -> None:
     """Manage extractor selection patterns.
 
@@ -119,7 +126,9 @@ async def select(
     Read more at https://docs.meltano.com/reference/command-line-interface#select
     """  # noqa: D301
     try:
-        if list_format:
+        if clear:
+            clear_selections(project, extractor)
+        elif list_format is not None:
             await show(
                 project,
                 extractor,
@@ -139,6 +148,12 @@ async def select(
             )
     except PluginExecutionError as err:
         raise CliError(f"Cannot list the selected attributes: {err}") from err  # noqa: EM102
+
+
+def clear_selections(project: Project, extractor: str) -> None:
+    """Clear all select patterns for a specific extractor."""
+    select_service = SelectService(project, extractor)
+    select_service.clear()
 
 
 def update(
