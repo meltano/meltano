@@ -149,8 +149,8 @@ class SelectPattern(t.NamedTuple):
             negated = True
             pattern = pattern[1:]
 
-        if re.search(UNESCAPED_DOT, pattern):
-            stream, prop = re.split(UNESCAPED_DOT, pattern, maxsplit=1)
+        if UNESCAPED_DOT.search(pattern):
+            stream, prop = UNESCAPED_DOT.split(pattern, maxsplit=1)
         else:
             stream = pattern
             prop = None
