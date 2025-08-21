@@ -31,37 +31,7 @@
       "name": "api_url",
       "value": "https://gitlab.com",
       "label": "GitLab Instance",
-      "description": "GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.",
-      "protected": true
-    },
-    {
-      "name": "private_token",
-      "value": "",
-      "label": "Access Token",
-      "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",
-      "placeholder": "Ex. *****************",
-      "sensitive": true
-    },
-    {
-      "name": "groups",
-      "value": "",
-      "label": "Groups",
-      "description": "This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a [project](#projects).\n\nLeave empty if you'd like to pull data from a project in a personal user namespace.\n\nFor example, `https://github.com/MeltanoLabs/tap-gitlab` has a group of `meltano`.\n\nMultiple group names can be separated using space characters.\n",
-      "placeholder": "Ex. my-organization"
-    },
-    {
-      "name": "projects",
-      "value": "",
-      "label": "Project",
-      "description": "This property allows you to scope the project(s) that the extractor fetches.\n\nLeave empty if you've specified one or more [groups](#groups) and would like to pull data from all projects inside these groups.\n\nThe format for it is `namespace/project`, where namespace can be a username or group name. Here are a couple examples:\n\n- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/meltano)\n- `meltano/sdk` - The project for the [Meltano SDK for Singer Taps and Targets ](https://gitlab.com/meltano/sdk)\n\nMultiple group paths can be separated using space characters.\n",
-      "placeholder": "Ex. my-organization/project-1"
-    },
-    {
-      "name": "ultimate_license",
-      "kind": "boolean",
-      "value": false,
-      "label": "Ultimate License",
-      "description": "Enable to pull in extra data (like Epics, Epic Issues and other entities)\nonly available to GitLab Ultimate and GitLab.com Gold accounts.\n\nThe `epics` and `epic_issues` entities cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n"
+      "description": "GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed."
     },
     {
       "name": "fetch_merge_request_commits",
@@ -78,10 +48,40 @@
       "description": "For every Pipeline, also fetch extended details of each of these pipelines.\n\nThis  can slow down extraction considerably because of the many API calls required.\n\nThe `pipelines_extended` entity cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n"
     },
     {
+      "name": "groups",
+      "value": "",
+      "label": "Groups",
+      "description": "This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a [project](#projects).\n\nLeave empty if you'd like to pull data from a project in a personal user namespace.\n\nFor example, `https://github.com/MeltanoLabs/tap-gitlab` has a group of `meltano`.\n\nMultiple group names can be separated using space characters.\n",
+      "placeholder": "Ex. my-organization"
+    },
+    {
+      "name": "private_token",
+      "kind": "string",
+      "value": "",
+      "label": "Access Token",
+      "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",
+      "placeholder": "Ex. *****************",
+      "sensitive": true
+    },
+    {
+      "name": "projects",
+      "value": "",
+      "label": "Project",
+      "description": "This property allows you to scope the project(s) that the extractor fetches.\n\nLeave empty if you've specified one or more [groups](#groups) and would like to pull data from all projects inside these groups.\n\nThe format for it is `namespace/project`, where namespace can be a username or group name. Here are a couple examples:\n\n- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/meltano)\n- `meltano/sdk` - The project for the [Meltano SDK for Singer Taps and Targets ](https://gitlab.com/meltano/sdk)\n\nMultiple group paths can be separated using space characters.\n",
+      "placeholder": "Ex. my-organization/project-1"
+    },
+    {
       "name": "start_date",
       "kind": "date_iso8601",
       "label": "Start Date",
       "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take."
+    },
+    {
+      "name": "ultimate_license",
+      "kind": "boolean",
+      "value": false,
+      "label": "Ultimate License",
+      "description": "Enable to pull in extra data (like Epics, Epic Issues and other entities)\nonly available to GitLab Ultimate and GitLab.com Gold accounts.\n\nThe `epics` and `epic_issues` entities cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n"
     }
   ]
 }
