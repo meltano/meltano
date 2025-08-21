@@ -119,9 +119,8 @@ class Tracker:  # - too many (public) methods
 
         self.project = project
         self.send_anonymous_usage_stats = project.settings.get(
-            "send_anonymous_usage_stats",
-            redacted=not project.settings.get("disable_tracking"),
-        )
+            "send_anonymous_usage_stats"
+        ) or not project.settings.get("disable_tracking")
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
 
