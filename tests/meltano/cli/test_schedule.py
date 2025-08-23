@@ -11,7 +11,6 @@ from meltano.cli import cli
 from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.schedule_service import BadCronError
 from meltano.core.task_sets import TaskSets
-from meltano.core.utils import iso8601_datetime
 
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
@@ -21,14 +20,7 @@ if t.TYPE_CHECKING:
 class TestCliSchedule:
     @pytest.mark.order(0)
     @pytest.mark.usefixtures("project", "session", "tap", "target")
-    @mock.patch(
-        "meltano.core.schedule_service.PluginSettingsService.get",
-        autospec=True,
-    )
-    def test_schedule_add(self, get, cli_runner, schedule_service) -> None:
-        test_date = "2010-01-01"
-        get.return_value = test_date
-
+    def test_schedule_add(self, cli_runner, schedule_service) -> None:
         # test adding a scheduled elt
         with mock.patch(
             "meltano.cli.schedule.ScheduleService",
@@ -59,7 +51,6 @@ class TestCliSchedule:
         assert schedule.loader == "target-mock"
         assert schedule.transform == "run"
         assert schedule.interval == "@yearly"  # not anytime soon ;)
-        assert schedule.start_date == iso8601_datetime(test_date)
 
         # test adding a scheduled job
         with mock.patch(
@@ -174,7 +165,7 @@ class TestCliSchedule:
         process_mock = mock.Mock(returncode=0)
 
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService.remove",
+            "meltano.cli.schedule.ScheduleService.remove_schedule",
             return_value=process_mock,
         ) as remove_mock:
             res = cli_runner.invoke(cli, ["schedule", "remove", job_schedule.name])
