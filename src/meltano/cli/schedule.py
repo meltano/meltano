@@ -205,7 +205,6 @@ def _format_elt_list_output(entry: ELTSchedule, session: Session) -> dict:
         "loader": entry.loader,
         "transform": entry.transform,
         "interval": entry.interval,
-        "start_date": "1970-01-01",
         "env": entry.env,
         "cron_interval": entry.cron_interval,
         "last_successful_run_ended_at": last_successful_run_ended_at,
