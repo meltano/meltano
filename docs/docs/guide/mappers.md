@@ -78,8 +78,8 @@ You can install a standalone mapper plugin that runs between a tap and a target 
 ## SDK Stream Maps
 
 If either your tap or your target is built on the Meltano SDK then it automatically has the mapper features, or also referred to as inline stream maps, built in.
-This is the easiest way to get mapper functionality into your pipeline by avoiding some of the limitations of standalone mappers (requires installing another plugin, isn't supported by `meltano elt`, etc.).
-The limitation is that the mapper functionality is baked into the SDK so if you ever need to make customizations its a bit less flexible relative to standalone mappers where you can create your own forks.
+This is the easiest way to get mapper functionality into your pipeline by avoiding some of the limitations of standalone mappers (requires installing another plugin, isn't supported by `meltano el`, etc.).
+The limitation is that the mapper functionality is baked into the SDK so if you ever need to make customizations it's a bit less flexible relative to standalone mappers where you can create your own forks.
 
 A few example configurations using inline stream maps are:
 
@@ -105,7 +105,7 @@ The other way of getting mapper functionality is to use a standalone mapper plug
 These can be used even when your your tap and/or target are not SDK based.
 
 The advantage relative to the SDK inline stream maps is that you can fork the mapper plugin or build your own to do whatever you need.
-A limitation with this approach is that currently you can't run these with `meltano elt`.
+A limitation with this approach is that currently you can't run these with `meltano el`.
 
 The two most common mapper plugins are:
 
@@ -170,7 +170,7 @@ To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/
 
 ## FAQs
 
-### Can I use standalone mapper plugins with the `meltano elt` command?
+### Can I use standalone mapper plugins with the `meltano el` command?
 
 No, currently only `meltano run` and `meltano invoke` support standalone mapper plugins.
 
@@ -188,7 +188,7 @@ It's mostly preference but here are some trade offs to consider:
 - SDK stream maps avoid having to install an additional plugin into your project.
 - Mapper plugins alter data after its been extracted whereas SDK based stream maps on the tap side could alter the extraction behavior.
   Depending on your use case, for example deleting streams, it might be slightly more efficient to do it in the tap and avoid extracting unneeded data.
-- Mapper plugins aren't supported by `meltano elt`
+- Mapper plugins aren't supported by `meltano el`
 
 ### Do both my tap and target need to support SDK based stream maps?
 

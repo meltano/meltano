@@ -1390,6 +1390,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "mahangu",
+      "name": "Mahangu Weerasinghe",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10125810?v=4",
+      "profile": "https://github.com/mahangu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ddobrinskiy",
+      "name": "David Dobrinskiy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29500178?v=4",
+      "profile": "https://linkedin.com/in/ddobrinskiy",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

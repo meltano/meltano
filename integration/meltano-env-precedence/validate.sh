@@ -9,7 +9,7 @@ set +o pipefail
 
 export STACKED=1
 
-meltano install utility example
+meltano install example
 
 # FIXME: https://github.com/meltano/meltano/issues/7023
 [ "$(meltano invoke --print-var STACKED example:echo-stacked)" = $'STACKED=4\nStacked env var value is: 4' ]

@@ -24,7 +24,8 @@ which was installed by the `meltano install` command but may require tweaking of
 ```shell
 meltano --environment=dev config target-postgres set user postgres
 meltano --environment=dev config target-postgres set password postgres
-meltano --environment=dev config target-postgres set dbname warehouse
+meltano --environment=dev config target-postgres set host localhost
+meltano --environment=dev config target-postgres set database warehouse
 meltano --environment=dev config target-postgres set default_target_schema public
 ```
 
@@ -41,7 +42,7 @@ You'll get quite a bit of output, two key lines near the end of the output that 
 
 ```
 <timestamps> [info     ] Incremental state has been updated at <timestamp>.
-<timestamps> [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
+<timestamps> [info     ] Block run completed            block_type=ExtractLoadBlocks err=None set_number=0 success=True
 ```
 
 ### Adding a job

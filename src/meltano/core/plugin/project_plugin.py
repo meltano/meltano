@@ -69,6 +69,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     name: str
     variant: str | None
     executable: str
+    python: str | None
 
     config_files: dict[str, str]
 
@@ -88,7 +89,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         commands: dict[str, Command] | None = None,
         requires: dict[PluginType, list[PluginRequirement]] | None = None,
         config: dict[str, t.Any] | None = None,
-        default_variant: str = Variant.ORIGINAL_NAME,
+        default_variant: str = Variant.DEFAULT_NAME,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):
@@ -161,7 +162,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
-        self.python = python
+        self.python = str(python) if python else None
         self.executable = executable
         self.capabilities = capabilities
         self.settings_group_validation = settings_group_validation

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-import warnings
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -14,9 +13,12 @@ from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
+    PluginTypeArg,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
+    infer_plugin_type,
+    validate_plugin_type_args,
 )
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -54,32 +56,6 @@ def _load_yaml_from_ref(
         raise click.BadParameter(str(e), ctx=ctx, param=param) from e
 
     return yaml.load(content) or {}
-
-
-class PluginTypeArg(click.Choice):
-    """A click parameter that converts a string to a PluginType."""
-
-    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
-        """Initialize the PluginTypeArg."""
-        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
-
-    def convert(
-        self,
-        value: str,
-        param: click.Parameter | None,  # noqa: ARG002
-        ctx: click.Context | None,  # noqa: ARG002
-    ) -> PluginType:
-        """Convert the value to a PluginType."""
-        return PluginType.from_cli_argument(value)
-
-
-def _infer_plugin_type(plugin_name: str) -> PluginType:
-    if plugin_name.startswith("tap-"):
-        return PluginType.EXTRACTORS
-    if plugin_name.startswith("target-"):
-        return PluginType.LOADERS
-
-    return PluginType.UTILITIES
 
 
 @click.command(
@@ -131,9 +107,11 @@ def _infer_plugin_type(plugin_name: str) -> PluginType:
     ),
 )
 @click.option(
-    "--update",
+    "--update/--no-update",
     is_flag=True,
+    default=True,
     help="Update an existing plugin.",
+    hidden=True,
 )
 @install
 @no_install
@@ -150,12 +128,12 @@ async def add(
     project: Project,
     plugin: tuple[str, ...],
     install_plugins: InstallPlugins,
-    plugin_type: PluginType | None = None,
-    inherit_from: str | None = None,
-    variant: str | None = None,
-    as_name: str | None = None,
-    plugin_yaml: dict | None = None,
-    python: str | None = None,
+    plugin_type: PluginType | None,
+    inherit_from: str | None,
+    variant: str | None,
+    as_name: str | None,
+    plugin_yaml: dict | None,
+    python: str | None,
     **flags: bool,
 ) -> None:
     """Add a plugin to your project.
@@ -165,18 +143,7 @@ async def add(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    if plugin_type is None and plugin[0] in PluginType.cli_arguments():
-        plugin_type = PluginType.from_cli_argument(plugin[0])
-        plugin_names = plugin[1:]
-        warnings.warn(
-            "Passing the plugin type as the first positional argument is deprecated "
-            "and will be removed in Meltano v4. "
-            "Please use the --plugin-type option instead.",
-            DeprecationWarning,
-            stacklevel=0,
-        )
-    else:
-        plugin_names = plugin
+    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
 
     if as_name:
         # `add <type> <inherit-from> --as <name>``
@@ -194,9 +161,7 @@ async def add(
 
     plugin_refs: list[PluginRef] = [
         PluginRef(
-            plugin_type=_infer_plugin_type(name)
-            if plugin_type is None
-            else plugin_type,
+            plugin_type=infer_plugin_type(name) if plugin_type is None else plugin_type,
             name=name,
         )
         for name in plugin_names

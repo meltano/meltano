@@ -11,7 +11,6 @@ import platform
 import shutil
 import string
 import typing as t
-import uuid
 from base64 import b64encode
 from contextlib import contextmanager
 from pathlib import Path
@@ -38,6 +37,8 @@ from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
+
+    import faker
 
 
 def on_windows() -> bool:
@@ -470,10 +471,14 @@ class TestS3StateStoreManager:
     def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
 
-    def test_set_first_time(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_set_first_time(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        faker: faker.Faker,
+    ) -> None:
         monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
         monkeypatch.delenv("AWS_PROFILE", raising=False)
-        state_id = uuid.uuid4().hex
+        state_id = faker.pystr()
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
                 uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
@@ -485,10 +490,11 @@ class TestS3StateStoreManager:
     def test_update_fail_object_in_glacier(
         self,
         monkeypatch: pytest.MonkeyPatch,
+        faker: faker.Faker,
     ) -> None:
         monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
         monkeypatch.delenv("AWS_PROFILE", raising=False)
-        state_id = uuid.uuid4().hex
+        state_id = faker.pystr()
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
                 uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
@@ -677,7 +683,7 @@ class TestGCSStateStoreManager:
     ):
         return GCSStateStoreManager(
             uri="gs://meltano/state/",
-            application_credentials="path/to/creds/file",
+            application_credentials_path="path/to/creds/file",
             lock_timeout_seconds=10,
         )
 
@@ -693,7 +699,7 @@ class TestGCSStateStoreManager:
         _ = subject.client
         _ = subject.client
         mock_client.from_service_account_json.assert_called_once_with(
-            subject.application_credentials,
+            subject.application_credentials_path,
         )
 
     @pytest.mark.usefixtures("mock_client")
@@ -771,3 +777,98 @@ class TestGCSStateStoreManager:
             bucket_or_name="meltano",
             prefix="state",
         )
+
+    @pytest.fixture
+    def subject_with_json_creds(self, function_scoped_test_dir):  # noqa: ARG002
+        return GCSStateStoreManager(
+            uri="gs://meltano/state/",
+            application_credentials_json=(
+                '{"type": "service_account", "project_id": "test"}'
+            ),
+            lock_timeout_seconds=10,
+        )
+
+    @pytest.fixture
+    def subject_with_path_creds(self, function_scoped_test_dir):  # noqa: ARG002
+        return GCSStateStoreManager(
+            uri="gs://meltano/state/",
+            application_credentials_path="path/to/creds/file",
+            lock_timeout_seconds=10,
+        )
+
+    def test_client_with_json_credentials(
+        self,
+        subject_with_json_creds: GCSStateStoreManager,
+        mock_client,
+    ) -> None:
+        # Call twice to assure memoization
+        _ = subject_with_json_creds.client
+        _ = subject_with_json_creds.client
+        mock_client.from_service_account_info.assert_called_once_with(
+            {"type": "service_account", "project_id": "test"},
+        )
+
+    def test_client_with_path_credentials(
+        self,
+        subject_with_path_creds: GCSStateStoreManager,
+        mock_client,
+    ) -> None:
+        # Call twice to assure memoization
+        _ = subject_with_path_creds.client
+        _ = subject_with_path_creds.client
+        mock_client.from_service_account_json.assert_called_once_with(
+            "path/to/creds/file",
+        )
+
+    def test_deprecation_warning_for_application_credentials(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ) -> None:
+        with pytest.warns(
+            DeprecationWarning, match="application_credentials.*deprecated"
+        ):
+            GCSStateStoreManager(
+                uri="gs://meltano/state/",
+                application_credentials="path/to/creds/file",
+                lock_timeout_seconds=10,
+            )
+
+    def test_application_credentials_precedence(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ) -> None:
+        # Test that application_credentials_path takes precedence when both are provided
+        with pytest.warns(
+            DeprecationWarning, match="application_credentials.*deprecated"
+        ):
+            subject = GCSStateStoreManager(
+                uri="gs://meltano/state/",
+                application_credentials="old/path/to/creds",
+                application_credentials_path="new/path/to/creds",
+                lock_timeout_seconds=10,
+            )
+        assert subject.application_credentials_path == "new/path/to/creds"
+
+    def test_client_with_invalid_json_credentials(self):
+        # Provide invalid JSON string
+        invalid_json = "{invalid_json: true,"
+        subject = GCSStateStoreManager(
+            uri="gs://meltano/state/",
+            application_credentials_json=invalid_json,
+            lock_timeout_seconds=10,
+        )
+        with pytest.raises(
+            ValueError,
+            match="Invalid JSON in application_credentials_json",
+        ):
+            _ = subject.client
+
+    def test_mutual_exclusivity_of_json_and_path_credentials(self):
+        # Both provided should raise ValueError
+        with pytest.raises(ValueError, match="only one of"):
+            GCSStateStoreManager(
+                uri="gs://meltano/state/",
+                application_credentials_path="/some/path.json",
+                application_credentials_json='{"type": "service_account"}',
+                lock_timeout_seconds=10,
+            )

@@ -4,14 +4,13 @@ import json
 import logging
 import typing as t
 from textwrap import dedent
-from uuid import uuid4
 
 import anyio
 import structlog
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin
-from meltano.core.utils import nest_object
+from meltano.core.utils import nest_object, uuid7
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -93,7 +92,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
     async def setup_logging_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),  # noqa: ARG002
     ) -> None:
         """Set up logging before invoking tap.
 
@@ -104,9 +103,6 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         Returns:
             None
         """
-        if exec_args:
-            return
-
         singer_sdk_logging = plugin_invoker.files["singer_sdk_logging"]
         pipelinewise_logging = plugin_invoker.files["pipelinewise_singer_logging"]
 
@@ -171,5 +167,5 @@ class SingerPlugin(BasePlugin):  # noqa: D101
     def instance_uuid(self) -> str:
         """Multiple processes running at the same time have a unique value to use."""
         if not self._instance_uuid:
-            self._instance_uuid = str(uuid4())
+            self._instance_uuid = str(uuid7())
         return self._instance_uuid

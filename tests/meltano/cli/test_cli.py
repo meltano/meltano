@@ -341,6 +341,12 @@ class TestCli:
                 id="log-level-warning",
             ),
             pytest.param(
+                "--log-level",
+                "cli.log_level",
+                "disabled",
+                id="log-level-disabled",
+            ),
+            pytest.param(
                 "--log-config",
                 "cli.log_config",
                 "path/to/logging.yml",

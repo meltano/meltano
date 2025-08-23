@@ -96,3 +96,28 @@ async def test_select_service_list_all(
             ),
         },
     }
+
+
+@pytest.mark.usefixtures("tap")
+def test_select_service_clear(project: Project) -> None:
+    extractor = "tap-mock"
+    service = SelectService(project, extractor)
+
+    # Check if there are any initial select patterns (should be default "*.*")
+    initial_patterns = service.current_select[:]
+    assert initial_patterns == ["*.*"]
+
+    # Add some select patterns
+    service.update("users", "*", exclude=False)
+    service.update("posts", "id", exclude=False)
+    service.update("posts", "secret", exclude=True)
+
+    # Verify patterns were added (should replace default)
+    expected_patterns = ["users.*", "posts.id", "!posts.secret"]
+    assert service.current_select == expected_patterns
+
+    # Clear all patterns
+    service.clear()
+
+    # Verify all custom patterns were removed and we're back to default
+    assert service.current_select == ["*.*"]

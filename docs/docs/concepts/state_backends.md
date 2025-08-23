@@ -17,6 +17,17 @@ for Meltano projects running in ephemeral environments or in circumstances where
 - [Amazon AWS S3](#aws-s3)
 - [Azure Blob Storage](#azure-blob-storage)
 - [Google Cloud Storage](#google-cloud-storage)
+- [Snowflake (External)](#snowflake-external)
+
+### Beyond Basic Storage
+
+With Meltano's flexible state backend architecture, you can store state in virtually any system that can store key-value data. Popular options include:
+
+- **Cloud Data Warehouses**: Snowflake, BigQuery, Redshift, Databricks
+- **Database Systems**: PostgreSQL, MySQL, MongoDB, Redis
+- **Custom Solutions**: Your own API endpoints or enterprise storage systems
+
+See our [Custom State Backends guide](/guide/custom-state-backend) to learn how to implement any of these options.
 
 ## Installation
 
@@ -142,12 +153,94 @@ For reference, read the [AWS documentation on service-specific endpoints](https:
 
 To store state remotely in Google Cloud Storage, set the `state_backend.uri` setting to `gs://<your bucket name>/<prefix for state JSON blobs>`.
 
-To authenticate to GCS, you must provide a path to a [service account credentials file](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
-These can be configured via the `state_backend.gcs.application_credentials` setting.
+To authenticate to GCS, you can provide service account credentials in one of the following ways:
 
-If credentials are not provided via these settings, Meltano will use the value the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
+#### Using a JSON credentials string
 
-If GCS credentials are not found via any of the methods described above, Meltano will not be able to authenticate to Google Cloud Storage and state operations will fail.
+You can provide service account credentials directly as a JSON string via the [`state_backend.gcs.application_credentials_json`](/reference/settings/#state_backendgcsapplication_credentials_json) setting. This is the most production-friendly approach, especially in containerized environments.
+
+```yaml
+state_backend:
+  uri: gs://my-bucket/state
+  gcs:
+    application_credentials_json: |
+      {
+        "type": "service_account",
+        "project_id": "my-project",
+        "private_key_id": "...",
+        "private_key": "...",
+        "client_email": "...",
+        "client_id": "...",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "..."
+      }
+```
+
+#### Using a credentials file path
+
+You can provide a path to a [service account credentials file](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) via the [`state_backend.gcs.application_credentials_path`](/reference/settings/#state_backendgcsapplication_credentials_path) setting.
+
+```yaml
+state_backend:
+  uri: gs://my-bucket/state
+  gcs:
+    application_credentials_path: /path/to/service-account-key.json
+```
+
+:::warning
+
+The legacy `state_backend.gcs.application_credentials` setting is still supported but deprecated. Use `state_backend.gcs.application_credentials_path` instead.
+
+:::
+
+#### Default authentication
+
+If credentials are not provided via any of the above settings, Meltano will use the value of the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
+
+### Snowflake (External)
+
+Snowflake state backend support is available as a separate package: [`meltano-state-backend-snowflake`](https://github.com/meltano/meltano-state-backend-snowflake).
+
+#### Installation
+
+Install Meltano with the Snowflake state backend extension using one of these methods:
+
+**Using uv:**
+```bash
+uv tool install --with meltano-state-backend-snowflake meltano
+```
+
+**Using pipx:**
+```bash
+pipx install meltano
+pipx inject meltano 'meltano-state-backend-snowflake'
+```
+
+#### Configuration
+
+To store state in Snowflake, set the `state_backend.uri` setting to `snowflake://<user>:<password>@<account>/<database>/<schema>`.
+
+State will be stored in two tables that the extension will create automatically:
+- `meltano_state` - Stores the actual state data
+- `meltano_state_locks` - Manages concurrency locks
+
+Example configuration using environment variables:
+
+```bash
+export MELTANO_STATE_BACKEND_URI='snowflake://my_user:my_password@my_account/my_database/my_schema'
+```
+
+#### Features
+
+- Automatic table creation and management
+- Concurrency control using database-level locking
+- Support for JSON state data using Snowflake's VARIANT data type
+- Flexible connection configuration with support for account, user, password, warehouse, database, schema, and role parameters
+- Security best practices with environment variable configuration
+
+For detailed configuration options and advanced features, see the [meltano-state-backend-snowflake documentation](https://github.com/meltano/meltano-state-backend-snowflake).
 
 ## Locking
 

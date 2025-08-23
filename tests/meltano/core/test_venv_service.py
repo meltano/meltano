@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import asyncio
 import platform
-import re
-import sys
 import typing as t
 from asyncio.subprocess import Process
 from pathlib import Path
@@ -14,35 +11,50 @@ import pytest
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_install_service import install_pip_plugin
-from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv, find_uv
+from meltano.core.venv_service import (
+    UvVenvService,
+    VenvService,
+    VirtualEnv,
+    fingerprint,
+)
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def _check_venv_created_with_python(project: Project, python: str | None) -> None:
-    with mock.patch("meltano.core.venv_service._resolve_python_path") as venv_mock:
-        VenvService(project=project)
-        venv_mock.assert_called_once_with(python)
+def test_fingerprint_with_python_path():
+    """Test that fingerprint includes Python path when provided."""
+    import sys
 
+    pip_args = ["package==1.0.0", "another-package"]
 
-async def _check_venv_created_with_python_for_plugin(
-    project: Project,
-    plugin: ProjectPlugin,
-    python: str | None,
-) -> None:
-    with (
-        mock.patch(
-            "meltano.core.venv_service._resolve_python_path",
-        ) as venv_mock,
-        mock.patch("meltano.core.venv_service.VenvService.install"),
-    ):
-        await install_pip_plugin(project=project, plugin=plugin)
-        venv_mock.assert_called_once_with(python)
+    fp1 = fingerprint(pip_args)
+    fp2 = fingerprint(pip_args, "/usr/bin/python3.11")
+
+    assert fp1 != fp2
+
+    fp3 = fingerprint(pip_args, "/usr/bin/python3.11")
+    assert fp2 == fp3
+
+    fp4 = fingerprint(pip_args, "/usr/bin/python3.12")
+    assert fp2 != fp4
+
+    fp5 = fingerprint(pip_args, None)
+    assert fp1 == fp5
+
+    # Test that sys.executable doesn't change fingerprint
+    fp6 = fingerprint(pip_args, sys.executable)
+    assert fp1 == fp6
 
 
 class TestVenvService:
+    cls = VenvService
+
+    def assert_pip_log_file(self, service: VenvService) -> None:
+        assert service.pip_log_path.exists()
+        assert service.pip_log_path.is_file()
+        assert service.pip_log_path.stat().st_size > 0
+
     @pytest.fixture
     def subject(self, project):
         return VenvService(project=project, namespace="namespace", name="name")
@@ -71,6 +83,34 @@ class TestVenvService:
         )
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="chmod behavior is different on Windows",
+    )
+    async def test_create_venv_dir_not_writable(
+        self, project: Project, request: pytest.FixtureRequest
+    ) -> None:
+        plugin_type = "dummy_type"
+        plugin_name = request.node.name
+
+        venv_service = VenvService(
+            project=project,
+            namespace=plugin_type,
+            name=plugin_name,
+        )
+        venv_dir = project.venvs_dir(plugin_type, plugin_name, make_dirs=True)
+        # Don't allow writing to the venv dir
+        venv_dir.chmod(0o555)
+
+        with pytest.raises(
+            AsyncSubprocessError,
+            match="Could not create the virtualenv for",
+        ) as excinfo:
+            await venv_service.create()
+
+        assert "is not write-able" in await excinfo.value.stderr
+
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_clean_install(self, subject: VenvService) -> None:
         if platform.system() == "Windows":
@@ -88,32 +128,12 @@ class TestVenvService:
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
 
         # ensure that the package is installed
-        proc = await asyncio.create_subprocess_exec(
-            str(venv_dir.joinpath("bin/python")),
-            "-m",
-            "pip",
-            "list",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await proc.communicate()
-        assert proc.returncode == 0
-        assert re.search(r"example\s+0\.1\.0", str(stdout))
+        installed = await subject.list_installed()
+        assert any(dep["name"] == "example" for dep in installed)
 
         # ensure that pip is the latest version
-        proc = await asyncio.create_subprocess_exec(
-            str(venv_dir.joinpath("bin/python")),
-            "-m",
-            "pip",
-            "list",
-            "--outdated",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await proc.communicate()
-        assert proc.returncode == 0
-        for line in str(stdout).splitlines():
-            assert not line.startswith("pip ")
+        outdated = await subject.list_installed("--outdated")
+        assert not any(dep["name"] == "pip" for dep in outdated)
 
         assert subject.exec_path("some_exe").parts[-6:] == (
             ".meltano",
@@ -125,17 +145,12 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        fingerprint = (venv_dir / ".meltano_plugin_fingerprint").read_text()
-        assert (
-            fingerprint
-            # sha256 of "example"
-            == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
-        )
+        fingerprint_content = (venv_dir / ".meltano_plugin_fingerprint").read_text()
+        expected_fingerprint = fingerprint(["example"], subject.venv.python_path)
+        assert fingerprint_content == expected_fingerprint
 
         # ensure that log file was created and is not empty
-        assert subject.pip_log_path.exists()
-        assert subject.pip_log_path.is_file()
-        assert subject.pip_log_path.stat().st_size > 0
+        self.assert_pip_log_file(subject)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -147,24 +162,14 @@ class TestVenvService:
 
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
-        venv_dir = subject.project.venvs_dir("namespace", "name")
 
         # remove the package, then check that after a regular install the package exists
         await subject.uninstall_package("example")
         await subject.install(["example"])
 
         # ensure that the package is installed
-        proc = await asyncio.create_subprocess_exec(
-            str(venv_dir.joinpath("bin/python")),
-            "-m",
-            "pip",
-            "list",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await proc.communicate()
-        assert proc.returncode == 0
-        assert re.search(r"example\s+0\.1\.0", str(stdout))
+        installed = await subject.list_installed()
+        assert any(dep["name"] == "example" for dep in installed)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -190,49 +195,66 @@ class TestVenvService:
         assert subject.requires_clean_install(["example==0.1.0"])
         assert subject.requires_clean_install(["example", "another-package"])
 
-    def test_top_level_python_setting(self, project: Project) -> None:
-        project.settings.set("python", "test-python-executable-project-level")
-        _check_venv_created_with_python(project, "test-python-executable-project-level")
-        project.settings.unset("python")
-        _check_venv_created_with_python(project, None)
+    @pytest.mark.asyncio
+    async def test_requires_clean_install_python_change(
+        self, subject: VenvService
+    ) -> None:
+        await subject.install(["example"], clean=True)
+        assert not subject.requires_clean_install(["example"])
 
-    async def test_plugin_python_setting(self, project: Project) -> None:
+        original_python = subject.venv.python_path
+        try:
+            subject.venv.python_path = "/fake/test/python"
+            assert subject.requires_clean_install(["example"])
+
+            subject.venv.python_path = original_python
+            assert not subject.requires_clean_install(["example"])
+        finally:
+            subject.venv.python_path = original_python
+
+    async def test_python_setting(self, project: Project) -> None:
+        plugin_python = "test-python-executable-plugin-level"
         plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-mock",
-            python="test-python-executable-plugin-level",
+            python=plugin_python,
         )
+        subject = self.cls.from_plugin(project, plugin)
 
-        await _check_venv_created_with_python_for_plugin(
-            project,
-            plugin,
-            "test-python-executable-plugin-level",
-        )
+        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
+            await subject.create_venv()
+            exec_mock.assert_called_once()
+            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
 
         # Setting the project-level `python` setting should have no effect at first
         # because the plugin-level setting takes precedence.
-        project.settings.set("python", "test-python-executable-project-level")
+        project_python = "test-python-executable-project-level"
+        project.settings.set("python", project_python)
+        subject = self.cls.from_plugin(project, plugin)
 
-        await _check_venv_created_with_python_for_plugin(
-            project,
-            plugin,
-            "test-python-executable-plugin-level",
-        )
+        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
+            await subject.create_venv()
+            exec_mock.assert_called_once()
+            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
 
         # The project-level setting should have an effect after the plugin-level
         # setting is unset
         plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
+        subject = self.cls.from_plugin(project, plugin)
 
-        await _check_venv_created_with_python_for_plugin(
-            project,
-            plugin,
-            "test-python-executable-project-level",
-        )
+        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
+            await subject.create_venv()
+            exec_mock.assert_called_once()
+            assert exec_mock.call_args.args[-2] == f"--python={project_python}"
 
         project.settings.unset("python")
+        subject = self.cls.from_plugin(project, plugin)
 
         # After both the project-level and plugin-level are unset, it should be None
-        await _check_venv_created_with_python_for_plugin(project, plugin, None)
+        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
+            await subject.create_venv()
+            exec_mock.assert_called_once()
+            assert Path(exec_mock.call_args.args[-2].split("=")[1]).is_absolute()
 
 
 class TestVirtualEnv:
@@ -259,78 +281,16 @@ class TestVirtualEnv:
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
 
-    def test_different_python_versions(self, project: Project) -> None:
-        root = project.venvs_dir("pytest", "pytest")
 
-        assert (
-            VirtualEnv(root, python=None).python_path
-            == VirtualEnv(root).python_path
-            == VirtualEnv(root, python=sys.executable).python_path
-            == sys.executable
-        )
+class TestUvVenvService(TestVenvService):
+    cls = UvVenvService
 
-        with (
-            mock.patch(
-                "shutil.which",
-                return_value="/usr/bin/test-python-executable",
-            ),
-            mock.patch("os.access", return_value=True),
-        ):
-            assert (
-                VirtualEnv(root, python="test-python-executable").python_path
-                == "/usr/bin/test-python-executable"
-            )
+    def assert_pip_log_file(self, service: UvVenvService) -> None:
+        pass
 
-        with (
-            mock.patch("os.path.exists", return_value=True),
-            mock.patch(
-                "os.access",
-                return_value=True,
-            ),
-        ):
-            path_str = "/usr/bin/test-python-executable"
-            venv = VirtualEnv(root, python=path_str)
-            assert venv.python_path == path_str
-
-            venv = VirtualEnv(root, python=Path(path_str))
-            assert venv.python_path == str(Path(path_str).resolve())
-
-        with (
-            mock.patch(
-                "shutil.which",
-                return_value="/usr/bin/test-python-executable",
-            ),
-            mock.patch("os.access", return_value=False),
-            pytest.raises(
-                MeltanoError,
-                match="'/usr/bin/test-python-executable' is not executable",
-            ),
-        ):
-            VirtualEnv(root, python="test-python-executable")
-
-        with pytest.raises(
-            MeltanoError,
-            match="Python executable 'test-python-executable' was not found",
-        ):
-            VirtualEnv(root, python="test-python-executable")
-
-        with pytest.raises(
-            MeltanoError,
-            match="not the number 3.11",
-        ):
-            VirtualEnv(root, python=3.11)
-
-
-class TestUvVenvService:
     @pytest.fixture
     def subject(self, project):
-        find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
-
-    def test_find_uv_builtin(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        find_uv.cache_clear()
-        monkeypatch.setattr("uv.find_uv_bin", lambda: "/usr/bin/uv")
-        assert find_uv() == "/usr/bin/uv"
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -342,17 +302,8 @@ class TestUvVenvService:
         await subject.uninstall_package("cowsay")
         await subject.install(["cowsay"])
 
-        process = await asyncio.create_subprocess_exec(
-            subject.uv,
-            "pip",
-            "list",
-            "--python",
-            str(subject.exec_path("python")),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await process.communicate()
-        assert "cowsay" in stdout.decode()
+        installed = await subject.list_installed()
+        assert any(dep["name"] == "cowsay" for dep in installed)
 
     async def test_handle_installation_error(self, subject: UvVenvService) -> None:
         process = mock.Mock(spec=Process)
@@ -369,3 +320,63 @@ class TestUvVenvService:
             ),
         ):
             await subject.install(["cowsay"])
+
+    async def test_error_logging_creates_log_file(
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
+    ) -> None:
+        """Test that error handling creates log file with details."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock(spec=Process)
+            original_err = AsyncSubprocessError(
+                "Something went wrong",
+                process,
+                stderr="Some error",
+            )
+            result_err = await subject.handle_installation_error(original_err)
+
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)
+
+            assert log_file_path.exists()
+            assert "Some error" in log_file_path.read_text()
+
+    async def test_error_logging_empty_stderr(
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
+    ) -> None:
+        """Test error logging when stderr is empty."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock(spec=Process)
+            process.stderr = None
+            original_err = AsyncSubprocessError("Another error", process)
+
+            await subject.handle_installation_error(original_err)
+
+            assert log_file_path.exists()
+            assert log_file_path.read_text() == ""
+
+    async def test_error_logging_handles_write_failure(
+        self,
+        subject: UvVenvService,
+    ) -> None:
+        """Test that log write failures are handled gracefully."""
+        process = mock.Mock(spec=Process)
+        process.stderr = mock.AsyncMock(return_value="Some error")
+
+        # Mock the log writing to fail
+        with mock.patch.object(
+            subject,
+            "_write_error_log",
+            side_effect=OSError("Permission denied"),
+        ):
+            original_err = AsyncSubprocessError("Something went wrong", process)
+            result_err = await subject.handle_installation_error(original_err)
+
+            # Should still return the installation error, not the log error
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)

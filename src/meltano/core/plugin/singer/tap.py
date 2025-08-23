@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
+import inspect
 import json
 import logging
 import shutil
@@ -60,7 +62,7 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            if asyncio.iscoroutinefunction(file_like_obj.write):
+            if inspect.iscoroutinefunction(file_like_obj.write):
                 await file_like_obj.write(data.decode(encoding) if write_str else data)
             else:
                 file_like_obj.write(data.decode(encoding) if write_str else data)
@@ -71,7 +73,7 @@ def _debug_logging_handler(
     plugin_invoker: PluginInvoker,
     stderr: StreamReader,
     *other_dsts,  # noqa: ANN002
-) -> asyncio.Task:
+) -> asyncio.Task[None]:
     """Route debug log lines.
 
     Routes to stderr, or an `OutputLogger` if one is present in our invocation
@@ -397,7 +399,7 @@ class SingerTap(SingerPlugin):
             return catalog_path
 
         use_cached_catalog = (
-            not (elt_context and elt_context.refresh_catalog)
+            not (elt_context and elt_context.should_refresh_catalog())
             and plugin_invoker.plugin_config_extras["_use_cached_catalog"]
         )
 
@@ -585,7 +587,7 @@ class SingerTap(SingerPlugin):
             metadata_rules.extend(select_metadata_rules(config["_select"]))
             metadata_rules.extend(config_metadata_rules(config["_metadata"]))
 
-        # Always apply select filters (`meltano elt` `--select` and `--exclude` options)
+        # Always apply select filters (`meltano el` `--select` and `--exclude` options)
         metadata_rules.extend(select_filter_metadata_rules(config["_select_filter"]))
 
         if not schema_rules and not metadata_rules:
