@@ -20,7 +20,11 @@ if t.TYPE_CHECKING:
 class TestCliSchedule:
     @pytest.mark.order(0)
     @pytest.mark.usefixtures("project", "session", "tap", "target")
-    def test_schedule_add(self, cli_runner, schedule_service) -> None:
+    def test_schedule_add(
+        self,
+        cli_runner: MeltanoCliRunner,
+        schedule_service: ScheduleService,
+    ) -> None:
         # test adding a scheduled elt
         with mock.patch(
             "meltano.cli.schedule.ScheduleService",
@@ -129,6 +133,37 @@ class TestCliSchedule:
             )
 
         assert res.exit_code == 1
+
+        # Can't omit --extractor/--loader for an EL(T) schedule
+        with mock.patch(
+            "meltano.cli.schedule.ScheduleService",
+            return_value=schedule_service,
+        ):
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "add",
+                    "elt-schedule-mock",
+                    "--interval=@hourly",
+                    "--loader=target-mock",
+                ],
+            )
+            assert res.exit_code == 2
+            assert "Missing --extractor" in res.stderr
+
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "add",
+                    "elt-schedule-mock",
+                    "--interval=@hourly",
+                    "--extractor=tap-mock",
+                ],
+            )
+            assert res.exit_code == 2
+            assert "Missing --loader" in res.stderr
 
     @pytest.mark.parametrize("exit_code", (0, 1, 143))
     def test_schedule_run(

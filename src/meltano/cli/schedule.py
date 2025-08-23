@@ -171,9 +171,9 @@ def add(
         return
 
     if not extractor:
-        raise click.ClickException("Missing --extractor")  # noqa: EM101
+        raise click.UsageError("Missing --extractor")  # noqa: EM101
     if not loader:
-        raise click.ClickException("Missing --loader")  # noqa: EM101
+        raise click.UsageError("Missing --loader")  # noqa: EM101
 
     _add_elt(ctx, name, extractor, loader, transform, interval)
 
