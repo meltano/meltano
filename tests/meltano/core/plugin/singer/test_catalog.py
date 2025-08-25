@@ -940,6 +940,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "code",
                     "name",
                     "created_at",
+                    "payload",
                     "payload.content",
                     "payload.timestamp",
                 },
@@ -973,6 +974,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "code",
                     "name",
                     "created_at",
+                    "payload",
                     "payload.content",
                     "payload.timestamp",
                 },
@@ -1023,6 +1025,217 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         visit(catalog, lister)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
+
+    @pytest.mark.parametrize(
+        ("patterns", "attrs"),
+        (
+            pytest.param(
+                ["MyStream.*"],
+                {
+                    "id",
+                    "name",
+                    "geo",
+                    "geo.city",
+                    "geo.state",
+                    "geo.state.name",
+                    "geo.state.code",
+                    "geo.country",
+                    "geo.country.name",
+                    "geo.country.code",
+                    "geo.point",
+                    "geo.point.lat",
+                    "geo.point.lon",
+                },
+                id="stream.*",
+            ),
+            pytest.param(
+                ["MyStream.geo.*"],
+                {
+                    "id",
+                    "geo",
+                    "geo.city",
+                    "geo.state",
+                    "geo.state.name",
+                    "geo.state.code",
+                    "geo.country",
+                    "geo.country.name",
+                    "geo.country.code",
+                    "geo.point",
+                    "geo.point.lat",
+                    "geo.point.lon",
+                },
+                id="stream.field.*",
+            ),
+            pytest.param(
+                ["MyStream.geo.city"],
+                {"id", "geo", "geo.city"},
+                id="stream.field.subfield",
+            ),
+            pytest.param(
+                ["MyStream.geo.point.*"],
+                {"id", "geo", "geo.point", "geo.point.lat", "geo.point.lon"},
+                id="stream.field.subfield.*",
+            ),
+            pytest.param(
+                ["MyStream.geo.*.*"],
+                {
+                    "id",
+                    "geo",
+                    "geo.city",
+                    "geo.state",
+                    "geo.state.name",
+                    "geo.state.code",
+                    "geo.country",
+                    "geo.country.name",
+                    "geo.country.code",
+                    "geo.point",
+                    "geo.point.lat",
+                    "geo.point.lon",
+                },
+                id="stream.field.*.*",
+            ),
+            pytest.param(
+                ["MyStream.geo.*", "!MyStream.geo.*.name"],
+                {
+                    "id",
+                    "geo",
+                    "geo.city",
+                    "geo.state",
+                    "geo.state.code",
+                    "geo.country",
+                    "geo.country.code",
+                    "geo.point",
+                    "geo.point.lat",
+                    "geo.point.lon",
+                },
+                id="!stream.field.*.subfield",
+            ),
+        ),
+    )
+    def test_select_stream_star(self, patterns: list[str], attrs: set[str]) -> None:
+        catalog = {
+            "streams": [
+                {
+                    "tap_stream_id": "MyStream",
+                    "stream": "my_stream",
+                    "metadata": [
+                        {
+                            "breadcrumb": [],
+                            "metadata": {
+                                "inclusion": "available",
+                                "table-key-properties": ["id"],
+                            },
+                        },
+                        {
+                            "breadcrumb": ["properties", "id"],
+                            "metadata": {"inclusion": "automatic"},
+                        },
+                        {
+                            "breadcrumb": ["properties", "name"],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": ["properties", "geo"],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": ["properties", "geo", "properties", "city"],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": ["properties", "geo", "properties", "state"],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "state",
+                                "properties",
+                                "name",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "state",
+                                "properties",
+                                "code",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "country",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "country",
+                                "properties",
+                                "name",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "country",
+                                "properties",
+                                "code",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": ["properties", "geo", "properties", "point"],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "point",
+                                "properties",
+                                "lat",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                        {
+                            "breadcrumb": [
+                                "properties",
+                                "geo",
+                                "properties",
+                                "point",
+                                "properties",
+                                "lon",
+                            ],
+                            "metadata": {"inclusion": "available"},
+                        },
+                    ],
+                },
+            ],
+        }
+        selector = SelectExecutor(patterns)
+        visit(catalog, selector)
+
+        lister = ListSelectedExecutor()
+        visit(catalog, lister)
+
+        assert lister.selected_properties["MyStream"] == attrs
 
     @pytest.mark.parametrize(
         ("node", "selection_type"),
@@ -1223,20 +1436,29 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         rules = select_metadata_rules(patterns)
 
         # Verify the correct number of rules (2 per pattern: stream + property)
-        assert len(rules) == 8  # 4 patterns x 2 rules each
+        # 4 patterns x 2 rules each + 5 parent properties
+        assert len(rules) == 13
 
         # Check that nested selections create proper breadcrumbs
         # For users.address (single-level)
         address_rules = [
             r for r in rules if r.tap_stream_id == "users" and "address" in r.breadcrumb
         ]
-        assert len(address_rules) == 3  # One for each nested pattern with users.address
+
+        # One for each nested pattern with users.address + one for each parent property
+        # implicitly selected
+        assert len(address_rules) == 6
 
         # Verify breadcrumb for users.address
         simple_address = [
             r for r in address_rules if r.breadcrumb == ["properties", "address"]
         ]
-        assert len(simple_address) == 1
+
+        # Selected three times:
+        # - explicitly
+        # - implicitly as a parent of users.address.city
+        # - implicitly as a parent of users.address.geo.lat
+        assert len(simple_address) == 3
         assert simple_address[0].key == "selected"
         assert simple_address[0].value is True
 
@@ -1554,15 +1776,6 @@ class TestMetadataRule:
                     ("my_stream", bc(["prop", "sub_prop"])),
                 ],
                 id="auto-select parent property when selecting one sub-property",
-                marks=(
-                    pytest.mark.xfail(
-                        reason=(
-                            "Selecting sub-properties does not imply selecting the "
-                            "parent property"
-                        ),
-                        strict=True,
-                    ),
-                ),
             ),
             pytest.param(
                 ("my_stream.prop.sub_prop1",),
@@ -1590,15 +1803,6 @@ class TestMetadataRule:
                     ("my_stream", bc(["prop", "sub_prop"])),
                 ],
                 id="auto-select parent property when selecting sub-properties",
-                marks=(
-                    pytest.mark.xfail(
-                        reason=(
-                            "Selecting sub-properties does not imply selecting the "
-                            "parent property"
-                        ),
-                        strict=True,
-                    ),
-                ),
             ),
             pytest.param(
                 ("my_stream.prop.*.*",),
@@ -1609,15 +1813,6 @@ class TestMetadataRule:
                     ("my_stream", bc(["prop", "sub_prop", "sub_sub_prop"])),
                 ],
                 id="auto-select parent property when selecting all sub-properties",
-                marks=(
-                    pytest.mark.xfail(
-                        reason=(
-                            "Selecting sub-properties does not imply selecting the "
-                            "parent property"
-                        ),
-                        strict=True,
-                    ),
-                ),
             ),
         ),
     )
