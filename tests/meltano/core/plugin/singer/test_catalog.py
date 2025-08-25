@@ -1436,7 +1436,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         rules = select_metadata_rules(patterns)
 
         # Verify the correct number of rules (2 per pattern: stream + property)
-        # 4 patterns x 2 rules each + 5 parent properties:
+        # 4 patterns x 2 rules each + 5 parent properties
         assert len(rules) == 13
 
         # Check that nested selections create proper breadcrumbs
@@ -1445,7 +1445,8 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             r for r in rules if r.tap_stream_id == "users" and "address" in r.breadcrumb
         ]
 
-        # One for each nested pattern with users.address + one for the parent property
+        # One for each nested pattern with users.address + one for each parent property
+        # implicitly selected
         assert len(address_rules) == 6
 
         # Verify breadcrumb for users.address
