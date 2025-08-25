@@ -1515,6 +1515,14 @@ class TestMetadataRule:
                 id="select all properties of a stream",
             ),
             pytest.param(
+                ("my_stream",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop"])),
+                ],
+                id="selecting a stream implies selecting all properties",
+            ),
+            pytest.param(
                 ("my\\.stream.*",),
                 [
                     ("my.stream", None),
