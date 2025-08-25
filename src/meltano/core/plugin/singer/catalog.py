@@ -226,7 +226,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                     MetadataRule(
                         tap_stream_id=parsed_pattern.stream_pattern,
                         breadcrumb=[],
-                        key="selected",
+                        key=SELECTED_KEY,
                         value=selected,
                     ),
                 )
