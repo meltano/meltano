@@ -230,7 +230,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                 ),
             )
 
-            # If all sub-properties are selected, the parent property is selected too
+            # If any sub-property is selected, the parent property is selected too
             if selected:
                 rules.extend(
                     MetadataRule(
