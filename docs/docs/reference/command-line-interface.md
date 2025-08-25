@@ -592,15 +592,17 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - A `--merge-state` flag can be passed to merge state with that of previous runs. **DEPRECATED**: Use `--state-strategy=merge` instead.
 
-- One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
-  Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
+- One or more `--select <entity>` options can be passed to only extract records for matching streams.
+  Similarly, `--exclude <entity>` can be used to extract records for all configured streams _except_ for those specified.
 
   Notes:
 
-  - The entities that are currently selected for extraction can be discovered using [`meltano select --list <extractor>`](#select).
-  - [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity identifiers to match multiple entities at once.
+  - These options control **which entire streams** are processed, applying **stream-level filtering** on top of your configured property selections.
+  - Stream names can be discovered using [`meltano select --list --all <extractor>`](#select).
+  - [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream identifiers to match multiple streams at once.
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/concepts/plugins#select-filter-extra).
+  - **Important**: These options preserve your existing property-level selections from the [`select` extra](/concepts/plugins#select-extra). They do not change which properties within each stream are extracted.
 
 - A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) instead of actually running the pipeline.
   This can aid in debugging [extractor catalog generation](/guide/integration#extractor-catalog-generation), [incremental replication state lookup](/guide/integration#incremental-replication-state), and [pipeline environment variables](/guide/integration#pipeline-environment-variables).
@@ -628,8 +630,12 @@ meltano el tap-gitlab target-postgres --state-id=gitlab-to-postgres --full-refre
 meltano el tap-gitlab target-postgres --catalog extract/tap-gitlab.catalog.json
 meltano el tap-gitlab target-postgres --state extract/tap-gitlab.state.json
 
+# Stream-level filtering: only process commits stream (preserves your property selections)
 meltano el tap-gitlab target-postgres --select commits
+# Stream-level filtering: process all configured streams except project_members
 meltano el tap-gitlab target-postgres --exclude project_members
+# Multiple stream selection
+meltano el tap-gitlab target-postgres --select commits issues --exclude archived_issues
 
 meltano el tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
 ```
@@ -1363,7 +1369,7 @@ Use the `select` command to add select patterns to a specific extractor in your 
 
 - `meltano select [--list] [--all] [--clear] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
-Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra).
+Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra), which defines the streams and properties within each stream that should be included during data extraction. Note that this is different from the [`select_filter` extra](/concepts/plugins#select-filter-extra), which is primarily used for further filtering of stream selections.
 
 :::caution
 
@@ -1400,7 +1406,7 @@ meltano select tap-gitlab --list --all
 # List all available entities and attributes in JSON format
 meltano select tap-gitlab --json --all
 
-# Include all attributes of an entity
+# Include all attributes of an entity (stream-only pattern)
 meltano select tap-gitlab tags "*"
 
 # Include specific attributes of an entity
@@ -1409,6 +1415,15 @@ meltano select tap-gitlab commits project_id
 meltano select tap-gitlab commits created_at
 meltano select tap-gitlab commits author_name
 meltano select tap-gitlab commits message
+
+# Select nested properties (for streams with nested JSON structures)
+meltano select tap-gitlab users address         # Select entire address object
+meltano select tap-gitlab users address city    # Select only city within address
+meltano select tap-gitlab users address geo lat # Select only latitude within geo within address
+
+# Note: These selections define what properties are available.
+# To filter which streams are processed at runtime, use:
+# meltano el tap-gitlab target-jsonl --select commits tags
 
 # Exclude matching attributes of all entities
 meltano select tap-gitlab --exclude "*" "*_url"
@@ -1428,6 +1443,9 @@ Enabled patterns:
     commits.created_at
     commits.author_name
     commits.message
+    users.address
+    users.address.city
+    users.address.geo.lat
     !*.*_url
 
 Selected attributes:
@@ -1441,6 +1459,9 @@ Selected attributes:
     [automatic] tags.name
     [automatic] tags.project_id
     [selected ] tags.target
+    [selected ] users.address
+    [selected ] users.address.city
+    [selected ] users.address.geo.lat
 ```
 
 Remove patterns (`--rm` or `--remove`):
