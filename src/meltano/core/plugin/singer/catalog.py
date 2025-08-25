@@ -229,7 +229,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                 ),
             )
         # Handle property patterns
-        elif prop_pattern:
+        else:
             # Always select the stream for property access
             if selected or prop_pattern == "*":
                 rules.append(
