@@ -954,8 +954,7 @@
             "extractor",
             "loader",
             "transform",
-            "interval",
-            "start_date"
+            "interval"
           ]
         }
       ],

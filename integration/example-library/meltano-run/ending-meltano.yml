@@ -13,9 +13,8 @@ plugins:
     pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
   loaders:
   - name: target-postgres
-    variant: transferwise
-    pip_url: >
-      git+https://github.com/transferwise/pipelinewise.git#subdirectory=singer-connectors/target-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-target-postgres
   utilities:
   - name: dbt-postgres
     variant: dbt-labs
@@ -36,7 +35,8 @@ environments:
       - name: target-postgres
         config:
           user: postgres
-          dbname: warehouse
+          host: localhost
+          database: warehouse
           default_target_schema: public
       utilities:
       - name: dbt-postgres
