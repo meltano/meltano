@@ -2033,13 +2033,11 @@ def elt_schedule(
 ):
     try:
         return schedule_service.add_elt(
-            None,
             "elt-schedule-mock",
             extractor=tap.name,
             loader=target.name,
             transform="skip",
             interval="@daily",
-            start_date=datetime.datetime.now(datetime.timezone.utc),
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule
