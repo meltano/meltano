@@ -158,7 +158,7 @@ def config_schema_rules(config: dict[str, t.Any]) -> list[SchemaRule]:
     return [
         SchemaRule(
             tap_stream_id=tap_stream_id,
-            breadcrumb=["properties", prop],
+            breadcrumb=property_breadcrumb([prop]),
             payload=payload,
         )
         for tap_stream_id, stream_config in config.items()
