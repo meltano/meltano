@@ -208,6 +208,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
 
         rules = include_rules if selected else exclude_rules
 
+        # Stream-only patterns should behave like stream.*
         if not prop_pattern:
             # Select the stream
             rules.append(
@@ -218,8 +219,17 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                     value=selected,
                 ),
             )
-
-        else:
+            # Also select all properties (like stream.*)
+            rules.append(
+                MetadataRule(
+                    tap_stream_id=parsed_pattern.stream_pattern,
+                    breadcrumb=property_breadcrumb(["*"]),
+                    key=SELECTED_KEY,
+                    value=selected,
+                ),
+            )
+        # Handle property patterns
+        elif prop_pattern:
             # Always select the stream for property access
             if selected or prop_pattern == "*":
                 rules.append(
