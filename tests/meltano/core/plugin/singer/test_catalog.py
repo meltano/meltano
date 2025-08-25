@@ -1576,15 +1576,6 @@ class TestMetadataRule:
                     ("my_stream", bc(["prop", "sub_prop"])),
                 ],
                 id="auto-select parent property when selecting one sub-property",
-                marks=(
-                    pytest.mark.xfail(
-                        reason=(
-                            "Selecting sub-properties does not imply selecting the "
-                            "parent property"
-                        ),
-                        strict=True,
-                    ),
-                ),
             ),
             pytest.param(
                 ("my_stream.prop.sub_prop1",),

@@ -236,7 +236,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                     MetadataRule(
                         tap_stream_id=parsed_pattern.stream_pattern,
                         breadcrumb=property_breadcrumb(props[:idx]),
-                        key="selected",
+                        key=SELECTED_KEY,
                         value=selected,
                     )
                     for idx, prop in enumerate(props)
