@@ -940,6 +940,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "code",
                     "name",
                     "created_at",
+                    "payload",
                     "payload.content",
                     "payload.timestamp",
                 },
@@ -973,6 +974,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "code",
                     "name",
                     "created_at",
+                    "payload",
                     "payload.content",
                     "payload.timestamp",
                 },
@@ -1066,12 +1068,12 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             ),
             pytest.param(
                 ["MyStream.geo.city"],
-                {"id", "geo.city"},
+                {"id", "geo", "geo.city"},
                 id="stream.field.subfield",
             ),
             pytest.param(
                 ["MyStream.geo.point.*"],
-                {"id", "geo.point", "geo.point.lat", "geo.point.lon"},
+                {"id", "geo", "geo.point", "geo.point.lat", "geo.point.lon"},
                 id="stream.field.subfield.*",
             ),
             pytest.param(

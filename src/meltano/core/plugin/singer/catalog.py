@@ -231,7 +231,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
             )
 
             # If all sub-properties are selected, the parent property is selected too
-            if selected and "*" in props:
+            if selected:
                 rules.extend(
                     MetadataRule(
                         tap_stream_id=parsed_pattern.stream_pattern,
@@ -240,7 +240,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                         value=selected,
                     )
                     for idx, prop in enumerate(props)
-                    if prop == "*" and idx > 0
+                    if idx > 0
                 )
 
     return include_rules + exclude_rules
