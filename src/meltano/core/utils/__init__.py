@@ -363,61 +363,6 @@ def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
 
 
-@t.overload
-def coerce_datetime(d: None) -> None: ...
-
-
-@t.overload
-def coerce_datetime(d: datetime) -> datetime: ...
-
-
-@t.overload
-def coerce_datetime(d: date) -> datetime: ...
-
-
-def coerce_datetime(d):
-    """Add a `time` component to `d` if it is missing.
-
-    Args:
-        d: the date or datetime to add the time to
-
-    Returns:
-        The resulting datetime
-    """
-    if d is None:
-        return None
-
-    return d if isinstance(d, datetime) else datetime.combine(d, time())
-
-
-@t.overload
-def iso8601_datetime(d: None) -> None: ...
-
-
-@t.overload
-def iso8601_datetime(d: str) -> datetime: ...
-
-
-def iso8601_datetime(d: str | None):  # noqa: D103
-    if d is None:
-        return None
-
-    isoformats = [
-        "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%dT%H:%M:%S+00:00",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d",
-    ]
-
-    for format_string in isoformats:
-        with suppress(ValueError):
-            return coerce_datetime(
-                datetime.strptime(d, format_string).replace(tzinfo=timezone.utc),
-            )
-    raise ValueError(f"{d} is not a valid UTC date.")  # noqa: EM102
-
-
 class _GetItemProtocol(t.Protocol):
     def __getitem__(self, key: str) -> str: ...
 

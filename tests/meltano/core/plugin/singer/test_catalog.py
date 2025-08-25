@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import pytest
 
 from meltano.core.plugin.singer.catalog import (
+    SELECTED_KEY,
     CatalogRule,
     ListExecutor,
     ListSelectedExecutor,
@@ -14,10 +16,13 @@ from meltano.core.plugin.singer.catalog import (
     SchemaRule,
     SelectExecutor,
     SelectionType,
+    SelectPattern,
     path_property,
+    select_filter_metadata_rules,
     select_metadata_rules,
     visit,
 )
+from meltano.core.plugin.singer.catalog import property_breadcrumb as bc
 
 LEGACY_CATALOG = """
 {
@@ -829,90 +834,6 @@ class TestCatalogRule:
         assert not rule.match("tap_stream", ["property", "nested"])
 
 
-class TestMetadataRule:
-    @pytest.mark.parametrize(
-        ("patterns", "expected"),
-        (
-            pytest.param(
-                ("my_stream.prop.*",),
-                [
-                    MetadataRule(
-                        "my_stream",
-                        [],
-                        "selected",
-                        value=True,
-                    ),
-                    MetadataRule(
-                        "my_stream",
-                        ["properties", "prop", "properties", "*"],
-                        "selected",
-                        value=True,
-                    ),
-                    MetadataRule(
-                        "my_stream",
-                        ["properties", "prop"],
-                        "selected",
-                        value=True,
-                    ),
-                ],
-                id="select all sub-properties of a property",
-            ),
-            pytest.param(
-                ("my_stream.*",),
-                [
-                    MetadataRule(
-                        "my_stream",
-                        [],
-                        "selected",
-                        value=True,
-                    ),
-                    MetadataRule(
-                        "my_stream",
-                        ["properties", "*"],
-                        "selected",
-                        value=True,
-                    ),
-                ],
-                id="select all properties of a stream",
-            ),
-            pytest.param(
-                ("my_stream.prop.*.*",),
-                [
-                    MetadataRule(
-                        "my_stream",
-                        [],
-                        "selected",
-                        value=True,
-                    ),
-                    MetadataRule(
-                        "my_stream",
-                        ["properties", "prop", "properties", "*", "properties", "*"],
-                        "selected",
-                        value=True,
-                    ),
-                    MetadataRule(
-                        "my_stream",
-                        ["properties", "prop"],
-                        "selected",
-                        value=True,
-                    ),
-                    MetadataRule(
-                        "my_stream",
-                        ["properties", "prop", "properties", "*"],
-                        "selected",
-                        value=True,
-                    ),
-                ],
-                id="select all sub-properties of all properties",
-            ),
-        ),
-    )
-    def test_rules_from_patterns(
-        self, patterns: tuple[str], expected: list[MetadataRule]
-    ) -> None:
-        assert select_metadata_rules(patterns) == expected
-
-
 class TestLegacyCatalogSelectVisitor:
     @pytest.fixture
     def catalog(self):
@@ -1027,7 +948,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select(self, catalog, attrs) -> None:
+    def test_select(self, catalog: dict[str, t.Any], attrs: set[str]) -> None:
         selector = SelectExecutor(
             [
                 "UniqueEntitiesName.code",
@@ -1060,7 +981,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_escaped(self, catalog, attrs) -> None:
+    def test_select_escaped(self, catalog: dict[str, t.Any], attrs: set[str]) -> None:
         selector = SelectExecutor(
             [
                 "Unique\\.Entities\\.Name.code",
@@ -1404,6 +1325,10 @@ class TestSelectionType:
         assert f"{SelectionType.AUTOMATIC}" == "automatic"
         assert f"{SelectionType.SELECTED}" == "selected"
 
+    def test_selection_type_addition_not_implemented(self) -> None:
+        with pytest.raises(TypeError, match="unsupported operand type"):
+            SelectionType.SELECTED + "foo"
+
 
 class TestMetadataExecutor:
     @pytest.fixture
@@ -1562,3 +1487,153 @@ class TestListExecutor:
                 "payload.timestamp",
             },
         }
+
+
+class TestSelectPattern:
+    def test_parse(self) -> None:
+        parse = SelectPattern.parse
+        assert parse("users") == SelectPattern(
+            stream_pattern="users",
+            property_pattern=None,
+            negated=False,
+            raw="users",
+        )
+        assert parse("users.id") == SelectPattern(
+            stream_pattern="users",
+            property_pattern="id",
+            negated=False,
+            raw="users.id",
+        )
+        assert parse("users.*") == SelectPattern(
+            stream_pattern="users",
+            property_pattern="*",
+            negated=False,
+            raw="users.*",
+        )
+        assert parse("!users") == SelectPattern(
+            stream_pattern="users",
+            property_pattern=None,
+            negated=True,
+            raw="!users",
+        )
+        assert parse("!users.*") == SelectPattern(
+            stream_pattern="users",
+            property_pattern="*",
+            negated=True,
+            raw="!users.*",
+        )
+        assert parse("!users.id") == SelectPattern(
+            stream_pattern="users",
+            property_pattern="id",
+            negated=True,
+            raw="!users.id",
+        )
+
+
+class TestMetadataRule:
+    @pytest.mark.parametrize(
+        ("patterns", "targets"),
+        (
+            pytest.param(
+                ("my_stream.*",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop"])),
+                ],
+                id="select all properties of a stream",
+            ),
+            pytest.param(
+                ("my\\.stream.*",),
+                [
+                    ("my.stream", None),
+                    ("my.stream", bc(["prop"])),
+                ],
+                id="escape stream with a dot",
+            ),
+            pytest.param(
+                ("my_stream.prop.*",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop", "sub_prop"])),
+                ],
+                id="select all sub-properties of a property",
+            ),
+            pytest.param(
+                ("my_stream.prop.*",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop"])),
+                    ("my_stream", bc(["prop", "sub_prop"])),
+                ],
+                id="auto-select parent property when selecting sub-properties",
+            ),
+            pytest.param(
+                ("my_stream.prop.*.*",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop"])),
+                    ("my_stream", bc(["prop", "sub_prop"])),
+                    ("my_stream", bc(["prop", "sub_prop", "sub_sub_prop"])),
+                ],
+                id="auto-select parent property when selecting all sub-properties",
+            ),
+        ),
+    )
+    def test_select_metadata_rules_matches(
+        self,
+        patterns: tuple[str],
+        targets: list[tuple[str, list[str] | None]],
+    ) -> None:
+        rules = select_metadata_rules(patterns)
+        assert all(rule.key == SELECTED_KEY and rule.value is True for rule in rules)
+        assert all(
+            any(rule.match(stream, breadcrumb) for rule in rules)
+            for stream, breadcrumb in targets
+        )
+
+    @pytest.mark.parametrize(
+        ("patterns", "matches"),
+        (
+            pytest.param(
+                # Equivalent to excluding all streams other than `my_stream`
+                ("my_stream",),
+                [
+                    ("my_stream", None, False),
+                    ("other_stream", None, True),
+                ],
+                id="select one stream",
+            ),
+            pytest.param(
+                # Equivalent to excluding all streams other than `stream_1` and
+                # `stream_2`
+                ("stream_1", "stream_2"),
+                [
+                    ("stream_1", None, False),
+                    ("stream_2", None, False),
+                    ("other_stream", None, True),
+                ],
+                id="select two stream",
+            ),
+            pytest.param(
+                # Equivalent to excluding `my_stream`
+                ("!my_stream",),
+                [
+                    ("my_stream", None, True),
+                    ("other_stream", None, False),
+                ],
+                id="exclude one stream",
+            ),
+        ),
+    )
+    def test_select_filter_metadata_rules_matches(
+        self,
+        patterns: tuple[str],
+        matches: list[tuple[str, list[str] | None, bool]],
+    ) -> None:
+        rules = select_filter_metadata_rules(patterns)
+        assert all(rule.key == SELECTED_KEY and rule.value is False for rule in rules)
+        assert all(
+            rule.match(stream, breadcrumb) is match
+            for rule in rules
+            for stream, breadcrumb, match in matches
+        )

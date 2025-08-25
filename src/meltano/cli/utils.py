@@ -460,8 +460,8 @@ def activate_environment(  # noqa: D417
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
-    if ctx.obj.get("selected_environment"):
-        project.activate_environment(ctx.obj["selected_environment"])
+    if env := ctx.obj.get("selected_environment"):
+        project.activate_environment(env)
         # Update the project context being used for telemetry:
         project_ctx = next(
             ctx
