@@ -1508,6 +1508,50 @@ class TestMetadataRule:
                 id="select all sub-properties of a property",
             ),
             pytest.param(
+                ("my_stream.prop.sub_prop",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop", "sub_prop"])),
+                ],
+                id="select one sub-property of a property",
+            ),
+            pytest.param(
+                ("my_stream.prop.sub_prop",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop"])),
+                    ("my_stream", bc(["prop", "sub_prop"])),
+                ],
+                id="auto-select parent property when selecting one sub-property",
+                marks=(
+                    pytest.mark.xfail(
+                        reason=(
+                            "Selecting sub-properties does not imply selecting the "
+                            "parent property"
+                        ),
+                        strict=True,
+                    ),
+                ),
+            ),
+            pytest.param(
+                ("my_stream.prop.sub_prop1",),
+                [
+                    ("my_stream", None),
+                    ("my_stream", bc(["prop"])),
+                    ("my_stream", bc(["prop", "sub_prop1"])),
+                    ("my_stream", bc(["prop", "sub_prop2"])),
+                ],
+                id="selecting sub-properties does not imply selecting siblings",
+                marks=(
+                    pytest.mark.xfail(
+                        reason=(
+                            "Selecting sub-properties does not imply selecting siblings"
+                        ),
+                        strict=True,
+                    ),
+                ),
+            ),
+            pytest.param(
                 ("my_stream.prop.*",),
                 [
                     ("my_stream", None),
