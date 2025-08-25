@@ -15,7 +15,7 @@ import re
 import sys
 import typing as t
 from enum import Enum, auto
-from functools import singledispatch
+from functools import partial, singledispatch
 
 import structlog
 
@@ -39,7 +39,7 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -129,6 +129,24 @@ class MetadataRule(_CatalogRuleProtocol):
     value: bool
     negated: bool = False
 
+    @classmethod
+    def select(
+        cls,
+        *,
+        value: bool,
+        stream: str | None = None,
+        properties: Sequence[str] = (),
+        negated: bool = False,
+    ) -> MetadataRule:
+        """Create a metadata rule for selecting a stream or property."""
+        return cls(
+            tap_stream_id=stream or [],
+            breadcrumb=property_breadcrumb(properties),
+            key=SELECTED_KEY,
+            value=value,
+            negated=negated,
+        )
+
 
 @dataclasses.dataclass
 class SchemaRule(_CatalogRuleProtocol):
@@ -205,61 +223,29 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
 
         prop_pattern = parsed_pattern.property_pattern
         selected = not parsed_pattern.negated
+        select = partial(MetadataRule.select, value=selected)
 
         rules = include_rules if selected else exclude_rules
 
         # Stream-only patterns should behave like stream.*
         if not prop_pattern:
             # Select the stream
-            rules.append(
-                MetadataRule(
-                    tap_stream_id=parsed_pattern.stream_pattern,
-                    breadcrumb=[],
-                    key=SELECTED_KEY,
-                    value=selected,
-                ),
-            )
+            rules.append(select(stream=parsed_pattern.stream_pattern))
             # Also select all properties (like stream.*)
-            rules.append(
-                MetadataRule(
-                    tap_stream_id=parsed_pattern.stream_pattern,
-                    breadcrumb=property_breadcrumb(["*"]),
-                    key=SELECTED_KEY,
-                    value=selected,
-                ),
-            )
+            rules.append(select(stream=parsed_pattern.stream_pattern, properties=["*"]))
         # Handle property patterns
         else:
             # Always select the stream for property access
             if selected or prop_pattern == "*":
-                rules.append(
-                    MetadataRule(
-                        tap_stream_id=parsed_pattern.stream_pattern,
-                        breadcrumb=[],
-                        key=SELECTED_KEY,
-                        value=selected,
-                    ),
-                )
+                rules.append(select(stream=parsed_pattern.stream_pattern))
 
             props = prop_pattern.split(PROP_DELIMITER)
-            rules.append(
-                MetadataRule(
-                    tap_stream_id=parsed_pattern.stream_pattern,
-                    breadcrumb=property_breadcrumb(props),
-                    key=SELECTED_KEY,
-                    value=selected,
-                ),
-            )
+            rules.append(select(stream=parsed_pattern.stream_pattern, properties=props))
 
             # If any sub-property is selected, the parent property is selected too
             if selected:
                 rules.extend(
-                    MetadataRule(
-                        tap_stream_id=parsed_pattern.stream_pattern,
-                        breadcrumb=property_breadcrumb(props[:idx]),
-                        key=SELECTED_KEY,
-                        value=selected,
-                    )
+                    select(stream=parsed_pattern.stream_pattern, properties=props[:idx])
                     for idx, prop in enumerate(props)
                     if idx > 0
                 )
@@ -278,20 +264,9 @@ def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """
     # We set `selected: false` if the `tap_stream_id`
     # does NOT match any of the selection/inclusion patterns
-    include_rule = MetadataRule(
-        negated=True,
-        tap_stream_id=[],
-        breadcrumb=[],
-        key=SELECTED_KEY,
-        value=False,
-    )
+    include_rule = MetadataRule.select(value=False, negated=True)
     # Or if it matches one of the exclusion patterns
-    exclude_rule = MetadataRule(
-        tap_stream_id=[],
-        breadcrumb=[],
-        key=SELECTED_KEY,
-        value=False,
-    )
+    exclude_rule = MetadataRule.select(value=False)
 
     for pattern in patterns:
         parsed_pattern = SelectPattern.parse(pattern)
@@ -330,7 +305,7 @@ def path_property(path: str) -> str:
     return PROP_DELIMITER.join(components)
 
 
-def property_breadcrumb(props: list[str]) -> list[str]:
+def property_breadcrumb(props: Iterable[str]) -> list[str]:
     """Create breadcrumb from properties path list.
 
     Args:
