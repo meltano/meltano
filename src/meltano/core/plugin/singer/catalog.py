@@ -1,4 +1,13 @@
-from __future__ import annotations  # noqa: D100
+"""Catalog executor classes for traversing and manipulating Singer catalog structures.
+
+This module provides a set of classes that implement the visitor pattern for
+traversing and processing Singer catalog nodes. The classes are organized into
+a hierarchy, with the base `CatalogExecutor` class providing the core traversal
+and dispatch functionality, and specialized executors for specific catalog
+manipulation tasks (e.g., metadata, selection, schema).
+"""
+
+from __future__ import annotations
 
 import dataclasses
 import fnmatch
@@ -6,11 +15,16 @@ import re
 import sys
 import typing as t
 from enum import Enum, auto
-from functools import singledispatch
+from functools import partial, singledispatch
 
 import structlog
 
 from meltano.core.behavior.visitor import visit_with
+
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias  # noqa: ICN003
+else:
+    from typing_extensions import TypeAlias
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -19,15 +33,26 @@ else:
     from backports.strenum import StrEnum
     from typing_extensions import Self
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
 
 logger = structlog.stdlib.get_logger(__name__)
 
-Node = dict[str, t.Any]
+Node: TypeAlias = dict[str, t.Any]
 
 
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
+PROP_DELIMITER = "."
+PROPERTIES_KEY = "properties"
+SCHEMA_KEY = "schema"
+INCLUSION_KEY = "inclusion"
+SELECTED_KEY = "selected"
+SELECTED_BY_DEFAULT_KEY = "selected-by-default"
 
 
 class CatalogDict(t.TypedDict):
@@ -78,8 +103,8 @@ class _CatalogRuleProtocol(t.Protocol):
         # If provided, the breadcrumb should still match, even on negated rules
         if breadcrumb is not None:
             result = result and fnmatch.fnmatch(
-                ".".join(breadcrumb),
-                ".".join(self.breadcrumb),
+                PROP_DELIMITER.join(breadcrumb),
+                PROP_DELIMITER.join(self.breadcrumb),
             )
 
         return result
@@ -103,6 +128,24 @@ class MetadataRule(_CatalogRuleProtocol):
     key: str
     value: bool
     negated: bool = False
+
+    @classmethod
+    def select(
+        cls,
+        *,
+        value: bool,
+        stream: str | None = None,
+        properties: Sequence[str] = (),
+        negated: bool = False,
+    ) -> MetadataRule:
+        """Create a metadata rule for selecting a stream or property."""
+        return cls(
+            tap_stream_id=stream or [],
+            breadcrumb=property_breadcrumb(properties),
+            key=SELECTED_KEY,
+            value=value,
+            negated=negated,
+        )
 
 
 @dataclasses.dataclass
@@ -149,14 +192,14 @@ class SelectPattern(t.NamedTuple):
             negated = True
             pattern = pattern[1:]
 
-        if re.search(UNESCAPED_DOT, pattern):
-            stream, prop = re.split(UNESCAPED_DOT, pattern, maxsplit=1)
+        if UNESCAPED_DOT.search(pattern):
+            stream, prop = UNESCAPED_DOT.split(pattern, maxsplit=1)
         else:
             stream = pattern
             prop = None
 
         return cls(
-            stream_pattern=stream.replace(r"\.", "."),
+            stream_pattern=stream.replace(r"\.", PROP_DELIMITER),
             property_pattern=prop,
             negated=negated,
             raw=raw,
@@ -180,30 +223,32 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
 
         prop_pattern = parsed_pattern.property_pattern
         selected = not parsed_pattern.negated
+        select = partial(MetadataRule.select, value=selected)
 
         rules = include_rules if selected else exclude_rules
 
-        if selected or not prop_pattern or prop_pattern == "*":
-            rules.append(
-                MetadataRule(
-                    tap_stream_id=parsed_pattern.stream_pattern,
-                    breadcrumb=[],
-                    key="selected",
-                    value=selected,
-                ),
-            )
+        # Stream-only patterns should behave like stream.*
+        if not prop_pattern:
+            # Select the stream
+            rules.append(select(stream=parsed_pattern.stream_pattern))
+            # Also select all properties (like stream.*)
+            rules.append(select(stream=parsed_pattern.stream_pattern, properties=["*"]))
+        # Handle property patterns
+        else:
+            # Always select the stream for property access
+            if selected or prop_pattern == "*":
+                rules.append(select(stream=parsed_pattern.stream_pattern))
 
-        if prop_pattern:
-            props = prop_pattern.split(".")
+            props = prop_pattern.split(PROP_DELIMITER)
+            rules.append(select(stream=parsed_pattern.stream_pattern, properties=props))
 
-            rules.append(
-                MetadataRule(
-                    tap_stream_id=parsed_pattern.stream_pattern,
-                    breadcrumb=property_breadcrumb(props),
-                    key="selected",
-                    value=selected,
-                ),
-            )
+            # If any sub-property is selected, the parent property is selected too
+            if selected:
+                rules.extend(
+                    select(stream=parsed_pattern.stream_pattern, properties=props[:idx])
+                    for idx, prop in enumerate(props)
+                    if idx > 0
+                )
 
     return include_rules + exclude_rules
 
@@ -219,20 +264,9 @@ def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """
     # We set `selected: false` if the `tap_stream_id`
     # does NOT match any of the selection/inclusion patterns
-    include_rule = MetadataRule(
-        negated=True,
-        tap_stream_id=[],
-        breadcrumb=[],
-        key="selected",
-        value=False,
-    )
+    include_rule = MetadataRule.select(value=False, negated=True)
     # Or if it matches one of the exclusion patterns
-    exclude_rule = MetadataRule(
-        tap_stream_id=[],
-        breadcrumb=[],
-        key="selected",
-        value=False,
-    )
+    exclude_rule = MetadataRule.select(value=False)
 
     for pattern in patterns:
         parsed_pattern = SelectPattern.parse(pattern)
@@ -268,10 +302,10 @@ def path_property(path: str) -> str:
     """
     prop_regex = r"properties\.([^.]+)+"
     components = re.findall(prop_regex, path)
-    return ".".join(components)
+    return PROP_DELIMITER.join(components)
 
 
-def property_breadcrumb(props: list[str]) -> list[str]:
+def property_breadcrumb(props: Iterable[str]) -> list[str]:
     """Create breadcrumb from properties path list.
 
     Args:
@@ -286,12 +320,18 @@ def property_breadcrumb(props: list[str]) -> list[str]:
     """
     breadcrumb = []
     for prop in props:
-        breadcrumb.extend(["properties", prop])
+        breadcrumb.extend([PROPERTIES_KEY, prop])
 
     return breadcrumb
 
 
-class CatalogNode(Enum):  # noqa: D101
+class CatalogNode(Enum):
+    """Enumeration of catalog node types encountered during traversal.
+
+    Defines the three fundamental node types in a Singer catalog structure
+    that executors can process during catalog traversal and manipulation.
+    """
+
     STREAM = auto()
     PROPERTY = auto()
     METADATA = auto()
@@ -305,10 +345,36 @@ class SelectionType(StrEnum):
     AUTOMATIC = auto()
     UNSUPPORTED = auto()
 
-    def __bool__(self) -> bool:  # noqa: D105
-        return self not in {self.__class__.EXCLUDED, self.__class__.UNSUPPORTED}
+    def __bool__(self) -> bool:
+        """Truth value of the selection type.
 
-    def __add__(self, other: SelectionType) -> SelectionType:  # type: ignore[override] # noqa: D105
+        Examples:
+        >>> for selection_type in SelectionType:
+        ...     if selection_type:
+        ...         print(selection_type)
+        selected
+        automatic
+        """
+        return self not in {SelectionType.EXCLUDED, SelectionType.UNSUPPORTED}
+
+    def __add__(self, other: object) -> SelectionType:
+        """Combine two selection types.
+
+        Args:
+            other: Another selection type.
+
+        Returns:
+            The combined selection type.
+
+        Examples:
+        >>> SelectionType.SELECTED + SelectionType.AUTOMATIC
+        <SelectionType.AUTOMATIC: 'automatic'>
+        >>> SelectionType.EXCLUDED + SelectionType.UNSUPPORTED
+        <SelectionType.EXCLUDED: 'excluded'>
+        """
+        if not isinstance(other, SelectionType):
+            return NotImplemented
+
         if self is SelectionType.EXCLUDED or other is SelectionType.EXCLUDED:
             return SelectionType.EXCLUDED
 
@@ -322,11 +388,12 @@ class SelectionType(StrEnum):
 
 
 @singledispatch
-def visit(  # noqa: D103
-    node,  # noqa: ANN001, ARG001
-    executor,  # noqa: ANN001, ARG001
+def visit(
+    node: t.Any,  # noqa: ANN401, ARG001
+    executor: CatalogExecutor,  # noqa: ARG001
     path: str = "",
 ) -> None:
+    """Visit a node in the catalog."""
     logger.debug("Skipping node at '%s'", path)
 
 
@@ -362,7 +429,23 @@ def _(node: list, executor, path: str = "") -> None:  # noqa: ANN001
 
 
 @visit_with(visit)
-class CatalogExecutor:  # noqa: D101
+class CatalogExecutor:
+    """Base executor class for traversing and processing Singer catalog nodes.
+
+    This class provides a visitor pattern implementation for traversing catalog
+    structures and dispatching processing to specific node handlers. It serves
+    as the foundation for more specialized executors that manipulate catalog
+    metadata, schema properties, and selection rules.
+
+    The executor processes three types of catalog nodes:
+    - Stream nodes: Top-level catalog entries representing data streams
+    - Property nodes: Schema property definitions within streams
+    - Metadata nodes: Selection and inclusion metadata for streams and properties
+
+    Subclasses should override the specific node processing methods to implement
+    their custom catalog manipulation logic.
+    """
+
     def execute(self, node_type: CatalogNode, node: Node, path: str) -> None:
         """Dispatch all node methods."""
         dispatch = {
@@ -395,13 +478,26 @@ class CatalogExecutor:  # noqa: D101
     def property_metadata_node(self, node: Node, path: str) -> None:
         """Process property metadata node."""
 
-    def __call__(self, node_type, node: Node, path: str):  # noqa: ANN001, ANN204
+    def __call__(self, node_type: CatalogNode, node: Node, path: str) -> None:
         """Call this instance as a function."""
         return self.execute(node_type, node, path)
 
 
-class MetadataExecutor(CatalogExecutor):  # noqa: D101
-    def __init__(self, rules: list[MetadataRule]):  # noqa: D107
+class MetadataExecutor(CatalogExecutor):
+    """Executor for applying metadata rules to catalog streams and properties.
+
+    This executor processes metadata rules that control stream and property selection,
+    inclusion settings, and other metadata attributes in Singer catalogs. It ensures
+    proper metadata structure exists and applies rule-based transformations to
+    control data extraction behavior.
+
+    The executor automatically creates missing metadata entries with appropriate
+    default inclusion settings (automatic for streams and top-level properties,
+    available for nested properties).
+    """
+
+    def __init__(self, rules: list[MetadataRule]):
+        """Initialize the MetadataExecutor with a list of metadata rules."""
         self._stream: Node | None = None
         self._rules = rules
 
@@ -434,6 +530,7 @@ class MetadataExecutor(CatalogExecutor):  # noqa: D101
 
             metadata_list.append(entry)
 
+    @override
     def stream_node(self, node: Node, path: str) -> None:
         """Process stream metadata node."""
         self._stream = node
@@ -448,17 +545,19 @@ class MetadataExecutor(CatalogExecutor):  # noqa: D101
             # Legacy catalogs have underscorized keys on the streams themselves
             self.set_metadata(node, path, rule.key.replace("-", "_"), rule.value)
 
+    @override
     def property_node(
         self,
-        node: Node,  # noqa: ARG002
+        node: Node,
         path: str,
     ) -> None:
         """Process property metadata node."""
-        breadcrumb_idx = path.index("properties")
-        breadcrumb = path[breadcrumb_idx:].split(".")
+        breadcrumb_idx = path.index(PROPERTIES_KEY)
+        breadcrumb = path[breadcrumb_idx:].split(PROP_DELIMITER)
 
         self.ensure_metadata(breadcrumb)
 
+    @override
     def metadata_node(self, node: Node, path: str) -> None:
         """Process metadata node."""
         tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]
@@ -482,9 +581,9 @@ class MetadataExecutor(CatalogExecutor):  # noqa: D101
         """Set selection and inclusion keys in a metadata node."""
         # Unsupported fields cannot be selected
         if (
-            key == "selected"
+            key == SELECTED_KEY
             and value is True
-            and node.get("inclusion") == "unsupported"
+            and node.get(INCLUSION_KEY) == SelectionType.UNSUPPORTED
         ):
             return
 
@@ -492,19 +591,55 @@ class MetadataExecutor(CatalogExecutor):  # noqa: D101
         logger.debug("Setting '%s.%s' to '%s'", path, key, value)
 
 
-class SelectExecutor(MetadataExecutor):  # noqa: D101
-    def __init__(self, patterns: list[str]):  # noqa: D107
+class SelectExecutor(MetadataExecutor):
+    """Executor for applying stream and property selection patterns to catalog metadata.
+
+    This executor processes selection patterns (e.g., 'users', '!orders.id', 'products.*')
+    and applies the corresponding metadata rules to mark streams and properties as
+    selected or excluded in the catalog. It extends MetadataExecutor to handle the
+    conversion of pattern-based selections into catalog metadata entries.
+
+    Selection patterns support:
+    - Stream selection: 'stream_name' selects entire streams
+    - Property selection: 'stream.property' selects specific properties
+    - Wildcards: 'stream.*' selects all properties in a stream
+    - Exclusion: '!pattern' excludes matching streams/properties
+    """  # noqa: E501
+
+    def __init__(self, patterns: list[str]):
+        """Initialize the SelectExecutor with a list of selection patterns.
+
+        Args:
+            patterns: List of selection patterns to apply to the catalog.
+        """
         super().__init__(select_metadata_rules(patterns))
 
 
-class SchemaExecutor(CatalogExecutor):  # noqa: D101
-    def __init__(self, rules: list[SchemaRule]):  # noqa: D107
+class SchemaExecutor(CatalogExecutor):
+    """Executor for applying schema modifications to catalog property definitions.
+
+    This executor processes schema rules that modify the JSON schema definitions
+    of catalog properties. It can add, update, or replace schema properties based
+    on breadcrumb patterns and payload definitions, allowing for dynamic schema
+    customization during catalog processing.
+
+    The executor ensures that property nodes exist in the catalog schema tree
+    before applying modifications, creating intermediate nodes as needed. It supports
+    wildcard matching in breadcrumb patterns for bulk schema operations.
+    """
+
+    def __init__(self, rules: list[SchemaRule]):
+        """Initialize the SchemaExecutor with a list of schema rules.
+
+        Args:
+            rules: List of schema rules to apply to the catalog.
+        """
         self._stream: Node | None = None
         self._rules = rules
 
     def ensure_property(self, breadcrumb: list[str]) -> None:
         """Create nodes for the breadcrumb and schema extra that matches."""
-        next_node: dict[str, t.Any] = self._stream["schema"]  # type: ignore[index]
+        next_node: dict[str, t.Any] = self._stream[SCHEMA_KEY]  # type: ignore[index]
 
         for idx, key in enumerate(breadcrumb):
             # If the key contains shell-style wildcards,
@@ -525,27 +660,27 @@ class SchemaExecutor(CatalogExecutor):  # noqa: D101
 
             next_node = next_node[key]
 
+    @override
     def stream_node(
         self,
         node: Node,
-        path,  # noqa: ANN001, ARG002
+        path: str,
     ) -> None:
         """Process stream schema node."""
         self._stream = node
         tap_stream_id: str = self._stream["tap_stream_id"]
-
-        if "schema" not in node:
-            node["schema"] = {"type": "object"}
+        node.setdefault(SCHEMA_KEY, {"type": "object"})
 
         for rule in SchemaRule.matching(self._rules, tap_stream_id):
             self.ensure_property(rule.breadcrumb)
 
+    @override
     def property_node(self, node: Node, path: str) -> None:
         """Process property schema node."""
         tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]
 
-        breadcrumb_idx = path.index("properties")
-        breadcrumb = path[breadcrumb_idx:].split(".")
+        breadcrumb_idx = path.index(PROPERTIES_KEY)
+        breadcrumb = path[breadcrumb_idx:].split(PROP_DELIMITER)
 
         for rule in SchemaRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_payload(node, path, rule.payload)
@@ -557,26 +692,39 @@ class SchemaExecutor(CatalogExecutor):  # noqa: D101
         logger.debug("Setting '%s' to %r", path, payload)
 
 
-class ListExecutor(CatalogExecutor):  # noqa: D101
-    def __init__(self) -> None:  # noqa: D107
+class ListExecutor(CatalogExecutor):
+    """Executor for cataloging available streams and properties in a catalog.
+
+    This executor traverses the catalog structure to build a comprehensive
+    inventory of all available streams and their properties. It creates a
+    mapping of stream names to sets of property paths, providing visibility
+    into the complete catalog structure without regard to selection status.
+
+    Useful for discovery operations and catalog introspection tasks.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the ListExecutor."""
         # properties per stream
         self.properties: dict[str, set[str]] = {}
 
         super().__init__()
 
+    @override
     def stream_node(
         self,
         node: Node,
-        path: str,  # noqa: ARG002
+        path: str,
     ) -> None:
         """Initialize empty property set stream."""
         stream = node["tap_stream_id"]
         if stream not in self.properties:
             self.properties[stream] = set()
 
+    @override
     def property_node(
         self,
-        node: Node,  # noqa: ARG002
+        node: Node,
         path: str,
     ) -> None:
         """Add property to stream collection."""
@@ -593,8 +741,21 @@ class SelectedNode(t.NamedTuple):
     selection: SelectionType
 
 
-class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
-    def __init__(self) -> None:  # noqa: D107
+class ListSelectedExecutor(CatalogExecutor):
+    """Executor for identifying selected streams and properties in a catalog.
+
+    This executor analyzes catalog metadata to determine which streams and
+    properties are currently selected for extraction. It processes selection
+    and inclusion metadata to build collections of selected nodes, distinguishing
+    between different selection types (selected, automatic, excluded, unsupported).
+
+    The executor maintains separate collections for streams and properties,
+    allowing consumers to query the current selection state and filter
+    catalogs based on selection criteria.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the ListSelectedExecutor."""
         self.streams: set[SelectedNode] = set()
         self.properties: dict[str, set[SelectedNode]] = {}
         super().__init__()
@@ -631,42 +792,45 @@ class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
         except KeyError:
             return SelectionType.EXCLUDED
 
-        if metadata.get("inclusion") == "automatic":
+        if metadata.get(INCLUSION_KEY) == SelectionType.AUTOMATIC:
             return SelectionType.AUTOMATIC
-        if metadata.get("inclusion") == "unsupported":
+        if metadata.get(INCLUSION_KEY) == SelectionType.UNSUPPORTED:
             return SelectionType.UNSUPPORTED
-        if metadata.get("selected") is True or (
-            metadata.get("selected") is None
-            and metadata.get("selected-by-default", False)
+        if metadata.get(SELECTED_KEY) is True or (
+            metadata.get(SELECTED_KEY) is None
+            and metadata.get(SELECTED_BY_DEFAULT_KEY, False)
         ):
             return SelectionType.SELECTED
         return SelectionType.EXCLUDED
 
+    @override
     def stream_node(
         self,
         node: Node,
-        path: str,  # noqa: ARG002
+        path: str,
     ) -> None:
         """Initialize empty set for selected nodes in stream."""
         self._stream: str = node["tap_stream_id"]
         self.properties[self._stream] = set()
 
+    @override
     def stream_metadata_node(
         self,
         node: Node,
-        path: str,  # noqa: ARG002
+        path: str,
     ) -> None:
         """Add stream selection to tap's collection."""
         selection = SelectedNode(self._stream, self.node_selection(node))
         self.streams.add(selection)
 
+    @override
     def property_metadata_node(
         self,
         node: Node,
-        path: str,  # noqa: ARG002
+        path: str,
     ) -> None:
         """Add property selection to stream's collection."""
-        property_path = ".".join(node["breadcrumb"])
+        property_path = PROP_DELIMITER.join(node["breadcrumb"])
         prop = path_property(property_path)
         selection = SelectedNode(prop, self.node_selection(node))
 
