@@ -21,11 +21,6 @@ import structlog
 
 from meltano.core.behavior.visitor import visit_with
 
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias  # noqa: ICN003
-else:
-    from typing_extensions import TypeAlias
-
 if sys.version_info >= (3, 11):
     from enum import StrEnum
     from typing import Self  # noqa: ICN003
@@ -43,7 +38,7 @@ if t.TYPE_CHECKING:
 
 logger = structlog.stdlib.get_logger(__name__)
 
-Node: TypeAlias = dict[str, t.Any]
+Node: t.TypeAlias = dict[str, t.Any]
 
 
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")

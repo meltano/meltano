@@ -81,13 +81,12 @@ jobs:
       packages: write
       security-events: write
     env:
-      DEFAULT_PYTHON: "3.9"  # will be used in 'latest' images
+      DEFAULT_PYTHON: "3.13"  # will be used in 'latest' images
 
     strategy:
       fail-fast: false
       matrix:
         python-version:
-        - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
