@@ -43,7 +43,7 @@ yaml.representer.add_representer(Decimal, _represent_decimal)
 yaml.representer.add_representer(uuid.UUID, _represent_uuid)
 
 
-@dataclass
+@dataclass(slots=True)
 class CachedCommentedMap:
     """The hash of the raw bytes of a YAML file, and its parsed content."""
 
