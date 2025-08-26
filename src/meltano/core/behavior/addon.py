@@ -6,10 +6,10 @@ import sys
 import typing as t
 from functools import cached_property
 
-if sys.version_info < (3, 12):
-    from importlib_metadata import EntryPoints, entry_points
-else:
+if sys.version_info >= (3, 12):
     from importlib.metadata import EntryPoints, entry_points
+else:
+    from importlib_metadata import EntryPoints, entry_points
 
 T = t.TypeVar("T")
 

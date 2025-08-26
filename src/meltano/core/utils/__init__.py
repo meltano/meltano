@@ -9,9 +9,12 @@ import math
 import os
 import platform
 import re
+import sys
+import time as _time
 import traceback
 import typing as t
 import unicodedata
+import uuid
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from copy import copy, deepcopy
@@ -27,6 +30,44 @@ import structlog
 from requests.auth import HTTPBasicAuth
 
 from meltano.core.error import MeltanoError
+
+if sys.version_info >= (3, 14):
+    from uuid import uuid7
+else:
+
+    def uuid7() -> uuid.UUID:
+        """Generate a UUIDv7 with time-ordering capability.
+
+        UUIDv7 encodes a timestamp in the first 48 bits, making them lexicographically
+        sortable by creation time. This is useful for job run IDs that need to be
+        ordered chronologically. Sourced from https://github.com/nalgeon/uuidv7/blob/main/src/uuidv7.py
+
+        Returns:
+            A UUID object with version 7 encoding.
+        """
+        # Get current timestamp in milliseconds
+        timestamp = int(_time.time() * 1000)
+
+        # Generate 16 random bytes
+        value = bytearray(os.urandom(16))
+
+        # Encode timestamp into first 6 bytes (48 bits)
+        value[0] = (timestamp >> 40) & 0xFF
+        value[1] = (timestamp >> 32) & 0xFF
+        value[2] = (timestamp >> 24) & 0xFF
+        value[3] = (timestamp >> 16) & 0xFF
+        value[4] = (timestamp >> 8) & 0xFF
+        value[5] = timestamp & 0xFF
+
+        # Set version (7) in bits 12-15 of the time_hi_and_version field
+        value[6] = (value[6] & 0x0F) | 0x70
+
+        # Set variant bits to '10' in the clock_seq_hi_and_reserved field
+        value[8] = (value[8] & 0x3F) | 0x80
+
+        # Create UUID from bytes
+        return uuid.UUID(bytes=bytes(value))
+
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Coroutine, Iterable, MutableMapping
@@ -320,61 +361,6 @@ async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103
 
 def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
-
-
-@t.overload
-def coerce_datetime(d: None) -> None: ...
-
-
-@t.overload
-def coerce_datetime(d: datetime) -> datetime: ...
-
-
-@t.overload
-def coerce_datetime(d: date) -> datetime: ...
-
-
-def coerce_datetime(d):
-    """Add a `time` component to `d` if it is missing.
-
-    Args:
-        d: the date or datetime to add the time to
-
-    Returns:
-        The resulting datetime
-    """
-    if d is None:
-        return None
-
-    return d if isinstance(d, datetime) else datetime.combine(d, time())
-
-
-@t.overload
-def iso8601_datetime(d: None) -> None: ...
-
-
-@t.overload
-def iso8601_datetime(d: str) -> datetime: ...
-
-
-def iso8601_datetime(d: str | None):  # noqa: D103
-    if d is None:
-        return None
-
-    isoformats = [
-        "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%dT%H:%M:%S+00:00",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%d",
-    ]
-
-    for format_string in isoformats:
-        with suppress(ValueError):
-            return coerce_datetime(
-                datetime.strptime(d, format_string).replace(tzinfo=timezone.utc),
-            )
-    raise ValueError(f"{d} is not a valid UTC date.")  # noqa: EM102
 
 
 class _GetItemProtocol(t.Protocol):
@@ -914,3 +900,21 @@ def parse_date(date_string: str) -> str:
         return _parsed.isoformat()
 
     return date_string
+
+
+def new_project_id() -> uuid.UUID:
+    """Generate a new project ID.
+
+    Returns:
+        A new project ID.
+    """
+    return uuid7()
+
+
+def new_run_id() -> uuid.UUID:
+    """Generate a new run ID.
+
+    Returns:
+        A new run ID.
+    """
+    return uuid7()

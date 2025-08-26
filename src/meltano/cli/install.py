@@ -8,7 +8,12 @@ import click
 import structlog
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliError,
+    PartialInstrumentedCmd,
+    PluginTypeArg,
+    validate_plugin_type_args,
+)
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import install_plugins
@@ -22,18 +27,12 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
-ANY = "-"
-
 logger = structlog.getLogger(__name__)
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
-@click.argument(
-    "plugin_type",
-    type=click.Choice((*PluginType.cli_arguments(), ANY)),
-    required=False,
-)
-@click.argument("plugin_name", nargs=-1, required=False)
+@click.argument("plugin", nargs=-1, required=False)
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--clean",
     is_flag=True,
@@ -68,8 +67,8 @@ async def install(
     project: Project,
     ctx: click.Context,
     *,
-    plugin_type: str,
-    plugin_name: str,
+    plugin: tuple[str, ...],
+    plugin_type: PluginType | None,
     clean: bool,
     parallelism: int,
     force: bool,
@@ -81,15 +80,21 @@ async def install(
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
+    plugin_names, plugin_type = validate_plugin_type_args(
+        plugin,
+        plugin_type,
+        ctx,
+        support_any=True,
+    )
+
     try:
-        if plugin_type and plugin_type != ANY:
-            plugin_type = PluginType.from_cli_argument(plugin_type)
+        if plugin_type:
             plugins = project.plugins.get_plugins_of_type(plugin_type)
         else:
             plugins = [p for p in project.plugins.plugins() if not p.is_mapping()]
 
-        if plugin_name:
-            plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
+        if plugin_names:
+            plugins = [plugin for plugin in plugins if plugin.name in plugin_names]
 
         if schedule_name:
             schedule_plugins = _get_schedule_plugins(

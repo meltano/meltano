@@ -15,7 +15,7 @@ meltano --log-format=json run my-job
 
 Logging in meltano can also be controlled in more detail via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
 
-By default, meltano will look for this in a `logging.yaml` file in the project root. However, you can override this by
+By default, meltano will look for this in a `logging.yaml` file in the project root. Both `.yaml` and `.yml` file extensions are supported. However, you can override this by
 setting the [environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or by using the
 `meltano` CLI option `--log-config`. e.g. `meltano --log-config=my-prod-logging.yaml ...`.
 
@@ -29,7 +29,7 @@ A logging.yaml contains a few key sections that you should be aware of.
 A few key points to note:
 
 1. Different handlers can use different formats. Meltano ships with [3 formatters](https://github.com/meltano/meltano/blob/main/src/meltano/core/logging/formatters.py):
-   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library.
+   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library. Supports `colors` (bool), `show_locals` (bool), `max_frames` (int, default: 2), and `utc` (bool) parameters.
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
    - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
@@ -57,6 +57,7 @@ formatters:
     (): meltano.core.logging.console_log_formatter
     colors: true # also enables traceback formatting with `rich`
     show_locals: true # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
+    max_frames: 5 # maximum number of frames to show in tracebacks (default: 2)
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
     sort_keys: false
@@ -259,7 +260,7 @@ See https://docs.datadoghq.com/logs/log_collection/python/?tab=jsonlogformatter 
 ## Google Cloud logging config
 
 For Google Cloud Logging (stackdriver) the default json log format is sufficient. That means when capturing `meltano run`,
-`meltano invoke` and `meltano elt` console output directly via something like CloudRun the built-in json format is
+`meltano invoke` and `meltano el` console output directly via something like CloudRun the built-in json format is
 sufficient:
 
 ```yaml

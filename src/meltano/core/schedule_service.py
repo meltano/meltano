@@ -3,25 +3,25 @@
 from __future__ import annotations
 
 import typing as t
-from datetime import date, datetime, timezone
 
 import structlog
-from croniter import croniter
 
 from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.schedule import CRON_INTERVALS, ELTSchedule, JobSchedule, Schedule
-from meltano.core.setting_definition import SettingMissingError
+from meltano.core.schedule import (
+    CRON_INTERVALS,
+    ELTSchedule,
+    JobSchedule,
+    Schedule,
+    is_valid_cron,
+)
 from meltano.core.task_sets_service import TaskSetsService
-from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
+from meltano.core.utils import NotFound, find_named
 
 if t.TYPE_CHECKING:
     import subprocess
-
-    from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
 
@@ -108,13 +108,11 @@ class ScheduleService:
 
     def add_elt(
         self,
-        session: Session,
         name: str,
         extractor: str,
         loader: str,
         transform: str,
         interval: str,
-        start_date: datetime | None = None,
         **env: str,
     ) -> ELTSchedule:
         """Add a scheduled legacy elt task.
@@ -126,24 +124,17 @@ class ScheduleService:
             loader: The name of the loader.
             transform: The transform statement (eg: skip, only, run)
             interval: The interval of the elt job.
-            start_date: The start date of the elt job.
             env: The env for this scheduled elt job.
 
         Returns:
             The added schedule.
         """
-        start_date = coerce_datetime(start_date) or self.default_start_date(  # TODO
-            session,
-            extractor,
-        )
-
         schedule = ELTSchedule(
             name=name,
             extractor=extractor,
             loader=loader,
             transform=transform,
             interval=interval,
-            start_date=start_date,
             env=env,
         )
         return self.add_schedule(schedule)
@@ -169,48 +160,6 @@ class ScheduleService:
             ),
         )
 
-    def remove(self, name: str) -> str:
-        """Remove a schedule from the project.
-
-        Args:
-            name: The name of the schedule.
-
-        Returns:
-            The name of the removed schedule.
-        """
-        return self.remove_schedule(name)
-
-    def default_start_date(self, session: Session, extractor: str) -> datetime:
-        """Obtain the default start date for an elt schedule.
-
-        Args:
-            session: The session to use.
-            extractor: The extractor to get the start_date from.
-
-        Returns:
-            The start_date of the extractor, or now.
-        """
-        extractor_plugin = self.project.plugins.find_plugin(
-            extractor,
-            plugin_type=PluginType.EXTRACTORS,
-        )
-        start_date: str | datetime | date | None = None
-        try:
-            settings_service = PluginSettingsService(self.project, extractor_plugin)
-            start_date = settings_service.get("start_date", session=session)
-        except SettingMissingError:
-            logger.debug(f"`start_date` not found in {extractor_plugin}.")  # noqa: G004
-
-        # TODO: this coercion should be handled by the `kind` attribute
-        # on the actual setting
-        if isinstance(start_date, date) and not isinstance(start_date, datetime):
-            return coerce_datetime(start_date)
-
-        if isinstance(start_date, datetime):
-            return start_date
-
-        return iso8601_datetime(start_date) or datetime.now(tz=timezone.utc)
-
     def add_schedule(self, schedule: _S) -> _S:
         """Add a schedule to the project.
 
@@ -227,7 +176,7 @@ class ScheduleService:
         if (
             schedule.interval is not None
             and schedule.interval not in CRON_INTERVALS
-            and not croniter.is_valid(schedule.interval)
+            and not is_valid_cron(schedule.interval)
         ):
             raise BadCronError(schedule.interval)
 
@@ -332,10 +281,7 @@ class ScheduleService:
         Raises:
             ScheduleNotFoundError: if the schedule does not exist
         """
-        try:
-            return find_named(self.schedules(), name)
-        except StopIteration as err:
-            raise ScheduleNotFoundError(name) from err
+        return find_named(self.schedules(), name)
 
     def run(
         self,
@@ -343,7 +289,7 @@ class ScheduleService:
         *args: str,
         env: dict | None = None,
         **kwargs: t.Any,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """Run a scheduled elt task or named job.
 
         Args:
@@ -355,9 +301,7 @@ class ScheduleService:
         Returns:
             The completed process.
         """
-        if env is None:
-            env = {}
-
+        env = env or {}
         if isinstance(schedule, JobSchedule):
             return MeltanoInvoker(self.project).invoke(
                 ["run", *args, schedule.job],

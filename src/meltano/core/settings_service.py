@@ -21,10 +21,12 @@ from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import Self  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
@@ -79,9 +81,6 @@ class FeatureNotAllowedException(Exception):
             string representation of the error
         """
         return f"{self.feature} not enabled."
-
-
-_T = t.TypeVar("_T", bound="SettingsService")
 
 
 class SettingsService(metaclass=ABCMeta):
@@ -159,7 +158,7 @@ class SettingsService(metaclass=ABCMeta):
         """Return definitions of supported settings."""
 
     @property
-    def inherited_settings_service(self: _T) -> _T | None:
+    def inherited_settings_service(self) -> Self | None:
         """Return settings service to inherit configuration from."""
         return None
 

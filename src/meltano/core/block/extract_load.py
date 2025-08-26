@@ -9,6 +9,8 @@ from contextlib import asynccontextmanager, closing
 
 import structlog
 
+from meltano.core._protocols.el_context import ELContextProtocol
+from meltano.core._state import StateStrategy
 from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
@@ -44,7 +46,7 @@ class BlockSetHasNoStateError(Exception):
     """Block has no state."""
 
 
-class ELBContext:
+class ELBContext(ELContextProtocol):
     """ELBContext holds the context for ELB BlockSets."""
 
     def __init__(
@@ -59,7 +61,7 @@ class ELBContext:
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        merge_state: bool | None = False,
+        state_strategy: StateStrategy = StateStrategy.AUTO,
         run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -74,7 +76,7 @@ class ELBContext:
             update_state: Whether to update the state of the job.
             state_id_suffix: The state ID suffix to use.
             base_output_logger: The base logger to use.
-            merge_state: Whether to merge state at the end of run.
+            state_strategy: Strategy to use for state updates.
             run_id: The run ID to use.
         """
         self.project = project
@@ -85,7 +87,7 @@ class ELBContext:
         self.force = force
         self.update_state = update_state
         self.state_id_suffix = state_id_suffix
-        self.merge_state = merge_state
+        self.state_strategy = state_strategy
         self.run_id = run_id
 
         # not yet used but required to satisfy the interface
@@ -121,7 +123,7 @@ class ELBContextBuilder:
         self._state_id_suffix = None
         self._env = {}
         self._blocks = []
-        self._merge_state = False
+        self._state_strategy = StateStrategy.AUTO
         self._run_id: uuid.UUID | None = None
 
         self._base_output_logger = None
@@ -138,17 +140,17 @@ class ELBContextBuilder:
         self._job = job
         return self
 
-    def with_merge_state(self, *, merge_state: bool):  # noqa: ANN201
+    def with_state_strategy(self, *, state_strategy: StateStrategy):  # noqa: ANN201
         """Set whether the state is to be merged or overwritten.
 
         Args:
-            merge_state : merge the state for the context
+            state_strategy : strategy to use for state updates
 
         Returns:
             self
 
         """
-        self._merge_state = merge_state
+        self._state_strategy = state_strategy
         return self
 
     def with_full_refresh(self, *, full_refresh: bool):  # noqa: ANN201
@@ -324,7 +326,7 @@ class ELBContextBuilder:
             update_state=self._state_update,
             state_id_suffix=self._state_id_suffix,
             base_output_logger=self._base_output_logger,
-            merge_state=self._merge_state,
+            state_strategy=self._state_strategy,
             run_id=self._run_id,
         )
 

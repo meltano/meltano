@@ -7,8 +7,12 @@ import typing as t
 import click
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd
-from meltano.core.plugin import PluginType
+from meltano.cli.utils import (
+    InstrumentedCmd,
+    PluginTypeArg,
+    infer_plugin_type,
+    validate_plugin_type_args,
+)
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
     DbRemoveManager,
@@ -19,25 +23,33 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from meltano.core.plugin import PluginType
     from meltano.core.project import Project
 
 
 @click.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
-@click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
-@click.argument("plugin_names", nargs=-1, required=True)
+@click.argument("plugin", nargs=-1, required=True)
+@click.option("--plugin-type", type=PluginTypeArg())
+@click.pass_context
 @pass_project()
 def remove(
     project: Project,
-    plugin_type: PluginType,
-    plugin_names: tuple[str, ...],
+    ctx: click.Context,
+    plugin: tuple[str, ...],
+    plugin_type: PluginType | None,
 ) -> None:
     """Remove plugins from your project.
 
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#remove
     """  # noqa: D301
+    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
+
     plugins = [
-        ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
+        ProjectPlugin(
+            infer_plugin_type(plugin_name) if plugin_type is None else plugin_type,
+            plugin_name,
+        )
         for plugin_name in plugin_names
     ]
     remove_plugins(project, plugins)

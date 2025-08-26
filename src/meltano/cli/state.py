@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import json.decoder
 import re
 import typing as t
 from datetime import datetime as dt
@@ -97,7 +98,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             return next(parser.find_blocks()).state_service  # type: ignore[union-attr]
         except Exception:
             logger.warning("No plugins found for provided state_id.")
-    # If provided state_id does not match convention (i.e., run via "meltano elt"),
+    # If provided state_id does not match convention (i.e., run via "meltano el"),
     # use the standalone StateService in the CLI context.
     return None
 

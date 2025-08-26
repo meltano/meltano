@@ -21,13 +21,13 @@ We're going to take data from a "source", namely GitHub, and extract a list of c
 To test that this part works, we will dump the data into JSON files.
 In Part 2, we will then place this data into a PostgreSQL database.
 
-We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ` meltano version`
+We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running `meltano --version`
 
 <Termy>
 
 ```console
 $ meltano --version
-meltano, version 3.4.0
+meltano, version 3.8.0
 ```
 
 </Termy>
@@ -419,7 +419,7 @@ $ meltano run tap-github target-jsonl
 2024-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
 2024-09-19T13:53:43.561190Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 1, "tags": {"endpoint": "commits"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github</span>
 2024-09-19T13:53:43.735250Z [info     ] Incremental state has been updated at 2024-09-19 13:53:43.734535.
-2024-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
+2024-09-19T13:53:43.820467Z [info     ] Block run completed            block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
 ```
 
 </Termy>

@@ -9,6 +9,7 @@ import typing as t
 
 import click
 
+from meltano.core._state import StateStrategy
 from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
 from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
@@ -79,7 +80,7 @@ class BlockParser:  # noqa: D101
         no_state_update: bool | None = False,
         force: bool | None = False,
         state_id_suffix: str | None = None,
-        merge_state: bool | None = False,
+        state_strategy: StateStrategy = StateStrategy.AUTO,
         run_id: uuid.UUID | None = None,
     ):
         """Parse a meltano run command invocation into a list of blocks.
@@ -95,7 +96,7 @@ class BlockParser:  # noqa: D101
             force: Whether to force a run if a job is already running (applies
                 to all found sets).
             state_id_suffix: State ID suffix to use.
-            merge_state: Whether to merge state at end of run.
+            state_strategy: Strategy to use for state evolution.
             run_id: Custom run ID to use.
 
         Raises:
@@ -112,7 +113,7 @@ class BlockParser:  # noqa: D101
         self._plugins: list[ProjectPlugin] = []
         self._commands: dict[int, str] = {}
         self._mappings_ref: dict[int, str] = {}
-        self._merge_state = merge_state
+        self._state_strategy = state_strategy
         self._run_id = run_id
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
@@ -254,7 +255,7 @@ class BlockParser:  # noqa: D101
             .with_refresh_catalog(refresh_catalog=self._refresh_catalog)
             .with_no_state_update(no_state_update=self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
-            .with_merge_state(merge_state=self._merge_state)
+            .with_state_strategy(state_strategy=self._state_strategy)
             .with_run_id(self._run_id)
         )
 

@@ -19,16 +19,16 @@ import structlog
 
 from meltano.core.runner import RunnerError
 
-from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
+from .formatters import get_default_foreign_pre_chain
 from .utils import capture_subprocess_output
 
 if t.TYPE_CHECKING:
-    if sys.version_info < (3, 10):
+    if sys.version_info >= (3, 10):
         from typing import TypeAlias  # noqa: ICN003
     else:
         from typing_extensions import TypeAlias
 
-StrPath: TypeAlias = t.Union[str, os.PathLike]
+StrPath: TypeAlias = t.Union[str, os.PathLike[str]]
 
 
 class OutputLogger:
@@ -181,7 +181,7 @@ class Out:
                 colors=False,
                 exception_formatter=structlog.dev.plain_traceback,
             ),
-            foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
+            foreign_pre_chain=get_default_foreign_pre_chain(),
         )
         handler = logging.FileHandler(self.file, delay=True)
         handler.setFormatter(formatter)

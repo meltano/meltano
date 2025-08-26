@@ -66,7 +66,7 @@ cli.add_command(job.job)
 
 # Holds the exit code for error reporting during process exiting. In
 # particular, a function registered by the `atexit` module uses this value.
-exit_code: None | int = None
+exit_code: int | None = None
 
 atexit_handler_registered = False
 exit_code_reported = False
@@ -77,7 +77,7 @@ setup_logging()
 logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to
+Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to \
 join our friendly Slack community.
 """
 

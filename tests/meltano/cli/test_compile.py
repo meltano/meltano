@@ -128,7 +128,7 @@ class TestCompile:
             # check is good enough:
             assert len(log.events) == 2
             return
-        assert log.events == [
+        assert log.events[-2:] == [
             {
                 "event": (
                     f"Failed to validate project files against Meltano "

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
+import typing as t
 from dataclasses import dataclass
 from unittest import mock
 from unittest.mock import AsyncMock
@@ -20,6 +21,9 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
+
+if t.TYPE_CHECKING:
+    from fixtures.cli import MeltanoCliRunner
 
 
 @dataclass
@@ -1083,7 +1087,7 @@ class TestCliEltScratchpadTwo:
     )
     def test_elt_transform_run_dbt_failure(
         self,
-        cli_runner,
+        cli_runner: MeltanoCliRunner,
         tap,
         target,
         tap_process,
@@ -1139,13 +1143,12 @@ class TestCliEltScratchpadTwo:
                     LogEntry("meltano", None, "Transformation failed", "error"),
                 ],
             )
-            assert exception_logged(
-                result.stderr,
-                CliError(
-                    "ELT could not be completed: `dbt run` failed.\n"
-                    + failure_help_log_suffix(job_logs_file),
-                ),
+            assert isinstance(result.exception, CliError)
+            message = (
+                "ELT could not be completed: `dbt run` failed.\n"
+                f"{failure_help_log_suffix(job_logs_file)}"
             )
+            assert message in str(result.exception)
 
             assert_log_lines(
                 result.stdout + result.stderr,
