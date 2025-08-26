@@ -26,11 +26,6 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias  # noqa: ICN003
-else:
-    from typing_extensions import TypeAlias
-
 if sys.version_info >= (3, 11):
     from typing import Self  # noqa: ICN003
 else:
@@ -44,7 +39,7 @@ else:
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
+StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
 
 
 @cache
