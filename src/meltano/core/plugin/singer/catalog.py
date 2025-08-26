@@ -105,7 +105,7 @@ class _CatalogRuleProtocol(t.Protocol):
         return result
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(slots=True)
 class CatalogRule(_CatalogRuleProtocol):
     """A catalog rule for a stream and property."""
 
@@ -114,7 +114,7 @@ class CatalogRule(_CatalogRuleProtocol):
     negated: bool = False
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(slots=True)
 class MetadataRule(_CatalogRuleProtocol):
     """A metadata rule for a stream and property."""
 
@@ -143,7 +143,7 @@ class MetadataRule(_CatalogRuleProtocol):
         )
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(slots=True)
 class SchemaRule(_CatalogRuleProtocol):
     """A schema rule for a stream and property."""
 
