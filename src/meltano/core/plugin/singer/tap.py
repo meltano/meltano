@@ -290,15 +290,12 @@ class SingerTap(SingerPlugin):
                 incremental state
         """
         if "state" not in plugin_invoker.capabilities:
-            raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support incremental state",  # noqa: EM102
-            )
+            msg = f"Extractor '{self.name}' does not support incremental state"
+            raise PluginLacksCapabilityError(msg)
 
         state_path = plugin_invoker.files["state"]
+        state_path.unlink(missing_ok=True)
 
-        with suppress(FileNotFoundError):
-            # Delete state left over from different pipeline run for same extractor
-            state_path.unlink()
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -319,11 +316,10 @@ class SingerTap(SingerPlugin):
             try:
                 shutil.copy(custom_state_path, state_path)
             except FileNotFoundError as err:
-                raise PluginExecutionError(
-                    f"Could not find state file {custom_state_path}",  # noqa: EM102
-                ) from err
+                msg = f"Could not find state file {custom_state_path}"
+                raise PluginExecutionError(msg) from err
 
-            logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
+            logger.info("Found state in %s", custom_state_filename)
             return
 
         # the `state.json` is stored in a state backend
