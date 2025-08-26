@@ -81,7 +81,7 @@ jobs:
       packages: write
       security-events: write
     env:
-      DEFAULT_PYTHON: "3.13"  # will be used in 'latest' images
+      DEFAULT_PYTHON: "3.10"  # will be used in 'latest' images
 
     strategy:
       fail-fast: false
