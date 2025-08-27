@@ -36,8 +36,7 @@ class JobFactory:
         run_id: str | None = None,
         log_content: str = "Test log content\nLine 2\nLine 3",
     ) -> Job:
-        if run_id is None:
-            run_id = str(uuid.uuid4())
+        run_id = run_id or str(uuid.uuid4())
 
         # Create job in database
         job = Job(
