@@ -308,13 +308,7 @@ class TestLogsShow:
         assert result.exit_code == 0
         # Job info should be in JSON format
         lines = result.output.strip().split("\n")
-        # Find the JSON block (before the log content)
-        json_end = None
-        for i, line in enumerate(lines):
-            if line == "}":
-                json_end = i
-                break
-
+        json_end = next((i for i, line in enumerate(lines) if line == "}"), None)
         assert json_end is not None
         json_str = "\n".join(lines[: json_end + 1])
         data = json.loads(json_str)
