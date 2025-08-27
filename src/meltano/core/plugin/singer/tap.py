@@ -41,7 +41,10 @@ if t.TYPE_CHECKING:
     from asyncio.streams import StreamReader
     from pathlib import Path
 
+    from sqlalchemy.orm import Session
+
     from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -323,12 +326,37 @@ class SingerTap(SingerPlugin):
             return
 
         # the `state.json` is stored in a state backend
-        state_service = StateService(
+        if state := self.get_singer_state(
             project=elt_context.project,
-            session=elt_context.session,
-        )
+            session=elt_context.session,  # type: ignore[arg-type]
+            job_name=elt_context.job.job_name,
+        ):
+            async with await anyio.open_file(state_path, "w") as state_file:
+                content = json.dumps(state, indent=2)
+                await state_file.write(content)
+        else:
+            logger.warning("No state was found, complete import.")
+
+    def get_singer_state(
+        self,
+        *,
+        project: Project,
+        session: Session,
+        job_name: str,
+    ) -> dict | None:
+        """Get the state for the given job.
+
+        Args:
+            project: the project
+            session: the session
+            job_name: the job name
+
+        Returns:
+            the state for the given job
+        """
+        state_service = StateService(project=project, session=session)
         try:
-            state = state_service.get_state(elt_context.job.job_name)
+            state = state_service.get_state(job_name)
         except Exception as err:  # pragma: no cover
             logger.error(
                 err.args[0],
@@ -337,13 +365,7 @@ class SingerTap(SingerPlugin):
             msg = "Failed to retrieve state"
             raise PluginExecutionError(msg) from err
 
-        if state:
-            if state.get(SINGER_STATE_KEY):
-                async with await anyio.open_file(state_path, "w") as state_file:
-                    content = json.dumps(state.get(SINGER_STATE_KEY), indent=2)
-                    await state_file.write(content)
-        else:
-            logger.warning("No state was found, complete import.")
+        return state.get(SINGER_STATE_KEY)
 
     @hook("before_invoke")
     async def discover_catalog_hook(
