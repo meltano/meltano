@@ -45,7 +45,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
         file_length = f.tell()
 
         # Read file in reverse to find line breaks
-        lines_found = []
+        lines_found: list[bytes] = []
         block_size = 1024
         blocks = []
 
@@ -89,8 +89,10 @@ def _format_job_info(job: Job, format_type: str = "text") -> str:
                 "job_name": job.job_name,
                 "run_id": str(job.run_id),
                 "state": job.state.name,
-                "started_at": job.started_at.isoformat() if job.started_at else None,
-                "ended_at": job.ended_at.isoformat() if job.ended_at else None,
+                "started_at": job.started_at.isoformat(),
+                "ended_at": job.ended_at.isoformat()
+                if job.ended_at is not None
+                else None,
                 "trigger": job.trigger,
             },
             indent=2,
@@ -110,8 +112,7 @@ def _format_job_info(job: Job, format_type: str = "text") -> str:
     name="logs",
     short_help="View job logs.",
 )
-@click.pass_context
-def logs(ctx: click.Context) -> None:
+def logs() -> None:
     """View and manage Meltano job logs."""
 
 
@@ -187,13 +188,11 @@ def list_logs(
                         "log_id": str(job.run_id),
                         "job_name": job.job_name,
                         "state": job.state.name,
-                        "started_at": job.started_at.isoformat()
-                        if job.started_at
-                        else None,
+                        "started_at": job.started_at.isoformat(),
                         "ended_at": job.ended_at.isoformat() if job.ended_at else None,
                         "duration_seconds": (
                             (job.ended_at - job.started_at).total_seconds()
-                            if job.ended_at and job.started_at
+                            if job.ended_at is not None
                             else None
                         ),
                         "trigger": job.trigger,
@@ -225,7 +224,7 @@ def list_logs(
                         status = f"  {job.state.name}"
 
                     # Duration calculation
-                    if job.ended_at and job.started_at:
+                    if job.ended_at is not None:
                         duration_seconds = (
                             job.ended_at - job.started_at
                         ).total_seconds()
@@ -248,15 +247,11 @@ def list_logs(
                     )
 
                     # Format started time
-                    started = (
-                        job.started_at.strftime("%Y-%m-%d %H:%M:%S")
-                        if job.started_at
-                        else "unknown"
-                    )
-
+                    started = job.started_at.strftime("%Y-%m-%d %H:%M:%S")
+                    trigger = job.trigger or "manual"
                     click.echo(
                         f"{status:<8} {job.run_id!s:<36} {job_display:<30} "
-                        f"{started:<20} {duration:<10} {job.trigger:<10}"
+                        f"{started:<20} {duration:<10} {trigger:<10}"
                     )
 
                 click.echo("\nUse 'meltano logs show <LOG_ID>' to view a specific log.")

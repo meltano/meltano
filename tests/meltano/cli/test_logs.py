@@ -16,19 +16,20 @@ from meltano.core.job import Job, State
 from meltano.core.logging.job_logging_service import JobLoggingService
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable
-
     from sqlalchemy.orm import Session
 
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.project import Project
 
 
-@pytest.fixture
-def create_test_job(project: Project):
-    """Create a test job with logs."""
+class JobFactory:
+    """Factory for creating test jobs."""
 
-    def _create(
+    def __init__(self, project: Project):
+        self.project = project
+
+    def create(
+        self,
         session: Session,
         job_name: str = "tap-gitlab target-postgres",
         state: State = State.SUCCESS,
@@ -52,14 +53,18 @@ def create_test_job(project: Project):
         job.save(session)
 
         # Create log file
-        job_logging_service = JobLoggingService(project)
+        job_logging_service = JobLoggingService(self.project)
         log_path = job_logging_service.generate_log_name(job_name, run_id)
         log_path.parent.mkdir(parents=True, exist_ok=True)
         log_path.write_text(log_content)
 
         return job
 
-    return _create
+
+@pytest.fixture
+def job_factory(project: Project):
+    """Create a test job with logs."""
+    return JobFactory(project)
 
 
 class TestLogsShow:
@@ -69,10 +74,10 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test showing the latest log for a job."""
-        job = create_test_job(
+        job = job_factory.create(
             session,
             log_content="Latest log content\nWith multiple lines",
         )
@@ -94,12 +99,12 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test showing log for a specific run ID."""
         # Create multiple runs
-        job1 = create_test_job(session, log_content="First run log")
-        create_test_job(session, log_content="Second run log")
+        job1 = job_factory.create(session, log_content="First run log")
+        job_factory.create(session, log_content="Second run log")
 
         # Show specific run
         with mock.patch(
@@ -119,13 +124,13 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test listing available runs for a job."""
         # Create multiple runs with different states
-        job1 = create_test_job(session, state=State.SUCCESS)
-        job2 = create_test_job(session, state=State.FAIL)
-        job3 = create_test_job(session, state=State.RUNNING)
+        job1 = job_factory.create(session, state=State.SUCCESS)
+        job2 = job_factory.create(session, state=State.FAIL)
+        job3 = job_factory.create(session, state=State.RUNNING)
 
         with mock.patch(
             "meltano.cli.logs.project_engine",
@@ -146,10 +151,10 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test listing runs in JSON format."""
-        job = create_test_job(session)
+        job = job_factory.create(session)
 
         with mock.patch(
             "meltano.cli.logs.project_engine",
@@ -171,11 +176,11 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test showing last N lines with --tail."""
         log_content = "\n".join([f"Line {i}" for i in range(1, 101)])
-        job = create_test_job(session, log_content=log_content)
+        job = job_factory.create(session, log_content=log_content)
 
         with mock.patch(
             "meltano.cli.logs.project_engine",
@@ -244,12 +249,12 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test confirmation prompt for large log files."""
         # Create a log larger than 2MB
         large_content = "x" * (2 * 1024 * 1024 + 1)
-        job = create_test_job(session, log_content=large_content)
+        job = job_factory.create(session, log_content=large_content)
 
         # Test declining confirmation
         with mock.patch(
@@ -286,10 +291,10 @@ class TestLogsShow:
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test JSON format for job info when showing logs."""
-        job = create_test_job(session)
+        job = job_factory.create(session)
 
         with mock.patch(
             "meltano.cli.logs.project_engine",
@@ -320,7 +325,7 @@ class TestLogsShow:
     def test_legacy_log_location(
         self,
         cli_runner: MeltanoCliRunner,
-        create_test_job: Callable[[...], Job],
+        job_factory: JobFactory,
     ):
         """Test reading logs from legacy location."""
         # This would require mocking the legacy_logs_dir method
