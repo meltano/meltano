@@ -7,7 +7,7 @@ from dataclasses import dataclass
 DEFAULT_VENDOR = "com.meltano"
 
 
-@dataclass
+@dataclass(slots=True)
 class IgluSchema:
     """Dataclass to store the name, version, vendor, and URL for an Iglu schema."""
 
