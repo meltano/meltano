@@ -28,10 +28,10 @@ from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
@@ -460,8 +460,8 @@ def activate_environment(  # noqa: D417
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
-    if ctx.obj.get("selected_environment"):
-        project.activate_environment(ctx.obj["selected_environment"])
+    if env := ctx.obj.get("selected_environment"):
+        project.activate_environment(env)
         # Update the project context being used for telemetry:
         project_ctx = next(
             ctx

@@ -1,6 +1,7 @@
 from __future__ import annotations  # noqa: D100
 
 import asyncio
+import asyncio.subprocess
 import subprocess
 import sys
 import typing as t

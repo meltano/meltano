@@ -5,10 +5,10 @@ import sys
 
 import structlog
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 logger = structlog.stdlib.get_logger()
 

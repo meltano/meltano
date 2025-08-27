@@ -6,7 +6,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 
 
-@dataclass
+@dataclass(slots=True)
 class IndexedPlugin:
     """Response schema for the plugin type index."""
 
@@ -30,7 +30,7 @@ class IndexedPlugin:
         ]
 
 
-@dataclass
+@dataclass(slots=True)
 class VariantRef:
     """Response schema for a plugin variant."""
 

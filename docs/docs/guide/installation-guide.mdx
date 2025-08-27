@@ -46,7 +46,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.9, 3.10, 3.11, 3.12 and 3.13 are supported. Some plugins do not yet support Python 3.13.
+Currently Python 3.10, 3.11, 3.12 and 3.13 are supported. Note that not all plugins support these versions, so you might need to specify [a different version for the plugin](/reference/settings/#python).
 
 #### Install pipx
 
@@ -149,7 +149,7 @@ We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Do
 
 To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v3.5.4`.
 
-By default, these images come with a version of Python chosen for a balance of stability and compatibility, currently Python 3.9.
+By default, these images come with a version of Python chosen for a balance of stability and compatibility, currently Python 3.10.
 If you'd like to use a different version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.11` and `v3.5.4-python3.11`.
 
 ```bash

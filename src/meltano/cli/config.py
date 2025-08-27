@@ -43,22 +43,22 @@ logger = structlog.stdlib.get_logger(__name__)
 install, no_install, only_install = get_install_options(include_only_install=True)
 
 
-def _get_ctx_arg(*args: t.Any) -> click.core.Context:
-    """Get the click.core.Context arg from a set of args.
+def _get_ctx_arg(*args: t.Any) -> click.Context:
+    """Get the click.Context arg from a set of args.
 
     Args:
         args: the args to get Context from
 
     Returns:
-        The click.core.Context arg.
+        The click.Context arg.
 
     Raises:
-        ValueError: if there is no click.core.Context in the given args.
+        ValueError: if there is no click.Context in the given args.
     """
     for arg in args:
-        if isinstance(arg, click.core.Context):
+        if isinstance(arg, click.Context):
             return arg
-    raise ValueError("No click.core.Context provided in *args")  # noqa: EM101
+    raise ValueError("No clickContext provided in *args")  # noqa: EM101
 
 
 def _get_store_choices() -> list[str]:
@@ -385,7 +385,7 @@ def reset(ctx, store) -> None:  # noqa: ANN001
 @click.pass_context
 @_use_meltano_env
 def set_(
-    ctx: click.core.Context,
+    ctx: click.Context,
     *,
     setting_name: tuple[str, ...],
     value: t.Any,  # noqa: ANN401

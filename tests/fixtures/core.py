@@ -6,7 +6,7 @@ import logging
 import os
 import shutil
 import typing as t
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
@@ -2033,13 +2033,11 @@ def elt_schedule(
 ):
     try:
         return schedule_service.add_elt(
-            None,
             "elt-schedule-mock",
             extractor=tap.name,
             loader=target.name,
             transform="skip",
             interval="@daily",
-            start_date=datetime.datetime.now(datetime.timezone.utc),
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule
@@ -2187,10 +2185,16 @@ def num_params() -> int:
     return 10
 
 
+class Payloads(t.NamedTuple):
+    mock_state_payloads: list[dict[str, dict]]
+    mock_error_payload: dict[str, str]
+    mock_empty_payload: dict[str, t.Any]
+
+
 @pytest.fixture
-def payloads(num_params):
-    mock_payloads_dict = {
-        "mock_state_payloads": [
+def payloads(num_params: int) -> Payloads:
+    return Payloads(
+        mock_state_payloads=[
             {
                 "singer_state": {
                     f"bookmark-{idx_i}": idx_i + idx_j for idx_j in range(num_params)
@@ -2198,31 +2202,34 @@ def payloads(num_params):
             }
             for idx_i in range(num_params)
         ],
-        "mock_error_payload": {"error": "failed"},
-        "mock_empty_payload": {},
-    }
-    payloads = namedtuple("payloads", mock_payloads_dict)
-    return payloads(**mock_payloads_dict)
+        mock_error_payload={"error": "failed"},
+        mock_empty_payload={},
+    )
+
+
+class StateIds(t.NamedTuple):
+    single_incomplete_state_id: str
+    single_complete_state_id: str
+    multiple_incompletes_state_id: str
+    multiple_completes_state_id: str
+    single_complete_then_multiple_incompletes_state_id: str
+    single_incomplete_then_multiple_completes_state_id: str
 
 
 @pytest.fixture
-def state_ids(
-    num_params,  # noqa: ARG001
-):
-    state_id_dict = {
-        "single_incomplete_state_id": create_state_id("single-incomplete"),
-        "single_complete_state_id": create_state_id("single-complete"),
-        "multiple_incompletes_state_id": create_state_id("multiple-incompletes"),
-        "multiple_completes_state_id": create_state_id("multiple-completes"),
-        "single_complete_then_multiple_incompletes_state_id": create_state_id(
+def state_ids():
+    return StateIds(
+        single_incomplete_state_id=create_state_id("single-incomplete"),
+        single_complete_state_id=create_state_id("single-complete"),
+        multiple_incompletes_state_id=create_state_id("multiple-incompletes"),
+        multiple_completes_state_id=create_state_id("multiple-completes"),
+        single_complete_then_multiple_incompletes_state_id=create_state_id(
             "single-complete-then-multiple-incompletes",
         ),
-        "single_incomplete_then_multiple_completes_state_id": create_state_id(
+        single_incomplete_then_multiple_completes_state_id=create_state_id(
             "single-incomplete-then-multiple-completes",
         ),
-    }
-    state_ids = namedtuple("state_ids", state_id_dict)
-    return state_ids(**state_id_dict)
+    )
 
 
 @pytest.fixture
@@ -2239,21 +2246,29 @@ def mock_time():
     return _mock_time()
 
 
+class JobArgs(t.NamedTuple):
+    complete_job_args: dict[str, t.Any]
+    incomplete_job_args: dict[str, t.Any]
+
+
 @pytest.fixture
-def job_args():
-    job_args_dict = {
-        "complete_job_args": {"state": State.SUCCESS, "payload_flags": Payload.STATE},
-        "incomplete_job_args": {
+def job_args() -> JobArgs:
+    return JobArgs(
+        complete_job_args={"state": State.SUCCESS, "payload_flags": Payload.STATE},
+        incomplete_job_args={
             "state": State.FAIL,
             "payload_flags": Payload.INCOMPLETE_STATE,
         },
-    }
-    job_args = namedtuple("job_args", job_args_dict)
-    return job_args(**job_args_dict)
+    )
 
 
 @pytest.fixture
-def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
+def state_ids_with_jobs(
+    state_ids: StateIds,
+    job_args: JobArgs,
+    payloads: Payloads,
+    mock_time: t.Generator[datetime.datetime, None, None],
+) -> dict[str, list[Job]]:
     jobs = {
         state_ids.single_incomplete_state_id: [
             Job(
@@ -2330,9 +2345,9 @@ def jobs(state_ids_with_jobs):
 
 @pytest.fixture
 def state_ids_with_expected_states(
-    state_ids,
-    payloads,
-    state_ids_with_jobs,
+    state_ids: StateIds,
+    payloads: Payloads,
+    state_ids_with_jobs: dict[str, list[Job]],
 ):
     final_state = {}
     for state in payloads.mock_state_payloads:
