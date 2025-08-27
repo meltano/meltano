@@ -416,13 +416,19 @@ settings:
 
 Optional. An array of aliases for the setting.
 
+An alias is an alternative setting name that can be used in 'meltano.yml' and 'meltano config set'. For example,
+
 ```yaml
-settings:
-- name: setting_name
-  aliases:
-  - setting_name_alias
-  - setting_name_alias_2
+plugins:
+- name: target-rdbms
+  settings:
+  - name: dbname
+    aliases:
+    - database
+    - database_name
 ```
+
+means that, along with the `TARGET_RDBMS_DBNAME` environment variable, the `target-rdbms` plugin also supports the `TARGET_RDBMS_DATABASE` and `TARGET_RDBMS_DATABASE_NAME` environment variables for the same setting. It also means that the `dbname` setting can be used in `meltano.yml` and `meltano config set` using the `database` and `database_name` aliases.
 
 ### `settings[*].description`
 
@@ -447,7 +453,17 @@ settings:
 
 ### `settings[*].env`
 
-Use to delegate to an environment variable for overriding this setting's value.
+Meltano takes the value of the setting and injects it into the plugin's runtime environment as this environment variable, in addition to the default environment variable (of the form `<PLUGIN_NAME>_<SETTING_NAME>`, etc.).
+
+For example, the following setting definition:
+
+```yaml
+settings:
+- name: setting_name
+  env: SOME_API_KEY
+```
+
+will result in the plugin being able to access the value of the setting via the `SOME_API_KEY` environment variable.
 
 ### `settings[*].hidden`
 Optional. Use to hide a setting.
@@ -460,7 +476,7 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `options`, `file`, `array`, and `object`.
+Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `decimal`, `date_iso8601`, `options`, `file`, `array`, and `object`.
 
 ```yaml
 settings:

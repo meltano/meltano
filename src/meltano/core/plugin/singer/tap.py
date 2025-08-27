@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
+import inspect
 import json
 import logging
 import shutil
@@ -60,7 +62,7 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            if asyncio.iscoroutinefunction(file_like_obj.write):
+            if inspect.iscoroutinefunction(file_like_obj.write):
                 await file_like_obj.write(data.decode(encoding) if write_str else data)
             else:
                 file_like_obj.write(data.decode(encoding) if write_str else data)
@@ -71,7 +73,7 @@ def _debug_logging_handler(
     plugin_invoker: PluginInvoker,
     stderr: StreamReader,
     *other_dsts,  # noqa: ANN002
-) -> asyncio.Task:
+) -> asyncio.Task[None]:
     """Route debug log lines.
 
     Routes to stderr, or an `OutputLogger` if one is present in our invocation
@@ -156,7 +158,7 @@ def config_schema_rules(config: dict[str, t.Any]) -> list[SchemaRule]:
     return [
         SchemaRule(
             tap_stream_id=tap_stream_id,
-            breadcrumb=["properties", prop],
+            breadcrumb=property_breadcrumb([prop]),
             payload=payload,
         )
         for tap_stream_id, stream_config in config.items()
@@ -288,15 +290,12 @@ class SingerTap(SingerPlugin):
                 incremental state
         """
         if "state" not in plugin_invoker.capabilities:
-            raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support incremental state",  # noqa: EM102
-            )
+            msg = f"Extractor '{self.name}' does not support incremental state"
+            raise PluginLacksCapabilityError(msg)
 
         state_path = plugin_invoker.files["state"]
+        state_path.unlink(missing_ok=True)
 
-        with suppress(FileNotFoundError):
-            # Delete state left over from different pipeline run for same extractor
-            state_path.unlink()
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -317,11 +316,10 @@ class SingerTap(SingerPlugin):
             try:
                 shutil.copy(custom_state_path, state_path)
             except FileNotFoundError as err:
-                raise PluginExecutionError(
-                    f"Could not find state file {custom_state_path}",  # noqa: EM102
-                ) from err
+                msg = f"Could not find state file {custom_state_path}"
+                raise PluginExecutionError(msg) from err
 
-            logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
+            logger.info("Found state in %s", custom_state_filename)
             return
 
         # the `state.json` is stored in a state backend
@@ -397,7 +395,7 @@ class SingerTap(SingerPlugin):
             return catalog_path
 
         use_cached_catalog = (
-            not (elt_context and elt_context.refresh_catalog)
+            not (elt_context and elt_context.should_refresh_catalog())
             and plugin_invoker.plugin_config_extras["_use_cached_catalog"]
         )
 
@@ -585,7 +583,7 @@ class SingerTap(SingerPlugin):
             metadata_rules.extend(select_metadata_rules(config["_select"]))
             metadata_rules.extend(config_metadata_rules(config["_metadata"]))
 
-        # Always apply select filters (`meltano elt` `--select` and `--exclude` options)
+        # Always apply select filters (`meltano el` `--select` and `--exclude` options)
         metadata_rules.extend(select_filter_metadata_rules(config["_select_filter"]))
 
         if not schema_rules and not metadata_rules:

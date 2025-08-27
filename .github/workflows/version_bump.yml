@@ -35,18 +35,17 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: "3.x"
 
-    - uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
-      with:
-        version: ">=0.6.15"
+    - uses: astral-sh/setup-uv@4959332f0f014c5280e7eac8b70c90cb574c9f9b # v6.6.0
 
     - name: Bump version
       id: cz-bump
@@ -66,6 +65,7 @@ jobs:
 
     - name: Draft Release
       id: draft-release
+      if: ${{ github.event.inputs.prerelease == 'none' }}
       uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
       with:
         draft: true
@@ -86,5 +86,5 @@ jobs:
         body: |
           Bump changelog for release v${{ steps.cz-bump.outputs.version }}
         branch: release/v${{ steps.cz-bump.outputs.version }}
-        base: main
         labels: release
+        assignees: "${{ github.actor }}"

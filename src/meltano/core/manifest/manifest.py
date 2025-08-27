@@ -33,17 +33,11 @@ from meltano.core.utils import (
 )
 
 if t.TYPE_CHECKING:
-    import sys
     from collections.abc import Iterable, MutableMapping
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
-
-    if sys.version_info >= (3, 10):
-        from typing import TypeAlias  # noqa: ICN003
-    else:
-        from typing_extensions import TypeAlias
 
 # NOTE: We do not use `Project(...).meltano.canonical` for 3 reasons:
 # - It will make it difficult to refactor the rest of the Meltano core to be
@@ -60,9 +54,9 @@ logger = structlog.getLogger(__name__)
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
 MANIFEST_SCHEMA_PATH = resources.files(schemas) / "meltano.schema.json"
 
-Trie: TypeAlias = dict[str, "Trie"]
-PluginsByType: TypeAlias = Mapping[str, list[Mapping[str, t.Any]]]
-PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, t.Any]]]
+Trie: t.TypeAlias = dict[str, "Trie"]
+PluginsByType: t.TypeAlias = Mapping[str, list[Mapping[str, t.Any]]]
+PluginsByNameByType: t.TypeAlias = Mapping[str, Mapping[str, Mapping[str, t.Any]]]
 
 
 # Ruamel doesn't have this problem where YAML tags like timestamps are

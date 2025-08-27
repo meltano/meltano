@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import json
+import contextlib
 import os
 import platform
 import shutil
 import typing as t
-from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -125,10 +124,7 @@ class TestCliAdd:
             )
 
             assert res.exit_code == 0, res.stdout
-            assert (
-                "Extractor 'tap-gitlab' already exists in your Meltano project"
-                in res.stderr
-            )
+            assert "Updated extractor 'tap-gitlab'" in res.stdout
             assert "Added extractor 'tap-adwords'" in res.stdout
             assert "Added extractor 'tap-facebook'" in res.stdout
 
@@ -337,7 +333,8 @@ class TestCliAdd:
         cli_runner,
     ) -> None:
         # Make sure tap-mock is not in the project as a project plugin
-        project.plugins.remove_from_file(tap)
+        with contextlib.suppress(PluginNotFoundError):
+            project.plugins.remove_from_file(tap)
 
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -804,10 +801,9 @@ class TestCliAdd:
 
     def test_add_with_python_version(self, cli_runner: CliRunner) -> None:
         with (
-            mock.patch(
-                "meltano.core.venv_service._resolve_python_path",
-            ) as venv_mock,
-            mock.patch("meltano.core.venv_service.VenvService.install"),
+            mock.patch("meltano.core.venv_service.exec_async") as exec_mock,
+            mock.patch("meltano.core.venv_service.UvVenvService.install_pip_args"),
+            mock.patch("meltano.core.venv_service.VirtualEnv.write_fingerprint"),
         ):
             python = "python3.X"
             assert_cli_runner(
@@ -822,7 +818,7 @@ class TestCliAdd:
                     ),
                 ),
             )
-            venv_mock.assert_called_with(python)
+            assert exec_mock.call_args.args[-2] == f"--python={python}"
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
@@ -846,7 +842,7 @@ class TestCliAdd:
         )
 
     @pytest.mark.usefixtures("reset_project_context")
-    def test_add_update(self, cli_runner) -> None:
+    def test_add_no_update(self, cli_runner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
@@ -860,36 +856,15 @@ class TestCliAdd:
             assert res.exit_code == 0, res.stdout
             assert "Updated extractor 'tap-mock" in res.stdout
 
-    @pytest.mark.usefixtures("reset_project_context")
-    def test_add_update_not_in_project(self, cli_runner) -> None:
-        res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock", "--update"])
-
-        assert res.exit_code == 1
-        assert res.exception
-        assert str(res.exception) == "Extractor 'tap-mock' is not known to Meltano"
-
-    @pytest.mark.usefixtures("reset_project_context")
-    def test_lockfile_exists(self, cli_runner) -> None:
-        plugins_dir = Path("plugins/utilities")
-        plugins_dir.mkdir(parents=True, exist_ok=True)
-        lockfile = plugins_dir / "utility-mock--original.lock"
-        lockfile.write_text(
-            json.dumps(
-                {
-                    "plugin_type": "utilities",
-                    "name": "utility-mock",
-                    "namespace": "utility_mock",
-                },
-            ),
-        )
-        lockfile.touch()
-
-        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
-            install_plugin_mock.return_value = True
-            res = cli_runner.invoke(cli, ["add", "utility", "utility-mock"])
+            res = cli_runner.invoke(
+                cli,
+                ["add", "extractor", "tap-mock", "--no-update"],
+            )
             assert res.exit_code == 0, res.stdout
-            assert "Plugin definition is already locked at" in res.stdout
-            assert "You can remove the file manually" in res.stdout
+            assert (
+                "Extractor 'tap-mock' already exists in your Meltano project"
+                in res.stderr
+            )
 
     @pytest.mark.usefixtures("reset_project_context")
     def test_add_multiple_no_plugin_type(self, project: Project, cli_runner) -> None:
@@ -962,3 +937,23 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
                 force=False,
             )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_conflicting_plugin_type_and_positional_argument(
+        self,
+        tap,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["add", "--plugin-type=extractors", "extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
+
+        result = cli_runner.invoke(
+            cli,
+            ["add", "extractors", "--plugin-type=extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr

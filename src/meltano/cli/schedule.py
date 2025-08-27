@@ -7,7 +7,6 @@ import sys
 import typing as t
 
 import click
-from croniter import croniter
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -17,18 +16,20 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.schedule import CRON_INTERVALS, ELTSchedule, JobSchedule
+from meltano.core.schedule import (
+    CRON_INTERVALS,
+    ELTSchedule,
+    JobSchedule,
+    is_valid_cron,
+)
 from meltano.core.schedule_service import (
     BadCronError,
     ScheduleAlreadyExistsError,
     ScheduleService,
 )
 from meltano.core.task_sets_service import TaskSetsService
-from meltano.core.utils import coerce_datetime
 
 if t.TYPE_CHECKING:
-    import datetime
-
     from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
@@ -62,31 +63,22 @@ def _add_elt(
     loader: str,
     transform: str,
     interval: str,
-    start_date: datetime.datetime | None,
 ) -> None:
     """Add a new legacy elt schedule."""
-    project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
-
-    _, session_maker = project_engine(project)
-    session = session_maker()
     try:
         added_schedule = schedule_service.add_elt(
-            session,
             name,
             extractor,
             loader,
             transform,
             interval,
-            start_date,
         )
         click.echo(
             f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}",
         )
     except ScheduleAlreadyExistsError:
         click.secho(f"Schedule '{name}' already exists.", fg="yellow")
-    finally:
-        session.close()
 
 
 def _add_job(ctx: click.Context, name: str, job: str, interval: str) -> None:
@@ -114,7 +106,7 @@ class CronParam(click.ParamType):
 
     def convert(self, value: str, *_) -> str:
         """Validate and con interval."""
-        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+        if value not in CRON_INTERVALS and not is_valid_cron(value):
             raise BadCronError(value)
 
         return value
@@ -143,7 +135,6 @@ class CronParam(click.ParamType):
     default="skip",
     help="ELT Only",
 )
-@click.option("--start-date", type=click.DateTime(), default=None, help="ELT Only")
 @click.pass_context
 def add(
     ctx: click.Context,
@@ -153,7 +144,6 @@ def add(
     loader: str | None,
     transform: str,
     interval: str,
-    start_date: datetime.datetime | None,
 ) -> None:
     """Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
 
@@ -176,15 +166,16 @@ def add(
             "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
         )
 
-    if not job:
-        if not extractor:
-            raise click.ClickException("Missing --extractor")  # noqa: EM101
-        if not loader:
-            raise click.ClickException("Missing --loader")  # noqa: EM101
-
-        _add_elt(ctx, name, extractor, loader, transform, interval, start_date)
+    if job:
+        _add_job(ctx, name, job, interval)
         return
-    _add_job(ctx, name, job, interval)
+
+    if not extractor:
+        raise click.UsageError("Missing --extractor")  # noqa: EM101
+    if not loader:
+        raise click.UsageError("Missing --loader")  # noqa: EM101
+
+    _add_elt(ctx, name, extractor, loader, transform, interval)
 
 
 def _format_job_list_output(entry: JobSchedule, job: TaskSets) -> dict:
@@ -201,9 +192,6 @@ def _format_job_list_output(entry: JobSchedule, job: TaskSets) -> dict:
 
 
 def _format_elt_list_output(entry: ELTSchedule, session: Session) -> dict:
-    start_date = coerce_datetime(entry.start_date)
-    start_date_str = start_date.date().isoformat() if start_date else None
-
     last_successful_run = entry.last_successful_run(session)
     last_successful_run_ended_at = (
         last_successful_run.ended_at.isoformat()
@@ -217,7 +205,6 @@ def _format_elt_list_output(entry: ELTSchedule, session: Session) -> dict:
         "loader": entry.loader,
         "transform": entry.transform,
         "interval": entry.interval,
-        "start_date": start_date_str,
         "env": entry.env,
         "cron_interval": entry.cron_interval,
         "last_successful_run_ended_at": last_successful_run_ended_at,
@@ -332,7 +319,7 @@ def remove(ctx: click.Context, name: str) -> None:
     Usage:
         meltano schedule remove <name>
     """
-    ctx.obj["schedule_service"].remove(name)
+    ctx.obj["schedule_service"].remove_schedule(name)
 
 
 def _update_job_schedule(

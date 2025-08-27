@@ -48,7 +48,7 @@
     "MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS": "1",
     "MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS": "10",
     "MELTANO_STATE_BACKEND_URI": "systemdb",
-    "MELTANO_VENV_BACKEND": "virtualenv",
+    "MELTANO_VENV_BACKEND": "uv",
     "SUPERSET_API_URL": "http://localhost:8088",
     "SUPERSET_PASS": "admin",
     "SUPERSET_USER": "admin",

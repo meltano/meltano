@@ -335,7 +335,7 @@ Additionally, the following variables can be referenced from plugin settings (as
 - `MELTANO_<PLUGIN_TYPE>_NAME`: The plugin's `name`, e.g. `MELTANO_EXTRACTOR_NAME` as `tap-gitlab` for extractor `tap-gitlab`
 - `MELTANO_<PLUGIN_TYPE>_NAMESPACE`: The plugin's `namespace`, e.g. `MELTANO_EXTRACTOR_NAMESPACE` as `tap_gitlab` for extractor `tap-gitlab`
 
-When running a [`meltano elt`](/reference/command-line-interface#elt) pipeline, additional [pipeline environment variables](/guide/integration#pipeline-environment-variables)
+When running a [`meltano el`](/reference/command-line-interface#el) pipeline, additional [pipeline environment variables](/guide/integration#pipeline-environment-variables)
 are available to loaders and transformers that describe the extractor and loader they are run with.
 When a plugin is invoked outside the context of a pipeline, these variables will be unset and any references to them will expand to empty strings.
 

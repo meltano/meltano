@@ -36,10 +36,10 @@ from meltano.core.venv_service import (
     fingerprint,
 )
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -624,14 +624,14 @@ async def install_pip_plugin(
     pip_install_args = get_pip_install_args(project, plugin, env=env)
     backend = project.settings.get("venv.backend")
 
-    if backend == "virtualenv":
+    if backend == "virtualenv":  # pragma: no cover
         service = VenvService(
             project=project,
             python=plugin.python,
             namespace=plugin.type,
             name=plugin.plugin_dir_name,
         )
-    elif backend == "uv":  # pragma: no cover
+    elif backend == "uv":
         service = UvVenvService(
             project=project,
             python=plugin.python,

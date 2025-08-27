@@ -7,7 +7,6 @@ import enum
 import os
 import sys
 import typing as t
-import uuid
 from contextlib import asynccontextmanager
 
 from structlog.stdlib import get_logger
@@ -18,15 +17,15 @@ from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
-from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, uuid7
 from meltano.core.venv_service import VenvService, VirtualEnv
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-    from typing_extensions import Unpack
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
     from typing import Unpack  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Unpack
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -546,7 +545,7 @@ class PluginInvoker:
         logger.debug("Running containerized command", command=plugin_command)
         async with self._invoke(*args, **kwargs) as (_proc_args, _, proc_env):
             plugin_name = self.plugin.name
-            random_id = uuid.uuid4()
+            random_id = uuid7()
             name = f"meltano-{plugin_name}--{plugin_command}-{random_id}"
 
             info = await service.run_container(spec, name, env=proc_env)

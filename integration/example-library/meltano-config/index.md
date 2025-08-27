@@ -17,6 +17,8 @@ echo 'plugins:
     - name: a_string
     - name: an_integer
       kind: integer
+    - name: a_number
+      kind: decimal
     - name: an_object
       kind: object
     - name: an_array
@@ -28,6 +30,7 @@ echo 'plugins:
 ```shell
 meltano config example set a_string -- -86.75
 meltano config example set an_integer '42'
+meltano config example set a_number 3.1415
 meltano config example set an_object '{"foo": "bar"}'
 meltano config example set an_array '["foo", "bar"]'
 ```
@@ -44,6 +47,7 @@ You should see the following output:
 {
   "a_string": "-86.75",
   "an_integer": 42,
+  "a_number": 3.1415,
   "an_object": {
     "foo": "bar"
   },
