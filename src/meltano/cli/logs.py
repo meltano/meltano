@@ -64,7 +64,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
             lines_found = all_content.split(b"\n")
 
             # Remove empty line at end if file ends with newline
-            lines_found = lines_found[:-1] if not lines_found[-1] else lines_found
+            lines_found = lines_found if lines_found[-1] else lines_found[:-1]
 
             file_length -= block_size
 
