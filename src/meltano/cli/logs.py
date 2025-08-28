@@ -220,7 +220,8 @@ def list_logs(
                         status = "✗ FAIL"
                     elif job.state == State.RUNNING:
                         status = "→ RUN"
-                    else:
+                    else:  # pragma: no cover
+                        # We filtered out any other states
                         status = f"  {job.state.name}"
 
                     # Duration calculation
@@ -256,7 +257,7 @@ def list_logs(
 
                 click.echo("\nUse 'meltano logs show <LOG_ID>' to view a specific log.")
 
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         tracker.track_command_event(CliEvent.failed)
         msg = f"Error listing logs: {e}"
         raise CliError(msg) from e
@@ -363,7 +364,7 @@ def show_log(
     except CliError:
         tracker.track_command_event(CliEvent.failed)
         raise
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         tracker.track_command_event(CliEvent.failed)
         msg = f"Error reading log: {e}"
         raise CliError(msg) from e

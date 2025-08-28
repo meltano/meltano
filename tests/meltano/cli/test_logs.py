@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import typing as t
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 import pytest
@@ -31,11 +31,14 @@ class JobFactory:
     def create(
         self,
         session: Session,
+        *,
         job_name: str = "tap-gitlab target-postgres",
         state: State = State.SUCCESS,
         run_id: str | None = None,
         log_content: str = "Test log content\nLine 2\nLine 3",
+        duration_seconds: int = 30,
     ) -> Job:
+        now = datetime.now(timezone.utc)
         run_id = run_id or str(uuid.uuid4())
 
         # Create job in database
@@ -43,13 +46,13 @@ class JobFactory:
             job_name=job_name,
             state=state,
             run_id=run_id,
-            started_at=datetime.now(timezone.utc),
+            started_at=now,
         )
 
         if state in (State.SUCCESS, State.FAIL):
-            job.ended_at = datetime.now(timezone.utc)
+            job.ended_at = now + timedelta(seconds=duration_seconds)
 
-        job.save(session)
+        saved = job.save(session)
 
         # Create log file
         job_logging_service = JobLoggingService(self.project)
@@ -57,7 +60,7 @@ class JobFactory:
         log_path.parent.mkdir(parents=True, exist_ok=True)
         log_path.write_text(log_content)
 
-        return job
+        return saved
 
 
 @pytest.fixture
@@ -127,9 +130,10 @@ class TestLogsShow:
     ):
         """Test listing available runs for a job."""
         # Create multiple runs with different states
-        job1 = job_factory.create(session, state=State.SUCCESS)
-        job2 = job_factory.create(session, state=State.FAIL)
-        job3 = job_factory.create(session, state=State.RUNNING)
+        job1 = job_factory.create(session, state=State.SUCCESS, duration_seconds=5400)
+        job2 = job_factory.create(session, state=State.FAIL, duration_seconds=300)
+        job3 = job_factory.create(session, state=State.RUNNING, duration_seconds=5400)
+        _ = job_factory.create(session, state=State.IDLE)
 
         with mock.patch(
             "meltano.cli.logs.project_engine",
@@ -234,6 +238,7 @@ class TestLogsShow:
         assert result.exit_code == 0
         assert "No job runs found." in result.output
 
+    @pytest.mark.usefixtures("project")
     def test_missing_run_id(self, cli_runner: MeltanoCliRunner):
         """Test error when specific run ID is not found."""
         fake_run_id = str(uuid.uuid4())
