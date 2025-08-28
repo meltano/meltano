@@ -7,6 +7,8 @@ import typing as t
 
 import click
 import structlog
+from rich.console import Console
+from rich.table import Column, Table
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -199,16 +201,15 @@ def list_logs(
                 ]
                 click.echo(json.dumps({"runs": runs, "total": len(runs)}, indent=2))
             else:
-                # Text table format
-                click.echo(f"Recent job runs (showing {len(jobs)} of last {limit}):\n")
-
-                # Header
-                header = (
-                    f"{'STATUS':<8} {'LOG ID':<36} {'JOB NAME':<30} "
-                    f"{'STARTED':<20} {'DURATION':<10} {'TRIGGER':<10}"
+                table = Table(
+                    Column("STATUS", style="bold"),
+                    Column("LOG ID", style="bold", min_width=36),
+                    Column("JOB NAME", style="bold", max_width=50),
+                    Column("STARTED", style="bold"),
+                    Column("DURATION", style="bold"),
+                    Column("TRIGGER", style="bold"),
+                    title=f"Recent job runs (showing {len(jobs)} of last {limit})",
                 )
-                click.echo(header)
-                click.echo("-" * len(header))
 
                 for job in jobs:
                     # Status indicator
@@ -238,21 +239,20 @@ def list_logs(
                             "running" if job.state == State.RUNNING else "unknown"
                         )
 
-                    # Truncate job name if too long
-                    job_display = (
-                        job.job_name[:27] + "..."
-                        if len(job.job_name) > 30
-                        else job.job_name
-                    )
-
                     # Format started time
                     started = job.started_at.strftime("%Y-%m-%d %H:%M:%S")
                     trigger = job.trigger or "manual"
-                    click.echo(
-                        f"{status:<8} {job.run_id!s:<36} {job_display:<30} "
-                        f"{started:<20} {duration:<10} {trigger:<10}"
+                    table.add_row(
+                        status,
+                        str(job.run_id),
+                        job.job_name,
+                        started,
+                        duration,
+                        trigger,
                     )
 
+                console = Console()
+                console.print(table)
                 click.echo("\nUse 'meltano logs show <LOG_ID>' to view a specific log.")
 
     except Exception as e:  # pragma: no cover
@@ -354,7 +354,7 @@ def show_log(
                 return
 
             click.echo("Log content:")
-            click.echo("-" * 40)
+            click.echo("-" * 12)
             with log_file_path.open("r") as f:
                 for line in f:
                     click.echo(line, nl=False)
