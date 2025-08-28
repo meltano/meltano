@@ -221,6 +221,7 @@ class TestLogsShow:
         assert isinstance(exc, CliError)
         assert f"Log file not found for job run '{job.run_id}'" in exc.args[0]
 
+    @pytest.mark.usefixtures("project")
     def test_no_runs_found(
         self,
         cli_runner: MeltanoCliRunner,
