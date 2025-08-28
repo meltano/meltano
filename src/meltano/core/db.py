@@ -65,7 +65,7 @@ def project_engine(
     project: Project,
     *,
     default: bool = False,
-) -> tuple[Engine, sessionmaker]:
+) -> tuple[Engine, sessionmaker[Session]]:
     """Create and register a SQLAlchemy engine for a Meltano project instance.
 
     Args:
