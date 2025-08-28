@@ -177,11 +177,13 @@ class TestLogsShow:
         run_ids = [run["log_id"] for run in data["runs"]]
         assert str(job.run_id) in run_ids
 
+    @pytest.mark.parametrize("tail", (5, 100, 200))
     def test_tail_option(
         self,
         session: Session,
         cli_runner: MeltanoCliRunner,
         job_factory: JobFactory,
+        tail: int,
     ):
         """Test showing last N lines with --tail."""
         log_content = "\n".join([f"Line {i}" for i in range(1, 101)])
@@ -192,16 +194,18 @@ class TestLogsShow:
             return_value=(None, lambda: session),
         ):
             result = cli_runner.invoke(
-                cli, ["logs", "show", str(job.run_id), "--tail", "5"]
+                cli,
+                ["logs", "show", str(job.run_id), "--tail", str(tail)],
             )
 
         assert result.exit_code == 0
-        assert "Line 96" in result.output
-        assert "Line 97" in result.output
-        assert "Line 98" in result.output
-        assert "Line 99" in result.output
-        assert "Line 100" in result.output
-        assert "Line 95" not in result.output
+
+        first_idx = max(100 - tail + 1, 1)
+        lines_present = [f"Line {i}" for i in range(first_idx, 100)]
+        lines_not_present = [f"Line {i}" for i in range(1, first_idx)]
+        log_lines = result.output.splitlines()
+        assert all(line in log_lines for line in lines_present)
+        assert all(line not in log_lines for line in lines_not_present)
 
     def test_no_logs_found(
         self,
