@@ -130,8 +130,8 @@ class TestLogsShow:
     ):
         """Test listing available runs for a job."""
         # Create multiple runs with different states
-        job1 = job_factory.create(session, state=State.SUCCESS, duration_seconds=5400)
-        job2 = job_factory.create(session, state=State.FAIL, duration_seconds=300)
+        job1 = job_factory.create(session, state=State.SUCCESS, duration_seconds=300)
+        job2 = job_factory.create(session, state=State.FAIL, duration_seconds=5)
         job3 = job_factory.create(session, state=State.RUNNING, duration_seconds=5400)
         _ = job_factory.create(session, state=State.IDLE)
 
