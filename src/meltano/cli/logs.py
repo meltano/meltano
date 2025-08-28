@@ -355,7 +355,7 @@ def show_log(
 
             click.echo("Log content:")
             click.echo("-" * 12)
-            with log_file_path.open("r") as f:
+            with log_file_path.open("r", encoding="utf-8", errors="replace") as f:
                 for line in f:
                     click.echo(line, nl=False)
 
