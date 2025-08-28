@@ -131,8 +131,9 @@ class TestLogsShow:
         """Test listing available runs for a job."""
         # Create multiple runs with different states
         job1 = job_factory.create(session, state=State.SUCCESS, duration_seconds=300)
-        job2 = job_factory.create(session, state=State.FAIL, duration_seconds=5)
-        job3 = job_factory.create(session, state=State.RUNNING, duration_seconds=5400)
+        job2 = job_factory.create(session, state=State.SUCCESS, duration_seconds=5400)
+        job3 = job_factory.create(session, state=State.FAIL, duration_seconds=5)
+        job4 = job_factory.create(session, state=State.RUNNING)
         _ = job_factory.create(session, state=State.IDLE)
 
         with mock.patch(
@@ -146,9 +147,10 @@ class TestLogsShow:
         assert str(job1.run_id) in result.output
         assert str(job2.run_id) in result.output
         assert str(job3.run_id) in result.output
-        assert "✓" in result.output  # Success marker
-        assert "✗" in result.output  # Fail marker
-        assert "→" in result.output  # Running marker
+        assert str(job4.run_id) in result.output
+        assert result.output.count("✓") == 2  # Success marker
+        assert result.output.count("✗") == 1  # Fail marker
+        assert result.output.count("→") == 1  # Running marker
 
     def test_list_runs_json_format(
         self,
