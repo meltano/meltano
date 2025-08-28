@@ -31,7 +31,7 @@ The logs command provides options for viewing partial logs with `--tail`, output
 
 ## Configuring Logging
 
-Logging in meltano can also be controlled in more detail via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
+Logging in Meltano can also be controlled in more detail via a standard YAML-formatted Python logging dict config file ([configuration dictionary schema](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema)).
 
 By default, meltano will look for this in a `logging.yaml` file in the project root. Both `.yaml` and `.yml` file extensions are supported. However, you can override this by
 setting the [environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or by using the
