@@ -51,8 +51,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
 
         while len(lines_found) < lines and file_length > 0:
             # Calculate how much to read
-            if file_length < block_size:
-                block_size = file_length
+            block_size = min(block_size, file_length)
 
             # Read block
             f.seek(file_length - block_size)
@@ -63,8 +62,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
             lines_found = all_content.split(b"\n")
 
             # Remove empty line at end if file ends with newline
-            if lines_found and not lines_found[-1]:
-                lines_found = lines_found[:-1]
+            lines_found = lines_found[:-1] if not lines_found[-1] else lines_found
 
             file_length -= block_size
 
