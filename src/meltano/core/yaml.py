@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import os
 import sys
 import typing as t
 import uuid
+from copy import deepcopy
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
@@ -14,11 +16,10 @@ from ruamel.yaml import YAML
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
 from meltano.core.setting_definition import SettingKind
-from meltano.core.utils import hash_sha256
+from meltano.core.user_config import UserConfigReadError, get_user_config_service
+from meltano.core.utils import hash_sha256, truthy
 
 if t.TYPE_CHECKING:
-    import os
-
     from ruamel.yaml import CommentedMap, Dumper, ScalarNode
 
 yaml = YAML()
@@ -79,6 +80,85 @@ def load(path: os.PathLike[str]) -> CommentedMap:
     return parsed
 
 
-# Alias to provide a clean interface when using this
-# module via `from meltano.core import yaml`
-dump = yaml.dump
+def _apply_user_configuration(yaml_instance: YAML) -> None:
+    """Apply user configuration to YAML instance if enabled."""
+    if not truthy(os.getenv("MELTANO_DISABLE_USER_YAML_CONFIG", "false")):
+        try:
+            settings = get_user_config_service().yaml_settings()
+
+            indent = settings.get("indent", 2)
+            indent = indent if isinstance(indent, int) else 2
+
+            block_seq_indent = settings.get("block_seq_indent", 0)
+            block_seq_indent = (
+                block_seq_indent if isinstance(block_seq_indent, int) else 0
+            )
+
+            sequence_dash_offset = settings.get("sequence_dash_offset")
+            sequence_dash_offset = (
+                sequence_dash_offset
+                if isinstance(sequence_dash_offset, int)
+                else max(0, indent - 2)
+            )
+
+            yaml_instance.indent(
+                mapping=indent,
+                sequence=indent + block_seq_indent,
+                offset=sequence_dash_offset,
+            )
+
+            for key, value in settings.items():
+                if key not in {
+                    "indent",
+                    "block_seq_indent",
+                    "sequence_dash_offset",
+                } and hasattr(yaml_instance, key):
+                    setattr(yaml_instance, key, value)
+        except UserConfigReadError:
+            pass
+
+
+def _create_configured_yaml_instance() -> YAML:
+    """Create a YAML instance with user configuration applied.
+
+    Returns:
+        A configured YAML instance.
+    """
+    yaml_instance = YAML()
+    yaml_instance.default_flow_style = False
+    yaml_instance.width = yaml.width
+
+    yaml_instance.representer.yaml_representers = deepcopy(
+        yaml.representer.yaml_representers
+    )
+    yaml_instance.representer.yaml_multi_representers = deepcopy(
+        yaml.representer.yaml_multi_representers
+    )
+
+    _apply_user_configuration(yaml_instance)
+
+    return yaml_instance
+
+
+def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str | None:
+    """Dump YAML with user-configured formatting.
+
+    Args:
+        data: The data to dump.
+        stream: The stream to dump to. If None, returns YAML as string.
+        **kwargs: Additional keyword arguments passed to yaml.dump.
+
+    Returns:
+        YAML string if stream is None, otherwise None.
+    """
+    yaml_instance = _create_configured_yaml_instance()
+
+    if stream is None:
+        from io import StringIO
+
+        stream = StringIO()
+        yaml_instance.dump(data, stream, **kwargs)
+        return stream.getvalue()
+
+    yaml_instance.dump(data, stream, **kwargs)
+    return None
