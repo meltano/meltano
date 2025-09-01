@@ -260,7 +260,12 @@ version_files = [
 
 [tool.mypy]
 check_untyped_defs = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+enable_error_code = [
+  "ignore-without-code",
+  "redundant-expr",
+  "truthy-bool",
+  "exhaustive-match",
+]
 incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
 files = [
   "src/meltano/",

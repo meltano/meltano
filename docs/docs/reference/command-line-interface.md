@@ -1025,6 +1025,80 @@ meltano lock --all --update
 
 The `lock` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
+## `logs`
+
+`meltano logs` provides utilities for viewing job logs. This is the CLI equivalent to the "Job Log" modal in the Meltano UI.
+
+### `list`
+
+`meltano logs list` shows a table of recent job runs with their metadata, including run ID, job name, status, timing, and duration.
+
+### `show`
+
+`meltano logs show <log_id>` displays the log content for a specific job run, identified by its log ID (run UUID).
+
+### How to use
+
+```bash
+# List recent job runs (shows 10 by default)
+meltano logs list
+
+# List more runs
+meltano logs list --limit 25
+
+# List runs in JSON format
+meltano logs list --format json
+
+# Show log content for a specific run
+meltano logs show <log_id>
+
+# Show only the last N lines
+meltano logs show <log_id> --tail 50
+
+# Show job metadata in JSON format
+meltano logs show <log_id> --format json
+```
+
+### Examples
+
+```bash
+# List recent job runs to see available logs
+meltano logs list
+
+# Show log for a specific run (get log_id from list command)
+meltano logs show 550e8400-e29b-41d4-a716-446655440000
+
+# Show last 50 lines of a log
+meltano logs show 550e8400-e29b-41d4-a716-446655440000 --tail 50
+
+# List recent runs in JSON format for programmatic use
+meltano logs list --format json
+```
+
+### Options for `list`
+
+- `--limit` / `-l` - Number of recent runs to show (default: 10)
+- `--format` - Output format (`text` or `json`)
+
+### Options for `show`
+
+- `--tail` / `-n` - Show only the last N lines of the log
+- `--format` - Output format for job metadata (`text` or `json`)
+
+### Workflow
+
+1. Use `meltano logs list` to see recent job runs and their status
+2. Copy the LOG ID of the run you want to investigate
+3. Use `meltano logs show <log_id>` to view the full log content
+
+### Notes
+
+- Log IDs are UUIDs that uniquely identify each job run
+- The list command shows runs in chronological order (most recent first)
+- Status indicators: ✓ PASS (success), ✗ FAIL (failed), → RUN (running)
+- Large log files (>2MB) will prompt for confirmation before displaying
+- Logs are stored in `.meltano/logs/elt/<state_id>/<run_id>/elt.log`
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) from your Meltano [project](/concepts/project).
