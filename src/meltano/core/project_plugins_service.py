@@ -304,6 +304,9 @@ class ProjectPluginsService:  # (too many methods, attributes)
                 f"ignoring `@{profile_name}` in plugin name.",
             )
 
+        found_plugin = None
+        found_mapping = None
+
         for plugin in self.plugins(ensure_parent=False):
             if (
                 plugin.name == plugin_name  # (with too much logic)
@@ -317,12 +320,22 @@ class ProjectPluginsService:  # (too many methods, attributes)
                     or self.ensure_parent(plugin).is_configurable() == configurable
                 )
             ):
-                return self.ensure_parent(plugin)
+                found_plugin = self.ensure_parent(plugin)
 
             if plugin.type == PluginType.MAPPERS:
                 mapping = self._find_mapping(plugin_name, plugin)
                 if mapping:
-                    return mapping
+                    found_mapping = mapping
+
+        # Check for collision between mapper plugin name and mapping name
+        if found_plugin and found_mapping and found_plugin.type == PluginType.MAPPERS:
+            raise AmbiguousMappingName(plugin_name)
+
+        # Return the found plugin or mapping
+        if found_plugin:
+            return found_plugin
+        if found_mapping:
+            return found_mapping
         raise PluginNotFoundError(
             PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
         )
