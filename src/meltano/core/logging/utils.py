@@ -103,75 +103,74 @@ def default_config(
     max_frames = 100 if log_level == "DEBUG" else 2
     foreign_pre_chain = get_default_foreign_pre_chain()
 
-    if log_format == LogFormat.colored:
-        no_color = get_no_color_flag()
+    match log_format:
+        case LogFormat.colored:
+            no_color = get_no_color_flag()
 
-        if no_color:
-            formatter = rich_exception_formatter_factory(
-                no_color=True,
-                max_frames=max_frames,
-            )
-        else:
-            formatter = rich_exception_formatter_factory(
-                color_system="truecolor",
-                max_frames=max_frames,
-            )
-        formatter_config = {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(
-                colors=not no_color,
-                exception_formatter=formatter,
-            ),
-            "foreign_pre_chain": foreign_pre_chain,
-        }
-
-    elif log_format == LogFormat.json:
-        formatter_config = {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processors": [
-                structlog.processors.dict_tracebacks,
-                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                structlog.processors.JSONRenderer(),
-            ],
-            "foreign_pre_chain": foreign_pre_chain,
-        }
-    elif log_format == LogFormat.key_value:
-        formatter_config = {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.KeyValueRenderer(
-                key_order=["timestamp", "level", "event", "logger"],
-            ),
-            "foreign_pre_chain": foreign_pre_chain,
-        }
-    elif log_format == LogFormat.uncolored:
-        formatter_config = {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.dev.ConsoleRenderer(
-                colors=False,
-                exception_formatter=rich_exception_formatter_factory(
+            if no_color:
+                formatter = rich_exception_formatter_factory(
                     no_color=True,
                     max_frames=max_frames,
+                )
+            else:
+                formatter = rich_exception_formatter_factory(
+                    color_system="truecolor",
+                    max_frames=max_frames,
+                )
+            formatter_config = {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=not no_color,
+                    exception_formatter=formatter,
                 ),
-            ),
-            "foreign_pre_chain": foreign_pre_chain,
-        }
-    elif log_format == LogFormat.plain:
-        formatter_config = {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processors": [
-                structlog.stdlib.filter_by_level,
-                structlog.stdlib.add_logger_name,
-                structlog.stdlib.add_log_level,
-                structlog.stdlib.PositionalArgumentsFormatter(),
-                structlog.processors.StackInfoRenderer(),
-                structlog.processors.format_exc_info,
-                structlog.processors.UnicodeDecoder(),
-                lambda _logger, _name, event_dict: event_dict["event"],
-            ],
-            "foreign_pre_chain": foreign_pre_chain,
-        }
-    else:
-        t.assert_never(log_format)
+                "foreign_pre_chain": foreign_pre_chain,
+            }
+
+        case LogFormat.json:
+            formatter_config = {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processors": [
+                    structlog.processors.dict_tracebacks,
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.JSONRenderer(),
+                ],
+                "foreign_pre_chain": foreign_pre_chain,
+            }
+        case LogFormat.key_value:
+            formatter_config = {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.KeyValueRenderer(
+                    key_order=["timestamp", "level", "event", "logger"],
+                ),
+                "foreign_pre_chain": foreign_pre_chain,
+            }
+        case LogFormat.uncolored:
+            formatter_config = {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(
+                    colors=False,
+                    exception_formatter=rich_exception_formatter_factory(
+                        no_color=True,
+                        max_frames=max_frames,
+                    ),
+                ),
+                "foreign_pre_chain": foreign_pre_chain,
+            }
+        case LogFormat.plain:
+            formatter_config = {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processors": [
+                    structlog.stdlib.filter_by_level,
+                    structlog.stdlib.add_logger_name,
+                    structlog.stdlib.add_log_level,
+                    structlog.stdlib.PositionalArgumentsFormatter(),
+                    structlog.processors.StackInfoRenderer(),
+                    structlog.processors.format_exc_info,
+                    structlog.processors.UnicodeDecoder(),
+                    lambda _logger, _name, event_dict: event_dict["event"],
+                ],
+                "foreign_pre_chain": foreign_pre_chain,
+            }
 
     return {
         "version": 1,

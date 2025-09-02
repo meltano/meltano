@@ -27,20 +27,18 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 
 def selection_color(selection: SelectionType) -> str:
     """Return the appropriate colour for given SelectionType."""
-    # TODO: Use a match statement when we drop Python 3.9 support
-    if selection is SelectionType.SELECTED:
-        return "bright_green"
-    if selection is SelectionType.AUTOMATIC:
-        return "bright_white"
-    if selection is SelectionType.EXCLUDED:
-        return "red"
-    if selection is SelectionType.UNSUPPORTED:
-        return "black"
-
-    t.assert_never(selection)
+    match selection:
+        case SelectionType.SELECTED:
+            return "bright_green"
+        case SelectionType.AUTOMATIC:
+            return "bright_white"
+        case SelectionType.EXCLUDED:
+            return "red"
+        case SelectionType.UNSUPPORTED:
+            return "black"
 
 
-def selection_mark(selection) -> str:  # noqa: ANN001
+def selection_mark(selection: SelectionType) -> str:
     """Return the mark to indicate the selection type of an attribute.
 
     Examples:
