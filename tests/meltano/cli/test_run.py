@@ -18,6 +18,7 @@ from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import (
     AmbiguousMappingName,
+    MapperMappingNameCollision,
     PluginAlreadyAddedException,
 )
 
@@ -1145,10 +1146,8 @@ class TestCliRunScratchpadOne:
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
-                AmbiguousMappingName,
-                match=(
-                    "Ambiguous mapping name mapper-collision, found multiple matches."
-                ),
+                MapperMappingNameCollision,
+                match=r"Name collision: 'mapper-collision' is used as both.*mapper",
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
@@ -1224,9 +1223,7 @@ class TestCliRunScratchpadOne:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 AmbiguousMappingName,
-                match=(
-                    "Ambiguous mapping name mock-mapping-dupe, found multiple matches."
-                ),
+                match=r"Ambiguous mapping name 'mock-mapping-dupe'.*multiple matches",
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
