@@ -77,14 +77,15 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    if flags == AddedPluginFlags.ADDED:
-        action, preposition = "Added", "to"
-    elif flags == AddedPluginFlags.UPDATED:
-        action, preposition = "Updated", "in"
-    elif flags == AddedPluginFlags.NOT_ADDED:
-        action, preposition = "Initialized", "in"
-    else:  # pragma: no cover
-        t.assert_never(flags)
+    match flags:
+        case AddedPluginFlags.ADDED:
+            action, preposition = "Added", "to"
+        case AddedPluginFlags.UPDATED:
+            action, preposition = "Updated", "in"
+        case AddedPluginFlags.NOT_ADDED:
+            action, preposition = "Initialized", "in"
+        case _:  # pragma: no cover
+            t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",

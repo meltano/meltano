@@ -1032,7 +1032,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp", marker = "python_full_version < '3.13'" },
+    { name = "zipp" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
@@ -1264,10 +1264,12 @@ coverage = [
     { name = "coverage", extra = ["toml"] },
 ]
 dev = [
+    { name = "backports-strenum" },
     { name = "boto3-stubs", extra = ["essential"] },
     { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
     { name = "faker" },
+    { name = "importlib-metadata" },
     { name = "moto" },
     { name = "mypy" },
     { name = "pytest" },
@@ -1310,10 +1312,12 @@ testing = [
     { name = "time-machine" },
 ]
 typing = [
+    { name = "backports-strenum" },
     { name = "boto3-stubs", extra = ["essential"] },
     { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
     { name = "faker" },
+    { name = "importlib-metadata" },
     { name = "moto" },
     { name = "mypy" },
     { name = "pytest" },
@@ -1383,10 +1387,12 @@ provides-extras = ["azure", "containers", "gcs", "mssql", "postgres", "psycopg2"
 [package.metadata.requires-dev]
 coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.10" }]
 dev = [
+    { name = "backports-strenum" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.39" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "faker", specifier = ">=37.4.2" },
+    { name = "importlib-metadata" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.16.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
@@ -1427,10 +1433,12 @@ testing = [
     { name = "time-machine", specifier = ">=2.15.0,<3" },
 ]
 typing = [
+    { name = "backports-strenum" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.39" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "faker", specifier = ">=37.4.2" },
+    { name = "importlib-metadata" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.16.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },

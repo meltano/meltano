@@ -142,7 +142,9 @@ testing = [
 ]
 typing = [
   { include-group = "testing" },
+  "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
   "boto3-stubs[essential]>=1.35,<1.39",
+  "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=1.16.0,<2",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
