@@ -170,37 +170,37 @@ class TestSingerRunner:
         (
             pytest.param(
                 True,
-                StateStrategy.AUTO,
+                StateStrategy.auto,
                 Payload.INCOMPLETE_STATE,
                 id="full-refresh-auto--incomplete-state",
             ),
             pytest.param(
                 False,
-                StateStrategy.AUTO,
+                StateStrategy.auto,
                 Payload.STATE,
                 id="incremental-auto--complete-state",
             ),
             pytest.param(
                 True,
-                StateStrategy.OVERWRITE,
+                StateStrategy.overwrite,
                 Payload.STATE,
                 id="full-refresh-overwrite--complete-state",
             ),
             pytest.param(
                 False,
-                StateStrategy.OVERWRITE,
+                StateStrategy.overwrite,
                 Payload.STATE,
                 id="incremental-overwrite--complete-state",
             ),
             pytest.param(
                 True,
-                StateStrategy.MERGE,
+                StateStrategy.merge,
                 Payload.INCOMPLETE_STATE,
                 id="full-refresh-merge--incomplete-state",
             ),
             pytest.param(
                 False,
-                StateStrategy.MERGE,
+                StateStrategy.merge,
                 Payload.INCOMPLETE_STATE,
                 id="incremental-merge--incomplete-state",
             ),

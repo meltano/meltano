@@ -106,7 +106,7 @@ class ELTContext(ELContextProtocol):
         catalog: str | None = None,
         state: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Initialise ELT Context instance.
@@ -246,7 +246,7 @@ class ELTContextBuilder:
         self._catalog: str | None = None
         self._state: str | None = None
         self._base_output_logger: OutputLogger | None = None
-        self._state_strategy: StateStrategy = StateStrategy.AUTO
+        self._state_strategy: StateStrategy = StateStrategy.auto
 
     def with_session(self, session: Session) -> ELTContextBuilder:
         """Include session when building context.

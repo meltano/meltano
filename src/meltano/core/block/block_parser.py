@@ -80,7 +80,7 @@ class BlockParser:  # noqa: D101
         no_state_update: bool | None = False,
         force: bool | None = False,
         state_id_suffix: str | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Parse a meltano run command invocation into a list of blocks.
