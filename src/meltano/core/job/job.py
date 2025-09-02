@@ -411,7 +411,7 @@ class Job(SystemModel):
         if isinstance(err, SystemExit):
             return "The process was terminated"
 
-        if isinstance(err, (KeyboardInterrupt, asyncio.CancelledError)):
+        if isinstance(err, KeyboardInterrupt | asyncio.CancelledError):
             return "The process was interrupted"
 
         if str(err):

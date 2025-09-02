@@ -22,7 +22,7 @@ from meltano.core.runner import RunnerError
 from .formatters import get_default_foreign_pre_chain
 from .utils import capture_subprocess_output
 
-StrPath: t.TypeAlias = t.Union[str, os.PathLike[str]]
+StrPath: t.TypeAlias = str | os.PathLike[str]
 
 
 class OutputLogger:

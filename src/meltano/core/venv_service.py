@@ -39,7 +39,7 @@ else:
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
+StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[str | None]]
 
 
 @cache

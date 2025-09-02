@@ -141,6 +141,7 @@ testing = [
   "time-machine>=2.15.0,<3",
 ]
 typing = [
+  { include-group = "testing" },
   "boto3-stubs[essential]>=1.35,<1.39",
   "mypy>=1.16.0,<2",
   "types-dateparser>=1.2.0.20250208",
@@ -324,7 +325,7 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 ignore = [
