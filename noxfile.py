@@ -105,6 +105,7 @@ def pytest_meltano(session: nox.Session) -> None:
     session.run_install(
         *UV_SYNC_COMMAND,
         "--group=testing",
+        "--all-packages",
         *(f"--extra={extra}" for extra in extras),
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )

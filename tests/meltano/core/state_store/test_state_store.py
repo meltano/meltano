@@ -15,6 +15,9 @@ from azure.storage.blob._shared.authentication import (
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import NotFound
 from google.cloud.storage import Blob
+from meltano_state_backend_azure import AZStorageStateStoreManager
+from meltano_state_backend_gcs import GCSStateStoreManager
+from meltano_state_backend_s3 import S3StateStoreManager
 
 from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
@@ -25,10 +28,7 @@ from meltano.core.state_store import (
     StateBackend,
     state_store_manager_from_project_settings,
 )
-from meltano.core.state_store.azure import AZStorageStateStoreManager
 from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
-from meltano.core.state_store.google import GCSStateStoreManager
-from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from pathlib import Path

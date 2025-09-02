@@ -1,0 +1,26 @@
+[project]
+name = "meltano-state-backend-azure"
+version = "0.1.0"
+description = "Azure Blob Storage state backend for Meltano"
+readme = "README.md"
+authors = [
+    { name = "Meltano", email = "hello@meltano.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+  "azure-storage-blob>=12.24.0,<13",
+  "azure-common>=1.1.28,<2",
+  "azure-core>=1.32.0,<2",
+  "azure-identity>=1.19.0,<2",
+]
+
+[project.entry-points."meltano.settings"]
+azure_connection_string = "meltano_state_backend_azure:CONNECTION_STRING"
+azure_storage_account_url = "meltano_state_backend_azure:STORAGE_ACCOUNT_URL"
+
+[project.entry-points."meltano.state_backends"]
+azure = "meltano_state_backend_azure:AZStorageStateStoreManager"
+
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"

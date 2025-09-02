@@ -25,15 +25,15 @@ from azure.storage.blob._models import BlobProperties
 from boto3 import client
 from botocore.stub import Stubber
 from google.cloud.storage import Blob, Bucket
+from meltano_state_backend_azure import AZStorageStateStoreManager
+from meltano_state_backend_gcs import GCSStateStoreManager
+from meltano_state_backend_s3 import S3StateStoreManager
 
 from meltano.core.state_store import MeltanoState
-from meltano.core.state_store.azure import AZStorageStateStoreManager
 from meltano.core.state_store.filesystem import (
     _LocalFilesystemStateStoreManager,
     _WindowsFilesystemStateStoreManager,
 )
-from meltano.core.state_store.google import GCSStateStoreManager
-from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -334,7 +334,7 @@ class TestAZStorageStateStoreManager:
     @pytest.fixture
     def mock_client(self):
         with patch(
-            "meltano.core.state_store.azure.BlobServiceClient",
+            "meltano_state_backend_azure.BlobServiceClient",
         ) as mock_client:
             yield mock_client
 
@@ -413,7 +413,7 @@ class TestS3StateStoreManager:
     @contextmanager
     def stubber(self) -> Iterator[Stubber]:
         with patch(
-            "meltano.core.state_store.s3.S3StateStoreManager.client",
+            "meltano_state_backend_s3.S3StateStoreManager.client",
             new_callable=PropertyMock,
         ) as mock_client:
             mock_client.return_value = client("s3")

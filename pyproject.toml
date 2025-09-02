@@ -61,20 +61,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-azure = [
-  "azure-storage-blob>=12.24.0,<13",
-  "azure-common>=1.1.28,<2",
-  "azure-core>=1.32.0,<2",
-  "azure-identity>=1.19.0,<2",
-]
+azure = ["meltano-state-backend-azure"]
 containers = [
   "aiodocker>=0.24.0,<0.25",
 ]
-gcs = ["google-cloud-storage>=1.31.0"]
+gcs = ["meltano-state-backend-gcs"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
-s3 = ["boto3>=1.35,<1.41"]
+s3 = ["meltano-state-backend-s3"]
 
 [project.urls]
 Homepage = "https://meltano.com"
@@ -89,27 +84,11 @@ Youtube = "https://www.youtube.com/meltano"
 [project.scripts]
 meltano = "meltano.cli:main"
 
-[project.entry-points."meltano.settings"]
-# AWS S3 state backend settings
-s3_aws_access_key_id = "meltano.core.state_store.s3:AWS_ACCESS_KEY_ID"
-s3_aws_secret_access_key = "meltano.core.state_store.s3:AWS_SECRET_ACCESS_KEY"
-s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
-# Azure state backend settings
-azure_connection_string = "meltano.core.state_store.azure:CONNECTION_STRING"
-azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
-# Google Cloud Storage state backend settings
-google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"  # Deprecated! Remove in Meltano v4
-google_application_credentials_path = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_PATH"
-google_application_credentials_json = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_JSON"
-
 [project.entry-points."meltano.state_backends"]
 # These keys should match the expected scheme for URIs of
 # the given type. E.g., filesystem state backends have a
 # file://<path>/<to>/<state directory> URI
-azure = "meltano.core.state_store.azure:AZStorageStateStoreManager"
 file = "meltano.core.state_store.filesystem:LocalFilesystemStateStoreManager"
-gs = "meltano.core.state_store.google:GCSStateStoreManager"
-s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
@@ -143,7 +122,6 @@ testing = [
 typing = [
   { include-group = "testing" },
   "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
-  "boto3-stubs[essential]>=1.35,<1.39",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=1.16.0,<2",
   "types-dateparser>=1.2.0.20250208",
@@ -434,3 +412,13 @@ ignore = [
 
 [tool.uv]
 required-version = ">=0.6.15"
+
+[tool.uv.sources]
+meltano-state-backend-azure = { workspace = true }
+meltano-state-backend-gcs = { workspace = true }
+meltano-state-backend-s3 = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+  "packages/*",
+]
