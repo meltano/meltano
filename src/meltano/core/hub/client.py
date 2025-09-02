@@ -7,6 +7,7 @@ from http import HTTPStatus
 
 import click
 import requests
+import requests.exceptions
 from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry

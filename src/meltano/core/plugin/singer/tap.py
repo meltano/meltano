@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
 import inspect
 import json
 import logging
@@ -40,7 +41,10 @@ if t.TYPE_CHECKING:
     from asyncio.streams import StreamReader
     from pathlib import Path
 
+    from sqlalchemy.orm import Session
+
     from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -157,7 +161,7 @@ def config_schema_rules(config: dict[str, t.Any]) -> list[SchemaRule]:
     return [
         SchemaRule(
             tap_stream_id=tap_stream_id,
-            breadcrumb=["properties", prop],
+            breadcrumb=property_breadcrumb([prop]),
             payload=payload,
         )
         for tap_stream_id, stream_config in config.items()
@@ -289,15 +293,12 @@ class SingerTap(SingerPlugin):
                 incremental state
         """
         if "state" not in plugin_invoker.capabilities:
-            raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support incremental state",  # noqa: EM102
-            )
+            msg = f"Extractor '{self.name}' does not support incremental state"
+            raise PluginLacksCapabilityError(msg)
 
         state_path = plugin_invoker.files["state"]
+        state_path.unlink(missing_ok=True)
 
-        with suppress(FileNotFoundError):
-            # Delete state left over from different pipeline run for same extractor
-            state_path.unlink()
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -318,20 +319,44 @@ class SingerTap(SingerPlugin):
             try:
                 shutil.copy(custom_state_path, state_path)
             except FileNotFoundError as err:
-                raise PluginExecutionError(
-                    f"Could not find state file {custom_state_path}",  # noqa: EM102
-                ) from err
+                msg = f"Could not find state file {custom_state_path}"
+                raise PluginExecutionError(msg) from err
 
-            logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
+            logger.info("Found state in %s", custom_state_filename)
             return
 
         # the `state.json` is stored in a state backend
-        state_service = StateService(
+        if state := self.get_singer_state(
             project=elt_context.project,
-            session=elt_context.session,
-        )
+            session=elt_context.session,  # type: ignore[arg-type]
+            job_name=elt_context.job.job_name,
+        ):
+            async with await anyio.open_file(state_path, "w") as state_file:
+                content = json.dumps(state, indent=2)
+                await state_file.write(content)
+        else:
+            logger.warning("No state was found, complete import.")
+
+    def get_singer_state(
+        self,
+        *,
+        project: Project,
+        session: Session,
+        job_name: str,
+    ) -> dict | None:
+        """Get the state for the given job.
+
+        Args:
+            project: the project
+            session: the session
+            job_name: the job name
+
+        Returns:
+            the state for the given job
+        """
+        state_service = StateService(project=project, session=session)
         try:
-            state = state_service.get_state(elt_context.job.job_name)
+            state = state_service.get_state(job_name)
         except Exception as err:  # pragma: no cover
             logger.error(
                 err.args[0],
@@ -340,13 +365,7 @@ class SingerTap(SingerPlugin):
             msg = "Failed to retrieve state"
             raise PluginExecutionError(msg) from err
 
-        if state:
-            if state.get(SINGER_STATE_KEY):
-                async with await anyio.open_file(state_path, "w") as state_file:
-                    content = json.dumps(state.get(SINGER_STATE_KEY), indent=2)
-                    await state_file.write(content)
-        else:
-            logger.warning("No state was found, complete import.")
+        return state.get(SINGER_STATE_KEY)
 
     @hook("before_invoke")
     async def discover_catalog_hook(

@@ -7,11 +7,10 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
-    PluginTypeArg,
     validate_plugin_type_args,
 )
 from meltano.core.block.block_parser import BlockParser

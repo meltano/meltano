@@ -26,22 +26,20 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeAlias
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
 else:
-    from typing import TypeAlias  # noqa: ICN003
+    from typing_extensions import Self
 
-if sys.version_info < (3, 12):
-    from typing_extensions import override
-else:
+if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
-
-_T = t.TypeVar("_T", bound="VenvService")
+else:
+    from typing_extensions import override
 
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
+StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[str | None]]
 
 
 @cache
@@ -303,7 +301,7 @@ class VenvService:
         ).resolve()
 
     @classmethod
-    def from_plugin(cls: type[_T], project: Project, plugin: ProjectPlugin) -> _T:
+    def from_plugin(cls, project: Project, plugin: ProjectPlugin) -> Self:
         """Create a service instance from a project and plugin.
 
         Args:

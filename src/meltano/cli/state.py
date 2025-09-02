@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import json.decoder
 import re
 import typing as t
 from datetime import datetime as dt

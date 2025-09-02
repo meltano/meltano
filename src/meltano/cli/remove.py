@@ -6,10 +6,9 @@ import typing as t
 
 import click
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import (
     InstrumentedCmd,
-    PluginTypeArg,
     infer_plugin_type,
     validate_plugin_type_args,
 )

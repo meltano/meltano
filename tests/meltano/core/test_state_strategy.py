@@ -12,43 +12,43 @@ class TestStateStrategy:
         assert (
             StateStrategy.from_cli_args(
                 merge_state=True,
-                state_strategy=StateStrategy.AUTO.value,
+                state_strategy=StateStrategy.auto.value,
             )
-            is StateStrategy.MERGE
+            is StateStrategy.merge
         )
 
         assert (
             StateStrategy.from_cli_args(
                 merge_state=False,
-                state_strategy=StateStrategy.AUTO.value,
+                state_strategy=StateStrategy.auto.value,
             )
-            is StateStrategy.AUTO
+            is StateStrategy.auto
         )
 
         assert (
             StateStrategy.from_cli_args(
                 merge_state=False,
-                state_strategy=StateStrategy.MERGE,
+                state_strategy=StateStrategy.merge,
             )
-            is StateStrategy.MERGE
+            is StateStrategy.merge
         )
 
         assert (
             StateStrategy.from_cli_args(
                 merge_state=False,
-                state_strategy=StateStrategy.OVERWRITE,
+                state_strategy=StateStrategy.overwrite,
             )
-            is StateStrategy.OVERWRITE
+            is StateStrategy.overwrite
         )
 
         with pytest.raises(click.UsageError):
             StateStrategy.from_cli_args(
                 merge_state=True,
-                state_strategy=StateStrategy.MERGE,
+                state_strategy=StateStrategy.merge,
             )
 
         with pytest.raises(click.UsageError):
             StateStrategy.from_cli_args(
                 merge_state=True,
-                state_strategy=StateStrategy.OVERWRITE,
+                state_strategy=StateStrategy.overwrite,
             )
