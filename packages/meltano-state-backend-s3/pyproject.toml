@@ -10,6 +10,9 @@ dependencies = [
 ]
 
 [dependency-groups]
+dev = [
+  { include-group = "typing" },
+]
 typing = [
   "boto3-stubs[essential]>=1.35",
 ]
