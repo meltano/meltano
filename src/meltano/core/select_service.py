@@ -83,6 +83,23 @@ class SelectService:  # noqa: D101
 
         return list_all
 
+    def clear(self) -> None:
+        """Clear all select patterns for the extractor."""
+        plugin: ProjectPlugin | EnvironmentPluginConfig
+        if self.project.environment is None:
+            plugin = self.extractor
+            if "select" in plugin.extras:
+                del plugin.extras["select"]
+            self.project.plugins.update_plugin(plugin)
+        else:
+            plugin = self.project.environment.get_plugin_config(
+                self.extractor.type,
+                self.extractor.name,
+            )
+            if "select" in plugin.extras:
+                del plugin.extras["select"]
+            self.project.plugins.update_environment_plugin(plugin)
+
     def update(
         self,
         entities_filter: str,

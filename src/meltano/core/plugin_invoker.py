@@ -20,12 +20,12 @@ from meltano.core.tracking import Tracker
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, uuid7
 from meltano.core.venv_service import VenvService, VirtualEnv
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-    from typing_extensions import Unpack
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
     from typing import Unpack  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Unpack
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator

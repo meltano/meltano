@@ -5,10 +5,10 @@ from __future__ import annotations
 import enum
 import sys
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 
 class InteractionStatus(StrEnum):

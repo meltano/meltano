@@ -64,7 +64,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 )
 @click.option(
     "--log-format",
-    type=click.Choice(tuple(LogFormat)),
+    type=click.Choice(LogFormat),
     help="A shortcut for setting the format of the log output.",
 )
 @click.option(
@@ -85,6 +85,10 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     help="Run Meltano as if it had been started in the specified directory.",
 )
 @click.option(
+    "--env-file",
+    type=click.Path(dir_okay=False, path_type=Path),
+)
+@click.option(
     "--logging-server",
     is_flag=True,
 )
@@ -99,6 +103,7 @@ def cli(
     environment: str,
     no_environment: bool,
     cwd: Path | None,
+    env_file: Path | None,
     logging_server: bool,
 ) -> None:
     """Your CLI for ELT+
@@ -131,7 +136,7 @@ def cli(
             raise Exception(f"Unable to run Meltano from {cwd!r}") from ex  # noqa: EM102
 
     try:
-        project = Project.find()
+        project = Project.find(dotenv_file=env_file)
         setup_logging(project)
         logger.debug(
             "Meltano %s, Python %s, %s (%s)",

@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import copy
 import json
+import sys
 import typing as t
 from functools import lru_cache
 
 import ruamel.yaml as yaml
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
 
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
+
 if t.TYPE_CHECKING:
     from os import PathLike
 
     from ruamel.yaml import Representer
-
-T = t.TypeVar("T", bound="Canonical")  # (name too short)
 
 
 class IdHashBox:
@@ -38,7 +42,7 @@ class IdHashBox:
         """
         return id(self.content)
 
-    def __eq__(self, other: t.Any) -> bool:  # noqa: ANN401
+    def __eq__(self, other: object) -> bool:
         """Check equality of this instance and some other object.
 
         Parameters:
@@ -137,7 +141,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
     @classmethod
     def as_canonical(
-        cls: type[T],
+        cls,
         target: t.Any,  # noqa: ANN401
     ) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
         """Return a canonical representation of the given instance.
@@ -167,9 +171,9 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
                 return as_commented_map
             return as_dict
 
-        if isinstance(target, (list, set, CommentedSet)):
+        if isinstance(target, list | set | CommentedSet):
             as_list = [cls._canonize(val) for val in target]
-            if isinstance(target, (CommentedSet, CommentedSeq)):
+            if isinstance(target, CommentedSet | CommentedSeq):
                 as_commented_seq = CommentedSeq(as_list)
                 target.copy_attributes(as_commented_seq)
                 return as_commented_seq
@@ -185,7 +189,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         """
         return type(self).as_canonical(self)
 
-    def with_attrs(self: T, *args: t.Any, **kwargs: t.Any) -> T:
+    def with_attrs(self, *args: t.Any, **kwargs: t.Any) -> Self:
         """Return a new instance with the given attributes set.
 
         Args:
@@ -198,7 +202,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         return type(self)(*args, **{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls: type[T], obj: t.Any) -> T:  # noqa: ANN401
+    def parse(cls, obj: t.Any) -> Self:  # noqa: ANN401
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
         Args:
@@ -211,7 +215,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
     @classmethod
     @lru_cache(maxsize=CANONICAL_PARSE_CACHE_SIZE)
-    def _parse(cls: type[T], boxed_obj: IdHashBox) -> T:
+    def _parse(cls, boxed_obj: IdHashBox) -> Self:
         """Parse a `Canonical` object from a dictionary or return the instance.
 
         Args:
@@ -421,7 +425,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         )
 
     @classmethod
-    def parse_json_file(cls: type[T], path: PathLike[str]) -> T:
+    def parse_json_file(cls, path: PathLike[str]) -> Self:
         """Parse a plugin definition from a JSON file.
 
         Args:

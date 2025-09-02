@@ -62,7 +62,7 @@ When a plugin is added using `meltano add`, the `pip_url` is automatically repea
 
 In order to support version-specific pip constraint files, the pip_url value can optionally be parameterized using the
 `${MELTANO__PYTHON_VERSION}` variable. This is a special variable populated by Meltano with the specific version of Python used to
-install the plugin and will inject the major and minor versions (e.g. 3.9, 3.10, etc.).
+install the plugin and will inject the major and minor versions (e.g. 3.10, 3.11, etc.).
 
 #### Inheriting plugin definitions
 

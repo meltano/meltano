@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
 import typing as t
 from contextlib import suppress
 

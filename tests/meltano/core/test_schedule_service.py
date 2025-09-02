@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import platform
 import typing as t
-from datetime import date, datetime, timezone
 from unittest import mock
 
 import pytest
@@ -13,12 +11,11 @@ from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.schedule import ELTSchedule, JobSchedule, is_valid_cron
 from meltano.core.schedule_service import (
     BadCronError,
-    Schedule,
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
     ScheduleNotFoundError,
-    SettingMissingError,
 )
+from meltano.core.utils import NotFound
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -67,7 +64,7 @@ def custom_tap(project: Project):
     )
     try:
         return project.plugins.add_to_file(tap)
-    except PluginAlreadyAddedException as err:
+    except PluginAlreadyAddedException as err:  # pragma: no cover
         return err.plugin
 
 
@@ -169,11 +166,6 @@ class TestScheduleService:
         assert excinfo.value.instruction == "Please use a valid cron expression"
 
     def test_remove_schedule(self, subject) -> None:
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
-
         schedules = list(subject.schedules())
         schedules_count = len(schedules)
 
@@ -217,70 +209,8 @@ class TestScheduleService:
         with pytest.raises(ScheduleDoesNotExistError):
             subject.update_schedule(schedule)
 
-    def test_schedule_start_date(
-        self,
-        subject: ScheduleService,
-        session,
-        tap,
-        target,
-        plugin_settings_service_factory,
-    ) -> None:
-        # curry the `add_elt` method to remove some arguments
-        def add_elt(name: str, start_date: str | date | datetime | None) -> Schedule:
-            return subject.add_elt(
-                session,
-                name,
-                tap.name,
-                target.name,
-                "run",
-                "@daily",
-                start_date=start_date,
-            )
-
-        mock_date = datetime(2002, 1, 1, tzinfo=timezone.utc)
-
-        # when a start_date is set, the schedule should use it
-        schedule = add_elt("with_start_date", mock_date)
-        assert schedule.start_date == mock_date
-
-        # or use the start_date in the extractor configuration
-        plugin_settings_service = plugin_settings_service_factory(tap)
-        plugin_settings_service.set("start_date", mock_date, session=session)
-        schedule = add_elt("with_default_start_date", None)
-        assert schedule.start_date == mock_date
-
-        # plugin start_date parsed as datetime.date is coerced to datetime.datetime
-        with mock.patch(
-            "meltano.core.schedule_service.PluginSettingsService.get",
-            return_value=mock_date.date(),
-        ):
-            schedule = add_elt("with_date_start_date", None)
-            assert schedule.start_date == mock_date.replace(tzinfo=None)
-
-        # plugin start_date is a datetime.datetime instance
-        with mock.patch(
-            "meltano.core.schedule_service.PluginSettingsService.get",
-            return_value=mock_date,
-        ):
-            schedule = add_elt("with_datetime_start_date", None)
-            assert schedule.start_date == mock_date
-
-        # or default to `utcnow()` if the plugin exposes no config
-        with mock.patch(
-            "meltano.core.schedule_service.PluginSettingsService.get",
-            side_effect=SettingMissingError("start_date"),
-        ):
-            schedule = add_elt("with_no_start_date", None)
-            assert schedule.start_date
-
-    def test_run_elt_schedule(self, subject, session, tap, target) -> None:
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
-
+    def test_run_elt_schedule(self, subject, tap, target) -> None:
         schedule = subject.add_elt(
-            session,
             "tap-to-target",
             tap.name,
             target.name,
@@ -319,11 +249,6 @@ class TestScheduleService:
 
     @pytest.mark.usefixtures("session", "tap", "target")
     def test_run_job_schedule(self, subject) -> None:
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
-
         schedule = subject.add(
             "mock-job-schedule",
             "mock-job",
@@ -385,3 +310,7 @@ class TestScheduleService:
     def test_find_namespace_schedule_not_found(self, subject) -> None:
         with pytest.raises(ScheduleNotFoundError):
             subject.find_namespace_schedule("no-such-namespace")
+
+    def test_find_schedule_not_found(self, subject) -> None:
+        with pytest.raises(NotFound):
+            subject.find_schedule("no-such-schedule")

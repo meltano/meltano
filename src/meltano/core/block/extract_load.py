@@ -61,7 +61,7 @@ class ELBContext(ELContextProtocol):
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -123,7 +123,7 @@ class ELBContextBuilder:
         self._state_id_suffix = None
         self._env = {}
         self._blocks = []
-        self._state_strategy = StateStrategy.AUTO
+        self._state_strategy = StateStrategy.auto
         self._run_id: uuid.UUID | None = None
 
         self._base_output_logger = None

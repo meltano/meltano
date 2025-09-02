@@ -1,0 +1,288 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-postgres",
+  "namespace": "target_postgres",
+  "variant": "meltanolabs",
+  "label": "Postgres",
+  "docs": "https://hub.meltano.com/loaders/target-postgres--meltanolabs",
+  "repo": "https://github.com/MeltanoLabs/target-postgres",
+  "pip_url": "meltanolabs-target-postgres",
+  "executable": "target-postgres",
+  "description": "PostgreSQL database loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/postgres.png",
+  "capabilities": [
+    "about",
+    "activate-version",
+    "hard-delete",
+    "schema-flattening",
+    "stream-maps"
+  ],
+  "settings_group_validation": [
+    []
+  ],
+  "settings": [
+    {
+      "name": "activate_version",
+      "kind": "boolean",
+      "value": true,
+      "label": "Activate Version",
+      "description": "If set to false, the tap will ignore activate version messages. If set to true, add_record_metadata must be set to true as well."
+    },
+    {
+      "name": "add_record_metadata",
+      "kind": "boolean",
+      "value": true,
+      "label": "Add Record Metadata",
+      "description": "Note that this must be enabled for activate_version to work!This adds _sdc_extracted_at, _sdc_batched_at, and more to every table. See https://sdk.meltano.com/en/latest/implementation/record_metadata.html for more information."
+    },
+    {
+      "name": "batch_size_rows",
+      "kind": "integer",
+      "label": "Batch Size Rows",
+      "description": "Maximum number of rows in each batch."
+    },
+    {
+      "name": "database",
+      "kind": "string",
+      "label": "Database",
+      "description": "Database name."
+    },
+    {
+      "name": "default_target_schema",
+      "kind": "string",
+      "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
+      "label": "Default Target Schema",
+      "description": "Postgres schema to send data to, example: tap-clickup"
+    },
+    {
+      "name": "dialect+driver",
+      "kind": "string",
+      "value": "postgresql+psycopg",
+      "label": "Dialect+Driver",
+      "description": "DEPRECATED. Dialect+driver see https://docs.sqlalchemy.org/en/20/core/engines.html. Generally just leave this alone."
+    },
+    {
+      "name": "faker_config.locale",
+      "kind": "array",
+      "label": "Faker Locale",
+      "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization"
+    },
+    {
+      "name": "faker_config.seed",
+      "kind": "string",
+      "label": "Faker Seed",
+      "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator"
+    },
+    {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Enable Schema Flattening",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Max Flattening Depth",
+      "description": "The max depth to flatten schemas."
+    },
+    {
+      "name": "hard_delete",
+      "kind": "boolean",
+      "value": false,
+      "label": "Hard Delete",
+      "description": "When activate version is sent from a tap this specefies if we should delete the records that don't match, or mark them with a date in the `_sdc_deleted_at` column. This config option is ignored if `activate_version` is set to false."
+    },
+    {
+      "name": "host",
+      "kind": "string",
+      "label": "Host",
+      "description": "Hostname for postgres instance."
+    },
+    {
+      "name": "interpret_content_encoding",
+      "kind": "boolean",
+      "value": false,
+      "label": "Interpret Content Encoding",
+      "description": "If set to true, the target will interpret the content encoding of the schema to determine how to store the data. Using this option may result in a more efficient storage of the data but may also result in an error if the data is not encoded as expected."
+    },
+    {
+      "name": "load_method",
+      "kind": "options",
+      "value": "append-only",
+      "label": "Load Method",
+      "description": "The method to use when loading data into the destination. `append-only` will always write all input records whether that records already exists or not. `upsert` will update existing records and insert new records. `overwrite` will delete all existing records and insert all input records.",
+      "options": [
+        {
+          "label": "Append Only",
+          "value": "append-only"
+        },
+        {
+          "label": "Upsert",
+          "value": "upsert"
+        },
+        {
+          "label": "Overwrite",
+          "value": "overwrite"
+        }
+      ]
+    },
+    {
+      "name": "password",
+      "kind": "string",
+      "label": "Password",
+      "description": "Password used to authenticate.",
+      "sensitive": true
+    },
+    {
+      "name": "port",
+      "kind": "integer",
+      "value": 5432,
+      "label": "Port",
+      "description": "The port on which postgres is awaiting connections."
+    },
+    {
+      "name": "process_activate_version_messages",
+      "kind": "boolean",
+      "value": true,
+      "label": "Process `ACTIVATE_VERSION` messages",
+      "description": "Whether to process `ACTIVATE_VERSION` messages."
+    },
+    {
+      "name": "sanitize_null_text_characters",
+      "kind": "boolean",
+      "value": false,
+      "label": "Sanitize Null Text Characters",
+      "description": "If set to true, the target will sanitize null characters in char/text/varchar fields, as they are not supported by Postgres. See [postgres documentation](https://www.postgresql.org/docs/current/functions-string.html) for more information about chr(0) not being supported."
+    },
+    {
+      "name": "sqlalchemy_url",
+      "kind": "string",
+      "label": "SQLAlchemy URL",
+      "description": "DEPRECATED. SQLAlchemy connection string. This will override using host, user, password, port, dialect, and all ssl settings. Note that you must escape password special characters properly. See https://docs.sqlalchemy.org/en/20/core/engines.html#escaping-special-characters-such-as-signs-in-passwords"
+    },
+    {
+      "name": "ssh_tunnel.enable",
+      "kind": "boolean",
+      "value": false,
+      "label": "SSH Tunnel Enable",
+      "description": "Enable an ssh tunnel (also known as bastion host), see the other ssh_tunnel.* properties for more details"
+    },
+    {
+      "name": "ssh_tunnel.host",
+      "kind": "string",
+      "label": "SSH Tunnel Host",
+      "description": "Host of the bastion host, this is the host we'll connect to via ssh"
+    },
+    {
+      "name": "ssh_tunnel.port",
+      "kind": "integer",
+      "value": 22,
+      "label": "SSH Tunnel Port",
+      "description": "Port to connect to bastion host"
+    },
+    {
+      "name": "ssh_tunnel.private_key",
+      "kind": "string",
+      "label": "SSH Tunnel Private Key",
+      "description": "Private Key for authentication to the bastion host",
+      "sensitive": true
+    },
+    {
+      "name": "ssh_tunnel.private_key_password",
+      "kind": "string",
+      "label": "SSH Tunnel Private Key Password",
+      "description": "Private Key Password, leave None if no password is set",
+      "sensitive": true
+    },
+    {
+      "name": "ssh_tunnel.username",
+      "kind": "string",
+      "label": "SSH Tunnel Username",
+      "description": "Username to connect to bastion host"
+    },
+    {
+      "name": "ssl_certificate_authority",
+      "kind": "string",
+      "value": "~/.postgresql/root.crl",
+      "label": "SSL Certificate Authority",
+      "description": "The certificate authority that should be used to verify the server's identity. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate."
+    },
+    {
+      "name": "ssl_client_certificate",
+      "kind": "string",
+      "value": "~/.postgresql/postgresql.crt",
+      "label": "SSL Client Certificate",
+      "description": "The certificate that should be used to verify your identity to the server. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate."
+    },
+    {
+      "name": "ssl_client_certificate_enable",
+      "kind": "boolean",
+      "value": false,
+      "label": "SSL Client Certificate Enable",
+      "description": "Whether or not to provide client-side certificates as a method of authentication to the server. Use ssl_client_certificate and ssl_client_private_key for further customization. To use SSL to verify the server's identity, use ssl_enable instead."
+    },
+    {
+      "name": "ssl_client_private_key",
+      "kind": "string",
+      "value": "~/.postgresql/postgresql.key",
+      "label": "SSL Client Private Key",
+      "description": "The private key for the certificate you provided. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate.",
+      "sensitive": true
+    },
+    {
+      "name": "ssl_enable",
+      "kind": "boolean",
+      "value": false,
+      "label": "SSL Enable",
+      "description": "Whether or not to use ssl to verify the server's identity. Use ssl_certificate_authority and ssl_mode for further customization. To use a client certificate to authenticate yourself to the server, use ssl_client_certificate_enable instead."
+    },
+    {
+      "name": "ssl_mode",
+      "kind": "string",
+      "value": "verify-full",
+      "label": "SSL Mode",
+      "description": "SSL Protection method, see [postgres documentation](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) for more information. Must be one of disable, allow, prefer, require, verify-ca, or verify-full."
+    },
+    {
+      "name": "ssl_storage_directory",
+      "kind": "string",
+      "value": ".secrets",
+      "label": "SSL Storage Directory",
+      "description": "The folder in which to store SSL certificates provided as raw values. When a certificate/key is provided as a raw value instead of as a filepath, it must be written to a file before it can be used. This configuration option determines where that file is created."
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "User Stream Map Configuration",
+      "description": "User-defined config values to be used within map expressions."
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html)."
+    },
+    {
+      "name": "use_copy",
+      "kind": "boolean",
+      "value": false,
+      "label": "Use COPY",
+      "description": "Use the COPY command to insert data. This is usually faster than INSERT statements. This option is only available for the postgresql+psycopg dialect+driver."
+    },
+    {
+      "name": "user",
+      "kind": "string",
+      "label": "User",
+      "description": "User name used to authenticate."
+    },
+    {
+      "name": "validate_records",
+      "kind": "boolean",
+      "value": true,
+      "label": "Validate Records",
+      "description": "Whether to validate the schema of the incoming streams."
+    }
+  ],
+  "dialect": "postgres",
+  "target_schema": "$TARGET_POSTGRES_SCHEMA"
+}

@@ -91,10 +91,8 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--state-strategy",
-    # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and use
-    # click 8.2+ exclusively
-    type=click.Choice([strategy.value for strategy in StateStrategy]),
-    default=StateStrategy.AUTO.value,
+    type=click.Choice(StateStrategy),
+    default=StateStrategy.auto.value,
     help="Strategy to use for state updates.",
 )
 @click.option(

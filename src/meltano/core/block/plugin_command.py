@@ -60,11 +60,11 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         self,
         name: str,
         log: SubprocessOutputWriter,
-        block_ctx: dict,
+        block_ctx: PluginContext,
         project: Project,
         plugin_invoker: PluginInvoker,
         command: str | None,
-        command_args: tuple[str],
+        command_args: str | None,
     ):
         """Configure and return a wrapped plugin invoker.
 
@@ -149,7 +149,7 @@ def plugin_command_invoker(
     plugin: ProjectPlugin,
     project: Project,
     command: str | None,
-    command_args: list[str] | None = None,
+    command_args: str | None = None,
     run_dir: Path | None = None,
 ) -> InvokerCommand:
     """Make an InvokerCommand from a plugin.
