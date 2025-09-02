@@ -9,7 +9,11 @@ from unittest import mock
 
 import pytest
 
-from meltano.core.logging.server import LoggingServer, is_logging_server_available
+from meltano.core.logging.server import (
+    LoggingServer,
+    MsgpackSocketHandler,
+    is_logging_server_available,
+)
 from meltano.core.plugin.singer.base import SingerPlugin
 
 
@@ -84,7 +88,7 @@ class TestSingerLoggingServerIntegration:
             assert config["handlers"]["console"]["class"] == "logging.StreamHandler"
             assert (
                 config["handlers"]["meltano_server"]["class"]
-                == "logging.handlers.SocketHandler"
+                == "meltano.core.logging.server.MsgpackSocketHandler"
             )
             assert config["handlers"]["meltano_server"]["host"] == "localhost"
             assert (
@@ -154,7 +158,10 @@ class TestSingerLoggingServerIntegration:
             assert "handlers=console,meltano_server" in config_content
             assert "[handler_console]" in config_content
             assert "[handler_meltano_server]" in config_content
-            assert "class=logging.handlers.SocketHandler" in config_content
+            assert (
+                "class=meltano.core.logging.server.MsgpackSocketHandler"
+                in config_content
+            )
 
     @pytest.mark.asyncio
     async def test_log_level_preservation_in_singer_config(self) -> None:
@@ -216,7 +223,7 @@ class TestSingerLoggingServerIntegration:
             # Create a client logger that uses SocketHandler
             # (simulating a Singer plugin)
             client_logger = logging.getLogger("test_singer_plugin")  # noqa: TID251
-            client_handler = logging.handlers.SocketHandler(
+            client_handler = MsgpackSocketHandler(
                 host="localhost",
                 port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
             )

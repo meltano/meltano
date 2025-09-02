@@ -128,7 +128,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         if use_logging_server:
             handlers.append("meltano_server")
             handler_configs["meltano_server"] = {
-                "class": "logging.handlers.SocketHandler",
+                "class": "meltano.core.logging.server.MsgpackSocketHandler",
                 "host": "localhost",
                 "port": logging.handlers.DEFAULT_TCP_LOGGING_PORT,
                 "formatter": "default",
@@ -171,7 +171,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
             pipelinewise_handler_configs += f"""
 
                 [handler_meltano_server]
-                class=logging.handlers.SocketHandler
+                class=meltano.core.logging.server.MsgpackSocketHandler
                 level={log_level}
                 formatter=default
                 args=('localhost', {logging.handlers.DEFAULT_TCP_LOGGING_PORT})"""

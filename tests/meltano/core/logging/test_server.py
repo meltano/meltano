@@ -5,7 +5,7 @@ import logging.handlers
 import threading
 import typing as t
 
-from meltano.core.logging.server import LoggingServer
+from meltano.core.logging.server import LoggingServer, MsgpackSocketHandler
 
 if t.TYPE_CHECKING:
     import pytest
@@ -20,7 +20,7 @@ class TestLoggingServer:
             LoggingServer(logger_name="server_logger"),
             caplog.at_level(logging.INFO, "server_logger"),
         ):
-            client_handler = logging.handlers.SocketHandler(
+            client_handler = MsgpackSocketHandler(
                 host="localhost",
                 port=logging.handlers.DEFAULT_TCP_LOGGING_PORT,
             )
