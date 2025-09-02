@@ -20,6 +20,11 @@ from meltano.core.logging.formatters import (
 )
 from meltano.core.utils import get_no_color_flag
 
+if sys.version_info >= (3, 11):
+    from typing import assert_never  # noqa: ICN003
+else:
+    from typing_extensions import assert_never
+
 logger = structlog.getLogger(__name__)
 
 if sys.version_info >= (3, 11):
@@ -172,7 +177,7 @@ def default_config(
                 "foreign_pre_chain": foreign_pre_chain,
             }
         case _:  # pragma: no cover
-            t.assert_never(log_format)
+            assert_never(log_format)
 
     return {
         "version": 1,
@@ -213,6 +218,100 @@ def default_config(
             },
         },
     }
+
+
+def _configure_logging(
+    *,
+    log_level: str,
+    log_format: LogFormat,
+    config: dict | None = None,
+) -> None:
+    if config is not None:
+        logging_config.dictConfig(config)
+        return
+
+    max_frames = 100 if log_level == "DEBUG" else 2
+    foreign_pre_chain = get_default_foreign_pre_chain()
+
+    if log_format == LogFormat.colored:
+        no_color = get_no_color_flag()
+        if no_color:
+            exception_formatter = rich_exception_formatter_factory(
+                no_color=True,
+                max_frames=max_frames,
+            )
+        else:
+            exception_formatter = rich_exception_formatter_factory(
+                color_system="truecolor",
+                max_frames=max_frames,
+            )
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processor=structlog.dev.ConsoleRenderer(
+                colors=not no_color,
+                exception_formatter=exception_formatter,
+            ),
+            foreign_pre_chain=foreign_pre_chain,
+        )
+    elif log_format == LogFormat.json:
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processor=structlog.processors.JSONRenderer(),
+            foreign_pre_chain=foreign_pre_chain,
+        )
+    elif log_format == LogFormat.key_value:
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processor=structlog.processors.KeyValueRenderer(
+                key_order=["timestamp", "level", "event", "logger"],
+            ),
+            foreign_pre_chain=foreign_pre_chain,
+        )
+    elif log_format == LogFormat.uncolored:
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processor=structlog.dev.ConsoleRenderer(
+                colors=False,
+                exception_formatter=rich_exception_formatter_factory(
+                    no_color=True,
+                    max_frames=max_frames,
+                ),
+            ),
+            foreign_pre_chain=foreign_pre_chain,
+        )
+    elif log_format == LogFormat.plain:
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processors=[
+                structlog.stdlib.filter_by_level,
+                structlog.stdlib.add_logger_name,
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.PositionalArgumentsFormatter(),
+                structlog.processors.StackInfoRenderer(),
+                structlog.processors.format_exc_info,
+                structlog.processors.UnicodeDecoder(),
+                lambda _logger, _name, event_dict: event_dict["event"],
+            ],
+            foreign_pre_chain=foreign_pre_chain,
+        )
+    else:
+        assert_never(log_format)
+
+    numeric_level = parse_log_level(log_level.lower())
+    log_level = log_level.upper()
+    effective_level = numeric_level if log_level == "DISABLED" else log_level
+    handler = logging.StreamHandler(stream=sys.stderr)
+    handler.setLevel(effective_level)
+    handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()  # noqa: TID251
+    root_logger.handlers.clear()
+    root_logger.setLevel(effective_level)
+    root_logger.addHandler(handler)
+    root_logger.propagate = True
+
+    logging.getLogger("snowplow_tracker.emitters").setLevel(logging.ERROR)  # noqa: TID251
+    logging.getLogger("urllib3").setLevel(logging.INFO)  # noqa: TID251
+    logging.getLogger("urllib3.connection").setLevel(logging.ERROR)  # noqa: TID251
+    logging.getLogger("asyncio").setLevel(logging.INFO)  # noqa: TID251
+    logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(  # noqa: TID251
+        logging.WARNING
+    )
 
 
 def setup_logging(
@@ -256,8 +355,7 @@ def setup_logging(
         else:
             which_config = f"Using logging configuration from {log_path}"
 
-    config = config or default_config(log_level, log_format=log_format)
-    logging_config.dictConfig(config)
+    _configure_logging(log_level=log_level, log_format=log_format, config=config)
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,

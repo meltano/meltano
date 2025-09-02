@@ -2,15 +2,20 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import re
+import sys
 import typing as t
 from unittest import mock
 from unittest.mock import AsyncMock
 
 import pytest
+import structlog.processors
+import structlog.stdlib
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
+from meltano.core.logging.formatters import get_default_foreign_pre_chain
 from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
@@ -329,7 +334,7 @@ class TestCliRunScratchpadOne:
             assert completion_event["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
-    @pytest.mark.usefixtures("use_test_log_config", "project")
+    # @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_run_custom_suffix_command_option(
         self,
         cli_runner,
@@ -1004,6 +1009,7 @@ class TestCliRunScratchpadOne:
         target,
         tap_process,
         target_process,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         args = ["run", tap.name, target.name]
 
@@ -1032,7 +1038,23 @@ class TestCliRunScratchpadOne:
         tap_process.wait.side_effect = wait_mock
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+
+        logger = logging.getLogger()  # noqa: TID251
+        logger.setLevel(logging.DEBUG)
+        logger.propagate = True
+        handler = logging.StreamHandler(stream=sys.stderr)
+        handler.setLevel(logging.DEBUG)
+        formatter = structlog.stdlib.ProcessorFormatter(
+            processor=structlog.processors.JSONRenderer(),
+            foreign_pre_chain=get_default_foreign_pre_chain(),
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        with (
+            mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async),
+            caplog.at_level(logging.DEBUG),
+        ):
             result = cli_runner.invoke(cli, args)
 
             assert (
