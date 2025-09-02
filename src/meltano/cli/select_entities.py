@@ -36,6 +36,8 @@ def selection_color(selection: SelectionType) -> str:
             return "red"
         case SelectionType.UNSUPPORTED:
             return "black"
+        case _:  # pragma: no cover
+            t.assert_never(selection)
 
 
 def selection_mark(selection: SelectionType) -> str:

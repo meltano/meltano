@@ -84,6 +84,8 @@ def print_added_plugin(
             action, preposition = "Updated", "in"
         case AddedPluginFlags.NOT_ADDED:
             action, preposition = "Initialized", "in"
+        case _:  # pragma: no cover
+            t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",

@@ -171,6 +171,8 @@ def default_config(
                 ],
                 "foreign_pre_chain": foreign_pre_chain,
             }
+        case _:  # pragma: no cover
+            t.assert_never(log_format)
 
     return {
         "version": 1,
