@@ -171,9 +171,9 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
                 return as_commented_map
             return as_dict
 
-        if isinstance(target, (list, set, CommentedSet)):
+        if isinstance(target, list | set | CommentedSet):
             as_list = [cls._canonize(val) for val in target]
-            if isinstance(target, (CommentedSet, CommentedSeq)):
+            if isinstance(target, CommentedSet | CommentedSeq):
                 as_commented_seq = CommentedSeq(as_list)
                 target.copy_attributes(as_commented_seq)
                 return as_commented_seq

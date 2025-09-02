@@ -527,7 +527,7 @@ def expand_env_vars(
     """
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, Mapping, list)):
+    if not isinstance(raw_value, str | Mapping | list):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -568,7 +568,7 @@ def _expand_env_vars(
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, Mapping, list))
+            if isinstance(v, str | Mapping | list)
             else v
             for k, v in raw_value.items()
         }
@@ -577,7 +577,7 @@ def _expand_env_vars(
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, Mapping, list))
+            if isinstance(v, str | Mapping | list)
             else v
             for v in raw_value
         ]

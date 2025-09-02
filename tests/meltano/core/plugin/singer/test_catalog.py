@@ -1319,7 +1319,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert len(stream_only_rules) == len(stream_star_rules) == 2
 
         # Both should create identical rules
-        for rule1, rule2 in zip(stream_only_rules, stream_star_rules):
+        for rule1, rule2 in zip(stream_only_rules, stream_star_rules, strict=False):
             assert rule1.tap_stream_id == rule2.tap_stream_id
             assert rule1.breadcrumb == rule2.breadcrumb
             assert rule1.key == rule2.key

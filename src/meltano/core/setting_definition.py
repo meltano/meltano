@@ -344,7 +344,7 @@ class SettingDefinition(NameEq, Canonical):
             kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
             kind = SettingKind.INTEGER
-        elif isinstance(value, (Decimal, float)):
+        elif isinstance(value, Decimal | float):
             kind = SettingKind.DECIMAL
         elif isinstance(value, dict):
             kind = SettingKind.OBJECT
@@ -477,7 +477,7 @@ class SettingDefinition(NameEq, Canonical):
         Raises:
             ValueError: If value is not of the expected type.
         """
-        value = value.isoformat() if isinstance(value, (date, datetime)) else value
+        value = value.isoformat() if isinstance(value, date | datetime) else value
 
         if isinstance(value, str):
             if self.kind == SettingKind.BOOLEAN:

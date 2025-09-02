@@ -413,7 +413,7 @@ class Tracker:  # - too many (public) methods
                     else tuple(
                         ctx
                         for ctx in self.contexts
-                        if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                        if isinstance(ctx, EnvironmentContext | ProjectContext)
                     ),
                 ),
             )

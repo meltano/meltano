@@ -72,7 +72,7 @@ class CliContext(SelfDescribingJson):
         """
         options = {
             key: val
-            if isinstance(val, (bool, int, float)) or val is None
+            if isinstance(val, bool | int | float) or val is None
             else hash_sha256(repr(val))
             for key, val in ctx.params.items()
         }
