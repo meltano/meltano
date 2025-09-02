@@ -63,7 +63,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 )
 @click.option(
     "--log-format",
-    type=click.Choice(tuple(LogFormat)),
+    type=click.Choice(LogFormat),
     help="A shortcut for setting the format of the log output.",
 )
 @click.option(

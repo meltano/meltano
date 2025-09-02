@@ -118,11 +118,9 @@ class ELOptions:
     )
     state_strategy = click.option(
         "--state-strategy",
-        # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and
-        # use click 8.2+ exclusively
-        type=click.Choice([strategy.value for strategy in StateStrategy]),
+        type=click.Choice(StateStrategy),
         help="Strategy to use for state updates.",
-        default=StateStrategy.AUTO.value,
+        default=StateStrategy.auto.value,
     )
     run_id = click.option(
         "--run-id",
