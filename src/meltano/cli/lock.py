@@ -8,8 +8,7 @@ import click
 import structlog
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd
-from meltano.core.plugin import PluginType
+from meltano.cli.utils import CliError, PartialInstrumentedCmd, PluginTypeArg
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLockService,
@@ -18,6 +17,7 @@ from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -36,7 +36,7 @@ logger = structlog.get_logger(__name__)
 )
 @click.option(
     "--plugin-type",
-    type=click.Choice(PluginType.cli_arguments()),
+    type=PluginTypeArg(),
     help="Lock only the plugins of the given type.",
 )
 @click.argument("plugin_name", nargs=-1, required=False)
@@ -48,7 +48,7 @@ def lock(
     ctx: click.Context,
     *,
     all_plugins: bool,
-    plugin_type: str | None,
+    plugin_type: PluginType | None,
     plugin_name: tuple[str, ...],
     update: bool,
 ) -> None:
@@ -75,8 +75,7 @@ def lock(
     if plugin_name:
         plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
 
-    if plugin_type:
-        plugin_type = PluginType.from_cli_argument(plugin_type)
+    if plugin_type is not None:
         plugins = [plugin for plugin in plugins if plugin.type == plugin_type]
 
     tracked_plugins: list[tuple[ProjectPlugin, str | None]] = []

@@ -19,9 +19,9 @@ from meltano.cli.utils import (
     CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
+    PluginTypeArg,
 )
 from meltano.core.db import project_engine
-from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -33,6 +33,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin import PluginType
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
     from meltano.core.setting_definition import SettingDefinition
@@ -129,7 +130,7 @@ def get_label(metadata, source) -> str:  # noqa: ANN001
 )
 @click.option(
     "--plugin-type",
-    type=click.Choice(PluginType.cli_arguments()),
+    type=PluginTypeArg(),
     default=None,
 )
 @click.argument("plugin_name")
@@ -152,7 +153,7 @@ def config(
     ctx,  # noqa: ANN001
     project: Project,
     *,
-    plugin_type: str,
+    plugin_type: PluginType | None,
     plugin_name: str,
     config_format: str,
     extras: bool,
@@ -164,16 +165,11 @@ def config(
     Read more at https://docs.meltano.com/reference/command-line-interface#config
     """  # noqa: D301
     tracker = ctx.obj["tracker"]
-    try:
-        ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None
-    except ValueError:
-        tracker.track_command_event(CliEvent.aborted)
-        raise
 
     try:
         plugin = project.plugins.find_plugin(
             plugin_name,
-            plugin_type=ptype,
+            plugin_type=plugin_type,
             configurable=True,
         )
     except PluginNotFoundError:
