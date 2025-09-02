@@ -13,6 +13,7 @@ from operator import eq
 
 import dotenv
 import sqlalchemy
+import sqlalchemy.orm
 import structlog
 
 from meltano.core.environment import NoActiveEnvironment

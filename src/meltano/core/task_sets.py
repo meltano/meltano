@@ -7,6 +7,7 @@ from collections.abc import Generator, Iterable
 
 import structlog
 import yaml
+import yaml.parser
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 

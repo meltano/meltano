@@ -33,7 +33,7 @@ from meltano.core.tracking.schemas import (
 from meltano.core.utils import format_exception, uuid7
 
 if t.TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Generator, Mapping
     from pathlib import Path
 
     from meltano.core.project import Project
@@ -300,7 +300,10 @@ class Tracker:  # - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(self, *extra_contexts) -> Tracker:  # noqa: ANN002
+    def with_contexts(
+        self,
+        *extra_contexts: SelfDescribingJson,
+    ) -> Generator[Tracker, None, None]:
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:
