@@ -30,6 +30,8 @@ ENV PATH="/venv/bin:${PATH}"
 
 # Installing the application from a pre-built wheel in the dist directory
 RUN --mount=type=bind,source=dist,target=/tmp/meltano-dist \
-    uv pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
+    # TODO: Uncomment when the state backends are published
+    # uv pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
+    uv pip install "meltano[mssql,postgres,psycopg2] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
 
 ENTRYPOINT ["meltano"]
