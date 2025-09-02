@@ -8,12 +8,16 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import (
+    InstallPlugins,
+    PluginTypeArg,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
     PartialInstrumentedCmd,
-    PluginTypeArg,
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine

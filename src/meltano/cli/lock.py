@@ -7,8 +7,8 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd, PluginTypeArg
+from meltano.cli.params import PluginTypeArg, pass_project
+from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLockService,

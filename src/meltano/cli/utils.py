@@ -624,23 +624,6 @@ class AutoInstallBehavior(StrEnum):
     only_install = auto()
 
 
-class PluginTypeArg(click.Choice):
-    """A click parameter that converts a string to a PluginType."""
-
-    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
-        """Initialize the PluginTypeArg."""
-        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
-
-    def convert(
-        self,
-        value: str,
-        param: click.Parameter | None,  # noqa: ARG002
-        ctx: click.Context | None,  # noqa: ARG002
-    ) -> PluginType:
-        """Convert the value to a PluginType."""
-        return PluginType.from_cli_argument(value)
-
-
 def infer_plugin_type(plugin_name: str) -> PluginType:
     """Infer the plugin type from the plugin name."""
     if plugin_name.startswith("tap-"):
