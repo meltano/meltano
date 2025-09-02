@@ -198,6 +198,9 @@ relative_files = true  # This allows coverage to be measured in Windows
 sigterm = true
 source = [
   "meltano",
+  "packages/meltano-state-backend-azure",
+  "packages/meltano-state-backend-gcs",
+  "packages/meltano-state-backend-s3",
   "tests",
 ]
 omit = [
