@@ -163,7 +163,9 @@ class TestGCSStateBackend:
     @pytest.fixture
     def manager(self, project: Project) -> GCSStateStoreManager:
         project.settings.set(["state_backend", "uri"], "gs://my-bucket")
-        return state_store_manager_from_project_settings(project.settings)
+        result = state_store_manager_from_project_settings(project.settings)
+        assert isinstance(result, GCSStateStoreManager)
+        return result
 
     def test_manager_from_settings(self, project: Project) -> None:
         # GCS
