@@ -3,54 +3,28 @@
 from __future__ import annotations
 
 import json
+import sys
 import typing as t
 import warnings
-from contextlib import contextmanager
 from functools import cached_property
 
+import google
+import google.api_core.exceptions
+import google.cloud.storage  # type: ignore[import-untyped]
 import structlog.stdlib
 
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
 logger = structlog.stdlib.get_logger(__name__)
-
-GOOGLE_INSTALLED = True
-
-try:
-    import google
-    import google.api_core.exceptions
-    import google.cloud.storage  # type: ignore[import-untyped]
-except ImportError:
-    GOOGLE_INSTALLED = False
-
-
-class MissingGoogleError(Exception):
-    """Raised when google is required but not installed."""
-
-    def __init__(self) -> None:
-        """Initialize a MissingGoogleError."""
-        super().__init__(
-            "google-cloud-storage required but not installed. Install meltano[gcs] to use GCS as a state backend.",  # noqa: E501
-        )
-
-
-@contextmanager
-def requires_gcs() -> Generator[None, None, None]:
-    """Raise MissingGoogleError if gcs is required but missing in context.
-
-    Raises:
-        MissingGoogleError: if google-cloud-storage is not installed.
-
-    Yields:
-        None
-    """
-    if not GOOGLE_INSTALLED:
-        raise MissingGoogleError
-    yield
 
 
 APPLICATION_CREDENTIALS = SettingDefinition(
@@ -93,6 +67,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
 
     label: str = "Google Cloud Storage"
 
+    @override
     def __init__(
         self,
         bucket: str | None = None,
@@ -149,7 +124,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         self.application_credentials_json = application_credentials_json
 
     @staticmethod
-    @requires_gcs()
+    @override
     def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
@@ -164,35 +139,36 @@ class GCSStateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
+    @override
     def client(self) -> google.cloud.storage.Client:
         """Get an authenticated google.cloud.storage.Client.
 
         Returns:
             A google.cloud.storage.Client.
         """
-        with requires_gcs():
-            if self.application_credentials_json:
-                # Parse JSON string and create client from service account info
-                try:
-                    credentials_info = json.loads(self.application_credentials_json)
-                except json.JSONDecodeError as e:
-                    msg = (
-                        "Invalid JSON in application_credentials_json: "
-                        f"{e.doc[max(e.pos - 9, 0) : e.pos + 10]}"
-                    )
-                    raise ValueError(msg) from e
-                return google.cloud.storage.Client.from_service_account_info(
-                    credentials_info,
+        if self.application_credentials_json:
+            # Parse JSON string and create client from service account info
+            try:
+                credentials_info = json.loads(self.application_credentials_json)
+            except json.JSONDecodeError as e:
+                msg = (
+                    "Invalid JSON in application_credentials_json: "
+                    f"{e.doc[max(e.pos - 9, 0) : e.pos + 10]}"
                 )
-            if self.application_credentials_path:
-                # Use existing file-based authentication
-                return google.cloud.storage.Client.from_service_account_json(
-                    self.application_credentials_path,
-                )
-            # Use default authentication in environment
-            return google.cloud.storage.Client()
+                raise ValueError(msg) from e
+            return google.cloud.storage.Client.from_service_account_info(
+                credentials_info,
+            )
+        if self.application_credentials_path:
+            # Use existing file-based authentication
+            return google.cloud.storage.Client.from_service_account_json(
+                self.application_credentials_path,
+            )
+        # Use default authentication in environment
+        return google.cloud.storage.Client()
 
     @property
+    @override
     def extra_transport_params(self) -> dict[str, t.Any]:
         """Extra transport params for ``smart_open.open``."""
         return {
@@ -201,6 +177,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             },
         }
 
+    @override
     def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
@@ -220,6 +197,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             else:
                 raise e
 
+    @override
     def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
         """List all files in the backend.
 
@@ -236,6 +214,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         ):
             yield blob.name
 
+    @override
     def copy_file(self, src: str, dst: str) -> None:
         """Copy a file from one location to another.
 

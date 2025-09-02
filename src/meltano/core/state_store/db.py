@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from contextlib import contextmanager
 
@@ -10,6 +11,11 @@ from sqlalchemy import select
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
 from meltano.core.utils import merge
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterator
@@ -22,6 +28,7 @@ class DBStateStoreManager(StateStoreManager):
 
     label = "Database"
 
+    @override
     def __init__(self, session: Session, **kwargs: t.Any):
         """Initialize the DBStateStoreManager.
 
@@ -32,6 +39,7 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(**kwargs)
         self.session = session
 
+    @override
     def set(self, state: MeltanoState) -> None:
         """Set the job state for the given state_id.
 
@@ -63,6 +71,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
+    @override
     def get(self, state_id: str) -> MeltanoState | None:
         """Get the job state for the given state_id.
 
@@ -81,6 +90,7 @@ class DBStateStoreManager(StateStoreManager):
 
         return None
 
+    @override
     def delete(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
@@ -93,6 +103,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.delete(job_state)
             self.session.commit()
 
+    @override
     def clear_all(self) -> int:
         """Clear all states.
 
@@ -103,6 +114,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.commit()
         return count
 
+    @override
     def get_state_ids(self, pattern: str | None = None) -> Iterator[str]:
         """Get all state_ids available in this state store manager.
 
@@ -125,11 +137,12 @@ class DBStateStoreManager(StateStoreManager):
         )
 
     @contextmanager
+    @override
     def acquire_lock(
         self,
-        state_id: str,  # noqa: ARG002
+        state_id: str,
         *,
-        retry_seconds: int = 1,  # noqa: ARG002
+        retry_seconds: int = 1,
     ) -> Generator[None, None, None]:
         """Acquire a naive lock for the given job's state.
 

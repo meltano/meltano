@@ -18,17 +18,17 @@ if sys.version_info >= (3, 11):
 else:
     from backports.strenum import StrEnum
 
+if sys.version_info >= (3, 12):
+    from importlib.metadata import EntryPoints, entry_points
+else:
+    from importlib_metadata import EntryPoints, entry_points
+
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
 
     from sqlalchemy.orm import Session
 
     from meltano.core.project_settings_service import ProjectSettingsService
-
-if sys.version_info >= (3, 12):
-    from importlib.metadata import EntryPoints, entry_points
-else:
-    from importlib_metadata import EntryPoints, entry_points
 
 __all__ = [
     "DBStateStoreManager",

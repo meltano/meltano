@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
-from contextlib import contextmanager
 from functools import cached_property
+
+import boto3
 
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import (
@@ -12,42 +14,15 @@ from meltano.core.state_store.filesystem import (
     InvalidStateBackendConfigurationException,
 )
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
     from mypy_boto3_s3 import S3Client
-
-BOTO_INSTALLED = True
-
-try:
-    import boto3
-except ImportError:
-    BOTO_INSTALLED = False
-
-
-class MissingBoto3Error(Exception):
-    """Raised when boto3 is required but not installed."""
-
-    def __init__(self) -> None:
-        """Initialize a MissingBoto3Error."""
-        super().__init__(
-            "boto3 required but not installed. Install meltano[s3] to use S3 as a state backend.",  # noqa: E501
-        )
-
-
-@contextmanager
-def requires_boto3() -> Generator[None, None, None]:
-    """Raise MissingBoto3Error if boto3 is required but missing in context.
-
-    Raises:
-        MissingBoto3Error: if boto3 is not installed.
-
-    Yields:
-        None
-    """
-    if not BOTO_INSTALLED:
-        raise MissingBoto3Error
-    yield
 
 
 AWS_ACCESS_KEY_ID = SettingDefinition(
@@ -82,6 +57,7 @@ class S3StateStoreManager(CloudStateStoreManager):
 
     label: str = "AWS S3"
 
+    @override
     def __init__(
         self,
         aws_access_key_id: str | None = None,
@@ -111,6 +87,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         self.endpoint_url = endpoint_url
 
     @staticmethod
+    @override
     def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
@@ -125,6 +102,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         )
 
     @property
+    @override
     def extra_transport_params(self) -> dict[str, t.Any]:
         """Extra transport params for ``smart_open.open``.
 
@@ -140,6 +118,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         }
 
     @cached_property
+    @override
     def client(self) -> S3Client:
         """Get an authenticated boto3.Client.
 
@@ -150,24 +129,24 @@ class S3StateStoreManager(CloudStateStoreManager):
             InvalidStateBackendConfigurationException: when configured AWS
                 settings are invalid.
         """
-        with requires_boto3():
-            if self.aws_secret_access_key and self.aws_access_key_id:
-                session = boto3.Session(
-                    aws_access_key_id=self.aws_access_key_id,
-                    aws_secret_access_key=self.aws_secret_access_key,
-                )
-                return session.client("s3", endpoint_url=self.endpoint_url)
-            if self.aws_secret_access_key:
-                raise InvalidStateBackendConfigurationException(
-                    "AWS secret access key configured, but not AWS access key ID.",  # noqa: EM101
-                )
-            if self.aws_access_key_id:
-                raise InvalidStateBackendConfigurationException(
-                    "AWS access key ID configured, but no AWS secret access key.",  # noqa: EM101
-                )
-            session = boto3.Session()
-            return session.client("s3")
+        if self.aws_secret_access_key and self.aws_access_key_id:
+            session = boto3.Session(
+                aws_access_key_id=self.aws_access_key_id,
+                aws_secret_access_key=self.aws_secret_access_key,
+            )
+            return session.client("s3", endpoint_url=self.endpoint_url)
+        if self.aws_secret_access_key:
+            raise InvalidStateBackendConfigurationException(
+                "AWS secret access key configured, but not AWS access key ID.",  # noqa: EM101
+            )
+        if self.aws_access_key_id:
+            raise InvalidStateBackendConfigurationException(
+                "AWS access key ID configured, but no AWS secret access key.",  # noqa: EM101
+            )
+        session = boto3.Session()
+        return session.client("s3")
 
+    @override
     def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
@@ -179,6 +158,7 @@ class S3StateStoreManager(CloudStateStoreManager):
             Delete={"Objects": [{"Key": file_path}]},
         )
 
+    @override
     def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
         """List all files in the backend.
 
@@ -195,6 +175,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         for state_obj in self.client.list_objects_v2(**kwargs).get("Contents", []):
             yield state_obj["Key"]
 
+    @override
     def copy_file(self, src: str, dst: str) -> None:
         """Copy a file from one path to another.
 
