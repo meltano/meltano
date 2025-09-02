@@ -110,10 +110,10 @@ jobs:
       run: >
         python scripts/generate_docker_tags.py
         --git-sha ${{ github.sha }}
-        -v ${NEEDS_BUILD_OUTPUTS_VERSION}
-        -p ${{ matrix.python-version }}
-        -d ${{ env.DEFAULT_PYTHON }}
-        -r ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
+        --package-version ${NEEDS_BUILD_OUTPUTS_VERSION}
+        --python-version ${{ matrix.python-version }}
+        --default-python ${{ env.DEFAULT_PYTHON }}
+        --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
         > tags
       env:
         NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}

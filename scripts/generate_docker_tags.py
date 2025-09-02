@@ -6,10 +6,10 @@ Usage:
 
 python scripts/generate_docker_tags.py \
     --git-sha e4bdaedab02462e9e19a1bf063cbce26bc3c7581 \
-    -v 3.0.0rc0 \
-    -p 3.9 \
-    -d 3.9 \
-    -r docker.io
+    --package-version 3.0.0rc0 \
+    --python-version 3.10 \
+    --default-python 3.10 \
+    --registry docker.io
 """
 
 from __future__ import annotations
