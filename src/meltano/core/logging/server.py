@@ -5,53 +5,18 @@ from __future__ import annotations
 import contextlib
 import logging
 import logging.handlers
+import pickle
 import socketserver
 import struct
 import threading
 import typing as t
 
-import msgpack
 import structlog
 
 if t.TYPE_CHECKING:
     import types
 
 logger = structlog.stdlib.get_logger(__name__)
-
-
-class MsgpackSocketHandler(logging.handlers.SocketHandler):
-    """A socket handler that uses msgpack for serialization instead of pickle."""
-
-    def makePickle(self, record: logging.LogRecord) -> bytes:  # noqa: N802
-        """Msgpack-serialize a LogRecord for transmission.
-
-        Args:
-            record: The LogRecord to serialize.
-
-        Returns:
-            The serialized data as bytes.
-        """
-        ei = record.exc_info
-        if ei:
-            # just to get traceback text into record.exc_text
-            dummy = self.format(record)  # noqa: F841
-            record.exc_info = None  # to avoid Unpickleable error
-
-        # Convert the LogRecord to a dictionary
-        record_dict = record.__dict__.copy()
-
-        # Handle datetime objects if present
-        if hasattr(record, "created"):
-            record_dict["created"] = record.created
-
-        # Serialize using msgpack
-        s = msgpack.packb(record_dict)
-
-        if ei:
-            record.exc_info = ei  # restore for next handler
-
-        slen = struct.pack(">L", len(s))
-        return slen + s
 
 
 class LogRecordStreamHandler(socketserver.StreamRequestHandler):
@@ -67,7 +32,7 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
         """Handle multiple requests.
 
         Each request expected to be a 4-byte length,
-        followed by the LogRecord in msgpack format. Logs the record
+        followed by the LogRecord in pickle format. Logs the record
         according to whatever policy is configured locally.
         """
         while True:
@@ -78,20 +43,20 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
             chunk = self.connection.recv(slen)
             while len(chunk) < slen:
                 chunk += self.connection.recv(slen - len(chunk))
-            obj = self.unpack(chunk)
+            obj = self.unPickle(chunk)
             record = logging.makeLogRecord(obj)
             self.handleLogRecord(record)
 
-    def unpack(self, data: bytes) -> dict[str, t.Any]:
-        """Unpack the msgpack data.
+    def unPickle(self, data: bytes) -> dict[str, t.Any]:  # noqa: N802
+        """Unpickle the data.
 
         Args:
-            data: The data to unpack.
+            data: The data to unpickle.
 
         Returns:
-            The unpacked data.
+            The unpickled data.
         """
-        return msgpack.unpackb(data, raw=False, strict_map_key=False)
+        return pickle.loads(data)  # noqa: S301
 
     def handleLogRecord(self, record: logging.LogRecord) -> None:  # noqa: N802
         """Handle the log record.
@@ -119,7 +84,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
       disable_existing_loggers: false
       formatters:
       default:
-        format: "%(message)s" # irrelevant since we send msgpack records
+        format: "%(message)s" # irrelevant since we send pickled records
       handlers:
         meltano:
           class: logging.handlers.SocketHandler
