@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+import typing as t
 
 import platformdirs
 import structlog
@@ -11,13 +12,16 @@ from ruamel.yaml import YAML
 from meltano.core.error import MeltanoError
 from meltano.core.utils import strtobool
 
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
 logger = structlog.stdlib.get_logger(__name__)
 
 
 class UserConfigReadError(MeltanoError):
     """User configuration could not be read."""
 
-    def __init__(self, config_path: object, original_error: Exception) -> None:
+    def __init__(self, config_path: Path, original_error: Exception) -> None:
         """Create a new exception.
 
         Args:
@@ -34,23 +38,26 @@ class UserConfigReadError(MeltanoError):
 class UserConfigService:
     """Meltano Service to manage user-specific configuration."""
 
-    def __init__(self, config_path: object | None = None) -> None:
+    def __init__(self, config_path: Path | None = None) -> None:
         """Create a new UserConfigService.
 
         Args:
             config_path: Path to the configuration file.
                 Defaults to platform-specific config directory.
         """
-        if config_path is None:
-            from pathlib import Path
-
-            config_dir = platformdirs.user_config_path("meltano")
-            config_path = Path(config_dir) / "config.yml"
-        self.config_path = config_path
-        self._config: dict[str, object] | None = None
+        self._config_path = config_path
+        self._config: dict[str, t.Any] | None = None
 
     @property
-    def config(self) -> dict[str, object]:
+    def config_path(self) -> Path:
+        """Get the path to the configuration file."""
+        if self._config_path is None:
+            config_dir = platformdirs.user_config_path("meltano")
+            self._config_path = config_dir / "config.yml"
+        return self._config_path
+
+    @property
+    def config(self) -> dict[str, t.Any]:
         """Get the configuration data.
 
         Returns:
@@ -227,7 +234,7 @@ _user_config_service: UserConfigService | None = None
 _user_config_service_lock = threading.Lock()
 
 
-def get_user_config_service(config_path: object | None = None) -> UserConfigService:
+def get_user_config_service(config_path: Path | None = None) -> UserConfigService:
     """Get the global user configuration service instance.
 
     Args:
@@ -237,15 +244,15 @@ def get_user_config_service(config_path: object | None = None) -> UserConfigServ
         The UserConfigService instance.
     """
     global _user_config_service
-    if _user_config_service is None or (
-        config_path and config_path != _user_config_service.config_path
+
+    if _user_config_service is not None and (
+        config_path is None or config_path == _user_config_service.config_path
     ):
-        with _user_config_service_lock:
-            if _user_config_service is None or (
-                config_path and config_path != _user_config_service.config_path
-            ):
-                _user_config_service = UserConfigService(config_path)
-    return _user_config_service
+        return _user_config_service
+
+    with _user_config_service_lock:
+        _user_config_service = UserConfigService(config_path)
+        return _user_config_service
 
 
 def _reset_user_config_service() -> None:
