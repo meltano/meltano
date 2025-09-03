@@ -4,13 +4,40 @@ Meltano allows users to customize YAML formatting preferences through a user con
 
 ## Configuration File
 
-User preferences are stored in `~/.meltanorc` using INI format:
+User preferences are stored in a platform-specific configuration directory using YAML format.
 
-```ini
-[yaml]
-indent = 4
-preserve_quotes = true
-width = 80
+### Configuration File Location
+
+The configuration file location follows platform conventions:
+
+- **Linux**: `$XDG_CONFIG_HOME/meltano/config.yml` (typically `~/.config/meltano/config.yml`)
+- **macOS**: `~/Library/Application Support/meltano/config.yml`
+- **Windows**: `%APPDATA%\meltano\config.yml`
+
+The location respects the `XDG_CONFIG_HOME` environment variable on Linux systems when set.
+
+### Creating the Configuration File
+
+The configuration directory and file are created automatically when Meltano first needs to read user configuration. You can also create them manually:
+
+**Linux/macOS:**
+```bash
+# Create the directory
+mkdir -p ~/.config/meltano  # Linux
+mkdir -p "~/Library/Application Support/meltano"  # macOS
+
+# Create the config file
+touch ~/.config/meltano/config.yml  # Linux
+touch "~/Library/Application Support/meltano/config.yml"  # macOS
+```
+
+### Configuration Format
+
+```yaml
+yaml:
+  indent: 4
+  preserve_quotes: true
+  width: 80
 ```
 
 ## Available Settings
@@ -39,12 +66,12 @@ width = 80
 
 ## Example Configuration
 
-```ini
-[yaml]
-indent = 4
-preserve_quotes = true
-width = 120
-explicit_start = true
+```yaml
+yaml:
+  indent: 4
+  preserve_quotes: true
+  width: 120
+  explicit_start: true
 ```
 
 ## Disabling User Configuration

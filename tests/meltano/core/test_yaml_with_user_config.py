@@ -46,8 +46,8 @@ class TestYAMLWithUserConfig:
             yield
 
     def test_yaml_indent_from_user_config(self):
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
-            tmp.write("[yaml]\nindent = 4\n")
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("yaml:\n  indent: 4\n")
             tmp.flush()
             config_path = Path(tmp.name)
 
@@ -85,7 +85,7 @@ class TestYAMLWithUserConfig:
                 config_path.unlink()
 
     def test_default_yaml_indent(self):
-        with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
+        with self._mock_user_config_service(Path("/nonexistent/config.yml")):
             data = self._create_test_data(name="test", items=["a", "b", "c"])
 
             with tempfile.NamedTemporaryFile(
@@ -106,8 +106,8 @@ class TestYAMLWithUserConfig:
             out_path.unlink()
 
     def test_environment_variable_disables_user_config(self):
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
-            tmp.write("[yaml]\nindent = 8\n")
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("yaml:\n  indent: 8\n")
             tmp.flush()
             config_path = Path(tmp.name)
 
@@ -143,8 +143,8 @@ class TestYAMLWithUserConfig:
                 config_path.unlink()
 
     def test_yaml_handles_config_read_error_gracefully(self):
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
-            tmp.write("invalid ini content without sections")
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("invalid yaml content:\n  - unclosed bracket [")
             tmp.flush()
             config_path = Path(tmp.name)
 
@@ -170,8 +170,8 @@ class TestYAMLWithUserConfig:
                 config_path.unlink()
 
     def test_yaml_instance_isolation(self):
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
-            tmp.write("[yaml]\nindent = 6\nexplicit_start = true\n")
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("yaml:\n  indent: 6\n  explicit_start: true\n")
             tmp.flush()
             config_path = Path(tmp.name)
 
@@ -196,8 +196,8 @@ class TestYAMLWithUserConfig:
 
     def test_yaml_decimal_and_uuid_types(self):
         """Test that Decimal and UUID types are properly represented in YAML."""
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
-            tmp.write("[yaml]\nindent = 2\n")
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("yaml:\n  indent: 2\n")
             tmp.flush()
             config_path = Path(tmp.name)
 
@@ -239,7 +239,7 @@ class TestYAMLWithUserConfig:
 
     def test_yaml_dump_returns_string_when_no_stream(self):
         """Test that yaml.dump() returns string when no stream provided."""
-        with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
+        with self._mock_user_config_service(Path("/nonexistent/config.yml")):
             data = self._create_test_data(name="test", value=123)
 
             # Test dump without stream (should return string)
@@ -251,7 +251,7 @@ class TestYAMLWithUserConfig:
 
     def test_yaml_dump_with_stream_returns_none(self):
         """Test that yaml.dump() returns None when stream is provided."""
-        with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
+        with self._mock_user_config_service(Path("/nonexistent/config.yml")):
             data = self._create_test_data(name="test", value=456)
 
             from io import StringIO

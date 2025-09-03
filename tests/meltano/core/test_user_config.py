@@ -28,10 +28,10 @@ class TestUserConfigService:
     def _config_file(self, content: str | None = None):
         if content is None:
             with tempfile.TemporaryDirectory() as tmpdir:
-                yield Path(tmpdir) / "nonexistent.ini"
+                yield Path(tmpdir) / "nonexistent.yml"
         else:
             with tempfile.NamedTemporaryFile(
-                mode="w", delete=False, suffix=".ini"
+                mode="w", delete=False, suffix=".yml"
             ) as tmp:
                 tmp.write(content)
                 tmp.flush()
@@ -47,15 +47,15 @@ class TestUserConfigService:
             assert UserConfigService(config_path).yaml_indent == 2
 
     def test_read_yaml_indent(self):
-        with self._config_file("[yaml]\nindent = 4\n") as config_path:
+        with self._config_file("yaml:\n  indent: 4\n") as config_path:
             assert UserConfigService(config_path).yaml_indent == 4
 
     def test_invalid_yaml_indent(self):
-        with self._config_file("[yaml]\nindent = not_a_number\n") as config_path:
+        with self._config_file("yaml:\n  indent: not_a_number\n") as config_path:
             assert UserConfigService(config_path).yaml_indent == 2
 
     def test_missing_yaml_section(self):
-        with self._config_file("[other]\nsetting = value\n") as config_path:
+        with self._config_file("other:\n  setting: value\n") as config_path:
             assert UserConfigService(config_path).yaml_indent == 2
 
     def test_get_user_config_service_singleton(self):
@@ -64,23 +64,23 @@ class TestUserConfigService:
         assert config1 is config2
 
     def test_get_user_config_service_with_path(self):
-        with self._config_file("[yaml]\nindent = 8\n") as config_path:
+        with self._config_file("yaml:\n  indent: 8\n") as config_path:
             user_config_service = get_user_config_service(config_path)
             assert user_config_service.yaml_indent == 8
             assert user_config_service.config_path == config_path
 
     def test_yaml_settings_all_types(self):
-        config = """[yaml]
-indent = 4
-width = 120
-preserve_quotes = true
-explicit_start = yes
-explicit_end = false
-allow_unicode = no
-default_flow_style = 1
-line_break = \\n
-encoding = utf-8
-map_indent = none
+        config = """yaml:
+  indent: 4
+  width: 120
+  preserve_quotes: true
+  explicit_start: yes
+  explicit_end: false
+  allow_unicode: no
+  default_flow_style: 1
+  line_break: \\n
+  encoding: utf-8
+  map_indent: null
 """
         with self._config_file(config) as config_path:
             settings = UserConfigService(config_path).yaml_settings()
@@ -90,19 +90,19 @@ map_indent = none
             assert settings["explicit_start"] is True
             assert settings["explicit_end"] is False
             assert settings["allow_unicode"] is False
-            assert settings["default_flow_style"] is True
+            assert settings["default_flow_style"] == 1
             assert settings["line_break"] == "\\n"
             assert settings["encoding"] == "utf-8"
             assert settings["map_indent"] is None
 
     def test_yaml_settings_empty(self):
-        with self._config_file("[other]\nkey = value\n") as config_path:
+        with self._config_file("other:\n  key: value\n") as config_path:
             assert UserConfigService(config_path).yaml_settings() == {}
 
     def test_config_read_error(self):
         """Test UserConfigReadError is raised for invalid config files."""
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
-            tmp.write("invalid ini content\nwithout proper format")
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("invalid: yaml: content: [\n    - unclosed")
             tmp.flush()
             config_path = Path(tmp.name)
 
@@ -118,10 +118,10 @@ map_indent = none
 
     def test_yaml_settings_validation(self):
         """Test validation of YAML settings."""
-        config = """[yaml]
-indent = -1
-width = 0
-block_seq_indent = -5
+        config = """yaml:
+  indent: -1
+  width: 0
+  block_seq_indent: -5
 """
         with self._config_file(config) as config_path:
             service = UserConfigService(config_path)
@@ -156,7 +156,7 @@ block_seq_indent = -5
         """Test that providing different config_path creates new instance."""
         service1 = get_user_config_service()
 
-        with self._config_file("[yaml]\nindent = 4\n") as config_path:
+        with self._config_file("yaml:\n  indent: 4\n") as config_path:
             service2 = get_user_config_service(config_path)
 
             assert service1 is not service2
@@ -164,22 +164,27 @@ block_seq_indent = -5
 
     def test_parse_value_edge_cases(self):
         """Test _parse_value method with various edge cases."""
-        with self._config_file("[yaml]\ntest = value\n") as config_path:
+        with self._config_file("yaml:\n  test: value\n") as config_path:
             service = UserConfigService(config_path)
 
             # Test None values
+            assert service._parse_value(None) is None
             assert service._parse_value("none") is None
             assert service._parse_value("null") is None
             assert service._parse_value("") is None
             assert service._parse_value("NONE") is None  # Case insensitive
 
-            # Test boolean values
+            # Test boolean values (already parsed by YAML)
+            assert service._parse_value(True) is True  # noqa: FBT003
+            assert service._parse_value(False) is False  # noqa: FBT003
             assert service._parse_value("true") is True
             assert service._parse_value("false") is False
             assert service._parse_value("1") is True
             assert service._parse_value("0") is False
 
-            # Test integer values
+            # Test integer values (already parsed by YAML)
+            assert service._parse_value(123) == 123
+            assert service._parse_value(-456) == -456
             assert service._parse_value("123") == 123
             assert service._parse_value("-456") == -456
 
@@ -188,3 +193,28 @@ block_seq_indent = -5
             assert (
                 service._parse_value("12.34") == "12.34"
             )  # Float strings remain strings
+
+            # Test other types
+            assert (
+                service._parse_value(12.34) == "12.34"
+            )  # Non-bool/int/str converted to string
+
+    def test_config_not_mapping(self):
+        """Test config file where root is not a mapping."""
+        with self._config_file("- item1\n- item2\n") as config_path:
+            service = UserConfigService(config_path)
+            # Should return empty config and use defaults
+            assert service.yaml_indent == 2
+            assert service.yaml_settings() == {}
+
+    def test_platformdirs_integration(self):
+        """Test that UserConfigService uses platformdirs correctly."""
+        from pathlib import Path
+
+        import platformdirs
+
+        service = UserConfigService()
+        expected_dir = platformdirs.user_config_path("meltano")
+        expected_path = Path(expected_dir) / "config.yml"
+
+        assert service.config_path == expected_path
