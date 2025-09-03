@@ -179,15 +179,3 @@ def is_logging_server_available(
             return True
     except OSError:
         return False
-
-
-def main() -> None:
-    """Run the TCP server."""
-    logging.basicConfig(format="%(asctime)s %(message)s")
-    tcpserver = LogRecordSocketReceiver()
-    print("About to start TCP server...")  # noqa: T201
-    tcpserver.serve_until_stopped()
-
-
-if __name__ == "__main__":
-    main()
