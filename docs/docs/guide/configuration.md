@@ -44,7 +44,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config <plugin> set`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
-You can customize how `meltano.yml` is formatted (indentation, spacing, etc.) using Meltano's [user YAML configuration](../user-yaml-config.md).
+You can customize how `meltano.yml` is formatted (indentation, spacing, etc.) using Meltano's [user YAML configuration](/guide/user-yaml-config).
 
 ### Overriding discoverable plugin properties
 
