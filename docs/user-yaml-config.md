@@ -36,54 +36,56 @@ touch "~/Library/Application Support/meltano/config.yml"  # macOS
 ```yaml
 yaml:
   indent: 4
-  preserve_quotes: true
-  width: 80
+  block_seq_indent: 2
+  sequence_dash_offset: 2
 ```
 
 ## Available Settings
 
-### Indentation Settings
+### YAML Indentation Settings
 
-- `indent` (int): Mapping indentation (default: 2)
-- `block_seq_indent` (int): Additional sequence indentation (default: 0)
-- `sequence_dash_offset` (int): Dash offset for sequences (default: max(0, indent-2))
+- `indent` (int): Base indentation level for mappings (default: 2, minimum: 1)
+- `block_seq_indent` (int): Additional indentation for block sequences (default: 0, minimum: 0)
+- `sequence_dash_offset` (int): Offset for sequence dashes (default: max(0, indent-2), minimum: 0)
 
-### Formatting Options
+## Example Configurations
 
-- `preserve_quotes` (bool): Preserve original quote style
-- `default_style` (string): Default scalar style ('', '|', '>')
-- `width` (int): Maximum line width
-- `explicit_start` (bool): Add explicit document start (---)
-- `explicit_end` (bool): Add explicit document end (...)
-- `version` (string): YAML version (e.g., "1.2")
-- `allow_unicode` (bool): Allow Unicode characters
+### Standard 2-space indentation (default)
+```yaml
+yaml:
+  indent: 2
+  block_seq_indent: 0
+  sequence_dash_offset: 0
+```
 
-### Type Representation
-
-- `default_flow_style` (bool): Use flow style by default
-- `canonical` (bool): Output in canonical form
-- `allow_duplicate_keys` (bool): Allow duplicate mapping keys
-
-## Example Configuration
-
+### 4-space indentation with block sequence indentation
 ```yaml
 yaml:
   indent: 4
-  preserve_quotes: true
-  width: 120
-  explicit_start: true
+  block_seq_indent: 2
+  sequence_dash_offset: 2
 ```
+
+## How It Works
+
+When Meltano writes YAML files (like `meltano.yml`), it applies these user configuration settings to control the formatting. The settings affect:
+
+- **indent**: Controls how much mapping keys are indented from their parent
+- **block_seq_indent**: Additional indentation for sequence items beyond the base indent
+- **sequence_dash_offset**: How far sequence dashes (`-`) are offset from the left margin
+
+### Invalid Values
+
+If invalid values are provided, Meltano will log a warning and fall back to defaults:
+- Negative `indent` values default to 2
+- Negative `block_seq_indent` values default to 0
 
 ## Disabling User Configuration
 
-Set the environment variable to any truthy value (`1`, `true`, `yes`, `on`) to disable user configuration:
+Set the `MELTANO_DISABLE_USER_YAML_CONFIG` environment variable to any truthy value (`1`, `true`, `yes`, `on`) to disable user configuration:
 
 ```bash
 export MELTANO_DISABLE_USER_YAML_CONFIG=true
-# or
-export MELTANO_DISABLE_USER_YAML_CONFIG=1
-# or
-export MELTANO_DISABLE_USER_YAML_CONFIG=yes
 ```
 
 This forces Meltano to use default YAML formatting settings.
