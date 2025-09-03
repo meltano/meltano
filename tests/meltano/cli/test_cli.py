@@ -413,6 +413,62 @@ class TestCli:
             assert result.exit_code == 0, result.exception
             assert ProjectSettingsService.config_override[setting_name] == value
 
+    @pytest.mark.usefixtures("deactivate_project")
+    def test_logging_server_flag(
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
+    ) -> None:
+        """Test that --logging-server flag creates and manages LoggingServer."""
+        # Import the actual class before mocking
+        from meltano.core.logging.server import LoggingServer
+
+        # Mock click Context.with_resource to capture what gets added
+        with mock.patch.object(click.Context, "with_resource") as mock_with_resource:
+            pushd(project_files_cli.root)
+            result = cli_runner.invoke(
+                cli,
+                ["--logging-server", "hub", "ping"],
+            )
+
+            # Verify the command succeeded
+            assert result.exit_code == 0, result.output
+
+            # Verify with_resource was called once
+            mock_with_resource.assert_called_once()
+
+            # Check that the argument to with_resource was a LoggingServer instance
+            args, kwargs = mock_with_resource.call_args
+            assert len(args) == 1, "with_resource should be called with one argument"
+
+            # The argument should be a LoggingServer instance
+            assert isinstance(args[0], LoggingServer), (
+                f"Expected LoggingServer instance, got {type(args[0])}"
+            )
+
+    def test_logging_server_flag_not_used(
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
+    ) -> None:
+        """Test that LoggingServer is not created without --logging-server flag."""
+        with mock.patch(
+            "meltano.core.logging.server.LoggingServer"
+        ) as mock_logging_server:
+            pushd(project_files_cli.root)
+            result = cli_runner.invoke(
+                cli,
+                ["hub", "ping"],
+            )
+
+            # Verify the command succeeded
+            assert result.exit_code == 0
+
+            # Verify LoggingServer was not instantiated
+            mock_logging_server.assert_not_called()
+
 
 def _get_dummy_logging_config(*, colors=True):
     return {
