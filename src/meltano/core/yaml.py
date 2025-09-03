@@ -6,6 +6,7 @@ import os
 import sys
 import typing as t
 import uuid
+from contextlib import suppress
 from copy import deepcopy
 from dataclasses import dataclass
 from decimal import Decimal
@@ -83,39 +84,13 @@ def load(path: os.PathLike[str]) -> CommentedMap:
 def _apply_user_configuration(yaml_instance: YAML) -> None:
     """Apply user configuration to YAML instance if enabled."""
     if not truthy(os.getenv("MELTANO_DISABLE_USER_YAML_CONFIG", "false")):
-        try:
-            settings = get_user_config_service().yaml_settings()
-
-            indent = settings.get("indent", 2)
-            indent = indent if isinstance(indent, int) else 2
-
-            block_seq_indent = settings.get("block_seq_indent", 0)
-            block_seq_indent = (
-                block_seq_indent if isinstance(block_seq_indent, int) else 0
-            )
-
-            sequence_dash_offset = settings.get("sequence_dash_offset")
-            sequence_dash_offset = (
-                sequence_dash_offset
-                if isinstance(sequence_dash_offset, int)
-                else max(0, indent - 2)
-            )
-
+        with suppress(UserConfigReadError):
+            settings = get_user_config_service().yaml
             yaml_instance.indent(
-                mapping=indent,
-                sequence=indent + block_seq_indent,
-                offset=sequence_dash_offset,
+                mapping=settings.indent,
+                sequence=settings.indent + settings.block_seq_indent,
+                offset=settings.sequence_dash_offset,
             )
-
-            for key, value in settings.items():
-                if key not in {
-                    "indent",
-                    "block_seq_indent",
-                    "sequence_dash_offset",
-                } and hasattr(yaml_instance, key):
-                    setattr(yaml_instance, key, value)
-        except UserConfigReadError:
-            pass
 
 
 def _create_configured_yaml_instance() -> YAML:

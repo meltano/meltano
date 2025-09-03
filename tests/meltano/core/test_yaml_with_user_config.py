@@ -169,31 +169,6 @@ class TestYAMLWithUserConfig:
             with suppress(PermissionError):
                 config_path.unlink()
 
-    def test_yaml_instance_isolation(self):
-        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
-            tmp.write("yaml:\n  indent: 6\n  explicit_start: true\n")
-            tmp.flush()
-            config_path = Path(tmp.name)
-
-            with self._mock_user_config_service(config_path):
-                data1 = self._create_test_data(test="first")
-                from io import StringIO
-
-                output1 = StringIO()
-                yaml.dump(data1, output1)
-                result1 = output1.getvalue()
-
-                data2 = self._create_test_data(test="second")
-                output2 = StringIO()
-                yaml.dump(data2, output2)
-                result2 = output2.getvalue()
-
-                assert result1 == "---\ntest: first\n"
-                assert result2 == "---\ntest: second\n"
-
-            with suppress(PermissionError):
-                config_path.unlink()
-
     def test_yaml_decimal_and_uuid_types(self):
         """Test that Decimal and UUID types are properly represented in YAML."""
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:

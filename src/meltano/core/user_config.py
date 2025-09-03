@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import threading
 import typing as t
+from dataclasses import KW_ONLY, dataclass, field
 
 import platformdirs
 import structlog
 from ruamel.yaml import YAML
 
 from meltano.core.error import MeltanoError
-from meltano.core.utils import strtobool
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -35,6 +35,76 @@ class UserConfigReadError(MeltanoError):
         super().__init__(reason, instruction)
 
 
+@dataclass(slots=True)
+class YamlSettings:
+    """YAML indentation settings."""
+
+    _: KW_ONLY
+    _indent: int = 2
+    _block_seq_indent: int = 0
+    _sequence_dash_offset: int | None = None
+
+    @property
+    def indent(self) -> int:
+        """Get the indentation level."""
+        if self._indent < 1:
+            logger.warning(
+                "Invalid YAML indentation level, using default",
+                indent=self._indent,
+            )
+            return 2
+        return self._indent
+
+    @property
+    def block_seq_indent(self) -> int:
+        """Get the block sequence indentation level."""
+        if self._block_seq_indent < 0:
+            logger.warning(
+                "Invalid YAML block sequence indentation level, using default",
+                block_seq_indent=self._block_seq_indent,
+            )
+            return 0
+        return self._block_seq_indent
+
+    @property
+    def sequence_dash_offset(self) -> int:
+        """Get the sequence dash offset."""
+        if self._sequence_dash_offset is None:
+            self._sequence_dash_offset = max(0, self.indent - 2)
+        return self._sequence_dash_offset
+
+    @classmethod
+    def from_dict(cls, data: dict[str, t.Any]) -> YamlSettings:
+        """Create a YAML settings from a dictionary."""
+        kwargs = {}
+        if indent := data.get("indent"):
+            kwargs["_indent"] = int(indent)
+
+        if block_seq_indent := data.get("block_seq_indent"):
+            kwargs["_block_seq_indent"] = int(block_seq_indent)
+
+        if sequence_dash_offset := data.get("sequence_dash_offset"):
+            kwargs["_sequence_dash_offset"] = int(sequence_dash_offset)
+
+        return cls(**kwargs)
+
+
+@dataclass(slots=True)
+class UserConfig:
+    """User configuration."""
+
+    _: KW_ONLY
+    yaml: YamlSettings = field(default_factory=YamlSettings)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, t.Any]) -> UserConfig:
+        """Create a UserConfig from a dictionary."""
+        kwargs = {}
+        if yaml := data.get("yaml"):
+            kwargs["yaml"] = YamlSettings.from_dict(yaml)
+        return cls(**kwargs)
+
+
 class UserConfigService:
     """Meltano Service to manage user-specific configuration."""
 
@@ -46,7 +116,7 @@ class UserConfigService:
                 Defaults to platform-specific config directory.
         """
         self._config_path = config_path
-        self._config: dict[str, t.Any] | None = None
+        self._config: UserConfig | None = None
 
     @property
     def config_path(self) -> Path:
@@ -57,7 +127,7 @@ class UserConfigService:
         return self._config_path
 
     @property
-    def config(self) -> dict[str, t.Any]:
+    def config(self) -> UserConfig:
         """Get the configuration data.
 
         Returns:
@@ -67,19 +137,12 @@ class UserConfigService:
             UserConfigReadError: If the configuration file exists but cannot be read.
         """
         if self._config is None:
-            self._config = {}
+            data: dict[str, t.Any] = {}
             if self.config_path.exists():
+                yaml = YAML(typ="safe")
                 try:
-                    yaml = YAML(typ="safe")
                     with self.config_path.open() as config_file:
-                        loaded_config = yaml.load(config_file) or {}
-                        if isinstance(loaded_config, dict):
-                            self._config = loaded_config
-                        else:
-                            logger.warning(
-                                "User config root must be a mapping, ignoring",
-                                config_path=str(self.config_path),
-                            )
+                        data = yaml.load(config_file) or {}
                 except Exception as err:
                     logger.error(
                         "Failed to read user config",
@@ -87,147 +150,18 @@ class UserConfigService:
                         error=str(err),
                     )
                     raise UserConfigReadError(self.config_path, err) from err
+
+            self._config = UserConfig.from_dict(data)
         return self._config
 
     @property
-    def yaml_indent(self) -> int:
-        """Get YAML indentation level.
-
-        Returns:
-            The YAML indentation level, defaults to 2.
-        """
-        yaml_section = self.config.get("yaml", {})
-        if not isinstance(yaml_section, dict):
-            return 2
-
-        indent_value = yaml_section.get("indent", 2)
-        if isinstance(indent_value, int):
-            return indent_value
-
-        try:
-            return int(indent_value)
-        except (ValueError, TypeError):
-            logger.warning(
-                "Invalid yaml indent value, using default",
-                config_path=str(self.config_path),
-                default=2,
-            )
-            return 2
-
-    def yaml_settings(self) -> dict[str, bool | int | str | None]:
+    def yaml(self) -> YamlSettings:
         """Get all YAML formatting settings.
 
         Returns:
             A dictionary of YAML formatting settings.
         """
-        yaml_section = self.config.get("yaml", {})
-        if not isinstance(yaml_section, dict):
-            return {}
-
-        known_settings = {
-            "indent",
-            "width",
-            "block_seq_indent",
-            "sequence_dash_offset",
-            "preserve_quotes",
-            "map_indent",
-            "sequence_indent",
-            "offset",
-            "explicit_start",
-            "explicit_end",
-            "version",
-            "tags",
-            "canonical",
-            "default_flow_style",
-            "default_style",
-            "allow_unicode",
-            "line_break",
-            "encoding",
-        }
-
-        settings: dict[str, bool | int | str | None] = {}
-        for key, value in yaml_section.items():
-            if key not in known_settings:
-                logger.warning(
-                    "Unrecognized YAML setting, ignoring",
-                    config_path=str(self.config_path),
-                    setting=key,
-                    value=value,
-                )
-                continue
-
-            parsed_value = self._parse_value(value)
-
-            if key == "indent" and isinstance(parsed_value, int) and parsed_value < 1:
-                logger.warning(
-                    "YAML indent must be >= 1, using default",
-                    config_path=str(self.config_path),
-                    invalid_value=parsed_value,
-                    default=2,
-                )
-                parsed_value = 2
-            elif key == "width" and isinstance(parsed_value, int) and parsed_value < 1:
-                logger.warning(
-                    "YAML width must be >= 1, using default",
-                    config_path=str(self.config_path),
-                    invalid_value=parsed_value,
-                    default=80,
-                )
-                parsed_value = 80
-            elif (
-                key == "block_seq_indent"
-                and isinstance(parsed_value, int)
-                and parsed_value < 0
-            ):
-                logger.warning(
-                    "YAML block_seq_indent must be >= 0, using default",
-                    config_path=str(self.config_path),
-                    invalid_value=parsed_value,
-                    default=0,
-                )
-                parsed_value = 0
-
-            settings[key] = parsed_value
-
-        return settings
-
-    def _parse_value(self, value: object) -> bool | int | str | None:
-        """Parse a configuration value using Meltano utilities.
-
-        Args:
-            value: The value to parse.
-
-        Returns:
-            The parsed value as the appropriate type.
-        """
-        # YAML already parses types for us, but we need to handle string conversion
-        # for compatibility with INI-style parsing
-        if value is None:
-            return None
-
-        if isinstance(value, bool):
-            return value
-
-        if isinstance(value, int):
-            return value
-
-        if isinstance(value, str):
-            if value.lower() in {"none", "null", ""}:
-                return None
-
-            try:
-                bool_val = strtobool(value)
-                return bool(bool_val)
-            except ValueError:
-                pass
-
-            try:
-                return int(value)
-            except ValueError:
-                return value
-
-        # For any other type, convert to string
-        return str(value)
+        return self.config.yaml
 
 
 _user_config_service: UserConfigService | None = None
