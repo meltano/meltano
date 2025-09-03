@@ -173,7 +173,7 @@ class Job(SystemModel):
         """
         return self.state is State.RUNNING
 
-    def valid_intil(self) -> datetime:
+    def valid_until(self) -> datetime:
         """Return the datetime when this job goes stale.
 
         Returns:
@@ -198,7 +198,7 @@ class Job(SystemModel):
         if not self.is_running():
             return False
 
-        return datetime.now(timezone.utc) > self.valid_intil()
+        return datetime.now(timezone.utc) > self.valid_until()
 
     def has_error(self) -> bool:
         """Return whether a job has failed.
