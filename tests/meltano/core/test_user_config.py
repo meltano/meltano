@@ -13,6 +13,7 @@ import pytest
 from meltano.core.user_config import (
     UserConfigReadError,
     UserConfigService,
+    YamlSettings,
     _reset_user_config_service,
     get_user_config_service,
 )
@@ -72,15 +73,30 @@ class TestUserConfigService:
             assert user_config_service.yaml.indent == 8
             assert user_config_service.config_path == config_path
 
-    def test_yaml_settings_all_types(self):
-        config = """yaml:
-  indent: 4
-"""
-        with self._config_file(config) as config_path:
+    @pytest.mark.parametrize(
+        ("content", "config"),
+        (
+            pytest.param(
+                "yaml:\n  indent: 4\n",
+                YamlSettings(_indent=4),
+                id="indent",
+            ),
+            pytest.param(
+                "yaml:\n  block_seq_indent: 2\n",
+                YamlSettings(_block_seq_indent=2),
+                id="block_seq_indent",
+            ),
+            pytest.param(
+                "yaml:\n  sequence_dash_offset: 3\n",
+                YamlSettings(_sequence_dash_offset=3),
+                id="sequence_dash_offset",
+            ),
+        ),
+    )
+    def test_yaml_settings(self, content: str, config: YamlSettings):
+        with self._config_file(content) as config_path:
             settings = UserConfigService(config_path).yaml
-            assert settings.indent == 4
-            assert settings.block_seq_indent == 0
-            assert settings.sequence_dash_offset == 2
+            assert settings == config
 
     def test_yaml_settings_empty(self):
         with self._config_file("other:\n  key: value\n") as config_path:
