@@ -23,6 +23,7 @@ from meltano.core.state_store import (
     DBStateStoreManager,
     MeltanoState,
     StateBackend,
+    StateBackendNotFoundError,
     state_store_manager_from_project_settings,
 )
 from meltano.core.state_store.azure import AZStorageStateStoreManager
@@ -43,7 +44,10 @@ else:
 
 def test_unknown_state_backend_scheme(project: Project):
     project.settings.set(["state_backend", "uri"], "unknown://")
-    with pytest.raises(ValueError, match="No state backend found for scheme"):
+    with pytest.raises(
+        StateBackendNotFoundError,
+        match="No state backend found for scheme",
+    ):
         state_store_manager_from_project_settings(project.settings)
 
 
