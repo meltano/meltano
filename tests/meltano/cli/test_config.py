@@ -12,6 +12,7 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
 if t.TYPE_CHECKING:
@@ -104,6 +105,23 @@ class TestCliConfig:
         json_config = json.loads(result.stdout)
         assert json_config["database_uri"] == engine_uri
         assert json_config["cli"]["log_level"] == "info"
+
+    @pytest.mark.usefixtures("project")
+    def test_config_unknown_plugin(
+        self,
+        request: pytest.FixtureRequest,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            [
+                "config",
+                "print",
+                f"unknown-plugin-{request.node.nodeid}",
+            ],
+        )
+        assert result.exit_code == 1
+        assert isinstance(result.exception, PluginNotFoundError)
 
     @pytest.mark.usefixtures("project")
     def test_config_meltano_set(self, cli_runner) -> None:
