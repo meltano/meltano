@@ -63,6 +63,7 @@ def _get_plugin(
     tracker: Tracker,
 ) -> ProjectPlugin | None:
     """Get a plugin from the project."""
+    plugin: ProjectPlugin | None = None
     try:
         plugin = project.plugins.find_plugin(
             plugin_name,
@@ -71,9 +72,7 @@ def _get_plugin(
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
     except PluginNotFoundError:
-        if plugin_name == "meltano":
-            plugin = None
-        else:
+        if plugin_name != "meltano":
             tracker.track_command_event(CliEvent.aborted)
             raise
 
@@ -287,7 +286,7 @@ def print_config(
     *,
     plugin_name: str,
     plugin_type: PluginType | None,
-    config_format: str,
+    config_format: t.Literal["json", "env"],
     extras: bool,
 ) -> None:
     """Print a plugin's configuration."""
@@ -306,32 +305,35 @@ def print_config(
     )
     settings = _get_settings(project=project, plugin=plugin)
 
-    if config_format == "json":
-        process = extras is not True
-        json_config = settings.as_dict(
-            extras=extras,
-            process=process,
-            session=session,
-            redacted=safe,
-            redacted_value="*****",
-        )
-        click.echo(json.dumps(json_config, indent=2))
-    elif config_format == "env":
-        env = settings.as_env(
-            extras=extras,
-            session=session,
-            redacted=safe,
-            redacted_value="*****",
-        )
+    match config_format:
+        case "json":
+            process = extras is not True
+            json_config = settings.as_dict(
+                extras=extras,
+                process=process,
+                session=session,
+                redacted=safe,
+                redacted_value="*****",
+            )
+            click.echo(json.dumps(json_config, indent=2))
+        case "env":
+            env = settings.as_env(
+                extras=extras,
+                session=session,
+                redacted=safe,
+                redacted_value="*****",
+            )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            path = Path(temp_dir) / ".env"
-            for key, value in env.items():
-                dotenv.set_key(path, key, value)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                path = Path(temp_dir) / ".env"
+                for key, value in env.items():
+                    dotenv.set_key(path, key, value)
 
-            dotenv_content = path.read_text()
+                dotenv_content = path.read_text()
 
-        click.echo(dotenv_content)
+            click.echo(dotenv_content)
+        case _:
+            t.assert_never(config_format)
 
 
 @_use_meltano_env
