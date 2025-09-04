@@ -38,14 +38,109 @@ from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin import PluginType
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
     from meltano.core.setting_definition import SettingDefinition
-    from meltano.core.settings_service import SettingsService
+    from meltano.core.tracking.tracker import Tracker
 
 logger = structlog.stdlib.get_logger(__name__)
 
 install, no_install, only_install = get_install_options(include_only_install=True)
+
+
+def _get_plugin(
+    *,
+    project: Project,
+    plugin_name: str,
+    plugin_type: PluginType | None = None,
+    tracker: Tracker,
+) -> ProjectPlugin | None:
+    """Get a plugin from the project."""
+    try:
+        plugin = project.plugins.find_plugin(
+            plugin_name,
+            plugin_type=plugin_type,
+            configurable=True,
+        )
+        tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
+    except PluginNotFoundError:
+        if plugin_name == "meltano":
+            plugin = None
+        else:
+            tracker.track_command_event(CliEvent.aborted)
+            raise
+
+    return plugin
+
+
+@t.overload
+def _get_settings(
+    *,
+    project: Project,
+    plugin: None,
+) -> ProjectSettingsService: ...
+
+
+@t.overload
+def _get_settings(
+    *,
+    project: Project,
+    plugin: ProjectPlugin,
+) -> PluginSettingsService: ...
+
+
+def _get_settings(
+    *,
+    project: Project,
+    plugin: ProjectPlugin | None,
+) -> ProjectSettingsService | PluginSettingsService:
+    """Get project or plugin settings.
+
+    Args:
+        project: Meltano project
+        plugin: Plugin, or None for Meltano
+
+    Returns:
+        Project or plugin settings
+    """
+    if plugin is None:
+        return project.settings
+
+    return PluginSettingsService(project, plugin)
+
+
+@t.overload
+def _get_invoker(*, project: Project, plugin: None) -> None: ...
+
+
+@t.overload
+def _get_invoker(
+    *,
+    project: Project,
+    plugin: ProjectPlugin,
+) -> PluginInvoker: ...
+
+
+def _get_invoker(
+    *, project: Project, plugin: ProjectPlugin | None
+) -> PluginInvoker | None:
+    """Set up plugin invoker, session, and tracker for config test command.
+
+    Args:
+        project: Meltano project
+        plugin: Plugin, or None for Meltano
+
+    Returns:
+        Plugin invoker, or None for Meltano
+
+    Raises:
+        PluginNotFoundError: If plugin is not found and not 'meltano'
+    """
+    if plugin is not None:
+        return PluginInvoker(project, plugin)
+
+    return None
 
 
 def _get_ctx_arg(*args: t.Any) -> click.Context:
@@ -133,11 +228,29 @@ def get_label(metadata, source) -> str:  # noqa: ANN001
     environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.option(
-    "--plugin-type",
-    type=PluginTypeArg(),
-    default=None,
+    "--safe/--unsafe",
+    default=True,
+    show_default=True,
+    help="Expose values for sensitive settings.",
+)
+@click.pass_context
+def config(ctx: click.Context, *, safe: bool) -> None:
+    """Display Meltano or plugin configuration.
+
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#config
+    """  # noqa: D301
+    ctx.obj["safe"] = safe
+
+
+@_use_meltano_env
+@config.command(
+    cls=PartialInstrumentedCmd,
+    name="print",
+    short_help="Print a plugin's configuration.",
 )
 @click.argument("plugin_name")
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--format",
     "config_format",
@@ -145,97 +258,59 @@ def get_label(metadata, source) -> str:  # noqa: ANN001
     default="json",
 )
 @click.option("--extras", is_flag=True, help="View or list only plugin extras.")
-@click.option(
-    "--safe/--unsafe",
-    default=True,
-    show_default=True,
-    help="Expose values for sensitive settings.",
-)
 @pass_project(migrate=True)
 @click.pass_context
-def config(
-    ctx,  # noqa: ANN001
+def print_config(
+    ctx: click.Context,
     project: Project,
     *,
-    plugin_type: PluginType | None,
     plugin_name: str,
+    plugin_type: PluginType | None,
     config_format: str,
     extras: bool,
-    safe: bool,
 ) -> None:
-    """Display Meltano or plugin configuration.
-
-    \b
-    Read more at https://docs.meltano.com/reference/command-line-interface#config
-    """  # noqa: D301
-    tracker = ctx.obj["tracker"]
-
-    try:
-        plugin = project.plugins.find_plugin(
-            plugin_name,
-            plugin_type=plugin_type,
-            configurable=True,
-        )
-    except PluginNotFoundError:
-        if plugin_name == "meltano":
-            plugin = None
-        else:
-            tracker.track_command_event(CliEvent.aborted)
-            raise
-
-    if plugin:
-        tracker.add_contexts(PluginsTrackingContext([(plugin, None)]))
-    tracker.track_command_event(CliEvent.inflight)
+    """Print a plugin's configuration."""
+    safe: bool = ctx.obj["safe"]
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
+    ctx.obj["session"] = session
+    ctx.with_resource(session)
 
-    settings: SettingsService
-    try:
-        if plugin:
-            settings = PluginSettingsService(project, plugin)
-            invoker = PluginInvoker(project, plugin)
-        else:
-            settings = project.settings
-            invoker = None
+    plugin = _get_plugin(
+        project=project,
+        plugin_name=plugin_name,
+        plugin_type=plugin_type,
+        tracker=ctx.obj["tracker"],
+    )
+    settings = _get_settings(project=project, plugin=plugin)
 
-        ctx.obj["settings"] = settings
-        ctx.obj["session"] = session
-        ctx.obj["invoker"] = invoker
-        ctx.obj["safe"] = safe
+    if config_format == "json":
+        process = extras is not True
+        json_config = settings.as_dict(
+            extras=extras,
+            process=process,
+            session=session,
+            redacted=safe,
+            redacted_value="*****",
+        )
+        click.echo(json.dumps(json_config, indent=2))
+    elif config_format == "env":
+        env = settings.as_env(
+            extras=extras,
+            session=session,
+            redacted=safe,
+            redacted_value="*****",
+        )
 
-        if ctx.invoked_subcommand is None:
-            if config_format == "json":
-                process = extras is not True
-                json_config = settings.as_dict(
-                    extras=extras,
-                    process=process,
-                    session=session,
-                    redacted=safe,
-                    redacted_value="*****",
-                )
-                click.echo(json.dumps(json_config, indent=2))
-            elif config_format == "env":
-                env = settings.as_env(
-                    extras=extras,
-                    session=session,
-                    redacted=safe,
-                    redacted_value="*****",
-                )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / ".env"
+            for key, value in env.items():
+                dotenv.set_key(path, key, value)
 
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    path = Path(temp_dir) / ".env"
-                    for key, value in env.items():
-                        dotenv.set_key(path, key, value)
+            dotenv_content = path.read_text()
 
-                    dotenv_content = path.read_text()
-
-                click.echo(dotenv_content)
-    except Exception:
-        tracker.track_command_event(CliEvent.failed)
-        raise
-    finally:
-        session.close()
+        click.echo(dotenv_content)
 
 
 @_use_meltano_env
@@ -247,14 +322,35 @@ def config(
         "environment variables, and current values."
     ),
 )
+@click.argument("plugin_name")
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option("--extras", is_flag=True, help="List only plugin extras.")
+@pass_project(migrate=True)
 @click.pass_context
-def list_settings(ctx: click.Context, *, extras: bool) -> None:
+def list_settings(
+    ctx: click.Context,
+    project: Project,
+    *,
+    plugin_name: str,
+    plugin_type: PluginType | None,
+    extras: bool,
+) -> None:
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
-    settings: ProjectSettingsService | PluginSettingsService = ctx.obj["settings"]
-    session = ctx.obj["session"]
-    tracker = ctx.obj["tracker"]
     safe: bool = ctx.obj["safe"]
+    tracker: Tracker = ctx.obj["tracker"]
+
+    _, Session = project_engine(project)  # noqa: N806
+    session = Session()
+    ctx.obj["session"] = session
+    ctx.with_resource(session)
+
+    plugin = _get_plugin(
+        project=project,
+        plugin_name=plugin_name,
+        plugin_type=plugin_type,
+        tracker=tracker,
+    )
+    settings = _get_settings(project=project, plugin=plugin)
 
     printed_custom_heading = False
     printed_extra_heading = extras
@@ -342,21 +438,41 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
 
 
 @config.command(cls=PartialInstrumentedCmd)
+@click.argument("plugin_name")
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO.value,
 )
 @click.confirmation_option()
+@pass_project(migrate=True)
 @click.pass_context
 @_use_meltano_env
-def reset(ctx, store) -> None:  # noqa: ANN001
+def reset(
+    ctx: click.Context,
+    project: Project,
+    *,
+    plugin_name: str,
+    plugin_type: PluginType | None,
+    store: str,
+) -> None:
     """Clear the configuration (back to defaults)."""
     store = SettingValueStore(store)
+    tracker: Tracker = ctx.obj["tracker"]
 
-    settings = ctx.obj["settings"]
-    session = ctx.obj["session"]
-    tracker = ctx.obj["tracker"]
+    _, Session = project_engine(project)  # noqa: N806
+    session = Session()
+    ctx.obj["session"] = session
+    ctx.with_resource(session)
+
+    plugin = _get_plugin(
+        project=project,
+        plugin_name=plugin_name,
+        plugin_type=plugin_type,
+        tracker=tracker,
+    )
+    settings = _get_settings(project=project, plugin=plugin)
 
     try:
         metadata = settings.reset(store=store, session=session)
@@ -373,6 +489,8 @@ def reset(ctx, store) -> None:  # noqa: ANN001
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
+@click.argument("plugin_name")
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option("--interactive", is_flag=True)
 @click.option("--from-file", type=click.File("r"))
 @click.argument("setting_name", nargs=-1)
@@ -382,11 +500,15 @@ def reset(ctx, store) -> None:  # noqa: ANN001
     type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO.value,
 )
+@pass_project(migrate=True)
 @click.pass_context
 @_use_meltano_env
 def set_(
     ctx: click.Context,
+    project: Project,
     *,
+    plugin_name: str,
+    plugin_type: PluginType | None,
     setting_name: tuple[str, ...],
     value: t.Any,  # noqa: ANN401
     store: str,
@@ -395,11 +517,34 @@ def set_(
 ) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
     store = SettingValueStore(store)
+    safe: bool = ctx.obj["safe"]
+    tracker: Tracker = ctx.obj["tracker"]
+
+    _, Session = project_engine(project)  # noqa: N806
+    session = Session()
+    ctx.obj["session"] = session
+    ctx.with_resource(session)
+
+    plugin = _get_plugin(
+        project=project,
+        plugin_name=plugin_name,
+        plugin_type=plugin_type,
+        tracker=tracker,
+    )
+    settings = _get_settings(project=project, plugin=plugin)
 
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
 
-    interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
+    interaction = InteractiveConfig(
+        store=store,
+        project=project,
+        settings=settings,
+        safe=safe,
+        session=session,
+        tracker=tracker,
+        extras=False,
+    )
 
     if interactive:
         interaction.configure_all()
@@ -413,25 +558,42 @@ def set_(
 
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
-@pass_project(migrate=True)
-@click.pass_context
+@click.argument("plugin_name")
+@click.option("--plugin-type", type=PluginTypeArg())
 @install
 @no_install
 @only_install
+@pass_project(migrate=True)
+@click.pass_context
 @run_async
 async def test(
-    ctx,  # noqa: ANN001
+    ctx: click.Context,
     project: Project,
+    *,
+    plugin_type: PluginType | None,
+    plugin_name: str,
     install_plugins: InstallPlugins,
 ) -> None:
     """Test the configuration of a plugin."""
-    invoker = ctx.obj["invoker"]
-    tracker = ctx.obj["tracker"]
-    if not invoker:
+    tracker: Tracker = ctx.obj["tracker"]
+
+    _, Session = project_engine(project)  # noqa: N806
+    session = Session()
+    ctx.obj["session"] = session
+    ctx.with_resource(session)
+
+    plugin = _get_plugin(
+        project=project,
+        plugin_name=plugin_name,
+        plugin_type=plugin_type,
+        tracker=tracker,
+    )
+    invoker = _get_invoker(project=project, plugin=plugin)
+
+    if invoker is None:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError("Testing of the Meltano project configuration is not supported")  # noqa: EM101
 
-    session = ctx.obj["session"]
     plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
 
     await install_plugins(
@@ -468,25 +630,43 @@ async def test(
 
 
 @config.command(cls=PartialInstrumentedCmd)
+@click.argument("plugin_name")
 @click.argument("setting_name", nargs=-1, required=True)
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO.value,
 )
+@pass_project(migrate=True)
 @click.pass_context
 @_use_meltano_env
-def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
+def unset(
+    ctx: click.Context,
+    project: Project,
+    *,
+    plugin_name: str,
+    plugin_type: PluginType | None,
+    setting_name: tuple[str, ...],
+    store: str,
+) -> None:
     """Unset the configurations' setting called `<name>`."""
     store = SettingValueStore(store)
-
-    settings = t.cast(
-        "ProjectSettingsService | PluginSettingsService",
-        ctx.obj["settings"],
-    )
-    session = ctx.obj["session"]
-    tracker = ctx.obj["tracker"]
     safe: bool = ctx.obj["safe"]
+    tracker: Tracker = ctx.obj["tracker"]
+
+    _, Session = project_engine(project)  # noqa: N806
+    session = Session()
+    ctx.obj["session"] = session
+    ctx.with_resource(session)
+
+    plugin = _get_plugin(
+        project=project,
+        plugin_name=plugin_name,
+        plugin_type=plugin_type,
+        tracker=tracker,
+    )
+    settings = _get_settings(project=project, plugin=plugin)
 
     path = list(setting_name)
     try:
