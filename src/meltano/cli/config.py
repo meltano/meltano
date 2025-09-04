@@ -332,7 +332,7 @@ def print_config(
                 dotenv_content = path.read_text()
 
             click.echo(dotenv_content)
-        case _:
+        case _:  # pragma: no cover
             t.assert_never(config_format)
 
 
