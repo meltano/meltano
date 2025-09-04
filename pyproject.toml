@@ -273,6 +273,7 @@ incremental = false # Disabled until https://github.com/python/mypy/issues/12664
 files = [
   "src/meltano/",
 ]
+follow_untyped_imports = true
 exclude = [
   "src/meltano/migrations/",
 ]

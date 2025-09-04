@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from functools import cached_property
 from pathlib import Path
 
-import fasteners  # type: ignore[import-untyped]
+import fasteners
 import structlog
 from dotenv import dotenv_values
 
