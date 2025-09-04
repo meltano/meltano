@@ -137,10 +137,7 @@ def _get_invoker(
     Raises:
         PluginNotFoundError: If plugin is not found and not 'meltano'
     """
-    if plugin is not None:
-        return PluginInvoker(project, plugin)
-
-    return None
+    return PluginInvoker(project, plugin) if plugin is not None else None
 
 
 def _get_ctx_arg(*args: t.Any) -> click.Context:
