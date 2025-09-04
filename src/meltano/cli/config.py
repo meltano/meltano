@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import tempfile
 import typing as t
 from functools import wraps
@@ -35,6 +36,11 @@ from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin import PluginType
@@ -216,6 +222,24 @@ def get_label(metadata, source) -> str:  # noqa: ANN001
         return f"from the {metadata['env_var']} variable in {source.label}"
     except KeyError:
         return f"from {source.label}"
+
+
+class StoreArg(click.Choice):
+    """A click.Choice for the --store flag."""
+
+    def __init__(self, **kwargs: t.Any):
+        """Initialise StoreArg instance."""
+        super().__init__(_get_store_choices(), **kwargs)
+
+    @override
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,
+        ctx: click.Context | None,
+    ) -> SettingValueStore:
+        """Convert the value to a SettingValueStore."""
+        return SettingValueStore(value)
 
 
 @click.group(
@@ -437,11 +461,7 @@ def list_settings(
 @config.command(cls=PartialInstrumentedCmd)
 @click.argument("plugin_name")
 @click.option("--plugin-type", type=PluginTypeArg())
-@click.option(
-    "--store",
-    type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO.value,
-)
+@click.option("--store", type=StoreArg(), default=SettingValueStore.AUTO.value)
 @click.confirmation_option()
 @pass_project(migrate=True)
 @click.pass_context
@@ -452,10 +472,9 @@ def reset(
     *,
     plugin_name: str,
     plugin_type: PluginType | None,
-    store: str,
+    store: SettingValueStore,
 ) -> None:
     """Clear the configuration (back to defaults)."""
-    store = SettingValueStore(store)
     tracker: Tracker = ctx.obj["tracker"]
 
     _, Session = project_engine(project)  # noqa: N806
@@ -492,11 +511,7 @@ def reset(
 @click.option("--from-file", type=click.File("r"))
 @click.argument("setting_name", nargs=-1)
 @click.argument("value", required=False)
-@click.option(
-    "--store",
-    type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO.value,
-)
+@click.option("--store", type=StoreArg(), default=SettingValueStore.AUTO.value)
 @pass_project(migrate=True)
 @click.pass_context
 @_use_meltano_env
@@ -508,12 +523,11 @@ def set_(
     plugin_type: PluginType | None,
     setting_name: tuple[str, ...],
     value: t.Any,  # noqa: ANN401
-    store: str,
+    store: SettingValueStore,
     interactive: bool,
     from_file: t.TextIO | None,
 ) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
-    store = SettingValueStore(store)
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
 
@@ -630,11 +644,7 @@ async def test(
 @click.argument("plugin_name")
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option("--plugin-type", type=PluginTypeArg())
-@click.option(
-    "--store",
-    type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO.value,
-)
+@click.option("--store", type=StoreArg(), default=SettingValueStore.AUTO.value)
 @pass_project(migrate=True)
 @click.pass_context
 @_use_meltano_env
@@ -645,10 +655,9 @@ def unset(
     plugin_name: str,
     plugin_type: PluginType | None,
     setting_name: tuple[str, ...],
-    store: str,
+    store: SettingValueStore,
 ) -> None:
     """Unset the configurations' setting called `<name>`."""
-    store = SettingValueStore(store)
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
 
