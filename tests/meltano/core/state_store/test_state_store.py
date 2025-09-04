@@ -27,7 +27,10 @@ from meltano.core.state_store import (
     state_store_manager_from_project_settings,
 )
 from meltano.core.state_store.azure.backend import AZStorageStateStoreManager
-from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
+from meltano.core.state_store.filesystem import (
+    InvalidStateBackendConfigurationException,
+    _LocalFilesystemStateStoreManager,
+)
 from meltano.core.state_store.google.backend import GCSStateStoreManager
 from meltano.core.state_store.s3.backend import S3StateStoreManager
 
@@ -291,6 +294,38 @@ class TestS3StateBackend:
         assert (
             s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
         )
+
+    def test_missing_aws_secret_access_key(
+        self,
+        aws_access_key_id: str,
+        prefix: str,
+        bucket: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=None,
+            lock_timeout_seconds=10,
+        )
+
+        with pytest.raises(InvalidStateBackendConfigurationException):
+            _ = manager.client
+
+    def test_missing_aws_access_key_id(
+        self,
+        aws_secret_access_key: str,
+        prefix: str,
+        bucket: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=None,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+        with pytest.raises(InvalidStateBackendConfigurationException):
+            _ = manager.client
 
     def test_get(
         self,
