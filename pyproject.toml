@@ -90,25 +90,25 @@ meltano = "meltano.cli:main"
 
 [project.entry-points."meltano.settings"]
 # AWS S3 state backend settings
-s3_aws_access_key_id = "meltano.core.state_store.s3:AWS_ACCESS_KEY_ID"
-s3_aws_secret_access_key = "meltano.core.state_store.s3:AWS_SECRET_ACCESS_KEY"
-s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
+s3_aws_access_key_id = "meltano.core.state_store.s3.settings:AWS_ACCESS_KEY_ID"
+s3_aws_secret_access_key = "meltano.core.state_store.s3.settings:AWS_SECRET_ACCESS_KEY"
+s3_endpoint_url = "meltano.core.state_store.s3.settings:ENDPOINT_URL"
 # Azure state backend settings
-azure_connection_string = "meltano.core.state_store.azure:CONNECTION_STRING"
-azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
+azure_connection_string = "meltano.core.state_store.azure.settings:CONNECTION_STRING"
+azure_storage_account_url = "meltano.core.state_store.azure.settings:STORAGE_ACCOUNT_URL"
 # Google Cloud Storage state backend settings
-google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"  # Deprecated! Remove in Meltano v4
-google_application_credentials_path = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_PATH"
-google_application_credentials_json = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_JSON"
+google_application_credentials = "meltano.core.state_store.google.settings:APPLICATION_CREDENTIALS"  # Deprecated! Remove in Meltano v4
+google_application_credentials_path = "meltano.core.state_store.google.settings:APPLICATION_CREDENTIALS_PATH"
+google_application_credentials_json = "meltano.core.state_store.google.settings:APPLICATION_CREDENTIALS_JSON"
 
 [project.entry-points."meltano.state_backends"]
 # These keys should match the expected scheme for URIs of
 # the given type. E.g., filesystem state backends have a
 # file://<path>/<to>/<state directory> URI
-azure = "meltano.core.state_store.azure:AZStorageStateStoreManager"
+azure = "meltano.core.state_store.azure.backend:AZStorageStateStoreManager"
 file = "meltano.core.state_store.filesystem:LocalFilesystemStateStoreManager"
-gs = "meltano.core.state_store.google:GCSStateStoreManager"
-s3 = "meltano.core.state_store.s3:S3StateStoreManager"
+gs = "meltano.core.state_store.google.backend:GCSStateStoreManager"
+s3 = "meltano.core.state_store.s3.backend:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
@@ -265,6 +265,7 @@ incremental = false # Disabled until https://github.com/python/mypy/issues/12664
 files = [
   "src/meltano/",
 ]
+follow_untyped_imports = true
 exclude = [
   "src/meltano/migrations/",
 ]
