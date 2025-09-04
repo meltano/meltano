@@ -38,7 +38,7 @@ meltano config set example an_array '["foo", "bar"]'
 ## Check plugin settings
 
 ```shell
-meltano config example
+meltano config print example
 ```
 
 You should see the following output:
