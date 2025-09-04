@@ -207,10 +207,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "set",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 "orchestrate/dags/meltano.py",
                 "false",
@@ -234,10 +233,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "unset",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 "orchestrate/dags/meltano.py",
             ],
@@ -268,10 +266,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "set",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 json.dumps(
                     {
