@@ -20,13 +20,14 @@ if t.TYPE_CHECKING:
     from click.testing import CliRunner
 
     from meltano.core.project import Project
+    from tests.fixtures.cli import MeltanoCliRunner
 
 
 class TestCliConfig:
     @pytest.mark.usefixtures("project")
     def test_config(
         self,
-        cli_runner: CliRunner,
+        cli_runner: MeltanoCliRunner,
         tap,
         session,
         plugin_settings_service_factory,
@@ -44,6 +45,26 @@ class TestCliConfig:
         json_config = json.loads(result.stdout)
         assert json_config["test"] == "mock"
         assert json_config["secure"] == "*****"
+
+    @pytest.mark.parametrize(
+        "subcommand",
+        (
+            "list",
+            "print",
+            "reset",
+            "set",
+            "test",
+            "unset",
+        ),
+    )
+    def test_config_help_outside_project(
+        self,
+        cli_runner: MeltanoCliRunner,
+        subcommand: str,
+    ) -> None:
+        """Confirm that `config <subcommand> --help` works outside of a project."""
+        result = cli_runner.invoke(cli, ["config", subcommand, "--help"])
+        assert_cli_runner(result)
 
     @pytest.mark.usefixtures("project")
     def test_config_extras(self, cli_runner, tap) -> None:
