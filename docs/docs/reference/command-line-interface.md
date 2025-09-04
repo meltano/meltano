@@ -344,6 +344,15 @@ The `meltano config` command structure changed in Meltano v4. The subcommand now
 
 :::
 
+:::info Print Subcommand Required
+
+To view a plugin's configuration, you must now use the explicit `print` subcommand:
+
+- **New format**: `meltano config print <plugin>` or `meltano config print <plugin> --format=env`
+- **Old format**: `meltano config <plugin>` or `meltano config <plugin> --format=env`
+
+:::
+
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
 When no explicit `--store` is specified, `meltano config set <plugin>` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
