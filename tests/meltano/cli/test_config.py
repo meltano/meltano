@@ -19,8 +19,8 @@ if t.TYPE_CHECKING:
 
     from click.testing import CliRunner
 
+    from fixtures.cli import MeltanoCliRunner
     from meltano.core.project import Project
-    from tests.fixtures.cli import MeltanoCliRunner
 
 
 class TestCliConfig:
