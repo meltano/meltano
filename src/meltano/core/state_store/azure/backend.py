@@ -3,66 +3,13 @@
 from __future__ import annotations
 
 import typing as t
-from contextlib import contextmanager
 from functools import cached_property
 
+from azure.storage.blob import BlobServiceClient
+
 from meltano.core.error import MeltanoError
-from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
-)
-
-if t.TYPE_CHECKING:
-    from collections.abc import Generator
-
-AZURE_INSTALLED = True
-
-try:
-    from azure.storage.blob import BlobServiceClient
-except ImportError:
-    AZURE_INSTALLED = False
-
-
-class MissingAzureError(Exception):
-    """Raised when azure is required but no installed."""
-
-    def __init__(self) -> None:
-        """Initialize a MissingAzureError."""
-        super().__init__(
-            "azure required but not installed. Install meltano[azure] to use Azure Blob Storage as a state backend.",  # noqa: E501
-        )
-
-
-@contextmanager
-def requires_azure() -> Generator[None, None, None]:
-    """Raise MissingAzureError if azure is required but missing in context.
-
-    Raises:
-        MissingAzureError: if azure is not installed.
-
-    Yields:
-        None
-    """
-    if not AZURE_INSTALLED:
-        raise MissingAzureError
-    yield
-
-
-CONNECTION_STRING = SettingDefinition(
-    name="state_backend.azure.connection_string",
-    label="Connection String",
-    description="Connection string for the Azure Blob Storage account",
-    kind=SettingKind.STRING,
-    sensitive=True,
-    env_specific=True,
-)
-
-STORAGE_ACCOUNT_URL = SettingDefinition(
-    name="state_backend.azure.storage_account_url",
-    label="Storage Account URL",
-    description="URL for the Azure Blob Storage account",
-    kind=SettingKind.STRING,
-    env_specific=True,
 )
 
 
@@ -129,24 +76,23 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         Raises:
             MeltanoError: If connection string is not provided.
         """
-        with requires_azure():
-            if self.storage_account_url:
-                from azure.identity import DefaultAzureCredential
+        if self.storage_account_url:
+            from azure.identity import DefaultAzureCredential
 
-                default_credential = DefaultAzureCredential()
-                return BlobServiceClient(
-                    self.storage_account_url,
-                    credential=default_credential,
-                )
-
-            if self.connection_string:
-                return BlobServiceClient.from_connection_string(self.connection_string)
-
-            raise MeltanoError(
-                "Azure state backend requires a connection string "  # noqa: EM101
-                "or an account URL to use host credentials",
-                "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
+            default_credential = DefaultAzureCredential()
+            return BlobServiceClient(
+                self.storage_account_url,
+                credential=default_credential,
             )
+
+        if self.connection_string:
+            return BlobServiceClient.from_connection_string(self.connection_string)
+
+        raise MeltanoError(
+            "Azure state backend requires a connection string "  # noqa: EM101
+            "or an account URL to use host credentials",
+            "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
+        )
 
     def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.

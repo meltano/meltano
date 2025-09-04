@@ -26,10 +26,10 @@ from meltano.core.state_store import (
     StateBackendNotFoundError,
     state_store_manager_from_project_settings,
 )
-from meltano.core.state_store.azure import AZStorageStateStoreManager
+from meltano.core.state_store.azure.backend import AZStorageStateStoreManager
 from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
-from meltano.core.state_store.google import GCSStateStoreManager
-from meltano.core.state_store.s3 import S3StateStoreManager
+from meltano.core.state_store.google.backend import GCSStateStoreManager
+from meltano.core.state_store.s3.backend import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from pathlib import Path
