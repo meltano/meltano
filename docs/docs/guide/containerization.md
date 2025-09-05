@@ -59,24 +59,24 @@ Meltano provides two types of Docker images to suit different use cases:
 ### Full Images (Default)
 - **Tags**: `latest`, `v3.9.1`, `latest-python3.11`, etc.
 - **Includes**: All database connectors (PostgreSQL, MSSQL), build tools, and system dependencies
-- **Use when**: You need MSSQL or PostgreSQL connectivity, or require plugins with complex system dependencies
+- **Use when**: You need MSSQL connectivity, or require plugins with complex system dependencies
 
 ### Slim Images (Recommended)
 - **Tags**: `latest-slim`, `v3.9.1-slim`, `latest-python3.11-slim`, etc.
-- **Includes**: Azure, GCS, and S3 connectors with minimal dependencies
-- **Excludes**: MSSQL/PostgreSQL connectors, build tools (gcc, make, etc.)
-- **Use when**: You primarily use cloud storage backends and want faster downloads and smaller deployments
+- **Includes**: Azure, GCS, PostgreSQL, and S3 connectors with minimal dependencies
+- **Excludes**: MSSQL connectors, build tools (gcc, make, etc.)
+- **Use when**: You primarily use cloud storage backends and PostgreSQL, and want faster downloads and smaller deployments
 
 ### Choosing the Right Image
 
 **Use slim images if you:**
 - Primarily use cloud storage (S3, GCS, Azure Blob Storage)
 - Want faster container startup and deployment times
-- Don't require MSSQL or PostgreSQL database connectivity
+- Don't require MSSQL database connectivity
 - Are using plugins that don't need compilation or complex system dependencies
 
 **Use full images if you:**
-- Need MSSQL or PostgreSQL database connectivity
+- Need MSSQL database connectivity
 - Use plugins requiring build tools or complex system dependencies
 - Need the complete set of database connectors and system tools
 
@@ -97,7 +97,7 @@ docker build --build-arg MELTANO_IMAGE=meltano/meltano:latest-slim --tag my-proj
 # Use specific version with Python 3.11
 docker build --build-arg MELTANO_IMAGE=meltano/meltano:v3.9.1-python3.11-slim --tag my-project:dev .
 
-# Use full image for MSSQL/PostgreSQL support
+# Use full image for MSSQL support
 docker build --build-arg MELTANO_IMAGE=meltano/meltano:latest --tag my-project:dev .
 ```
 
