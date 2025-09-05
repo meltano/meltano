@@ -18,6 +18,7 @@ from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import (
     AmbiguousMappingName,
+    MapperMappingNameCollision,
     PluginAlreadyAddedException,
 )
 
@@ -1066,23 +1067,20 @@ class TestCliRunScratchpadOne:
         "dbt_process",
         "job_logging_service",
     )
-    def test_run_mapper_config(
+    def test_run_invalid_mapping_name(
         self,
         cli_runner,
         tap,
         target,
-        mapper,
         tap_process,
         target_process,
         mapper_process,
-        project_add_service,
     ) -> None:
-        # exit cleanly when everything is fine
+        # no mapper should be found
         create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process),
         )
 
-        # no mapper should be found
         args = ["run", tap.name, "not-a-valid-mapping-name", target.name]
         with (
             mock.patch.object(SingerTap, "discover_catalog"),
@@ -1095,37 +1093,38 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
 
-        # test mapper/mapping name collision detection - mapper plugin name no mappings
-        project_add_service.add(
-            PluginType.MAPPERS,
-            "mapper-collision-01",
-            inherit_from=mapper.name,
-        )
-        args = ["run", tap.name, "mapper-collision-01", target.name]
-        with (
-            mock.patch.object(SingerTap, "discover_catalog"),
-            mock.patch.object(SingerTap, "apply_catalog_rules"),
-            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
-        ):
-            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
-            with pytest.raises(
-                Exception,
-                match=(
-                    "block violates set requirements: Expected unique mappings "
-                    "name not the mapper plugin name: mapper-collision-01"
-                ),
-            ):
-                cli_runner.invoke(cli, args, catch_exceptions=False)
-
-        # Test mapper/mapping name collision detection - mappings name same a
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "dbt_process",
+        "job_logging_service",
+    )
+    def test_run_mapper_name_collision(
+        self,
+        cli_runner,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        project_add_service,
+    ) -> None:
+        # Test mapper/mapping name collision detection - mapping name same as
         # mapper plugin name
+        create_subprocess_exec = AsyncMock(
+            side_effect=(tap_process, mapper_process, target_process),
+        )
+
         project_add_service.add(
             PluginType.MAPPERS,
-            "mapper-collision-02",
+            "mapper-collision",
             inherit_from=mapper.name,
             mappings=[
                 {
-                    "name": "mapper-collision-02",
+                    "name": "mapper-collision",
                     "config": {
                         "transformations": [
                             {
@@ -1138,23 +1137,44 @@ class TestCliRunScratchpadOne:
                 },
             ],
         )
-        args = ["run", tap.name, "mapper-collision-02", target.name]
+
+        args = ["run", tap.name, "mapper-collision", target.name]
         with (
             mock.patch.object(SingerTap, "discover_catalog"),
             mock.patch.object(SingerTap, "apply_catalog_rules"),
-            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
         ):
-            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
-                Exception,
-                match=(
-                    "block violates set requirements: Expected unique mappings "
-                    "name not the mapper plugin name: mapper-collision-02"
-                ),
+                MapperMappingNameCollision,
+                match=r"Name collision: 'mapper-collision' is used as both.*mapper",
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
-        # create duplicate mapping name - should also fail
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "dbt_process",
+        "job_logging_service",
+    )
+    def test_run_duplicate_mapping_names(
+        self,
+        cli_runner,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        project_add_service,
+    ) -> None:
+        # Test duplicate mapping names across different mappers - should also fail
+        create_subprocess_exec = AsyncMock(
+            side_effect=(tap_process, mapper_process, target_process),
+        )
+
         project_add_service.add(
             PluginType.MAPPERS,
             "mapper-dupe1",
@@ -1198,14 +1218,12 @@ class TestCliRunScratchpadOne:
         with (
             mock.patch.object(SingerTap, "discover_catalog"),
             mock.patch.object(SingerTap, "apply_catalog_rules"),
-            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
         ):
-            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 AmbiguousMappingName,
-                match=(
-                    "Ambiguous mapping name mock-mapping-dupe, found multiple matches."
-                ),
+                match=r"Ambiguous mapping name 'mock-mapping-dupe'.*multiple matches",
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
