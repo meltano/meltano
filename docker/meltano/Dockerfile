@@ -2,6 +2,10 @@ ARG PYTHON_VERSION="3.13"
 
 FROM python:${PYTHON_VERSION}-slim
 
+LABEL org.opencontainers.image.source=https://github.com/meltano/meltano
+LABEL org.opencontainers.image.description="Meltano: Your DataOps OS. The declarative code-first data integration engine that powers your wildest data and ML-powered product ideas."
+LABEL org.opencontainers.image.licenses=MIT
+
 # Meltano project directory - this is where you should mount your Meltano project
 ARG WORKDIR="/project"
 
