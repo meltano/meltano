@@ -23,6 +23,10 @@ inputs:
   python-version:
     description: 'The version of Python that will be installed on the image'
     required: true
+  slim:
+    description: 'Whether to build the slim variant of the image'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -51,11 +55,21 @@ runs:
         name: Packages
         path: dist
 
+    - name: Set Dockerfile path
+      id: dockerfile-path
+      shell: bash
+      run: |
+        if [[ "${{ inputs.slim }}" == "true" ]]; then
+          echo "path=docker/meltano/Dockerfile.slim" >> $GITHUB_OUTPUT
+        else
+          echo "path=docker/meltano/Dockerfile" >> $GITHUB_OUTPUT
+        fi
+
     - name: Build the image for all supported architectures
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
-        file: docker/meltano/Dockerfile
+        file: ${{ steps.dockerfile-path.outputs.path }}
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
@@ -72,7 +86,7 @@ runs:
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
-        file: docker/meltano/Dockerfile
+        file: ${{ steps.dockerfile-path.outputs.path }}
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
@@ -129,7 +143,7 @@ runs:
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
-        file: docker/meltano/Dockerfile
+        file: ${{ steps.dockerfile-path.outputs.path }}
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
