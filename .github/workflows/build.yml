@@ -2,6 +2,8 @@ name: Build
 
 on:
   push:
+    branches-ignore:
+    - 'gh-readonly-queue/**'
     paths:
     - .github/actions/docker-build-scan-push/action.yml
     - .github/workflows/build.yml
