@@ -91,6 +91,9 @@ jobs:
         - "3.11"
         - "3.12"
         - "3.13"
+        slim:
+        - false
+        - true
 
     steps:
     - name: Set the workflow inputs
@@ -114,6 +117,7 @@ jobs:
         --python-version ${{ matrix.python-version }}
         --default-python ${{ env.DEFAULT_PYTHON }}
         --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
+        ${{ matrix.slim && '--slim' || '' }}
         > tags
       env:
         NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
@@ -157,6 +161,7 @@ jobs:
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}
+        slim: ${{ matrix.slim }}
 
   pypi_release:
     name: Publish to PyPI
