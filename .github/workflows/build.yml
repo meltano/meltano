@@ -72,7 +72,7 @@ jobs:
       id: baipp
 
   build_docker:
-    name: Docker Images
+    name: Docker Images (${{ matrix.slim && 'Slim' || 'Full' }}, Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     needs: build
     permissions:
