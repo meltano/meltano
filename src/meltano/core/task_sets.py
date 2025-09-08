@@ -62,7 +62,6 @@ class TaskSets(NameEq, Canonical):
 
     def __init__(
         self,
-        *,
         name: str,
         tasks: list[str] | list[list[str]],
         env: dict[str, str] | None = None,
