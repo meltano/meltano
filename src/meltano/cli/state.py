@@ -317,7 +317,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 @click.pass_context
 def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
     """Edit state in your default text editor.
-    
+
     The state must be valid JSON with a top-level 'singer_state' key:
     {
         "singer_state": {
@@ -360,7 +360,9 @@ def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
             dt.now(tz=tz.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
         )
     except json.JSONDecodeError as err:
-        logger.error("Invalid JSON at line %d, column %d: %s", err.lineno, err.colno, err.msg)
+        logger.error(
+            "Invalid JSON at line %d, column %d: %s", err.lineno, err.colno, err.msg
+        )
         ctx.exit(1)
     except InvalidJobStateError as err:
         logger.error("Invalid state format: %s", err)

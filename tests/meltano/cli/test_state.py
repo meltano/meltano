@@ -74,7 +74,9 @@ class TestCliState:
 
     @pytest.mark.usefixtures("project")
     def test_list(self, state_ids, state_service, cli_runner) -> None:
-        result = self.invoke_with_state_service(cli_runner, state_service, ["state", "list"])
+        result = self.invoke_with_state_service(
+            cli_runner, state_service, ["state", "list"]
+        )
         assert_cli_runner(result)
         assert self.get_result_set(result) == set(state_ids)
 
@@ -343,22 +345,26 @@ class TestCliState:
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
 
-    def test_edit_existing_state(self, state_service, cli_runner, state_ids, payloads) -> None:
+    def test_edit_existing_state(
+        self, state_service, cli_runner, state_ids, payloads
+    ) -> None:
         """Test editing an existing state."""
         state_id = state_ids[0]
         original_state = state_service.get_state(state_id)
-        
+
         modified_state = original_state.copy()
         if "bookmarks" not in modified_state["singer_state"]:
             modified_state["singer_state"]["bookmarks"] = {}
         modified_state["singer_state"]["bookmarks"]["new_stream"] = {"version": 1}
         edited_content = json.dumps(modified_state, indent=2)
-        
+
         with mock.patch("click.edit", return_value=edited_content) as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert_cli_runner(result)
             mock_edit.assert_called_once()
-            
+
             updated_state = state_service.get_state(state_id)
             assert updated_state == modified_state
             assert "new_stream" in updated_state["singer_state"]["bookmarks"]
@@ -368,12 +374,14 @@ class TestCliState:
         state_id = "new-state-id"
         new_state = {"singer_state": {"bookmarks": {}}}
         edited_content = json.dumps(new_state, indent=2)
-        
+
         with mock.patch("click.edit", return_value=edited_content) as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert_cli_runner(result)
             mock_edit.assert_called_once()
-            
+
             created_state = state_service.get_state(state_id)
             assert created_state == new_state
 
@@ -381,12 +389,14 @@ class TestCliState:
         """Test cancelling edit operation."""
         state_id = state_ids[0]
         original_state = state_service.get_state(state_id)
-        
+
         with mock.patch("click.edit", return_value=None) as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert_cli_runner(result)
             mock_edit.assert_called_once()
-            
+
             current_state = state_service.get_state(state_id)
             assert current_state == original_state
 
@@ -395,12 +405,14 @@ class TestCliState:
         state_id = state_ids[0]
         original_state = state_service.get_state(state_id)
         original_content = json.dumps(original_state, indent=2)
-        
+
         with mock.patch("click.edit", return_value=original_content) as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert_cli_runner(result)
             mock_edit.assert_called_once()
-            
+
             current_state = state_service.get_state(state_id)
             assert current_state == original_state
 
@@ -408,21 +420,27 @@ class TestCliState:
         """Test editing with invalid JSON."""
         state_id = state_ids[0]
         invalid_json = "{ invalid json"
-        
+
         with mock.patch("click.edit", return_value=invalid_json) as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert result.exit_code == 1
             mock_edit.assert_called_once()
             assert "Invalid JSON" in result.stderr
 
-    def test_edit_invalid_state_format(self, state_service, cli_runner, state_ids) -> None:
+    def test_edit_invalid_state_format(
+        self, state_service, cli_runner, state_ids
+    ) -> None:
         """Test editing with invalid state format."""
         state_id = state_ids[0]
         invalid_state = {"invalid": "state"}
         edited_content = json.dumps(invalid_state, indent=2)
-        
+
         with mock.patch("click.edit", return_value=edited_content) as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert result.exit_code == 1
             mock_edit.assert_called_once()
             assert "Invalid state format" in result.stderr
@@ -431,23 +449,27 @@ class TestCliState:
         """Test editing with empty content."""
         state_id = state_ids[0]
         original_state = state_service.get_state(state_id)
-        
+
         with mock.patch("click.edit", return_value="   \n  ") as mock_edit:
-            result = self.invoke_with_state_service(cli_runner, state_service, ["state", "edit", "--force", state_id])
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
             assert_cli_runner(result)
             mock_edit.assert_called_once()
-            
+
             current_state = state_service.get_state(state_id)
             assert current_state == original_state
 
-    def test_edit_prompt_confirmation(self, state_service, cli_runner, state_ids, payloads) -> None:
+    def test_edit_prompt_confirmation(
+        self, state_service, cli_runner, state_ids, payloads
+    ) -> None:
         """Test the confirmation prompt when editing."""
         state_id = state_ids[0]
         original_state = state_service.get_state(state_id)
-        
+
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             result = cli_runner.invoke(cli, ["state", "edit", state_id], input="n")
         assert result.exit_code == 1
-        
+
         current_state = state_service.get_state(state_id)
         assert current_state == original_state
