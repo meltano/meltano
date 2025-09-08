@@ -308,6 +308,65 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
     click.echo(json.dumps(retrieved_state))
 
 
+@meltano_state.command(cls=InstrumentedCmd, name="edit")
+@prompt_for_confirmation(
+    prompt="This will overwrite the state's current value. Continue?",
+)
+@click.argument("state-id")
+@pass_project(migrate=True)
+@click.pass_context
+def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
+    """Edit state in your default text editor.
+    
+    The state must be valid JSON with a top-level 'singer_state' key:
+    {
+        "singer_state": {
+            "bookmarks": {...}
+        }
+    }
+    """
+    state_service: StateService = (
+        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+
+    current_state = state_service.get_state(state_id)
+    if not current_state:
+        logger.info("No state found for %s. Creating new state.", state_id)
+        current_state = {}
+
+    initial_content = json.dumps(current_state, indent=2)
+    edited_content = click.edit(initial_content, extension=".json")
+
+    if edited_content is None:
+        logger.info("Edit cancelled - no changes made.")
+        return
+
+    edited_content = edited_content.strip()
+
+    if not edited_content:
+        logger.info("Empty content provided - no changes made.")
+        return
+
+    if edited_content == initial_content:
+        logger.info("No changes detected.")
+        return
+
+    try:
+        json.loads(edited_content)
+        state_service.set_state(state_id, edited_content)
+        logger.info(
+            "State for %s was successfully updated at %s.",
+            state_id,
+            dt.now(tz=tz.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
+        )
+    except json.JSONDecodeError as err:
+        logger.error("Invalid JSON at line %d, column %d: %s", err.lineno, err.colno, err.msg)
+        ctx.exit(1)
+    except InvalidJobStateError as err:
+        logger.error("Invalid state format: %s", err)
+        ctx.exit(1)
+
+
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
 @prompt_for_confirmation(prompt="This will clear state for the job(s). Continue?")
 @click.argument("state-id", required=False)
