@@ -62,9 +62,11 @@ class TaskSets(NameEq, Canonical):
 
     def __init__(
         self,
+        *,
         name: str,
         tasks: list[str] | list[list[str]],
         env: dict[str, str] | None = None,
+        **kwargs: t.Any,
     ):
         """Initialize a `TaskSets`.
 
@@ -72,8 +74,9 @@ class TaskSets(NameEq, Canonical):
             name: The name of the job.
             tasks: The tasks that associated with this job.
             env: The environment variables for this job.
+            kwargs: The keyword arguments to initialize the job with.
         """
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.name: str = name
         self.tasks: list[str] | list[list[str]] = tasks
