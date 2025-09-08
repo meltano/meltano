@@ -66,7 +66,10 @@ class TestTaskSets:
             ),
             (
                 "with-multiple-env-vars",
-                "{'tasks': ['tap target'], 'env': {'DBT_MODELS': '+gitlab+', 'TARGET_BATCH_SIZE': '100'}}",
+                (
+                    "{'tasks': ['tap target'], "
+                    "'env': {'DBT_MODELS': '+gitlab+', 'TARGET_BATCH_SIZE': '100'}}"
+                ),
                 TaskSets(
                     name="with-multiple-env-vars",
                     tasks=["tap target"],

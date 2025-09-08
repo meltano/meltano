@@ -46,14 +46,12 @@ def _parse_env_vars(env_params: tuple[str, ...]) -> dict[str, str]:
     env_dict = {}
     for env_param in env_params:
         if "=" not in env_param:
-            raise click.BadParameter(
-                f"Environment variable must be in KEY=value format, got: {env_param}"
-            )
+            msg = f"Environment variable must be in KEY=value format, got: {env_param}"
+            raise click.BadParameter(msg)
         key, value = env_param.split("=", 1)
         if not key:
-            raise click.BadParameter(
-                f"Environment variable key cannot be empty: {env_param}"
-            )
+            msg = f"Environment variable key cannot be empty: {env_param}"
+            raise click.BadParameter(msg)
         env_dict[key] = value
     return env_dict
 
@@ -84,7 +82,10 @@ def _list_single_job(  # noqa: D417
         env_str = f", env: {task_set.env}" if task_set.env else ""
         click.echo(f"{task_set.name}: {task_set.tasks}{env_str}")
     elif list_format == "json":
-        job_data = {"job_name": task_set.name, "tasks": task_set.tasks}
+        job_data: dict[str, t.Any] = {
+            "job_name": task_set.name,
+            "tasks": task_set.tasks,
+        }
         if task_set.env:
             job_data["env"] = task_set.env
         click.echo(json.dumps(job_data, indent=2))
@@ -106,7 +107,7 @@ def _list_all_jobs(  # noqa: D417
     if list_format == "json":
         jobs_data = []
         for tset in task_sets_service.list():
-            job_data = {"job_name": tset.name, "tasks": tset.tasks}
+            job_data: dict[str, t.Any] = {"job_name": tset.name, "tasks": tset.tasks}
             if tset.env:
                 job_data["env"] = tset.env
             jobs_data.append(job_data)
@@ -294,7 +295,8 @@ def set_cmd(ctx, job_name: str, raw_tasks: str, env: tuple[str, ...]) -> None:  
 
     if not raw_tasks and not env:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Must provide either --tasks or --env")
+        msg = "Must provide either --tasks or --env"
+        raise CliError(msg)
 
     if raw_tasks:
         task_sets = tasks_from_yaml_str(job_name, raw_tasks)
