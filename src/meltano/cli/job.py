@@ -31,6 +31,33 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
+def _parse_env_vars(env_params: tuple[str, ...]) -> dict[str, str]:
+    """Parse environment variable parameters in KEY=value format.
+
+    Args:
+        env_params: Tuple of environment variable strings in KEY=value format.
+
+    Returns:
+        Dictionary of environment variables.
+
+    Raises:
+        click.BadParameter: If any parameter is not in KEY=value format.
+    """
+    env_dict = {}
+    for env_param in env_params:
+        if "=" not in env_param:
+            raise click.BadParameter(
+                f"Environment variable must be in KEY=value format, got: {env_param}"
+            )
+        key, value = env_param.split("=", 1)
+        if not key:
+            raise click.BadParameter(
+                f"Environment variable key cannot be empty: {env_param}"
+            )
+        env_dict[key] = value
+    return env_dict
+
+
 def _list_single_job(  # noqa: D417
     task_sets_service: TaskSetsService,
     list_format: str,
@@ -54,11 +81,13 @@ def _list_single_job(  # noqa: D417
         return
 
     if list_format == "text":
-        click.echo(f"{task_set.name}: {task_set.tasks}")
+        env_str = f", env: {task_set.env}" if task_set.env else ""
+        click.echo(f"{task_set.name}: {task_set.tasks}{env_str}")
     elif list_format == "json":
-        click.echo(
-            json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2),
-        )
+        job_data = {"job_name": task_set.name, "tasks": task_set.tasks}
+        if task_set.env:
+            job_data["env"] = task_set.env
+        click.echo(json.dumps(job_data, indent=2))
     tracker.track_command_event(CliEvent.completed)
 
 
@@ -75,20 +104,18 @@ def _list_all_jobs(  # noqa: D417
         list_format: The format to use.
     """
     if list_format == "json":
-        click.echo(
-            json.dumps(
-                {
-                    "jobs": [
-                        {"job_name": tset.name, "tasks": tset.tasks}
-                        for tset in task_sets_service.list()
-                    ],
-                },
-                indent=2,
-            ),
-        )
+        jobs_data = []
+        for tset in task_sets_service.list():
+            job_data = {"job_name": tset.name, "tasks": tset.tasks}
+            if tset.env:
+                job_data["env"] = tset.env
+            jobs_data.append(job_data)
+
+        click.echo(json.dumps({"jobs": jobs_data}, indent=2))
     elif list_format == "text":
         for task_set in task_sets_service.list():
-            click.echo(f"{task_set.name}: {task_set.tasks}")
+            env_str = f", env: {task_set.env}" if task_set.env else ""
+            click.echo(f"{task_set.name}: {task_set.tasks}{env_str}")
     tracker: Tracker = ctx.obj["tracker"]
     tracker.track_command_event(CliEvent.completed)
 
@@ -167,8 +194,13 @@ def list_jobs(ctx, list_format: str, job_name: str) -> None:  # noqa: ANN001
     default=None,
     help="Tasks that will be run as part of this job.",
 )
+@click.option(
+    "--env",
+    multiple=True,
+    help="Environment variables for this job in KEY=value format.",
+)
 @click.pass_context
-def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
+def add(ctx, job_name: str, raw_tasks: str, env: tuple[str, ...]) -> None:  # noqa: ANN001
     """Add tasks to a new job.
 
     Example usage:
@@ -191,6 +223,16 @@ def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     except InvalidTasksError as yerr:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(yerr) from yerr
+
+    # Parse and apply environment variables from CLI
+    if env:
+        try:
+            env_dict = _parse_env_vars(env)
+            # Merge with any env vars from YAML (CLI takes precedence)
+            task_sets.env.update(env_dict)
+        except click.BadParameter as err:
+            tracker.track_command_event(CliEvent.aborted)
+            raise CliError(str(err)) from err
 
     try:
         _validate_tasks(project, task_sets, ctx)
@@ -222,12 +264,17 @@ def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
 @click.option(
     "--tasks",
     "raw_tasks",
-    required=True,
+    required=False,
     default=None,
     help="Tasks that will be run as part of this job.",
 )
+@click.option(
+    "--env",
+    multiple=True,
+    help="Environment variables for this job in KEY=value format.",
+)
 @click.pass_context
-def set_cmd(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
+def set_cmd(ctx, job_name: str, raw_tasks: str, env: tuple[str, ...]) -> None:  # noqa: ANN001
     """Update the tasks associated with an existing job.
 
     Example usage:
@@ -245,7 +292,29 @@ def set_cmd(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     project: Project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
-    task_sets = tasks_from_yaml_str(job_name, raw_tasks)
+    if not raw_tasks and not env:
+        tracker.track_command_event(CliEvent.aborted)
+        raise CliError("Must provide either --tasks or --env")
+
+    if raw_tasks:
+        task_sets = tasks_from_yaml_str(job_name, raw_tasks)
+    else:
+        # Only env vars being updated, get existing job
+        try:
+            task_sets = task_sets_service.get(job_name)
+        except JobNotFoundError as err:
+            tracker.track_command_event(CliEvent.failed)
+            raise CliError(str(err)) from err
+
+    # Parse and apply environment variables from CLI
+    if env:
+        try:
+            env_dict = _parse_env_vars(env)
+            # Merge with any env vars from YAML (CLI takes precedence)
+            task_sets.env.update(env_dict)
+        except click.BadParameter as err:
+            tracker.track_command_event(CliEvent.aborted)
+            raise CliError(str(err)) from err
 
     try:
         _validate_tasks(project, task_sets, ctx)

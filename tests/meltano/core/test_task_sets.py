@@ -54,17 +54,53 @@ class TestTaskSets:
                     tasks=[["tap target", "tap2 target2"], "cmd1"],
                 ),
             ),
+            # Test cases with environment variables
+            (
+                "with-env-vars",
+                "{'tasks': ['tap target'], 'env': {'DBT_MODELS': '+gitlab+'}}",
+                TaskSets(
+                    name="with-env-vars",
+                    tasks=["tap target"],
+                    env={"DBT_MODELS": "+gitlab+"},
+                ),
+            ),
+            (
+                "with-multiple-env-vars",
+                "{'tasks': ['tap target'], 'env': {'DBT_MODELS': '+gitlab+', 'TARGET_BATCH_SIZE': '100'}}",
+                TaskSets(
+                    name="with-multiple-env-vars",
+                    tasks=["tap target"],
+                    env={"DBT_MODELS": "+gitlab+", "TARGET_BATCH_SIZE": "100"},
+                ),
+            ),
+            (
+                "with-empty-env",
+                "{'tasks': ['tap target'], 'env': {}}",
+                TaskSets(
+                    name="with-empty-env",
+                    tasks=["tap target"],
+                    env={},
+                ),
+            ),
         ]
 
         for name, task_str, expected in cases:
             tset = tasks_from_yaml_str(name, task_str)
             assert tset.name == expected.name
             assert tset.tasks == expected.tasks
+            if hasattr(expected, "env"):
+                assert tset.env == expected.env
+            else:
+                # For backward compatibility, env should default to empty dict
+                assert getattr(tset, "env", {}) == {}
 
         obvious_edge_cases = [
             ("bad-yaml", "['tap target'"),
             ("too-many-levels", "[[['tap target']]]"),
             ("non-string-list", "['tap target', 5"),
+            # Invalid env var formats
+            ("invalid-env-not-dict", "{'tasks': ['tap target'], 'env': 'not-a-dict'}"),
+            ("invalid-env-values", "{'tasks': ['tap target'], 'env': {'KEY': 123}}"),
         ]
 
         for name, task_str in obvious_edge_cases:

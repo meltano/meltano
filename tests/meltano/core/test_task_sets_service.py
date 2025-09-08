@@ -12,8 +12,8 @@ from meltano.core.task_sets_service import (
 
 @pytest.fixture(scope="session")
 def create_task_set():
-    def make(name):
-        return TaskSets(name=name, tasks=["tap-mock target-mock"])
+    def make(name, env=None):
+        return TaskSets(name=name, tasks=["tap-mock target-mock"], env=env or {})
 
     return make
 
@@ -37,6 +37,15 @@ class TestTaskSetsService:
         with pytest.raises(JobAlreadyExistsError):
             subject.add(jobs[0])
 
+        # test adding a job with environment variables
+        job_with_env = create_task_set(
+            "test_job_with_env", env={"DBT_MODELS": "+gitlab+"}
+        )
+        subject.add(job_with_env)
+
+        retrieved_job = subject.get("test_job_with_env")
+        assert retrieved_job.env == {"DBT_MODELS": "+gitlab+"}
+
     def test_update(self, subject: TaskSetsService, create_task_set) -> None:
         job = subject.list()[0]
         job.tasks = ["tap-mock target-mock updated:addition"]
@@ -47,6 +56,25 @@ class TestTaskSetsService:
         nonexistent = create_task_set("does-not-exist")
         with pytest.raises(JobNotFoundError):
             subject.update(nonexistent)
+
+        # test updating environment variables
+        job_with_env = create_task_set(
+            "test_update_env", env={"INITIAL_VAR": "initial_value"}
+        )
+        subject.add(job_with_env)
+
+        # Update env vars
+        job_with_env.env = {
+            "UPDATED_VAR": "updated_value",
+            "ADDITIONAL_VAR": "additional",
+        }
+        subject.update(job_with_env)
+
+        updated_job = subject.get("test_update_env")
+        assert updated_job.env == {
+            "UPDATED_VAR": "updated_value",
+            "ADDITIONAL_VAR": "additional",
+        }
 
     @pytest.mark.usefixtures("create_task_set")
     def test_remove(self, subject: TaskSetsService) -> None:

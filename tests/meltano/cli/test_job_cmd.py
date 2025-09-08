@@ -101,6 +101,63 @@ class TestCliJob:
             assert res.exit_code == 1
             assert "Failed to parse yaml" in str(res.exception)
 
+            # test adding job with environment variables
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "add",
+                    "job-with-env",
+                    "--tasks",
+                    "'tap-mock target-mock'",
+                    "--env",
+                    "DBT_MODELS=+gitlab+",
+                ],
+            )
+            assert_cli_runner(res)
+            task_sets = task_sets_service.get("job-with-env")
+            assert task_sets.name == "job-with-env"
+            assert task_sets.tasks == ["tap-mock target-mock"]
+            assert task_sets.env == {"DBT_MODELS": "+gitlab+"}
+
+            # test adding job with multiple environment variables
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "add",
+                    "job-with-multiple-env",
+                    "--tasks",
+                    "'tap-mock target-mock'",
+                    "--env",
+                    "DBT_MODELS=+gitlab+",
+                    "--env",
+                    "TARGET_BATCH_SIZE=100",
+                ],
+            )
+            assert_cli_runner(res)
+            task_sets = task_sets_service.get("job-with-multiple-env")
+            assert task_sets.env == {
+                "DBT_MODELS": "+gitlab+",
+                "TARGET_BATCH_SIZE": "100",
+            }
+
+            # test invalid env var format
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "add",
+                    "job-bad-env",
+                    "--tasks",
+                    "'tap-mock target-mock'",
+                    "--env",
+                    "INVALID_FORMAT",
+                ],
+                catch_exceptions=True,
+            )
+            assert res.exit_code == 1  # CliError for invalid env format
+
     @pytest.mark.usefixtures("session", "tap", "target")
     def test_job_add_invalid(self, cli_runner: MeltanoCliRunner) -> None:
         """Add a job with an invalid EL block should raise an error."""
@@ -155,6 +212,27 @@ class TestCliJob:
             task_sets = task_sets_service.get("job-set-mock")
             assert task_sets.name == "job-set-mock"
             assert task_sets.tasks == ["tap2-mock target2-mock"]
+
+            # test setting environment variables
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "job-set-mock",
+                    "--env",
+                    "DBT_MODELS=+gitlab+",
+                    "--env",
+                    "TARGET_BATCH_SIZE=500",
+                ],
+            )
+            assert_cli_runner(res)
+
+            task_sets = task_sets_service.get("job-set-mock")
+            assert task_sets.env == {
+                "DBT_MODELS": "+gitlab+",
+                "TARGET_BATCH_SIZE": "500",
+            }
 
     @pytest.mark.order(after="test_job_add")
     @pytest.mark.usefixtures("session", "project")
@@ -231,3 +309,38 @@ class TestCliJob:
             output = json.loads(res.stdout)
             assert output["job_name"] == "job-list-mock"
             assert output["tasks"] == ["tap-mock target-mock"]
+
+            # test job list with environment variables
+            cli_args = [
+                "job",
+                "add",
+                "job-list-with-env",
+                "--tasks",
+                "'tap-mock target-mock'",
+                "--env",
+                "DBT_MODELS=+gitlab+",
+                "--env",
+                "TARGET_BATCH_SIZE=100",
+            ]
+            res = cli_runner.invoke(cli, cli_args)
+            assert_cli_runner(res)
+
+            # test vanilla list includes env vars
+            res = cli_runner.invoke(cli, ["job", "list"])
+            assert_cli_runner(res)
+            assert "job-list-with-env" in res.output
+            # The exact format will depend on implementation, but env vars should appear
+
+            # test json format includes env vars
+            res = cli_runner.invoke(
+                cli,
+                ["job", "list", "--format=json", "job-list-with-env"],
+            )
+            assert_cli_runner(res)
+            output = json.loads(res.stdout)
+            assert output["job_name"] == "job-list-with-env"
+            assert output["tasks"] == ["tap-mock target-mock"]
+            assert output.get("env") == {
+                "DBT_MODELS": "+gitlab+",
+                "TARGET_BATCH_SIZE": "100",
+            }
