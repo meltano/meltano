@@ -345,9 +345,7 @@ class TestCliState:
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
 
-    def test_edit_existing_state(
-        self, state_service, cli_runner, state_ids, payloads
-    ) -> None:
+    def test_edit_existing_state(self, state_service, cli_runner, state_ids) -> None:
         """Test editing an existing state."""
         state_id = state_ids[0]
         original_state = state_service.get_state(state_id)
@@ -416,6 +414,27 @@ class TestCliState:
             current_state = state_service.get_state(state_id)
             assert current_state == original_state
 
+    def test_edit_semantic_no_changes(
+        self, state_service, cli_runner, state_ids
+    ) -> None:
+        """Test semantically identical but differently formatted JSON as no change."""
+        state_id = state_ids[0]
+        original_state = state_service.get_state(state_id)
+
+        # Create differently formatted but semantically identical JSON
+        compact_content = json.dumps(original_state, separators=(",", ":"))
+
+        with mock.patch("click.edit", return_value=compact_content) as mock_edit:
+            result = self.invoke_with_state_service(
+                cli_runner, state_service, ["state", "edit", "--force", state_id]
+            )
+            assert_cli_runner(result)
+            mock_edit.assert_called_once()
+
+            # Verify state was not changed
+            current_state = state_service.get_state(state_id)
+            assert current_state == original_state
+
     def test_edit_invalid_json(self, state_service, cli_runner, state_ids) -> None:
         """Test editing with invalid JSON."""
         state_id = state_ids[0]
@@ -428,6 +447,8 @@ class TestCliState:
             assert result.exit_code == 1
             mock_edit.assert_called_once()
             assert "Invalid JSON" in result.stderr
+            assert "line" in result.stderr
+            assert "column" in result.stderr
 
     def test_edit_invalid_state_format(
         self, state_service, cli_runner, state_ids
@@ -443,7 +464,7 @@ class TestCliState:
             )
             assert result.exit_code == 1
             mock_edit.assert_called_once()
-            assert "Invalid state format" in result.stderr
+            assert "missing required 'singer_state' key" in result.stderr
 
     def test_edit_empty_content(self, state_service, cli_runner, state_ids) -> None:
         """Test editing with empty content."""
@@ -461,7 +482,7 @@ class TestCliState:
             assert current_state == original_state
 
     def test_edit_prompt_confirmation(
-        self, state_service, cli_runner, state_ids, payloads
+        self, state_service, cli_runner, state_ids
     ) -> None:
         """Test the confirmation prompt when editing."""
         state_id = state_ids[0]

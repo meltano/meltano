@@ -347,12 +347,23 @@ def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
         logger.info("Empty content provided - no changes made.")
         return
 
-    if edited_content == initial_content:
-        logger.info("No changes detected.")
-        return
+    try:
+        initial_json = json.loads(initial_content)
+        edited_json = json.loads(edited_content)
+        if initial_json == edited_json:
+            logger.info("No changes detected.")
+            return
+    except json.JSONDecodeError:
+        if edited_content == initial_content:
+            logger.info("No changes detected.")
+            return
 
     try:
-        json.loads(edited_content)
+        parsed_state = json.loads(edited_content)
+
+        if "singer_state" not in parsed_state:
+            logger.error("Invalid state format: missing required 'singer_state' key")
+            ctx.exit(1)
         state_service.set_state(state_id, edited_content)
         logger.info(
             "State for %s was successfully updated at %s.",
