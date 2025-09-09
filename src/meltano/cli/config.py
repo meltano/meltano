@@ -507,7 +507,7 @@ def reset(
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
-@click.argument("plugin_name")
+@click.argument("plugin_name", required=False)
 @click.option("--plugin-type", type=PluginTypeArg())
 @click.option("--interactive", is_flag=True)
 @click.option("--from-file", type=click.File("r"))
@@ -521,7 +521,7 @@ def set_(
     ctx: click.Context,
     project: Project,
     *,
-    plugin_name: str,
+    plugin_name: str | None,
     plugin_type: PluginType | None,
     setting_name: tuple[str, ...],
     value: t.Any,  # noqa: ANN401
@@ -532,6 +532,8 @@ def set_(
     """Set the configurations' setting `<name>` to `<value>`."""
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
+
+    plugin_name = plugin_name or click.prompt("Plugin name", type=str)
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -559,7 +561,7 @@ def set_(
         extras=False,
     )
 
-    if interactive:
+    if interactive or not setting_name:
         interaction.configure_all()
         ctx.exit()
 
