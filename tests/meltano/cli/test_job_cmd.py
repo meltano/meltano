@@ -279,6 +279,20 @@ class TestCliJob:
             )
             assert res.exit_code == 1  # CliError for missing parameters
 
+            # test setting env vars on non-existent job
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "non-existent-job",
+                    "--env",
+                    "KEY=value",
+                ],
+                catch_exceptions=True,
+            )
+            assert res.exit_code == 1  # CliError for JobNotFoundError
+
     @pytest.mark.order(after="test_job_add")
     @pytest.mark.usefixtures("session", "project")
     def test_job_remove(self, cli_runner, task_sets_service) -> None:
@@ -376,6 +390,11 @@ class TestCliJob:
             assert "job-list-with-env" in res.output
             # The exact format will depend on implementation, but env vars should appear
 
+            # test job without env vars doesn't show env in output
+            assert (
+                "job-list-mock:" in res.output
+            )  # Job without env should not show env section
+
             # test json format includes env vars
             res = cli_runner.invoke(
                 cli,
@@ -389,3 +408,14 @@ class TestCliJob:
                 "DBT_MODELS": "+gitlab+",
                 "TARGET_BATCH_SIZE": "100",
             }
+
+            # test json format for job without env vars
+            res = cli_runner.invoke(
+                cli,
+                ["job", "list", "--format=json", "job-list-mock"],
+            )
+            assert_cli_runner(res)
+            output = json.loads(res.stdout)
+            assert output["job_name"] == "job-list-mock"
+            assert output["tasks"] == ["tap-mock target-mock"]
+            assert "env" not in output  # Job without env should not have env field

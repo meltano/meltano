@@ -65,6 +65,15 @@ class TestTaskSets:
                 ),
             ),
             (
+                "with-env-null",
+                "{'tasks': ['tap target'], 'env': null}",
+                TaskSets(
+                    name="with-env-null",
+                    tasks=["tap target"],
+                    env={},
+                ),
+            ),
+            (
                 "with-multiple-env-vars",
                 (
                     "{'tasks': ['tap target'], "
