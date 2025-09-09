@@ -94,6 +94,14 @@ class TestTaskSets:
                     env={},
                 ),
             ),
+            # Test case without env field for backward compatibility
+            (
+                "backward-compat-no-env",
+                "tap target",
+                TaskSets(
+                    name="backward-compat-no-env", tasks=["tap target"]
+                ),  # No env field
+            ),
         ]
 
         for name, task_str, expected in cases:

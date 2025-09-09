@@ -298,15 +298,19 @@ def set_cmd(ctx, job_name: str, raw_tasks: str, env: tuple[str, ...]) -> None:  
         msg = "Must provide either --tasks or --env"
         raise CliError(msg)
 
+    # Get existing job to preserve annotations and other fields
+    try:
+        task_sets = task_sets_service.get(job_name)
+    except JobNotFoundError as err:
+        tracker.track_command_event(CliEvent.failed)
+        raise CliError(str(err)) from err
+
+    # Update tasks if provided
     if raw_tasks:
-        task_sets = tasks_from_yaml_str(job_name, raw_tasks)
-    else:
-        # Only env vars being updated, get existing job
-        try:
-            task_sets = task_sets_service.get(job_name)
-        except JobNotFoundError as err:
-            tracker.track_command_event(CliEvent.failed)
-            raise CliError(str(err)) from err
+        new_tasks = tasks_from_yaml_str(job_name, raw_tasks)
+        task_sets.tasks = new_tasks.tasks
+        # Also merge any env vars from the tasks YAML
+        task_sets.env.update(new_tasks.env)
 
     # Parse and apply environment variables from CLI
     if env:

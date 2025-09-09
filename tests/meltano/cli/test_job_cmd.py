@@ -293,6 +293,24 @@ class TestCliJob:
             )
             assert res.exit_code == 1  # CliError for JobNotFoundError
 
+            # test setting tasks with env vars in YAML format
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "job-set-mock",
+                    "--tasks",
+                    "{'tasks': ['tap-new target-new'], 'env': {'YAML_ENV_VAR': 'yaml_value'}}",
+                ],
+            )
+            assert_cli_runner(res)
+
+            task_sets = task_sets_service.get("job-set-mock")
+            assert task_sets.tasks == ["tap-new target-new"]
+            assert "YAML_ENV_VAR" in task_sets.env
+            assert task_sets.env["YAML_ENV_VAR"] == "yaml_value"
+
     @pytest.mark.order(after="test_job_add")
     @pytest.mark.usefixtures("session", "project")
     def test_job_remove(self, cli_runner, task_sets_service) -> None:
