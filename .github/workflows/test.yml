@@ -60,6 +60,7 @@ jobs:
         - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py311-ubuntu-psycopg3' }
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py312-ubuntu-psycopg3' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py313-ubuntu-psycopg3' }
+        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py314-ubuntu-psycopg3' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
         - { python-version: '3.13', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
       fail-fast: false
