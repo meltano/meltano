@@ -112,14 +112,30 @@ class AmbiguousMappingName(MeltanoError):
         """Initialize the exception.
 
         Args:
-            mapping_name: The name of the schedule that does not exist.
+            mapping_name: The name of the mapping that is ambiguous.
         """
-        super().__init__(
-            reason=f"Ambiguous mapping name {mapping_name}, found multiple matches.",
-            instruction=(
-                "Alter one of the instances of this mapping name to make it distinct."
-            ),
+        reason = f"Ambiguous mapping name '{mapping_name}', found multiple matches"
+        instruction = (
+            "Alter one of the instances of this mapping name to make it distinct"
         )
+        super().__init__(reason=reason, instruction=instruction)
+
+
+class MapperMappingNameCollision(MeltanoError):
+    """Occurs when a mapper plugin name collides with one of its mapping names."""
+
+    def __init__(self, name: str):
+        """Initialize the exception.
+
+        Args:
+            name: The name that is used for both the mapper plugin and mapping.
+        """
+        reason = (
+            f"Name collision: '{name}' is used as both a mapper plugin name "
+            f"and a mapping name within that mapper"
+        )
+        instruction = "Rename either the mapping to avoid the collision"
+        super().__init__(reason=reason, instruction=instruction)
 
 
 class ProjectPluginsService:  # (too many methods, attributes)
@@ -304,6 +320,9 @@ class ProjectPluginsService:  # (too many methods, attributes)
                 f"ignoring `@{profile_name}` in plugin name.",
             )
 
+        found_plugin = None
+        found_mapping = None
+
         for plugin in self.plugins(ensure_parent=False):
             if (
                 plugin.name == plugin_name  # (with too much logic)
@@ -317,12 +336,28 @@ class ProjectPluginsService:  # (too many methods, attributes)
                     or self.ensure_parent(plugin).is_configurable() == configurable
                 )
             ):
-                return self.ensure_parent(plugin)
+                found_plugin = self.ensure_parent(plugin)
 
             if plugin.type == PluginType.MAPPERS:
                 mapping = self._find_mapping(plugin_name, plugin)
                 if mapping:
-                    return mapping
+                    found_mapping = mapping
+
+        # Check for collision between mapper plugin name and mapping name
+        if (
+            found_plugin is not None
+            and found_mapping is not None
+            and found_plugin.type == PluginType.MAPPERS
+        ):
+            raise MapperMappingNameCollision(plugin_name)
+
+        # Return the found plugin or mapping
+        if found_plugin is not None:
+            return found_plugin
+
+        if found_mapping is not None:
+            return found_mapping
+
         raise PluginNotFoundError(
             PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
         )
@@ -332,8 +367,8 @@ class ProjectPluginsService:  # (too many methods, attributes)
         plugin_name: str,
         plugin: ProjectPlugin,
     ) -> ProjectPlugin | None:
-        mapping_name = plugin.extra_config.get("_mapping_name")
-        if mapping_name == plugin_name:
+        mapping_name: str | None = plugin.extra_config.get("_mapping_name")
+        if mapping_name is not None and mapping_name == plugin_name:
             all_mappings = self.find_plugins_by_mapping_name(mapping_name)
             if len(all_mappings) > 1:
                 raise AmbiguousMappingName(mapping_name)
