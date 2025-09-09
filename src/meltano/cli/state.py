@@ -191,7 +191,7 @@ def move_state(
     dst_state_id: str,
 ) -> None:
     """Move state to another job ID, clearing the original."""
-    # Retrieve state for moveing
+    # Retrieve state for moving
     state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
@@ -336,49 +336,27 @@ def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
         current_state = {}
 
     initial_content = json.dumps(current_state, indent=2)
-    edited_content = click.edit(initial_content, extension=".json")
-
-    if edited_content is None:
-        logger.info("Edit cancelled - no changes made.")
-        return
-
-    edited_content = edited_content.strip()
+    if edited_content := click.edit(initial_content, extension=".json"):
+        edited_content = edited_content.strip()
+    else:
+        logger.info("Edit cancelled - no changes made")
+        ctx.exit(0)
 
     if not edited_content:
-        logger.info("Empty content provided - no changes made.")
-        return
+        logger.info("Empty content provided - no changes made")
+        ctx.exit(0)
 
-    try:
-        initial_json = json.loads(initial_content)
-        edited_json = json.loads(edited_content)
-        if initial_json == edited_json:
-            logger.info("No changes detected.")
-            return
-    except json.JSONDecodeError:
-        if edited_content == initial_content:
-            logger.info("No changes detected.")
-            return
+    initial_json = json.loads(initial_content)
+    if json.loads(edited_content) == initial_json:
+        logger.info("No changes detected")
+        ctx.exit(0)
 
-    try:
-        parsed_state = json.loads(edited_content)
-
-        if "singer_state" not in parsed_state:
-            logger.error("Invalid state format: missing required 'singer_state' key")
-            ctx.exit(1)
-        state_service.set_state(state_id, edited_content)
-        logger.info(
-            "State for %s was successfully updated at %s.",
-            state_id,
-            dt.now(tz=tz.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
-        )
-    except json.JSONDecodeError as err:
-        logger.error(
-            "Invalid JSON at line %d, column %d: %s", err.lineno, err.colno, err.msg
-        )
-        ctx.exit(1)
-    except InvalidJobStateError as err:
-        logger.error("Invalid state format: %s", err)
-        ctx.exit(1)
+    state_service.set_state(state_id, edited_content)
+    logger.info(
+        "State for %s was successfully updated at %s",
+        state_id,
+        dt.now(tz=tz.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
+    )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
