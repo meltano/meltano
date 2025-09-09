@@ -301,7 +301,10 @@ class TestCliJob:
                     "set",
                     "job-set-mock",
                     "--tasks",
-                    "{'tasks': ['tap-new target-new'], 'env': {'YAML_ENV_VAR': 'yaml_value'}}",
+                    (
+                        "{'tasks': ['tap-new target-new'], "
+                        "'env': {'YAML_ENV_VAR': 'yaml_value'}}"
+                    ),
                 ],
             )
             assert_cli_runner(res)
