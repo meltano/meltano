@@ -419,3 +419,23 @@ class TestCliJob:
             assert output["job_name"] == "job-list-mock"
             assert output["tasks"] == ["tap-mock target-mock"]
             assert "env" not in output  # Job without env should not have env field
+
+            # test json format for all jobs includes both with and without env
+            res = cli_runner.invoke(cli, ["job", "list", "--format=json"])
+            assert_cli_runner(res)
+            output = json.loads(res.stdout)
+            assert "jobs" in output
+            jobs = output["jobs"]
+
+            # Find jobs with and without env in the list
+            job_with_env = next(
+                (j for j in jobs if j["job_name"] == "job-list-with-env"), None
+            )
+            job_without_env = next(
+                (j for j in jobs if j["job_name"] == "job-list-mock"), None
+            )
+
+            assert job_with_env is not None
+            assert "env" in job_with_env
+            assert job_without_env is not None
+            assert "env" not in job_without_env
