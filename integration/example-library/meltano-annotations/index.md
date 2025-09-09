@@ -19,14 +19,14 @@ meltano job set gitlab-to-jsonl --tasks '[tap-gitlab target-jsonl]'
 ## Configure meltano to use local filesystem for state.
 
 ```shell
-meltano config meltano set state_backend.uri "file:///`pwd`/.meltano/state"
+meltano config set meltano state_backend.uri "file:///`pwd`/.meltano/state"
 ```
 
 ## Configure the tap and target
 
 ```shell
-meltano config tap-gitlab set start_date 2022-11-01T00:00:01Z
-meltano config target-jsonl set do_timestamp_file false
+meltano config set tap-gitlab start_date 2022-11-01T00:00:01Z
+meltano config set target-jsonl do_timestamp_file false
 ```
 
 ## Run a job

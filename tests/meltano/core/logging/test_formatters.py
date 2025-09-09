@@ -17,23 +17,16 @@ import time_machine
 
 from meltano.core.logging import formatters
 
-if sys.version_info < (3, 11):
-    from typing_extensions import TypeAlias
-else:
-    from typing import TypeAlias  # noqa: ICN003
-
 if t.TYPE_CHECKING:
     from pathlib import Path
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
-ExcInfo: TypeAlias = t.Union[
-    tuple[type[BaseException], BaseException, TracebackType],
-    tuple[None, None, None],
-]
+ExcInfo: t.TypeAlias = tuple[type[BaseException], BaseException, TracebackType]
+OptExcInfo: t.TypeAlias = ExcInfo | tuple[None, None, None]
 
 
 @pytest.fixture
-def exc_info() -> ExcInfo:
+def exc_info() -> OptExcInfo:
     """Fake a valid exc_info."""
     my_var = "my_value"  # noqa: F841
     try:
@@ -43,7 +36,7 @@ def exc_info() -> ExcInfo:
 
 
 @pytest.fixture
-def deep_exc_info() -> ExcInfo:
+def deep_exc_info() -> OptExcInfo:
     """Create a deeper call stack for testing max_frames."""
 
     def level_5():

@@ -20,6 +20,8 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config meltano set <setting> <value>`](/reference/command-line-interface#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
+You can customize how `meltano.yml` is formatted (indentation, spacing, etc.) using Meltano's [user YAML configuration](/guide/user-yaml-config).
+
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](../reference/command-line-interface#config).
 
 ## Plugin settings
@@ -56,6 +58,32 @@ plugins:
 ## Your Meltano project
 
 These are settings specific to [your Meltano project](/concepts/project).
+
+### <a name="default-environment"></a>`default_environment`
+
+- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_DEFAULT_ENVIRONMENT`
+- Default: `dev`
+
+The default environment to use when no environment is explicitly specified.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set default_environment prod
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_DEFAULT_ENVIRONMENT=prod
+```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="project-python"></a>`python`
 
@@ -184,6 +212,32 @@ Meltano hashes any fields at all which could be used by a hacker to compromise a
 We hope you will choose to enable reporting, because this really does help us - and it helps the Meltano community in a very real way.
 
 If you still have any concerns about keeping anonymous reporting enabled, we hope you'll share those concerns with us. You can do so by emailing `hello@meltano.com` or by logging an issue in our [Meltano Issue Tracker](https://github.com/meltano/meltano/issues).
+
+### <a name="disable-tracking"></a>`disable_tracking`
+
+- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_DISABLE_TRACKING`
+- Default: `None`
+
+Alternative way to disable tracking. When set to any truthy value, disables all tracking functionality.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set disable_tracking true
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_DISABLE_TRACKING=true
+```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="project-id"></a>`project_id`
 
@@ -828,7 +882,7 @@ export MELTANO_STATE_BACKEND_URI="s3://your_bucket/meltano/state"
 ### <a name="state-backend-uri"></a>`state_backend.lock_timeout_seconds`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS`
-- Default: `360`
+- Default: `10`
 
 Number of seconds that a [lock for a state ID](/concepts/state_backends#locking) should be considered valid in a state backend
 
@@ -854,7 +908,7 @@ export MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS=720
 ### <a name="state-backend-uri"></a>`state_backend.lock_retry_seconds`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS`
-- Default: `360`
+- Default: `1`
 
 Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked](/concepts/state_backends#locking)
 
@@ -945,7 +999,7 @@ export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=h
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_access_key_id`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ACCESS_KEY_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID`
 - Default: None
 
 The AWS access key ID to use when authenticating to S3.
@@ -971,7 +1025,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID="someaccesskeyid"
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_secret_access_key`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_SECRET_ACCESS_KEY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY`
 - Default: None
 
 The AWS secret access key to use when authenticating to S3.
@@ -997,7 +1051,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY="somesecretaccesskey"
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.endpoint_url`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ENDPOINT_URL`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_S3_ENDPOINT_URL`
 - Default: None
 
 The endpoint URL to use when connecting to S3. Only necessary if using S3-compatible storage _not_ hosted by AWS (e.g. [Minio](https://min.io))
@@ -1170,6 +1224,32 @@ MELTANO_VENV_BACKEND=virtualenv meltano install --clean
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
 
 ## Feature Flags
+
+### <a name="experimental"></a>`experimental`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_EXPERIMENTAL`
+- Default: `False`
+
+Whether to enable experimental features that are under development and may change or be removed in future versions.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set experimental true
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_EXPERIMENTAL=true
+```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 

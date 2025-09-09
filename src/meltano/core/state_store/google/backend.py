@@ -5,87 +5,19 @@ from __future__ import annotations
 import json
 import typing as t
 import warnings
-from contextlib import contextmanager
 from functools import cached_property
 
+import google
+import google.api_core.exceptions
+import google.cloud.storage
 import structlog.stdlib
 
-from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
 logger = structlog.stdlib.get_logger(__name__)
-
-GOOGLE_INSTALLED = True
-
-try:
-    import google
-    import google.api_core.exceptions
-    import google.cloud.storage  # type: ignore[import-untyped]
-except ImportError:
-    GOOGLE_INSTALLED = False
-
-
-class MissingGoogleError(Exception):
-    """Raised when google is required but not installed."""
-
-    def __init__(self) -> None:
-        """Initialize a MissingGoogleError."""
-        super().__init__(
-            "google-cloud-storage required but not installed. Install meltano[gcs] to use GCS as a state backend.",  # noqa: E501
-        )
-
-
-@contextmanager
-def requires_gcs() -> Generator[None, None, None]:
-    """Raise MissingGoogleError if gcs is required but missing in context.
-
-    Raises:
-        MissingGoogleError: if google-cloud-storage is not installed.
-
-    Yields:
-        None
-    """
-    if not GOOGLE_INSTALLED:
-        raise MissingGoogleError
-    yield
-
-
-APPLICATION_CREDENTIALS = SettingDefinition(
-    name="state_backend.gcs.application_credentials",
-    label="Application Credentials",
-    description=(
-        "Path to the credential file to use in authenticating to Google Cloud Storage"
-    ),
-    kind=SettingKind.STRING,
-    sensitive=True,
-    env_specific=True,
-)
-
-APPLICATION_CREDENTIALS_PATH = SettingDefinition(
-    name="state_backend.gcs.application_credentials_path",
-    label="Application Credentials Path",
-    description=(
-        "Path to the credential file to use in authenticating to Google Cloud Storage"
-    ),
-    kind=SettingKind.STRING,
-    sensitive=True,
-    env_specific=True,
-)
-
-APPLICATION_CREDENTIALS_JSON = SettingDefinition(
-    name="state_backend.gcs.application_credentials_json",
-    label="Application Credentials JSON",
-    description=(
-        "JSON object containing the service account credentials for "
-        "Google Cloud Storage"
-    ),
-    kind=SettingKind.STRING,
-    sensitive=True,
-    env_specific=True,
-)
 
 
 class GCSStateStoreManager(CloudStateStoreManager):
@@ -149,7 +81,6 @@ class GCSStateStoreManager(CloudStateStoreManager):
         self.application_credentials_json = application_credentials_json
 
     @staticmethod
-    @requires_gcs()
     def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
@@ -170,27 +101,26 @@ class GCSStateStoreManager(CloudStateStoreManager):
         Returns:
             A google.cloud.storage.Client.
         """
-        with requires_gcs():
-            if self.application_credentials_json:
-                # Parse JSON string and create client from service account info
-                try:
-                    credentials_info = json.loads(self.application_credentials_json)
-                except json.JSONDecodeError as e:
-                    msg = (
-                        "Invalid JSON in application_credentials_json: "
-                        f"{e.doc[max(e.pos - 9, 0) : e.pos + 10]}"
-                    )
-                    raise ValueError(msg) from e
-                return google.cloud.storage.Client.from_service_account_info(
-                    credentials_info,
+        if self.application_credentials_json:
+            # Parse JSON string and create client from service account info
+            try:
+                credentials_info = json.loads(self.application_credentials_json)
+            except json.JSONDecodeError as e:
+                msg = (
+                    "Invalid JSON in application_credentials_json: "
+                    f"{e.doc[max(e.pos - 9, 0) : e.pos + 10]}"
                 )
-            if self.application_credentials_path:
-                # Use existing file-based authentication
-                return google.cloud.storage.Client.from_service_account_json(
-                    self.application_credentials_path,
-                )
-            # Use default authentication in environment
-            return google.cloud.storage.Client()
+                raise ValueError(msg) from e
+            return google.cloud.storage.Client.from_service_account_info(
+                credentials_info,
+            )
+        if self.application_credentials_path:
+            # Use existing file-based authentication
+            return google.cloud.storage.Client.from_service_account_json(
+                self.application_credentials_path,
+            )
+        # Use default authentication in environment
+        return google.cloud.storage.Client()
 
     @property
     def extra_transport_params(self) -> dict[str, t.Any]:

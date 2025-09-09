@@ -69,6 +69,23 @@ Installation
 
 If you're ready to build your ideal data platform and start running data workflows across multiple tools, start by following the [Installation guide](https://docs.meltano.com/getting-started/installation) to have Meltano up and running in your device.
 
+### Docker Images
+
+Meltano is available as Docker images on [Docker Hub](https://hub.docker.com/r/meltano/meltano):
+
+- **Slim images** (recommended): `meltano/meltano:latest-slim` - optimized size, includes cloud storage support
+- **Full images**: `meltano/meltano:latest` - includes all database connectors and build tools
+
+```bash
+# Quick start with slim image
+docker run --rm meltano/meltano:latest-slim --version
+
+# For projects needing MSSQL/PostgreSQL
+docker run --rm meltano/meltano:latest --version
+```
+
+See our [Containerization guide](https://docs.meltano.com/guide/containerization) for detailed usage instructions.
+
 Documentation
 -------------
 

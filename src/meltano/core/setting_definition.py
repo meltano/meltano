@@ -17,10 +17,10 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -77,7 +77,8 @@ class EnvVar:
         return str(not utils.truthy(value)) if self.negated else value
 
 
-class SettingMissingError(Error):
+# TODO: No longer used, consider removing
+class SettingMissingError(Error):  # pragma: no cover
     """A setting is missing."""
 
     def __init__(self, name: str) -> None:
@@ -344,7 +345,7 @@ class SettingDefinition(NameEq, Canonical):
             kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
             kind = SettingKind.INTEGER
-        elif isinstance(value, (Decimal, float)):
+        elif isinstance(value, Decimal | float):
             kind = SettingKind.DECIMAL
         elif isinstance(value, dict):
             kind = SettingKind.OBJECT
@@ -477,7 +478,7 @@ class SettingDefinition(NameEq, Canonical):
         Raises:
             ValueError: If value is not of the expected type.
         """
-        value = value.isoformat() if isinstance(value, (date, datetime)) else value
+        value = value.isoformat() if isinstance(value, date | datetime) else value
 
         if isinstance(value, str):
             if self.kind == SettingKind.BOOLEAN:

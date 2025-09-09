@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-import typing as t
+import sys
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 
-TReq = t.TypeVar("TReq", bound="PluginRequirement")
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
 
 
 class PluginRequirement(NameEq, Canonical):
@@ -23,7 +26,7 @@ class PluginRequirement(NameEq, Canonical):
         super().__init__(name=name, variant=variant)
 
     @classmethod
-    def parse_all(cls: type[TReq], obj: dict | None) -> dict[str, list[TReq]]:
+    def parse_all(cls, obj: dict | None) -> dict[str, list[Self]]:
         """Deserialize requirements data into a dict of PluginRequirement.
 
         Args:

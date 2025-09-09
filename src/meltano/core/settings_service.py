@@ -8,23 +8,24 @@ import sys
 import typing as t
 import warnings
 from abc import ABCMeta, abstractmethod
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 
 import structlog
 
 from meltano.core.setting_definition import (
     SettingDefinition,
     SettingKind,
-    SettingMissingError,
 )
 from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import Self  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
@@ -79,9 +80,6 @@ class FeatureNotAllowedException(Exception):
             string representation of the error
         """
         return f"{self.feature} not enabled."
-
-
-_T = t.TypeVar("_T", bound="SettingsService")
 
 
 class SettingsService(metaclass=ABCMeta):
@@ -159,7 +157,7 @@ class SettingsService(metaclass=ABCMeta):
         """Return definitions of supported settings."""
 
     @property
-    def inherited_settings_service(self: _T) -> _T | None:
+    def inherited_settings_service(self) -> Self | None:
         """Return settings service to inherit configuration from."""
         return None
 
@@ -337,8 +335,7 @@ class SettingsService(metaclass=ABCMeta):
         Returns:
             a tuple of the setting value and metadata
         """
-        with suppress(SettingMissingError):
-            setting_def = setting_def or self.find_setting(name)
+        setting_def = setting_def or self.find_setting(name)
         if setting_def:
             name = setting_def.name
 
@@ -503,11 +500,9 @@ class SettingsService(metaclass=ABCMeta):
 
         name = ".".join(path)
 
-        try:
-            setting_def = self.find_setting(name)
-        except SettingMissingError:
+        setting_def = self.find_setting(name)
+        if setting_def is None:
             warnings.warn(f"Unknown setting {name!r}", RuntimeWarning, stacklevel=2)
-            setting_def = None
 
         metadata: dict[str, t.Any] = {
             "name": name,
@@ -574,11 +569,7 @@ class SettingsService(metaclass=ABCMeta):
             path = [path]
 
         name = ".".join(path)
-
-        try:
-            setting_def = self.find_setting(name)
-        except SettingMissingError:
-            setting_def = None
+        setting_def = self.find_setting(name)
 
         metadata = {
             "name": name,
@@ -636,27 +627,27 @@ class SettingsService(metaclass=ABCMeta):
 
         return self._setting_defs
 
-    def find_setting(self, name: str) -> SettingDefinition:
+    def find_setting(self, name: str) -> SettingDefinition | None:
         """Find a setting by name.
 
         Args:
             name:the name or alias of the setting to return
 
         Returns:
-            the setting definition matching the given name
+            the setting definition matching the given name or None if not found
 
         Raises:
             SettingMissingError: if the setting is not found
 
         """
-        try:
-            return next(
+        return next(
+            (
                 setting
                 for setting in self.definitions()
                 if setting.name == name or name in setting.aliases
-            )
-        except StopIteration as err:
-            raise SettingMissingError(name) from err
+            ),
+            None,
+        )
 
     # TODO: The `for_writing` parameter is unused, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.

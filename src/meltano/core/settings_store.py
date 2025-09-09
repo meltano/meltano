@@ -13,25 +13,25 @@ from operator import eq
 
 import dotenv
 import sqlalchemy
+import sqlalchemy.orm
 import structlog
 
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.setting import Setting
-from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
     from sqlalchemy.orm import Session
 
-    from meltano.core.setting_definition import EnvVar
+    from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_service import SettingsService
 
 
@@ -1535,7 +1535,4 @@ class AutoStoreManager(SettingsStoreManager):
         Returns:
             A matching SettingDefinition, if found, else None.
         """
-        try:
-            return self.settings_service.find_setting(name)
-        except SettingMissingError:
-            return None
+        return self.settings_service.find_setting(name)

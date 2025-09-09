@@ -26,6 +26,7 @@ class MeltanoFile(Canonical):
     environments: list[Environment]
     jobs: list[TaskSets]
     env: dict[str, str | None]
+    extras: dict[str, t.Any]
 
     def __init__(
         self,

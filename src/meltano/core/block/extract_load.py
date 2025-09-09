@@ -61,7 +61,7 @@ class ELBContext(ELContextProtocol):
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -123,7 +123,7 @@ class ELBContextBuilder:
         self._state_id_suffix = None
         self._env = {}
         self._blocks = []
-        self._state_strategy = StateStrategy.AUTO
+        self._state_strategy = StateStrategy.auto
         self._run_id: uuid.UUID | None = None
 
         self._base_output_logger = None
@@ -519,19 +519,12 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
         if self.context.force:
-            logger.warning(
-                "Force option is enabled, ignoring stale job check.",
-            )
-
-        if not self.context.force and (
-            existing := JobFinder(job.job_name).latest_running(
-                self.context.session,
-            )
-        ):
+            logger.warning("Force option is enabled, ignoring stale job check.")
+        elif existing := JobFinder(job.job_name).latest_running(self.context.session):
             msg = (
                 f"Another '{job.job_name}' pipeline is already running "
                 f"which started at {existing.started_at}. "
-                f"Wait until {existing.valid_intil()} when the job will be "
+                f"Wait until {existing.valid_until()} when the job will be "
                 "automatically cancelled if stale, or ignore this check using the "
                 "'--force' option."
             )
