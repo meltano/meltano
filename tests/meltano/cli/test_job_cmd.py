@@ -158,6 +158,22 @@ class TestCliJob:
             )
             assert res.exit_code == 1  # CliError for invalid env format
 
+            # test invalid env var format - empty key
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "add",
+                    "job-bad-empty-key",
+                    "--tasks",
+                    "'tap-mock target-mock'",
+                    "--env",
+                    "=value",
+                ],
+                catch_exceptions=True,
+            )
+            assert res.exit_code == 1  # CliError for empty key
+
     @pytest.mark.usefixtures("session", "tap", "target")
     def test_job_add_invalid(self, cli_runner: MeltanoCliRunner) -> None:
         """Add a job with an invalid EL block should raise an error."""
@@ -233,6 +249,35 @@ class TestCliJob:
                 "DBT_MODELS": "+gitlab+",
                 "TARGET_BATCH_SIZE": "500",
             }
+
+            # test setting env vars only (no tasks)
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "job-set-mock",
+                    "--env",
+                    "ENV_ONLY_VAR=test_value",
+                ],
+            )
+            assert_cli_runner(res)
+
+            task_sets = task_sets_service.get("job-set-mock")
+            assert "ENV_ONLY_VAR" in task_sets.env
+            assert task_sets.env["ENV_ONLY_VAR"] == "test_value"
+
+            # test error when neither tasks nor env provided to set command
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "job-set-mock",
+                ],
+                catch_exceptions=True,
+            )
+            assert res.exit_code == 1  # CliError for missing parameters
 
     @pytest.mark.order(after="test_job_add")
     @pytest.mark.usefixtures("session", "project")

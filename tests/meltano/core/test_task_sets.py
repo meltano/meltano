@@ -104,6 +104,7 @@ class TestTaskSets:
             # Invalid env var formats
             ("invalid-env-not-dict", "{'tasks': ['tap target'], 'env': 'not-a-dict'}"),
             ("invalid-env-values", "{'tasks': ['tap target'], 'env': {'KEY': 123}}"),
+            ("missing-tasks-field", "{'env': {'KEY': 'value'}}"),
         ]
 
         for name, task_str in obvious_edge_cases:
