@@ -2348,7 +2348,7 @@ def state_ids_with_expected_states(
     state_ids: StateIds,
     payloads: Payloads,
     state_ids_with_jobs: dict[str, list[Job]],
-):
+) -> list[tuple[str, dict]]:
     final_state = {}
     for state in payloads.mock_state_payloads:
         merge(state, final_state)
