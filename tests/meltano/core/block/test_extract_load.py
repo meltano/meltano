@@ -448,7 +448,7 @@ class TestExtractLoadBlocks:
 
             with pytest.raises(
                 BlockSetValidationError,
-                match="^.*: last block in set should not be a producer",
+                match=r"^.*: last block in set should not be a producer",
             ):
                 elb.validate_set()
 
@@ -469,7 +469,7 @@ class TestExtractLoadBlocks:
             elb = ExtractLoadBlocks(elb_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
-                match="^.*: first block in set should not be consumer",
+                match=r"^.*: first block in set should not be consumer",
             ):
                 elb.validate_set()
 
@@ -496,7 +496,7 @@ class TestExtractLoadBlocks:
             elb = ExtractLoadBlocks(elb_context, blocks)
             with pytest.raises(
                 BlockSetValidationError,
-                match="^.*: intermediate blocks must be producers AND consumers",
+                match=r"^.*: intermediate blocks must be producers AND consumers",
             ):
                 elb.validate_set()
 

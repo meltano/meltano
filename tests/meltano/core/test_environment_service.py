@@ -42,7 +42,7 @@ class TestEnvironmentService:
 
         with pytest.raises(
             EnvironmentAlreadyExistsError,
-            match="An Environment named 'environment_0' already exists.",
+            match=r"An Environment named 'environment_0' already exists.",
         ):
             subject.add_environment(environments[3])
 

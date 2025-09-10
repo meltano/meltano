@@ -530,7 +530,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update
-            p_idx, p_outdated = next(
+            p_idx, _p_outdated = next(
                 (
                     (idx, plg)
                     for idx, plg in enumerate(environment.config.plugins[plugin.type])
