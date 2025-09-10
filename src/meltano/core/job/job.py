@@ -13,15 +13,15 @@ from enum import Enum, IntEnum
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column  # noqa: TC002
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import (
     DateTimeUTC,
-    GUIDType,
+    GUIDType,  # noqa: TC001
     IntFlag,
-    IntPK,
+    IntPK,  # noqa: TC001
     JSONEncodedDict,
 )
 from meltano.core.utils import new_run_id

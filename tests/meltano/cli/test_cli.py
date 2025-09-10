@@ -251,7 +251,7 @@ class TestCli:
 
     def test_handle_meltano_error(self) -> None:
         exception = MeltanoError(reason="This failed", instruction="Try again")
-        with pytest.raises(CliError, match="This failed. Try again."):
+        with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
 
     @pytest.mark.usefixtures("pushd")

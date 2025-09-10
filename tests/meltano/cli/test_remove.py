@@ -8,13 +8,11 @@ import pytest
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
-from meltano.core.project_add_service import (
-    PluginAlreadyAddedException,
-    ProjectAddService,
-)
+from meltano.core.project_add_service import PluginAlreadyAddedException
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project_add_service import ProjectAddService
 
 
 class TestCliRemove:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typing as t
 
-from meltano.core.plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
+from meltano.core.plugin import PluginDefinition, PluginRef
 from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
@@ -13,6 +13,7 @@ from meltano.core.plugin_repository import PluginRepository
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from meltano.core.plugin import BasePlugin, PluginType
     from meltano.core.project import Project
 
 

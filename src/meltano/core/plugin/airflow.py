@@ -127,7 +127,7 @@ class Airflow(BasePlugin):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        stdout, stderr = await handle.communicate()
+        stdout, _stderr = await handle.communicate()
         if handle.returncode:
             raise AsyncSubprocessError(
                 "Command `airflow config generate` failed",  # noqa: EM101
@@ -150,7 +150,7 @@ class Airflow(BasePlugin):
             stderr=subprocess.PIPE,
         )
 
-        stdout, stderr = await handle.communicate()
+        stdout, _stderr = await handle.communicate()
 
         if handle.returncode:
             raise AsyncSubprocessError(

@@ -15,7 +15,6 @@ import structlog
 
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import (
-    InstallPlugins,
     PluginTypeArg,
     get_install_options,
     pass_project,
@@ -43,6 +42,7 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project

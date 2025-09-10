@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import typing as t
-from collections import Counter, abc
+from collections import Counter
 from copy import deepcopy
 from http import HTTPStatus
 
@@ -16,6 +16,7 @@ from meltano.core.plugin.base import PluginType
 from meltano.core.user_config import _reset_user_config_service
 
 if t.TYPE_CHECKING:
+    from collections import abc
     from collections.abc import Callable
 
     from meltano.core.project import Project
