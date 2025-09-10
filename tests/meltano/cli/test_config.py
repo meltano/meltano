@@ -21,6 +21,7 @@ if t.TYPE_CHECKING:
     from click.testing import CliRunner
 
     from fixtures.cli import MeltanoCliRunner
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 
@@ -356,6 +357,21 @@ class TestCliConfigSet:
             {},
         )
         assert tap_config["config"]["test"] == "dev-mock"
+
+    def test_interactive_config_triggered(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
+        """Test that the interactive config flow is triggered."""
+        target = "meltano.cli.interactive.config.InteractiveConfig.configure_all"
+        with mock.patch(target) as mock_configure_all:
+            cli_runner.invoke(cli, ["config", "set", tap.name, "--interactive"])
+            mock_configure_all.assert_called_once()
+
+        with mock.patch(target) as mock_configure_all:
+            cli_runner.invoke(cli, ["config", "set", tap.name])
+            mock_configure_all.assert_called_once()
 
 
 class TestCliConfigUnset:
