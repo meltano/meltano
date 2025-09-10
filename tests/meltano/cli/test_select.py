@@ -281,4 +281,4 @@ class TestCliSelect:
 
         json_result = json.loads(result.stdout)
         assert json_result["enabled_patterns"] == ["users.id", "!users.name"]
-        assert json_result["entities"] == entities
+        assert json_result["streams"] == entities

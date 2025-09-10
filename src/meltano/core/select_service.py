@@ -102,16 +102,16 @@ class SelectService:  # noqa: D101
 
     def update(
         self,
-        entities_filter: str,
-        attributes_filter: str,
+        streams_filter: str,
+        properties_filter: str,
         exclude: bool,  # noqa: FBT001
         *,
         remove: bool = False,
     ) -> None:
         """Update plugins' select patterns."""
         this_pattern = self._get_pattern_string(
-            entities_filter,
-            attributes_filter,
+            streams_filter,
+            properties_filter,
             exclude,
         )
 
@@ -146,10 +146,10 @@ class SelectService:  # noqa: D101
 
     @staticmethod
     def _get_pattern_string(
-        entities_filter: str,
-        attributes_filter: str,
+        streams_filter: str,
+        properties_filter: str,
         exclude: bool,  # noqa: FBT001
     ) -> str:
         """Return a select pattern in string form."""
         exclude_char = "!" if exclude else ""
-        return f"{exclude_char}{entities_filter}.{attributes_filter}"
+        return f"{exclude_char}{streams_filter}.{properties_filter}"
