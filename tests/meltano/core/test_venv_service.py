@@ -276,7 +276,7 @@ class TestVirtualEnv:
             mock.patch("platform.system", return_value="commodore64"),
             pytest.raises(
                 MeltanoError,
-                match="(?i)Platform 'commodore64'.*?not supported.",
+                match=r"(?i)Platform 'commodore64'.*?not supported.",
             ),
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))

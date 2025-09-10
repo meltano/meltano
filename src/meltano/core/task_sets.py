@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from collections.abc import Generator, Iterable
+from collections.abc import Iterable
 
 import structlog
 import yaml
@@ -13,6 +13,9 @@ from jsonschema.exceptions import ValidationError
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
 
 logger = structlog.getLogger(__name__)
 

@@ -22,7 +22,6 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
-    ProjectAddService,
 )
 from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
@@ -37,6 +36,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
     from meltano.core.project_plugins_service import ProjectPluginsService
 
 setup_logging()

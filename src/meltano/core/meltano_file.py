@@ -9,11 +9,13 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.schedule import ELTSchedule, JobSchedule, Schedule
+from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.task_sets import TaskSets
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
+
+    from meltano.core.schedule import Schedule
 
 VERSION = 1
 

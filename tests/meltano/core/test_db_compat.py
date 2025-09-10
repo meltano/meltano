@@ -21,9 +21,9 @@ class TestDatabaseCompatibility:
                 pytest.raises(
                     MeltanoDatabaseCompatibilityError,
                     match=(
-                        "Detected SQLite 3.25.0, but Meltano requires at least 3.25.1. "
+                        r"Detected SQLite 3.25.0, but Meltano requires at least 3.25.1. "  # noqa: E501
                         "Upgrade your database to be compatible with Meltano or use a "
-                        "different database."
+                        r"different database."
                     ),
                 ),
                 id="sqlite-3.25.0",

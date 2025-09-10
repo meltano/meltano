@@ -13,23 +13,19 @@ from enum import Enum, IntEnum
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import mapped_column
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import (
-    DateTimeUTC,
-    GUIDType,
-    IntFlag,
-    IntPK,
-    JSONEncodedDict,
-)
+from meltano.core.sqlalchemy import DateTimeUTC, IntFlag, JSONEncodedDict
 from meltano.core.utils import new_run_id
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Generator
 
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Mapped, Session
+
+    from meltano.core.sqlalchemy import GUIDType, IntPK
 
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24

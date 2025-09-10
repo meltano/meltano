@@ -18,10 +18,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import (
-    CatalogDict,
     ListSelectedExecutor,
-    MetadataRule,
-    SchemaRule,
     property_breadcrumb,
     select_metadata_rules,
 )
@@ -33,6 +30,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin.singer.catalog import CatalogDict, MetadataRule, SchemaRule
     from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.project_add_service import ProjectAddService

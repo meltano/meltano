@@ -9,7 +9,7 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     InstrumentedCmd,
@@ -25,6 +25,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm.session import Session
 
+    from meltano.cli.params import InstallPlugins
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)

@@ -12,8 +12,8 @@ import click
 from meltano.core._state import StateStrategy
 from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
-from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
-from meltano.core.block.singer import CONSUMERS, SingerBlock
+from meltano.core.block.plugin_command import plugin_command_invoker
+from meltano.core.block.singer import CONSUMERS
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.task_sets_service import TaskSetsService
@@ -24,6 +24,8 @@ if t.TYPE_CHECKING:
 
     import structlog
 
+    from meltano.core.block.plugin_command import PluginCommandBlock
+    from meltano.core.block.singer import SingerBlock
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 

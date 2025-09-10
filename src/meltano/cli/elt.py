@@ -12,7 +12,6 @@ import click
 import structlog
 
 from meltano.cli.params import (
-    InstallPlugins,
     UUIDParamType,
     get_install_options,
     pass_project,
@@ -20,7 +19,7 @@ from meltano.cli.params import (
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core._state import StateStrategy
 from meltano.core.db import project_engine
-from meltano.core.elt_context import ELTContext, ELTContextBuilder
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -38,6 +37,8 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.cli.params import InstallPlugins
+    from meltano.core.elt_context import ELTContext
     from meltano.core.plugin.base import PluginDefinition
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker

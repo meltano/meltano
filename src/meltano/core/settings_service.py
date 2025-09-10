@@ -12,10 +12,7 @@ from contextlib import contextmanager
 
 import structlog
 
-from meltano.core.setting_definition import (
-    SettingDefinition,
-    SettingKind,
-)
+from meltano.core.setting_definition import SettingKind
 from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
@@ -31,7 +28,7 @@ if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
 
     from meltano.core.project import Project
-    from meltano.core.setting_definition import EnvVar
+    from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_store import SettingsStoreManager
 
 logger = structlog.stdlib.get_logger(__name__)

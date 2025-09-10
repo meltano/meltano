@@ -9,7 +9,6 @@ import click
 import structlog
 
 from meltano.cli.params import (
-    InstallPlugins,
     PluginTypeArg,
     get_install_options,
     pass_project,
@@ -25,7 +24,6 @@ from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
-    PluginInvoker,
     UnknownCommandError,
     invoker_factory,
 )
@@ -35,7 +33,9 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin import PluginType
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
