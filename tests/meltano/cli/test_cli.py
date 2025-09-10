@@ -441,7 +441,7 @@ class TestCli:
             mock_with_resource.assert_called_once()
 
             # Check that the argument to with_resource was a LoggingServer instance
-            args, kwargs = mock_with_resource.call_args
+            args, _kwargs = mock_with_resource.call_args
             assert len(args) == 1, "with_resource should be called with one argument"
 
             # The argument should be a LoggingServer instance

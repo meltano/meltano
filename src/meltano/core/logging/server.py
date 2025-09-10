@@ -122,7 +122,7 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 
         abort = 0
         while not abort:
-            rd, wr, ex = select.select([self.socket.fileno()], [], [], self.timeout)
+            rd, _wr, _ex = select.select([self.socket.fileno()], [], [], self.timeout)
             if rd:
                 self.handle_request()
             abort = self.abort

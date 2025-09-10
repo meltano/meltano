@@ -187,7 +187,7 @@ class InteractiveConfig:
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
-            label = f"inherited from '{self.settings.plugin.parent.name}'"
+            label = f"inherited from '{self.settings.plugin.parent.name}'"  # type: ignore[attr-defined]
         else:
             label = f"from {source.label}"
 
@@ -227,7 +227,7 @@ class InteractiveConfig:
         ]
 
         details.add_row(Text("Env(s)"), Text(f"{', '.join(env_keys)}"))
-        post = []
+        post: list[Group | Text] = []
         if setting_def.description:
             post.append(
                 Group(
@@ -404,7 +404,14 @@ class InteractiveConfig:
                     show_set_prompt=False,
                 )
 
-    def set_value(self, setting_name, value, store, *, interactive=False) -> None:  # noqa: ANN001
+    def set_value(
+        self,
+        setting_name: tuple[str, ...],
+        value: t.Any,  # noqa: ANN401
+        store: SettingValueStore,
+        *,
+        interactive: bool = False,
+    ) -> None:
         """Set value helper function."""
         settings = self.settings
         path = list(setting_name)

@@ -281,12 +281,12 @@ These rules are not applied when a catalog is [provided manually](#catalog-extra
 Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
 These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<key>`.
 
-Property (attribute) metadata `<key>: <value>` pairs (e.g. `{"is-replication-key": true}`) are nested under top-level entity identifiers and second-level attribute identifiers that correspond to Singer stream property names.
-These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<attribute>.<key>`.
+Property metadata `<key>: <value>` pairs (e.g. `{"is-replication-key": true}`) are nested under top-level stream identifiers and second-level property identifiers that correspond to Singer stream property names.
+These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_metadata.<stream>.<property>.<key>`.
 
-[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream and property identifiers to match multiple streams and/or properties at once.
 
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
+Stream and property names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
 ##### How to use
 
@@ -310,8 +310,8 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _metadata <entity> <key> <value>
-meltano config <extractor> set _metadata <entity> <attribute> <key> <value>
+meltano config <extractor> set _metadata <stream> <key> <value>
+meltano config <extractor> set _metadata <stream> <property> <key> <value>
 
 # For example:
 meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
@@ -324,7 +324,7 @@ meltano config tap-postgres set _metadata some_stream_id created_at is-replicati
   <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
-export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
+export <EXTRACTOR>__METADATA='{"<stream>": {"<key>": "<value>", "<property>": {"<key>": "<value>"}}}'
 
 # Once metadata has been set in `meltano.yml`, environment variables can be used
 # to override specific nested properties:
@@ -356,12 +356,12 @@ rules that are applied to the extractor's [discovered catalog file](https://hub.
 when the extractor is run using [`meltano el`](/reference/command-line-interface#el) or [`meltano invoke`](/reference/command-line-interface#invoke).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
-[JSON Schema](https://json-schema.org/) descriptions for specific properties (attributes) (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values, and second-level attribute identifiers that correspond to Singer stream property names.
-These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_schema.<entity>.<attribute>` and `_schema.<entity>.<attribute>.<key>`.
+[JSON Schema](https://json-schema.org/) descriptions for specific properties (e.g. `{"type": ["string", "null"], "format": "date-time"}`) are nested under top-level stream identifiers that correspond to Singer stream `tap_stream_id` values, and second-level property identifiers that correspond to Singer stream property names.
+These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_schema.<stream>.<property>` and `_schema.<stream>.<property>.<key>`.
 
-[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
+[Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream and property identifiers to match multiple streams and/or properties at once.
 
-Entity and attribute names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
+Stream and property names can be discovered using [`meltano select --list --all <plugin>`](/reference/command-line-interface#select).
 
 If a schema is specified for a property that does not yet exist in the discovered stream's schema, the property (and its schema) will be added to the catalog.
 This allows you to define a full schema for taps such as [`tap-dynamodb`](https://github.com/singer-io/tap-dynamodb) that do not themselves have the ability to discover the schema of their streams.
