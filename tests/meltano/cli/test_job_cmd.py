@@ -279,20 +279,19 @@ class TestCliJob:
             )
             assert res.exit_code == 1  # CliError for missing parameters
 
-            # test setting env vars on non-existent job
-            with mock.patch("meltano.cli.job.CliEvent") as mock_event:
-                res = cli_runner.invoke(
-                    cli,
-                    [
-                        "job",
-                        "set",
-                        "non-existent-job",
-                        "--env",
-                        "KEY=value",
-                    ],
-                    catch_exceptions=True,
-                )
-                assert res.exit_code == 1  # CliError for JobNotFoundError
+            # test setting env vars on non-existent job to hit tracking code
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "non-existent-job",
+                    "--env",
+                    "KEY=value",
+                ],
+                catch_exceptions=True,
+            )
+            assert res.exit_code == 1  # CliError for JobNotFoundError
 
             # test setting tasks with env vars in YAML format
             res = cli_runner.invoke(
@@ -323,7 +322,10 @@ class TestCliJob:
                     "set",
                     "job-set-mock",
                     "--tasks",
-                    "{'tasks': ['tap-final target-final'], 'env': {'YAML_VAR': 'yaml_val'}}",
+                    (
+                        "{'tasks': ['tap-final target-final'], "
+                        "'env': {'YAML_VAR': 'yaml_val'}}"
+                    ),
                     "--env",
                     "CLI_VAR=cli_val",
                     "--env",

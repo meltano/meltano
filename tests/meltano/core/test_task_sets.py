@@ -27,16 +27,22 @@ class TestTaskSets:
 
     def test_tasks_from_yaml_str(self) -> None:
         cases = [
-            ("generic", "tap target", TaskSets(name="generic", tasks=["tap target"])),
+            (
+                "generic",
+                "tap target",
+                TaskSets(name="generic", tasks=["tap target"], env={}),
+            ),
             (
                 "single-list",
                 "[tap target]",
-                TaskSets(name="single-list", tasks=["tap target"]),
+                TaskSets(name="single-list", tasks=["tap target"], env={}),
             ),
             (
                 "multiple-lists",
                 "[tap target, tap2 target2]",
-                TaskSets(name="multiple-lists", tasks=["tap target", "tap2 target2"]),
+                TaskSets(
+                    name="multiple-lists", tasks=["tap target", "tap2 target2"], env={}
+                ),
             ),
             (
                 "multiple-lists-quoted",
@@ -44,6 +50,7 @@ class TestTaskSets:
                 TaskSets(
                     name="multiple-lists-quoted",
                     tasks=["tap target", "tap2 target2"],
+                    env={},
                 ),
             ),
             (
@@ -52,6 +59,7 @@ class TestTaskSets:
                 TaskSets(
                     name="nested-mixed-lists",
                     tasks=[["tap target", "tap2 target2"], "cmd1"],
+                    env={},
                 ),
             ),
             # Test cases with environment variables
@@ -94,13 +102,11 @@ class TestTaskSets:
                     env={},
                 ),
             ),
-            # Test case without env field for backward compatibility
+            # Test case for simple string format (backward compatibility)
             (
-                "backward-compat-no-env",
+                "backward-compat-simple",
                 "tap target",
-                TaskSets(
-                    name="backward-compat-no-env", tasks=["tap target"]
-                ),  # No env field
+                TaskSets(name="backward-compat-simple", tasks=["tap target"], env={}),
             ),
         ]
 
@@ -108,11 +114,8 @@ class TestTaskSets:
             tset = tasks_from_yaml_str(name, task_str)
             assert tset.name == expected.name
             assert tset.tasks == expected.tasks
-            if hasattr(expected, "env"):
-                assert tset.env == expected.env
-            else:
-                # For backward compatibility, env should default to empty dict
-                assert getattr(tset, "env", {}) == {}
+            # All TaskSets objects now have env field, compare directly
+            assert tset.env == expected.env
 
         obvious_edge_cases = [
             ("bad-yaml", "['tap target'"),
