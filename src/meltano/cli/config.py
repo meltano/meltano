@@ -507,7 +507,7 @@ def reset(
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
-@click.argument("plugin_name")
+@click.argument("plugin_name", required=False)
 @click.option("--plugin-type", type=PluginTypeArg())
 @click.option("--interactive", is_flag=True)
 @click.option("--from-file", type=click.File("r"))
@@ -521,10 +521,10 @@ def set_(
     ctx: click.Context,
     project: Project,
     *,
-    plugin_name: str,
+    plugin_name: str | None,
     plugin_type: PluginType | None,
     setting_name: tuple[str, ...],
-    value: t.Any,  # noqa: ANN401
+    value: str | None,
     store: SettingValueStore,
     interactive: bool,
     from_file: t.TextIO | None,
@@ -532,6 +532,8 @@ def set_(
     """Set the configurations' setting `<name>` to `<value>`."""
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
+
+    plugin_name = plugin_name or click.prompt("Plugin name", type=str)
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -545,9 +547,9 @@ def set_(
         tracker=tracker,
     )
     settings = _get_settings(project=project, plugin=plugin)
-
-    if len(setting_name) == 1:
-        setting_name = tuple(setting_name[0].split("."))
+    setting_name = (
+        tuple(setting_name[0].split(".")) if len(setting_name) == 1 else setting_name
+    )
 
     interaction = InteractiveConfig(
         store=store,
@@ -559,12 +561,12 @@ def set_(
         extras=False,
     )
 
-    if interactive:
+    if interactive or (not setting_name and value is None):
         interaction.configure_all()
         ctx.exit()
 
     if from_file is not None:
-        setting_name += (value,)
+        setting_name += (value,)  # type: ignore[operator]
         value = from_file.read().strip()
 
     interaction.set_value(setting_name=setting_name, value=value, store=store)
