@@ -8,9 +8,17 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.job import _parse_env_vars
 
 if t.TYPE_CHECKING:
     from tests.fixtures.cli import MeltanoCliRunner
+
+
+def test_parse_env_vars():
+    """Test the _parse_env_vars helper function directly."""
+    # Test normal case
+    result = _parse_env_vars(("KEY1=value1", "KEY2=value2"))
+    assert result == {"KEY1": "value1", "KEY2": "value2"}
 
 
 class TestCliJob:
