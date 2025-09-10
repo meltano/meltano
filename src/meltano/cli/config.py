@@ -547,9 +547,9 @@ def set_(
         tracker=tracker,
     )
     settings = _get_settings(project=project, plugin=plugin)
-
-    if len(setting_name) == 1:
-        setting_name = tuple(setting_name[0].split("."))
+    setting_name = (
+        tuple(setting_name[0].split(".")) if len(setting_name) == 1 else setting_name
+    )
 
     interaction = InteractiveConfig(
         store=store,
@@ -561,7 +561,7 @@ def set_(
         extras=False,
     )
 
-    if interactive or not setting_name:
+    if interactive or (len(setting_name) == 0 and value is None):
         interaction.configure_all()
         ctx.exit()
 
