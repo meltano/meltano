@@ -77,7 +77,8 @@ class EnvVar:
         return str(not utils.truthy(value)) if self.negated else value
 
 
-class SettingMissingError(Error):
+# TODO: No longer used, consider removing
+class SettingMissingError(Error):  # pragma: no cover
     """A setting is missing."""
 
     def __init__(self, name: str) -> None:

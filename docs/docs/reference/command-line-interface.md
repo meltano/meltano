@@ -335,16 +335,34 @@ To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.js
 
 ## `config`
 
+:::warning Command Structure Changed
+
+The `meltano config` command structure changed in Meltano v4. The subcommand now comes _before_ the plugin name:
+
+- **New format**: `meltano config list <plugin>`, `meltano config set <plugin> <setting> <value>`
+- **Old format**: `meltano config <plugin> list`, `meltano config <plugin> set <setting> <value>`
+
+:::
+
+:::info Print Subcommand Required
+
+To view a plugin's configuration, you must now use the explicit `print` subcommand:
+
+- **New format**: `meltano config print <plugin>` or `meltano config print <plugin> --format=env`
+- **Old format**: `meltano config <plugin>` or `meltano config <plugin> --format=env`
+
+:::
+
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
-When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
+When no explicit `--store` is specified, `meltano config set <plugin>` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
 
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
 - [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `sensitive: true` or `env_specific: true`);
 - [`meltano.yml`](/concepts/project#meltano-yml-project-file) otherwise.
 
-If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config test <plugin>`](/reference/command-line-interface#config).
 
 ### How to use
 
@@ -353,49 +371,50 @@ To manage the configuration of Meltano itself, specify `meltano` as the plugin n
 ```bash
 # List all settings for Meltano itself with their names,
 # environment variables, and current values
-meltano config meltano list
+meltano config list meltano
 
 # List all settings for the specified plugin with their names,
 # environment variables, and current values
-meltano config <plugin> list
+meltano config list <plugin>
 
 # View the plugin's current configuration.
-meltano config <plugin>
+meltano config print <plugin>
 
 # Sets the configuration's setting `<name>` to `<value>`.
-meltano config <plugin> set <name> <value>
+meltano config set <plugin> <name> <value>
 
 # Values are parsed as JSON, and interpreted as simple strings when invalid
-meltano config <plugin> set <name> <string>             # String with no meaning in JSON
-meltano config <plugin> set <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
-meltano config <plugin> set <name> <json>               # JSON that fits in a single word
-meltano config <plugin> set <name> '<json>'             # JSON in a string argument
-meltano config <plugin> set <name> '"<string>"'         # JSON string
-meltano config <plugin> set <name> <number>             # JSON number, e.g. 100 or 3.14
-meltano config <plugin> set <name> <true/false>         # Boolean True or False
-meltano config <plugin> set <name> '[<elem>, ...]'      # Array
-meltano config <plugin> set <name> '{"<key>": <value>, ...}' # JSON object
+meltano config set <plugin> <name> <string>             # String with no meaning in JSON
+meltano config set <plugin> <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
+meltano config set <plugin> <name> <json>               # JSON that fits in a single word
+meltano config set <plugin> <name> '<json>'             # JSON in a string argument
+meltano config set <plugin> <name> '"<string>"'         # JSON string
+meltano config set <plugin> <name> <number>             # JSON number, e.g. 100 or 3.14
+meltano config set <plugin> <name> <true/false>         # Boolean True or False
+meltano config set <plugin> <name> '[<elem>, ...]'      # Array
+meltano config set <plugin> <name> '{"<key>": <value>, ...}' # JSON object
 
 # Remove the configuration's setting `<name>`.
-meltano config <plugin> unset <name>
+meltano config unset <plugin> <name>
 
 # Clear the configuration (back to defaults).
-meltano config <plugin> reset
+meltano config reset <plugin>
 
 # Set, unset, or reset in a specific location
-meltano config <plugin> set --store=meltano_yml <name> <value> # set in `meltano.yml`
-meltano config <plugin> unset --store=dotenv <name> # unset in `.env`
-meltano config <plugin> reset --store=db # reset in system database
+meltano config set <plugin> --store=meltano_yml <name> <value> # set in `meltano.yml`
+meltano config unset <plugin> --store=dotenv <name> # unset in `.env`
+meltano config reset <plugin> --store=db # reset in system database
 
 # Test the plugin's current configuration, if supported.
-meltano config <plugin> test
-meltano config --no-install <plugin> test # prevent auto-install of plugin
+meltano config test <plugin>
+meltano config --no-install test <plugin> # prevent auto-install of plugin
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano config --plugin-type=<type> <plugin> ...
+meltano config list --plugin-type=<type> <plugin>
+meltano config set --plugin-type=<type> <plugin> <name> <value>
 ```
 
 When setting a config value that contains the character `$`, you can avoid expansion by

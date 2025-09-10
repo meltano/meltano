@@ -8,7 +8,7 @@ from contextlib import closing
 
 import click
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import get_install_options, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
@@ -18,6 +18,7 @@ from meltano.core.select_service import SelectService
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin.singer.catalog import ListSelectedExecutor
     from meltano.core.project import Project
 

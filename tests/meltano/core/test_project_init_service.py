@@ -71,8 +71,8 @@ def test_project_init_existing_meltano_yml(tmp_path: Path, pushd) -> None:
     with pytest.raises(
         ProjectInitServiceError,
         match=(
-            "A `meltano.yml` file already exists in the target directory. "
-            "Use `--force` to overwrite it."
+            r"A `meltano.yml` file already exists in the target directory. "
+            r"Use `--force` to overwrite it."
         ),
     ):
         ProjectInitService(project_dir).init(activate=False)
@@ -118,6 +118,6 @@ def test_project_init_missing_parent_directory(tmp_path: Path, pushd) -> None:
     missing_dir.rmdir()  # remove the parent directory
     with pytest.raises(
         ProjectInitServiceError,
-        match="Could not create directory 'test_project'.",
+        match=r"Could not create directory 'test_project'.",
     ):
         project_init_service.init(activate=False)

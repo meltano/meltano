@@ -9,7 +9,6 @@ import click
 import structlog
 
 from meltano.cli.params import (
-    InstallPlugins,
     UUIDParamType,
     get_install_options,
     pass_project,
@@ -23,7 +22,7 @@ from meltano.core.logging.utils import change_console_log_level
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, Tracker
+from meltano.core.tracking import BlockEvents
 from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import new_run_id, run_async
@@ -31,7 +30,9 @@ from meltano.core.utils import new_run_id, run_async
 if t.TYPE_CHECKING:
     import uuid
 
+    from meltano.cli.params import InstallPlugins
     from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 logger = structlog.getLogger(__name__)
 

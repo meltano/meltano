@@ -27,7 +27,6 @@ from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
 from .catalog import (
-    CatalogDict,
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
@@ -45,6 +44,8 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
+
+    from .catalog import CatalogDict
 
 logger = structlog.stdlib.get_logger(__name__)
 

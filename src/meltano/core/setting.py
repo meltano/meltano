@@ -3,7 +3,7 @@ from __future__ import annotations  # noqa: D100
 import typing as t
 
 from sqlalchemy import types
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column  # noqa: TC002
 
 from meltano.core.sqlalchemy import StrPK  # noqa: TC001
 

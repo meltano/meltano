@@ -429,7 +429,7 @@ class TestPluginSettingsService:
         assert subject.get("schema") is None
 
         subject.set("schema", "default", store=SettingValueStore.DOTENV)
-        value, metadata = subject.get_with_metadata("schema")
+        _value, _metadata = subject.get_with_metadata("schema")
 
         # Env is the default
         assert_env_value("default", "TARGET_MOCK_SCHEMA")

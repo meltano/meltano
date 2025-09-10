@@ -39,7 +39,7 @@ class TestCliSelect:
         # first, reset to defaults
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", tap.name, "reset"],
+            [*environment_flag, "config", "reset", tap.name],
             input="y\n",
         )
         assert_cli_runner(result)
@@ -52,7 +52,7 @@ class TestCliSelect:
         # verify pattern was added
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
@@ -66,7 +66,7 @@ class TestCliSelect:
         # verify select pattern removed
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
@@ -90,7 +90,7 @@ class TestCliSelect:
         # first, reset to defaults
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", tap.name, "reset"],
+            [*environment_flag, "config", "reset", tap.name],
             input="y\n",
         )
         assert_cli_runner(result)
@@ -102,7 +102,7 @@ class TestCliSelect:
         assert_cli_runner(result)
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
@@ -126,7 +126,7 @@ class TestCliSelect:
         # verify patterns were added
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
@@ -142,7 +142,7 @@ class TestCliSelect:
         # verify all select patterns were removed (reverted to default)
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)

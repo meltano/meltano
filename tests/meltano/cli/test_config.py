@@ -12,6 +12,7 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
 if t.TYPE_CHECKING:
@@ -19,6 +20,7 @@ if t.TYPE_CHECKING:
 
     from click.testing import CliRunner
 
+    from fixtures.cli import MeltanoCliRunner
     from meltano.core.project import Project
 
 
@@ -26,7 +28,7 @@ class TestCliConfig:
     @pytest.mark.usefixtures("project")
     def test_config(
         self,
-        cli_runner: CliRunner,
+        cli_runner: MeltanoCliRunner,
         tap,
         session,
         plugin_settings_service_factory,
@@ -38,16 +40,36 @@ class TestCliConfig:
             store=SettingValueStore.DOTENV,
             session=session,
         )
-        result = cli_runner.invoke(cli, ["config", tap.name])
+        result = cli_runner.invoke(cli, ["config", "print", tap.name])
         assert_cli_runner(result)
 
         json_config = json.loads(result.stdout)
         assert json_config["test"] == "mock"
         assert json_config["secure"] == "*****"
 
+    @pytest.mark.parametrize(
+        "subcommand",
+        (
+            "list",
+            "print",
+            "reset",
+            "set",
+            "test",
+            "unset",
+        ),
+    )
+    def test_config_help_outside_project(
+        self,
+        cli_runner: MeltanoCliRunner,
+        subcommand: str,
+    ) -> None:
+        """Confirm that `config <subcommand> --help` works outside of a project."""
+        result = cli_runner.invoke(cli, ["config", subcommand, "--help"])
+        assert_cli_runner(result)
+
     @pytest.mark.usefixtures("project")
     def test_config_extras(self, cli_runner, tap) -> None:
-        result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
+        result = cli_runner.invoke(cli, ["config", "print", "--extras", tap.name])
         assert_cli_runner(result)
 
         json_config = json.loads(result.stdout)
@@ -68,7 +90,7 @@ class TestCliConfig:
             store=SettingValueStore.DOTENV,
             session=session,
         )
-        result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
+        result = cli_runner.invoke(cli, ["config", "print", "--format=env", tap.name])
         assert_cli_runner(result)
 
         env_config = dotenv.dotenv_values(stream=io.StringIO(result.stdout))
@@ -77,7 +99,7 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_meltano(self, cli_runner, engine_uri) -> None:
-        result = cli_runner.invoke(cli, ["config", "meltano"])
+        result = cli_runner.invoke(cli, ["config", "print", "meltano"])
         assert_cli_runner(result)
 
         json_config = json.loads(result.stdout)
@@ -85,10 +107,27 @@ class TestCliConfig:
         assert json_config["cli"]["log_level"] == "info"
 
     @pytest.mark.usefixtures("project")
+    def test_config_unknown_plugin(
+        self,
+        request: pytest.FixtureRequest,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            [
+                "config",
+                "print",
+                f"unknown-plugin-{request.node.nodeid}",
+            ],
+        )
+        assert result.exit_code == 1
+        assert isinstance(result.exception, PluginNotFoundError)
+
+    @pytest.mark.usefixtures("project")
     def test_config_meltano_set(self, cli_runner) -> None:
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "cli.log_config", "log_config.yml"],
+            ["config", "set", "meltano", "cli.log_config", "log_config.yml"],
         )
         assert_cli_runner(result)
         assert (
@@ -111,7 +150,7 @@ class TestCliConfig:
             "meltano.core.plugin_invoker.PluginInvoker.invoke_async",
             return_value=mock_invoke,
         ) as mocked_invoke:
-            result = cli_runner.invoke(cli, ["config", tap.name, "test"])
+            result = cli_runner.invoke(cli, ["config", "test", tap.name])
             assert mocked_invoke.assert_called_once
             assert_cli_runner(result)
 
@@ -119,7 +158,7 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_meltano_test(self, cli_runner) -> None:
-        result = cli_runner.invoke(cli, ["config", "meltano", "test"])
+        result = cli_runner.invoke(cli, ["config", "test", "meltano"])
 
         assert result.exit_code == 1
         assert (
@@ -143,7 +182,7 @@ class TestCliConfig:
             session=session,
         )
 
-        result = cli_runner.invoke(cli, ["config", tap.name, "list"])
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
         assert_cli_runner(result)
 
         assert (
@@ -168,7 +207,7 @@ class TestCliConfig:
             session=session,
         )
 
-        result = cli_runner.invoke(cli, ["config", inherited_tap.name, "list"])
+        result = cli_runner.invoke(cli, ["config", "list", inherited_tap.name])
         assert_cli_runner(result)
 
         assert (
@@ -194,7 +233,7 @@ class TestCliConfig:
             session=session,
         )
 
-        result = cli_runner.invoke(cli, ["config", "--unsafe", tap.name, "list"])
+        result = cli_runner.invoke(cli, ["config", "--unsafe", "list", tap.name])
         assert_cli_runner(result)
 
         assert (
@@ -208,7 +247,7 @@ class TestCliConfigSet:
     def test_config_set_redacted(self, cli_runner, tap) -> None:
         result = cli_runner.invoke(
             cli,
-            ["config", tap.name, "set", "secure", "thisisatest"],
+            ["config", "set", tap.name, "secure", "thisisatest"],
         )
         assert_cli_runner(result)
 
@@ -223,7 +262,7 @@ class TestCliConfigSet:
 
         result = cli_runner.invoke(
             cli,
-            ["config", "--unsafe", tap.name, "set", "secure", value],
+            ["config", "--unsafe", "set", tap.name, "secure", value],
         )
         assert_cli_runner(result)
 
@@ -236,7 +275,7 @@ class TestCliConfigSet:
     def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path) -> None:
         result = cli_runner.invoke(
             cli,
-            ["config", tap.name, "set", "private_key", "--from-file", "-"],
+            ["config", "set", tap.name, "private_key", "--from-file", "-"],
             input="content-from-stdin",
         )
         assert_cli_runner(result)
@@ -251,7 +290,7 @@ class TestCliConfigSet:
 
         result = cli_runner.invoke(
             cli,
-            ["config", tap.name, "set", "private_key", "--from-file", filepath],
+            ["config", "set", tap.name, "private_key", "--from-file", filepath],
         )
         assert_cli_runner(result)
 
@@ -269,7 +308,7 @@ class TestCliConfigSet:
         # set base config in `meltano.yml`
         result = cli_runner.invoke(
             cli,
-            ["--no-environment", "config", "tap-mock", "set", "test", "base-mock"],
+            ["--no-environment", "config", "set", "tap-mock", "test", "base-mock"],
         )
         assert_cli_runner(result)
         base_tap_config = next(
@@ -285,7 +324,7 @@ class TestCliConfigSet:
         # set base config in `meltano.yml` -- ignore default environment
         result = cli_runner.invoke(
             cli,
-            ["config", "tap-mock", "set", "test", "base-mock-no-default"],
+            ["config", "set", "tap-mock", "test", "base-mock-no-default"],
         )
         assert_cli_runner(result)
         base_tap_config = next(
@@ -301,7 +340,7 @@ class TestCliConfigSet:
         # set dev environment config in `meltano.yml`
         result = cli_runner.invoke(
             cli,
-            ["--environment=dev", "config", "tap-mock", "set", "test", "dev-mock"],
+            ["--environment=dev", "config", "set", "tap-mock", "test", "dev-mock"],
         )
         assert_cli_runner(result)
         dev_env = next(
@@ -325,7 +364,7 @@ class TestCliConfigUnset:
         secure_value = "thisisatest"
         set_default_result = cli_runner.invoke(
             cli,
-            ["config", tap.name, "set", "secure", secure_value],
+            ["config", "set", tap.name, "secure", secure_value],
         )
         assert_cli_runner(set_default_result)
 
@@ -334,8 +373,8 @@ class TestCliConfigUnset:
             cli,
             [
                 "config",
-                tap.name,
                 "set",
+                tap.name,
                 "--store=meltano_yml",
                 "secure",
                 meltano_yml_value,
@@ -345,7 +384,7 @@ class TestCliConfigUnset:
 
         unset_result = cli_runner.invoke(
             cli,
-            ["config", tap.name, "unset", "--store=meltano_yml", "secure"],
+            ["config", "unset", tap.name, "--store=meltano_yml", "secure"],
         )
         assert_cli_runner(unset_result)
         assert (

@@ -19,7 +19,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
@@ -35,6 +35,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
     from .ioblock import IOBlock
@@ -519,19 +520,12 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
         if self.context.force:
-            logger.warning(
-                "Force option is enabled, ignoring stale job check.",
-            )
-
-        if not self.context.force and (
-            existing := JobFinder(job.job_name).latest_running(
-                self.context.session,
-            )
-        ):
+            logger.warning("Force option is enabled, ignoring stale job check.")
+        elif existing := JobFinder(job.job_name).latest_running(self.context.session):
             msg = (
                 f"Another '{job.job_name}' pipeline is already running "
                 f"which started at {existing.started_at}. "
-                f"Wait until {existing.valid_intil()} when the job will be "
+                f"Wait until {existing.valid_until()} when the job will be "
                 "automatically cancelled if stale, or ignore this check using the "
                 "'--force' option."
             )

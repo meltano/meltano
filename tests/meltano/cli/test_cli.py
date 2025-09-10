@@ -251,7 +251,7 @@ class TestCli:
 
     def test_handle_meltano_error(self) -> None:
         exception = MeltanoError(reason="This failed", instruction="Try again")
-        with pytest.raises(CliError, match="This failed. Try again."):
+        with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
 
     @pytest.mark.usefixtures("pushd")
@@ -310,8 +310,9 @@ class TestCli:
                     "--env-file",
                     str(dotenv_path),
                     "config",
-                    "--format=env",
+                    "print",
                     "meltano",
+                    "--format=env",
                 ),
             )
             assert result.exit_code == 0
@@ -326,8 +327,9 @@ class TestCli:
                     "--env-file",
                     "prod.env",
                     "config",
-                    "--format=env",
+                    "print",
                     "meltano",
+                    "--format=env",
                 ),
             )
             assert result.exit_code == 0
@@ -337,7 +339,7 @@ class TestCli:
         "command_args",
         (
             ("invoke", "example"),
-            ("config", "example"),
+            ("config", "print", "example"),
             ("job", "list"),
             ("environment", "list"),
             ("add", "utility", "example"),
@@ -629,7 +631,7 @@ class TestLargeConfigProject:
         assert (
             cli_runner.invoke(
                 cli,
-                ["--no-environment", "config", "target-with-large-config", "list"],
+                ["--no-environment", "config", "list", "target-with-large-config"],
             ).exit_code
             == 0
         )

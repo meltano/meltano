@@ -27,41 +27,47 @@ def main() -> None:
     parser.add_argument("-p", "--python-version", required=True)
     parser.add_argument("-d", "--default-python", required=True)
     parser.add_argument("--git-sha")
+    parser.add_argument(
+        "--slim", action="store_true", help="Generate tags for slim images"
+    )
     args = parser.parse_args()
 
     is_default_python = args.default_python == args.python_version
     version = Version(args.package_version)
     tags = []
 
+    # Add suffix for slim images
+    suffix = "-slim" if args.slim else ""
+
     # To save space, only publish the `latest` tag for each
     # images to the GitHub registry
     if args.registry != "ghcr.io":
-        tags.append(f"v{version}-python{args.python_version}")
+        tags.append(f"v{version}-python{args.python_version}{suffix}")
 
         if not version.is_prerelease:
             tags.extend(
                 (
-                    f"v{version.major}-python{args.python_version}",
-                    f"v{version.major}.{version.minor}-python{args.python_version}",
+                    f"v{version.major}-python{args.python_version}{suffix}",
+                    f"v{version.major}.{version.minor}-python{args.python_version}{suffix}",
                 ),
             )
             if is_default_python:
                 tags.extend(
                     (
-                        f"SHA-{args.git_sha}",
-                        f"v{version.major}",
-                        f"v{version.major}.{version.minor}",
-                        f"v{version}",
+                        f"SHA-{args.git_sha}{suffix}",
+                        f"v{version.major}{suffix}",
+                        f"v{version.major}.{version.minor}{suffix}",
+                        f"v{version}{suffix}",
                     ),
                 )
 
     # ghcr.io: publish `latest` for ALL versions
     # docker.io: only publish `latest` for final releases
     if not version.is_prerelease or args.registry == "ghcr.io":
-        tags.append(f"latest-python{args.python_version}")
+        tags.append(f"latest-python{args.python_version}{suffix}")
 
         if is_default_python:
-            tags.append("latest")
+            tags.append(f"latest{suffix}")
 
     print("\n".join(tags))  # noqa: T201
 

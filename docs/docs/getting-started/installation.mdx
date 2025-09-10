@@ -68,21 +68,25 @@ successfully installed meltano
 
 We maintain [the `meltano/meltano` Docker image on Docker Hub](https://hub.docker.com/r/meltano/meltano/tags), which comes with Python and Meltano pre-installed.
 
-To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged `v<major>.<minor>.<patch>`, e.g. `v3.8.0`. Add a `-python3.X` suffix to the image tag to change the python version, e.g. `latest-python3.13`. To get the latest minor or patch version, omit that value from the version number, e.g. `v3` for the latest Meltano `v3.*.*` image, or `v3.8` for the latest Meltano `v3.8.*` image
+**Image Variants:**
+- **Slim images** (recommended): Add `-slim` suffix, e.g. `latest-slim` - optimized size, includes cloud storage and PostgreSQL support
+- **Full images**: Default tags like `latest` - includes all database connectors and build tools
+
+To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged `v<major>.<minor>.<patch>`, e.g. `v3.8.0` or `v3.8.0-slim`. Add a `-python3.X` suffix to the image tag to change the python version, e.g. `latest-python3.13-slim`. To get the latest minor or patch version, omit that value from the version number, e.g. `v3-slim` for the latest Meltano `v3.*.*` slim image.
 
 <br/>
 
 <Termy>
 
 ```console
-$ docker pull meltano/meltano
-latest: Pulling from meltano/meltano
+$ docker pull meltano/meltano:latest-slim
+latest-slim: Pulling from meltano/meltano
 ---> 100%
-Status: Downloaded newer image for meltano/meltano:latest
-docker.io/meltano/meltano:latest
+Status: Downloaded newer image for meltano/meltano:latest-slim
+docker.io/meltano/meltano:latest-slim
 
-$ docker run meltano/meltano --version
-meltano, version 2.19.0
+$ docker run meltano/meltano:latest-slim --version
+meltano, version 3.9.1
 
 ```
 

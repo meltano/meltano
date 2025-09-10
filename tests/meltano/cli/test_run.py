@@ -1204,7 +1204,7 @@ class TestCliRunScratchpadOne:
             with pytest.raises(
                 AmbiguousMappingName,
                 match=(
-                    "Ambiguous mapping name mock-mapping-dupe, found multiple matches."
+                    r"Ambiguous mapping name mock-mapping-dupe, found multiple matches."
                 ),
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)

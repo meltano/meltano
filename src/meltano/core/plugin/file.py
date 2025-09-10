@@ -9,10 +9,7 @@ import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_install_service import (
-    PluginInstallReason,
-    PluginInstallService,
-)
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
 
@@ -21,6 +18,7 @@ if t.TYPE_CHECKING:
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_install_service import PluginInstallService
     from meltano.core.project import Project
 
 
