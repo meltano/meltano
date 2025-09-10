@@ -280,18 +280,19 @@ class TestCliJob:
             assert res.exit_code == 1  # CliError for missing parameters
 
             # test setting env vars on non-existent job
-            res = cli_runner.invoke(
-                cli,
-                [
-                    "job",
-                    "set",
-                    "non-existent-job",
-                    "--env",
-                    "KEY=value",
-                ],
-                catch_exceptions=True,
-            )
-            assert res.exit_code == 1  # CliError for JobNotFoundError
+            with mock.patch("meltano.cli.job.CliEvent") as mock_event:
+                res = cli_runner.invoke(
+                    cli,
+                    [
+                        "job",
+                        "set",
+                        "non-existent-job",
+                        "--env",
+                        "KEY=value",
+                    ],
+                    catch_exceptions=True,
+                )
+                assert res.exit_code == 1  # CliError for JobNotFoundError
 
             # test setting tasks with env vars in YAML format
             res = cli_runner.invoke(
@@ -313,6 +314,27 @@ class TestCliJob:
             assert task_sets.tasks == ["tap-new target-new"]
             assert "YAML_ENV_VAR" in task_sets.env
             assert task_sets.env["YAML_ENV_VAR"] == "yaml_value"
+
+            # test combining YAML env vars with CLI env vars (CLI takes precedence)
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "job",
+                    "set",
+                    "job-set-mock",
+                    "--tasks",
+                    "{'tasks': ['tap-final target-final'], 'env': {'YAML_VAR': 'yaml_val'}}",
+                    "--env",
+                    "CLI_VAR=cli_val",
+                    "--env",
+                    "YAML_VAR=cli_override",  # Should override YAML value
+                ],
+            )
+            assert_cli_runner(res)
+
+            task_sets = task_sets_service.get("job-set-mock")
+            assert task_sets.env["YAML_VAR"] == "cli_override"  # CLI overrides YAML
+            assert task_sets.env["CLI_VAR"] == "cli_val"
 
     @pytest.mark.order(after="test_job_add")
     @pytest.mark.usefixtures("session", "project")
@@ -412,9 +434,9 @@ class TestCliJob:
             # The exact format will depend on implementation, but env vars should appear
 
             # test job without env vars doesn't show env in output
-            assert (
-                "job-list-mock:" in res.output
-            )  # Job without env should not show env section
+            assert "job-list-mock:" in res.output
+            # Verify env vars appear in text output for jobs that have them
+            assert "env:" in res.output  # Should show env section for job-list-with-env
 
             # test json format includes env vars
             res = cli_runner.invoke(
