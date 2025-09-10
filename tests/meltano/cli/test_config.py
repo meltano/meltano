@@ -372,13 +372,13 @@ class TestCliConfigSet:
             )
             assert_cli_runner(result)
             mock_configure_all.assert_called_once()
+            mock_configure_all.reset_mock()
 
-        with mock.patch(target) as mock_configure_all:
             result = cli_runner.invoke(cli, ["config", "set", tap.name])
             assert_cli_runner(result)
             mock_configure_all.assert_called_once()
+            mock_configure_all.reset_mock()
 
-        with mock.patch(target) as mock_configure_all:
             result = cli_runner.invoke(cli, ["config", "set"], input=f"{tap.name}\n")
             assert_cli_runner(result)
             mock_configure_all.assert_called_once()
