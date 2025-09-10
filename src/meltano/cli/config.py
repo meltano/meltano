@@ -524,7 +524,7 @@ def set_(
     plugin_name: str | None,
     plugin_type: PluginType | None,
     setting_name: tuple[str, ...],
-    value: t.Any,  # noqa: ANN401
+    value: str | None,
     store: SettingValueStore,
     interactive: bool,
     from_file: t.TextIO | None,
@@ -561,12 +561,12 @@ def set_(
         extras=False,
     )
 
-    if interactive or (len(setting_name) == 0 and value is None):
+    if interactive or (not setting_name and value is None):
         interaction.configure_all()
         ctx.exit()
 
     if from_file is not None:
-        setting_name += (value,)
+        setting_name += (value,)  # type: ignore[operator]
         value = from_file.read().strip()
 
     interaction.set_value(setting_name=setting_name, value=value, store=store)
