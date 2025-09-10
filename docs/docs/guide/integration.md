@@ -45,7 +45,7 @@ If you'd like to manually inspect the generated catalog for debugging purposes, 
 
 Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano el`](/reference/command-line-interface#elt)'s `--catalog` option or the [`catalog` extractor extra](/concepts/plugins#catalog-extra).
 
-In some cases, like when a tap has extra commmand line options like `--about` or `--version` that don't need a catalog, or when you only need to dump the tap configuration with `--dump=config`, Meltano avoids running discovery to save the overhead and to not require the tap to be configured with valid credentials.
+In some cases, like when a tap has extra command line options like `--about` or `--version` that don't need a catalog, or when you only need to dump the tap configuration with `--dump=config`, Meltano avoids running discovery to save the overhead and to not require the tap to be configured with valid credentials.
 
 ### Selecting streams and properties for extraction
 
