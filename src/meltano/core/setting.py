@@ -3,11 +3,14 @@ from __future__ import annotations  # noqa: D100
 import typing as t
 
 from sqlalchemy import types
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import mapped_column
 
 from meltano.core.sqlalchemy import StrPK  # noqa: TC001
 
 from .models import SystemModel
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Mapped
 
 
 class Setting(SystemModel):  # noqa: D101

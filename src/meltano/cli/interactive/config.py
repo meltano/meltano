@@ -21,12 +21,7 @@ from rich.text import Text
 
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.settings_service import (
-    REDACTED_VALUE,
-    SettingKind,
-    SettingsService,
-    SettingValueStore,
-)
+from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent
 
@@ -34,6 +29,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
+    from meltano.core.settings_service import SettingsService
     from meltano.core.tracking.tracker import Tracker
 
 PLUGIN_COLOR = "magenta"

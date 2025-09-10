@@ -5,7 +5,10 @@ from __future__ import annotations
 import importlib
 import typing as t
 
-from . import BasePlugin, PluginDefinition, PluginType, Variant
+from . import BasePlugin, PluginType
+
+if t.TYPE_CHECKING:
+    from . import PluginDefinition, Variant
 
 
 def lazy_import(module: str, classname: str) -> t.Callable[[], type[BasePlugin]]:

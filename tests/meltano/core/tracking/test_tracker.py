@@ -11,7 +11,7 @@ from time import sleep
 from unittest import mock
 
 import pytest
-from snowplow_tracker import Emitter, SelfDescribing
+from snowplow_tracker import Emitter
 
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
@@ -22,6 +22,8 @@ from meltano.core.utils import hash_sha256, new_project_id
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+
+    from snowplow_tracker import SelfDescribing
 
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project

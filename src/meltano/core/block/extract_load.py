@@ -19,7 +19,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
@@ -35,6 +35,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
     from .ioblock import IOBlock

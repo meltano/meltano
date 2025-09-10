@@ -13,18 +13,13 @@ from structlog.stdlib import get_logger
 from urllib3 import Retry
 
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
-from meltano.core.plugin import (
-    BasePlugin,
-    PluginDefinition,
-    PluginRef,
-    PluginType,
-    Variant,
-)
+from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin import BasePlugin
     from meltano.core.project import Project
 
 logger = get_logger(__name__)

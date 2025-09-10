@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.job import Job, Payload
+from meltano.core.job import Payload
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
@@ -20,6 +20,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.job import Job
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = get_logger(__name__)

@@ -9,12 +9,7 @@ from urllib.parse import urlparse
 import click
 import requests
 
-from meltano.cli.params import (
-    InstallPlugins,
-    PluginTypeArg,
-    get_install_options,
-    pass_project,
-)
+from meltano.cli.params import PluginTypeArg, get_install_options, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
@@ -32,6 +27,7 @@ from meltano.core.utils import run_async
 from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker

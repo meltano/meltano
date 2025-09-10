@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import typing as t
 
 import pytest
 
@@ -9,11 +10,11 @@ from meltano.core.environment import (
     Environment,
     EnvironmentNameContainsStateIdDelimiterError,
 )
-from meltano.core.environment_service import (
-    EnvironmentAlreadyExistsError,
-    EnvironmentService,
-)
+from meltano.core.environment_service import EnvironmentAlreadyExistsError
 from meltano.core.utils import NotFound
+
+if t.TYPE_CHECKING:
+    from meltano.core.environment_service import EnvironmentService
 
 
 class TestEnvironmentService:

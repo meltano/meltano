@@ -13,16 +13,14 @@ from meltano.cli.utils import (
     validate_plugin_type_args,
 )
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_location_remove import (
-    DbRemoveManager,
-    PluginLocationRemoveManager,
-)
+from meltano.core.plugin_location_remove import DbRemoveManager
 from meltano.core.plugin_remove_service import PluginRemoveService
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
 
     from meltano.core.plugin import PluginType
+    from meltano.core.plugin_location_remove import PluginLocationRemoveManager
     from meltano.core.project import Project
 
 

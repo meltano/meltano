@@ -8,7 +8,7 @@ import typing as t
 from abc import ABCMeta, abstractmethod
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -21,6 +21,7 @@ else:
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
 
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
 EXIT_CODE_OK = 0
