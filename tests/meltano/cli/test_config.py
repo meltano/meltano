@@ -366,11 +366,21 @@ class TestCliConfigSet:
         """Test that the interactive config flow is triggered."""
         target = "meltano.cli.interactive.config.InteractiveConfig.configure_all"
         with mock.patch(target) as mock_configure_all:
-            cli_runner.invoke(cli, ["config", "set", tap.name, "--interactive"])
+            result = cli_runner.invoke(
+                cli,
+                ["config", "set", tap.name, "--interactive"],
+            )
+            assert_cli_runner(result)
             mock_configure_all.assert_called_once()
 
         with mock.patch(target) as mock_configure_all:
-            cli_runner.invoke(cli, ["config", "set", tap.name])
+            result = cli_runner.invoke(cli, ["config", "set", tap.name])
+            assert_cli_runner(result)
+            mock_configure_all.assert_called_once()
+
+        with mock.patch(target) as mock_configure_all:
+            result = cli_runner.invoke(cli, ["config", "set"], input=f"{tap.name}\n")
+            assert_cli_runner(result)
             mock_configure_all.assert_called_once()
 
 
