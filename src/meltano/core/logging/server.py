@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import logging
 import logging.handlers
+import os
 import pickle
 import socketserver
 import struct
@@ -100,17 +101,28 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 
     def __init__(
         self,
-        host: str = "localhost",
-        port: int = logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+        host: str | None = None,
+        port: int | None = None,
         handler: type[socketserver.BaseRequestHandler] = LogRecordStreamHandler,
     ):
         """Initialize the server.
 
         Args:
-            host: The host to listen on.
-            port: The port to listen on.
+            host: The host to listen on. If None, uses MELTANO_LOGGING_HOST
+                or "localhost".
+            port: The port to listen on. If None, uses MELTANO_LOGGING_PORT
+                or DEFAULT_TCP_LOGGING_PORT.
             handler: The handler to use.
         """
+        if host is None:
+            host = os.environ.get("MELTANO_LOGGING_HOST", "localhost")
+        if port is None:
+            port = int(
+                os.environ.get(
+                    "MELTANO_LOGGING_PORT",
+                    str(logging.handlers.DEFAULT_TCP_LOGGING_PORT),
+                )
+            )
         super().__init__((host, port), handler)
         self.abort = 0
         self.timeout = 1
@@ -131,9 +143,20 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 class LoggingServer(contextlib.AbstractContextManager):
     """A context manager that starts and stops the logging server."""
 
-    def __init__(self, logger_name: str | None = None) -> None:
-        """Initialize the logging server."""
-        self.tcpserver = LogRecordSocketReceiver()
+    def __init__(
+        self,
+        logger_name: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+    ) -> None:
+        """Initialize the logging server.
+
+        Args:
+            logger_name: The logger name to use.
+            host: The host to listen on. If None, uses environment variables.
+            port: The port to listen on. If None, uses environment variables.
+        """
+        self.tcpserver = LogRecordSocketReceiver(host=host, port=port)
         self.tcpserver.logger_name = logger_name
         self.server_thread = threading.Thread(target=self._start, daemon=True)
 

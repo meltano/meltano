@@ -3,6 +3,7 @@ from __future__ import annotations  # noqa: D100
 import json
 import logging
 import logging.handlers
+import os
 import typing as t
 from textwrap import dedent
 
@@ -112,8 +113,19 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         # getEffectiveLevel
         log_level = logging.getLevelName(logging.getLogger().getEffectiveLevel())  # noqa: TID251
 
+        # Get configurable logging server host and port
+        logging_host = os.environ.get("MELTANO_LOGGING_HOST", "localhost")
+        logging_port = int(
+            os.environ.get(
+                "MELTANO_LOGGING_PORT",
+                str(logging.handlers.DEFAULT_TCP_LOGGING_PORT),
+            )
+        )
+
         # Check if logging server is available for centralized logging
-        use_logging_server = is_logging_server_available()
+        use_logging_server = is_logging_server_available(
+            host=logging_host, port=logging_port
+        )
         handlers: list[str] = ["console"]
         handler_configs: dict[str, dict[str, t.Any]] = {
             "console": {
@@ -129,8 +141,8 @@ class SingerPlugin(BasePlugin):  # noqa: D101
             handlers.append("meltano_server")
             handler_configs["meltano_server"] = {
                 "class": "logging.handlers.SocketHandler",
-                "host": "localhost",
-                "port": logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+                "host": logging_host,
+                "port": logging_port,
                 "formatter": "default",
                 "level": log_level,
             }
@@ -174,7 +186,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
                 class=logging.handlers.SocketHandler
                 level={log_level}
                 formatter=default
-                args=('localhost', {logging.handlers.DEFAULT_TCP_LOGGING_PORT})"""
+                args=('{logging_host}', {logging_port})"""
 
         async with await anyio.open_file(pipelinewise_logging, mode="w") as f:
             await f.write(
