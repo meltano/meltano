@@ -69,7 +69,6 @@ class PluginInstallStatus(StrEnum):
     SKIPPED = enum.auto()
     ERROR = enum.auto()
     WARNING = enum.auto()
-    NOT_REQUIRED = enum.auto()
 
 
 @dataclass(frozen=True)
@@ -108,15 +107,6 @@ class PluginInstallState:
         return self.status == PluginInstallStatus.SKIPPED
 
     @cached_property
-    def not_required(self) -> bool:
-        """Plugin install not required status.
-
-        Returns:
-            `True` if the installation was not required.
-        """
-        return self.status == PluginInstallStatus.NOT_REQUIRED
-
-    @cached_property
     def verb(self) -> str:
         """Verb form of status.
 
@@ -138,8 +128,6 @@ class PluginInstallState:
                 )
             case PluginInstallStatus.SKIPPED:
                 return "Skipped installing"
-            case PluginInstallStatus.NOT_REQUIRED:
-                return "Installation not required for"
             case _:
                 return "Errored"
 
@@ -243,7 +231,7 @@ class PluginInstallService:
                     PluginInstallState(
                         plugin=plugin,
                         reason=reason,
-                        status=PluginInstallStatus.NOT_REQUIRED,
+                        status=PluginInstallStatus.SKIPPED,
                         message=(
                             f"Plugin {plugin.name!r} does not require "
                             "installation: reusing parent virtualenv"
@@ -573,13 +561,6 @@ def install_status_update(install_state: PluginInstallState) -> None:
             logger.error(install_state.message, details=install_state.details)
         case PluginInstallStatus.WARNING:  # pragma: no cover
             logger.warning(install_state.message)
-        case PluginInstallStatus.NOT_REQUIRED:
-            level = (
-                logging.DEBUG
-                if install_state.reason is PluginInstallReason.AUTO
-                else logging.INFO
-            )
-            logger.log(level, install_state.message)
         case _:  # pragma: no cover
             assert_never(install_state.status)
 
@@ -605,16 +586,14 @@ async def install_plugins(
     total = len(install_results)
     num_successful = len([status for status in install_results if status.successful])
     num_skipped = len([status for status in install_results if status.skipped])
-    num_not_required = len([s for s in install_results if s.not_required])
-    num_failed = total - num_successful - num_not_required
-    num_not_installed = num_not_required + num_skipped
+    num_failed = total - num_successful
 
     level = logging.INFO
     if num_failed >= 0 and num_successful == 0:
         level = logging.ERROR
     elif num_failed > 0 and num_successful > 0:
         level = logging.WARNING
-    elif reason == PluginInstallReason.AUTO and num_not_installed == len(plugins):
+    elif reason == PluginInstallReason.AUTO and num_skipped == len(plugins):
         level = logging.DEBUG
 
     if len(plugins) > 1:
@@ -630,13 +609,6 @@ async def install_plugins(
             level,
             "Skipped installing %d/%d plugins",
             num_skipped,
-            total,
-        )
-    if num_not_required:  # pragma: no cover
-        logger.log(
-            level,
-            "Installation not required for %d/%d plugins",
-            num_not_required,
             total,
         )
 
