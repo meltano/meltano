@@ -129,7 +129,7 @@ class PluginInstallState:
             case PluginInstallStatus.SKIPPED:
                 return "Skipped installing"
             case _:
-                return "Errored"
+                return "Installation failed"
 
 
 def with_semaphore(func):  # noqa: ANN001, ANN201
@@ -388,10 +388,7 @@ class PluginInstallService:
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=(
-                    f"{plugin.type.descriptor.capitalize()} '{plugin.name}' "
-                    f"could not be installed: {err}"
-                ),
+                message=str(err),
                 details=await err.stderr,
             )
             self.status_cb(state)
@@ -558,7 +555,12 @@ def install_status_update(install_state: PluginInstallState) -> None:
         case PluginInstallStatus.RUNNING | PluginInstallStatus.SUCCESS:
             logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
         case PluginInstallStatus.ERROR:
-            logger.error(install_state.message, details=install_state.details)
+            logger.error(
+                "%s. %s.",
+                install_state.verb,
+                install_state.message,
+                details=install_state.details,
+            )
         case PluginInstallStatus.WARNING:  # pragma: no cover
             logger.warning(install_state.message)
         case _:  # pragma: no cover

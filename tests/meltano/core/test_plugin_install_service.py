@@ -11,10 +11,12 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import yaml
 
+from meltano.core.error import PluginInstallError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallStatus,
     get_pip_install_args,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
@@ -331,3 +333,21 @@ class TestPluginInstallService:
         )
 
         assert state.skipped, "Expected mapper defining mapping to not be installed"
+
+    async def test_install_failed(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        subject = PluginInstallService(project)
+        error_message = "Failed to install plugin"
+        monkeypatch.setattr(
+            "meltano.core.plugin_install_service.install_pip_plugin",
+            AsyncMock(side_effect=PluginInstallError(error_message)),
+        )
+        state = await subject.install_plugin_async(tap)
+
+        assert state.status == PluginInstallStatus.ERROR
+        assert state.message == error_message
+        assert state.verb == "Installation failed"

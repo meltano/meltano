@@ -556,7 +556,7 @@ class VenvService:
             self.pip_log_path,
         )
         return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'.",
+            f"Failed to install plugin '{self.name}'",
             err.process,
             stderr=await err.stderr,
         )
@@ -726,7 +726,7 @@ class UvVenvService(VenvService):
                 self.pip_log_path,
             )
         return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'.",
+            f"Failed to install plugin '{self.name}'",
             err.process,
             stderr=await err.stderr,
         )
