@@ -13,6 +13,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
 from meltano.core.error import Error
+from meltano.core.manifest.loader import load_or_compile_manifest
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
@@ -210,6 +211,10 @@ class PluginInvoker:
         self.plugin_config_extras: dict = {}
         self.plugin_config_env: dict[str, str] = {}
 
+        # Manifest data is loaded lazily when needed
+        self._manifest_data: dict[str, t.Any] | None = None
+        self._manifest_loaded = False
+
     @property
     def capabilities(self) -> frozenset[str]:
         """Get plugin immutable capabilities.
@@ -352,71 +357,140 @@ class PluginInvoker:
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
+    def _load_manifest(self) -> dict[str, t.Any] | None:
+        """Load or compile the manifest if not already loaded.
+
+        Returns:
+            The manifest data, or None if loading failed.
+        """
+        if not self._manifest_loaded:
+            self._manifest_data = load_or_compile_manifest(self.project)
+            self._manifest_loaded = True
+        return self._manifest_data
+
+    def _env_from_manifest(self) -> dict[str, str] | None:
+        """Extract environment variables from the manifest for this plugin.
+
+        Returns:
+            Environment variables from the manifest, or None if not available.
+        """
+        manifest_data = self._load_manifest()
+        if not manifest_data:
+            return None
+
+        # Start with project-level env vars from manifest
+        env = manifest_data.get("env", {}).copy()
+
+        # Find the plugin in the manifest
+        plugins_by_type = manifest_data.get("plugins", {})
+        plugin_type_key = self.plugin.type.value
+        plugins_of_type = plugins_by_type.get(plugin_type_key, [])
+
+        # Look for our specific plugin
+        plugin_data = None
+        for p in plugins_of_type:
+            if p.get("name") == self.plugin.name:
+                plugin_data = p
+                break
+
+        if not plugin_data:
+            logger.warning(
+                "Plugin %s not found in manifest",
+                self.plugin.name,
+                plugin_name=self.plugin.name,
+                plugin_type=plugin_type_key,
+            )
+            return None
+
+        # Merge plugin-specific env vars
+        plugin_env = plugin_data.get("env", {})
+        env.update(plugin_env)
+
+        return env
+
     def env(self) -> dict[str, t.Any]:
         """Environment variable mapping.
 
         Returns:
             Dictionary of environment variables.
         """
-        with self.project.settings.feature_flag(
-            FeatureFlags.STRICT_ENV_VAR_MODE,
-            raise_error=False,
-        ) as strict_env_var_mode:
-            # Expand root env w/ os.environ
-            expanded_project_env = {
-                **expand_env_vars(
-                    self.project.settings.env,
-                    os.environ,
-                    if_missing=EnvVarMissingBehavior(
-                        strict_env_var_mode,
+        # Try to get environment variables from manifest first
+        manifest_env = self._env_from_manifest()
+        if manifest_env is not None:
+            # Use manifest environment variables
+            env = manifest_env.copy()
+
+            # Still need to add some runtime values that aren't in the manifest
+            env.update(self.plugin.exec_env(self))
+            env.update(self.project.dotenv_env)
+            env.update(self.tracker.env)
+
+            # Add plugin config env vars
+            env.update(self.plugin_config_env)
+
+            # Add settings service env
+            env.update(self.settings_service.env)
+        else:
+            # Fall back to original implementation
+            with self.project.settings.feature_flag(
+                FeatureFlags.STRICT_ENV_VAR_MODE,
+                raise_error=False,
+            ) as strict_env_var_mode:
+                # Expand root env w/ os.environ
+                expanded_project_env = {
+                    **expand_env_vars(
+                        self.project.settings.env,
+                        os.environ,
+                        if_missing=EnvVarMissingBehavior(
+                            strict_env_var_mode,
+                        ),
                     ),
-                ),
-                **expand_env_vars(
-                    self.settings_service.project.dotenv_env,
-                    os.environ,
-                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                ),
-            }
-            # Expand active env w/ expanded root env
-            expanded_active_env = (
-                expand_env_vars(
-                    self.settings_service.project.environment.env,
-                    expanded_project_env,
+                    **expand_env_vars(
+                        self.settings_service.project.dotenv_env,
+                        os.environ,
+                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                    ),
+                }
+                # Expand active env w/ expanded root env
+                expanded_active_env = (
+                    expand_env_vars(
+                        self.settings_service.project.environment.env,
+                        expanded_project_env,
+                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                    )
+                    if self.settings_service.project.environment
+                    else {}
+                )
+
+                # Expand root plugin env w/ expanded active env
+                expanded_root_plugin_env = expand_env_vars(
+                    self.settings_service.plugin.env,
+                    expanded_active_env,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
-                if self.settings_service.project.environment
-                else {}
-            )
 
-            # Expand root plugin env w/ expanded active env
-            expanded_root_plugin_env = expand_env_vars(
-                self.settings_service.plugin.env,
-                expanded_active_env,
-                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-            )
-
-            # Expand active env plugin env w/ expanded root plugin env
-            expanded_active_env_plugin_env = (
-                expand_env_vars(
-                    self.settings_service.environment_plugin_config.env,
-                    expanded_root_plugin_env,
-                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                # Expand active env plugin env w/ expanded root plugin env
+                expanded_active_env_plugin_env = (
+                    expand_env_vars(
+                        self.settings_service.environment_plugin_config.env,
+                        expanded_root_plugin_env,
+                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                    )
+                    if self.settings_service.environment_plugin_config
+                    else {}
                 )
-                if self.settings_service.environment_plugin_config
-                else {}
-            )
 
-        env = {
-            **self.plugin.exec_env(self),
-            **expanded_project_env,
-            **self.project.dotenv_env,
-            **self.settings_service.env,
-            **self.plugin_config_env,
-            **expanded_root_plugin_env,
-            **expanded_active_env,
-            **expanded_active_env_plugin_env,
-            **self.tracker.env,
-        }
+                env = {
+                    **self.plugin.exec_env(self),
+                    **expanded_project_env,
+                    **self.project.dotenv_env,
+                    **self.settings_service.env,
+                    **self.plugin_config_env,
+                    **expanded_root_plugin_env,
+                    **expanded_active_env,
+                    **expanded_active_env_plugin_env,
+                    **self.tracker.env,
+                }
 
         # Ensure Meltano venv is not inherited
         env.pop("VIRTUAL_ENV", None)

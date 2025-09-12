@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
 import platform
+import shutil
+from unittest import mock
 
 import dotenv
 import pytest
@@ -97,6 +100,158 @@ class TestPluginInvoker:
         assert env["ENVIRONMENT_ENV_VAR"] == str(
             project_with_environment.root / "file.txt",
         )
+
+    @pytest.mark.asyncio
+    async def test_env_from_manifest_success(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
+        # Create a mock manifest file
+        manifest_dir = project.root / ".meltano" / "manifests"
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+        manifest_file = manifest_dir / "meltano-manifest.json"
+
+        manifest_data = {
+            "env": {"PROJECT_VAR": "project_value"},
+            "plugins": {
+                "extractors": [
+                    {
+                        "name": "tap-mock",
+                        "env": {
+                            "TAP_MOCK_API_KEY": "manifest_key",
+                            "TAP_MOCK_ENDPOINT": "https://manifest.example.com",
+                        },
+                    }
+                ]
+            },
+        }
+
+        with manifest_file.open("w") as f:
+            json.dump(manifest_data, f)
+
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        # Verify manifest env vars are present
+        assert env["PROJECT_VAR"] == "project_value"
+        assert env["TAP_MOCK_API_KEY"] == "manifest_key"
+        assert env["TAP_MOCK_ENDPOINT"] == "https://manifest.example.com"
+
+        # Verify runtime env vars still work
+        assert env["MELTANO_EXTRACTOR_NAME"] == tap.name
+        assert "VIRTUAL_ENV" in env
+
+    @pytest.mark.asyncio
+    async def test_env_fallback_when_no_manifest(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
+        # Ensure no manifest exists
+        manifest_dir = project.root / ".meltano" / "manifests"
+        if manifest_dir.exists():
+            shutil.rmtree(manifest_dir)
+
+        # Mock compile_manifest to fail
+        with mock.patch(
+            "meltano.core.manifest.loader.compile_manifest"
+        ) as mock_compile:
+            mock_compile.side_effect = Exception("Compilation failed")
+
+            subject = plugin_invoker_factory(tap)
+            async with subject.prepared(session):
+                env = subject.env()
+
+            # Should still have env vars from original implementation
+            assert env["MELTANO_EXTRACTOR_NAME"] == tap.name
+            assert env["MELTANO_PROJECT_ROOT"] == str(project.root)
+            assert (
+                env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
+            )
+
+    @pytest.mark.asyncio
+    async def test_env_plugin_not_in_manifest(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
+        # Create manifest without our plugin
+        manifest_dir = project.root / ".meltano" / "manifests"
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+        manifest_file = manifest_dir / "meltano-manifest.json"
+
+        manifest_data = {
+            "env": {"PROJECT_VAR": "project_value"},
+            "plugins": {"extractors": []},  # Empty list
+        }
+
+        with manifest_file.open("w") as f:
+            json.dump(manifest_data, f)
+
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        # Should fall back to original implementation
+        # The warning is logged by structlog which outputs to stdout, not to caplog
+        # We just need to verify that it falls back to the original implementation
+        # by checking that we have the expected env vars
+        assert env["MELTANO_EXTRACTOR_NAME"] == tap.name
+        # Should have the normal env vars from settings
+        assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
+
+    @pytest.mark.asyncio
+    async def test_env_manifest_override_precedence(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
+        # Create a mock manifest file with overlapping env vars
+        manifest_dir = project.root / ".meltano" / "manifests"
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+        manifest_file = manifest_dir / "meltano-manifest.json"
+
+        manifest_data = {
+            "env": {"PROJECT_VAR": "project_value", "SHARED_VAR": "project_shared"},
+            "plugins": {
+                "extractors": [
+                    {
+                        "name": "tap-mock",
+                        "env": {
+                            "SHARED_VAR": "plugin_shared",  # Should override project
+                            "TAP_MOCK_CUSTOM": "custom_value",
+                        },
+                    }
+                ]
+            },
+        }
+
+        with manifest_file.open("w") as f:
+            json.dump(manifest_data, f)
+
+        # Also set a dotenv var
+        project.dotenv.touch()
+        dotenv.set_key(project.dotenv, "SHARED_VAR", "dotenv_shared")
+        project.refresh()
+
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        # Verify precedence: dotenv should override manifest
+        assert env["SHARED_VAR"] == "dotenv_shared"
+        assert env["PROJECT_VAR"] == "project_value"
+        assert env["TAP_MOCK_CUSTOM"] == "custom_value"
 
     @pytest.mark.asyncio
     async def test_unknown_command(self, plugin_invoker) -> None:

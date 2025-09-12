@@ -44,6 +44,7 @@ jobs:
         - { integration_test: "meltano-manifest", needs_postgres: false}
         - { integration_test: "meltano-run-merge-states", needs_postgres: false}
         - { integration_test: "meltano-expand-envvars-in-array", needs_postgres: false}
+        - { integration_test: "meltano-invoker-manifest", needs_postgres: false}
       fail-fast: false
 
     runs-on: ubuntu-latest

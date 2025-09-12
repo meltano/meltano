@@ -1,0 +1,21 @@
+version: 1
+default_environment: dev
+project_id: test-invoker-manifest
+
+environments:
+- name: dev
+  env:
+    DEV_VAR: "dev_value"
+
+env:
+  PROJECT_VAR: "project_value"
+
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
+    config:
+      projects: meltano/meltano
+    env:
+      TAP_GITLAB_VAR: "plugin_value"
