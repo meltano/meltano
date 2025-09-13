@@ -98,7 +98,7 @@ class TaskSetsService:
             if job.name == task_sets.name:
                 with self.project.meltano_update() as meltano:
                     logger.debug("updating job", name=job.name)
-                    meltano.jobs[idx].tasks = task_sets.tasks
+                    meltano.jobs[idx] = task_sets
                 return
         raise JobNotFoundError(task_sets.name)
 

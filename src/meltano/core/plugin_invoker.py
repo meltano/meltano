@@ -406,6 +406,11 @@ class PluginInvoker:
                 else {}
             )
 
+        # Extract job env from context
+        job_env: dict[str, str] = {}
+        if self.context and hasattr(self.context, "job_env") and self.context.job_env:
+            job_env = self.context.job_env
+
         env = {
             **self.plugin.exec_env(self),
             **expanded_project_env,
@@ -413,6 +418,7 @@ class PluginInvoker:
             **self.settings_service.env,
             **self.plugin_config_env,
             **expanded_root_plugin_env,
+            **job_env,  # Job env (precedence level 3)
             **expanded_active_env,
             **expanded_active_env_plugin_env,
             **self.tracker.env,

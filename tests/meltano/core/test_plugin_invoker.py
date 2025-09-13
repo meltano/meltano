@@ -99,6 +99,34 @@ class TestPluginInvoker:
         )
 
     @pytest.mark.asyncio
+    async def test_job_env_in_plugin_context(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
+        """Test that job env gets included via PluginContext."""
+        from meltano.core.elt_context import PluginContext
+        from meltano.core.plugin.settings_service import PluginSettingsService
+
+        job_env = {"JOB_TEST_VAR": "job_test_value"}
+
+        # Create PluginContext with job_env (mimics what plugin_command_invoker does)
+        ctx = PluginContext(
+            plugin=tap,
+            settings_service=PluginSettingsService(project, tap),
+            session=session,
+            job_env=job_env,
+        )
+
+        subject = plugin_invoker_factory(tap, context=ctx)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        assert env["JOB_TEST_VAR"] == "job_test_value"
+
+    @pytest.mark.asyncio
     async def test_unknown_command(self, plugin_invoker) -> None:
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")

@@ -63,17 +63,26 @@ def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
 class TaskSets(NameEq, Canonical):
     """A named entity that holds one or more tasks that can be executed by Meltano."""
 
-    def __init__(self, name: str, tasks: list[str] | list[list[str]]):
+    def __init__(
+        self,
+        name: str,
+        tasks: list[str] | list[list[str]],
+        env: dict[str, str] | None = None,
+        **kwargs: t.Any,
+    ):
         """Initialize a `TaskSets`.
 
         Args:
             name: The name of the job.
             tasks: The tasks that associated with this job.
+            env: The environment variables for this job.
+            kwargs: The keyword arguments to initialize the job with.
         """
-        super().__init__()
+        super().__init__(**kwargs)
 
         self.name: str = name
         self.tasks: list[str] | list[list[str]] = tasks
+        self.env: dict[str, str] = env or {}
 
     @t.overload
     def _as_args(self) -> list[str]: ...
@@ -157,14 +166,44 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
         InvalidTasksError: If the yaml string failed to parse or failed to
             validate against the `TASKS_JSON_SCHEMA`.
     """
-    tasks: list[str] | str = []
+    parsed_data: list[str] | str | dict = []
     try:
-        tasks = yaml.safe_load(yaml_str)
+        parsed_data = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:
         raise InvalidTasksError(
             name,
             f"Failed to parse yaml '{yaml_str}': {yerr}",
         ) from yerr
+
+    # Handle new dict format with tasks and env
+    if isinstance(parsed_data, dict):
+        if "tasks" not in parsed_data:
+            raise InvalidTasksError(
+                name,
+                "Dict format must include 'tasks' field",
+            )
+
+        tasks = parsed_data["tasks"]
+        env = parsed_data.get("env", {})
+
+        # Validate env is a dict of strings
+        if env is not None and not isinstance(env, dict):
+            raise InvalidTasksError(
+                name,
+                "Environment variables must be a dict",
+            )
+
+        if env and not all(
+            isinstance(k, str) and isinstance(v, str) for k, v in env.items()
+        ):
+            raise InvalidTasksError(
+                name,
+                "Environment variable keys and values must be strings",
+            )
+    else:
+        # Handle backward compatible formats
+        tasks = parsed_data
+        env = {}
 
     try:
         validate(instance=tasks, schema=TASKS_JSON_SCHEMA)
@@ -178,4 +217,4 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
     if isinstance(tasks, str):
         tasks = [tasks]
 
-    return TaskSets(name=name, tasks=tasks)
+    return TaskSets(name=name, tasks=tasks, env=env)

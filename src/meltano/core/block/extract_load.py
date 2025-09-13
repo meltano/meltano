@@ -64,6 +64,7 @@ class ELBContext(ELContextProtocol):
         base_output_logger: OutputLogger | None = None,
         state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
+        job_env: dict[str, str] | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
 
@@ -79,6 +80,7 @@ class ELBContext(ELContextProtocol):
             base_output_logger: The base logger to use.
             state_strategy: Strategy to use for state updates.
             run_id: The run ID to use.
+            job_env: Job environment variables to pass to plugins.
         """
         self.project = project
         self.session = session
@@ -90,6 +92,7 @@ class ELBContext(ELContextProtocol):
         self.state_id_suffix = state_id_suffix
         self.state_strategy = state_strategy
         self.run_id = run_id
+        self.job_env = job_env or {}
 
         # not yet used but required to satisfy the interface
         self.dry_run = False
@@ -126,6 +129,7 @@ class ELBContextBuilder:
         self._blocks = []
         self._state_strategy = StateStrategy.auto
         self._run_id: uuid.UUID | None = None
+        self._job_env = {}
 
         self._base_output_logger = None
 
@@ -229,6 +233,18 @@ class ELBContextBuilder:
         self._run_id = run_id
         return self
 
+    def with_job_env(self, *, job_env: dict[str, str]):  # noqa: ANN201
+        """Set job environment variables for this context.
+
+        Args:
+            job_env: Job environment variables.
+
+        Returns:
+            self
+        """
+        self._job_env = job_env
+        return self
+
     def make_block(
         self,
         plugin: ProjectPlugin,
@@ -277,6 +293,7 @@ class ELBContextBuilder:
                 env_override=env,
             ),
             session=self.session,
+            job_env=self._job_env,
         )
 
     def invoker_for(
@@ -329,6 +346,7 @@ class ELBContextBuilder:
             base_output_logger=self._base_output_logger,
             state_strategy=self._state_strategy,
             run_id=self._run_id,
+            job_env=self._job_env,
         )
 
 

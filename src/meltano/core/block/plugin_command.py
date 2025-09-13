@@ -152,6 +152,7 @@ def plugin_command_invoker(
     command: str | None,
     command_args: str | None = None,
     run_dir: Path | None = None,
+    job_env: dict[str, str] | None = None,
 ) -> InvokerCommand:
     """Make an InvokerCommand from a plugin.
 
@@ -162,6 +163,7 @@ def plugin_command_invoker(
         command_args: any additional command args that should be passed in
             during invocation.
         run_dir: Optional directory to run commands in.
+        job_env: Job environment variables to pass to the plugin context.
 
     Returns:
         InvokerCommand
@@ -181,6 +183,7 @@ def plugin_command_invoker(
         plugin=plugin,
         settings_service=PluginSettingsService(project, plugin),
         session=session,
+        job_env=job_env,
     )
 
     invoker = invoker_factory(

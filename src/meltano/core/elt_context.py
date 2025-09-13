@@ -30,6 +30,7 @@ class PluginContext(t.NamedTuple):
     plugin: ProjectPlugin
     settings_service: PluginSettingsService
     session: Session
+    job_env: dict[str, str] | None = None
 
     def __getattr__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Get plugin attribute.
