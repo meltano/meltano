@@ -504,15 +504,21 @@ class PluginInvoker:
                     **expanded_plugin_env,
                 }
 
-            # When using manifest, expanded_env already contains all the env vars
-            # so we should prioritize it over settings_service.env
+            # When using manifest, we need to maintain the same precedence order
+            # as the non-manifest path, but avoid settings_service.env overwriting
+            # our expanded values with unexpanded ones
             if manifest_data:
+                # Get settings_service.env but exclude keys already in expanded_env
+                settings_env_filtered = {
+                    k: v for k, v in self.settings_service.env.items()
+                    if k not in expanded_env
+                }
                 env = {
                     **self.plugin.exec_env(self),
-                    **self.project.dotenv_env,
-                    **self.settings_service.env,
+                    **expanded_env,
+                    **self.project.dotenv_env,  # dotenv should override manifest
+                    **settings_env_filtered,  # Only add new keys from settings
                     **self.plugin_config_env,
-                    **expanded_env,  # Put expanded_env last so it takes precedence
                     **self.tracker.env,
                 }
             else:
