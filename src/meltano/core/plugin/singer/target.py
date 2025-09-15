@@ -109,6 +109,7 @@ class SingerTarget(SingerPlugin):
     __plugin_type__ = PluginType.LOADERS
 
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
+        *SingerPlugin.EXTRA_SETTINGS,
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 

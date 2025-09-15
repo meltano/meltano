@@ -653,12 +653,14 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                     self.output_logger.out(
                         block.string_id,
                         logger_base.bind(stdio="stdout"),
+                        # No log_parser for stdout - it contains Singer protocol messages
                     ),
                 )
             block.stderr_link(
                 self.output_logger.out(
                     block.string_id,
                     logger_base.bind(stdio="stderr"),
+                    log_parser=block.invoker.plugin.get_log_parser(),
                 ),
             )
             if block.consumer and block.stdin is not None:

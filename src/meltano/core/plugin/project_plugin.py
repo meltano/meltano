@@ -498,3 +498,15 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.type is PluginType.MAPPERS and bool(
             self.extra_config.get("_mapping"),
         )
+
+    def get_log_parser(self) -> str | None:
+        """Get the log parser ID for the plugin.
+
+        Returns:
+            The log parser for the plugin. Defaults to 'singer-sdk' for plugins
+            with structured-logging capability.
+        """
+        if "structured-logging" in self.capabilities:
+            return self.extra_config.get("_log_parser", "singer-sdk")
+
+        return None
