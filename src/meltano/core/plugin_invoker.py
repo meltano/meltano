@@ -459,11 +459,11 @@ class PluginInvoker:
             else:
                 # Original expansion logic for non-manifest path
                 # First expand project env
-                expanded_env = expand_env_vars(
+                expanded_env = dict(expand_env_vars(
                     project_env,
                     base_env,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                )
+                ))
 
                 # Expand dotenv
                 expanded_project_env = {
