@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-meltano add extractor tap-mock
-meltano config tap-mock set api_key "config_value"
+meltano add extractor tap-gitlab
+meltano config tap-gitlab set projects "meltano/meltano"
 rm -rf .meltano/manifests
-meltano invoke tap-mock --help
+meltano invoke tap-gitlab --help
 ls .meltano/manifests/meltano-manifest.json
 meltano --environment=dev compile
-meltano --environment=dev invoke tap-mock --help
+meltano --environment=dev invoke tap-gitlab --help

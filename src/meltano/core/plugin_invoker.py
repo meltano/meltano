@@ -368,127 +368,159 @@ class PluginInvoker:
             self._manifest_loaded = True
         return self._manifest_data
 
-    def _env_from_manifest(self) -> dict[str, str] | None:
-        """Extract environment variables from the manifest for this plugin.
-
-        Returns:
-            Environment variables from the manifest, or None if not available.
-        """
-        manifest_data = self._load_manifest()
-        if not manifest_data:
-            return None
-
-        # Start with project-level env vars from manifest
-        env = manifest_data.get("env", {}).copy()
-
-        # Find the plugin in the manifest
-        plugins_by_type = manifest_data.get("plugins", {})
-        plugin_type_key = self.plugin.type.value
-        plugins_of_type = plugins_by_type.get(plugin_type_key, [])
-
-        # Look for our specific plugin
-        plugin_data = None
-        for p in plugins_of_type:
-            if p.get("name") == self.plugin.name:
-                plugin_data = p
-                break
-
-        if not plugin_data:
-            logger.warning(
-                "Plugin %s not found in manifest",
-                self.plugin.name,
-                plugin_name=self.plugin.name,
-                plugin_type=plugin_type_key,
-            )
-            return None
-
-        # Merge plugin-specific env vars
-        plugin_env = plugin_data.get("env", {})
-        env.update(plugin_env)
-
-        return env
-
     def env(self) -> dict[str, t.Any]:
         """Environment variable mapping.
 
         Returns:
             Dictionary of environment variables.
         """
-        # Try to get environment variables from manifest first
-        manifest_env = self._env_from_manifest()
-        if manifest_env is not None:
-            # Use manifest environment variables
-            env = manifest_env.copy()
+        # Try to load manifest for env var data
+        manifest_data = self._load_manifest()
 
-            # Still need to add some runtime values that aren't in the manifest
-            env.update(self.plugin.exec_env(self))
-            env.update(self.project.dotenv_env)
-            env.update(self.tracker.env)
+        with self.project.settings.feature_flag(
+            FeatureFlags.STRICT_ENV_VAR_MODE,
+            raise_error=False,
+        ) as strict_env_var_mode:
+            # Get env var sources - either from manifest or settings service
+            if manifest_data:
+                # The manifest already contains merged values for the current
+                # environment. For env vars, we just need project and plugin values
+                project_env = manifest_data.get("env", {})
 
-            # Add plugin config env vars
-            env.update(self.plugin_config_env)
+                # Find plugin env in the manifest
+                plugin_env = {}
+                plugin_type_key = self.plugin.type.value
+                plugins_of_type = manifest_data.get("plugins", {}).get(
+                    plugin_type_key, []
+                )
+                for p in plugins_of_type:
+                    if p.get("name") == self.plugin.name:
+                        plugin_env = p.get("env", {})
+                        break
 
-            # Add settings service env
-            env.update(self.settings_service.env)
-        else:
-            # Fall back to original implementation
-            with self.project.settings.feature_flag(
-                FeatureFlags.STRICT_ENV_VAR_MODE,
-                raise_error=False,
-            ) as strict_env_var_mode:
-                # Expand root env w/ os.environ
+                # The manifest has already merged environment-specific values,
+                # so we don't need to look for them separately
+                environment_env = {}
+                env_plugin_env = {}
+            else:
+                # Fall back to settings service
+                project_env = self.project.settings.env
+                environment_env = (
+                    self.settings_service.project.environment.env
+                    if self.settings_service.project.environment
+                    else {}
+                )
+                plugin_env = self.settings_service.plugin.env
+                env_plugin_env = (
+                    self.settings_service.environment_plugin_config.env
+                    if self.settings_service.environment_plugin_config
+                    else {}
+                )
+
+            # Now apply the same expansion logic regardless of source
+            # When using manifest, we need to expand in the right order
+            # to match the original behavior
+
+            # Start with os.environ as the base
+            base_env = os.environ.copy()
+
+            # If using manifest, plugin env already includes all merged values
+            # Just expand it with the current environment
+            if manifest_data:
+                # First expand project env with os.environ
+                # This handles cases like ${STACKED}23 -> 123
+                expanded_project_env = expand_env_vars(
+                    project_env,
+                    base_env,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                )
+
+                # Add dotenv vars
+                expanded_project_env.update(
+                    expand_env_vars(
+                        self.settings_service.project.dotenv_env,
+                        base_env,
+                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                    )
+                )
+
+                # Now expand plugin env with the expanded project env
+                # This handles cases like ${STACKED}45 -> 12345 (using STACKED=123)
+                expanded_plugin_env = expand_env_vars(
+                    plugin_env,
+                    {**base_env, **expanded_project_env},
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                )
+
+                expanded_env = {
+                    **expanded_project_env,
+                    **expanded_plugin_env,
+                }
+            else:
+                # Original expansion logic for non-manifest path
+                # First expand project env
+                expanded_env = expand_env_vars(
+                    project_env,
+                    base_env,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                )
+
+                # Expand dotenv
                 expanded_project_env = {
-                    **expand_env_vars(
-                        self.project.settings.env,
-                        os.environ,
-                        if_missing=EnvVarMissingBehavior(
-                            strict_env_var_mode,
-                        ),
-                    ),
+                    **expanded_env,
                     **expand_env_vars(
                         self.settings_service.project.dotenv_env,
-                        os.environ,
+                        base_env,
                         if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                     ),
                 }
+
                 # Expand active env w/ expanded root env
-                expanded_active_env = (
-                    expand_env_vars(
-                        self.settings_service.project.environment.env,
-                        expanded_project_env,
-                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                    )
-                    if self.settings_service.project.environment
-                    else {}
+                expanded_active_env = expand_env_vars(
+                    environment_env,
+                    expanded_project_env,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
 
                 # Expand root plugin env w/ expanded active env
                 expanded_root_plugin_env = expand_env_vars(
-                    self.settings_service.plugin.env,
+                    plugin_env,
                     expanded_active_env,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
 
                 # Expand active env plugin env w/ expanded root plugin env
-                expanded_active_env_plugin_env = (
-                    expand_env_vars(
-                        self.settings_service.environment_plugin_config.env,
-                        expanded_root_plugin_env,
-                        if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                    )
-                    if self.settings_service.environment_plugin_config
-                    else {}
+                expanded_plugin_env = expand_env_vars(
+                    env_plugin_env,
+                    expanded_root_plugin_env,
+                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
 
+                expanded_env = {
+                    **expanded_project_env,
+                    **expanded_active_env,
+                    **expanded_plugin_env,
+                }
+
+            # When using manifest, expanded_env already contains all the env vars
+            # so we should prioritize it over settings_service.env
+            if manifest_data:
                 env = {
                     **self.plugin.exec_env(self),
-                    **expanded_project_env,
                     **self.project.dotenv_env,
                     **self.settings_service.env,
                     **self.plugin_config_env,
-                    **expanded_root_plugin_env,
-                    **expanded_active_env,
-                    **expanded_active_env_plugin_env,
+                    **expanded_env,  # Put expanded_env last so it takes precedence
+                    **self.tracker.env,
+                }
+            else:
+                # Original order for non-manifest path
+                env = {
+                    **self.plugin.exec_env(self),
+                    **expanded_env,
+                    **self.project.dotenv_env,
+                    **self.settings_service.env,
+                    **self.plugin_config_env,
                     **self.tracker.env,
                 }
 
