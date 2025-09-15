@@ -510,7 +510,8 @@ class PluginInvoker:
             if manifest_data:
                 # Get settings_service.env but exclude keys already in expanded_env
                 settings_env_filtered = {
-                    k: v for k, v in self.settings_service.env.items()
+                    k: v
+                    for k, v in self.settings_service.env.items()
                     if k not in expanded_env
                 }
                 env = {
