@@ -11,7 +11,7 @@ meltano add extractor tap-gitlab
 Configure some environment variables:
 
 ```shell
-meltano config tap-gitlab set projects "meltano/meltano"
+meltano config tap-gitlab set projects meltano/meltano
 ```
 
 Test without manifest (should auto-compile):
