@@ -69,7 +69,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.55.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v9.35.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
@@ -90,6 +90,6 @@ repos:
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.16
+    rev: 0.8.17
     hooks:
       - id: uv-lock
