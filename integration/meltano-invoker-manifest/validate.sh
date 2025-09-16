@@ -2,6 +2,7 @@
 
 set -eu
 
+# shellcheck source=/dev/null
 source "$(git rev-parse --show-toplevel)/integration/commons.sh"
 cd "${TEST_DOCS_DIR}"
 
@@ -73,7 +74,8 @@ export STACKED=1
 $MELTANO --environment=dev compile --unsafe
 manifest_content=$(cat .meltano/manifests/meltano-manifest.dev.json)
 # The manifest should contain the raw unexpanded values
-echo "$manifest_content" | grep -q '"STACKED": "\${STACKED}4"' || echo "Warning: STACKED not found in manifest"
+# shellcheck disable=SC2016
+echo "$manifest_content" | grep -q '"STACKED": "\\${STACKED}4"' || echo "Warning: STACKED not found in manifest"
 
 # Now test the actual expansion when invoking
 # We'll use a trick - create a utility plugin that prints env vars
