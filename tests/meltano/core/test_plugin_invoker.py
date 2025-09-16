@@ -299,9 +299,6 @@ class TestPluginInvoker:
             env = subject.env()
 
         # Verify stacked expansion:
-        # OS: STACKED=1
-        # Project manifest: STACKED=${STACKED}2 -> "12"
-        # Plugin manifest: STACKED=${STACKED}3 -> "123"
         assert env["STACKED"] == "123"
         assert env["PROJECT_VAR"] == "project"
         assert env["PLUGIN_VAR"] == "plugin"
