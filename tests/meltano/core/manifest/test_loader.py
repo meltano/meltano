@@ -5,10 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 import time
-from pathlib import Path
 from unittest import mock
-
-import pytest
 
 from meltano.core.manifest.loader import (
     check_manifest_staleness,
@@ -91,7 +88,6 @@ class TestManifestLoader:
         # Verify it's the environment-specific manifest
         assert ".dev.json" in str(manifest_path)
 
-
     def test_check_manifest_staleness_fresh(self, project):
         manifest_path = (
             project.root / ".meltano" / "manifests" / "meltano-manifest.json"
@@ -123,8 +119,6 @@ class TestManifestLoader:
             project_function.root / ".meltano" / "manifests" / "meltano-manifest.json"
         )
         assert not check_manifest_staleness(project_function, manifest_path)
-
-
 
     def test_load_or_compile_manifest_existing(self, project):
         manifest_path = get_manifest_path(project)
