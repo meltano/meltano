@@ -17,7 +17,6 @@ from meltano.core.manifest.contexts import (
     plugin_context,
     schedule_context,
 )
-from meltano.core.utils import expand_env_vars
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -77,7 +76,7 @@ def mock_manifest(project: Project, tmp_path: Path) -> Manifest:
             }
         ],
     }
-    
+
     manifest_path = tmp_path / "test-manifest.json"
     manifest = Manifest(
         project=project,
@@ -97,17 +96,17 @@ class TestManifestContext:
         """Test basic manifest context functionality."""
         # Set a base variable for expansion
         os.environ["BASE_VAR"] = "base"
-        
+
         # Ensure variables don't exist before context
         assert os.environ.get("MANIFEST_VAR") is None
         assert os.environ.get("OVERRIDE_ME") != "manifest_override"
-        
+
         with manifest_context(mock_manifest):
             # Variables should be set within context
             assert os.environ["MANIFEST_VAR"] == "manifest_value"
             assert os.environ["OVERRIDE_ME"] == "manifest_override"
             assert os.environ["EXPANDABLE"] == "base_expanded"
-            
+
         # Variables should be removed after context
         assert os.environ.get("MANIFEST_VAR") is None
         assert os.environ.get("OVERRIDE_ME") != "manifest_override"
@@ -118,13 +117,13 @@ class TestManifestContext:
         # Set existing values
         os.environ["OVERRIDE_ME"] = "original_value"
         os.environ["PRESERVE_ME"] = "keep_this"
-        
+
         with manifest_context(mock_manifest):
             # Should override existing
             assert os.environ["OVERRIDE_ME"] == "manifest_override"
             # Should preserve unrelated vars
             assert os.environ["PRESERVE_ME"] == "keep_this"
-            
+
         # Should restore original value
         assert os.environ["OVERRIDE_ME"] == "original_value"
         assert os.environ["PRESERVE_ME"] == "keep_this"
@@ -132,10 +131,10 @@ class TestManifestContext:
     def test_get_active_manifest_with_env(self, mock_manifest: Manifest) -> None:
         """Test getting active manifest with expanded env vars."""
         os.environ["BASE_VAR"] = "base"
-        
+
         # No active manifest
         assert get_active_manifest_with_env() is None
-        
+
         with manifest_context(mock_manifest):
             result = get_active_manifest_with_env()
             assert result is not None
@@ -151,7 +150,7 @@ class TestPluginContext:
         with manifest_context(mock_manifest):
             # Manifest vars should be set
             assert os.environ["MANIFEST_VAR"] == "manifest_value"
-            
+
             with plugin_context("tap-test"):
                 # Plugin vars should be set
                 assert os.environ["TAP_TEST_API_KEY"] == "test_key"
@@ -159,7 +158,7 @@ class TestPluginContext:
                 assert os.environ["OVERRIDE_ME"] == "tap_override"
                 # Expansion should work with manifest vars
                 assert os.environ["TAP_EXPANDABLE"] == "manifest_value_tap"
-                
+
             # Plugin vars should be removed
             assert os.environ.get("TAP_TEST_API_KEY") is None
             assert os.environ["OVERRIDE_ME"] == "manifest_override"
@@ -172,10 +171,9 @@ class TestPluginContext:
 
     def test_plugin_context_unknown_plugin(self, mock_manifest: Manifest) -> None:
         """Test plugin context with unknown plugin."""
-        with manifest_context(mock_manifest):
-            with plugin_context("tap-unknown"):
-                # Should not fail, but won't set plugin-specific vars
-                assert os.environ["MANIFEST_VAR"] == "manifest_value"
+        with manifest_context(mock_manifest), plugin_context("tap-unknown"):
+            # Should not fail, but won't set plugin-specific vars
+            assert os.environ["MANIFEST_VAR"] == "manifest_value"
 
 
 class TestScheduleContext:
@@ -187,7 +185,7 @@ class TestScheduleContext:
             with schedule_context("daily-sync"):
                 assert os.environ["SCHEDULE_VAR"] == "schedule_value"
                 assert os.environ["OVERRIDE_ME"] == "schedule_override"
-                
+
             assert os.environ.get("SCHEDULE_VAR") is None
             assert os.environ["OVERRIDE_ME"] == "manifest_override"
 
@@ -203,13 +201,12 @@ class TestJobContext:
 
     def test_job_context_basic(self, mock_manifest: Manifest) -> None:
         """Test basic job context functionality."""
-        with manifest_context(mock_manifest):
-            with schedule_context("daily-sync"):
-                with job_context("sync-job"):
-                    assert os.environ["JOB_VAR"] == "job_value"
-                    assert os.environ["OVERRIDE_ME"] == "job_override"
-                    # Should have access to schedule vars for expansion
-                    assert os.environ["JOB_EXPANDABLE"] == "schedule_value_job"
+        with manifest_context(mock_manifest), schedule_context("daily-sync"):
+            with job_context("sync-job"):
+                assert os.environ["JOB_VAR"] == "job_value"
+                assert os.environ["OVERRIDE_ME"] == "job_override"
+                # Should have access to schedule vars for expansion
+                assert os.environ["JOB_EXPANDABLE"] == "schedule_value_job"
 
     def test_job_context_without_manifest(self) -> None:
         """Test job context without active manifest."""
@@ -225,38 +222,38 @@ class TestContextNesting:
         """Test full hierarchy: manifest -> plugin -> schedule -> job."""
         os.environ["BASE_VAR"] = "base"
         original_override = os.environ.get("OVERRIDE_ME", "none")
-        
+
         with manifest_context(mock_manifest):
             assert os.environ["OVERRIDE_ME"] == "manifest_override"
-            
+
             with plugin_context("tap-test"):
                 assert os.environ["OVERRIDE_ME"] == "tap_override"
-                
+
                 with schedule_context("daily-sync"):
                     assert os.environ["OVERRIDE_ME"] == "schedule_override"
-                    
+
                     with job_context("sync-job"):
                         # Job should win in precedence
                         assert os.environ["OVERRIDE_ME"] == "job_override"
-                        
+
                         # All vars should be accessible
                         assert os.environ["MANIFEST_VAR"] == "manifest_value"
                         assert os.environ["TAP_TEST_API_KEY"] == "test_key"
                         assert os.environ["SCHEDULE_VAR"] == "schedule_value"
                         assert os.environ["JOB_VAR"] == "job_value"
-                        
+
                     # Should revert to schedule
                     assert os.environ["OVERRIDE_ME"] == "schedule_override"
                     assert os.environ.get("JOB_VAR") is None
-                    
+
                 # Should revert to plugin
                 assert os.environ["OVERRIDE_ME"] == "tap_override"
                 assert os.environ.get("SCHEDULE_VAR") is None
-                
+
             # Should revert to manifest
             assert os.environ["OVERRIDE_ME"] == "manifest_override"
             assert os.environ.get("TAP_TEST_API_KEY") is None
-            
+
         # Should revert to original
         if original_override == "none":
             assert os.environ.get("OVERRIDE_ME") is None
@@ -267,8 +264,11 @@ class TestContextNesting:
 class TestContextVarsIsolation:
     """Test contextvars isolation between concurrent executions."""
 
-    def test_concurrent_manifest_contexts(self, project: Project, tmp_path: Path) -> None:
+    def test_concurrent_manifest_contexts(
+        self, project: Project, tmp_path: Path
+    ) -> None:
         """Test that concurrent contexts are isolated."""
+
         def create_manifest(name: str, value: str) -> Manifest:
             manifest = Manifest(
                 project=project,
@@ -282,13 +282,15 @@ class TestContextVarsIsolation:
                 "env": {f"{name}_VAR": value},
             }
             return manifest
-        
+
         manifest1 = create_manifest("MANIFEST1", "value1")
         manifest2 = create_manifest("MANIFEST2", "value2")
-        
+
         results = []
-        
-        def run_in_context(manifest: Manifest, expected_var: str, expected_val: str) -> None:
+
+        def run_in_context(
+            manifest: Manifest, expected_var: str, expected_val: str
+        ) -> None:
             with manifest_context(manifest):
                 # Verify our var is set
                 assert os.environ.get(expected_var) == expected_val
@@ -297,13 +299,13 @@ class TestContextVarsIsolation:
                 assert active is not None
                 assert active["env"][expected_var] == expected_val
                 results.append((expected_var, expected_val))
-        
+
         # Run contexts in parallel
         with ThreadPoolExecutor(max_workers=2) as executor:
             # Each runs in its own context (contextvars are thread-local)
             ctx1 = copy_context()
             ctx2 = copy_context()
-            
+
             future1 = executor.submit(
                 ctx1.run,
                 run_in_context,
@@ -315,13 +317,13 @@ class TestContextVarsIsolation:
                 ctx2.run,
                 run_in_context,
                 manifest2,
-                "MANIFEST2_VAR", 
+                "MANIFEST2_VAR",
                 "value2",
             )
-            
+
             future1.result()
             future2.result()
-        
+
         # Both should have completed successfully
         assert len(results) == 2
         assert ("MANIFEST1_VAR", "value1") in results
@@ -355,12 +357,12 @@ class TestEnvVarExpansion:
             },
         }
         mock_manifest.data = manifest_data
-        
+
         with manifest_context(mock_manifest):
             assert os.environ["A"] == "a"
             assert os.environ["B"] == "ab"
             assert os.environ["C"] == "abc"
-            
+
             with plugin_context("tap-test"):
                 assert os.environ["D"] == "abcd"
                 assert os.environ["E"] == "abcde"
@@ -376,7 +378,7 @@ class TestEnvVarExpansion:
             },
         }
         mock_manifest.data = manifest_data
-        
+
         with manifest_context(mock_manifest):
             # Should handle circular refs gracefully
             # The exact behavior depends on expand_env_vars implementation
