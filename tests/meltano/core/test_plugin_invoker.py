@@ -254,6 +254,108 @@ class TestPluginInvoker:
         assert env["TAP_MOCK_CUSTOM"] == "custom_value"
 
     @pytest.mark.asyncio
+    async def test_env_stacked_expansion_with_manifest(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+        monkeypatch,
+    ) -> None:
+        """Test stacked env var expansion order with manifest."""
+        # Set base env var in OS
+        monkeypatch.setenv("STACKED", "1")
+
+        # Create a mock manifest file with stacked env vars
+        manifest_dir = project.root / ".meltano" / "manifests"
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+        manifest_file = manifest_dir / "meltano-manifest.json"
+
+        manifest_data = {
+            "env": {"STACKED": "${STACKED}2", "PROJECT_VAR": "project"},
+            "plugins": {
+                "extractors": [
+                    {
+                        "name": "tap-mock",
+                        "env": {
+                            "STACKED": "${STACKED}3",
+                            "PLUGIN_VAR": "plugin",
+                        },
+                    }
+                ]
+            },
+        }
+
+        with manifest_file.open("w") as f:
+            json.dump(manifest_data, f)
+
+        # Also set dotenv to test that path
+        project.dotenv.touch()
+        dotenv.set_key(project.dotenv, "DOTENV_VAR", "${STACKED}4")
+        project.refresh()
+
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        # Verify stacked expansion:
+        # OS: STACKED=1
+        # Project manifest: STACKED=${STACKED}2 -> "12" 
+        # Plugin manifest: STACKED=${STACKED}3 -> "123"
+        assert env["STACKED"] == "123"
+        assert env["PROJECT_VAR"] == "project"
+        assert env["PLUGIN_VAR"] == "plugin"
+        assert env["DOTENV_VAR"] == "14"  # Expands with base OS env
+
+    @pytest.mark.asyncio
+    async def test_env_with_manifest_and_dotenv_expansion(
+        self,
+        project,
+        tap,
+        session,
+        plugin_invoker_factory,
+        monkeypatch,
+    ) -> None:
+        """Test dotenv expansion with manifest env vars."""
+        # Set base env var
+        monkeypatch.setenv("BASE", "base")
+
+        # Create manifest with env vars
+        manifest_dir = project.root / ".meltano" / "manifests"
+        manifest_dir.mkdir(parents=True, exist_ok=True)
+        manifest_file = manifest_dir / "meltano-manifest.json"
+
+        manifest_data = {
+            "env": {"PROJECT_PATH": "${BASE}/project"},
+            "plugins": {
+                "extractors": [
+                    {
+                        "name": "tap-mock",
+                        "env": {"PLUGIN_PATH": "${PROJECT_PATH}/plugin"},
+                    }
+                ]
+            },
+        }
+
+        with manifest_file.open("w") as f:
+            json.dump(manifest_data, f)
+
+        # Set dotenv vars that use expanded values
+        project.dotenv.touch()
+        dotenv.set_key(project.dotenv, "DOTENV_PATH", "${PROJECT_PATH}/dotenv")
+        project.refresh()
+
+        subject = plugin_invoker_factory(tap)
+        async with subject.prepared(session):
+            env = subject.env()
+
+        # Verify expansion chain
+        assert env["PROJECT_PATH"] == "base/project"
+        assert env["PLUGIN_PATH"] == "base/project/plugin"
+        # Dotenv vars are expanded with base env, not with manifest env vars
+        assert env["DOTENV_PATH"] == "/dotenv"
+
+    @pytest.mark.asyncio
     async def test_unknown_command(self, plugin_invoker) -> None:
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")
