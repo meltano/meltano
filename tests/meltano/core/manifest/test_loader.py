@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 import time
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -76,11 +77,20 @@ class TestManifestLoader:
         assert manifest_dir.exists()
         assert manifest_path.exists()
 
-    @pytest.mark.skip(reason="compile_manifest doesn't have exception handling")
-    def test_compile_manifest_exception(self, project):
-        # compile_manifest doesn't have try/except, the exception handling
-        # is in load_or_compile_manifest which is tested separately
-        pass
+    def test_compile_manifest_with_environment(self, project_with_environment):
+        """Test manifest compilation with an active environment."""
+        manifest_path = get_manifest_path(project_with_environment)
+        if manifest_path.exists():
+            manifest_path.unlink()
+
+        result = compile_manifest(project_with_environment, manifest_path)
+
+        # Should have compiled a new manifest
+        assert result is not None
+        assert manifest_path.exists()
+        # Verify it's the environment-specific manifest
+        assert ".dev.json" in str(manifest_path)
+
 
     def test_check_manifest_staleness_fresh(self, project):
         manifest_path = (
@@ -114,11 +124,7 @@ class TestManifestLoader:
         )
         assert not check_manifest_staleness(project_function, manifest_path)
 
-    @pytest.mark.skip(reason="Complex Path mocking not working as expected")
-    def test_check_manifest_staleness_oserror(self, project, tmp_path):
-        # This test aims to cover the OSError handling in check_manifest_staleness
-        # lines 59-61 in loader.py
-        pass
+
 
     def test_load_or_compile_manifest_existing(self, project):
         manifest_path = get_manifest_path(project)
