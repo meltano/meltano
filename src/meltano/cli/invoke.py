@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 import typing as t
 
@@ -21,6 +22,7 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.manifest.contexts import manifest_context, plugin_context
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
@@ -105,6 +107,7 @@ async def invoke(
     Read more at https://docs.meltano.com/reference/command-line-interface#invoke
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
+    manifest = ctx.obj.get("manifest")
 
     try:
         plugin_name, command_name = plugin_name.split(":")
@@ -136,20 +139,39 @@ async def invoke(
         reason=PluginInstallReason.AUTO,
     )
 
-    invoker = invoker_factory(project, plugin)
-    try:
-        exit_code = await _invoke(
-            invoker=invoker,
-            plugin_args=plugin_args,
-            session=session,
-            dump=dump,
-            command_name=command_name,
-            containers=containers,
-            print_var=print_var,
-        )
-    except Exception as invoke_err:
-        tracker.track_command_event(CliEvent.failed)
-        raise invoke_err
+    # Establish manifest and plugin contexts
+    if manifest:
+        with manifest_context(manifest), plugin_context(plugin_name):
+            invoker = invoker_factory(project, plugin)
+            try:
+                exit_code = await _invoke(
+                    invoker=invoker,
+                    plugin_args=plugin_args,
+                    session=session,
+                    dump=dump,
+                    command_name=command_name,
+                    containers=containers,
+                    print_var=print_var,
+                )
+            except Exception as invoke_err:
+                tracker.track_command_event(CliEvent.failed)
+                raise invoke_err
+    else:
+        # Fallback without contexts
+        invoker = invoker_factory(project, plugin)
+        try:
+            exit_code = await _invoke(
+                invoker=invoker,
+                plugin_args=plugin_args,
+                session=session,
+                dump=dump,
+                command_name=command_name,
+                containers=containers,
+                print_var=print_var,
+            )
+        except Exception as invoke_err:
+            tracker.track_command_event(CliEvent.failed)
+            raise invoke_err
 
     if exit_code == 0:
         tracker.track_command_event(CliEvent.completed)
@@ -174,9 +196,8 @@ async def _invoke(  # noqa: ANN202
     try:
         async with invoker.prepared(session):
             if print_var:
-                env = invoker.env()
                 for key in print_var:
-                    val = env.get(key)
+                    val = os.environ.get(key)
                     click.echo(f"{key}={val}")
             if dump:
                 await dump_file(invoker, dump)

@@ -19,6 +19,11 @@ from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.logging.utils import change_console_log_level
+from meltano.core.manifest.contexts import (
+    job_context,
+    manifest_context,
+    plugin_context,
+)
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
@@ -159,6 +164,7 @@ async def run(
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     tracker: Tracker = ctx.obj["tracker"]
+    manifest = ctx.obj.get("manifest")
 
     _state_strategy = StateStrategy.from_cli_args(
         merge_state=merge_state,
@@ -199,10 +205,45 @@ async def run(
         reason=PluginInstallReason.AUTO,
     )
 
+    # Check if we're running a job
+    from meltano.core.task_sets_service import TaskSetsService
+
+    task_sets_service = TaskSetsService(project)
+
+    # Determine if all blocks comprise a single job
+    job_name = None
+    if len(blocks) == 1 and task_sets_service.exists(blocks[0]):
+        job_name = blocks[0]
+
     run_start_time = time.perf_counter()
     success = False
     try:
-        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        # Establish manifest context for the duration of the run
+        if manifest:
+            with manifest_context(manifest):
+                # If running a job, establish job context
+                if job_name:
+                    with job_context(job_name):
+                        await _run_blocks(
+                            tracker,
+                            parsed_blocks,
+                            dry_run=dry_run,
+                            project=project,
+                            manifest=manifest,
+                        )
+                else:
+                    await _run_blocks(
+                        tracker,
+                        parsed_blocks,
+                        dry_run=dry_run,
+                        project=project,
+                        manifest=manifest,
+                    )
+        else:
+            # Fallback if manifest is not available
+            await _run_blocks(
+                tracker, parsed_blocks, dry_run=dry_run, project=project, manifest=None
+            )
         success = True
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
@@ -223,6 +264,8 @@ async def _run_blocks(
     parsed_blocks: list[BlockSet | PluginCommandBlock],
     *,
     dry_run: bool,
+    project: Project | None = None,  # noqa: ARG001
+    manifest: t.Any = None,  # noqa: ANN401
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):
         blk_name = blk.__class__.__name__
@@ -247,7 +290,12 @@ async def _run_blocks(
 
         block_start_time = time.perf_counter()
         try:
-            await blk.run()
+            # Establish plugin context for plugin command blocks
+            if isinstance(blk, PluginCommandBlock) and manifest:
+                with plugin_context(blk.name):
+                    await blk.run()
+            else:
+                await blk.run()
         except RunnerError as err:
             block_end_time = time.perf_counter()
             block_duration = block_end_time - block_start_time

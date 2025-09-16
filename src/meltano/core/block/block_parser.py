@@ -115,6 +115,7 @@ class BlockParser:  # noqa: D101
         self._plugins: list[ProjectPlugin] = []
         self._commands: dict[int, str] = {}
         self._mappings_ref: dict[int, str] = {}
+        self._job_envs: dict[int, dict[str, str]] = {}
         self._state_strategy = state_strategy
         self._run_id = run_id
 
@@ -179,16 +180,26 @@ class BlockParser:  # noqa: D101
             List of block names with jobs expanded.
         """
         expanded_blocks: list[str] = []
+        current_index = 0
         for name in blocks:
             if task_sets.exists(name):
+                job = task_sets.get(name)
                 self.log.debug(
                     "expanding job to tasks",
                     job_name=name,
-                    tasks=task_sets.get(name).flat_args,
+                    tasks=job.flat_args,
                 )
-                expanded_blocks.extend(task_sets.get(name).flat_args)
+                # Track job env for each expanded block
+                job_flat_args = job.flat_args
+                for i in range(len(job_flat_args)):
+                    self._job_envs[current_index + i] = job.env
+                expanded_blocks.extend(job_flat_args)
+                current_index += len(job_flat_args)
             else:
+                # Non-job blocks have empty job env
+                self._job_envs[current_index] = {}
                 expanded_blocks.append(name)
+                current_index += 1
         return expanded_blocks
 
     def find_blocks(
@@ -225,6 +236,7 @@ class BlockParser:  # noqa: D101
                     self._plugins[cur],
                     self.project,
                     command=self._commands.get(cur),
+                    job_env=self._job_envs.get(cur, {}),
                 )
                 cur += 1
             else:
@@ -259,6 +271,7 @@ class BlockParser:  # noqa: D101
             .with_state_id_suffix(self._state_id_suffix)
             .with_state_strategy(state_strategy=self._state_strategy)
             .with_run_id(self._run_id)
+            .with_job_env(job_env=self._job_envs.get(offset, {}))
         )
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:

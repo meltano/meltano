@@ -11,29 +11,75 @@ from __future__ import annotations
 import os
 import typing as t
 from contextlib import contextmanager, suppress
+from contextvars import ContextVar
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator, Mapping
 
     from meltano.core.manifest.manifest import Manifest
 
-_active_manifest: list[Manifest] = []
+from meltano.core.utils import expand_env_vars
+
+
+def _expand_env_vars_multi_pass(
+    env_dict: Mapping[str, str], base_env: Mapping[str, str]
+) -> dict[str, str]:
+    """Expand environment variables with multiple passes to handle dependencies.
+
+    Args:
+        env_dict: Dictionary of environment variables to expand
+        base_env: Base environment to use for expansion
+
+    Returns:
+        Fully expanded environment dictionary
+    """
+    if not env_dict:
+        return {}
+
+    # Keep expanding until no changes occur
+    max_iterations = 10  # Prevent infinite loops
+    result = dict(env_dict)
+
+    for _ in range(max_iterations):
+        # Create environment for this iteration: base + current state
+        iteration_env = dict(base_env)
+        iteration_env.update(result)
+
+        # Expand all variables using the combined environment
+        new_result = expand_env_vars(result, iteration_env)
+
+        # Check if we've reached a fixed point
+        if new_result == result:
+            break
+
+        result = new_result
+
+    return result
+
+
+_active_manifest: ContextVar[Manifest | None] = ContextVar(
+    "active_manifest",
+    default=None,
+)
+_active_plugin: ContextVar[str | None] = ContextVar("active_plugin", default=None)
+_active_schedule: ContextVar[str | None] = ContextVar("active_schedule", default=None)
+_active_job: ContextVar[str | None] = ContextVar("active_job", default=None)
 
 
 def _get_active_manifest() -> Manifest:
-    try:
-        return _active_manifest[-1]
-    except IndexError:
+    manifest = _active_manifest.get()
+    if manifest is None:
         raise Exception("No manifest has been activated") from None  # noqa: EM101
+    return manifest
 
 
 @contextmanager
 def _manifest_context(manifest: Manifest) -> Iterator[None]:
-    _active_manifest.append(manifest)
+    token = _active_manifest.set(manifest)
     try:
         yield
     finally:
-        _active_manifest.pop()
+        _active_manifest.reset(token)
 
 
 @contextmanager
@@ -69,7 +115,13 @@ def manifest_context(manifest: Manifest) -> Iterator[None]:
     Yields:
         `None`.
     """
-    with _manifest_context(manifest), _env_context(manifest.data["env"]):
+    # Use multi-pass expansion to handle dependencies between env vars
+    manifest_env = manifest.data.get("env", {})
+    if not manifest_env:
+        manifest_env = {}
+    expanded_env = _expand_env_vars_multi_pass(manifest_env, os.environ)
+
+    with _manifest_context(manifest), _env_context(expanded_env):
         yield
 
 
@@ -90,7 +142,12 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
     Yields:
         `None`.
     """
-    manifest = _get_active_manifest()
+    try:
+        manifest = _get_active_manifest()
+    except Exception:
+        # No active manifest, context does nothing
+        yield
+        return
 
     try:
         plugin = next(
@@ -100,10 +157,23 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
             if x["name"] == plugin_name
         )
     except StopIteration:
-        raise ValueError(f"Plugin {plugin_name!r} not found in manifest") from None  # noqa: EM102
-
-    with _env_context(plugin["env"]):
+        # Plugin not found, context does nothing
         yield
+        return
+
+    # Track the active plugin
+    plugin_token = _active_plugin.set(plugin_name)
+
+    # Use multi-pass expansion to handle dependencies, using current os.environ
+    # which includes manifest vars already set
+    plugin_env = plugin.get("env", {})
+    expanded_env = _expand_env_vars_multi_pass(plugin_env, os.environ)
+
+    try:
+        with _env_context(expanded_env):
+            yield
+    finally:
+        _active_plugin.reset(plugin_token)
 
 
 @contextmanager
@@ -123,15 +193,30 @@ def schedule_context(schedule_name: str) -> Iterator[None]:
     Yields:
         `None`.
     """
-    schedules = _get_active_manifest().data["schedules"]
+    try:
+        schedules = _get_active_manifest().data.get("schedules", [])
+    except Exception:
+        # No active manifest, context does nothing
+        yield
+        return
 
     try:
         schedule = next(x for x in schedules if x["name"] == schedule_name)
     except StopIteration:
-        raise ValueError(f"Schedule {schedule!r} not found in manifest") from None  # noqa: EM102
+        raise ValueError(f"Schedule {schedule_name!r} not found in manifest") from None  # noqa: EM102
 
-    with _env_context(schedule["env"]):
-        yield
+    # Track the active schedule
+    schedule_token = _active_schedule.set(schedule_name)
+
+    # Use multi-pass expansion to handle dependencies
+    schedule_env = schedule.get("env", {})
+    expanded_env = _expand_env_vars_multi_pass(schedule_env, os.environ)
+
+    try:
+        with _env_context(expanded_env):
+            yield
+    finally:
+        _active_schedule.reset(schedule_token)
 
 
 @contextmanager
@@ -151,17 +236,59 @@ def job_context(job_name: str) -> Iterator[None]:
     Yields:
         `None`.
     """
-    jobs = _get_active_manifest().data["jobs"]
+    try:
+        jobs = _get_active_manifest().data.get("jobs", [])
+    except Exception:
+        # No active manifest, context does nothing
+        yield
+        return
 
     try:
         job = next(x for x in jobs if x["name"] == job_name)
     except StopIteration:
-        raise ValueError(f"Job {job!r} not found in manifest") from None  # noqa: EM102
+        raise ValueError(f"Job {job_name!r} not found in manifest") from None  # noqa: EM102
 
-    with _env_context(job["env"]):
-        yield
+    # Track the active job
+    job_token = _active_job.set(job_name)
+
+    # Use multi-pass expansion to handle dependencies
+    job_env = job.get("env", {})
+    expanded_env = _expand_env_vars_multi_pass(job_env, os.environ)
+
+    try:
+        with _env_context(expanded_env):
+            yield
+    finally:
+        _active_job.reset(job_token)
 
 
-# TODO: Provide a function which returns `_get_active_manifest().data` with
-# env vars injected into each of its string fields, taking only from
-# `os.environ`.
+def get_expanded_manifest_data() -> dict[str, t.Any]:
+    """Get the active manifest data with env vars expanded from os.environ.
+
+    Returns:
+        The manifest data with all string values having environment variables
+        expanded using the current os.environ.
+
+    Raises:
+        Exception: If no manifest has been activated.
+    """
+    manifest = _get_active_manifest()
+    return expand_env_vars(manifest.data, os.environ)
+
+
+def get_active_manifest_with_env() -> dict[str, t.Any] | None:
+    """Get the active manifest with expanded environment variables.
+
+    Returns:
+        The manifest data with expanded env vars, or None if no active manifest.
+    """
+    manifest = _active_manifest.get()
+    if manifest is None:
+        return None
+
+    # Return a copy of the manifest data with expanded env vars
+    manifest_data = manifest.data.copy()
+    if "env" in manifest_data:
+        manifest_data["env"] = expand_env_vars(manifest_data["env"], os.environ)
+
+    return manifest_data

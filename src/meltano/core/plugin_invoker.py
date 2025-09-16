@@ -15,10 +15,9 @@ from meltano.core.container.container_service import ContainerService
 from meltano.core.error import Error
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
-from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, uuid7
-from meltano.core.venv_service import VenvService, VirtualEnv
+from meltano.core.utils import uuid7
+from meltano.core.venv_service import VenvService
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -352,77 +351,40 @@ class PluginInvoker:
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self) -> dict[str, t.Any]:
-        """Environment variable mapping.
+    def env(self) -> dict[str, str]:
+        """Get the environment variables that would be used for plugin invocation.
+
+        This method builds the environment for testing purposes. In actual execution,
+        environment variables are set by context managers.
 
         Returns:
             Dictionary of environment variables.
         """
-        with self.project.settings.feature_flag(
-            FeatureFlags.STRICT_ENV_VAR_MODE,
-            raise_error=False,
-        ) as strict_env_var_mode:
-            # Expand root env w/ os.environ
-            expanded_project_env = {
-                **expand_env_vars(
-                    self.project.settings.env,
-                    os.environ,
-                    if_missing=EnvVarMissingBehavior(
-                        strict_env_var_mode,
-                    ),
-                ),
-                **expand_env_vars(
-                    self.settings_service.project.dotenv_env,
-                    os.environ,
-                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                ),
-            }
-            # Expand active env w/ expanded root env
-            expanded_active_env = (
-                expand_env_vars(
-                    self.settings_service.project.environment.env,
-                    expanded_project_env,
-                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                )
-                if self.settings_service.project.environment
-                else {}
-            )
+        # Start with current os.environ as base
+        env = dict(os.environ)
 
-            # Expand root plugin env w/ expanded active env
-            expanded_root_plugin_env = expand_env_vars(
-                self.settings_service.plugin.env,
-                expanded_active_env,
-                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-            )
+        # Add plugin exec env
+        env.update(self.plugin.exec_env(self))
 
-            # Expand active env plugin env w/ expanded root plugin env
-            expanded_active_env_plugin_env = (
-                expand_env_vars(
-                    self.settings_service.environment_plugin_config.env,
-                    expanded_root_plugin_env,
-                    if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-                )
-                if self.settings_service.environment_plugin_config
-                else {}
-            )
+        # Add project dotenv
+        env.update(self.project.dotenv_env)
 
-        env = {
-            **self.plugin.exec_env(self),
-            **expanded_project_env,
-            **self.project.dotenv_env,
-            **self.settings_service.env,
-            **self.plugin_config_env,
-            **expanded_root_plugin_env,
-            **expanded_active_env,
-            **expanded_active_env_plugin_env,
-            **self.tracker.env,
-        }
+        # Add settings service env
+        env.update(self.settings_service.env)
+
+        # Add plugin config env
+        env.update(self.plugin_config_env)
+
+        # Add tracker env
+        env.update(self.tracker.env)
 
         # Ensure Meltano venv is not inherited
         env.pop("VIRTUAL_ENV", None)
         env.pop("PYTHONPATH", None)
         if self.venv_service:
             # Switch to plugin-specific venv
+            from meltano.core.venv_service import VirtualEnv
+
             venv = VirtualEnv(
                 self.project.venvs_dir(
                     self.plugin.type,
@@ -432,7 +394,7 @@ class PluginInvoker:
             )
             venv_dir = str(venv.bin_dir)
             env["VIRTUAL_ENV"] = str(venv.root)
-            env["PATH"] = os.pathsep.join([venv_dir, env["PATH"]])
+            env["PATH"] = os.pathsep.join([venv_dir, env.get("PATH", "")])
 
         return env
 
@@ -478,7 +440,7 @@ class PluginInvoker:
 
         async with self.plugin.trigger_hooks("invoke", self, args):
             popen_options = {**self.Popen_options(), **kwargs}
-            popen_env = {**self.env(), **env}
+            popen_env = {**os.environ, **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
             logger.debug(f"Invoking: {popen_args}")  # noqa: G004
 
