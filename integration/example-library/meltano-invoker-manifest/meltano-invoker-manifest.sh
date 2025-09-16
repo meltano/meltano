@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 meltano add extractor tap-gitlab
 meltano config set tap-gitlab projects meltano/meltano
 rm -rf .meltano/manifests
