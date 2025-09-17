@@ -139,6 +139,13 @@ async def invoke(
         reason=PluginInstallReason.AUTO,
     )
 
+    # Set project environment variables before establishing contexts
+    # This ensures MELTANO_PROJECT_ROOT is available for expansion
+    project_env = project.env if project else {}
+    for key, value in project_env.items():
+        if key not in os.environ:
+            os.environ[key] = value
+
     # Establish manifest and plugin contexts
     if manifest:
         with manifest_context(manifest), plugin_context(plugin_name):

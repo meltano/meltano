@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import time
 import typing as t
 
@@ -218,6 +219,13 @@ async def run(
     run_start_time = time.perf_counter()
     success = False
     try:
+        # Set project environment variables before establishing contexts
+        # This ensures MELTANO_PROJECT_ROOT is available for expansion
+        project_env = project.env if project else {}
+        for key, value in project_env.items():
+            if key not in os.environ:
+                os.environ[key] = value
+        
         # Establish manifest context for the duration of the run
         if manifest:
             with manifest_context(manifest):
