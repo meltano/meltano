@@ -225,7 +225,7 @@ async def run(
         for key, value in project_env.items():
             if key not in os.environ:
                 os.environ[key] = value
-        
+
         # Establish manifest context for the duration of the run
         if manifest:
             with manifest_context(manifest):
