@@ -18,7 +18,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.manifest.manifest import Manifest
 
-from meltano.core.utils import expand_env_vars
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 
 
 def _expand_env_vars_multi_pass(
@@ -36,17 +36,22 @@ def _expand_env_vars_multi_pass(
     if not env_dict:
         return {}
 
-    # Keep expanding until no changes occur
-    max_iterations = 10  # Prevent infinite loops
+    # Start with the base environment
+    combined_env = dict(base_env)
     result = dict(env_dict)
 
+    # Keep expanding until no changes occur
+    max_iterations = 10  # Prevent infinite loops
     for _ in range(max_iterations):
-        # Create environment for this iteration: base + current state
-        iteration_env = dict(base_env)
-        iteration_env.update(result)
+        # Update combined environment with current results
+        combined_env.update(result)
 
         # Expand all variables using the combined environment
-        new_result = expand_env_vars(result, iteration_env)
+        new_result = expand_env_vars(
+            env_dict,
+            combined_env,
+            if_missing=EnvVarMissingBehavior.ignore,
+        )
 
         # Check if we've reached a fixed point
         if new_result == result:
