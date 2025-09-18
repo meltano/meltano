@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import platform
 import typing as t
 
@@ -8,11 +9,7 @@ import pytest
 
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.command import UndefinedEnvVarError
-from meltano.core.plugin_invoker import (
-    ExecutableNotFoundError,
-    PluginExecutionError,
-    UnknownCommandError,
-)
+from meltano.core.plugin_invoker import ExecutableNotFoundError, UnknownCommandError
 from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
@@ -203,9 +200,6 @@ class TestPluginInvoker:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Test that ExecutableNotFoundError is raised when executable is missing."""
-        import asyncio
-
-        from meltano.core.plugin_invoker import ExecutableNotFoundError
 
         # Mock asyncio.create_subprocess_exec to raise FileNotFoundError
         # for the executable
@@ -235,15 +229,12 @@ class TestPluginInvoker:
         assert plugin_invoker.plugin.name in error_msg
 
     @pytest.mark.asyncio
-    async def test_plugin_execution_error(
+    async def test_plugin_file_access_error(
         self,
         plugin_invoker: PluginInvoker,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        """Test that PluginExecutionError is raised when plugin can't access files."""
-        import asyncio
-
-        from meltano.core.plugin_invoker import PluginExecutionError
+        """Test that FileNotFoundError is raised when plugin can't access files."""
 
         # Mock asyncio.create_subprocess_exec to raise FileNotFoundError for
         # a different file
@@ -268,14 +259,14 @@ class TestPluginInvoker:
             lambda *args, **kwargs: ["/usr/bin/existing-executable", "arg1", "arg2"],  # noqa: ARG005
         )
 
-        with pytest.raises(PluginExecutionError) as exc_info:
+        with pytest.raises(FileNotFoundError) as exc_info:
             await plugin_invoker.invoke_async()
 
-        # Verify the error message indicates execution failure, not missing executable
+        # Verify the error message indicates file access failure, not missing executable
+        assert isinstance(exc_info.value, FileNotFoundError)
+        assert exc_info.value.filename == "/project/data/missing-file"
         error_msg = str(exc_info.value)
-        assert "execution failed" in error_msg
         assert "/project/data/missing-file" in error_msg
-        assert plugin_invoker.plugin.name in error_msg
 
     def test_executable_not_found_error_class(self) -> None:
         """Test ExecutableNotFoundError class directly."""
@@ -286,17 +277,3 @@ class TestPluginInvoker:
         assert "Executable 'missing-executable' could not be found" in error_msg
         assert "Extractor 'test-tap'" in error_msg
         assert "meltano install extractor test-tap" in error_msg
-
-    def test_plugin_execution_error_class(self) -> None:
-        """Test PluginExecutionError class directly."""
-        plugin = PluginRef(PluginType.TRANSFORMERS, "dbt")
-        original_error = (
-            "[Errno 2] No such file or directory: '/project/transform/dbt_project.yml'"
-        )
-        error = PluginExecutionError(plugin, original_error)
-
-        error_msg = str(error)
-        assert "Transformer 'dbt' execution failed:" in error_msg
-        assert "/project/transform/dbt_project.yml" in error_msg
-        # Should not suggest installation since it's not an executable issue
-        assert "meltano install" not in error_msg

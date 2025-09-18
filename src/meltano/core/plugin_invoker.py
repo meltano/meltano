@@ -103,23 +103,6 @@ class ExecutableNotFoundError(InvokerError):
         )
 
 
-class PluginExecutionError(InvokerError):
-    """File or directory access error during plugin execution."""
-
-    def __init__(self, plugin: PluginRef, original_error: str):
-        """Initialize PluginExecutionError.
-
-        Args:
-            plugin: Meltano plugin reference.
-            original_error: Original error message that provides context.
-        """
-        plugin_type_descriptor = plugin.type.descriptor.capitalize()
-        super().__init__(
-            f"{plugin_type_descriptor} '{plugin.name}' execution failed: "
-            f"{original_error}",
-        )
-
-
 class InvokerNotPreparedError(InvokerError):
     """Occurs when `invoke` is called before `prepare`."""
 
@@ -512,9 +495,7 @@ class PluginInvoker:
                         self.plugin,
                         self.plugin.executable,
                     ) from err
-                else:
-                    # The executable exists but couldn't access a file/directory
-                    raise PluginExecutionError(self.plugin, str(err)) from err
+                raise
 
     async def invoke_async(
         self,
