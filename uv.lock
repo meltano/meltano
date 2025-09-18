@@ -1421,7 +1421,7 @@ dev = [
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.16.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
-    { name = "pytest-asyncio", specifier = ">=1" },
+    { name = "pytest-asyncio", specifier = ">=1,<1.2" },
     { name = "pytest-docker", specifier = "~=3.1" },
     { name = "pytest-order", specifier = "~=1.3" },
     { name = "pytest-randomly", specifier = ">=3.16,<5.0" },
@@ -1445,7 +1445,7 @@ testing = [
     { name = "faker", specifier = ">=37.4.2" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
-    { name = "pytest-asyncio", specifier = ">=1" },
+    { name = "pytest-asyncio", specifier = ">=1,<1.2" },
     { name = "pytest-docker", specifier = "~=3.1" },
     { name = "pytest-order", specifier = "~=1.3" },
     { name = "pytest-randomly", specifier = ">=3.16,<5.0" },
@@ -1467,7 +1467,7 @@ typing = [
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.16.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
-    { name = "pytest-asyncio", specifier = ">=1" },
+    { name = "pytest-asyncio", specifier = ">=1,<1.2" },
     { name = "pytest-docker", specifier = "~=3.1" },
     { name = "pytest-order", specifier = "~=1.3" },
     { name = "pytest-randomly", specifier = ">=3.16,<5.0" },
@@ -2210,15 +2210,15 @@ wheels = [
 
 [[package]]
 name = "pytest-asyncio"
-version = "1.1.0"
+version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "backports-asyncio-runner", marker = "python_full_version < '3.11'" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4e/51/f8794af39eeb870e87a8c8068642fc07bce0c854d6865d7dd0f2a9d338c2/pytest_asyncio-1.1.0.tar.gz", hash = "sha256:796aa822981e01b68c12e4827b8697108f7205020f24b5793b3c41555dab68ea", size = 46652, upload-time = "2025-07-16T04:29:26.393Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8d/1e/2aa43805d4a320a9489d2b99f7877b69f9094c79aa0732159a1415dd6cd4/pytest_asyncio-1.1.1.tar.gz", hash = "sha256:b72d215c38e2c91dbb32f275e0b5be69602d7869910e109360e375129960a649", size = 46590, upload-time = "2025-09-12T06:36:20.834Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c7/9d/bf86eddabf8c6c9cb1ea9a869d6873b46f105a5d292d3a6f7071f5b07935/pytest_asyncio-1.1.0-py3-none-any.whl", hash = "sha256:5fe2d69607b0bd75c656d1211f969cadba035030156745ee09e7d71740e58ecf", size = 15157, upload-time = "2025-07-16T04:29:24.929Z" },
+    { url = "https://files.pythonhosted.org/packages/28/de/aba79e9ccdb51b5d0d65c67dd857bd78b00c64723df16b9fc800d8b94ce6/pytest_asyncio-1.1.1-py3-none-any.whl", hash = "sha256:726339d30fcfde24691f589445b9b67d058b311ac632b1d704e97f20f1d878da", size = 14719, upload-time = "2025-09-12T06:36:19.726Z" },
 ]
 
 [[package]]
