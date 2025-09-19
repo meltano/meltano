@@ -30,9 +30,10 @@ logger = structlog.get_logger(__name__)
 @click.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
 @click.option(
     "--all",
-    "all_plugins",
     is_flag=True,
-    help="Lock all the plugins of the project.",
+    deprecated=True,
+    hidden=True,
+    help="DEPRECATED: All plugins are now locked by default.",
 )
 @click.option(
     "--plugin-type",
@@ -47,7 +48,7 @@ def lock(
     project: Project,
     ctx: click.Context,
     *,
-    all_plugins: bool,
+    all: bool,  # noqa: A002, ARG001
     plugin_type: PluginType | None,
     plugin_name: tuple[str, ...],
     update: bool,
@@ -58,11 +59,7 @@ def lock(
     Read more at https://docs.meltano.com/reference/command-line-interface#lock
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
-
     lock_service = PluginLockService(project)
-    if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
-        tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Exactly one of --all or plugin name must be specified.")  # noqa: EM101
 
     try:
         with project.plugins.use_preferred_source(DefinitionSource.ANY):
