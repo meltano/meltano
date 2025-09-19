@@ -29,8 +29,12 @@ class TestLock:
     @pytest.mark.order(1)
     @pytest.mark.usefixtures("project")
     def test_lock_no_plugins(self, cli_runner: CliRunner) -> None:
-        result = cli_runner.invoke(cli, ["lock"])
         exception_message = "No matching plugin(s) found"
+
+        result = cli_runner.invoke(cli, ["lock"])
+        assert exception_message == str(result.exception)
+
+        result = cli_runner.invoke(cli, ["lock", "--update"])
         assert exception_message == str(result.exception)
 
     @pytest.mark.order(2)
