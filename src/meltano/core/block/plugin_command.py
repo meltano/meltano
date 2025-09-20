@@ -66,6 +66,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         plugin_invoker: PluginInvoker,
         command: str | None,
         command_args: str | None,
+        job_env: dict[str, str] | None = None,
     ):
         """Configure and return a wrapped plugin invoker.
 
@@ -77,6 +78,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
             plugin_invoker: the plugin invoker.
             command: the command to invoke.
             command_args: any additional plugin args that should be used.
+            job_env: optional job environment variables.
         """
         super().__init__(
             block_ctx=block_ctx,
@@ -88,6 +90,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         self._command = command
         self._command_args = command_args
         self._log = log
+        self._job_env = job_env or {}
 
     @property
     def name(self) -> str:
@@ -152,6 +155,7 @@ def plugin_command_invoker(
     command: str | None,
     command_args: str | None = None,
     run_dir: Path | None = None,
+    job_env: dict[str, str] | None = None,
 ) -> InvokerCommand:
     """Make an InvokerCommand from a plugin.
 
@@ -162,6 +166,7 @@ def plugin_command_invoker(
         command_args: any additional command args that should be passed in
             during invocation.
         run_dir: Optional directory to run commands in.
+        job_env: Optional job environment variables.
 
     Returns:
         InvokerCommand
@@ -198,4 +203,5 @@ def plugin_command_invoker(
         plugin_invoker=invoker,
         command=command,
         command_args=command_args,
+        job_env=job_env,
     )

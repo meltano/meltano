@@ -251,6 +251,20 @@ jobs:
       - tap-foo target-baz
 ```
 
+Jobs can also include environment variables specific to the job execution using an `env` dictionary:
+
+```yaml
+jobs:
+  - name: tap-foo-to-target-bar-with-env
+    tasks:
+      - tap-foo target-bar
+    env:
+      JOB_SPECIFIC_VAR: "value"
+      TAP_FOO_API_KEY: "${BASE_API_KEY}_job"
+```
+
+Environment variables defined at the job level take precedence over those defined at the schedule, plugin, environment, and project levels. They are expanded using values from the layers above them.
+
 You can learn more about how tasks are defined and run in the [`meltano job` documentation](/reference/command-line-interface#job).
 
 ### Schedules

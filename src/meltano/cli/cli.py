@@ -18,6 +18,7 @@ from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, LogFormat, setup_logging
+from meltano.core.manifest import Manifest
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
@@ -151,6 +152,20 @@ def cli(
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
         ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+
+        # Compile and establish manifest context
+        # The manifest is compiled and cached in the project
+        env_name = project.environment.name if project.environment else "default"
+        manifest = Manifest(
+            project=project,
+            path=project.root / f"meltano-manifest.{env_name}.json",
+            check_schema=False,
+            redact_secrets=False,
+        )
+        ctx.obj["manifest"] = manifest
+        # Note: We don't establish the manifest context here as it would
+        # affect the entire CLI session. Instead, individual commands should
+        # establish the context when needed.
     except ProjectNotFound:
         ctx.obj["project"] = None
     except EmptyMeltanoFileException:
