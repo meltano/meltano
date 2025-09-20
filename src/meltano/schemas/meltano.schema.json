@@ -591,6 +591,13 @@
             "type": "boolean",
             "description": "A boolean that determines if the catalog cache should be used or ignored.",
             "default": true
+          },
+          "log_parser": {
+            "type": "string",
+            "description": "The log parser to use for the extractor.",
+            "enum": [
+              "singer-sdk"
+            ]
           }
         }
       },
@@ -622,7 +629,8 @@
                     "batch",
                     "test",
                     "log-based",
-                    "schema-flattening"
+                    "schema-flattening",
+                    "structured-logging"
                   ]
                 }
               }
@@ -652,7 +660,8 @@
                     "soft-delete",
                     "hard-delete",
                     "datatype-failsafe",
-                    "schema-flattening"
+                    "schema-flattening",
+                    "structured-logging"
                   ]
                 }
               },

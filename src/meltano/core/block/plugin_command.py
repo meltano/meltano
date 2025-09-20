@@ -175,7 +175,12 @@ def plugin_command_invoker(
     session = session_maker()
 
     output_logger = OutputLogger("run.log")
-    invoker_log = output_logger.out(plugin.name, stderr_log)
+
+    invoker_log = output_logger.out(
+        plugin.name,
+        stderr_log,
+        log_parser=plugin.get_log_parser(),
+    )
 
     ctx = PluginContext(
         plugin=plugin,
