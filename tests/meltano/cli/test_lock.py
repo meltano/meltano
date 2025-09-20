@@ -22,9 +22,8 @@ class TestLock:
     @pytest.mark.order(0)
     @pytest.mark.usefixtures("project")
     def test_lock_all_deprecation(self, cli_runner: CliRunner) -> None:
-        result = cli_runner.invoke(cli, ["lock", "--all"])
-        deprecation_message = "The option 'all' is deprecated"
-        assert deprecation_message in result.stderr
+        with pytest.warns(DeprecationWarning, match="The --all flag is deprecated"):
+            cli_runner.invoke(cli, ["lock", "--all"])
 
     @pytest.mark.order(1)
     @pytest.mark.usefixtures("project")
