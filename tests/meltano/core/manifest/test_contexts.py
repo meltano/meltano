@@ -201,12 +201,15 @@ class TestJobContext:
 
     def test_job_context_basic(self, mock_manifest: Manifest) -> None:
         """Test basic job context functionality."""
-        with manifest_context(mock_manifest), schedule_context("daily-sync"):
-            with job_context("sync-job"):
-                assert os.environ["JOB_VAR"] == "job_value"
-                assert os.environ["OVERRIDE_ME"] == "job_override"
-                # Should have access to schedule vars for expansion
-                assert os.environ["JOB_EXPANDABLE"] == "schedule_value_job"
+        with (
+            manifest_context(mock_manifest),
+            schedule_context("daily-sync"),
+            job_context("sync-job"),
+        ):
+            assert os.environ["JOB_VAR"] == "job_value"
+            assert os.environ["OVERRIDE_ME"] == "job_override"
+            # Should have access to schedule vars for expansion
+            assert os.environ["JOB_EXPANDABLE"] == "schedule_value_job"
 
     def test_job_context_without_manifest(self) -> None:
         """Test job context without active manifest."""
