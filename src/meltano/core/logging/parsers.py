@@ -26,17 +26,6 @@ class LogParser(ABC):
     """Base class for log parsers."""
 
     @abstractmethod
-    def can_parse(self, line: str) -> bool:
-        """Check if this parser can handle the given log line.
-
-        Args:
-            line: Raw log line to check.
-
-        Returns:
-            True if this parser can handle the line.
-        """
-
-    @abstractmethod
     def parse(self, line: str) -> ParsedLogRecord | None:
         """Parse a log line into structured data.
 
@@ -51,35 +40,6 @@ class LogParser(ABC):
 class SingerSDKLogParser(LogParser):
     """Parser for Singer SDK structured JSON logs."""
 
-    def can_parse(self, line: str) -> bool:
-        """Check if line is a JSON log from Singer SDK.
-
-        Args:
-            line: Raw log line to check.
-
-        Returns:
-            True if line appears to be Singer SDK JSON log.
-        """
-        line = line.strip()
-        if not line:
-            return False
-
-        # Quick check for JSON structure
-        if not (line.startswith("{") and line.endswith("}")):
-            return False
-
-        try:
-            data = json.loads(line)
-            # Singer SDK logs should have at least these fields
-            return (
-                isinstance(data, dict)
-                and "levelname" in data
-                and "message" in data
-                and "name" in data
-            )
-        except (json.JSONDecodeError, TypeError):
-            return False
-
     def parse(self, line: str) -> ParsedLogRecord | None:
         """Parse Singer SDK JSON log line.
 
@@ -89,8 +49,25 @@ class SingerSDKLogParser(LogParser):
         Returns:
             ParsedLogRecord with structured data or None if parsing fails.
         """
+        line = line.strip()
+        if not line:
+            return None
+
+        # Quick check for JSON structure
+        if not (line.startswith("{") and line.endswith("}")):
+            return None
+
         try:
-            data = json.loads(line.strip())
+            data = json.loads(line)
+
+            # Singer SDK logs should have at least these fields
+            if not (
+                isinstance(data, dict)
+                and "levelname" in data
+                and "message" in data
+                and "name" in data
+            ):
+                return None
 
             # Extract core log fields
             level_name = data.get("levelname", "INFO")
@@ -120,10 +97,6 @@ class SingerSDKLogParser(LogParser):
                 "process",
             }
 
-            # extra = {}
-            # for key, value in data.items():
-            #     if key not in skip_fields:
-            #         extra[key] = value
             extra = {
                 key: value for key, value in data.items() if key not in skip_fields
             }
@@ -148,17 +121,6 @@ class SingerSDKLogParser(LogParser):
 
 class PassthroughLogParser(LogParser):
     """Fallback parser that passes through unparsed lines."""
-
-    def can_parse(self, line: str) -> bool:
-        """Always returns True as this is the fallback parser.
-
-        Args:
-            line: Raw log line.
-
-        Returns:
-            Always True.
-        """
-        return True
 
     def parse(self, line: str) -> ParsedLogRecord | None:
         """Return line as-is with minimal structure.
@@ -227,24 +189,22 @@ class LogParserFactory:
         # Try preferred parser first if specified
         if preferred_parser:
             parser = self.get_parser(preferred_parser)
-            if parser and parser.can_parse(line):
+            if parser:
                 result = parser.parse(line)
                 if result is not None:
                     return result
 
         # Try all registered parsers
         for parser in self._parsers.values():
-            if parser.can_parse(line):
-                result = parser.parse(line)
-                if result is not None:
-                    return result
+            result = parser.parse(line)
+            if result is not None:
+                return result
 
         # Fall back to default parsers
         for parser in self._default_parsers:
-            if parser.can_parse(line):
-                result = parser.parse(line)
-                if result is not None:
-                    return result
+            result = parser.parse(line)
+            if result is not None:
+                return result
 
         return None
 
