@@ -75,7 +75,7 @@ def _get_structured_sdk_logging(*, level: str) -> dict[str, t.Any]:
 
 class SingerPlugin(BasePlugin):  # noqa: D101
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
-        SettingDefinition(name="_log_parser"),
+        SettingDefinition(name="_log_parser", value="singer-sdk"),
     ]
 
     def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
