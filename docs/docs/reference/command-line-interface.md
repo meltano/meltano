@@ -1023,11 +1023,11 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 ### How to use
 
 ```bash
-# Lock all plugins
-meltano lock --all
+# Lock all plugins (default behavior)
+meltano lock
 
 # Lock all plugins of a certain type
-meltano lock --all --plugin-type=<type>
+meltano lock --plugin-type=<type>
 
 # Lock specific plugins
 meltano lock <name> <name_two>
@@ -1037,7 +1037,10 @@ meltano lock <name> <name_two> --plugin-type=<type>
 
 # Use --update in combination with any of the above to update the lock file
 # with the latest definition from MeltanoHub
-meltano lock --all --update
+meltano lock --update
+
+# Note: --all flag is deprecated but still supported
+meltano lock --all  # deprecated, use 'meltano lock' instead
 ```
 
 ### Using `lock` with Environments

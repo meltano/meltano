@@ -169,15 +169,15 @@ class SettingValueStore(StrEnum):
         # ordering here is not significant, other than being consistent with
         # the order of precedence.
         managers: dict[str, type[SettingsStoreManager]] = {
-            self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,  # type: ignore[dict-item]
-            self.ENV: EnvStoreManager,  # type: ignore[dict-item]
-            self.DOTENV: DotEnvStoreManager,  # type: ignore[dict-item]
-            self.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,  # type: ignore[dict-item]
-            self.MELTANO_YML: MeltanoYmlStoreManager,  # type: ignore[dict-item]
-            self.DB: DbStoreManager,  # type: ignore[dict-item]
-            self.INHERITED: InheritedStoreManager,  # type: ignore[dict-item]
-            self.DEFAULT: DefaultStoreManager,  # type: ignore[dict-item]
-            self.AUTO: AutoStoreManager,  # type: ignore[dict-item]
+            self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
+            self.ENV: EnvStoreManager,
+            self.DOTENV: DotEnvStoreManager,
+            self.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,
+            self.MELTANO_YML: MeltanoYmlStoreManager,
+            self.DB: DbStoreManager,
+            self.INHERITED: InheritedStoreManager,
+            self.DEFAULT: DefaultStoreManager,
+            self.AUTO: AutoStoreManager,
         }
         return managers[self]
 

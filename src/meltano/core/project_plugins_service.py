@@ -98,7 +98,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
             instruction = "Check https://hub.meltano.com/ for available plugins"
         else:
             instruction = (
-                "Try running `meltano lock --update --all` to ensure your plugins are "
+                "Try running `meltano lock --update` to ensure your plugins are "
                 "up to date, or add a `namespace` to your plugin if it is a custom one"
             )
 

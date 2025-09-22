@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
 import enum
 import os
 import sys
@@ -485,10 +486,17 @@ class PluginInvoker:
             try:
                 yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
-                raise ExecutableNotFoundError(
-                    self.plugin,
-                    self.plugin.executable,
-                ) from err
+                # Check if the error is about the executable itself or a file it's
+                # trying to access
+                executable_path = popen_args[0] if popen_args else ""
+
+                if err.filename == executable_path:
+                    # The executable itself was not found
+                    raise ExecutableNotFoundError(
+                        self.plugin,
+                        self.plugin.executable,
+                    ) from err
+                raise
 
     async def invoke_async(
         self,
