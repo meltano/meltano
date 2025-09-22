@@ -31,7 +31,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.3
+    rev: 0.34.0
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -83,13 +83,13 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.0
+    rev: v0.13.1
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.17
+    rev: 0.8.19
     hooks:
       - id: uv-lock
