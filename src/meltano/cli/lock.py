@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 
 import click
 import structlog
@@ -32,7 +33,8 @@ logger = structlog.get_logger(__name__)
     "--all",
     "all_plugins",
     is_flag=True,
-    help="Lock all the plugins of the project.",
+    hidden=True,
+    help="DEPRECATED: All plugins are now locked by default.",
 )
 @click.option(
     "--plugin-type",
@@ -59,10 +61,14 @@ def lock(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
+    if all_plugins:
+        warnings.warn(
+            "The --all flag is deprecated and is no longer needed",
+            DeprecationWarning,
+            stacklevel=0,
+        )
+
     lock_service = PluginLockService(project)
-    if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
-        tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Exactly one of --all or plugin name must be specified.")  # noqa: EM101
 
     try:
         with project.plugins.use_preferred_source(DefinitionSource.ANY):

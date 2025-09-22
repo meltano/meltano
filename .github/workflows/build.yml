@@ -23,7 +23,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write  # Needed to upload artifacts to the release
   id-token: write  # Needed for OIDC PyPI publishing
 
 jobs:
@@ -185,15 +184,6 @@ jobs:
       with:
         name: Packages
         path: dist
-
-    - name: Upload wheel to release
-      uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: dist/*.whl
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
 
     - name: Publish
       uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
