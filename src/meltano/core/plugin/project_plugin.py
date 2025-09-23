@@ -507,6 +507,6 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             with structured-logging capability.
         """
         if "structured-logging" in self.capabilities:
-            return self.extra_config.get("_log_parser", "singer-sdk")
+            return self.extra_config.get("_log_parser")
 
         return None
