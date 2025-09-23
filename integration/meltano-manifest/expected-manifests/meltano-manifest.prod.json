@@ -1933,6 +1933,7 @@
           "TARGET_YAML_METRICS_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "TARGET_YAML_METRICS_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML_METRICS__DIALECT": "target_yaml_metrics",
+          "TARGET_YAML_METRICS__LOG_PARSER": "singer-sdk",
           "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.metrics",
           "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "(redacted)",
@@ -2043,8 +2044,7 @@
           "TARGET_SNOWFLAKE_VALIDATE_RECORDS": "false",
           "TARGET_SNOWFLAKE_WAREHOUSE": "LOADER",
           "TARGET_SNOWFLAKE__DIALECT": "snowflake",
-          "TARGET_SNOWFLAKE__LOG_PARSER": "singer-sdk",
-          "TARGET_SNOWFLAKE__TARGET_SCHEMA": "_"
+          "TARGET_SNOWFLAKE__LOG_PARSER": "singer-sdk"
         },
         "label": "Snowflake",
         "logo_url": "https://hub.meltano.com/assets/logos/loaders/snowflake.png",
