@@ -66,9 +66,9 @@ class TestPluginLogParser:
         self,
         plugin_no_log_parser_config,
     ):
-        """Test get_log_parser defaults to 'singer-sdk' when no parser configured."""
+        """Test get_log_parser returns None when no parser configured."""
         log_parser = plugin_no_log_parser_config.get_log_parser()
-        assert log_parser == "singer-sdk"
+        assert log_parser is None
 
     @pytest.mark.parametrize(
         ("parser_value", "expected"),
@@ -76,7 +76,7 @@ class TestPluginLogParser:
             ("singer-sdk", "singer-sdk"),
             ("default", "default"),
             ("custom-parser", "custom-parser"),
-            (None, "singer-sdk"),  # Default to singer-sdk when no config
+            (None, None),  # No parser when no config
         ),
     )
     def test_get_log_parser_different_values(self, parser_value, expected):
@@ -109,8 +109,8 @@ class TestPluginLogParser:
         log_parser = plugin_opt_out.get_log_parser()
         assert log_parser == "default"
 
-    def test_default_singer_sdk_behavior(self):
-        """Test plugins with structured-logging default to singer-sdk."""
+    def test_default_behavior_no_parser(self):
+        """Test plugins return None when no parser configured."""
         # Plugin with structured-logging capability but no explicit log parser config
         plugin_default = ProjectPlugin(
             plugin_type=PluginType.EXTRACTORS,
@@ -121,4 +121,4 @@ class TestPluginLogParser:
         )
 
         log_parser = plugin_default.get_log_parser()
-        assert log_parser == "singer-sdk"
+        assert log_parser is None

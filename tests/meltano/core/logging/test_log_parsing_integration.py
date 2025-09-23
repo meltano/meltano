@@ -159,7 +159,7 @@ class TestLogParsingIntegration:
         (
             (["structured-logging"], "singer-sdk", "singer-sdk"),
             (["structured-logging"], "default", "default"),
-            (["structured-logging"], None, "singer-sdk"),  # Default to singer-sdk
+            (["structured-logging"], None, None),  # No parser when no config
             (["catalog"], "singer-sdk", None),  # No structured-logging capability
             ([], "singer-sdk", None),  # No capabilities at all
         ),

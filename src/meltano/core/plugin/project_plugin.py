@@ -503,8 +503,8 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         """Get the log parser ID for the plugin.
 
         Returns:
-            The log parser for the plugin. Defaults to 'singer-sdk' for plugins
-            with structured-logging capability.
+            The log parser for the plugin if explicitly configured and the plugin
+            has structured-logging capability.
         """
         if "structured-logging" in self.capabilities:
             return self.extra_config.get("_log_parser")
