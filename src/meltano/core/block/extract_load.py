@@ -660,7 +660,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 self.output_logger.out(
                     block.string_id,
                     logger_base.bind(stdio="stderr"),
-                    log_parser=block.invoker.plugin.get_log_parser(),
+                    log_parser=block.invoker.get_log_parser(),
                 ),
             )
             if block.consumer and block.stdin is not None:

@@ -48,7 +48,7 @@ def _get_basic_sdk_logging(*, level: str) -> dict[str, t.Any]:
 def _get_structured_sdk_logging(*, level: str) -> dict[str, t.Any]:
     return {
         "version": 1,
-        "disable_existing_loggers": False,
+        "disable_existing_loggers": True,
         "formatters": {
             "structured": {
                 "()": "singer_sdk.logging.StructuredFormatter",
@@ -70,7 +70,7 @@ def _get_structured_sdk_logging(*, level: str) -> dict[str, t.Any]:
 
 class SingerPlugin(BasePlugin):  # noqa: D101
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
-        SettingDefinition(name="_log_parser", value="singer-sdk"),
+        SettingDefinition(name="_log_parser", value=LOG_PARSER_SINGER_SDK),
     ]
 
     def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
@@ -161,7 +161,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         log_level = logging.getLevelName(logger.getEffectiveLevel())
 
         # Check if structured logging is enabled
-        log_parser = plugin_invoker.plugin.get_log_parser()
+        log_parser = plugin_invoker.get_log_parser()
 
         # https://sdk.meltano.com/en/v0.44.3/implementation/logging.html
         if log_parser == LOG_PARSER_SINGER_SDK:

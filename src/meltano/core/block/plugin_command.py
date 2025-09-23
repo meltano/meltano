@@ -176,12 +176,6 @@ def plugin_command_invoker(
 
     output_logger = OutputLogger("run.log")
 
-    invoker_log = output_logger.out(
-        plugin.name,
-        stderr_log,
-        log_parser=plugin.get_log_parser(),
-    )
-
     ctx = PluginContext(
         plugin=plugin,
         settings_service=PluginSettingsService(project, plugin),
@@ -195,6 +189,12 @@ def plugin_command_invoker(
         run_dir=run_dir,
         plugin_settings_service=ctx.settings_service,
     )
+    invoker_log = output_logger.out(
+        plugin.name,
+        stderr_log,
+        log_parser=invoker.get_log_parser(),
+    )
+
     return InvokerCommand(
         name=plugin.name,
         log=invoker_log,
