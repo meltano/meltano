@@ -625,10 +625,10 @@ class TestLogParserIntegration:
 
         factory = LogParserFactory()
 
-        for case in edge_cases:
-            line = json.dumps(case)
-            result = factory.parse_line(line)
-
-            # Should either parse successfully or fail gracefully
-            if result is not None:
-                assert isinstance(result, ParsedLogRecord)
+        assert all(
+            isinstance(
+                factory.parse_line(json.dumps(case)),
+                ParsedLogRecord,
+            )
+            for case in edge_cases
+        )
