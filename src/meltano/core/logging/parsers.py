@@ -11,7 +11,7 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)  # noqa: TID251
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(kw_only=True, slots=True)
 class ParsedLogRecord:
     """Represents a parsed log record with structured data."""
 
