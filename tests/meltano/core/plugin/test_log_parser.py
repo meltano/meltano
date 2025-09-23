@@ -56,7 +56,7 @@ class TestPluginLogParser:
         self,
         plugin_with_structured_logging,
     ):
-        """Test that get_log_parser returns the configured parser when structured-logging capability is present."""
+        """Test get_log_parser returns parser when structured-logging present."""
         log_parser = plugin_with_structured_logging.get_log_parser()
         assert log_parser == "singer-sdk"
 
@@ -64,7 +64,7 @@ class TestPluginLogParser:
         self,
         plugin_without_structured_logging,
     ):
-        """Test that get_log_parser returns None when structured-logging capability is absent."""
+        """Test get_log_parser returns None when structured-logging absent."""
         log_parser = plugin_without_structured_logging.get_log_parser()
         assert log_parser is None
 
@@ -72,18 +72,18 @@ class TestPluginLogParser:
         self,
         plugin_no_log_parser_config,
     ):
-        """Test that get_log_parser returns 'singer-sdk' by default when structured-logging capability is present but no parser is configured."""
+        """Test get_log_parser defaults to 'singer-sdk' when no parser configured."""
         log_parser = plugin_no_log_parser_config.get_log_parser()
         assert log_parser == "singer-sdk"
 
     @pytest.mark.parametrize(
-        "parser_value,expected",
-        [
+        ("parser_value", "expected"),
+        (
             ("singer-sdk", "singer-sdk"),
             ("default", "default"),
             ("custom-parser", "custom-parser"),
             (None, "singer-sdk"),  # Default to singer-sdk when no config
-        ],
+        ),
     )
     def test_get_log_parser_different_values(self, parser_value, expected):
         """Test get_log_parser with different parser values."""
@@ -103,7 +103,7 @@ class TestPluginLogParser:
         assert log_parser == expected
 
     def test_opt_out_of_singer_sdk_parser(self):
-        """Test that plugins can opt out of singer-sdk parser by explicitly setting a different parser."""
+        """Test plugins can opt out of singer-sdk parser."""
         # Plugin that explicitly opts out to use default parser
         plugin_opt_out = ProjectPlugin(
             name="test-plugin-opt-out",
@@ -120,7 +120,7 @@ class TestPluginLogParser:
         assert log_parser == "default"
 
     def test_default_singer_sdk_behavior(self):
-        """Test that plugins with structured-logging capability default to singer-sdk parser."""
+        """Test plugins with structured-logging default to singer-sdk."""
         # Plugin with structured-logging capability but no explicit log parser config
         plugin_default = ProjectPlugin(
             name="test-plugin-default",

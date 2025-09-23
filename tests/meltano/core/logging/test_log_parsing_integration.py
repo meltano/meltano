@@ -100,7 +100,7 @@ class TestLogParsingIntegration:
         plugin_without_structured_logging,
         tmp_path,
     ):
-        """Test that no log parser is used when structured-logging capability is absent."""
+        """Test no log parser when structured-logging capability is absent."""
         log_file = tmp_path / "test.log"
         output_logger = OutputLogger(file=log_file)
 
@@ -130,7 +130,7 @@ class TestLogParsingIntegration:
         mock_get_parser_factory.return_value = mock_parser
 
         log_parser = plugin_with_singer_sdk_parser.get_log_parser()
-        out = output_logger.out(
+        _ = output_logger.out(
             name="test-tap",
             log_parser=log_parser,
         )
@@ -175,14 +175,14 @@ class TestLogParsingIntegration:
         )  # Should return None despite config
 
     @pytest.mark.parametrize(
-        "capabilities,parser_config,expected_parser",
-        [
+        ("capabilities", "parser_config", "expected_parser"),
+        (
             (["structured-logging"], "singer-sdk", "singer-sdk"),
             (["structured-logging"], "default", "default"),
             (["structured-logging"], None, "singer-sdk"),  # Default to singer-sdk
             (["catalog"], "singer-sdk", None),  # No structured-logging capability
             ([], "singer-sdk", None),  # No capabilities at all
-        ],
+        ),
     )
     def test_log_parser_combinations(
         self, capabilities, parser_config, expected_parser

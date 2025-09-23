@@ -52,11 +52,6 @@ def _get_structured_sdk_logging(*, level: str) -> dict[str, t.Any]:
         "formatters": {
             "structured": {
                 "()": "singer_sdk.logging.StructuredFormatter",
-                # "format": "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-                # "defaults": {
-                #     "plugin_name": plugin_invoker.plugin.name,
-                #     "plugin_type": plugin_invoker.plugin.type.value,
-                # },
             },
         },
         "handlers": {
@@ -167,11 +162,9 @@ class SingerPlugin(BasePlugin):  # noqa: D101
 
         # Check if structured logging is enabled
         log_parser = plugin_invoker.plugin.get_log_parser()
-        # breakpoint()
 
         # https://sdk.meltano.com/en/v0.44.3/implementation/logging.html
         if log_parser == LOG_PARSER_SINGER_SDK:
-            # breakpoint()
             # Structured logging configuration
             logging_config = _get_structured_sdk_logging(level=log_level)
         else:

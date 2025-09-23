@@ -285,13 +285,10 @@ class Out:
         if not line:
             return
 
-        # breakpoint()
-
         # Try to parse the line if we have a parser configured
         if self.log_parser:
             parsed_record = self._parser_factory.parse_line(line, self.log_parser)
             if parsed_record:
-                # breakpoint()
                 # Use the parsed record's level and extra fields
                 extra = {"name": self.name, **parsed_record.extra}
 
@@ -300,8 +297,6 @@ class Out:
                     extra["plugin_logger"] = parsed_record.logger_name
 
                 # Log with the parsed level and structured data
-                # if "METRIC" in parsed_record.message:
-                #     breakpoint()
                 self.logger.log(parsed_record.level, parsed_record.message, **extra)
                 return
 

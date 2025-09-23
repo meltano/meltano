@@ -653,7 +653,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                     self.output_logger.out(
                         block.string_id,
                         logger_base.bind(stdio="stdout"),
-                        # No log_parser for stdout - it contains Singer protocol messages
+                        # No log_parser for stdout - Singer protocol messages
                     ),
                 )
             block.stderr_link(
