@@ -22,42 +22,22 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-def _get_basic_sdk_logging(*, level: str) -> dict[str, t.Any]:
+def _get_sdk_logging(
+    *,
+    level: str,
+    formatter: dict[str, t.Any],
+    disable_existing_loggers: bool = False,
+) -> dict[str, t.Any]:
     return {
         "version": 1,
-        "disable_existing_loggers": False,
+        "disable_existing_loggers": disable_existing_loggers,
         "formatters": {
-            "default": {
-                "format": "%(message)s",
-            },
+            "singer_formatter": formatter,
         },
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "formatter": "default",
-                "stream": "ext://sys.stderr",
-                "level": level,
-            },
-        },
-        "root": {
-            "handlers": ["console"],
-        },
-    }
-
-
-def _get_structured_sdk_logging(*, level: str) -> dict[str, t.Any]:
-    return {
-        "version": 1,
-        "disable_existing_loggers": True,
-        "formatters": {
-            "structured": {
-                "()": "singer_sdk.logging.StructuredFormatter",
-            },
-        },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "formatter": "structured",
+                "formatter": "singer_formatter",
                 "stream": "ext://sys.stderr",
                 "level": level,
             },
@@ -163,13 +143,21 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         # Check if structured logging is enabled
         log_parser = plugin_invoker.get_log_parser()
 
-        # https://sdk.meltano.com/en/v0.44.3/implementation/logging.html
+        # https://sdk.meltano.com/en/v0.49.1/implementation/logging.html
         if log_parser == LOG_PARSER_SINGER_SDK:
             # Structured logging configuration
-            logging_config = _get_structured_sdk_logging(level=log_level)
+            formatter = {"()": "singer_sdk.logging.StructuredFormatter"}
+            disable_existing_loggers = True
         else:
             # Default logging configuration
-            logging_config = _get_basic_sdk_logging(level=log_level)
+            formatter = {"format": "%(message)s"}
+            disable_existing_loggers = False
+
+        logging_config = _get_sdk_logging(
+            level=log_level,
+            formatter=formatter,
+            disable_existing_loggers=disable_existing_loggers,
+        )
 
         async with await anyio.open_file(singer_sdk_logging, mode="w") as f:
             await f.write(json.dumps(logging_config, indent=2))
