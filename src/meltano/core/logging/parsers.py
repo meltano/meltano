@@ -175,7 +175,9 @@ class LogParserFactory:
         return self._parsers.get(name)
 
     def parse_line(
-        self, line: str, preferred_parser: str | None = None
+        self,
+        line: str,
+        preferred_parser: str | None = None,
     ) -> ParsedLogRecord | None:
         """Parse a log line using the most appropriate parser.
 

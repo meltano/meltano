@@ -401,6 +401,14 @@ class TestLogParserFactory:
         assert result.message == "mock result"
         assert result.extra["source"] == "mock"
 
+        result = self.factory.parse_line("foo", preferred_parser="mock")
+        assert result is not None
+        assert result.message == "foo"
+        assert result.extra == {}
+        assert result.level == logging.INFO
+        assert result.timestamp is None
+        assert result.logger_name is None
+
     def test_parse_line_preferred_parser_fails_fallback(self):
         """Test that if preferred parser fails, it tries other parsers."""
         # Create a line that singer-sdk parser can handle
