@@ -15,41 +15,35 @@ class TestPluginLogParser:
     def plugin_with_structured_logging(self):
         """Create a plugin with structured-logging capability."""
         return ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin",
             namespace="test_plugin",
             pip_url="test-plugin",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={"_log_parser": "singer-sdk"},
-            definition={
-                "capabilities": ["structured-logging", "catalog", "discover"],
-            },
+            capabilities=["structured-logging", "catalog", "discover"],
+            log_parser="singer-sdk",
         )
 
     @pytest.fixture
     def plugin_without_structured_logging(self):
         """Create a plugin without structured-logging capability."""
         return ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin-no-logging",
             namespace="test_plugin_no_logging",
             pip_url="test-plugin-no-logging",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={"_log_parser": "singer-sdk"},
-            definition={
-                "capabilities": ["catalog", "discover"],
-            },
+            capabilities=["catalog", "discover"],
+            log_parser="singer-sdk",
         )
 
     @pytest.fixture
     def plugin_no_log_parser_config(self):
         """Create a plugin with structured-logging but no log parser config."""
         return ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin-no-config",
             namespace="test_plugin_no_config",
             pip_url="test-plugin-no-config",
-            plugin_type=PluginType.EXTRACTORS,
-            definition={
-                "capabilities": ["structured-logging", "catalog", "discover"],
-            },
+            capabilities=["structured-logging", "catalog", "discover"],
         )
 
     def test_get_log_parser_with_structured_logging_capability(
@@ -87,16 +81,14 @@ class TestPluginLogParser:
     )
     def test_get_log_parser_different_values(self, parser_value, expected):
         """Test get_log_parser with different parser values."""
-        extra_config = {"_log_parser": parser_value} if parser_value else {}
+        extras = {"log_parser": parser_value} if parser_value else {}
         plugin = ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin",
             namespace="test_plugin",
             pip_url="test-plugin",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config=extra_config,
-            definition={
-                "capabilities": ["structured-logging"],
-            },
+            capabilities=["structured-logging"],
+            **extras,
         )
 
         log_parser = plugin.get_log_parser()
@@ -106,14 +98,12 @@ class TestPluginLogParser:
         """Test plugins can opt out of singer-sdk parser."""
         # Plugin that explicitly opts out to use default parser
         plugin_opt_out = ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin-opt-out",
             namespace="test_plugin_opt_out",
             pip_url="test-plugin-opt-out",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={"_log_parser": "default"},
-            definition={
-                "capabilities": ["structured-logging"],
-            },
+            capabilities=["structured-logging"],
+            log_parser="default",
         )
 
         log_parser = plugin_opt_out.get_log_parser()
@@ -123,13 +113,11 @@ class TestPluginLogParser:
         """Test plugins with structured-logging default to singer-sdk."""
         # Plugin with structured-logging capability but no explicit log parser config
         plugin_default = ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin-default",
             namespace="test_plugin_default",
             pip_url="test-plugin-default",
-            plugin_type=PluginType.EXTRACTORS,
-            definition={
-                "capabilities": ["structured-logging", "catalog", "discover"],
-            },
+            capabilities=["structured-logging", "catalog", "discover"],
         )
 
         log_parser = plugin_default.get_log_parser()

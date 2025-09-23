@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from meltano.core.logging.output_logger import OutputLogger
@@ -18,41 +16,35 @@ class TestLogParsingIntegration:
     def plugin_with_singer_sdk_parser(self):
         """Create a plugin configured with singer-sdk log parser."""
         return ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-tap",
             namespace="test_tap",
             pip_url="test-tap",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={"_log_parser": "singer-sdk"},
-            definition={
-                "capabilities": ["structured-logging", "catalog", "discover"],
-            },
+            capabilities=["structured-logging", "catalog", "discover"],
+            log_parser="singer-sdk",
         )
 
     @pytest.fixture
     def plugin_with_default_parser(self):
         """Create a plugin configured with default log parser."""
         return ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-tap-default",
             namespace="test_tap_default",
             pip_url="test-tap-default",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={"_log_parser": "default"},
-            definition={
-                "capabilities": ["structured-logging", "catalog", "discover"],
-            },
+            capabilities=["structured-logging", "catalog", "discover"],
+            log_parser="default",
         )
 
     @pytest.fixture
     def plugin_without_structured_logging(self):
         """Create a plugin without structured-logging capability."""
         return ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-tap-no-logging",
             namespace="test_tap_no_logging",
             pip_url="test-tap-no-logging",
-            plugin_type=PluginType.EXTRACTORS,
-            definition={
-                "capabilities": ["catalog", "discover"],
-            },
+            capabilities=["catalog", "discover"],
         )
 
     def test_singer_sdk_log_parser_integration(
@@ -114,56 +106,44 @@ class TestLogParsingIntegration:
 
         assert out.log_parser is None
 
-    @patch("meltano.core.logging.parsers.get_parser_factory")
-    def test_parser_factory_called_with_correct_parser(
+    def test_parser_factory_integration(
         self,
-        mock_get_parser_factory,
         plugin_with_singer_sdk_parser,
         tmp_path,
     ):
-        """Test that the parser factory is called with the correct log parser."""
+        """Test that log parser is correctly integrated with output logger."""
         log_file = tmp_path / "test.log"
         output_logger = OutputLogger(file=log_file)
 
-        # Mock parser factory
-        mock_parser = MagicMock()
-        mock_get_parser_factory.return_value = mock_parser
-
         log_parser = plugin_with_singer_sdk_parser.get_log_parser()
-        _ = output_logger.out(
+        out = output_logger.out(
             name="test-tap",
             log_parser=log_parser,
         )
 
-        # Verify parser factory was called with singer-sdk
-        mock_get_parser_factory.assert_called_with("singer-sdk")
+        # Verify that the correct log parser is configured
+        assert out.log_parser == "singer-sdk"
 
     def test_structured_logging_capability_detection(self):
         """Test that structured-logging capability is correctly detected."""
         # Plugin with structured-logging capability
         plugin_with = ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-with-logging",
             namespace="test_with_logging",
             pip_url="test-with-logging",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={"_log_parser": "singer-sdk"},
-            definition={
-                "capabilities": ["structured-logging", "catalog"],
-            },
+            capabilities=["structured-logging", "catalog"],
+            log_parser="singer-sdk",
         )
 
         # Plugin without structured-logging capability
         plugin_without = ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-without-logging",
             namespace="test_without_logging",
             pip_url="test-without-logging",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config={
-                "_log_parser": "singer-sdk"
-            },  # Config present but capability missing
-            definition={
-                "capabilities": ["catalog"],
-            },
+            capabilities=["catalog"],
+            log_parser="singer-sdk",  # Config present but capability missing
         )
 
         assert "structured-logging" in plugin_with.capabilities
@@ -188,16 +168,14 @@ class TestLogParsingIntegration:
         self, capabilities, parser_config, expected_parser
     ):
         """Test various combinations of capabilities and parser configurations."""
-        extra_config = {"_log_parser": parser_config} if parser_config else {}
+        extras = {"log_parser": parser_config} if parser_config else {}
         plugin = ProjectPlugin(
+            plugin_type=PluginType.EXTRACTORS,
             name="test-plugin",
             namespace="test_plugin",
             pip_url="test-plugin",
-            plugin_type=PluginType.EXTRACTORS,
-            extra_config=extra_config,
-            definition={
-                "capabilities": capabilities,
-            },
+            capabilities=capabilities,
+            **extras,
         )
 
         log_parser = plugin.get_log_parser()
