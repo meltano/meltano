@@ -187,23 +187,21 @@ class LogParserFactory:
             ParsedLogRecord or None if no parser could handle the line.
         """
         # Try preferred parser first if specified
-        if preferred_parser:
-            parser = self.get_parser(preferred_parser)
-            if parser:
-                result = parser.parse(line)
-                if result is not None:
-                    return result
+        if (
+            preferred_parser
+            and (parser := self.get_parser(preferred_parser))
+            and (result := parser.parse(line)) is not None
+        ):
+            return result
 
         # Try all registered parsers
         for parser in self._parsers.values():
-            result = parser.parse(line)
-            if result is not None:
+            if (result := parser.parse(line)) is not None:
                 return result
 
         # Fall back to default parsers
         for parser in self._default_parsers:
-            result = parser.parse(line)
-            if result is not None:
+            if (result := parser.parse(line)) is not None:
                 return result
 
         return None
