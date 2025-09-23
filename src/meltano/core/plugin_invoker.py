@@ -602,6 +602,9 @@ class PluginInvoker:
         Returns:
             The log parser for the plugin.
         """
-        if "structured-logging" in self.plugin.capabilities:
+        if (
+            self.plugin.capabilities
+            and "structured-logging" in self.plugin.capabilities
+        ):
             return self.plugin_config_extras.get("_log_parser")
         return None
