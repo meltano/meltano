@@ -329,7 +329,7 @@ cat meltano.log | jq -c 'select(.string_id == "tap-gitlab" and .stdio == "stderr
 
 ### Exclude plugin stdout logs
 
-When DEBUG level logging is enabled, a plugin's stdout logs can be very verbose. For extractors, these can include the raw [Singer](/reference/glossary/#singer) messages. To exclude them, you can set the `meltano.core.block.extract_load` logger to `INFO` level.
+When DEBUG level logging is enabled, a plugin's stdout logs can be very verbose. For extractors, these can include the raw [Singer](/reference/glossary/#singer) messages. To exclude them, you can set the `meltano.plugins` logger to the `INFO` level.
 
 ```yaml
 version: 1
@@ -337,8 +337,9 @@ disable_existing_loggers: no
 
 loggers:
   # Disable logging of tap and target stdout
-  meltano.core.block.extract_load:
+  meltano.plugins:
     level: INFO
+    propagate: no
   root:
     level: DEBUG
     handlers: [console]
