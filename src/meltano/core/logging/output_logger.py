@@ -20,6 +20,7 @@ import structlog
 from meltano.core.runner import RunnerError
 
 from .formatters import get_default_foreign_pre_chain
+from .parsers import get_parser_factory
 from .utils import capture_subprocess_output
 
 StrPath: t.TypeAlias = str | os.PathLike[str]
@@ -45,6 +46,7 @@ class OutputLogger:
         name: str,
         logger=None,  # noqa: ANN001
         write_level: int = logging.INFO,
+        log_parser: str | None = None,
     ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 
@@ -52,6 +54,7 @@ class OutputLogger:
             name: name of this Out instance and to use in the name field.
             logger: logger to temporarily add a handler too.
             write_level: log level passed to underlying logger.log calls.
+            log_parser: name of the log parser to use for structured parsing.
 
         Returns:
             An Out instance that will log anything written in to a
@@ -66,6 +69,7 @@ class OutputLogger:
             logger=logger,
             write_level=write_level,
             file=self.file,
+            log_parser=log_parser,
         )
         self.outs[name] = out
         return out
@@ -145,6 +149,7 @@ class Out:
         logger: structlog.stdlib.BoundLogger,
         write_level: int,
         file: StrPath,
+        log_parser: str | None = None,
     ):
         """Log anything written in a stream.
 
@@ -154,14 +159,17 @@ class Out:
             logger: logger to temporarily add a handler too.
             write_level: log level passed to logger.log calls.
             file: file to associate with the FileHandler to log to.
+            log_parser: name of the log parser to use for structured parsing.
         """
         self.output_logger = output_logger
         self.logger = logger
         self.name = name
         self.write_level = write_level
         self.file = file
+        self.log_parser = log_parser
 
         self.last_line = ""
+        self._parser_factory = get_parser_factory()
 
     @property
     def redirect_log_handler(self) -> logging.Handler:
@@ -265,13 +273,38 @@ class Out:
     def writeline(self, line: str) -> None:
         """Write a line to the underlying structured logger.
 
-        Cleans up any dangling control chars.
+        Attempts to parse structured logs if a parser is configured,
+        otherwise falls back to simple line logging.
 
         Args:
             line: A line to write.
         """
         self.last_line = line
-        self.logger.log(self.write_level, line.rstrip(), name=self.name)
+        line = line.rstrip()
+
+        if not line:
+            return
+
+        # Try to parse the line if we have a parser configured
+        if self.log_parser and (
+            parsed_record := self._parser_factory.parse_line(
+                line,
+                self.log_parser,
+            )
+        ):
+            # Use the parsed record's level and extra fields
+            extra = {"name": self.name, **parsed_record.extra}
+
+            # If we have a logger name from the parsed record, include it
+            if parsed_record.logger_name:
+                extra["plugin_logger"] = parsed_record.logger_name
+
+            # Log with the parsed level and structured data
+            self.logger.log(parsed_record.level, parsed_record.message, **extra)
+            return
+
+        # Fallback to original behavior for unparseable lines
+        self.logger.log(self.write_level, line, name=self.name)
 
     async def _read_from_fd(self, read_fd) -> None:  # noqa: ANN001
         # Since we're redirecting our own stdout and stderr output,

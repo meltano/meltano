@@ -595,3 +595,16 @@ class PluginInvoker:
             self.output_handlers[src].append(handler)
         else:
             self.output_handlers = {src: [handler]}
+
+    def get_log_parser(self) -> str | None:
+        """Get the log parser for the plugin.
+
+        Returns:
+            The log parser for the plugin.
+        """
+        if (
+            self.plugin.capabilities
+            and "structured-logging" in self.plugin.capabilities
+        ):
+            return self.plugin_config_extras.get("_log_parser")
+        return None
