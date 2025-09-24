@@ -33,6 +33,7 @@ if t.TYPE_CHECKING:
     from pathlib import Path
 
     from sqlalchemy.orm import Session
+    from structlog.stdlib import BoundLogger
 
     from meltano.core.block.extract_load import ELBContext
     from meltano.core.elt_context import ELTContext, PluginContext
@@ -595,6 +596,15 @@ class PluginInvoker:
             self.output_handlers[src].append(handler)
         else:
             self.output_handlers = {src: [handler]}
+
+    @property
+    def logger(self) -> BoundLogger:
+        """Get the logger for the plugin.
+
+        Returns:
+            The logger for the plugin.
+        """
+        return get_logger(f"meltano.plugin.{self.plugin.type}.{self.plugin.name}")
 
     def get_log_parser(self) -> str | None:
         """Get the log parser for the plugin.

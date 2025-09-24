@@ -48,7 +48,9 @@ def _get_sdk_logging(
     }
 
 
-class SingerPlugin(BasePlugin):  # noqa: D101
+class SingerPlugin(BasePlugin):
+    """Base class for all Singer plugins."""
+
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(name="_log_parser", value=LOG_PARSER_SINGER_SDK),
     ]
@@ -111,14 +113,14 @@ class SingerPlugin(BasePlugin):  # noqa: D101
             config = invoker.plugin_config_processed
             await config_file.write(json.dumps(config, indent=2))
 
-        logger.debug(f"Created configuration at {config_path}")  # noqa: G004
+        logger.debug("Created configuration at %s", config_path)
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker: PluginInvoker) -> None:
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
-        logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
+        logger.debug("Deleted configuration at %s", config_path)
 
     @hook("before_invoke")
     async def setup_logging_hook(
@@ -138,7 +140,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         singer_sdk_logging = plugin_invoker.files["singer_sdk_logging"]
         pipelinewise_logging = plugin_invoker.files["pipelinewise_singer_logging"]
 
-        log_level = logging.getLevelName(logger.getEffectiveLevel())
+        log_level = logging.getLevelName(plugin_invoker.logger.getEffectiveLevel())
 
         # Check if structured logging is enabled
         log_parser = plugin_invoker.get_log_parser()

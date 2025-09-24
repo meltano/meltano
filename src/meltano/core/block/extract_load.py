@@ -641,14 +641,14 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             BlockSetValidationError: if consumer does not have an upstream producer.
         """
         for idx, block in enumerate(self.blocks):
-            logger_base = logger.bind(
+            logger_base = block.invoker.logger.bind(
                 consumer=block.consumer,
                 producer=block.producer,
                 string_id=block.string_id,
                 cmd_type="elb",
                 job_name=self.context.job.job_name if self.context.job else None,
             )
-            if logger.isEnabledFor(logging.DEBUG):
+            if block.invoker.logger.isEnabledFor(logging.DEBUG):
                 block.stdout_link(
                     self.output_logger.out(
                         block.string_id,
