@@ -1043,7 +1043,7 @@ class TestSingerTap:
             ) as stream_mock2,
         ):
             await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock2.call_count == 2
+            assert stream_mock2.call_count == 1
 
         # ensure stderr is redirected to devnull if we don't need it
         discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")  # noqa: TID251
@@ -1059,12 +1059,16 @@ class TestSingerTap:
             mock.patch(
                 "meltano.core.plugin.singer.tap._stream_redirect",
             ) as stream_mock3,
+            mock.patch(
+                "meltano.core.plugin.singer.tap.capture_subprocess_output",
+            ) as capture_subprocess_output_mock,
         ):
             await subject.run_discovery(invoker, catalog_path)
 
-            assert stream_mock3.call_count == 2
+            assert stream_mock3.call_count == 1
             call_kwargs = invoker.invoke_async.call_args_list[0][1]
             assert call_kwargs.get("stderr") is subprocess.PIPE
+            assert capture_subprocess_output_mock.call_count == 1
 
         discovery_logger.setLevel(original_level)
 
