@@ -23,6 +23,7 @@ from meltano.core.plugin.singer.catalog import (
     property_breadcrumb,
     select_metadata_rules,
 )
+from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 if t.TYPE_CHECKING:
@@ -32,7 +33,6 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin.singer.catalog import CatalogDict, MetadataRule, SchemaRule
-    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.project_add_service import ProjectAddService
 
@@ -1018,9 +1018,11 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         with (
-            mock.patch(
-                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-                return_value=False,
+            mock.patch.object(
+                PluginInvoker,
+                "stderr_logger",
+                new_callable=mock.PropertyMock,
+                return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=False)),
             ),
             mock.patch(
                 "meltano.core.plugin.singer.tap._stream_redirect",
@@ -1030,9 +1032,11 @@ class TestSingerTap:
             assert stream_mock.call_count == 2
 
         with (
-            mock.patch(
-                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-                return_value=True,
+            mock.patch.object(
+                PluginInvoker,
+                "stderr_logger",
+                new_callable=mock.PropertyMock,
+                return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
             ),
             mock.patch(
                 "meltano.core.plugin.singer.tap._stream_redirect",
@@ -1046,9 +1050,11 @@ class TestSingerTap:
         original_level = discovery_logger.getEffectiveLevel()
         discovery_logger.setLevel(logging.INFO)
         with (
-            mock.patch(
-                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-                return_value=True,
+            mock.patch.object(
+                PluginInvoker,
+                "stderr_logger",
+                new_callable=mock.PropertyMock,
+                return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
             ),
             mock.patch(
                 "meltano.core.plugin.singer.tap._stream_redirect",
@@ -1111,9 +1117,11 @@ class TestSingerTap:
 
         assert sys.getdefaultencoding() == "utf-8"
 
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-            return_value=True,
+        with mock.patch.object(
+            PluginInvoker,
+            "stderr_logger",
+            new_callable=mock.PropertyMock,
+            return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
         ):
             await subject.run_discovery(invoker, catalog_path)
 
