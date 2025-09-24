@@ -462,7 +462,7 @@ class SingerTap(SingerPlugin):
                         plugin_invoker.stderr_logger.isEnabledFor(logging.DEBUG)
                         and handle.stderr is not None
                     ):
-                        out = OutputLogger(None).out(
+                        out = OutputLogger("discovery.log").out(
                             self.name,
                             plugin_invoker.stderr_logger.bind(type="discovery"),
                             log_parser=plugin_invoker.get_log_parser(),
