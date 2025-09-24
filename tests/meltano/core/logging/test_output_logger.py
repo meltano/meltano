@@ -33,6 +33,22 @@ class TestOutputLogger:
             yield file
 
     @pytest.fixture
+    def valid_singer_sdk_log(self) -> dict[str, t.Any]:
+        return {
+            "level": "info",
+            "pid": 12345,
+            "logger_name": "tap_example.streams",
+            "ts": 1703097600.123456,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
+            "stream_name": "users",
+            "message": "Processing records",
+            "extra": {
+                "custom_field": "custom_value",
+            },
+        }
+
+    @pytest.fixture
     def subject(self, log: t.IO[str]) -> OutputLogger:
         return OutputLogger(log.name)
 
@@ -300,14 +316,18 @@ class TestOutputLogger:
         # Singer SDK structured log line
         singer_log = json.dumps(
             {
-                "levelname": "INFO",
-                "message": "Processing records",
-                "name": "tap_example.streams",
-                "created": 1703097600.123456,
-                "plugin_name": "tap-example",
+                "level": "info",
+                "pid": 12345,
+                "logger_name": "tap_example.streams",
+                "ts": 1703097600.123456,
+                "thread_name": "MainThread",
+                "app_name": "tap-example",
                 "stream_name": "users",
-                "record_count": 100,
-            }
+                "message": "Processing records",
+                "extra": {
+                    "record_count": 100,
+                },
+            },
         )
 
         out.writeline(singer_log)
@@ -319,10 +339,7 @@ class TestOutputLogger:
         assert entry["event"] == "Processing records"
         assert entry["log_level"] == "info"
         assert entry["name"] == "test_singer"
-        assert entry["plugin_name"] == "tap-example"
-        assert entry["stream_name"] == "users"
         assert entry["record_count"] == 100
-        assert entry["plugin_logger"] == "tap_example.streams"
 
     def test_writeline_with_parser_error_log(
         self,
@@ -335,14 +352,20 @@ class TestOutputLogger:
         # Singer SDK error log line
         error_log = json.dumps(
             {
-                "levelname": "ERROR",
+                "level": "error",
+                "pid": 12345,
+                "logger_name": "tap_example.client",
+                "ts": 1703097600.123456,
+                "thread_name": "MainThread",
+                "app_name": "tap-example",
+                "stream_name": "users",
                 "message": "API connection failed",
-                "name": "tap_example.client",
-                "plugin_name": "tap-example",
-                "endpoint": "https://api.example.com",
-                "retry_count": 3,
-                "error_code": "CONNECTION_ERROR",
-            }
+                "extra": {
+                    "endpoint": "https://api.example.com",
+                    "retry_count": 3,
+                    "error_code": "CONNECTION_ERROR",
+                },
+            },
         )
 
         out.writeline(error_log)
@@ -354,7 +377,6 @@ class TestOutputLogger:
         assert entry["event"] == "API connection failed"
         assert entry["log_level"] == "error"
         assert entry["name"] == "test_error"
-        assert entry["plugin_name"] == "tap-example"
         assert entry["endpoint"] == "https://api.example.com"
         assert entry["retry_count"] == 3
         assert entry["error_code"] == "CONNECTION_ERROR"
@@ -422,21 +444,17 @@ class TestOutputLogger:
         self,
         subject: OutputLogger,
         log_output: LogCapture,
+        valid_singer_sdk_log: dict[str, t.Any],
     ) -> None:
         """Test writeline with Singer SDK logs at different levels."""
         out = subject.out("test_levels", log_parser="singer-sdk")
 
         # Test different log levels
-        levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        levels = ["debug", "info", "warning", "error", "critical"]
 
         for level in levels:
-            log_line = json.dumps(
-                {
-                    "levelname": level,
-                    "message": f"Test {level} message",
-                    "name": "test.logger",
-                }
-            )
+            valid_singer_sdk_log["level"] = level
+            log_line = json.dumps(valid_singer_sdk_log)
             out.writeline(log_line)
 
         # Verify all levels were parsed correctly
@@ -444,8 +462,9 @@ class TestOutputLogger:
 
         for i, level in enumerate(levels):
             entry = log_output.entries[i]
-            assert entry["event"] == f"Test {level} message"
+            assert entry["event"] == "Processing records"
             assert entry["log_level"] == level.lower()
+            assert entry["name"] == "test_levels"
 
     def test_writeline_with_custom_write_level(
         self,
@@ -455,7 +474,9 @@ class TestOutputLogger:
         """Test writeline with custom write_level for unparseable lines."""
         # Set custom write_level to WARNING
         out = subject.out(
-            "test_custom_level", log_parser="singer-sdk", write_level=logging.WARNING
+            "test_custom_level",
+            log_parser="singer-sdk",
+            write_level=logging.WARNING,
         )
 
         # Use a line that won't parse as Singer SDK
@@ -483,21 +504,26 @@ class TestOutputLogger:
         # Singer SDK metrics log
         metrics_log = json.dumps(
             {
-                "levelname": "INFO",
-                "message": "METRIC",
-                "name": "singer_sdk.metrics",
-                "plugin_name": "tap-example",
+                "level": "info",
+                "pid": 12345,
+                "logger_name": "singer_sdk.metrics",
+                "ts": 1703097600.123456,
+                "thread_name": "MainThread",
+                "app_name": "tap-example",
                 "stream_name": "users",
-                "point": {
-                    "metric_name": "records_processed",
-                    "value": 1500,
-                    "tags": {
-                        "stream": "users",
-                        "tap": "tap-example",
+                "message": "METRIC",
+                "extra": {
+                    "point": {
+                        "metric_name": "records_processed",
+                        "value": 1500,
+                        "tags": {
+                            "stream": "users",
+                            "tap": "tap-example",
+                        },
+                        "timestamp": "2023-12-20T10:01:00.345678Z",
                     },
-                    "timestamp": "2023-12-20T10:01:00.345678Z",
                 },
-            }
+            },
         )
 
         out.writeline(metrics_log)
@@ -509,8 +535,6 @@ class TestOutputLogger:
         assert entry["event"] == "METRIC"
         assert entry["log_level"] == "info"
         assert entry["name"] == "test_metrics"
-        assert entry["plugin_name"] == "tap-example"
-        assert entry["stream_name"] == "users"
         assert "point" in entry
         assert entry["point"]["metric_name"] == "records_processed"
         assert entry["point"]["value"] == 1500
@@ -519,19 +543,14 @@ class TestOutputLogger:
         self,
         subject: OutputLogger,
         log_output: LogCapture,
+        valid_singer_sdk_log: dict[str, t.Any],
     ) -> None:
         """Test writeline with a parser that doesn't exist."""
         out = subject.out("test_missing_parser", log_parser="nonexistent-parser")
 
         # Valid JSON that could be parsed by a real parser, but nonexistent parser
         # should fall back to trying other parsers in the factory
-        json_line = json.dumps(
-            {
-                "levelname": "INFO",
-                "message": "Test message",
-                "name": "test.logger",
-            }
-        )
+        json_line = json.dumps(valid_singer_sdk_log)
 
         out.writeline(json_line)
 
@@ -540,10 +559,10 @@ class TestOutputLogger:
         assert len(log_output.entries) == 1
         entry = log_output.entries[0]
 
-        assert entry["event"] == "Test message"  # Parsed message
+        assert entry["event"] == "Processing records"  # Parsed message
         assert entry["log_level"] == "info"
         assert entry["name"] == "test_missing_parser"
-        assert entry["plugin_logger"] == "test.logger"  # Shows it was parsed
+        assert entry["plugin_logger"] == "tap_example.streams"  # Shows it was parsed
 
     def test_writeline_with_truly_nonexistent_parser_fallback(
         self,
@@ -582,6 +601,7 @@ class TestOutputLogger:
         # Should preserve the original line (with newline)
         assert out.last_line == test_line
         assert log_output.entries[0]["event"] == test_line.strip()
+        assert log_output.entries[0]["name"] == "test_last_line"
 
     @mock.patch("meltano.core.logging.output_logger.get_parser_factory")
     def test_writeline_with_mocked_parser(

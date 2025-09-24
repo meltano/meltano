@@ -40,6 +40,17 @@ class LogParser(ABC):
 class SingerSDKLogParser(LogParser):
     """Parser for Singer SDK structured JSON logs."""
 
+    required_fields: t.ClassVar[set[str]] = {
+        "level",
+        "pid",
+        "logger_name",
+        "ts",
+        "thread_name",
+        "app_name",
+        "stream_name",
+        "message",
+    }
+
     def parse(self, line: str) -> ParsedLogRecord | None:
         """Parse Singer SDK JSON log line.
 
@@ -61,50 +72,21 @@ class SingerSDKLogParser(LogParser):
             data = json.loads(line)
 
             # Singer SDK logs should have at least these fields
-            if not (
-                isinstance(data, dict)
-                and "levelname" in data
-                and "message" in data
-                and "name" in data
-            ):
+            if not (isinstance(data, dict) and self.required_fields.issubset(data)):
                 return None
 
             # Extract core log fields
-            level_name = data.get("levelname", "INFO")
-            level = getattr(logging, level_name, logging.INFO)
-            message = data.get("message", "")
-            logger_name = data.get("name")
-            timestamp = data.get("created") or data.get("asctime")
-
-            # Prepare extra fields (everything except core logging fields)
-            skip_fields = {
-                "levelname",
-                "message",
-                "name",
-                "created",
-                "asctime",
-                "levelno",
-                "pathname",
-                "filename",
-                "module",
-                "lineno",
-                "funcName",
-                "msecs",
-                "relativeCreated",
-                "thread",
-                "threadName",
-                "processName",
-                "process",
-            }
-
-            extra = {
-                key: value for key, value in data.items() if key not in skip_fields
-            }
+            level_name = data.pop("level")
+            level = logging._nameToLevel.get(level_name.upper(), logging.INFO)
+            logger_name = data.pop("logger_name")
+            timestamp = data.pop("ts")
+            message = data.pop("message")
+            extra = data.pop("extra", {})
 
             return ParsedLogRecord(
                 level=level,
                 message=message,
-                extra=extra,
+                extra={**data, **extra},
                 timestamp=str(timestamp) if timestamp else None,
                 logger_name=logger_name,
             )
@@ -131,15 +113,13 @@ class PassthroughLogParser(LogParser):
         Returns:
             ParsedLogRecord with the line as message.
         """
-        line = line.strip()
-        if not line:
-            return None
-
-        return ParsedLogRecord(
-            level=logging.INFO,
-            message=line,
-            extra={},
-        )
+        if stripped_line := line.strip():
+            return ParsedLogRecord(
+                level=logging.INFO,
+                message=stripped_line,
+                extra={},
+            )
+        return None
 
 
 class LogParserFactory:

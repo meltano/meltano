@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import typing as t
 from unittest.mock import patch
 
 import pytest
@@ -69,24 +70,30 @@ class TestParsedLogRecord:
 class TestSingerSDKLogParser:
     """Test SingerSDKLogParser class."""
 
+    @pytest.fixture
+    def log(self) -> dict[str, t.Any]:
+        """A valid Singer SDK log."""
+        return {
+            "level": "info",
+            "pid": 12345,
+            "logger_name": "tap_example.streams",
+            "ts": 1703097600.123456,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
+            "stream_name": "users",
+            "message": "Processing records",
+            "extra": {
+                "custom_field": "custom_value",
+            },
+        }
+
     def setup_method(self):
         """Set up test fixtures."""
         self.parser = SingerSDKLogParser()
 
-    def test_parse_valid_singer_sdk_log(self):
+    def test_parse_valid_singer_sdk_log(self, log: dict[str, t.Any]):
         """Test parsing a valid Singer SDK JSON log line."""
-        log_line = json.dumps(
-            {
-                "levelname": "INFO",
-                "message": "Processing records",
-                "name": "tap_example.streams",
-                "created": 1703097600.123456,
-                "plugin_name": "tap-example",
-                "stream_name": "users",
-                "record_count": 100,
-            }
-        )
-
+        log_line = json.dumps(log)
         result = self.parser.parse(log_line)
 
         assert result is not None
@@ -95,56 +102,17 @@ class TestSingerSDKLogParser:
         assert result.logger_name == "tap_example.streams"
         assert result.timestamp == "1703097600.123456"
         assert result.extra == {
-            "plugin_name": "tap-example",
+            "pid": 12345,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
             "stream_name": "users",
-            "record_count": 100,
+            "custom_field": "custom_value",
         }
 
-    def test_parse_minimal_singer_sdk_log(self):
-        """Test parsing a minimal Singer SDK log with required fields only."""
-        log_line = json.dumps(
-            {
-                "levelname": "DEBUG",
-                "message": "Debug message",
-                "name": "test.logger",
-            }
-        )
-
-        result = self.parser.parse(log_line)
-
-        assert result is not None
-        assert result.level == logging.DEBUG
-        assert result.message == "Debug message"
-        assert result.logger_name == "test.logger"
-        assert result.timestamp is None
-        assert result.extra == {}
-
-    def test_parse_with_asctime_timestamp(self):
-        """Test parsing log with asctime instead of created timestamp."""
-        log_line = json.dumps(
-            {
-                "levelname": "WARNING",
-                "message": "Warning message",
-                "name": "test.logger",
-                "asctime": "2023-12-20 10:00:00,123",
-            }
-        )
-
-        result = self.parser.parse(log_line)
-
-        assert result is not None
-        assert result.level == logging.WARNING
-        assert result.timestamp == "2023-12-20 10:00:00,123"
-
-    def test_parse_unknown_log_level(self):
+    def test_parse_unknown_log_level(self, log: dict[str, t.Any]):
         """Test parsing log with unknown log level falls back to INFO."""
-        log_line = json.dumps(
-            {
-                "levelname": "UNKNOWN_LEVEL",
-                "message": "Test message",
-                "name": "test.logger",
-            }
-        )
+        log["level"] = "UNKNOWN_LEVEL"
+        log_line = json.dumps(log)
 
         result = self.parser.parse(log_line)
 
@@ -185,12 +153,17 @@ class TestSingerSDKLogParser:
 
     def test_parse_missing_required_fields(self):
         """Test parsing JSON missing required fields returns None."""
-        # Missing levelname
+        # Missing level
         result = self.parser.parse(
             json.dumps(
                 {
+                    "pid": 12345,
+                    "logger_name": "test.logger",
+                    "ts": 1703097600.123456,
+                    "thread_name": "MainThread",
+                    "app_name": "test",
+                    "stream_name": "test",
                     "message": "Test",
-                    "name": "test.logger",
                 }
             )
         )
@@ -200,53 +173,28 @@ class TestSingerSDKLogParser:
         result = self.parser.parse(
             json.dumps(
                 {
-                    "levelname": "INFO",
-                    "name": "test.logger",
-                }
-            )
-        )
-        assert result is None
-
-        # Missing name
-        result = self.parser.parse(
-            json.dumps(
-                {
-                    "levelname": "INFO",
+                    "level": "info",
+                    "logger_name": "test.logger",
+                    "ts": 1703097600.123456,
+                    "thread_name": "MainThread",
+                    "app_name": "test",
+                    "stream_name": "test",
                     "message": "Test",
                 }
             )
         )
         assert result is None
 
-    def test_parse_filters_core_fields_from_extra(self):
+    def test_parse_filters_core_fields_from_extra(self, log: dict[str, t.Any]):
         """Test that core logging fields are filtered from extra."""
-        log_line = json.dumps(
-            {
-                "levelname": "INFO",
-                "message": "Test message",
-                "name": "test.logger",
-                "created": 1703097600.123456,
-                "levelno": 20,
-                "pathname": "/app/test.py",
-                "filename": "test.py",
-                "module": "test",
-                "lineno": 42,
-                "funcName": "test_function",
-                "msecs": 123.456,
-                "relativeCreated": 1000.0,
-                "thread": 12345,
-                "threadName": "MainThread",
-                "processName": "MainProcess",
-                "process": 67890,
-                "custom_field": "should_be_in_extra",
-            }
-        )
+        log["extra"]["my_custom_field"] = "should_be_in_extra"
+        log_line = json.dumps(log)
 
         result = self.parser.parse(log_line)
 
         assert result is not None
-        # Only custom fields should be in extra
-        assert result.extra == {"custom_field": "should_be_in_extra"}
+        # Custom fields should be in extra
+        assert result.extra["my_custom_field"] == "should_be_in_extra"
 
     def test_parse_exception_handling_with_logging(self):
         """Test that parsing exceptions are logged for debugging."""
@@ -351,6 +299,23 @@ class TestPassthroughLogParser:
 class TestLogParserFactory:
     """Test LogParserFactory class."""
 
+    @pytest.fixture
+    def log(self) -> dict[str, t.Any]:
+        """A valid Singer SDK log."""
+        return {
+            "level": "info",
+            "pid": 12345,
+            "logger_name": "tap_example.streams",
+            "ts": 1703097600.123456,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
+            "stream_name": "users",
+            "message": "Processing records",
+            "extra": {
+                "custom_field": "custom_value",
+            },
+        }
+
     def setup_method(self):
         """Set up test fixtures."""
         self.factory = LogParserFactory()
@@ -409,23 +374,17 @@ class TestLogParserFactory:
         assert result.timestamp is None
         assert result.logger_name is None
 
-    def test_parse_line_preferred_parser_fails_fallback(self):
+    def test_parse_line_preferred_parser_fails_fallback(self, log: dict[str, t.Any]):
         """Test that if preferred parser fails, it tries other parsers."""
         # Create a line that singer-sdk parser can handle
-        line = json.dumps(
-            {
-                "levelname": "INFO",
-                "message": "Test message",
-                "name": "test.logger",
-            }
-        )
+        line = json.dumps(log)
 
         # Try with a nonexistent preferred parser
         result = self.factory.parse_line(line, preferred_parser="nonexistent")
 
         # Should still parse with singer-sdk parser
         assert result is not None
-        assert result.message == "Test message"
+        assert result.message == "Processing records"
 
     def test_parse_line_all_parsers_fail_uses_default(self):
         """Test that if all registered parsers fail, default parsers are used."""
@@ -543,6 +502,23 @@ class TestGlobalParserFactory:
 class TestLogParserIntegration:
     """Integration tests for parser interactions."""
 
+    @pytest.fixture
+    def log(self) -> dict[str, t.Any]:
+        """A valid Singer SDK log."""
+        return {
+            "level": "info",
+            "pid": 12345,
+            "logger_name": "tap_example.streams",
+            "ts": 1703097600.123456,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
+            "stream_name": "users",
+            "message": "Processing records",
+            "extra": {
+                "custom_field": "custom_value",
+            },
+        }
+
     def test_singer_sdk_to_passthrough_fallback(self):
         """Test fallback from Singer SDK parser to passthrough."""
         factory = LogParserFactory()
@@ -557,23 +533,17 @@ class TestLogParserIntegration:
     def test_complex_singer_sdk_log_parsing(self):
         """Test parsing a complex Singer SDK log with all features."""
         complex_log = {
-            "levelname": "ERROR",
+            "level": "error",
+            "pid": 12345,
+            "logger_name": "tap_example.client",
+            "ts": 1703097600.789012,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
+            "stream_name": None,
             "message": "API connection failed",
-            "name": "tap_example.client",
-            "created": 1703097600.789012,
-            "filename": "client.py",
-            "funcName": "connect",
-            "lineno": 67,
-            "module": "client",
-            "pathname": "/app/tap_example/client.py",
-            "process": 12345,
-            "processName": "MainProcess",
-            "thread": 140123456789,
-            "threadName": "MainThread",
-            "plugin_name": "tap-example",
-            "endpoint": "https://api.example.com/v1/users",
-            "retry_count": 3,
-            "error_code": "CONNECTION_ERROR",
+            "extra": {
+                "phase": "discovery",
+            },
             "exception": "Traceback...",
         }
 
@@ -585,42 +555,38 @@ class TestLogParserIntegration:
         assert result.message == "API connection failed"
         assert result.logger_name == "tap_example.client"
         assert result.timestamp == "1703097600.789012"
-
-        # Check that extra fields include Singer-specific fields but not core fields
-        expected_extra = {
-            "plugin_name": "tap-example",
-            "endpoint": "https://api.example.com/v1/users",
-            "retry_count": 3,
-            "error_code": "CONNECTION_ERROR",
+        assert result.extra == {
+            "pid": 12345,
+            "thread_name": "MainThread",
+            "app_name": "tap-example",
+            "stream_name": None,
             "exception": "Traceback...",
+            "phase": "discovery",
         }
-        assert result.extra == expected_extra
 
-    def test_all_log_levels_parsing(self):
+    def test_all_log_levels_parsing(self, log: dict[str, t.Any]):
         """Test parsing all standard log levels."""
         factory = LogParserFactory()
-        levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        levels = ["debug", "info", "warning", "error", "critical"]
 
         for level_name in levels:
-            log_line = json.dumps(
-                {
-                    "levelname": level_name,
-                    "message": f"Test {level_name} message",
-                    "name": "test.logger",
-                }
-            )
+            log["level"] = level_name
+            log_line = json.dumps(log)
 
             result = factory.parse_line(log_line)
             assert result is not None
-            assert result.level == getattr(logging, level_name)
-            assert result.message == f"Test {level_name} message"
+            assert result.level == getattr(logging, level_name.upper())
 
     def test_edge_case_field_values(self):
         """Test parsing with edge case field values."""
         edge_cases = [
-            {"levelname": "", "message": "", "name": ""},  # Empty strings
-            {"levelname": "INFO", "message": None, "name": "test"},  # None message
-            {"levelname": "INFO", "message": 123, "name": "test"},  # Non-string message
+            {"level": "", "message": "", "logger_name": ""},  # Empty strings
+            {"level": "INFO", "message": None, "logger_name": "test"},  # None message
+            {
+                "level": "INFO",
+                "message": 123,  # Non-string message
+                "logger_name": "test",
+            },
         ]
 
         factory = LogParserFactory()

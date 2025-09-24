@@ -286,19 +286,22 @@ class Out:
             return
 
         # Try to parse the line if we have a parser configured
-        if self.log_parser:
-            parsed_record = self._parser_factory.parse_line(line, self.log_parser)
-            if parsed_record:
-                # Use the parsed record's level and extra fields
-                extra = {"name": self.name, **parsed_record.extra}
+        if self.log_parser and (
+            parsed_record := self._parser_factory.parse_line(
+                line,
+                self.log_parser,
+            )
+        ):
+            # Use the parsed record's level and extra fields
+            extra = {"name": self.name, **parsed_record.extra}
 
-                # If we have a logger name from the parsed record, include it
-                if parsed_record.logger_name:
-                    extra["plugin_logger"] = parsed_record.logger_name
+            # If we have a logger name from the parsed record, include it
+            if parsed_record.logger_name:
+                extra["plugin_logger"] = parsed_record.logger_name
 
-                # Log with the parsed level and structured data
-                self.logger.log(parsed_record.level, parsed_record.message, **extra)
-                return
+            # Log with the parsed level and structured data
+            self.logger.log(parsed_record.level, parsed_record.message, **extra)
+            return
 
         # Fallback to original behavior for unparseable lines
         self.logger.log(self.write_level, line, name=self.name)
