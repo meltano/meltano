@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock
 
 import anyio
 import pytest
+import structlog
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
@@ -63,6 +64,10 @@ class TestSingerTap:
     @pytest.fixture(scope="class")
     def subject(self, project_add_service: ProjectAddService) -> SingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
+
+    @pytest.fixture(scope="class", autouse=True)
+    def fixture_configure_structlog(self) -> None:
+        structlog.stdlib.recreate_defaults(log_level=logging.INFO)
 
     @pytest.mark.order(0)
     @pytest.mark.asyncio
