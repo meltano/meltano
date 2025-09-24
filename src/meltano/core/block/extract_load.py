@@ -229,6 +229,18 @@ class ELBContextBuilder:
         self._run_id = run_id
         return self
 
+    def with_job_env(self, *, job_env: dict[str, str]):  # noqa: ANN201
+        """Set job environment variables for this run.
+
+        Args:
+            job_env: The job environment variables.
+
+        Returns:
+            self
+        """
+        self._env.update(job_env)
+        return self
+
     def make_block(
         self,
         plugin: ProjectPlugin,

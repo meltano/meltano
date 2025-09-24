@@ -165,6 +165,8 @@ Environment variables are inherited across layers in the following order, where 
 - active environment env
 - root-level plugin-level env
 - active environment-level plugin-level env
+- schedule env (when running a schedule)
+- job env (when running a job)
 ```
 
 The following example illustrates how values are expanded:
