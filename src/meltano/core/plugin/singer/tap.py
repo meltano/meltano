@@ -503,10 +503,7 @@ class SingerTap(SingerPlugin):
                         asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
                         asyncio.ensure_future(handle.wait()),
                     ]
-                    if (
-                        plugin_invoker.stderr_logger.isEnabledFor(logging.DEBUG)
-                        and handle.stderr is not None
-                    ):
+                    if logger.isEnabledFor(logging.DEBUG) and handle.stderr:
                         invoke_futures.append(
                             _debug_logging_handler(
                                 self.name,

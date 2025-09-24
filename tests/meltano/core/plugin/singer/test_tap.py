@@ -1014,7 +1014,7 @@ class TestSingerTap:
 
         with (
             mock.patch(
-                "meltano.core.plugin_invoker.PluginInvoker.stderr_logger.isEnabledFor",
+                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
                 return_value=False,
             ),
             mock.patch(
@@ -1026,7 +1026,7 @@ class TestSingerTap:
 
         with (
             mock.patch(
-                "meltano.core.plugin_invoker.PluginInvoker.stderr_logger.isEnabledFor",
+                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
                 return_value=True,
             ),
             mock.patch(
@@ -1042,7 +1042,7 @@ class TestSingerTap:
         discovery_logger.setLevel(logging.INFO)
         with (
             mock.patch(
-                "meltano.core.plugin_invoker.PluginInvoker.stderr_logger.isEnabledFor",
+                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
                 return_value=True,
             ),
             mock.patch(
@@ -1107,7 +1107,7 @@ class TestSingerTap:
         assert sys.getdefaultencoding() == "utf-8"
 
         with mock.patch(
-            "meltano.core.plugin_invoker.PluginInvoker.stderr_logger.isEnabledFor",
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
             return_value=True,
         ):
             await subject.run_discovery(invoker, catalog_path)
