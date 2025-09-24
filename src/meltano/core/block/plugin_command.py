@@ -184,7 +184,7 @@ def plugin_command_invoker(
         run_dir=run_dir,
         plugin_settings_service=ctx.settings_service,
     )
-    stderr_log = invoker.logger.bind(stdio="stderr", cmd_type="command")
+    stderr_log = invoker.stdout_logger.bind(stdio="stderr", cmd_type="command")
     invoker_log = output_logger.out(
         plugin.name,
         stderr_log,

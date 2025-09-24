@@ -337,7 +337,7 @@ disable_existing_loggers: no
 
 loggers:
   # Disable logging of tap and target stdout
-  meltano.plugins:
+  meltano.plugins.stdout:
     level: INFO
     propagate: no
   root:

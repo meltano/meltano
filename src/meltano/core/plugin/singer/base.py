@@ -39,11 +39,11 @@ def _get_sdk_logging(
                 "class": "logging.StreamHandler",
                 "formatter": "singer_formatter",
                 "stream": "ext://sys.stderr",
-                "level": level,
             },
         },
         "root": {
             "handlers": ["console"],
+            "level": level,
         },
     }
 
@@ -140,7 +140,8 @@ class SingerPlugin(BasePlugin):
         singer_sdk_logging = plugin_invoker.files["singer_sdk_logging"]
         pipelinewise_logging = plugin_invoker.files["pipelinewise_singer_logging"]
 
-        log_level = logging.getLevelName(plugin_invoker.logger.getEffectiveLevel())
+        logger = plugin_invoker.stderr_logger
+        log_level = logging.getLevelName(logger.getEffectiveLevel())
 
         # Check if structured logging is enabled
         log_parser = plugin_invoker.get_log_parser()

@@ -598,13 +598,28 @@ class PluginInvoker:
             self.output_handlers = {src: [handler]}
 
     @property
-    def logger(self) -> BoundLogger:
-        """Get the logger for the plugin.
+    def stdout_logger(self) -> BoundLogger:
+        """Get the logger for the plugin stdout.
 
         Returns:
-            The logger for the plugin.
+            The logger for the plugin stdout.
         """
-        return get_logger(f"meltano.plugin.{self.plugin.type}.{self.plugin.name}")
+        return get_logger(
+            f"meltano.plugin.stdout.{self.plugin.type}.{self.plugin.name}",
+            stdio="stdout",
+        )
+
+    @property
+    def stderr_logger(self) -> BoundLogger:
+        """Get the logger for the plugin stderr.
+
+        Returns:
+            The logger for the plugin stderr.
+        """
+        return get_logger(
+            f"meltano.plugin.stderr.{self.plugin.type}.{self.plugin.name}",
+            stdio="stderr",
+        )
 
     def get_log_parser(self) -> str | None:
         """Get the log parser for the plugin.
