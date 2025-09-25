@@ -21,7 +21,7 @@ if t.TYPE_CHECKING:
 class TestRichStructuredExceptionRenderer:
     @pytest.fixture
     def subject(self) -> RichStructuredExceptionRenderer:
-        console = Console(no_color=True)
+        console = Console(no_color=True, highlight=False)
         return RichStructuredExceptionRenderer(console=console)
 
     @pytest.fixture
