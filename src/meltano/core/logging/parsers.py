@@ -7,7 +7,7 @@ import logging
 import typing as t
 from abc import ABC, abstractmethod
 
-from .models import ParsedLogRecord
+from .models import ParsedLogRecord, PluginException
 
 logger = logging.getLogger(__name__)  # noqa: TID251
 
@@ -71,6 +71,7 @@ class SingerSDKLogParser(LogParser):
             logger_name = data.pop("logger_name")
             timestamp = data.pop("ts")
             message = data.pop("message")
+            exception = data.pop("exception", None)
             extra = data.pop("extra", {})
 
             return ParsedLogRecord(
@@ -79,6 +80,7 @@ class SingerSDKLogParser(LogParser):
                 extra={**data, **extra},
                 timestamp=str(timestamp) if timestamp else None,
                 logger_name=logger_name,
+                exception=PluginException.from_dict(exception) if exception else None,
             )
 
         except (json.JSONDecodeError, TypeError, AttributeError) as e:

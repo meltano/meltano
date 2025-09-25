@@ -15,6 +15,7 @@ class ParsedLogRecord:
     extra: dict[str, t.Any]
     timestamp: str | None = None
     logger_name: str | None = None
+    exception: PluginException | None = None
 
 
 @dataclass

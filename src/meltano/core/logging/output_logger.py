@@ -301,7 +301,12 @@ class Out:
                 extra["plugin_logger"] = parsed_record.logger_name
 
             # Log with the parsed level and structured data
-            self.logger.log(parsed_record.level, parsed_record.message, **extra)
+            self.logger.log(
+                parsed_record.level,
+                parsed_record.message,
+                plugin_exception=parsed_record.exception,
+                **extra,
+            )
             return
 
         # Fallback to original behavior for unparseable lines

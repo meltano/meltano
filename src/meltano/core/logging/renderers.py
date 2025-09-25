@@ -27,6 +27,9 @@ class StructuredExceptionFormatter:
     """A renderer for Singer exceptions using the rich package."""
 
     no_color: bool | None = None
+    color_system: t.Literal["auto", "standard", "256", "truecolor", "windows"] = (
+        "truecolor"
+    )
     force_terminal: bool | None = None
     width: int | None = None
 
@@ -108,6 +111,7 @@ class StructuredExceptionFormatter:
         kwargs.setdefault("no_color", self.no_color)
         kwargs.setdefault("force_terminal", self.force_terminal)
         kwargs.setdefault("width", self.width)
+        kwargs.setdefault("color_system", self.color_system)
         Console(**kwargs).print(
             Panel(
                 self.format_exception_chain(exc),
