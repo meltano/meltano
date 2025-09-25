@@ -9,10 +9,10 @@ from unittest.mock import patch
 
 import pytest
 
+from meltano.core.logging.models import ParsedLogRecord
 from meltano.core.logging.parsers import (
     LogParser,
     LogParserFactory,
-    ParsedLogRecord,
     PassthroughLogParser,
     SingerSDKLogParser,
     get_parser_factory,

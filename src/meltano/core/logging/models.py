@@ -2,7 +2,19 @@
 
 from __future__ import annotations
 
+import typing as t
 from dataclasses import KW_ONLY, dataclass
+
+
+@dataclass(frozen=True, kw_only=True, slots=True)
+class ParsedLogRecord:
+    """Represents a parsed log record with structured data."""
+
+    level: int
+    message: str
+    extra: dict[str, t.Any]
+    timestamp: str | None = None
+    logger_name: str | None = None
 
 
 @dataclass

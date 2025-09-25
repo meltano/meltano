@@ -6,20 +6,10 @@ import json
 import logging
 import typing as t
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+
+from .models import ParsedLogRecord
 
 logger = logging.getLogger(__name__)  # noqa: TID251
-
-
-@dataclass(frozen=True, kw_only=True, slots=True)
-class ParsedLogRecord:
-    """Represents a parsed log record with structured data."""
-
-    level: int
-    message: str
-    extra: dict[str, t.Any]
-    timestamp: str | None = None
-    logger_name: str | None = None
 
 
 class LogParser(ABC):
