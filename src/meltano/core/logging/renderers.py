@@ -3,26 +3,32 @@
 from __future__ import annotations
 
 import typing as t
+from dataclasses import dataclass
+from io import StringIO
 
+import structlog.dev
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.tree import Tree
 
-from meltano.core.logging.models import SingerSDKException
+from meltano.core.logging.models import PluginException
 
 if t.TYPE_CHECKING:
     from collections.abc import MutableMapping
 
+    from structlog.typing import WrappedLogger
+
     from meltano.core.logging.models import TracebackFrame
 
 
-class RichStructuredExceptionRenderer:
+@dataclass
+class StructuredExceptionFormatter:
     """A renderer for Singer exceptions using the rich package."""
 
-    def __init__(self, console: Console | None = None) -> None:
-        """Initialize the RichExceptionRenderer."""
-        self.console = console or Console()
+    no_color: bool | None = None
+    force_terminal: bool | None = None
+    width: int | None = None
 
     def render_traceback_frame(self, frame: TracebackFrame) -> Text:
         """Render a single traceback frame.
@@ -42,9 +48,7 @@ class RichStructuredExceptionRenderer:
         text.append(frame.function, style="blue")
         return text
 
-    def render_exception_chain(
-        self, exc: SingerSDKException, *, depth: int = 0
-    ) -> Tree:
+    def format_exception_chain(self, exc: PluginException, *, depth: int = 0) -> Tree:
         """Render the exception chain as a tree.
 
         Args:
@@ -70,75 +74,107 @@ class RichStructuredExceptionRenderer:
         # Add cause chain
         if exc.cause:
             cause_tree = tree.add(Text("Caused by:", style="bold magenta"))
-            cause_tree.add(self.render_exception_chain(exc.cause, depth=depth + 1))
+            cause_tree.add(self.format_exception_chain(exc.cause, depth=depth + 1))
 
         # Add context chain
         if exc.context:
             context_tree = tree.add(Text("During handling of:", style="bold blue"))
-            context_tree.add(self.render_exception_chain(exc.context, depth=depth + 1))
+            context_tree.add(self.format_exception_chain(exc.context, depth=depth + 1))
 
         return tree
 
-    def render_to_console(self, exc: SingerSDKException) -> None:
+    def format(
+        self,
+        sio: t.TextIO,
+        exc: PluginException,
+        *,
+        plugin_name: str | None = None,
+        **kwargs: t.Any,
+    ) -> None:
         """Render the exception to the console.
 
         Args:
+            sio: The stream to render the exception to.
             exc: The exception to render.
+            plugin_name: The name of the plugin.
+            kwargs: Additional keyword arguments to pass to the Console.
         """
-        panel = Panel(
-            self.render_exception_chain(exc),
-            title="[bold red]Exception Details[/bold red]",
-            border_style="red",
+        title = (
+            f"[bold red]Exception Details for {plugin_name}[/bold red]"
+            if plugin_name
+            else "[bold red]Exception Details[/bold red]"
         )
-        self.console.print(panel)
+        kwargs.setdefault("file", sio)
+        kwargs.setdefault("no_color", self.no_color)
+        kwargs.setdefault("force_terminal", self.force_terminal)
+        kwargs.setdefault("width", self.width)
+        Console(**kwargs).print(
+            Panel(
+                self.format_exception_chain(exc),
+                title=title,
+                border_style="red",
+            ),
+        )
 
 
-class StructlogExceptionProcessor:
-    """Custom structlog processor for SingerException objects."""
+class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):
+    """Custom console renderer that handles our own data structures."""
 
-    def __init__(self, renderer: RichStructuredExceptionRenderer | None = None) -> None:
-        """Initialize the StructlogExceptionProcessor.
+    def __init__(
+        self,
+        *args,  # noqa: ANN002
+        plugin_exception_renderer: StructuredExceptionFormatter | None = None,
+        **kwargs,  # noqa: ANN003
+    ) -> None:
+        """Initialize the MeltanoConsoleRenderer.
 
         Args:
-            renderer: The renderer to use.
+            args: Arguments to pass to the parent class.
+            plugin_exception_renderer: The renderer to use for plugin exceptions.
+            kwargs: Keyword arguments to pass to the parent class.
         """
-        self.renderer = renderer or RichStructuredExceptionRenderer()
+        super().__init__(*args, **kwargs)
+        self._plugin_exception_formatter = (
+            plugin_exception_renderer or StructuredExceptionFormatter()
+        )
 
     def __call__(
         self,
-        logger: t.Any,  # noqa: ANN401, ARG002
-        method_name: str,
+        logger: WrappedLogger,
+        name: str,
         event_dict: MutableMapping[str, t.Any],
-    ) -> MutableMapping[str, t.Any]:
-        """Process log events containing SingerException.
-
-        Docs: https://www.structlog.org/en/stable/processors.html.
+    ) -> str:
+        """Render the event dictionary to the console.
 
         Args:
             logger: Wrapped logger object.
-            method_name: The name of the wrapped method. If you called
-                `log.warning("foo")`, it will be `"warning"`.
+            name: The name of the wrapped logger.
             event_dict: Current context together with the current event. If the context
                 was `{"a": 42}` and the event is `"foo"`, the initial event_dict will be
                 `{"a": 42, "event": "foo"}`.
 
         Returns:
-            The event dictionary.
+            The rendered event dictionary.
         """
         if (
-            "exception" in event_dict  # TODO: Rename to "sdk_exception"?
-            and isinstance(event_dict["exception"], SingerSDKException)
+            (exc := event_dict.pop("plugin_exception", None))  # WOLOLO
+            and isinstance(exc, PluginException)
         ):
-            exc = event_dict["exception"]
+            sio = StringIO()
 
             # Add formatted exception info to the event
-            event_dict["exc_type"] = f"{exc.module}.{exc.type}"
-            event_dict["exc_message"] = exc.message
+            event_dict["plugin_exc_type"] = exc.type
+            event_dict["plugin_exc_message"] = exc.message
 
-            # If this is an ERROR level log, we might want to render it
-            if method_name == "error":
-                self.renderer.render_to_console(exc)
-                # Remove the raw exception object to avoid double rendering
-                event_dict.pop("exception", None)
+            if name == "error":
+                # Render the regular log message
+                regular_output = super().__call__(logger, name, event_dict)
+                # Then render the exception
+                self._plugin_exception_formatter.format(
+                    sio,
+                    exc,
+                    plugin_name=event_dict.get("string_id"),
+                )
+                return sio.getvalue() + "\n" + regular_output
 
-        return event_dict
+        return super().__call__(logger, name, event_dict)
