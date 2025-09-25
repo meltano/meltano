@@ -21,6 +21,7 @@ from meltano.core.runner import RunnerError
 
 from .formatters import get_default_foreign_pre_chain
 from .parsers import get_parser_factory
+from .renderers import MeltanoConsoleRenderer
 from .utils import capture_subprocess_output
 
 StrPath: t.TypeAlias = str | os.PathLike[str]
@@ -179,7 +180,7 @@ class Out:
             logging.FileHandler using an uncolorized console formatter
         """
         formatter = structlog.stdlib.ProcessorFormatter(
-            processor=structlog.dev.ConsoleRenderer(
+            processor=MeltanoConsoleRenderer(
                 colors=False,
                 exception_formatter=structlog.dev.plain_traceback,
             ),

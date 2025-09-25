@@ -20,6 +20,8 @@ from meltano.core.logging.formatters import (
 )
 from meltano.core.utils import get_no_color_flag
 
+from .renderers import MeltanoConsoleRenderer
+
 logger = structlog.getLogger(__name__)
 
 if sys.version_info >= (3, 11):
@@ -119,7 +121,7 @@ def default_config(
                 )
             formatter_config = {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(
+                "processor": MeltanoConsoleRenderer(
                     colors=not no_color,
                     exception_formatter=formatter,
                 ),
@@ -147,7 +149,7 @@ def default_config(
         case LogFormat.uncolored:
             formatter_config = {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(
+                "processor": MeltanoConsoleRenderer(
                     colors=False,
                     exception_formatter=rich_exception_formatter_factory(
                         no_color=True,

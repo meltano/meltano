@@ -13,6 +13,8 @@ from rich.traceback import Traceback, install
 
 from meltano.core.utils import get_boolean_env_var, get_no_color_flag
 
+from .renderers import MeltanoConsoleRenderer
+
 if sys.version_info >= (3, 11):
     from typing import Unpack  # noqa: ICN003
 else:
@@ -186,7 +188,7 @@ def console_log_formatter(
     return _process_formatter(
         *_processors_from_kwargs(callsite_parameters=callsite_parameters),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-        structlog.dev.ConsoleRenderer(
+        MeltanoConsoleRenderer(
             colors=colors,
             exception_formatter=exception_formatter,
         ),
