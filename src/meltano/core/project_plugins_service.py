@@ -306,7 +306,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         for plugin in self.plugins(ensure_parent=False):
             if (
-                plugin.name == plugin_name  # (with too much logic)
+                plugin.name == plugin_name
                 and (plugin_type is None or plugin.type == plugin_type)
                 and (
                     invokable is None

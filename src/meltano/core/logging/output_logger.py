@@ -78,7 +78,7 @@ class OutputLogger:
 class LineWriter:
     """Line Writer."""
 
-    def __init__(self, out) -> None:  # noqa: ANN001
+    def __init__(self, out: Out) -> None:
         """Instantiate a Line Writer.
 
         Args:

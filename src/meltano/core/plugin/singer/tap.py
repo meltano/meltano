@@ -20,6 +20,8 @@ import anyio
 import structlog
 
 from meltano.core.behavior.hookable import hook
+from meltano.core.logging import capture_subprocess_output
+from meltano.core.logging.output_logger import OutputLogger
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
@@ -37,7 +39,6 @@ from .catalog import (
 )
 
 if t.TYPE_CHECKING:
-    from asyncio.streams import StreamReader
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -70,52 +71,6 @@ async def _stream_redirect(
                 await file_like_obj.write(data.decode(encoding) if write_str else data)
             else:
                 file_like_obj.write(data.decode(encoding) if write_str else data)
-
-
-def _debug_logging_handler(
-    name: str,
-    plugin_invoker: PluginInvoker,
-    stderr: StreamReader,
-    *other_dsts,  # noqa: ANN002
-) -> asyncio.Task[None]:
-    """Route debug log lines.
-
-    Routes to stderr, or an `OutputLogger` if one is present in our invocation
-    context.
-
-    Args:
-        name: name of the plugin
-        plugin_invoker: the PluginInvoker to route log lines for
-        stderr: stderr StreamReader to route to
-        other_dsts: other destinations that the stream should be routed too
-            along with logging output
-
-    Returns:
-        asyncio.Task which performs the routing of log lines
-    """
-    if not plugin_invoker.context or not plugin_invoker.context.base_output_logger:
-        return asyncio.ensure_future(
-            _stream_redirect(
-                stderr,
-                sys.stderr,
-                *other_dsts,
-                write_str=True,
-            ),
-        )
-
-    out = plugin_invoker.context.base_output_logger.out(
-        name,
-        logger.bind(type="discovery", stdio="stderr"),
-    )
-    with out.line_writer() as outerr:
-        return asyncio.ensure_future(
-            _stream_redirect(
-                stderr,
-                outerr,
-                *other_dsts,
-                write_str=True,
-            ),
-        )
 
 
 def config_metadata_rules(config: dict[str, t.Any]) -> list[MetadataRule]:
@@ -503,15 +458,17 @@ class SingerTap(SingerPlugin):
                         asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
                         asyncio.ensure_future(handle.wait()),
                     ]
-                    if logger.isEnabledFor(logging.DEBUG) and handle.stderr:
-                        invoke_futures.append(
-                            _debug_logging_handler(
-                                self.name,
-                                plugin_invoker,
-                                handle.stderr,
-                                stderr_buff,
-                            ),
+                    if (
+                        plugin_invoker.stderr_logger.isEnabledFor(logging.DEBUG)
+                        and handle.stderr is not None
+                    ):
+                        out = OutputLogger("discovery.log").out(
+                            self.name,
+                            plugin_invoker.stderr_logger.bind(type="discovery"),
+                            log_parser=plugin_invoker.get_log_parser(),
                         )
+                        future = capture_subprocess_output(handle.stderr, out)
+                        invoke_futures.append(asyncio.ensure_future(future))
                     else:
                         invoke_futures.append(
                             asyncio.ensure_future(

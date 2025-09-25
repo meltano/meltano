@@ -166,11 +166,6 @@ def plugin_command_invoker(
     Returns:
         InvokerCommand
     """
-    stderr_log = logger.bind(
-        stdio="stderr",
-        cmd_type="command",
-    )
-
     _, session_maker = project_engine(project)
     session = session_maker()
 
@@ -191,7 +186,7 @@ def plugin_command_invoker(
     )
     invoker_log = output_logger.out(
         plugin.name,
-        stderr_log,
+        invoker.stderr_logger.bind(cmd_type="command"),
         log_parser=invoker.get_log_parser(),
     )
 
