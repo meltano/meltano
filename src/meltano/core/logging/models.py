@@ -80,7 +80,7 @@ class PluginException:
 
     def to_dict(self) -> dict:
         """Convert the PluginException to a dictionary."""
-        result = {
+        result: dict[str, t.Any] = {
             "type": self.type,
             "module": self.module,
             "message": self.message,
