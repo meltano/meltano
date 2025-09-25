@@ -57,7 +57,7 @@ def exception() -> PluginException:
 
 @pytest.fixture
 def formatter() -> StructuredExceptionFormatter:
-    return StructuredExceptionFormatter(force_terminal=False, width=80)
+    return StructuredExceptionFormatter(force_terminal=False, width=80, no_color=True)
 
 
 @pytest.fixture
