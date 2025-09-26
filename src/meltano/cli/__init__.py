@@ -79,9 +79,9 @@ setup_logging()
 logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to \
+Need help fixing this problem? Visit https://melta.no/ for troubleshooting steps, or to \
 join our friendly Slack community.
-"""
+"""  # noqa: E501
 
 
 def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
