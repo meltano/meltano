@@ -70,21 +70,23 @@ def formatter() -> StructuredExceptionFormatter:
 @pytest.fixture
 def expected_output() -> str:
     return dedent("""\
-        ╭──────────────────────── Error Details ─────────────────────────╮
+        ╭──────────────────────── Error details ─────────────────────────╮
         │ my_package.my_module.CustomException: Custom exception message │
         │                                                                │
         │ my_module.py:10 in my_function                                 │
         │                                                                │
         │   10 raise CustomExceptio('Custom exception message') from err │
         │                                                                │
-        │ Caused by:                                                     │
+        │                           Caused by:                           │
+        │                                                                │
         │ builtins.ValueError: Invalid value provided                    │
         │                                                                │
         │ my_module.py:8 in my_function                                  │
         │                                                                │
         │   8 raise ValueError('Invalid value provided')                 │
         │                                                                │
-        │ During handling of:                                            │
+        │                      During handling of:                       │
+        │                                                                │
         │ builtins.ValueError: An invalid value was provided             │
         ╰────────────────────────────────────────────────────────────────╯
     """)

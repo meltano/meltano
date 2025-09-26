@@ -105,15 +105,23 @@ class StructuredExceptionFormatter:
                 )
 
         # Add cause chain
-        # TODO: Make these prettier
         if exc.cause:
-            yield Text.assemble(("Caused by:", "bold magenta"))
+            yield Text(
+                "Caused by:",
+                justify="center",
+                style="bold magenta italic",
+            )
+            yield ""
             yield self.format_exception_chain(exc.cause, depth=depth + 1)
 
         # Add context chain
-        # TODO: Make these prettier
         if exc.context:
-            yield Text.assemble(("During handling of:", "bold blue"))
+            yield Text(
+                "During handling of:",
+                justify="center",
+                style="bold blue italic",
+            )
+            yield ""
             yield self.format_exception_chain(exc.context, depth=depth + 1)
 
     def format(
@@ -133,9 +141,9 @@ class StructuredExceptionFormatter:
             kwargs: Additional keyword arguments to pass to the Console.
         """
         title = (
-            f"[traceback.title]Error Details for {plugin_name}"
+            f"[traceback.title]Error details for {plugin_name}"
             if plugin_name
-            else "[traceback.title]Error Details"
+            else "[traceback.title]Error details"
         )
         kwargs.setdefault("file", sio)
         kwargs.setdefault("no_color", self.no_color)
