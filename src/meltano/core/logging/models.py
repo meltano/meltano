@@ -105,3 +105,7 @@ class PluginException:
         if self.context:
             result["context"] = self.context.to_dict()
         return result
+
+    def __structlog__(self) -> dict:
+        """Convert the PluginException to a dictionary."""
+        return self.to_dict()

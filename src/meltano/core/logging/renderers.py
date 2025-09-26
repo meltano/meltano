@@ -157,7 +157,7 @@ class StructuredExceptionFormatter:
         Console(**kwargs).print(self.render_exception(exc, plugin_name=plugin_name))
 
 
-class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):
+class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
     """Custom console renderer that handles our own data structures."""
 
     def __init__(

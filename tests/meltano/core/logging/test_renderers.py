@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
 import typing as t
 from io import StringIO
 from textwrap import dedent
 
 import pytest
+import structlog
+import structlog.processors
 
 from meltano.core.logging.models import PluginException, TracebackFrame
 from meltano.core.logging.renderers import (
@@ -96,7 +99,7 @@ def expected_output() -> str:
     """)
 
 
-class TestStructuredExceptionFormatter:
+class TestPluginException:
     def test_to_dict_and_back(self) -> None:
         exception = PluginException(
             type="CustomException",
@@ -130,6 +133,21 @@ class TestStructuredExceptionFormatter:
         )
         assert PluginException.from_dict(exception_data.to_dict()) == exception_data
 
+    def test_to_structlog(self) -> None:
+        exception = PluginException(
+            type="CustomException",
+            module="my_package.my_module",
+            message="Custom exception message",
+        )
+        processor = structlog.processors.JSONRenderer()
+        logger = structlog.get_logger()
+        event_dict = {"plugin_exception": exception}
+        assert json.loads(processor(logger, "info", event_dict)) == {
+            "plugin_exception": exception.to_dict(),
+        }
+
+
+class TestStructuredExceptionFormatter:
     def test_simple_exception(self, formatter: StructuredExceptionFormatter) -> None:
         exception = PluginException(
             type="CustomException",
