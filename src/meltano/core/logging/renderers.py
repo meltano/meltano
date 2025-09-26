@@ -7,16 +7,18 @@ from dataclasses import dataclass
 from io import StringIO
 
 import structlog.dev
-from rich.console import Console
+from rich.console import Console, group
 from rich.panel import Panel
+from rich.syntax import Syntax
 from rich.text import Text
-from rich.tree import Tree
+from rich.traceback import PathHighlighter
 
 from meltano.core.logging.models import PluginException
 
 if t.TYPE_CHECKING:
     from collections.abc import MutableMapping
 
+    from rich.console import RenderResult
     from structlog.typing import WrappedLogger
 
     from meltano.core.logging.models import TracebackFrame
@@ -42,16 +44,24 @@ class StructuredExceptionFormatter:
         Returns:
             The rendered traceback frame.
         """
-        text = Text()
-        text.append("  File ", style="dim")
-        text.append(f'"{frame.filename}"', style="cyan")
-        text.append(", line ", style="dim")
-        text.append(str(frame.lineno), style="yellow")
-        text.append(", in ", style="dim")
-        text.append(frame.function, style="blue")
-        return text
+        path_highlighter = PathHighlighter()
 
-    def format_exception_chain(self, exc: PluginException, *, depth: int = 0) -> Tree:
+        return Text.assemble(
+            path_highlighter(Text(frame.filename, style="pygments.string")),
+            (":", "pygments.text"),
+            (str(frame.lineno), "pygments.number"),
+            " in ",
+            (frame.function, "pygments.function"),
+            style="pygments.text",
+        )
+
+    @group()
+    def format_exception_chain(
+        self,
+        exc: PluginException,
+        *,
+        depth: int = 0,
+    ) -> RenderResult:
         """Render the exception chain as a tree.
 
         Args:
@@ -62,29 +72,49 @@ class StructuredExceptionFormatter:
             The rendered exception chain.
         """
         # Create the main exception node
-        exc_text = Text()
-        exc_text.append(f"{exc.module}.{exc.type}", style="bold red")
-        exc_text.append(f": {exc.message}", style="red")
-
-        tree = Tree(exc_text)
+        yield Text.assemble(
+            (f"{exc.module}.{exc.type}", "bold red"),
+            (f": {exc.message}", "red"),
+        )
 
         # Add traceback if present
         if exc.traceback:
-            tb_tree = tree.add(Text("Traceback:", style="bold yellow"))
-            for frame in exc.traceback:
-                tb_tree.add(self.render_traceback_frame(frame))
+            yield ""
+
+            frames = list(reversed(exc.traceback[-3:]))
+            num_skipped = max(len(exc.traceback) - 3, 0)
+            for frame in frames:
+                yield self.render_traceback_frame(frame)
+                yield ""
+                yield Syntax(
+                    frame.line.rstrip(),
+                    "python",
+                    start_line=frame.lineno,
+                    line_numbers=True,
+                    word_wrap=False,
+                    indent_guides=True,
+                    theme=Syntax.get_theme("ansi_dark"),
+                )
+                yield ""
+
+            if num_skipped > 0:
+                yield Text(
+                    f"\n... {num_skipped} frames hidden ...",
+                    justify="center",
+                    style="traceback.error",
+                )
 
         # Add cause chain
+        # TODO: Make these prettier
         if exc.cause:
-            cause_tree = tree.add(Text("Caused by:", style="bold magenta"))
-            cause_tree.add(self.format_exception_chain(exc.cause, depth=depth + 1))
+            yield Text.assemble(("Caused by:", "bold magenta"))
+            yield self.format_exception_chain(exc.cause, depth=depth + 1)
 
         # Add context chain
+        # TODO: Make these prettier
         if exc.context:
-            context_tree = tree.add(Text("During handling of:", style="bold blue"))
-            context_tree.add(self.format_exception_chain(exc.context, depth=depth + 1))
-
-        return tree
+            yield Text.assemble(("During handling of:", "bold blue"))
+            yield self.format_exception_chain(exc.context, depth=depth + 1)
 
     def format(
         self,
@@ -103,9 +133,9 @@ class StructuredExceptionFormatter:
             kwargs: Additional keyword arguments to pass to the Console.
         """
         title = (
-            f"[bold red]Exception Details for {plugin_name}[/bold red]"
+            f"[traceback.title]Error Details for {plugin_name}"
             if plugin_name
-            else "[bold red]Exception Details[/bold red]"
+            else "[traceback.title]Error Details"
         )
         kwargs.setdefault("file", sio)
         kwargs.setdefault("no_color", self.no_color)
@@ -116,7 +146,9 @@ class StructuredExceptionFormatter:
             Panel(
                 self.format_exception_chain(exc),
                 title=title,
-                border_style="red",
+                border_style="traceback.border",
+                expand=False,
+                padding=(0, 1),
             ),
         )
 

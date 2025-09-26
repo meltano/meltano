@@ -37,6 +37,7 @@ def exception() -> PluginException:
                     filename="my_module.py",
                     function="my_function",
                     lineno=8,
+                    line="raise ValueError('Invalid value provided')",
                 ),
             ],
             context=PluginException(
@@ -50,6 +51,7 @@ def exception() -> PluginException:
                 filename="my_module.py",
                 function="my_function",
                 lineno=10,
+                line="raise CustomExceptio('Custom exception message') from err",
             ),
         ],
     )
@@ -68,17 +70,23 @@ def formatter() -> StructuredExceptionFormatter:
 @pytest.fixture
 def expected_output() -> str:
     return dedent("""\
-        ╭───────────────────────────── Exception Details ──────────────────────────────╮
-        │ my_package.my_module.CustomException: Custom exception message               │
-        │ ├── Traceback:                                                               │
-        │ │   └──   File "my_module.py", line 10, in my_function                       │
-        │ └── Caused by:                                                               │
-        │     └── builtins.ValueError: Invalid value provided                          │
-        │         ├── Traceback:                                                       │
-        │         │   └──   File "my_module.py", line 8, in my_function                │
-        │         └── During handling of:                                              │
-        │             └── builtins.ValueError: An invalid value was provided           │
-        ╰──────────────────────────────────────────────────────────────────────────────╯
+        ╭──────────────────────── Error Details ─────────────────────────╮
+        │ my_package.my_module.CustomException: Custom exception message │
+        │                                                                │
+        │ my_module.py:10 in my_function                                 │
+        │                                                                │
+        │   10 raise CustomExceptio('Custom exception message') from err │
+        │                                                                │
+        │ Caused by:                                                     │
+        │ builtins.ValueError: Invalid value provided                    │
+        │                                                                │
+        │ my_module.py:8 in my_function                                  │
+        │                                                                │
+        │   8 raise ValueError('Invalid value provided')                 │
+        │                                                                │
+        │ During handling of:                                            │
+        │ builtins.ValueError: An invalid value was provided             │
+        ╰────────────────────────────────────────────────────────────────╯
     """)
 
 
@@ -100,6 +108,7 @@ class TestStructuredExceptionFormatter:
                     filename="my_module.py",
                     function="my_function",
                     lineno=8,
+                    line="raise ValueError('Invalid value provided')",
                 ),
             ],
             cause=PluginException(

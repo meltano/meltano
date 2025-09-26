@@ -28,6 +28,8 @@ class TracebackFrame:
     function: str
     #: The line number location of the frame.
     lineno: int
+    #: The line of code in the original file.
+    line: str
 
 
 @dataclass
@@ -62,6 +64,7 @@ class PluginException:
                     filename=frame["filename"],
                     function=frame["function"],
                     lineno=frame["lineno"],
+                    line=frame["line"],
                 )
                 for frame in exc_traceback
             ]
@@ -93,6 +96,7 @@ class PluginException:
                     "filename": frame.filename,
                     "function": frame.function,
                     "lineno": frame.lineno,
+                    "line": frame.line,
                 }
                 for frame in self.traceback
             ]
