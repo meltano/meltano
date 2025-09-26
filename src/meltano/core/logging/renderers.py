@@ -34,6 +34,7 @@ class StructuredExceptionFormatter:
     )
     force_terminal: bool | None = None
     width: int | None = None
+    legacy_windows: bool | None = None
 
     @group()
     def _render_exception(self, exc: PluginException) -> RenderResult:
@@ -154,6 +155,7 @@ class StructuredExceptionFormatter:
         kwargs.setdefault("force_terminal", self.force_terminal)
         kwargs.setdefault("width", self.width)
         kwargs.setdefault("color_system", self.color_system)
+        kwargs.setdefault("legacy_windows", self.legacy_windows)
         Console(**kwargs).print(self.render_exception(exc, plugin_name=plugin_name))
 
 

@@ -54,7 +54,7 @@ def exception() -> PluginException:
                 filename="my_module.py",
                 function="my_function",
                 lineno=10,
-                line="raise CustomExceptio('Custom exception message') from err",
+                line="raise CustomException('Custom exception message') from err",
             ),
         ],
     )
@@ -67,6 +67,7 @@ def formatter() -> StructuredExceptionFormatter:
         width=80,
         no_color=True,
         color_system="auto",
+        legacy_windows=False,
     )
 
 
@@ -77,7 +78,7 @@ def expected_output() -> str:
         │                                                                              │
         │ my_module.py:10 in my_function                                               │
         │                                                                              │
-        │   10 raise CustomExceptio('Custom exception message') from err               │
+        │   10 raise CustomException('Custom exception message') from err              │
         │                                                                              │
         ╰──────────────────────────────────────────────────────────────────────────────╯
         CustomException: Custom exception message
