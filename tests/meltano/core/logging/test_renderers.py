@@ -130,6 +130,16 @@ class TestStructuredExceptionFormatter:
         )
         assert PluginException.from_dict(exception_data.to_dict()) == exception_data
 
+    def test_simple_exception(self, formatter: StructuredExceptionFormatter) -> None:
+        exception = PluginException(
+            type="CustomException",
+            module="my_package.my_module",
+            message="Custom exception message",
+        )
+        buffer = StringIO()
+        formatter.format(buffer, exception)
+        assert buffer.getvalue() == "CustomException: Custom exception message\n"
+
     def test_render(
         self,
         formatter: StructuredExceptionFormatter,
