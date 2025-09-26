@@ -8,6 +8,8 @@ from io import StringIO
 
 import structlog.dev
 from rich.console import Console, group
+from rich.constrain import Constrain
+from rich.highlighter import ReprHighlighter
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.text import Text
@@ -21,8 +23,6 @@ if t.TYPE_CHECKING:
     from rich.console import RenderResult
     from structlog.typing import WrappedLogger
 
-    from meltano.core.logging.models import TracebackFrame
-
 
 @dataclass
 class StructuredExceptionFormatter:
@@ -35,47 +35,17 @@ class StructuredExceptionFormatter:
     force_terminal: bool | None = None
     width: int | None = None
 
-    def render_traceback_frame(self, frame: TracebackFrame) -> Text:
-        """Render a single traceback frame.
-
-        Args:
-            frame: The traceback frame to render.
-
-        Returns:
-            The rendered traceback frame.
-        """
-        path_highlighter = PathHighlighter()
-
-        return Text.assemble(
-            path_highlighter(Text(frame.filename, style="pygments.string")),
-            (":", "pygments.text"),
-            (str(frame.lineno), "pygments.number"),
-            " in ",
-            (frame.function, "pygments.function"),
-            style="pygments.text",
-        )
-
     @group()
-    def format_exception_chain(
-        self,
-        exc: PluginException,
-        *,
-        depth: int = 0,
-    ) -> RenderResult:
-        """Render the exception chain as a tree.
+    def _render_exception(self, exc: PluginException) -> RenderResult:
+        """Render a single exception.
 
         Args:
             exc: The exception to render.
-            depth: The depth of the exception chain.
 
         Returns:
-            The rendered exception chain.
+            The rendered exception.
         """
-        # Create the main exception node
-        yield Text.assemble(
-            (f"{exc.module}.{exc.type}", "bold red"),
-            (f": {exc.message}", "red"),
-        )
+        path_highlighter = PathHighlighter()
 
         # Add traceback if present
         if exc.traceback:
@@ -84,7 +54,14 @@ class StructuredExceptionFormatter:
             frames = list(reversed(exc.traceback[-3:]))
             num_skipped = max(len(exc.traceback) - 3, 0)
             for frame in frames:
-                yield self.render_traceback_frame(frame)
+                yield Text.assemble(
+                    path_highlighter(Text(frame.filename, style="pygments.string")),
+                    (":", "pygments.text"),
+                    (str(frame.lineno), "pygments.number"),
+                    " in ",
+                    (frame.function, "pygments.function"),
+                    style="pygments.text",
+                )
                 yield ""
                 yield Syntax(
                     frame.line.rstrip(),
@@ -104,25 +81,57 @@ class StructuredExceptionFormatter:
                     style="traceback.error",
                 )
 
+    @group()
+    def render_exception(
+        self,
+        exc: PluginException,
+        *,
+        plugin_name: str | None = None,
+    ) -> RenderResult:
+        """Render the exception chain.
+
+        Args:
+            exc: The exception to render.
+            plugin_name: The name of the plugin.
+
+        Returns:
+            The rendered exception chain.
+        """
+        title = (
+            f"[traceback.title]Error details for {plugin_name}"
+            if plugin_name
+            else "[traceback.title]Error details"
+        )
+        highlighter = ReprHighlighter()
+
+        if exc.traceback:
+            panel = Panel(
+                self._render_exception(exc),
+                title=title,
+                border_style="traceback.border",
+                expand=True,
+                padding=(0, 1),
+            )
+            yield Constrain(panel, self.width)
+
+        yield Text.assemble(
+            (f"{exc.type}: ", "traceback.exc_type"),
+            highlighter(exc.message),
+        )
+
         # Add cause chain
         if exc.cause:
-            yield Text(
-                "Caused by:",
-                justify="center",
-                style="bold magenta italic",
+            yield Text.from_markup(
+                "\n[i]The above exception was the direct cause of the following exception:\n",  # noqa: E501
             )
-            yield ""
-            yield self.format_exception_chain(exc.cause, depth=depth + 1)
+            yield self.render_exception(exc.cause)
 
         # Add context chain
         if exc.context:
-            yield Text(
-                "During handling of:",
-                justify="center",
-                style="bold blue italic",
+            yield Text.from_markup(
+                "\n[i]During handling of the above exception, another exception occurred:\n",  # noqa: E501
             )
-            yield ""
-            yield self.format_exception_chain(exc.context, depth=depth + 1)
+            yield self.render_exception(exc.context)
 
     def format(
         self,
@@ -140,25 +149,12 @@ class StructuredExceptionFormatter:
             plugin_name: The name of the plugin.
             kwargs: Additional keyword arguments to pass to the Console.
         """
-        title = (
-            f"[traceback.title]Error details for {plugin_name}"
-            if plugin_name
-            else "[traceback.title]Error details"
-        )
         kwargs.setdefault("file", sio)
         kwargs.setdefault("no_color", self.no_color)
         kwargs.setdefault("force_terminal", self.force_terminal)
         kwargs.setdefault("width", self.width)
         kwargs.setdefault("color_system", self.color_system)
-        Console(**kwargs).print(
-            Panel(
-                self.format_exception_chain(exc),
-                title=title,
-                border_style="traceback.border",
-                expand=False,
-                padding=(0, 1),
-            ),
-        )
+        Console(**kwargs).print(self.render_exception(exc, plugin_name=plugin_name))
 
 
 class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):
