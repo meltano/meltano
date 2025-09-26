@@ -77,7 +77,7 @@ class StructuredExceptionFormatter:
 
         if num_skipped > 0:
             yield Text(
-                f"\n... {num_skipped} frames hidden ...",
+                f"... {num_skipped} frames hidden ...",
                 justify="center",
                 style="traceback.error",
             )

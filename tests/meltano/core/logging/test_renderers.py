@@ -178,6 +178,44 @@ class TestStructuredExceptionFormatter:
             "ValueError: Invalid value provided\n"
         )
 
+    def test_hidden_tracebacks(self, formatter: StructuredExceptionFormatter) -> None:
+        expected_output = dedent("""\
+        ╭─────────────────────────────── Error details ────────────────────────────────╮
+        │                                                                              │
+        │ my_module.py:5 in my_function                                                │
+        │                                                                              │
+        │   5 raise RuntimeError()                                                     │
+        │                                                                              │
+        │ my_module.py:4 in my_function                                                │
+        │                                                                              │
+        │   4 raise RuntimeError()                                                     │
+        │                                                                              │
+        │ my_module.py:3 in my_function                                                │
+        │                                                                              │
+        │   3 raise RuntimeError()                                                     │
+        │                                                                              │
+        │                           ... 3 frames hidden ...                            │
+        ╰──────────────────────────────────────────────────────────────────────────────╯
+        CustomException: Custom exception message
+        """)
+        exception = PluginException(
+            type="CustomException",
+            module="my_package.my_module",
+            message="Custom exception message",
+            traceback=[
+                TracebackFrame(
+                    filename="my_module.py",
+                    function="my_function",
+                    lineno=i,
+                    line="raise RuntimeError()",
+                )
+                for i in range(6)
+            ],
+        )
+        buffer = StringIO()
+        formatter.format(buffer, exception)
+        assert buffer.getvalue() == expected_output
+
     def test_render(
         self,
         formatter: StructuredExceptionFormatter,
