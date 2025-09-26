@@ -52,6 +52,7 @@ jobs:
         - { python-version: '3.11', os: ubuntu-latest, backend-db: mssql, id: 'py311-ubuntu-mssql' }
         - { python-version: '3.12', os: ubuntu-latest, backend-db: mssql, id: 'py312-ubuntu-mssql' }
         - { python-version: '3.13', os: ubuntu-latest, backend-db: mssql, id: 'py313-ubuntu-mssql' }
+        - { python-version: '3.14', os: ubuntu-latest, backend-db: mssql, id: 'py314-ubuntu-mssql' }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         - { python-version: '3.10', os: windows-2025,  backend-db: sqlite, id: 'py310-windows-sqlite' }
         - { python-version: '3.11', os: windows-2025,  backend-db: sqlite, id: 'py311-windows-sqlite' }
