@@ -23,6 +23,8 @@ if t.TYPE_CHECKING:
     from rich.console import RenderResult
     from structlog.typing import WrappedLogger
 
+    from meltano.core.logging.models import TracebackFrame
+
 
 @dataclass
 class StructuredExceptionFormatter:
@@ -37,50 +39,48 @@ class StructuredExceptionFormatter:
     legacy_windows: bool | None = None
 
     @group()
-    def _render_exception(self, exc: PluginException) -> RenderResult:
+    def _render_traceback(self, traceback: list[TracebackFrame]) -> RenderResult:
         """Render a single exception.
 
         Args:
-            exc: The exception to render.
+            traceback: The traceback frames to render.
 
         Returns:
-            The rendered exception.
+            The rendered traceback.
         """
         path_highlighter = PathHighlighter()
 
-        # Add traceback if present
-        if exc.traceback:
+        yield ""
+
+        frames = list(reversed(traceback[-3:]))
+        num_skipped = max(len(traceback) - 3, 0)
+        for frame in frames:
+            yield Text.assemble(
+                path_highlighter(Text(frame.filename, style="pygments.string")),
+                (":", "pygments.text"),
+                (str(frame.lineno), "pygments.number"),
+                " in ",
+                (frame.function, "pygments.function"),
+                style="pygments.text",
+            )
+            yield ""
+            yield Syntax(
+                frame.line.rstrip(),
+                "python",
+                start_line=frame.lineno,
+                line_numbers=True,
+                word_wrap=False,
+                indent_guides=True,
+                theme=Syntax.get_theme("ansi_dark"),
+            )
             yield ""
 
-            frames = list(reversed(exc.traceback[-3:]))
-            num_skipped = max(len(exc.traceback) - 3, 0)
-            for frame in frames:
-                yield Text.assemble(
-                    path_highlighter(Text(frame.filename, style="pygments.string")),
-                    (":", "pygments.text"),
-                    (str(frame.lineno), "pygments.number"),
-                    " in ",
-                    (frame.function, "pygments.function"),
-                    style="pygments.text",
-                )
-                yield ""
-                yield Syntax(
-                    frame.line.rstrip(),
-                    "python",
-                    start_line=frame.lineno,
-                    line_numbers=True,
-                    word_wrap=False,
-                    indent_guides=True,
-                    theme=Syntax.get_theme("ansi_dark"),
-                )
-                yield ""
-
-            if num_skipped > 0:
-                yield Text(
-                    f"\n... {num_skipped} frames hidden ...",
-                    justify="center",
-                    style="traceback.error",
-                )
+        if num_skipped > 0:
+            yield Text(
+                f"\n... {num_skipped} frames hidden ...",
+                justify="center",
+                style="traceback.error",
+            )
 
     @group()
     def render_exception(
@@ -107,7 +107,7 @@ class StructuredExceptionFormatter:
 
         if exc.traceback:
             panel = Panel(
-                self._render_exception(exc),
+                self._render_traceback(exc.traceback),
                 title=title,
                 border_style="traceback.border",
                 expand=True,

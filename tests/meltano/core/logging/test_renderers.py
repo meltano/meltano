@@ -159,6 +159,25 @@ class TestStructuredExceptionFormatter:
         formatter.format(buffer, exception)
         assert buffer.getvalue() == "CustomException: Custom exception message\n"
 
+    def test_no_tracebacks(self, formatter: StructuredExceptionFormatter) -> None:
+        exception = PluginException(
+            type="CustomException",
+            module="my_package.my_module",
+            message="Custom exception message",
+            cause=PluginException(
+                type="ValueError",
+                module="builtins",
+                message="Invalid value provided",
+            ),
+        )
+        buffer = StringIO()
+        formatter.format(buffer, exception)
+        assert buffer.getvalue() == (
+            "CustomException: Custom exception message\n\n"
+            "The above exception was the direct cause of the following exception:\n\n"
+            "ValueError: Invalid value provided\n"
+        )
+
     def test_render(
         self,
         formatter: StructuredExceptionFormatter,
