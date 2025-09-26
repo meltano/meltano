@@ -47,13 +47,25 @@ A logging.yaml contains a few key sections that you should be aware of.
 A few key points to note:
 
 1. Different handlers can use different formats. Meltano ships with [3 formatters](https://github.com/meltano/meltano/blob/main/src/meltano/core/logging/formatters.py):
-   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library. Supports `colors` (bool), `show_locals` (bool), `max_frames` (int, default: 2), and `utc` (bool) parameters.
+   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library. Supports `colors` (bool), `show_locals` (bool), `max_frames` (int, default: 2), `all_keys` (bool), and `include_keys` (set[str]) parameters. By default, only essential keys are displayed for cleaner output.
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
    - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
-2. Different loggers can use different handlers and log at different log levels.
-3. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
-4. If a logging config file is found, it will take precedence over the `--log-format` and `--log-level` CLI options.
+2. **Console output filtering**: By default, the console formatter displays only essential log keys for cleaner output. The default keys include:
+   - Base keys: `timestamp`, `level`, `event`, `logger`, `logger_name`
+   - Plugin subprocess keys: `string_id`
+   - Plugin structured logging keys: `plugin_exception`, `metric_info`
+
+   You can control this behavior using the `all_keys` and `include_keys` parameters in your logging configuration. When both `all_keys` and `include_keys` are specified,
+   **`include_keys` takes precedence**. The behavior is:
+
+   1. If `include_keys` is set (regardless of `all_keys`): Shows default keys + specified keys
+   2. If only `all_keys: true` is set: Shows all keys
+   3. If neither is set (default): Shows only default keys
+
+3. Different loggers can use different handlers and log at different log levels.
+4. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
+5. If a logging config file is found, it will take precedence over the `--log-format` and `--log-level` CLI options.
 
 Here's an annotated example of a logging.yaml file:
 
@@ -67,6 +79,10 @@ formatters:
   structured_colored:
     (): meltano.core.logging.console_log_formatter
     colors: true
+  structured_colored_all_keys: # log format with colored output showing all log keys
+    (): meltano.core.logging.console_log_formatter
+    colors: true
+    all_keys: true # displays all log keys instead of just the default set
   structured_plain_no_locals: # log format for structured plain text logs without colored output and without local variables
     (): meltano.core.logging.console_log_formatter
     colors: false # also disables `rich` traceback formatting

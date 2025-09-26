@@ -152,6 +152,25 @@ class TestLogFormatters:
         assert "frames hidden" not in output_zero
         assert output_zero.count("in level_") == 5
 
+    def test_console_log_formatter_include_keys(self, record) -> None:
+        record.foo = "bar"
+        record.baz = "qux"
+
+        formatter = formatters.console_log_formatter()
+        output = formatter.format(record)
+        assert "foo=bar" not in output
+        assert "baz=qux" not in output
+
+        formatter = formatters.console_log_formatter(include_keys=["foo"])
+        output = formatter.format(record)
+        assert "foo=bar" in output
+        assert "baz=qux" not in output
+
+        formatter = formatters.console_log_formatter(all_keys=True)
+        output = formatter.format(record)
+        assert "foo=bar" in output
+        assert "baz=qux" in output
+
     def test_key_value_formatter(self, record):
         formatter = formatters.key_value_formatter()
         output = formatter.format(record)

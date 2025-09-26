@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import json
 import typing as t
 from io import StringIO
@@ -236,7 +237,81 @@ class TestMeltanoConsoleRenderer:
         return MeltanoConsoleRenderer(
             plugin_exception_renderer=formatter,
             colors=False,
+            all_keys=True,
         )
+
+    def test_included_keys(
+        self,
+        formatter: StructuredExceptionFormatter,
+        exception: PluginException,
+        subtests: SubTests,
+    ) -> None:
+        make_renderer = functools.partial(
+            MeltanoConsoleRenderer,
+            plugin_exception_renderer=formatter,
+            colors=False,
+        )
+
+        def get_event_dict() -> dict:
+            return {
+                # Base keys
+                "timestamp": "2021-01-01T00:00:00Z",
+                "level": "info",
+                "event": "Something happened",
+                # Plugin subprocess
+                "name": "tap-mock",
+                # Plugin structured logging
+                "plugin_exception": exception,
+                "metric_info": {"key": "value"},
+                # Extra keys
+                "job_name": "dev:tap-mock-to-target-mock",
+                "run_id": "123e4567-e89b-12d3-a456-426614174000",
+                "foo": "bar",
+            }
+
+        event_dict = get_event_dict()
+        with subtests.test(msg="default"):
+            renderer = make_renderer()
+            result = renderer(None, "info", event_dict)
+            # Preserved keys
+            assert "name=tap-mock" in result
+            # Auto-added keys
+            assert "plugin_exc_message=" in result
+            assert "plugin_exc_type=" in result
+            # Extra keys (not included)
+            assert "job_name=dev:tap-mock-to-target-mock" not in result
+            assert "run_id=123e4567-e89b-12d3-a456-426614174000" not in result
+            assert "foo=bar" not in result
+
+        event_dict = get_event_dict()
+        with subtests.test(msg="all keys"):
+            renderer = make_renderer(all_keys=True)
+            result = renderer(None, "info", event_dict)
+            # Preserved keys
+            assert "name=tap-mock" in result
+            # Auto-added keys
+            assert "plugin_exc_message=" in result
+            assert "plugin_exc_type=" in result
+            # Extra keys (included)
+            assert "job_name=dev:tap-mock-to-target-mock" in result
+            assert "run_id=123e4567-e89b-12d3-a456-426614174000" in result
+            assert "foo=bar" in result
+
+        event_dict = get_event_dict()
+        include_keys = {"foo"}
+        with subtests.test(msg="include keys"):
+            renderer = make_renderer(include_keys=include_keys)
+            result = renderer(None, "info", event_dict)
+            # Preserved keys
+            assert "name=tap-mock" in result
+            # Auto-added keys
+            assert "plugin_exc_message=" in result
+            assert "plugin_exc_type=" in result
+            # Extra keys (not included)
+            assert "job_name=dev:tap-mock-to-target-mock" not in result
+            assert "run_id=123e4567-e89b-12d3-a456-426614174000" not in result
+            # Extra keys (included)
+            assert "foo=bar" in result
 
     def test_console_output(
         self,
