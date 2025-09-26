@@ -158,6 +158,8 @@ def console_log_formatter(
     callsite_parameters: bool = False,
     show_locals: bool = False,
     max_frames: int = 2,
+    include_keys: set[str] | None = None,
+    all_keys: bool | None = None,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
@@ -166,6 +168,8 @@ def console_log_formatter(
         callsite_parameters: Whether to include callsite parameters in the output.
         show_locals: Whether to show local variables in the traceback.
         max_frames: Maximum number of frames to show in a traceback, 0 for no maximum.
+        include_keys: Whether to include specific keys in the output.
+        all_keys: Whether to include all keys in the output.
 
     Returns:
         A configured console log formatter.
@@ -191,6 +195,8 @@ def console_log_formatter(
         MeltanoConsoleRenderer(
             colors=colors,
             exception_formatter=exception_formatter,
+            include_keys=include_keys,
+            all_keys=all_keys,
         ),
     )
 
