@@ -83,13 +83,9 @@ class SingerSDKLogParser(LogParser):
                 exception=PluginException.from_dict(exception) if exception else None,
             )
 
-        except (json.JSONDecodeError, TypeError, AttributeError) as e:
+        except Exception as e:
             # Log parsing failure for debugging
-            logger.debug(
-                "Failed to parse Singer SDK log line: %s",
-                e,
-                extra={"raw_line": line[:200]},  # Truncate for safety
-            )
+            logger.debug("Failed to parse Singer SDK log line: %s", e)
             return None
 
 
