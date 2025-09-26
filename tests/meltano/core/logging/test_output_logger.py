@@ -13,8 +13,8 @@ import pytest
 import structlog
 from structlog.testing import LogCapture
 
+from meltano.core.logging.models import ParsedLogRecord
 from meltano.core.logging.output_logger import Out, OutputLogger
-from meltano.core.logging.parsers import ParsedLogRecord
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator

@@ -426,6 +426,7 @@ convention = "google"
 "logging.getLogger".msg = "Use `structlog.stdlib.get_logger` instead"
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
+"structlog.dev.ConsoleRenderer".msg = "Use `meltano.core.logging.renderers.MeltanoConsoleRenderer` instead"
 
 [tool.check-wheel-contents]
 ignore = [

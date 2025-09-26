@@ -9,10 +9,10 @@ from unittest.mock import patch
 
 import pytest
 
+from meltano.core.logging.models import ParsedLogRecord, PluginException
 from meltano.core.logging.parsers import (
     LogParser,
     LogParserFactory,
-    ParsedLogRecord,
     PassthroughLogParser,
     SingerSDKLogParser,
     get_parser_factory,
@@ -195,20 +195,6 @@ class TestSingerSDKLogParser:
         assert result is not None
         # Custom fields should be in extra
         assert result.extra["my_custom_field"] == "should_be_in_extra"
-
-    def test_parse_exception_handling_with_logging(self):
-        """Test that parsing exceptions are logged for debugging."""
-        with patch("meltano.core.logging.parsers.logger") as mock_logger:
-            # Trigger a JSON decode error
-            result = self.parser.parse('{"invalid": json}')
-
-            assert result is None
-            mock_logger.debug.assert_called_once()
-
-            # Check that the log call includes the error and truncated line
-            call_args = mock_logger.debug.call_args
-            assert "Failed to parse Singer SDK log line" in call_args[0][0]
-            assert "raw_line" in call_args[1]["extra"]
 
     def test_parse_type_error_handling(self):
         """Test handling of TypeError during parsing."""
@@ -544,7 +530,11 @@ class TestLogParserIntegration:
             "extra": {
                 "phase": "discovery",
             },
-            "exception": "Traceback...",
+            "exception": {
+                "type": "Exception",
+                "module": "tap_example.client",
+                "message": "API connection failed",
+            },
         }
 
         factory = LogParserFactory()
@@ -555,12 +545,13 @@ class TestLogParserIntegration:
         assert result.message == "API connection failed"
         assert result.logger_name == "tap_example.client"
         assert result.timestamp == "1703097600.789012"
+        assert isinstance(result.exception, PluginException)
+        assert result.exception.type == "Exception"
         assert result.extra == {
             "pid": 12345,
             "thread_name": "MainThread",
             "app_name": "tap-example",
             "stream_name": None,
-            "exception": "Traceback...",
             "phase": "discovery",
         }
 

@@ -21,6 +21,7 @@ from meltano.core.runner import RunnerError
 
 from .formatters import get_default_foreign_pre_chain
 from .parsers import get_parser_factory
+from .renderers import MeltanoConsoleRenderer
 from .utils import capture_subprocess_output
 
 StrPath: t.TypeAlias = str | os.PathLike[str]
@@ -179,7 +180,7 @@ class Out:
             logging.FileHandler using an uncolorized console formatter
         """
         formatter = structlog.stdlib.ProcessorFormatter(
-            processor=structlog.dev.ConsoleRenderer(
+            processor=MeltanoConsoleRenderer(
                 colors=False,
                 exception_formatter=structlog.dev.plain_traceback,
             ),
@@ -300,7 +301,12 @@ class Out:
                 extra["plugin_logger"] = parsed_record.logger_name
 
             # Log with the parsed level and structured data
-            self.logger.log(parsed_record.level, parsed_record.message, **extra)
+            self.logger.log(
+                parsed_record.level,
+                parsed_record.message,
+                plugin_exception=parsed_record.exception,
+                **extra,
+            )
             return
 
         # Fallback to original behavior for unparseable lines
