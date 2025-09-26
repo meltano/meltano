@@ -173,7 +173,7 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         "exception",
         "exc_info",
         # Plugin subprocess
-        "string_id",
+        "name",
         # Plugin structured logging
         "plugin_exception",
         "metric_info",

@@ -259,7 +259,7 @@ class TestMeltanoConsoleRenderer:
                 "level": "info",
                 "event": "Something happened",
                 # Plugin subprocess
-                "string_id": "tap-mock",
+                "name": "tap-mock",
                 # Plugin structured logging
                 "plugin_exception": exception,
                 "metric_info": {"key": "value"},
@@ -274,7 +274,7 @@ class TestMeltanoConsoleRenderer:
             renderer = make_renderer()
             result = renderer(None, "info", event_dict)
             # Preserved keys
-            assert "string_id=tap-mock" in result
+            assert "name=tap-mock" in result
             # Auto-added keys
             assert "plugin_exc_message=" in result
             assert "plugin_exc_type=" in result
@@ -288,7 +288,7 @@ class TestMeltanoConsoleRenderer:
             renderer = make_renderer(all_keys=True)
             result = renderer(None, "info", event_dict)
             # Preserved keys
-            assert "string_id=tap-mock" in result
+            assert "name=tap-mock" in result
             # Auto-added keys
             assert "plugin_exc_message=" in result
             assert "plugin_exc_type=" in result
@@ -303,7 +303,7 @@ class TestMeltanoConsoleRenderer:
             renderer = make_renderer(include_keys=include_keys)
             result = renderer(None, "info", event_dict)
             # Preserved keys
-            assert "string_id=tap-mock" in result
+            assert "name=tap-mock" in result
             # Auto-added keys
             assert "plugin_exc_message=" in result
             assert "plugin_exc_type=" in result
