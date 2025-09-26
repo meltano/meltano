@@ -632,7 +632,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "`dbt run` failed" in str(result.exception)
+            assert "`dbt run` failed" in result.output
 
             matcher = EventMatcher(result.stderr)
             assert matcher.event_matches(
@@ -703,10 +703,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert (
-                "Run invocation could not be completed as block failed: "
-                "Extractor failed"
-            ) in str(result.exception)
+            assert "Extractor failed" in result.output
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -721,7 +718,7 @@ class TestCliRunScratchpadOne:
             assert completed_events[0]["success"] is False
             assert completed_events[0]["duration_seconds"] > 0
 
-            assert completed_events[0]["err"] == "RunnerError('Extractor failed')"
+            assert completed_events[0]["err"] == "Extractor failed"
             assert completed_events[0]["exit_codes"]["extractors"] == 1
 
             tap_stop_event = matcher.find_by_event("tap failure")
@@ -797,10 +794,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert (
-                "Run invocation could not be completed as block failed: Loader failed"
-                in str(result.exception)
-            )
+            assert "Loader failed" in result.output
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -818,7 +812,7 @@ class TestCliRunScratchpadOne:
             assert completed_events[0]["success"] is False
             assert completed_events[0]["duration_seconds"] > 0
 
-            assert completed_events[0]["err"] == "RunnerError('Loader failed')"
+            assert completed_events[0]["err"] == "Loader failed"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
 
             # The tap should NOT have finished, we'll have a write of the
@@ -869,10 +863,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert (
-                "Run invocation could not be completed as block failed: Loader failed"
-                in str(result.exception)
-            )
+            assert "Loader failed" in result.output
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -888,7 +879,7 @@ class TestCliRunScratchpadOne:
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
-            assert completed_events[0]["err"] == "RunnerError('Loader failed')"
+            assert completed_events[0]["err"] == "Loader failed"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
             assert completed_events[0]["duration_seconds"] > 0
 
@@ -948,10 +939,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert (
-                "Run invocation could not be completed as block failed: "
-                "Extractor and loader failed"
-            ) in str(result.exception)
+            assert "Extractor and loader failed" in result.output
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -966,10 +954,7 @@ class TestCliRunScratchpadOne:
             assert completed_events[0]["success"] is False
             assert completed_events[0]["duration_seconds"] > 0
 
-            assert (
-                completed_events[0]["err"]
-                == "RunnerError('Extractor and loader failed')"
-            )
+            assert completed_events[0]["err"] == "Extractor and loader failed"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
 
             tap_stop_event = matcher.find_by_event("tap failure")
@@ -1035,10 +1020,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert (
-                "Run invocation could not be completed as block failed: "
-                "Output line length limit exceeded"
-            ) in str(result.exception)
+            assert "Output line length limit exceeded" in result.output
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -1053,10 +1035,7 @@ class TestCliRunScratchpadOne:
             assert completed_events[0]["success"] is False
             assert completed_events[0]["duration_seconds"] > 0
 
-            assert (
-                completed_events[0]["err"]
-                == "RunnerError('Output line length limit exceeded')"
-            )
+            assert completed_events[0]["err"] == "Output line length limit exceeded"
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -1246,7 +1225,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
 
-            assert "Mappers failed" in str(result.exception)
+            assert "Mappers failed" in result.output
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
