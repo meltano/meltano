@@ -517,7 +517,14 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             RunnerError: if failures are encountered during execution or if the
                 underlying pipeline/job is already running.
         """
+        assert self.context.job  # noqa: S101
+
         job = self.context.job
+        logger.info(
+            "Running job with name '%s' and run ID '%s'",
+            job.job_name,
+            job.run_id,
+        )
         fail_stale_jobs(self.context.session, job.job_name)
         if self.context.force:
             logger.warning("Force option is enabled, ignoring stale job check.")

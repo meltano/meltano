@@ -162,10 +162,26 @@ class StructuredExceptionFormatter:
 class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
     """Custom console renderer that handles our own data structures."""
 
+    default_keys: t.ClassVar[set[str]] = {
+        # Base keys
+        "timestamp",
+        "level",
+        "event",
+        "logger",
+        "logger_name",
+        # Plugin subprocess
+        "string_id",
+        # Plugin structured logging
+        "plugin_exception",
+        "metric_info",
+    }
+
     def __init__(
         self,
         *args,  # noqa: ANN002
         plugin_exception_renderer: StructuredExceptionFormatter | None = None,
+        all_keys: bool | None = None,
+        include_keys: set[str] | None = None,
         **kwargs,  # noqa: ANN003
     ) -> None:
         """Initialize the MeltanoConsoleRenderer.
@@ -173,12 +189,16 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         Args:
             args: Arguments to pass to the parent class.
             plugin_exception_renderer: The renderer to use for plugin exceptions.
+            all_keys: Whether to include all keys in the output.
+            include_keys: Whether to include specific keys in the output.
             kwargs: Keyword arguments to pass to the parent class.
         """
         super().__init__(*args, **kwargs)
         self._plugin_exception_formatter = (
             plugin_exception_renderer or StructuredExceptionFormatter()
         )
+        self._all_keys = all_keys
+        self._include_keys = include_keys
 
     def __call__(
         self,
@@ -198,6 +218,15 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         Returns:
             The rendered event dictionary.
         """
+        if self._include_keys:
+            event_dict = {
+                k: v
+                for k, v in event_dict.items()
+                if k in self.default_keys | self._include_keys
+            }
+        elif not self._all_keys:
+            event_dict = {k: v for k, v in event_dict.items() if k in self.default_keys}
+
         if (
             (exc := event_dict.pop("plugin_exception", None))  # WOLOLO
             and isinstance(exc, PluginException)
