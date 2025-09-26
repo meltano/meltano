@@ -196,20 +196,6 @@ class TestSingerSDKLogParser:
         # Custom fields should be in extra
         assert result.extra["my_custom_field"] == "should_be_in_extra"
 
-    def test_parse_exception_handling_with_logging(self):
-        """Test that parsing exceptions are logged for debugging."""
-        with patch("meltano.core.logging.parsers.logger") as mock_logger:
-            # Trigger a JSON decode error
-            result = self.parser.parse('{"invalid": json}')
-
-            assert result is None
-            mock_logger.debug.assert_called_once()
-
-            # Check that the log call includes the error and truncated line
-            call_args = mock_logger.debug.call_args
-            assert "Failed to parse Singer SDK log line" in call_args[0][0]
-            assert "raw_line" in call_args[1]["extra"]
-
     def test_parse_type_error_handling(self):
         """Test handling of TypeError during parsing."""
         # Create a scenario that could cause TypeError
