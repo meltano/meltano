@@ -202,7 +202,7 @@ async def run(
     run_start_time = time.perf_counter()
     success = False
     try:
-        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        await _run_blocks(ctx, tracker, parsed_blocks, dry_run=dry_run)
         success = True
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
@@ -219,6 +219,7 @@ async def run(
 
 
 async def _run_blocks(
+    ctx: click.Context,
     tracker: Tracker,
     parsed_blocks: list[BlockSet | PluginCommandBlock],
     *,
@@ -256,15 +257,13 @@ async def _run_blocks(
                 set_number=idx,
                 block_type=blk_name,
                 success=False,
-                err=err,
+                err=err.args[0] if err.args else err.__class__.__name__,
                 exit_codes=err.exitcodes,
                 duration_seconds=round(block_duration, 3),
             )
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
-            raise CliError(
-                f"Run invocation could not be completed as block failed: {err}",  # noqa: EM102
-            ) from err
+            ctx.exit(1)
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions
             with tracker.with_contexts(tracking_ctx):
