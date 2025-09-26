@@ -56,7 +56,13 @@ A few key points to note:
    - Plugin subprocess keys: `string_id`
    - Plugin structured logging keys: `plugin_exception`, `metric_info`
 
-   You can control this behavior using the `all_keys` and `include_keys` parameters in your logging configuration.
+   You can control this behavior using the `all_keys` and `include_keys` parameters in your logging configuration. When both `all_keys` and `include_keys` are specified,
+   **`include_keys` takes precedence**. The behavior is:
+
+   1. If `include_keys` is set (regardless of `all_keys`): Shows default keys + specified keys
+   2. If only `all_keys: true` is set: Shows all keys
+   3. If neither is set (default): Shows only default keys
+
 3. Different loggers can use different handlers and log at different log levels.
 4. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
 5. If a logging config file is found, it will take precedence over the `--log-format` and `--log-level` CLI options.
