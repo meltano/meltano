@@ -52,6 +52,51 @@ In some cases, like when a tap has extra command line options like `--about` or 
 Extractors are often capable of extracting many more streams and properties than your use case may require.
 To save on bandwidth and storage, it's usually a good idea to instruct your extractor to only select those streams and properties you actually plan on using.
 
+Meltano provides several configuration options for controlling stream and property selection, each serving different purposes:
+
+#### `select` vs `select_filter`
+
+**`select`** ([`select` extractor extra](/concepts/plugins#select-extra)) defines which streams and properties to extract from the **discovered or provided catalog**. Use this when you want fine-grained control over which specific properties within streams are included or excluded:
+
+- Supports both stream-level patterns (e.g., `users`) and property-level patterns (e.g., `users.email`)
+- Applied **only when no custom `catalog` is provided**
+- Controls selection at the property level within streams
+- Configured via [`meltano select`](/reference/command-line-interface#select) or `select:` in `meltano.yml`
+
+**`select_filter`** filters **entire streams** at runtime and is always applied regardless of whether a custom catalog is provided:
+
+- Only supports stream-level patterns (e.g., `users`, `!logs`)
+- Applied **even when a custom `catalog` is provided**
+- Set via `--select` and `--exclude` flags on [`meltano run`](/reference/command-line-interface#run) or [`meltano el`](/reference/command-line-interface#el)
+- Useful for temporarily filtering streams without modifying `select` configuration
+
+**Key difference**: `select_filter` is applied to the **provided catalog** (whether custom or discovered), while `select` is used to build the catalog from discovery results.
+
+#### `catalog`, `schema`, and `metadata`
+
+When controlling catalog generation and modification, you have these options:
+
+**`catalog`** ([`catalog` extractor extra](/concepts/plugins#catalog-extra)) provides a **pre-built catalog file** that completely bypasses discovery:
+
+- When set, Meltano uses this file instead of running discovery
+- `select` and `schema` rules are **not applied** to custom catalogs
+- `metadata` rules are **not applied** to custom catalogs
+- `select_filter` **is still applied** to filter streams at runtime
+
+**`schema`** ([`schema` extractor extra](/concepts/plugins#schema-extra)) **modifies stream schemas** in the discovered catalog:
+
+- Allows overriding or adding JSON Schema definitions for properties
+- Applied **only to discovered catalogs** (not custom catalogs)
+- Supports wildcards to match multiple streams/properties
+- Useful for adding missing properties or changing property types
+
+**`metadata`** ([`metadata` extractor extra](/concepts/plugins#metadata-extra)) sets **stream and property metadata** in the discovered catalog:
+
+- Controls replication methods, replication keys, and other Singer metadata
+- Applied **only to discovered catalogs** (not custom catalogs)
+- Supports wildcards to match multiple streams/properties
+- Used primarily for database extractors to configure replication behavior
+
 Meltano makes it easy to select specific streams and properties for inclusion or exclusion using [`meltano select`](/reference/command-line-interface#select)
 and the [`select` extractor extra](/concepts/plugins#select-extra),
 which let you specify inclusion and exclusion rules that can contain [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) to match multiple streams and/or properties at once.
