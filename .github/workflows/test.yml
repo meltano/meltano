@@ -56,6 +56,7 @@ jobs:
         - { python-version: '3.11', os: windows-2025,  backend-db: sqlite, id: 'py311-windows-sqlite' }
         - { python-version: '3.12', os: windows-2025,  backend-db: sqlite, id: 'py312-windows-sqlite' }
         - { python-version: '3.13', os: windows-2025,  backend-db: sqlite, id: 'py313-windows-sqlite' }
+        - { python-version: '3.14', os: windows-2025,  backend-db: sqlite, id: 'py314-windows-sqlite' }
         - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py310-ubuntu-psycopg3' }
         - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py311-ubuntu-psycopg3' }
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py312-ubuntu-psycopg3' }
