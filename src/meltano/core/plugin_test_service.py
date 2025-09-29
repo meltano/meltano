@@ -160,8 +160,7 @@ class LoaderTestService(PluginTestService):
 
             while process.stdout and not process.stdout.at_eof():
                 data = await process.stdout.readline()
-                line = data.decode("utf-8").strip()
-                if line:
+                if line := data.decode("utf-8").strip():
                     logger.debug(line)
                     last_line = line
                     # Check for error indicators
