@@ -15,6 +15,8 @@ from meltano.core.utils import hash_sha256, safe_hasattr
 from .base import new_context_uuid
 
 if t.TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from meltano.core.elt_context import ELTContext
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
@@ -117,7 +119,7 @@ class PluginsTrackingContext(SelfDescribingJson):
     @classmethod
     def from_blocks(
         cls,
-        parsed_blocks: list[BlockSet | PluginCommandBlock],
+        parsed_blocks: Sequence[BlockSet | PluginCommandBlock],
     ) -> PluginsTrackingContext:
         """Create a `PluginsTrackingContext` from blocks.
 

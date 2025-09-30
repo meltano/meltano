@@ -127,12 +127,17 @@ class InvokerBase:
         Args:
             kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
+        if self._process_handle is None:
+            return
+
         with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
             else:
                 self.process_handle.terminate()
         await self.process_future
+
+        # Cancel any remaining output futures
         if self._stdout_future is not None:
             self._stdout_future.cancel()
         if self._stderr_future is not None:
@@ -342,12 +347,17 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
+        if self._process_handle is None:
+            return
+
         with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
             else:
                 self.process_handle.terminate()
         await self.process_future
+
+        # Cancel any remaining output futures
         if self._stdout_future is not None:
             self._stdout_future.cancel()
         if self._stderr_future is not None:
