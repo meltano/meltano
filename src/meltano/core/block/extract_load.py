@@ -554,8 +554,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             graceful=graceful,
             block_count=len(self.blocks),
         )
-        for block in self.blocks:
-            await block.stop(kill=not graceful)
+        await asyncio.gather(*(block.stop(kill=not graceful) for block in self.blocks))
 
     @property
     def process_futures(self) -> list[asyncio.Task]:
