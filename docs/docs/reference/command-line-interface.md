@@ -410,6 +410,34 @@ meltano config test <plugin>
 meltano config --no-install test <plugin> # prevent auto-install of plugin
 ```
 
+#### Testing Plugin Configuration
+
+The `meltano config test` command validates a plugin's configuration by running a connectivity test. This is currently supported for:
+
+- **Extractors (taps)**: Validates configuration by invoking the extractor and checking if it can successfully emit at least one RECORD or BATCH message.
+- **Loaders (targets)**: Validates configuration by sending test Singer messages (SCHEMA, RECORD, STATE, and optionally ACTIVATE_VERSION) to the loader and verifying it can process them without errors.
+
+The test helps identify configuration or credential issues before setting up full data pipelines. For loaders with the `activate-version` capability, the test automatically includes an ACTIVATE_VERSION message in the test stream.
+
+:::warning Loader Testing Side Effects
+
+When testing a loader, **test data will be written to your target system**. The test creates a table/collection called `meltano_test_stream` with one test record. You may need to manually clean up this test data after the test completes.
+
+:::
+
+Example usage:
+
+```bash
+# Test an extractor configuration
+meltano config test tap-gitlab
+
+# Test a loader configuration
+meltano config test target-postgres
+
+# Test with a specific plugin type if names are ambiguous
+meltano config test --plugin-type=loader target-jsonl
+```
+
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
