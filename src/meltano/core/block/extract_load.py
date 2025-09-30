@@ -543,21 +543,18 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 await self.execute()
 
     async def terminate(self, *, graceful: bool = False) -> None:
-        """Terminate an in flight ExtractLoad execution, potentially disruptive.
-
-        Not actually implemented yet.
+        """Terminate an in flight ExtractLoad execution.
 
         Args:
             graceful: Whether the BlockSet should try to gracefully quit.
-
-        Raises:
-            NotImplementedError: if graceful termination is not implemented.
+                If True, sends SIGTERM to allow cleanup. If False, sends SIGKILL.
         """
-        if graceful:
-            raise NotImplementedError
-
-        for block in self.blocks:
-            await block.stop(kill=True)
+        logger.info(
+            "Terminating ExtractLoadBlocks",
+            graceful=graceful,
+            block_count=len(self.blocks),
+        )
+        await asyncio.gather(*(block.stop(kill=not graceful) for block in self.blocks))
 
     @property
     def process_futures(self) -> list[asyncio.Task]:

@@ -10,6 +10,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
@@ -22,6 +23,7 @@ from meltano.core.project_plugins_service import (
 )
 
 if t.TYPE_CHECKING:
+    from fixtures.cli import MeltanoCliRunner
     from meltano.core.logging.job_logging_service import JobLoggingService
     from meltano.core.project import Project
 
@@ -157,7 +159,7 @@ class EventMatcher:
 
         return False
 
-    def find_by_event(self, event: str) -> list[dict] | None:
+    def find_by_event(self, event: str) -> list[dict]:
         """Return the first matching event, that matches the given event.
 
         Args:
@@ -172,6 +174,14 @@ class EventMatcher:
             if match:
                 matches.append(line)
         return matches
+
+    def find_first_event(self, event: str) -> dict | None:
+        """Return the first matching event, that matches the given event.
+
+        Args:
+            event: the event to search for.
+        """
+        return next((line for line in self.seen_events if line["event"] == event), None)
 
 
 class TestCliRunScratchpadOne:
@@ -301,7 +311,10 @@ class TestCliRunScratchpadOne:
             assert target_stop_event[0]["name"] == target.name
             assert target_stop_event[0]["cmd_type"] == "elb"
             assert target_stop_event[0]["stdio"] == "stderr"
-            completion_event = matcher.find_by_event("Block run completed")[0]
+
+            events = matcher.find_by_event("Block run completed")
+            assert len(events) == 1
+            completion_event = events[0]
             assert completion_event["success"]
             assert completion_event["duration_seconds"] > 0
 
@@ -313,18 +326,18 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert (
-                matcher.find_by_event("found plugin in cli invocation")[0].get(
-                    "plugin_name",
-                )
-                == "dbt"
-            )
-            dbt_start_event = matcher.find_by_event("dbt done")
-            assert len(dbt_start_event) == 1
-            assert dbt_start_event[0]["name"] == "dbt"
-            assert dbt_start_event[0]["cmd_type"] == "command"
-            assert dbt_start_event[0]["stdio"] == "stderr"
-            completion_event = matcher.find_by_event("Block run completed")[0]
+            events = matcher.find_first_event("found plugin in cli invocation")
+            assert events is not None
+            assert events.get("plugin_name") == "dbt"
+
+            dbt_start_event = matcher.find_first_event("dbt done")
+            assert dbt_start_event is not None
+            assert dbt_start_event["name"] == "dbt"
+            assert dbt_start_event["cmd_type"] == "command"
+            assert dbt_start_event["stdio"] == "stderr"
+
+            completion_event = matcher.find_first_event("Block run completed")
+            assert completion_event is not None
             assert completion_event["success"]
             assert completion_event["duration_seconds"] > 0
 
@@ -356,7 +369,8 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            completion_event = matcher.find_by_event("Block run completed")[0]
+            completion_event = matcher.find_first_event("Block run completed")
+            assert completion_event is not None
             assert completion_event["success"]
             assert completion_event["duration_seconds"] > 0
 
@@ -415,6 +429,8 @@ class TestCliRunScratchpadOne:
         # Verify that a state ID with custom suffix from active environment is
         # generated for an ELB run
         project.activate_environment("dev")
+
+        assert project.environment is not None
         project.environment.state_id_suffix = state_id_suffix
 
         args = ["run", tap.name, target.name]
@@ -436,7 +452,8 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            completion_event = matcher.find_by_event("Block run completed")[0]
+            completion_event = matcher.find_first_event("Block run completed")
+            assert completion_event is not None
             assert completion_event["success"]
             assert completion_event["duration_seconds"] > 0
 
@@ -480,7 +497,8 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            completion_event = matcher.find_by_event("Block run completed")[0]
+            completion_event = matcher.find_first_event("Block run completed")
+            assert completion_event is not None
             assert completion_event["success"]
             assert completion_event["duration_seconds"] > 0
 
@@ -509,17 +527,13 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert (
-                matcher.find_by_event("found plugin in cli invocation")[0].get(
-                    "plugin_name",
-                )
-                == "dbt"
-            )
+            event = matcher.find_first_event("found plugin in cli invocation")
+            assert event is not None
+            assert event.get("plugin_name") == "dbt"
 
             command_add_events = matcher.find_by_event(
                 "plugin command added for execution",
             )
-
             assert len(command_add_events) == 2
             assert invoke_async.call_count == 2
 
@@ -1317,6 +1331,39 @@ class TestCliRunScratchpadOne:
             assert asyncio_mock.call_count == 0
 
     @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
+    )
+    def test_run_dry_run_plugin_command(
+        self,
+        cli_runner,
+        dbt_process,
+    ) -> None:
+        # exit cleanly when everything is fine
+        create_subprocess_exec = AsyncMock(side_effect=(dbt_process,))
+
+        args = ["run", "--dry-run", "dbt:run"]
+        with (
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+
+            events = matcher.find_by_event("Dry run, but would have run block 1/1.")
+            assert len(events) == 1
+            assert events[0]["comprised_of"] == "dbt:run"
+
+            assert not matcher.find_by_event("dbt done")
+            assert create_subprocess_exec.call_count == 0
+            assert asyncio_mock.call_count == 0
+
+    @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("colors", (True, False))
     def test_color_console_exception_handler(
@@ -1366,3 +1413,255 @@ class TestCliRunScratchpadOne:
                 assert match
             else:
                 assert not match
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+    )
+    def test_run_with_timeout_success(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+    ) -> None:
+        """Test that a run completes successfully when timeout is not exceeded."""
+        args = ["run", "--timeout", "30", tap.name, target.name]
+
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("Run timeout configured")
+            events = matcher.find_by_event("Run timeout configured")
+            assert len(events) == 1
+            timeout_config = events[0]
+            assert timeout_config["timeout_seconds"] == 30
+
+            events = matcher.find_by_event("Block run completed")
+            assert len(events) == 1
+            completion_event = events[0]
+            assert completion_event["success"]
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+    )
+    def test_run_with_timeout_exceeded(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+    ) -> None:
+        """Test that timeout properly terminates a long-running pipeline."""
+        args = ["run", "--timeout", "1", tap.name, target.name]
+
+        # Make the tap process take longer than the timeout
+        async def long_wait():
+            await asyncio.sleep(10)
+            return 0
+
+        tap_process.wait.side_effect = long_wait
+
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 1
+
+            exc = result.exception
+            assert isinstance(exc, CliError)
+            assert "Run exceeded timeout of 1 seconds and was terminated" in str(exc)
+
+            matcher = EventMatcher(result.stderr)
+
+            events = matcher.find_by_event("Run timeout configured")
+            assert len(events) == 1
+            timeout_config = events[0]
+            assert timeout_config["timeout_seconds"] == 1
+
+            assert matcher.event_matches("Run timed out")
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+        "dbt",
+    )
+    def test_run_with_timeout_exceeded_plugin_command(
+        self,
+        cli_runner: MeltanoCliRunner,
+        dbt_process,
+    ) -> None:
+        """Test timeout with plugin commands like dbt:run."""
+        args = ["run", "--timeout", "1", "dbt:run"]
+
+        async def long_wait():
+            await asyncio.sleep(10)
+            return 0
+
+        dbt_process.wait.side_effect = long_wait
+
+        invoke_async = AsyncMock(side_effect=(dbt_process,))
+
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 1
+
+            exc = result.exception
+            assert isinstance(exc, CliError)
+            assert "Run exceeded timeout of 1 seconds and was terminated" in str(exc)
+
+            matcher = EventMatcher(result.stderr)
+
+            events = matcher.find_by_event("Run timeout configured")
+            assert len(events) == 1
+            timeout_config = events[0]
+            assert timeout_config["timeout_seconds"] == 1
+
+            assert matcher.event_matches("Run timed out")
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+    )
+    def test_run_with_timeout_environment_variable(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test that MELTANO_RUN_TIMEOUT environment variable works."""
+        monkeypatch.setenv("MELTANO_RUN_TIMEOUT", "25")
+        args = ["run", tap.name, target.name]
+
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("Run timeout configured")
+
+            events = matcher.find_by_event("Run timeout configured")
+            assert len(events) == 1
+            timeout_config = events[0]
+            assert timeout_config["timeout_seconds"] == 25
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+    )
+    def test_run_with_timeout_zero(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap,
+        target,
+    ) -> None:
+        """Test that timeout=0 is rejected."""
+        args = ["run", "--no-install", "--timeout", "0", tap.name, target.name]
+
+        result = cli_runner.invoke(cli, args, catch_exceptions=True)
+        assert result.exit_code == 1
+        # CliError messages appear in result.output (stdout/stderr combined)
+        assert (
+            "Timeout must be a positive integer" in result.output
+            or "Timeout must be a positive integer" in str(result.exception)
+        )
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+        "dbt",
+    )
+    def test_run_with_timeout_plugin_command(
+        self,
+        cli_runner: MeltanoCliRunner,
+        dbt_process,
+    ) -> None:
+        """Test timeout with plugin commands like dbt:run."""
+        args = ["run", "--timeout", "20", "dbt:run"]
+
+        invoke_async = AsyncMock(side_effect=(dbt_process,))
+
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("Run timeout configured")
+            events = matcher.find_by_event("Run timeout configured")
+            assert len(events) == 1
+            timeout_config = events[0]
+            assert timeout_config["timeout_seconds"] == 20
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "job_logging_service",
+        "dbt",
+    )
+    def test_run_with_timeout_multiple_blocks(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        dbt_process,
+    ) -> None:
+        """Test timeout with multiple blocks in sequence."""
+        args = ["run", "--timeout", "30", tap.name, target.name, "dbt:run"]
+
+        invoke_async = AsyncMock(
+            side_effect=(tap_process, target_process, dbt_process),
+        )
+
+        with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+            result = cli_runner.invoke(cli, args, catch_exceptions=False)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("Run timeout configured")
+
+            # Should have completed all blocks
+            completed_events = matcher.find_by_event("Block run completed")
+            assert len(completed_events) == 2
+            assert all(event["success"] for event in completed_events)

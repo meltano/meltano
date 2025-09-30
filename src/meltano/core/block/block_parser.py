@@ -24,7 +24,7 @@ if t.TYPE_CHECKING:
 
     import structlog
 
-    from meltano.core.block.plugin_command import PluginCommandBlock
+    from meltano.core.block.plugin_command import InvokerCommand
     from meltano.core.block.singer import SingerBlock
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -48,7 +48,7 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
 
 def validate_block_sets(
     log: structlog.BoundLogger,
-    blocks: list[BlockSet | PluginCommandBlock],
+    blocks: list[InvokerCommand | ExtractLoadBlocks],
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
@@ -194,7 +194,7 @@ class BlockParser:  # noqa: D101
     def find_blocks(
         self,
         offset: int = 0,
-    ) -> Generator[BlockSet | PluginCommandBlock | ExtractLoadBlocks, None, None]:
+    ) -> Generator[ExtractLoadBlocks | InvokerCommand, None, None]:
         """Find all blocks in the invocation.
 
         Args:

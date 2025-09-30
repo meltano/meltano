@@ -1218,6 +1218,7 @@ meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
 meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 meltano run --refresh-catalog tap-salesforce target-postgres
+meltano run --timeout 3600 tap-gitlab target-postgres
 ```
 
 #### Parameters
@@ -1234,6 +1235,7 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
+- `--timeout` will set a maximum duration (in seconds) for the pipeline run. After this time, the pipeline will be gracefully terminated. The `MELTANO_RUN_TIMEOUT` environment variable can be used to set this behavior. This is useful for preventing pipelines from running indefinitely and allows for preview runs or limiting resource usage.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
 Examples:
@@ -1256,6 +1258,12 @@ meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-s
 
 # run a pipeline, merging state with that of previous runs.
 meltano --environment=dev run --state-strategy=merge tap-gitlab target-postgres
+
+# run a pipeline with a timeout of 3600 seconds (1 hour)
+meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
+
+# run a pipeline with timeout set via environment variable
+MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments
