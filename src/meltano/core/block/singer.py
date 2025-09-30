@@ -127,7 +127,7 @@ class InvokerBase:
         Args:
             kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
-        if self._process_handle is None:
+        if self._process_handle is None:  # pragma: no cover
             return
 
         with suppress(ProcessLookupError):
@@ -347,7 +347,7 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
-        if self._process_handle is None:
+        if self._process_handle is None:  # pragma: no cover
             return
 
         with suppress(ProcessLookupError):
