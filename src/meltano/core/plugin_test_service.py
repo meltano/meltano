@@ -128,6 +128,14 @@ class LoaderTestService(PluginTestService):
         Returns:
             The validation result and supporting context message (if applicable).
         """
+        # Warn users about potential side effects
+        logger.warning(
+            "Testing a loader will write test data to your target system. "
+            "This test will create a table/collection called 'meltano_test_stream'. "
+            "You may need to manually clean up this test data after the test "
+            "completes.",
+        )
+
         try:
             process = await self.plugin_invoker.invoke_async(
                 stdin=asyncio.subprocess.PIPE,
@@ -171,6 +179,11 @@ class LoaderTestService(PluginTestService):
             logger.debug("Process return code: %s", returncode)
 
             if returncode == 0 and not error_occurred:
+                logger.info(
+                    "Test data was written to your target system. "
+                    "You may want to clean up the 'meltano_test_stream' "
+                    "table/collection.",
+                )
                 return (
                     True,
                     "Successfully processed test data for loader "

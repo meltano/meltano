@@ -419,6 +419,12 @@ The `meltano config test` command validates a plugin's configuration by running 
 
 The test helps identify configuration or credential issues before setting up full data pipelines. For loaders with the `activate-version` capability, the test automatically includes an ACTIVATE_VERSION message in the test stream.
 
+:::warning Loader Testing Side Effects
+
+When testing a loader, **test data will be written to your target system**. The test creates a table/collection called `meltano_test_stream` with one test record. You may need to manually clean up this test data after the test completes.
+
+:::
+
 Example usage:
 
 ```bash
