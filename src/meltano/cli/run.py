@@ -104,7 +104,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--timeout",
-    type=click.INT,
+    type=click.IntRange(min=1),
     envvar="MELTANO_RUN_TIMEOUT",
     help=(
         "Maximum duration in seconds for the pipeline run. After this time, "
@@ -211,9 +211,6 @@ async def run(
     )
 
     if timeout is not None:
-        if timeout <= 0:
-            tracker.track_command_event(CliEvent.aborted)
-            raise CliError("Timeout must be a positive integer")  # noqa: EM101
         logger.info("Run timeout configured", timeout_seconds=timeout)
 
     run_start_time = time.perf_counter()

@@ -1596,12 +1596,8 @@ class TestCliRunScratchpadOne:
         args = ["run", "--no-install", "--timeout", "0", tap.name, target.name]
 
         result = cli_runner.invoke(cli, args, catch_exceptions=True)
-        assert result.exit_code == 1
-        # CliError messages appear in result.output (stdout/stderr combined)
-        assert (
-            "Timeout must be a positive integer" in result.output
-            or "Timeout must be a positive integer" in str(result.exception)
-        )
+        assert result.exit_code == 2
+        assert "Invalid value for '--timeout'" in result.output
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
