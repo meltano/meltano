@@ -10,7 +10,6 @@ from unittest.mock import AsyncMock
 import pytest
 
 from meltano.cli import cli
-from meltano.cli.utils import CliError
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
@@ -1489,11 +1488,8 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
 
-            exc = result.exception
-            assert isinstance(exc, CliError)
-            assert "Run exceeded timeout of 1 seconds and was terminated" in str(exc)
-
             matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("Run exceeded timeout and was terminated")
 
             events = matcher.find_by_event("Run timeout configured")
             assert len(events) == 1
@@ -1529,11 +1525,8 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
 
-            exc = result.exception
-            assert isinstance(exc, CliError)
-            assert "Run exceeded timeout of 1 seconds and was terminated" in str(exc)
-
             matcher = EventMatcher(result.stderr)
+            assert matcher.event_matches("Run exceeded timeout and was terminated")
 
             events = matcher.find_by_event("Run timeout configured")
             assert len(events) == 1
