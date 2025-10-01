@@ -232,9 +232,9 @@ async def run(
             timeout_seconds=timeout,
             duration_seconds=round(total_duration, 3),
         )
-        tracker.track_command_event(CliEvent.failed)
-        msg = f"Run exceeded timeout of {timeout} seconds and was terminated"
-        raise CliError(msg) from None
+        tracker.track_command_event(CliEvent.aborted)
+        logger.error("Run exceeded timeout and was terminated", timeout_seconds=timeout)
+        ctx.exit(1)
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
         raise err
