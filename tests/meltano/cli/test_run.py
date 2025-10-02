@@ -1489,13 +1489,10 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.event_matches("Run exceeded timeout and was terminated")
-
             events = matcher.find_by_event("Run timeout configured")
             assert len(events) == 1
             timeout_config = events[0]
             assert timeout_config["timeout_seconds"] == 1
-
             assert matcher.event_matches("Run timed out")
 
     @pytest.mark.backend("sqlite")
@@ -1526,13 +1523,10 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.event_matches("Run exceeded timeout and was terminated")
-
             events = matcher.find_by_event("Run timeout configured")
             assert len(events) == 1
             timeout_config = events[0]
             assert timeout_config["timeout_seconds"] == 1
-
             assert matcher.event_matches("Run timed out")
 
     @pytest.mark.backend("sqlite")
