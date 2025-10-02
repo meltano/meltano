@@ -1227,14 +1227,14 @@ meltano run --timeout 3600 tap-gitlab target-postgres
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
   (implicitly enables --log-level=debug for 'console' named handlers).
-- `--no-state-update` will disable state saving for this invocation.
+- `--no-state-update` will disable state saving for this invocation. Can also be set via `MELTANO_RUN_NO_STATE_UPDATE` environment variable.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
-- `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
-- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--state-id-suffix` defines a custom suffix to generate a state ID with for each EL pair. Can also be set via `MELTANO_RUN_STATE_ID_SUFFIX` environment variable.
+- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. Can also be set via `MELTANO_RUN_STATE_STRATEGY` environment variable. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
-- `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
-- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
+- `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano. Can also be set via `MELTANO_RUN_ID` environment variable.
+- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs. Can also be set via `MELTANO_RUN_REFRESH_CATALOG` environment variable.
 - `--timeout` will set a maximum duration (in seconds) for the pipeline run. After this time, the pipeline will be gracefully terminated. The `MELTANO_RUN_TIMEOUT` environment variable can be used to set this behavior. This is useful for preventing pipelines from running indefinitely and allows for preview runs or limiting resource usage.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
@@ -1264,6 +1264,21 @@ meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
 
 # run a pipeline with timeout set via environment variable
 MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with state-id-suffix set via environment variable
+MELTANO_RUN_STATE_ID_SUFFIX=pipeline-alias meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with state strategy set via environment variable
+MELTANO_RUN_STATE_STRATEGY=merge meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with no state update via environment variable
+MELTANO_RUN_NO_STATE_UPDATE=1 meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with refresh catalog via environment variable
+MELTANO_RUN_REFRESH_CATALOG=1 meltano --environment=dev run tap-salesforce target-postgres
+
+# run a pipeline with run ID set via environment variable
+MELTANO_RUN_ID=550e8400-e29b-41d4-a716-446655440000 meltano --environment=dev run tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments
