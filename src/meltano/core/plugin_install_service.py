@@ -33,7 +33,6 @@ from meltano.core.venv_service import (
     UvVenvService,
     VenvService,
     VirtualEnv,
-    fingerprint,
 )
 
 if sys.version_info >= (3, 11):
@@ -428,7 +427,10 @@ class PluginInstallService:
 
         venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
         message = "Requirements have not changed"
-        return fingerprint(pip_install_args) != venv.read_fingerprint(), message
+        return (
+            venv.get_fingerprint(pip_install_args) != venv.read_fingerprint(),
+            message,
+        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
@@ -643,19 +645,9 @@ async def install_pip_plugin(
     backend = project.settings.get("venv.backend")
 
     if backend == "virtualenv":  # pragma: no cover
-        service = VenvService(
-            project=project,
-            python=plugin.python,
-            namespace=plugin.type,
-            name=plugin.plugin_dir_name,
-        )
+        service = VenvService.from_plugin(project, plugin)
     elif backend == "uv":
-        service = UvVenvService(
-            project=project,
-            python=plugin.python,
-            namespace=plugin.type,
-            name=plugin.plugin_dir_name,
-        )
+        service = UvVenvService.from_plugin(project, plugin)
     else:  # pragma: no cover
         msg = f"Unsupported venv backend: {backend}"
         raise ValueError(msg)
