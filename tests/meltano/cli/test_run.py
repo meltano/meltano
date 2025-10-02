@@ -1511,7 +1511,7 @@ class TestCliRunScratchpadOne:
         args = ["run", "--timeout", "1", "dbt:run"]
 
         async def long_wait():
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
             return 0
 
         dbt_process.wait.side_effect = long_wait
@@ -1545,7 +1545,7 @@ class TestCliRunScratchpadOne:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Test that MELTANO_RUN_TIMEOUT environment variable works."""
-        monkeypatch.setenv("MELTANO_RUN_TIMEOUT", "25")
+        monkeypatch.setenv("MELTANO_RUN_TIMEOUT", "10")
         args = ["run", tap.name, target.name]
 
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
@@ -1565,7 +1565,7 @@ class TestCliRunScratchpadOne:
             events = matcher.find_by_event("Run timeout configured")
             assert len(events) == 1
             timeout_config = events[0]
-            assert timeout_config["timeout_seconds"] == 25
+            assert timeout_config["timeout_seconds"] == 10
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -1599,7 +1599,7 @@ class TestCliRunScratchpadOne:
         dbt_process,
     ) -> None:
         """Test timeout with plugin commands like dbt:run."""
-        args = ["run", "--timeout", "20", "dbt:run"]
+        args = ["run", "--timeout", "10", "dbt:run"]
 
         invoke_async = AsyncMock(side_effect=(dbt_process,))
 
@@ -1612,7 +1612,7 @@ class TestCliRunScratchpadOne:
             events = matcher.find_by_event("Run timeout configured")
             assert len(events) == 1
             timeout_config = events[0]
-            assert timeout_config["timeout_seconds"] == 20
+            assert timeout_config["timeout_seconds"] == 10
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -1631,7 +1631,7 @@ class TestCliRunScratchpadOne:
         dbt_process,
     ) -> None:
         """Test timeout with multiple blocks in sequence."""
-        args = ["run", "--timeout", "30", tap.name, target.name, "dbt:run"]
+        args = ["run", "--timeout", "10", tap.name, target.name, "dbt:run"]
 
         invoke_async = AsyncMock(
             side_effect=(tap_process, target_process, dbt_process),

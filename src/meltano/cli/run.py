@@ -65,11 +65,13 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 @click.option(
     "--refresh-catalog",
     help="Invalidates catalog cache and forces running discovery before this run.",
+    envvar="MELTANO_RUN_REFRESH_CATALOG",
     is_flag=True,
 )
 @click.option(
     "--no-state-update",
     help="Run without state saving. Applies to all pipelines.",
+    envvar="MELTANO_RUN_NO_STATE_UPDATE",
     is_flag=True,
 )
 @click.option(
@@ -83,6 +85,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--state-id-suffix",
+    envvar="MELTANO_RUN_STATE_ID_SUFFIX",
     help="Define a custom suffix to autogenerate state IDs with.",
 )
 @click.option(
@@ -95,11 +98,13 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     "--state-strategy",
     type=click.Choice(StateStrategy),
     default=StateStrategy.auto.value,
+    envvar="MELTANO_RUN_STATE_STRATEGY",
     help="Strategy to use for state updates.",
 )
 @click.option(
     "--run-id",
     type=UUIDParamType(),
+    envvar="MELTANO_RUN_ID",
     help="Use a custom run ID.",
 )
 @click.option(
