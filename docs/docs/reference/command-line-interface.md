@@ -1230,7 +1230,7 @@ meltano run --timeout 3600 tap-gitlab target-postgres
 - `--no-state-update` will disable state saving for this invocation. Can also be set via `MELTANO_RUN_NO_STATE_UPDATE` environment variable.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
-- `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair. Can also be set via `MELTANO_RUN_STATE_ID_SUFFIX` environment variable.
+- `--state-id-suffix` defines a custom suffix to generate a state ID with for each EL pair. Can also be set via `MELTANO_RUN_STATE_ID_SUFFIX` environment variable.
 - `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. Can also be set via `MELTANO_RUN_STATE_STRATEGY` environment variable. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano. Can also be set via `MELTANO_RUN_ID` environment variable.
