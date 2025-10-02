@@ -42,10 +42,7 @@ def _install_plugins_fn(
     else:
         behavior = value
 
-    behavior = value or ctx.obj.get(
-        "auto_install_behaviour",
-        AutoInstallBehavior.install,
-    )
+    behavior = value or AutoInstallBehavior.install
     if behavior == AutoInstallBehavior.no_install:
         return async_noop
     if behavior == AutoInstallBehavior.only_install:

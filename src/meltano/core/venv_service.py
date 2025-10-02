@@ -89,6 +89,7 @@ class VirtualEnv:
     def __init__(
         self,
         root: Path,
+        *,
         python: str | None = None,
     ):
         """Initialize the `VirtualEnv` instance.
@@ -184,6 +185,17 @@ class VirtualEnv:
             ),
         )
 
+    def get_fingerprint(self, pip_install_args: Sequence[str]) -> str:
+        """Compute the fingerprint of the virtual environment.
+
+        Args:
+            pip_install_args: The arguments being passed to `pip install`.
+
+        Returns:
+            The fingerprint of the virtual environment.
+        """
+        return fingerprint(pip_install_args, self.python_path)
+
     def read_fingerprint(self) -> str | None:
         """Get the fingerprint of the existing virtual environment.
 
@@ -201,9 +213,7 @@ class VirtualEnv:
         Args:
             pip_install_args: The arguments being passed to `pip install`.
         """
-        self.plugin_fingerprint_path.write_text(
-            fingerprint(pip_install_args, self.python_path)
-        )
+        self.plugin_fingerprint_path.write_text(self.get_fingerprint(pip_install_args))
 
 
 async def _extract_stderr(_) -> None:
@@ -291,7 +301,7 @@ class VenvService:
         self.name = name
         self.venv = VirtualEnv(
             self.project.venvs_dir(namespace, name, make_dirs=False),
-            python or project.settings.get("python"),
+            python=python or project.settings.get("python"),
         )
         self.pip_log_path = self.project.logs_dir(
             "pip",
@@ -362,9 +372,7 @@ class VenvService:
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.venv.read_fingerprint()
             yield existing_fingerprint is None
-            yield existing_fingerprint != fingerprint(
-                pip_install_args, self.venv.python_path
-            )
+            yield existing_fingerprint != self.venv.get_fingerprint(pip_install_args)
 
         return any(checks())
 
