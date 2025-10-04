@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 
 from meltano.core.task_sets import TaskSets
-from meltano.core.task_sets_service import (
-    JobAlreadyExistsError,
-    JobNotFoundError,
-    TaskSetsService,
-)
+from meltano.core.task_sets_service import JobAlreadyExistsError, JobNotFoundError
+
+if t.TYPE_CHECKING:
+    from meltano.core.task_sets_service import TaskSetsService
 
 
 @pytest.fixture(scope="session")

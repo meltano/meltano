@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import platform
 import typing as t
-import uuid
 from contextlib import asynccontextmanager, nullcontext, suppress
 from datetime import datetime, timezone
 
@@ -13,7 +12,6 @@ import click
 import structlog
 
 from meltano.cli.params import (
-    InstallPlugins,
     UUIDParamType,
     get_install_options,
     pass_project,
@@ -21,7 +19,7 @@ from meltano.cli.params import (
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core._state import StateStrategy
 from meltano.core.db import project_engine
-from meltano.core.elt_context import ELTContext, ELTContextBuilder
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -32,11 +30,15 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import run_async
+from meltano.core.utils import new_run_id, run_async
 
 if t.TYPE_CHECKING:
+    import uuid
+
     from sqlalchemy.orm import Session
 
+    from meltano.cli.params import InstallPlugins
+    from meltano.core.elt_context import ELTContext
     from meltano.core.plugin.base import PluginDefinition
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -117,11 +119,9 @@ class ELOptions:
     )
     state_strategy = click.option(
         "--state-strategy",
-        # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and
-        # use click 8.2+ exclusively
-        type=click.Choice([strategy.value for strategy in StateStrategy]),
+        type=click.Choice(StateStrategy),
         help="Strategy to use for state updates.",
-        default=StateStrategy.AUTO.value,
+        default=StateStrategy.auto.value,
     )
     run_id = click.option(
         "--run-id",
@@ -333,7 +333,7 @@ async def _run_el_command(
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     # Bind run_id at the start of the CLI entrypoint
-    run_id = run_id or uuid.uuid4()
+    run_id = run_id or new_run_id()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     _state_strategy = StateStrategy.from_cli_args(

@@ -9,7 +9,7 @@ from meltano.core._state import StateStrategy
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 
 if t.TYPE_CHECKING:
     import uuid
@@ -20,6 +20,7 @@ if t.TYPE_CHECKING:
     from meltano.core.job import Job
     from meltano.core.logging.output_logger import OutputLogger
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
 
@@ -106,7 +107,7 @@ class ELTContext(ELContextProtocol):
         catalog: str | None = None,
         state: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Initialise ELT Context instance.
@@ -246,7 +247,7 @@ class ELTContextBuilder:
         self._catalog: str | None = None
         self._state: str | None = None
         self._base_output_logger: OutputLogger | None = None
-        self._state_strategy: StateStrategy = StateStrategy.AUTO
+        self._state_strategy: StateStrategy = StateStrategy.auto
 
     def with_session(self, session: Session) -> ELTContextBuilder:
         """Include session when building context.

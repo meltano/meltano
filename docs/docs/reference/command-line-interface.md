@@ -23,6 +23,10 @@ The following CLI options are available for the top-level `meltano` command:
 - [`--log-format`](/reference/settings#clilog_format) - Shortcut for setting the log format instead of using `--log-config`. See the CLI output for available options.
 - [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 
+### DotEnv Configuration
+
+- `--env-file` - Path to a [`.env` file](/concepts/project#env) to load environment variables from. Can be an absolute path, or relative to the current working directory.
+
 ### No Color
 
 The no color configuration is available for all meltano subcommands via an environment variable:
@@ -331,16 +335,34 @@ To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.js
 
 ## `config`
 
+:::warning Command Structure Changed
+
+The `meltano config` command structure changed in Meltano v4. The subcommand now comes _before_ the plugin name:
+
+- **New format**: `meltano config list <plugin>`, `meltano config set <plugin> <setting> <value>`
+- **Old format**: `meltano config <plugin> list`, `meltano config <plugin> set <setting> <value>`
+
+:::
+
+:::info Print Subcommand Required
+
+To view a plugin's configuration, you must now use the explicit `print` subcommand:
+
+- **New format**: `meltano config print <plugin>` or `meltano config print <plugin> --format=env`
+- **Old format**: `meltano config <plugin>` or `meltano config <plugin> --format=env`
+
+:::
+
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
-When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
+When no explicit `--store` is specified, `meltano config set <plugin>` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
 
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
 - [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `sensitive: true` or `env_specific: true`);
 - [`meltano.yml`](/concepts/project#meltano-yml-project-file) otherwise.
 
-If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config test <plugin>`](/reference/command-line-interface#config).
 
 ### How to use
 
@@ -349,49 +371,78 @@ To manage the configuration of Meltano itself, specify `meltano` as the plugin n
 ```bash
 # List all settings for Meltano itself with their names,
 # environment variables, and current values
-meltano config meltano list
+meltano config list meltano
 
 # List all settings for the specified plugin with their names,
 # environment variables, and current values
-meltano config <plugin> list
+meltano config list <plugin>
 
 # View the plugin's current configuration.
-meltano config <plugin>
+meltano config print <plugin>
 
 # Sets the configuration's setting `<name>` to `<value>`.
-meltano config <plugin> set <name> <value>
+meltano config set <plugin> <name> <value>
 
 # Values are parsed as JSON, and interpreted as simple strings when invalid
-meltano config <plugin> set <name> <string>             # String with no meaning in JSON
-meltano config <plugin> set <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
-meltano config <plugin> set <name> <json>               # JSON that fits in a single word
-meltano config <plugin> set <name> '<json>'             # JSON in a string argument
-meltano config <plugin> set <name> '"<string>"'         # JSON string
-meltano config <plugin> set <name> <number>             # JSON number, e.g. 100 or 3.14
-meltano config <plugin> set <name> <true/false>         # Boolean True or False
-meltano config <plugin> set <name> '[<elem>, ...]'      # Array
-meltano config <plugin> set <name> '{"<key>": <value>, ...}' # JSON object
+meltano config set <plugin> <name> <string>             # String with no meaning in JSON
+meltano config set <plugin> <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
+meltano config set <plugin> <name> <json>               # JSON that fits in a single word
+meltano config set <plugin> <name> '<json>'             # JSON in a string argument
+meltano config set <plugin> <name> '"<string>"'         # JSON string
+meltano config set <plugin> <name> <number>             # JSON number, e.g. 100 or 3.14
+meltano config set <plugin> <name> <true/false>         # Boolean True or False
+meltano config set <plugin> <name> '[<elem>, ...]'      # Array
+meltano config set <plugin> <name> '{"<key>": <value>, ...}' # JSON object
 
 # Remove the configuration's setting `<name>`.
-meltano config <plugin> unset <name>
+meltano config unset <plugin> <name>
 
 # Clear the configuration (back to defaults).
-meltano config <plugin> reset
+meltano config reset <plugin>
 
 # Set, unset, or reset in a specific location
-meltano config <plugin> set --store=meltano_yml <name> <value> # set in `meltano.yml`
-meltano config <plugin> unset --store=dotenv <name> # unset in `.env`
-meltano config <plugin> reset --store=db # reset in system database
+meltano config set <plugin> --store=meltano_yml <name> <value> # set in `meltano.yml`
+meltano config unset <plugin> --store=dotenv <name> # unset in `.env`
+meltano config reset <plugin> --store=db # reset in system database
 
 # Test the plugin's current configuration, if supported.
-meltano config <plugin> test
-meltano config --no-install <plugin> test # prevent auto-install of plugin
+meltano config test <plugin>
+meltano config --no-install test <plugin> # prevent auto-install of plugin
+```
+
+#### Testing Plugin Configuration
+
+The `meltano config test` command validates a plugin's configuration by running a connectivity test. This is currently supported for:
+
+- **Extractors (taps)**: Validates configuration by invoking the extractor and checking if it can successfully emit at least one RECORD or BATCH message.
+- **Loaders (targets)**: Validates configuration by sending test Singer messages (SCHEMA, RECORD, STATE, and optionally ACTIVATE_VERSION) to the loader and verifying it can process them without errors.
+
+The test helps identify configuration or credential issues before setting up full data pipelines. For loaders with the `activate-version` capability, the test automatically includes an ACTIVATE_VERSION message in the test stream.
+
+:::warning Loader Testing Side Effects
+
+When testing a loader, **test data will be written to your target system**. The test creates a table/collection called `meltano_test_stream` with one test record. You may need to manually clean up this test data after the test completes.
+
+:::
+
+Example usage:
+
+```bash
+# Test an extractor configuration
+meltano config test tap-gitlab
+
+# Test a loader configuration
+meltano config test target-postgres
+
+# Test with a specific plugin type if names are ambiguous
+meltano config test --plugin-type=loader target-jsonl
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano config --plugin-type=<type> <plugin> ...
+meltano config list --plugin-type=<type> <plugin>
+meltano config set --plugin-type=<type> <plugin> <name> <value>
 ```
 
 When setting a config value that contains the character `$`, you can avoid expansion by
@@ -592,15 +643,17 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - A `--merge-state` flag can be passed to merge state with that of previous runs. **DEPRECATED**: Use `--state-strategy=merge` instead.
 
-- One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
-  Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
+- One or more `--select <entity>` options can be passed to only extract records for matching streams.
+  Similarly, `--exclude <entity>` can be used to extract records for all configured streams _except_ for those specified.
 
   Notes:
 
-  - The entities that are currently selected for extraction can be discovered using [`meltano select --list <extractor>`](#select).
-  - [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity identifiers to match multiple entities at once.
+  - These options control **which entire streams** are processed, applying **stream-level filtering** on top of your configured property selections.
+  - Stream names can be discovered using [`meltano select --list --all <extractor>`](#select).
+  - [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream identifiers to match multiple streams at once.
   - Exclusion using `--exclude` takes precedence over inclusion using `--select`.
   - Specifying `--select` and/or `--exclude` is equivalent to setting the [`select_filter` extractor extra](/concepts/plugins#select-filter-extra).
+  - **Important**: These options preserve your existing property-level selections from the [`select` extra](/concepts/plugins#select-extra). They do not change which properties within each stream are extracted.
 
 - A `--dump` option can be passed (along with any of the other options) to dump the content of a pipeline-specific generated file to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) instead of actually running the pipeline.
   This can aid in debugging [extractor catalog generation](/guide/integration#extractor-catalog-generation), [incremental replication state lookup](/guide/integration#incremental-replication-state), and [pipeline environment variables](/guide/integration#pipeline-environment-variables).
@@ -628,8 +681,12 @@ meltano el tap-gitlab target-postgres --state-id=gitlab-to-postgres --full-refre
 meltano el tap-gitlab target-postgres --catalog extract/tap-gitlab.catalog.json
 meltano el tap-gitlab target-postgres --state extract/tap-gitlab.state.json
 
+# Stream-level filtering: only process commits stream (preserves your property selections)
 meltano el tap-gitlab target-postgres --select commits
+# Stream-level filtering: process all configured streams except project_members
 meltano el tap-gitlab target-postgres --exclude project_members
+# Multiple stream selection
+meltano el tap-gitlab target-postgres --select commits issues --exclude archived_issues
 
 meltano el tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
 ```
@@ -994,11 +1051,11 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 ### How to use
 
 ```bash
-# Lock all plugins
-meltano lock --all
+# Lock all plugins (default behavior)
+meltano lock
 
 # Lock all plugins of a certain type
-meltano lock --all --plugin-type=<type>
+meltano lock --plugin-type=<type>
 
 # Lock specific plugins
 meltano lock <name> <name_two>
@@ -1008,12 +1065,89 @@ meltano lock <name> <name_two> --plugin-type=<type>
 
 # Use --update in combination with any of the above to update the lock file
 # with the latest definition from MeltanoHub
-meltano lock --all --update
+meltano lock --update
+
+# Note: --all flag is deprecated but still supported
+meltano lock --all  # deprecated, use 'meltano lock' instead
 ```
 
 ### Using `lock` with Environments
 
 The `lock` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
+## `logs`
+
+`meltano logs` provides utilities for viewing job logs. This is the CLI equivalent to the "Job Log" modal in the Meltano UI.
+
+### `list`
+
+`meltano logs list` shows a table of recent job runs with their metadata, including run ID, job name, status, timing, and duration.
+
+### `show`
+
+`meltano logs show <log_id>` displays the log content for a specific job run, identified by its log ID (run UUID).
+
+### How to use
+
+```bash
+# List recent job runs (shows 10 by default)
+meltano logs list
+
+# List more runs
+meltano logs list --limit 25
+
+# List runs in JSON format
+meltano logs list --format json
+
+# Show log content for a specific run
+meltano logs show <log_id>
+
+# Show only the last N lines
+meltano logs show <log_id> --tail 50
+
+# Show job metadata in JSON format
+meltano logs show <log_id> --format json
+```
+
+### Examples
+
+```bash
+# List recent job runs to see available logs
+meltano logs list
+
+# Show log for a specific run (get log_id from list command)
+meltano logs show 550e8400-e29b-41d4-a716-446655440000
+
+# Show last 50 lines of a log
+meltano logs show 550e8400-e29b-41d4-a716-446655440000 --tail 50
+
+# List recent runs in JSON format for programmatic use
+meltano logs list --format json
+```
+
+### Options for `list`
+
+- `--limit` / `-l` - Number of recent runs to show (default: 10)
+- `--format` - Output format (`text` or `json`)
+
+### Options for `show`
+
+- `--tail` / `-n` - Show only the last N lines of the log
+- `--format` - Output format for job metadata (`text` or `json`)
+
+### Workflow
+
+1. Use `meltano logs list` to see recent job runs and their status
+2. Copy the LOG ID of the run you want to investigate
+3. Use `meltano logs show <log_id>` to view the full log content
+
+### Notes
+
+- Log IDs are UUIDs that uniquely identify each job run
+- The list command shows runs in chronological order (most recent first)
+- Status indicators: ✓ PASS (success), ✗ FAIL (failed), → RUN (running)
+- Large log files (>2MB) will prompt for confirmation before displaying
+- Logs are stored in `.meltano/logs/elt/<state_id>/<run_id>/elt.log`
 
 ## `remove`
 
@@ -1084,6 +1218,7 @@ meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
 meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 meltano run --refresh-catalog tap-salesforce target-postgres
+meltano run --timeout 3600 tap-gitlab target-postgres
 ```
 
 #### Parameters
@@ -1092,14 +1227,15 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
   (implicitly enables --log-level=debug for 'console' named handlers).
-- `--no-state-update` will disable state saving for this invocation.
+- `--no-state-update` will disable state saving for this invocation. Can also be set via `MELTANO_RUN_NO_STATE_UPDATE` environment variable.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
-- `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
-- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--state-id-suffix` defines a custom suffix to generate a state ID with for each EL pair. Can also be set via `MELTANO_RUN_STATE_ID_SUFFIX` environment variable.
+- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. Can also be set via `MELTANO_RUN_STATE_STRATEGY` environment variable. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
-- `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
-- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
+- `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano. Can also be set via `MELTANO_RUN_ID` environment variable.
+- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs. Can also be set via `MELTANO_RUN_REFRESH_CATALOG` environment variable.
+- `--timeout` will set a maximum duration (in seconds) for the pipeline run. After this time, the pipeline will be gracefully terminated. The `MELTANO_RUN_TIMEOUT` environment variable can be used to set this behavior. This is useful for preventing pipelines from running indefinitely and allows for preview runs or limiting resource usage.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
 Examples:
@@ -1122,6 +1258,27 @@ meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-s
 
 # run a pipeline, merging state with that of previous runs.
 meltano --environment=dev run --state-strategy=merge tap-gitlab target-postgres
+
+# run a pipeline with a timeout of 3600 seconds (1 hour)
+meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
+
+# run a pipeline with timeout set via environment variable
+MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with state-id-suffix set via environment variable
+MELTANO_RUN_STATE_ID_SUFFIX=pipeline-alias meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with state strategy set via environment variable
+MELTANO_RUN_STATE_STRATEGY=merge meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with no state update via environment variable
+MELTANO_RUN_NO_STATE_UPDATE=1 meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with refresh catalog via environment variable
+MELTANO_RUN_REFRESH_CATALOG=1 meltano --environment=dev run tap-salesforce target-postgres
+
+# run a pipeline with run ID set via environment variable
+MELTANO_RUN_ID=550e8400-e29b-41d4-a716-446655440000 meltano --environment=dev run tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments
@@ -1267,9 +1424,9 @@ meltano job remove simple-demo
 
 Use the `schedule` command to define EL or Job pipelines to be run by an orchestrator at regular intervals.
 These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
-You can schedule both [jobs](#job) or legacy [`meltano el`](#el) and [`meltano elt`](#elt) tasks.
+You can schedule both [jobs](#job) or legacy [`meltano el`](#el) tasks.
 
-You can run a specific scheduled pipeline's corresponding [`meltano run`](#run), [`meltano el`](#el) or [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+You can run a specific scheduled pipeline's corresponding [`meltano run`](#run) or [`meltano el`](#el) command as a one-off using `meltano schedule run <schedule_name>`.
 Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passed on to the underlying commands.
 
 Note that the state ID generated under the hood when invoking `meltano schedule run` will differ depending on the type of schedule:
@@ -1361,9 +1518,9 @@ meltano schedule set gitlab-to-jsonl --loader target-csv
 
 Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
-- `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
+- `meltano select [--list] [--all] [--clear] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
-Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra).
+Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra), which defines the streams and properties within each stream that should be included during data extraction. Note that this is different from the [`select_filter` extra](/concepts/plugins#select-filter-extra), which is primarily used for further filtering of stream selections.
 
 :::caution
 
@@ -1385,6 +1542,8 @@ Use `--list` or `--json` to list the currently selected tap attributes.
 
 Use `--rm` or `--remove` to remove previously added select patterns.
 
+Use `--clear` to remove all select patterns for the extractor, reverting to the default behavior of the extractor.
+
 ### Using `select` with Environments
 
 The `select` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
@@ -1398,7 +1557,7 @@ meltano select tap-gitlab --list --all
 # List all available entities and attributes in JSON format
 meltano select tap-gitlab --json --all
 
-# Include all attributes of an entity
+# Include all attributes of an entity (stream-only pattern)
 meltano select tap-gitlab tags "*"
 
 # Include specific attributes of an entity
@@ -1407,6 +1566,15 @@ meltano select tap-gitlab commits project_id
 meltano select tap-gitlab commits created_at
 meltano select tap-gitlab commits author_name
 meltano select tap-gitlab commits message
+
+# Select nested properties (for streams with nested JSON structures)
+meltano select tap-gitlab users address         # Select entire address object
+meltano select tap-gitlab users address city    # Select only city within address
+meltano select tap-gitlab users address geo lat # Select only latitude within geo within address
+
+# Note: These selections define what properties are available.
+# To filter which streams are processed at runtime, use:
+# meltano el tap-gitlab target-jsonl --select commits tags
 
 # Exclude matching attributes of all entities
 meltano select tap-gitlab --exclude "*" "*_url"
@@ -1426,6 +1594,9 @@ Enabled patterns:
     commits.created_at
     commits.author_name
     commits.message
+    users.address
+    users.address.city
+    users.address.geo.lat
     !*.*_url
 
 Selected attributes:
@@ -1439,6 +1610,9 @@ Selected attributes:
     [automatic] tags.name
     [automatic] tags.project_id
     [selected ] tags.target
+    [selected ] users.address
+    [selected ] users.address.city
+    [selected ] users.address.geo.lat
 ```
 
 Remove patterns (`--rm` or `--remove`):
@@ -1448,6 +1622,13 @@ Remove patterns (`--rm` or `--remove`):
 meltano select tap-gitlab --rm tags "*"
 meltano select tap-gitlab --rm --exclude "*" "*_url"
 meltano select tap-gitlab --rm commits id
+```
+
+Clear all select patterns (`--clear`):
+
+```bash
+# Remove all select patterns and revert to default behavior
+meltano select tap-gitlab --clear
 ```
 
 :::info
@@ -1562,7 +1743,7 @@ Merge new state onto existing state for a state ID.
 :::info
 
   <p><strong>Not seeing merged state in the system database?</strong></p>
-  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
+  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
 :::
 
 #### How to use

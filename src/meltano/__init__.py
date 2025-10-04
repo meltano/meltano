@@ -1,9 +1,5 @@
-"""Meltano."""
+"""Meltano."""  # noqa: I002
 
-from __future__ import annotations
+import importlib.metadata
 
-from importlib.metadata import version
-
-__version__ = version("meltano")
-
-del annotations, version
+__version__ = importlib.metadata.version("meltano")

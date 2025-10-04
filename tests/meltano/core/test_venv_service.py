@@ -276,7 +276,7 @@ class TestVirtualEnv:
             mock.patch("platform.system", return_value="commodore64"),
             pytest.raises(
                 MeltanoError,
-                match="(?i)Platform 'commodore64'.*?not supported.",
+                match=r"(?i)Platform 'commodore64'.*?not supported.",
             ),
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
@@ -320,3 +320,63 @@ class TestUvVenvService(TestVenvService):
             ),
         ):
             await subject.install(["cowsay"])
+
+    async def test_error_logging_creates_log_file(
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
+    ) -> None:
+        """Test that error handling creates log file with details."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock(spec=Process)
+            original_err = AsyncSubprocessError(
+                "Something went wrong",
+                process,
+                stderr="Some error",
+            )
+            result_err = await subject.handle_installation_error(original_err)
+
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)
+
+            assert log_file_path.exists()
+            assert "Some error" in log_file_path.read_text()
+
+    async def test_error_logging_empty_stderr(
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
+    ) -> None:
+        """Test error logging when stderr is empty."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock(spec=Process)
+            process.stderr = None
+            original_err = AsyncSubprocessError("Another error", process)
+
+            await subject.handle_installation_error(original_err)
+
+            assert log_file_path.exists()
+            assert log_file_path.read_text() == ""
+
+    async def test_error_logging_handles_write_failure(
+        self,
+        subject: UvVenvService,
+    ) -> None:
+        """Test that log write failures are handled gracefully."""
+        process = mock.Mock(spec=Process)
+        process.stderr = mock.AsyncMock(return_value="Some error")
+
+        # Mock the log writing to fail
+        with mock.patch.object(
+            subject,
+            "_write_error_log",
+            side_effect=OSError("Permission denied"),
+        ):
+            original_err = AsyncSubprocessError("Something went wrong", process)
+            result_err = await subject.handle_installation_error(original_err)
+
+            # Should still return the installation error, not the log error
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)

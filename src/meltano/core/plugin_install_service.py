@@ -33,13 +33,14 @@ from meltano.core.venv_service import (
     UvVenvService,
     VenvService,
     VirtualEnv,
-    fingerprint,
 )
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import assert_never  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import assert_never
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -111,20 +112,23 @@ class PluginInstallState:
         Returns:
             Verb form of status.
         """
-        if self.status is PluginInstallStatus.RUNNING:
-            return (
-                "Updating"
-                if self.reason is PluginInstallReason.UPGRADE
-                else "Installing"
-            )
-        if self.status is PluginInstallStatus.SUCCESS:
-            return (
-                "Updated" if self.reason is PluginInstallReason.UPGRADE else "Installed"
-            )
-        if self.status is PluginInstallStatus.SKIPPED:
-            return "Skipped installing"
-
-        return "Errored"
+        match self.status:
+            case PluginInstallStatus.RUNNING:
+                return (
+                    "Updating"
+                    if self.reason is PluginInstallReason.UPGRADE
+                    else "Installing"
+                )
+            case PluginInstallStatus.SUCCESS:
+                return (
+                    "Updated"
+                    if self.reason is PluginInstallReason.UPGRADE
+                    else "Installed"
+                )
+            case PluginInstallStatus.SKIPPED:
+                return "Skipped installing"
+            case _:
+                return "Installation failed"
 
 
 def with_semaphore(func):  # noqa: ANN001, ANN201
@@ -316,12 +320,13 @@ class PluginInstallService:
         """
         env = self.plugin_installation_env(plugin)
 
-        if not self._requires_install(plugin, reason, env=env):
+        requires_install, message = self._requires_install(plugin, reason, env=env)
+        if not requires_install:
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.SKIPPED,
-                message=f"Plugin '{plugin.name}' does not require installation",
+                message=message,
             )
             self.status_cb(state)
             return state
@@ -382,10 +387,7 @@ class PluginInstallService:
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=(
-                    f"{plugin.type.descriptor.capitalize()} '{plugin.name}' "
-                    f"could not be installed: {err}"
-                ),
+                message=str(err),
                 details=await err.stderr,
             )
             self.status_cb(state)
@@ -397,12 +399,12 @@ class PluginInstallService:
         reason: PluginInstallReason,
         *,
         env: Mapping[str, str] | None = None,
-    ) -> bool:
+    ) -> tuple[bool, str]:
         if not plugin.is_installable():
-            return False
+            return False, "Plugin is not installable"
 
         if reason is not PluginInstallReason.AUTO:
-            return not plugin.is_mapping()
+            return not plugin.is_mapping(), "Plugin is a mapping"
 
         try:
             pip_install_args = get_pip_install_args(
@@ -420,10 +422,18 @@ class PluginInstallService:
                 e.env_var,
                 plugin.name,
             )
-            return False
+            message = "Missing environment variable"
+            return False, message
 
-        venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
-        return fingerprint(pip_install_args) != venv.read_fingerprint()
+        venv = VirtualEnv(
+            self.project.plugin_dir(plugin, "venv", make_dirs=False),
+            python=plugin.python or self.project.settings.get("python"),
+        )
+        message = "Requirements have not changed"
+        return (
+            venv.get_fingerprint(pip_install_args) != venv.read_fingerprint(),
+            message,
+        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
@@ -532,22 +542,34 @@ def install_status_update(install_state: PluginInstallState) -> None:
     plugin = install_state.plugin
     desc = plugin.type.descriptor
 
-    if install_state.status is PluginInstallStatus.SKIPPED:
-        level = (
-            logging.DEBUG
-            if install_state.reason == PluginInstallReason.AUTO
-            else logging.INFO
-        )
-        logger.log(level, "%s %s '%s'", install_state.verb, desc, plugin.name)
-    elif install_state.status in {
-        PluginInstallStatus.RUNNING,
-        PluginInstallStatus.SUCCESS,
-    }:
-        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
-    elif install_state.status is PluginInstallStatus.ERROR:
-        logger.error(install_state.message, details=install_state.details)
-    elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
-        logger.warning(install_state.message)
+    match install_state.status:
+        case PluginInstallStatus.SKIPPED:
+            level = (
+                logging.DEBUG
+                if install_state.reason is PluginInstallReason.AUTO
+                else logging.INFO
+            )
+            logger.log(
+                level,
+                "%s %s '%s'. %s.",
+                install_state.verb,
+                desc,
+                plugin.name,
+                install_state.message,
+            )
+        case PluginInstallStatus.RUNNING | PluginInstallStatus.SUCCESS:
+            logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
+        case PluginInstallStatus.ERROR:
+            logger.error(
+                "%s. %s.",
+                install_state.verb,
+                install_state.message,
+                details=install_state.details,
+            )
+        case PluginInstallStatus.WARNING:  # pragma: no cover
+            logger.warning(install_state.message)
+        case _:  # pragma: no cover
+            assert_never(install_state.status)
 
 
 async def install_plugins(
@@ -568,9 +590,10 @@ async def install_plugins(
         force=force,
     )
     install_results = await install_service.install_plugins(plugins, reason=reason)
+    total = len(install_results)
     num_successful = len([status for status in install_results if status.successful])
     num_skipped = len([status for status in install_results if status.skipped])
-    num_failed = len(install_results) - num_successful
+    num_failed = total - num_successful
 
     level = logging.INFO
     if num_failed >= 0 and num_successful == 0:
@@ -586,14 +609,14 @@ async def install_plugins(
             "%s %d/%d plugins",
             "Updated" if reason == PluginInstallReason.UPGRADE else "Installed",
             num_successful - num_skipped,
-            num_successful + num_failed,
+            total,
         )
     if num_skipped:  # pragma: no cover
         logger.log(
             level,
             "Skipped installing %d/%d plugins",
             num_skipped,
-            num_successful + num_failed,
+            total,
         )
 
     return num_failed == 0
@@ -625,19 +648,9 @@ async def install_pip_plugin(
     backend = project.settings.get("venv.backend")
 
     if backend == "virtualenv":  # pragma: no cover
-        service = VenvService(
-            project=project,
-            python=plugin.python,
-            namespace=plugin.type,
-            name=plugin.plugin_dir_name,
-        )
+        service = VenvService.from_plugin(project, plugin)
     elif backend == "uv":
-        service = UvVenvService(
-            project=project,
-            python=plugin.python,
-            namespace=plugin.type,
-            name=plugin.plugin_dir_name,
-        )
+        service = UvVenvService.from_plugin(project, plugin)
     else:  # pragma: no cover
         msg = f"Unsupported venv backend: {backend}"
         raise ValueError(msg)

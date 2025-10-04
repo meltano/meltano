@@ -25,7 +25,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.9, 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 <Tabs>
   <TabItem value="linux-macos" label="Linux & macOS" default>
@@ -243,7 +243,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
     You can now continue to step 4.
 
-    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking out [MeltanoHub for Singer](https://hub.meltano.com/singer/), which is the best place to find and explore existing Singer taps and targets.
+    - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking out [MeltanoHub](https://hub.meltano.com/extractors/), which is the best place to find and explore existing Singer taps and targets.
 
 1.  Depending on the result, pick your next step:
 
@@ -428,7 +428,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
 
   <p><strong>What if I already have a catalog file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have already generated a <a href="https://hub.meltano.com/singer/spec#catalog-files">catalog file</a>.</p>
-  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
+  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#el">`meltano el`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
 :::
 
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/reference/command-line-interface#select):
@@ -637,7 +637,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
                   You can now continue to step 4.
 
-            - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, for example, `Singer target BigQuery`.
+            - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [MeltanoHub](https://hub.meltano.com/loaders/), which is the best place to find and explore existing Singer taps and targets.
 
 1.  Depending on the result, pick your next step:
 
@@ -680,7 +680,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
 :::
 
-        - If a Singer target for your data source **doesn't yet exist**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
+        - If a Singer target for your data source **doesn't yet exist**, learn how to build your own target by following [Target Development Overview](https://sdk.meltano.com/en/latest/dev_guide.html#target-development-overview) in the Meltano SDK documentation.
 
         Once you've got your new target project set up, you can add it to your Meltano project
         as a custom plugin by following the `meltano add --custom` instructions above.
@@ -853,7 +853,7 @@ meltano state get dev:tap-gitlab-to-target-postgres
 
 :::
 
-There is also the [`meltano elt`](/reference/command-line-interface#elt) command which is a more rigid command for running only EL pipelines.
+There is also the [`meltano el`](/reference/command-line-interface#el) command which is a more rigid command for running only EL pipelines.
 
 Or directly using the `meltano invoke`, which only executes a single plugin at a time.
 This can be useful for debugging a failing extractor or loader.
@@ -886,7 +886,7 @@ meltano schedule add <pipeline name> --extractor <extractor> --loader <loader> -
 meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-postgres --interval @daily
 ```
 
-The `pipeline name` argument corresponds to the `--state-id` option on `meltano elt`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
+The `pipeline name` argument corresponds to the `--state-id` option on `meltano el`, which identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
 To have scheduled runs pick up where your [earlier manual run](#run-a-data-integration-el-pipeline) left off, ensure you use the same pipeline name.
 

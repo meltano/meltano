@@ -64,9 +64,10 @@ def _run_pytest(session: nox.Session) -> None:
         )
 
         session.run(
+            "coverage",
+            "run",
+            "-m",
             "pytest",
-            "--cov=meltano",
-            "--cov=tests",
             "--durations=10",
             "--order-scope=module",
             "--timeout=300",
@@ -92,7 +93,7 @@ def pytest_meltano(session: nox.Session) -> None:
         session: Nox session.
     """
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
-    extras = ["azure", "gcs", "s3"]
+    extras = ["azure", "gcs", "s3", "containers"]
 
     if backend_db == "mssql":
         extras.append("mssql")
@@ -168,6 +169,7 @@ def mypy(session: nox.Session) -> None:
         "--extra=azure",
         "--extra=gcs",
         "--extra=s3",
+        "--extra=containers",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
     session.run("mypy", *session.posargs)

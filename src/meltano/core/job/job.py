@@ -6,7 +6,6 @@ import asyncio
 import os
 import signal
 import typing as t
-import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntEnum
@@ -14,17 +13,18 @@ from enum import Enum, IntEnum
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column  # noqa: TC002
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import (
     DateTimeUTC,
-    GUIDType,
+    GUIDType,  # noqa: TC001
     IntFlag,
-    IntPK,
+    IntPK,  # noqa: TC001
     JSONEncodedDict,
 )
+from meltano.core.utils import new_run_id
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Generator
@@ -103,7 +103,7 @@ class Payload(IntEnum):
 
 
 class Job(SystemModel):
-    """Model class that represents a `meltano elt` run in the system database.
+    """Model class that represents a `meltano el` run in the system database.
 
     Includes State.STATE_EDIT rows which represent CLI invocations of the
     `meltano state` command which wrote state to the db. Queries that are
@@ -132,7 +132,7 @@ class Job(SystemModel):
         """
         kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
-        kwargs["run_id"] = kwargs.get("run_id") or uuid.uuid4()
+        kwargs["run_id"] = kwargs.get("run_id") or new_run_id()
         super().__init__(**kwargs)
 
     @hybrid_property
@@ -173,7 +173,7 @@ class Job(SystemModel):
         """
         return self.state is State.RUNNING
 
-    def valid_intil(self) -> datetime:
+    def valid_until(self) -> datetime:
         """Return the datetime when this job goes stale.
 
         Returns:
@@ -198,7 +198,7 @@ class Job(SystemModel):
         if not self.is_running():
             return False
 
-        return datetime.now(timezone.utc) > self.valid_intil()
+        return datetime.now(timezone.utc) > self.valid_until()
 
     def has_error(self) -> bool:
         """Return whether a job has failed.
@@ -411,7 +411,7 @@ class Job(SystemModel):
         if isinstance(err, SystemExit):
             return "The process was terminated"
 
-        if isinstance(err, (KeyboardInterrupt, asyncio.CancelledError)):
+        if isinstance(err, KeyboardInterrupt | asyncio.CancelledError):
             return "The process was interrupted"
 
         if str(err):

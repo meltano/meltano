@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
 import enum
 import os
 import sys
 import typing as t
-import uuid
 from contextlib import asynccontextmanager
 
 from structlog.stdlib import get_logger
@@ -18,21 +18,22 @@ from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
-from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
+from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, uuid7
 from meltano.core.venv_service import VenvService, VirtualEnv
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-    from typing_extensions import Unpack
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
     from typing import Unpack  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Unpack
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
+    from structlog.stdlib import BoundLogger
 
     from meltano.core.block.extract_load import ELBContext
     from meltano.core.elt_context import ELTContext, PluginContext
@@ -486,10 +487,17 @@ class PluginInvoker:
             try:
                 yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
-                raise ExecutableNotFoundError(
-                    self.plugin,
-                    self.plugin.executable,
-                ) from err
+                # Check if the error is about the executable itself or a file it's
+                # trying to access
+                executable_path = popen_args[0] if popen_args else ""
+
+                if err.filename == executable_path:
+                    # The executable itself was not found
+                    raise ExecutableNotFoundError(
+                        self.plugin,
+                        self.plugin.executable,
+                    ) from err
+                raise
 
     async def invoke_async(
         self,
@@ -546,7 +554,7 @@ class PluginInvoker:
         logger.debug("Running containerized command", command=plugin_command)
         async with self._invoke(*args, **kwargs) as (_proc_args, _, proc_env):
             plugin_name = self.plugin.name
-            random_id = uuid.uuid4()
+            random_id = uuid7()
             name = f"meltano-{plugin_name}--{plugin_command}-{random_id}"
 
             info = await service.run_container(spec, name, env=proc_env)
@@ -588,3 +596,40 @@ class PluginInvoker:
             self.output_handlers[src].append(handler)
         else:
             self.output_handlers = {src: [handler]}
+
+    @property
+    def stdout_logger(self) -> BoundLogger:
+        """Get the logger for the plugin stdout.
+
+        Returns:
+            The logger for the plugin stdout.
+        """
+        return get_logger(
+            f"meltano.plugin.stdout.{self.plugin.type}.{self.plugin.name}",
+            stdio="stdout",
+        )
+
+    @property
+    def stderr_logger(self) -> BoundLogger:
+        """Get the logger for the plugin stderr.
+
+        Returns:
+            The logger for the plugin stderr.
+        """
+        return get_logger(
+            f"meltano.plugin.stderr.{self.plugin.type}.{self.plugin.name}",
+            stdio="stderr",
+        )
+
+    def get_log_parser(self) -> str | None:
+        """Get the log parser for the plugin.
+
+        Returns:
+            The log parser for the plugin.
+        """
+        if (
+            self.plugin.capabilities
+            and "structured-logging" in self.plugin.capabilities
+        ):
+            return self.plugin_config_extras.get("_log_parser")
+        return None

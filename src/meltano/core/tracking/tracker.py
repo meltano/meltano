@@ -30,10 +30,10 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
-from meltano.core.utils import format_exception
+from meltano.core.utils import format_exception, uuid7
 
 if t.TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Generator, Mapping
     from pathlib import Path
 
     from meltano.core.project import Project
@@ -75,6 +75,15 @@ def check_url(url: str) -> bool:
     return bool(re.match(URL_REGEX, url))
 
 
+def new_client_id() -> uuid.UUID:
+    """Generate a new client ID.
+
+    Returns:
+        A new client ID.
+    """
+    return uuid7()
+
+
 class TelemetrySettings(t.NamedTuple):
     """Settings which control telemetry and anonymous usage stats.
 
@@ -109,9 +118,11 @@ class Tracker:  # - too many (public) methods
         )
 
         self.project = project
-        self.send_anonymous_usage_stats = project.settings.get(
-            "send_anonymous_usage_stats",
-            redacted=not project.settings.get("disable_tracking"),
+        send_stats = project.settings.get("send_anonymous_usage_stats")
+        self.send_anonymous_usage_stats = (
+            send_stats
+            if send_stats is not None
+            else not project.settings.get("disable_tracking")
         )
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
@@ -206,7 +217,7 @@ class Tracker:  # - too many (public) methods
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
-        return uuid.uuid4()
+        return new_client_id()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
@@ -289,7 +300,10 @@ class Tracker:  # - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(self, *extra_contexts) -> Tracker:  # noqa: ANN002
+    def with_contexts(
+        self,
+        *extra_contexts: SelfDescribingJson,
+    ) -> Generator[Tracker, None, None]:
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:
@@ -402,7 +416,7 @@ class Tracker:  # - too many (public) methods
                     else tuple(
                         ctx
                         for ctx in self.contexts
-                        if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                        if isinstance(ctx, EnvironmentContext | ProjectContext)
                     ),
                 ),
             )

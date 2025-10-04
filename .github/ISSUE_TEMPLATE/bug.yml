@@ -19,7 +19,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.8.0"
+      placeholder: "4.0.0b4"
     validations:
       required: false
   - type: dropdown
@@ -32,8 +32,7 @@ body:
         - "3.12"
         - "3.11"
         - "3.10"
-        - "3.9"
-        - "3.8 or earlier (unsupported)"
+        - "3.9 or earlier (unsupported)"
         - "NA"
     validations:
       required: false

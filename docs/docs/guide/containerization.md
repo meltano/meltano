@@ -52,7 +52,56 @@ docker build --tag meltano-demo-project:dev .
 
 Files added to your project include a `Dockerfile` inheriting `FROM` the public [`meltano/meltano:latest`](https://hub.docker.com/r/meltano/meltano/tags) image available on [Docker Hub](https://hub.docker.com).
 
-This can be customized to use another public mirror, a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v3.5-python3.12`), or Python 3.11 or 3.12 (e.g. `meltano/meltano:latest-python3.12` or `meltano/meltano:v3.5-python3.12`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). We currently publish release images to [Docker Hub](https://hub.docker.com/r/meltano/meltano). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
+## Image Variants
+
+Meltano provides two types of Docker images to suit different use cases:
+
+### Full Images (Default)
+- **Tags**: `latest`, `v3.9.1`, `latest-python3.11`, etc.
+- **Includes**: All database connectors (PostgreSQL, MSSQL), build tools, and system dependencies
+- **Use when**: You need MSSQL connectivity, or require plugins with complex system dependencies
+
+### Slim Images (Recommended)
+- **Tags**: `latest-slim`, `v3.9.1-slim`, `latest-python3.11-slim`, etc.
+- **Includes**: Azure, GCS, PostgreSQL, and S3 connectors with minimal dependencies
+- **Excludes**: MSSQL connectors, build tools (gcc, make, etc.)
+- **Use when**: You primarily use cloud storage backends and PostgreSQL, and want faster downloads and smaller deployments
+
+### Choosing the Right Image
+
+**Use slim images if you:**
+- Primarily use cloud storage (S3, GCS, Azure Blob Storage)
+- Want faster container startup and deployment times
+- Don't require MSSQL database connectivity
+- Are using plugins that don't need compilation or complex system dependencies
+
+**Use full images if you:**
+- Need MSSQL database connectivity
+- Use plugins requiring build tools or complex system dependencies
+- Need the complete set of database connectors and system tools
+
+## Customizing the Base Image
+
+You can customize the base image by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg):
+
+- **Public mirror**: `your-company/meltano:latest`
+- **Specific version**: `meltano/meltano:v3.9.1` or `meltano/meltano:v3.9.1-slim`
+- **Python version**: `meltano/meltano:latest-python3.12` or `meltano/meltano:latest-python3.12-slim`
+
+### Examples
+
+```bash
+# Use slim image (recommended for most use cases)
+docker build --build-arg MELTANO_IMAGE=meltano/meltano:latest-slim --tag my-project:dev .
+
+# Use specific version with Python 3.11
+docker build --build-arg MELTANO_IMAGE=meltano/meltano:v3.9.1-python3.11-slim --tag my-project:dev .
+
+# Use full image for MSSQL support
+docker build --build-arg MELTANO_IMAGE=meltano/meltano:latest --tag my-project:dev .
+```
+
+We currently publish release images to [Docker Hub](https://hub.docker.com/r/meltano/meltano). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
 
 The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/reference/command-line-interface),

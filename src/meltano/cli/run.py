@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import time
 import typing as t
-import uuid
 
 import click
 import structlog
 
 from meltano.cli.params import (
-    InstallPlugins,
     UUIDParamType,
     get_install_options,
     pass_project,
@@ -18,19 +17,23 @@ from meltano.cli.params import (
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser, validate_block_sets
-from meltano.core.block.blockset import BlockSet
-from meltano.core.block.plugin_command import PluginCommandBlock
+from meltano.core.block.extract_load import ExtractLoadBlocks
+from meltano.core.block.plugin_command import InvokerCommand
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, Tracker
+from meltano.core.tracking import BlockEvents
 from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
-from meltano.core.utils import run_async
+from meltano.core.utils import new_run_id, run_async
 
 if t.TYPE_CHECKING:
+    import uuid
+
+    from meltano.cli.params import InstallPlugins
     from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 logger = structlog.getLogger(__name__)
 
@@ -56,17 +59,22 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
         "Perform a full refresh (ignore state left behind by any previous "
         "runs). Applies to all pipelines."
     ),
+    show_envvar=True,
     envvar="MELTANO_RUN_FULL_REFRESH",
     is_flag=True,
 )
 @click.option(
     "--refresh-catalog",
     help="Invalidates catalog cache and forces running discovery before this run.",
+    show_envvar=True,
+    envvar="MELTANO_RUN_REFRESH_CATALOG",
     is_flag=True,
 )
 @click.option(
     "--no-state-update",
     help="Run without state saving. Applies to all pipelines.",
+    show_envvar=True,
+    envvar="MELTANO_RUN_NO_STATE_UPDATE",
     is_flag=True,
 )
 @click.option(
@@ -80,6 +88,8 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--state-id-suffix",
+    show_envvar=True,
+    envvar="MELTANO_RUN_STATE_ID_SUFFIX",
     help="Define a custom suffix to autogenerate state IDs with.",
 )
 @click.option(
@@ -90,16 +100,28 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--state-strategy",
-    # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and use
-    # click 8.2+ exclusively
-    type=click.Choice([strategy.value for strategy in StateStrategy]),
-    default=StateStrategy.AUTO.value,
+    type=click.Choice(StateStrategy),
+    default=StateStrategy.auto.value,
+    show_envvar=True,
+    envvar="MELTANO_RUN_STATE_STRATEGY",
     help="Strategy to use for state updates.",
 )
 @click.option(
     "--run-id",
     type=UUIDParamType(),
+    show_envvar=True,
+    envvar="MELTANO_RUN_ID",
     help="Use a custom run ID.",
+)
+@click.option(
+    "--timeout",
+    type=click.IntRange(min=1),
+    show_envvar=True,
+    envvar="MELTANO_RUN_TIMEOUT",
+    help=(
+        "Maximum duration in seconds for the pipeline run. After this time, "
+        "the pipeline will be gracefully terminated."
+    ),
 )
 @click.argument(
     "blocks",
@@ -124,6 +146,7 @@ async def run(
     merge_state: bool,
     state_strategy: str,
     run_id: uuid.UUID | None,
+    timeout: int | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
 ) -> None:
@@ -155,7 +178,7 @@ async def run(
         change_console_log_level()
 
     # Bind run_id at the start of the CLI entrypoint
-    run_id = run_id or uuid.uuid4()
+    run_id = run_id or new_run_id()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     tracker: Tracker = ctx.obj["tracker"]
@@ -199,11 +222,30 @@ async def run(
         reason=PluginInstallReason.AUTO,
     )
 
+    if timeout is not None:
+        logger.info("Run timeout configured", timeout_seconds=timeout)
+
     run_start_time = time.perf_counter()
     success = False
     try:
-        await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        if timeout is not None:
+            await asyncio.wait_for(
+                _run_blocks(ctx, tracker, parsed_blocks, dry_run=dry_run),
+                timeout=timeout,
+            )
+        else:
+            await _run_blocks(ctx, tracker, parsed_blocks, dry_run=dry_run)
         success = True
+    except asyncio.TimeoutError:
+        run_end_time = time.perf_counter()
+        total_duration = run_end_time - run_start_time
+        logger.error(
+            "Run timed out",
+            timeout_seconds=timeout,
+            duration_seconds=round(total_duration, 3),
+        )
+        tracker.track_command_event(CliEvent.aborted)
+        ctx.exit(1)
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
         raise err
@@ -219,25 +261,28 @@ async def run(
 
 
 async def _run_blocks(
+    ctx: click.Context,
     tracker: Tracker,
-    parsed_blocks: list[BlockSet | PluginCommandBlock],
+    parsed_blocks: list[InvokerCommand | ExtractLoadBlocks],
     *,
     dry_run: bool,
 ) -> None:
+    current_block = None
     for idx, blk in enumerate(parsed_blocks):
+        current_block = blk
         blk_name = blk.__class__.__name__
         tracking_ctx = PluginsTrackingContext.from_block(blk)
         with tracker.with_contexts(tracking_ctx):
             tracker.track_block_event(blk_name, BlockEvents.initialized)
         if dry_run:
             msg = f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}."
-            if isinstance(blk, BlockSet):
+            if isinstance(blk, ExtractLoadBlocks):
                 logger.info(
                     msg,
                     block_type=blk_name,
                     comprised_of=[plugin.string_id for plugin in blk.blocks],
                 )
-            elif isinstance(blk, PluginCommandBlock):
+            elif isinstance(blk, InvokerCommand):  # pragma: no branch
                 logger.info(
                     msg,
                     block_type=blk_name,
@@ -256,15 +301,24 @@ async def _run_blocks(
                 set_number=idx,
                 block_type=blk_name,
                 success=False,
-                err=err,
+                err=err.args[0] if err.args else err.__class__.__name__,
                 exit_codes=err.exitcodes,
                 duration_seconds=round(block_duration, 3),
             )
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
-            raise CliError(
-                f"Run invocation could not be completed as block failed: {err}",  # noqa: EM102
-            ) from err
+            ctx.exit(1)
+        except asyncio.CancelledError:
+            # Handle graceful termination on timeout
+            logger.info(
+                "Attempting graceful termination of current block",
+                block_type=current_block.__class__.__name__,
+            )
+            if isinstance(current_block, ExtractLoadBlocks):
+                await current_block.terminate(graceful=True)
+            else:
+                await current_block.stop(kill=False)
+            raise
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions
             with tracker.with_contexts(tracking_ctx):

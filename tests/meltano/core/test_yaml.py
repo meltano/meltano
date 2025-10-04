@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import typing as t
+import uuid
 from decimal import Decimal
 
 from ruamel.yaml import YAML, CommentedMap
@@ -13,12 +14,19 @@ if t.TYPE_CHECKING:
     from pathlib import Path
 
 
+def _create_test_data(**kwargs) -> CommentedMap:
+    """Create a CommentedMap with test data."""
+    data = CommentedMap()
+    for key, value in kwargs.items():
+        data[key] = value
+    return data
+
+
 def test_decimal_representation() -> None:
     """Test that Decimal values are properly represented in YAML."""
-    data = CommentedMap()
-    data["decimal_value"] = Decimal("123.45")
-    data["regular_float"] = 67.89
-    data["integer"] = 100
+    data = _create_test_data(
+        decimal_value=Decimal("123.45"), regular_float=67.89, integer=100
+    )
 
     # Test dumping to string
     stream = io.StringIO()
@@ -33,12 +41,16 @@ def test_decimal_representation() -> None:
 
 def test_decimal_in_nested_structure() -> None:
     """Test that Decimal values work in nested YAML structures."""
-    data = CommentedMap()
-    data["config"] = CommentedMap()
-    data["config"]["settings"] = CommentedMap()
-    data["config"]["settings"]["price"] = Decimal("99.99")
-    data["config"]["settings"]["discount"] = Decimal("0.15")
-    data["other"] = {"nested": {"value": Decimal("42.0")}}
+    config_settings = CommentedMap()
+    config_settings["price"] = Decimal("99.99")
+    config_settings["discount"] = Decimal("0.15")
+
+    config = CommentedMap()
+    config["settings"] = config_settings
+
+    data = _create_test_data(
+        config=config, other={"nested": {"value": Decimal("42.0")}}
+    )
 
     stream = io.StringIO()
     yaml.dump(data, stream)
@@ -47,6 +59,15 @@ def test_decimal_in_nested_structure() -> None:
     assert "99.99" in output
     assert "0.15" in output
     assert "42.0" in output
+
+
+def test_uuid_representation() -> None:
+    """Test that UUID values are properly represented in YAML."""
+    data = _create_test_data(uuid_value=uuid.uuid4())
+
+    stream = io.StringIO()
+    yaml.dump(data, stream)
+    assert str(data["uuid_value"]) in stream.getvalue()
 
 
 def test_load_and_dump_with_decimals(tmp_path: Path):
@@ -119,15 +140,16 @@ def test_decimal_representer_function() -> None:
 
 def test_mixed_numeric_types() -> None:
     """Test YAML handling with mixed numeric types including decimals."""
-    data = CommentedMap()
-    data["values"] = [
-        Decimal("1.23"),
-        4.56,
-        789,
-        Decimal("0.001"),
-        float("inf"),
-        Decimal("999999999.999999999"),
-    ]
+    data = _create_test_data(
+        values=[
+            Decimal("1.23"),
+            4.56,
+            789,
+            Decimal("0.001"),
+            float("inf"),
+            Decimal("999999999.999999999"),
+        ]
+    )
 
     stream = io.StringIO()
     yaml.dump(data, stream)

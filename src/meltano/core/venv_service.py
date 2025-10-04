@@ -26,22 +26,20 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-if sys.version_info < (3, 10):
-    from typing_extensions import TypeAlias
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
 else:
-    from typing import TypeAlias  # noqa: ICN003
+    from typing_extensions import Self
 
-if sys.version_info < (3, 12):
-    from typing_extensions import override
-else:
+if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
-
-_T = t.TypeVar("_T", bound="VenvService")
+else:
+    from typing_extensions import override
 
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
+StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[str | None]]
 
 
 @cache
@@ -91,6 +89,7 @@ class VirtualEnv:
     def __init__(
         self,
         root: Path,
+        *,
         python: str | None = None,
     ):
         """Initialize the `VirtualEnv` instance.
@@ -186,6 +185,17 @@ class VirtualEnv:
             ),
         )
 
+    def get_fingerprint(self, pip_install_args: Sequence[str]) -> str:
+        """Compute the fingerprint of the virtual environment.
+
+        Args:
+            pip_install_args: The arguments being passed to `pip install`.
+
+        Returns:
+            The fingerprint of the virtual environment.
+        """
+        return fingerprint(pip_install_args, self.python_path)
+
     def read_fingerprint(self) -> str | None:
         """Get the fingerprint of the existing virtual environment.
 
@@ -203,9 +213,7 @@ class VirtualEnv:
         Args:
             pip_install_args: The arguments being passed to `pip install`.
         """
-        self.plugin_fingerprint_path.write_text(
-            fingerprint(pip_install_args, self.python_path)
-        )
+        self.plugin_fingerprint_path.write_text(self.get_fingerprint(pip_install_args))
 
 
 async def _extract_stderr(_) -> None:
@@ -293,7 +301,7 @@ class VenvService:
         self.name = name
         self.venv = VirtualEnv(
             self.project.venvs_dir(namespace, name, make_dirs=False),
-            python or project.settings.get("python"),
+            python=python or project.settings.get("python"),
         )
         self.pip_log_path = self.project.logs_dir(
             "pip",
@@ -303,7 +311,7 @@ class VenvService:
         ).resolve()
 
     @classmethod
-    def from_plugin(cls: type[_T], project: Project, plugin: ProjectPlugin) -> _T:
+    def from_plugin(cls, project: Project, plugin: ProjectPlugin) -> Self:
         """Create a service instance from a project and plugin.
 
         Args:
@@ -364,9 +372,7 @@ class VenvService:
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.venv.read_fingerprint()
             yield existing_fingerprint is None
-            yield existing_fingerprint != fingerprint(
-                pip_install_args, self.venv.python_path
-            )
+            yield existing_fingerprint != self.venv.get_fingerprint(pip_install_args)
 
         return any(checks())
 
@@ -558,7 +564,7 @@ class VenvService:
             self.pip_log_path,
         )
         return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'.",
+            f"Failed to install plugin '{self.name}'",
             err.process,
             stderr=await err.stderr,
         )
@@ -713,11 +719,39 @@ class UvVenvService(VenvService):
         Returns:
             The error that occurred during installation with additional context.
         """
+        self.pip_log_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            await self._write_error_log(err)
+        except OSError as log_err:
+            logger.debug(
+                "Failed to write installation error to log file %s: %s",
+                self.pip_log_path,
+                log_err,
+            )
+        else:
+            logger.info(
+                "Logged uv pip install output to %s",
+                self.pip_log_path,
+            )
         return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'.",
+            f"Failed to install plugin '{self.name}'",
             err.process,
             stderr=await err.stderr,
         )
+
+    async def _write_error_log(self, err: AsyncSubprocessError) -> None:
+        """Write error details to the log file."""
+        import anyio
+
+        stderr_content = await err.stderr
+
+        async with await anyio.open_file(
+            self.pip_log_path,
+            "a",
+            encoding="utf-8",
+        ) as log_file:
+            if stderr_content:
+                await log_file.write(stderr_content)
 
     @override
     async def create_venv(

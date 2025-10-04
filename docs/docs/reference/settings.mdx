@@ -20,6 +20,8 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config meltano set <setting> <value>`](/reference/command-line-interface#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
+You can customize how `meltano.yml` is formatted (indentation, spacing, etc.) using Meltano's [user YAML configuration](/guide/user-yaml-config).
+
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](../reference/command-line-interface#config).
 
 ## Plugin settings
@@ -56,6 +58,32 @@ plugins:
 ## Your Meltano project
 
 These are settings specific to [your Meltano project](/concepts/project).
+
+### <a name="default-environment"></a>`default_environment`
+
+- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_DEFAULT_ENVIRONMENT`
+- Default: `dev`
+
+The default environment to use when no environment is explicitly specified.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set default_environment prod
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_DEFAULT_ENVIRONMENT=prod
+```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="project-python"></a>`python`
 
@@ -185,6 +213,32 @@ We hope you will choose to enable reporting, because this really does help us - 
 
 If you still have any concerns about keeping anonymous reporting enabled, we hope you'll share those concerns with us. You can do so by emailing `hello@meltano.com` or by logging an issue in our [Meltano Issue Tracker](https://github.com/meltano/meltano/issues).
 
+### <a name="disable-tracking"></a>`disable_tracking`
+
+- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_DISABLE_TRACKING`
+- Default: `None`
+
+Alternative way to disable tracking. When set to any truthy value, disables all tracking functionality.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set disable_tracking true
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_DISABLE_TRACKING=true
+```
+
+  </TabItem>
+</Tabs>
+
 ### <a name="project-id"></a>`project_id`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_ID`
@@ -287,6 +341,76 @@ meltano run --database-uri=mssql+pymssql://<username>:<password>@<host>:<port>/<
 :::info
 Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
 :::
+
+#### PostgreSQL Database Privileges and Requirements
+
+When using PostgreSQL as your system database, the database user must have sufficient privileges to create and manage the tables that Meltano uses for storing metadata, job execution history, and incremental state.
+
+##### Minimum PostgreSQL Version
+- **PostgreSQL 13 or higher** is recommended
+
+##### Installation with PostgreSQL Support
+See the guide for how to install [optional components](/guide/advanced-topics/#installing-optional-components).
+
+##### Required Database Privileges
+
+The PostgreSQL user specified in your `database_uri` must have the following privileges:
+
+**Database-level privileges:**
+- `CONNECT` - To connect to the database
+- `CREATE` - To create schemas during initialization
+- `TEMPORARY` - To create temporary tables during operations
+
+**Schema-level privileges** (on the target schema, typically `public`):
+- `CREATE` - To create tables and other database objects
+- `USAGE` - To access and use the schema
+
+**Object-level privileges:**
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` on all Meltano tables
+- `USAGE`, `SELECT` on all sequences used by Meltano tables
+
+##### Setting Up Database Privileges
+
+To grant the necessary privileges to your Meltano database user:
+
+```sql
+-- Connect as a superuser or database owner
+-- Replace 'meltano_user' with your actual username
+-- Replace 'your_database' with your actual database name
+
+-- Grant database-level privileges
+GRANT CONNECT, CREATE, TEMPORARY ON DATABASE your_database TO meltano_user;
+
+-- Grant schema-level privileges (assuming 'public' schema)
+GRANT CREATE, USAGE ON SCHEMA public TO meltano_user;
+
+-- Grant privileges on existing tables and sequences
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO meltano_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO meltano_user;
+
+-- Set default privileges for future objects created by other users
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO meltano_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO meltano_user;
+```
+
+##### Tables Created by Meltano
+
+Meltano will automatically create several tables in your PostgreSQL database:
+- `runs` - Stores job execution history and metadata
+- `state` - Stores incremental state for pipeline runs
+- `plugin_settings` - Stores plugin configuration
+- `alembic_version` - Tracks database schema version for migrations
+
+##### Database Migration Support
+
+Meltano uses [Alembic](https://alembic.sqlalchemy.org/) to manage database schema changes. The system will automatically run migrations when needed, which requires the user to have `ALTER TABLE` privileges on existing tables.
+
+##### Security Considerations
+
+- Use a dedicated database user for Meltano operations, granting it only the minimum privileges required to function. This follows the principle of least privilege and helps reduce security risks.
+- Consider using environment variables or a `.env` file to store database credentials securely
+- Enable SSL connections by adding appropriate parameters to your `database_uri`
+- Regularly review and audit database access logs
 
 #### Targeting a PostgreSQL Schema
 
@@ -526,10 +650,12 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/refere
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`.
 - `meltano` CLI option: `--log-level`
-- Options: `debug`, `info`, `warning`, `error`, `critical`
+- Options: `debug`, `info`, `warning`, `error`, `critical`, `disabled`
 - Default: `info`
 
 The granularity of CLI logging. Ignored if a local logging config is found.
+
+The `disabled` option completely suppresses all logging output, which is useful for scripts that need to parse Meltano output or for running commands in completely silent mode.
 
 #### How to use
 
@@ -756,7 +882,7 @@ export MELTANO_STATE_BACKEND_URI="s3://your_bucket/meltano/state"
 ### <a name="state-backend-uri"></a>`state_backend.lock_timeout_seconds`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS`
-- Default: `360`
+- Default: `10`
 
 Number of seconds that a [lock for a state ID](/concepts/state_backends#locking) should be considered valid in a state backend
 
@@ -782,7 +908,7 @@ export MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS=720
 ### <a name="state-backend-uri"></a>`state_backend.lock_retry_seconds`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS`
-- Default: `360`
+- Default: `1`
 
 Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked](/concepts/state_backends#locking)
 
@@ -873,7 +999,7 @@ export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=h
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_access_key_id`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ACCESS_KEY_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID`
 - Default: None
 
 The AWS access key ID to use when authenticating to S3.
@@ -899,7 +1025,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID="someaccesskeyid"
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_secret_access_key`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_SECRET_ACCESS_KEY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY`
 - Default: None
 
 The AWS secret access key to use when authenticating to S3.
@@ -925,7 +1051,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY="somesecretaccesskey"
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.endpoint_url`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ENDPOINT_URL`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_S3_ENDPOINT_URL`
 - Default: None
 
 The endpoint URL to use when connecting to S3. Only necessary if using S3-compatible storage _not_ hosted by AWS (e.g. [Minio](https://min.io))
@@ -1098,6 +1224,32 @@ MELTANO_VENV_BACKEND=virtualenv meltano install --clean
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
 
 ## Feature Flags
+
+### <a name="experimental"></a>`experimental`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_EXPERIMENTAL`
+- Default: `False`
+
+Whether to enable experimental features that are under development and may change or be removed in future versions.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set experimental true
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_EXPERIMENTAL=true
+```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 

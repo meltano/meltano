@@ -24,7 +24,20 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def _get_pep610_data() -> dict[str, t.Any] | None:
+class Pep610DirInfo(t.TypedDict):
+    """PEP 610 directory information."""
+
+    editable: bool
+
+
+class Pep610Data(t.TypedDict):
+    """PEP 610 data."""
+
+    url: str
+    dir_info: Pep610DirInfo
+
+
+def _get_pep610_data() -> Pep610Data | None:
     dist = distribution("meltano")
     if contents := dist.read_text("direct_url.json"):
         return json.loads(contents)
@@ -35,10 +48,11 @@ def _get_pep610_data() -> dict[str, t.Any] | None:
 def _check_editable_installation(*, force: bool) -> None:
     if (pep610_data := _get_pep610_data()) is None:
         return
-    url: str | None = pep610_data.get("url")
-    dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
     if (  # pragma: no branch
-        url and dir_info and dir_info.get("editable", False) and not force
+        (url := pep610_data.get("url"))
+        and (dir_info := pep610_data.get("dir_info", {}))
+        and dir_info.get("editable", False)
+        and not force
     ):
         meltano_dir = url.removeprefix("file://")
         raise AutomaticPackageUpgradeError(

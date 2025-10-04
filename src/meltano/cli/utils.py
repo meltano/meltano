@@ -22,21 +22,21 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
-    ProjectAddService,
 )
 from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
     from meltano.core.project_plugins_service import ProjectPluginsService
 
 setup_logging()
@@ -80,14 +80,15 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    if flags == AddedPluginFlags.ADDED:
-        action, preposition = "Added", "to"
-    elif flags == AddedPluginFlags.UPDATED:
-        action, preposition = "Updated", "in"
-    elif flags == AddedPluginFlags.NOT_ADDED:
-        action, preposition = "Initialized", "in"
-    else:  # pragma: no cover
-        t.assert_never(flags)
+    match flags:
+        case AddedPluginFlags.ADDED:
+            action, preposition = "Added", "to"
+        case AddedPluginFlags.UPDATED:
+            action, preposition = "Updated", "in"
+        case AddedPluginFlags.NOT_ADDED:
+            action, preposition = "Initialized", "in"
+        case _:  # pragma: no cover
+            t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",
@@ -463,8 +464,8 @@ def activate_environment(  # noqa: D417
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
-    if ctx.obj.get("selected_environment"):
-        project.activate_environment(ctx.obj["selected_environment"])
+    if env := ctx.obj.get("selected_environment"):
+        project.activate_environment(env)
         # Update the project context being used for telemetry:
         project_ctx = next(
             ctx
@@ -662,23 +663,6 @@ class AutoInstallBehavior(StrEnum):
     install = auto()
     no_install = auto()
     only_install = auto()
-
-
-class PluginTypeArg(click.Choice):
-    """A click parameter that converts a string to a PluginType."""
-
-    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
-        """Initialize the PluginTypeArg."""
-        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
-
-    def convert(
-        self,
-        value: str,
-        param: click.Parameter | None,  # noqa: ARG002
-        ctx: click.Context | None,  # noqa: ARG002
-    ) -> PluginType:
-        """Convert the value to a PluginType."""
-        return PluginType.from_cli_argument(value)
 
 
 def infer_plugin_type(plugin_name: str) -> PluginType:

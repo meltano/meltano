@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import asyncio
-from asyncio import Task
+import typing as t
 
 import structlog
 
 from meltano.core.runner import RunnerError
 from meltano.core.utils import human_size
+
+if t.TYPE_CHECKING:
+    from asyncio import Task
 
 logger = structlog.stdlib.get_logger(__name__)
 

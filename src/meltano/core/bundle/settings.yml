@@ -82,6 +82,8 @@ settings:
     value: error
   - label: Critical
     value: critical
+  - label: Disabled
+    value: disabled
   value: info
   env_specific: true
   description: Log level for the CLI

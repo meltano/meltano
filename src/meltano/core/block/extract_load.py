@@ -19,7 +19,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
@@ -35,6 +35,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
     from .ioblock import IOBlock
@@ -61,7 +62,7 @@ class ELBContext(ELContextProtocol):
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -123,7 +124,7 @@ class ELBContextBuilder:
         self._state_id_suffix = None
         self._env = {}
         self._blocks = []
-        self._state_strategy = StateStrategy.AUTO
+        self._state_strategy = StateStrategy.auto
         self._run_id: uuid.UUID | None = None
 
         self._base_output_logger = None
@@ -516,22 +517,22 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             RunnerError: if failures are encountered during execution or if the
                 underlying pipeline/job is already running.
         """
+        assert self.context.job  # noqa: S101
+
         job = self.context.job
+        logger.info(
+            "Running job with name '%s' and run ID '%s'",
+            job.job_name,
+            job.run_id,
+        )
         fail_stale_jobs(self.context.session, job.job_name)
         if self.context.force:
-            logger.warning(
-                "Force option is enabled, ignoring stale job check.",
-            )
-
-        if not self.context.force and (
-            existing := JobFinder(job.job_name).latest_running(
-                self.context.session,
-            )
-        ):
+            logger.warning("Force option is enabled, ignoring stale job check.")
+        elif existing := JobFinder(job.job_name).latest_running(self.context.session):
             msg = (
                 f"Another '{job.job_name}' pipeline is already running "
                 f"which started at {existing.started_at}. "
-                f"Wait until {existing.valid_intil()} when the job will be "
+                f"Wait until {existing.valid_until()} when the job will be "
                 "automatically cancelled if stale, or ignore this check using the "
                 "'--force' option."
             )
@@ -542,21 +543,18 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 await self.execute()
 
     async def terminate(self, *, graceful: bool = False) -> None:
-        """Terminate an in flight ExtractLoad execution, potentially disruptive.
-
-        Not actually implemented yet.
+        """Terminate an in flight ExtractLoad execution.
 
         Args:
             graceful: Whether the BlockSet should try to gracefully quit.
-
-        Raises:
-            NotImplementedError: if graceful termination is not implemented.
+                If True, sends SIGTERM to allow cleanup. If False, sends SIGKILL.
         """
-        if graceful:
-            raise NotImplementedError
-
-        for block in self.blocks:
-            await block.stop(kill=True)
+        logger.info(
+            "Terminating ExtractLoadBlocks",
+            graceful=graceful,
+            block_count=len(self.blocks),
+        )
+        await asyncio.gather(*(block.stop(kill=not graceful) for block in self.blocks))
 
     @property
     def process_futures(self) -> list[asyncio.Task]:
@@ -647,24 +645,28 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             BlockSetValidationError: if consumer does not have an upstream producer.
         """
         for idx, block in enumerate(self.blocks):
-            logger_base = logger.bind(
-                consumer=block.consumer,
-                producer=block.producer,
-                string_id=block.string_id,
-                cmd_type="elb",
-                job_name=self.context.job.job_name if self.context.job else None,
-            )
-            if logger.isEnabledFor(logging.DEBUG):
+            context = {
+                "consumer": block.consumer,
+                "producer": block.producer,
+                "string_id": block.string_id,
+                "cmd_type": "elb",
+                "job_name": self.context.job.job_name if self.context.job else None,
+            }
+            stdout_logger = block.invoker.stdout_logger.bind(**context)
+            stderr_logger = block.invoker.stderr_logger.bind(**context)
+            if stdout_logger.isEnabledFor(logging.DEBUG):
                 block.stdout_link(
                     self.output_logger.out(
                         block.string_id,
-                        logger_base.bind(stdio="stdout"),
+                        stdout_logger,
+                        # No log_parser for stdout - Singer protocol messages
                     ),
                 )
             block.stderr_link(
                 self.output_logger.out(
                     block.string_id,
-                    logger_base.bind(stdio="stderr"),
+                    stderr_logger,
+                    log_parser=block.invoker.get_log_parser(),
                 ),
             )
             if block.consumer and block.stdin is not None:

@@ -27,7 +27,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.9, 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1.  Create and navigate to a directory to hold your Meltano projects:
 
@@ -465,7 +465,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
 
   <p><strong>What if I already have a catalog file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have already generated a <a href="https://hub.meltano.com/singer/spec#catalog-files">catalog file</a>.</p>
-  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
+  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#el">`meltano el`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
 :::
 
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/reference/command-line-interface#select):
@@ -961,7 +961,7 @@ meltano state get dev:tap-gitlab-to-target-postgres
 
 :::
 
-There is also the [`meltano elt`](/reference/command-line-interface#elt) command which is a more rigid command for running only EL pipelines.
+There is also the [`meltano el`](/reference/command-line-interface#el) command which is a more rigid command for running only EL pipelines.
 
 Or directly using the `meltano invoke`, which only executes a single plugin at a time.
 This can be useful for debugging a failing extractor or loader.

@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.job import Job, Payload
+from meltano.core.job import Payload
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
@@ -20,6 +20,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.job import Job
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = get_logger(__name__)
@@ -41,7 +42,7 @@ class BookmarkWriter:
         """Initialize the `BookmarkWriter`.
 
         Args:
-            job: meltano elt job associated with this invocation and whose
+            job: meltano el or meltano elt job associated with this invocation and whose
                 state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: A payload flag.
@@ -108,6 +109,7 @@ class SingerTarget(SingerPlugin):
     __plugin_type__ = PluginType.LOADERS
 
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
+        *SingerPlugin.EXTRA_SETTINGS,
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 

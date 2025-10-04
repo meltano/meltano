@@ -98,7 +98,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
             instruction = "Check https://hub.meltano.com/ for available plugins"
         else:
             instruction = (
-                "Try running `meltano lock --update --all` to ensure your plugins are "
+                "Try running `meltano lock --update` to ensure your plugins are "
                 "up to date, or add a `namespace` to your plugin if it is a custom one"
             )
 
@@ -306,7 +306,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         for plugin in self.plugins(ensure_parent=False):
             if (
-                plugin.name == plugin_name  # (with too much logic)
+                plugin.name == plugin_name
                 and (plugin_type is None or plugin.type == plugin_type)
                 and (
                     invokable is None
@@ -530,7 +530,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update
-            p_idx, p_outdated = next(
+            p_idx, _p_outdated = next(
                 (
                     (idx, plg)
                     for idx, plg in enumerate(environment.config.plugins[plugin.type])

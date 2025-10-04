@@ -8,7 +8,7 @@ from contextlib import closing
 
 import click
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import get_install_options, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
@@ -18,6 +18,7 @@ from meltano.core.select_service import SelectService
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin.singer.catalog import ListSelectedExecutor
     from meltano.core.project import Project
 
@@ -27,21 +28,21 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 
 def selection_color(selection: SelectionType) -> str:
     """Return the appropriate colour for given SelectionType."""
-    # TODO: Use a match statement when we drop Python 3.9 support
-    if selection is SelectionType.SELECTED:
-        return "bright_green"
-    if selection is SelectionType.AUTOMATIC:
-        return "bright_white"
-    if selection is SelectionType.EXCLUDED:
-        return "red"
-    if selection is SelectionType.UNSUPPORTED:
-        return "black"
+    match selection:
+        case SelectionType.SELECTED:
+            return "bright_green"
+        case SelectionType.AUTOMATIC:
+            return "bright_white"
+        case SelectionType.EXCLUDED:
+            return "red"
+        case SelectionType.UNSUPPORTED:
+            return "black"
+        case _:  # pragma: no cover
+            t.assert_never(selection)
 
-    t.assert_never(selection)
 
-
-def selection_mark(selection) -> str:  # noqa: ANN001
-    """Return the mark to indicate the selection type of an attribute.
+def selection_mark(selection: SelectionType) -> str:
+    """Return the mark to indicate the selection type of a property.
 
     Examples:
       [automatic]
@@ -58,25 +59,26 @@ def selection_mark(selection) -> str:  # noqa: ANN001
     environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.argument("extractor")
-@click.argument("entities_filter", default="*")
-@click.argument("attributes_filter", default="*")
+@click.argument("streams_filter", default="*")
+@click.argument("properties_filter", default="*")
 @click.option(
     "--list",
     "list_format",
     flag_value="text",
-    help="List the current selected tap attributes in plain text format.",
+    default=None,
+    help="List the current selected tap properties in plain text format.",
 )
 @click.option(
     "--json",
     "list_format",
     flag_value="json",
-    help="List the current selected tap attributes in JSON format.",
+    help="List the current selected tap properties in JSON format.",
 )
 @click.option(
     "--all",
     "show_all",
     is_flag=True,
-    help="Show all the tap attributes with their selected status.",
+    help="Show all the tap properties with their selected status.",
 )
 @click.option(
     "--refresh-catalog",
@@ -93,7 +95,12 @@ def selection_mark(selection) -> str:  # noqa: ANN001
 @click.option(
     "--exclude",
     is_flag=True,
-    help="Exclude all attributes that match specified pattern.",
+    help="Exclude all properties that match specified pattern.",
+)
+@click.option(
+    "--clear",
+    is_flag=True,
+    help="Clear all select patterns for the extractor.",
 )
 @install
 @no_install
@@ -103,8 +110,8 @@ def selection_mark(selection) -> str:  # noqa: ANN001
 async def select(
     project: Project,
     extractor: str,
-    entities_filter: str,
-    attributes_filter: str,
+    streams_filter: str,
+    properties_filter: str,
     install_plugins: InstallPlugins,
     *,
     list_format: t.Literal["text", "json"] | None,
@@ -112,6 +119,7 @@ async def select(
     refresh_catalog: bool,
     remove: bool,
     exclude: bool,
+    clear: bool,
 ) -> None:
     """Manage extractor selection patterns.
 
@@ -119,7 +127,9 @@ async def select(
     Read more at https://docs.meltano.com/reference/command-line-interface#select
     """  # noqa: D301
     try:
-        if list_format:
+        if clear:
+            clear_selections(project, extractor)
+        elif list_format is not None:
             await show(
                 project,
                 extractor,
@@ -132,27 +142,33 @@ async def select(
             update(
                 project,
                 extractor,
-                entities_filter,
-                attributes_filter,
+                streams_filter,
+                properties_filter,
                 exclude=exclude,
                 remove=remove,
             )
     except PluginExecutionError as err:
-        raise CliError(f"Cannot list the selected attributes: {err}") from err  # noqa: EM102
+        raise CliError(f"Cannot list the selected properties: {err}") from err  # noqa: EM102
+
+
+def clear_selections(project: Project, extractor: str) -> None:
+    """Clear all select patterns for a specific extractor."""
+    select_service = SelectService(project, extractor)
+    select_service.clear()
 
 
 def update(
     project: Project,
     extractor: str,
-    entities_filter: str,
-    attributes_filter: str,
+    streams_filter: str,
+    properties_filter: str,
     *,
     exclude: bool = False,
     remove: bool = False,
 ) -> None:
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
-    select_service.update(entities_filter, attributes_filter, exclude, remove=remove)
+    select_service.update(streams_filter, properties_filter, exclude, remove=remove)
 
 
 async def show(
@@ -199,7 +215,7 @@ def _show_json(
 ) -> None:
     output: dict[str, list] = {
         "enabled_patterns": [],
-        "entities": [],
+        "streams": [],
     }
     for select_pattern in map(SelectPattern.parse, patterns):
         output["enabled_patterns"].append(select_pattern.raw)
@@ -211,7 +227,7 @@ def _show_json(
     ):
         entry_selection = stream.selection + prop.selection
         if show_all or entry_selection:
-            output["entities"].append(
+            output["streams"].append(
                 {
                     "stream": stream.key,
                     "property": prop.key,
@@ -240,7 +256,7 @@ def _show_plain(
         color = "red" if select_pattern.negated else "white"
         click.secho(f"\t{select_pattern.raw}", fg=color)
 
-    click.secho("\nSelected attributes:")
+    click.secho("\nSelected properties:")
     for stream, prop in (
         (strm, prp)
         for strm in sorted(list_all.streams)

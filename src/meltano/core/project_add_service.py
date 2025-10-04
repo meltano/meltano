@@ -6,21 +6,22 @@ import enum
 import sys
 import typing as t
 
-from meltano.core.plugin import BasePlugin, PluginType, Variant
+from meltano.core.plugin import BasePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import (
-    AddedPluginFlags,
     DefinitionSource,
     PluginAlreadyAddedException,
 )
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin import PluginType
     from meltano.core.project import Project
+    from meltano.core.project_plugins_service import AddedPluginFlags
 
 
 class PluginAddedReason(StrEnum):

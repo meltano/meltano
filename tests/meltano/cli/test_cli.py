@@ -251,7 +251,7 @@ class TestCli:
 
     def test_handle_meltano_error(self) -> None:
         exception = MeltanoError(reason="This failed", instruction="Try again")
-        with pytest.raises(CliError, match="This failed. Try again."):
+        with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
 
     @pytest.mark.usefixtures("pushd")
@@ -294,11 +294,52 @@ class TestCli:
             assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
             assert Path().resolve() == dirpath
 
+    def test_env_file_option(
+        self,
+        cli_runner: MeltanoCliRunner,
+        test_cli_project: Project,
+        tmp_path: Path,
+    ):
+        project = test_cli_project
+        with cd(project.root_dir()):
+            dotenv_path = tmp_path / ".env"
+            dotenv_path.write_text("MELTANO_DEFAULT_ENVIRONMENT=custom\n")
+            result = cli_runner.invoke(
+                cli,
+                (
+                    "--env-file",
+                    str(dotenv_path),
+                    "config",
+                    "print",
+                    "meltano",
+                    "--format=env",
+                ),
+            )
+            assert result.exit_code == 0
+            assert "MELTANO_DEFAULT_ENVIRONMENT='custom'" in result.output
+
+        with cd(project.root_dir()):
+            dotenv_path = project.root.joinpath("prod.env")
+            dotenv_path.write_text("MELTANO_DEFAULT_ENVIRONMENT=custom\n")
+            result = cli_runner.invoke(
+                cli,
+                (
+                    "--env-file",
+                    "prod.env",
+                    "config",
+                    "print",
+                    "meltano",
+                    "--format=env",
+                ),
+            )
+            assert result.exit_code == 0
+            assert "MELTANO_DEFAULT_ENVIRONMENT='custom'" in result.output
+
     @pytest.mark.parametrize(
         "command_args",
         (
             ("invoke", "example"),
-            ("config", "example"),
+            ("config", "print", "example"),
             ("job", "list"),
             ("environment", "list"),
             ("add", "utility", "example"),
@@ -339,6 +380,12 @@ class TestCli:
                 "cli.log_level",
                 "warning",
                 id="log-level-warning",
+            ),
+            pytest.param(
+                "--log-level",
+                "cli.log_level",
+                "disabled",
+                id="log-level-disabled",
             ),
             pytest.param(
                 "--log-config",
@@ -517,7 +564,7 @@ class TestCliColors:
             result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
             assert result.exit_code == 0, result.exception
             assert result.stdout.strip() == expected_text
-            assert bool(ANSI_RE.match(result.stderr)) is log_colors_expected
+            assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
             assert result.exception is None
 
 
@@ -528,7 +575,7 @@ class TestLargeConfigProject:
         assert (
             cli_runner.invoke(
                 cli,
-                ["--no-environment", "config", "target-with-large-config", "list"],
+                ["--no-environment", "config", "list", "target-with-large-config"],
             ).exit_code
             == 0
         )

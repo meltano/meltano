@@ -5,12 +5,15 @@ from __future__ import annotations
 import typing as t
 from datetime import datetime
 
-from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column  # noqa: TC002
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import StateType  # noqa: TC001
 from meltano.core.utils import merge
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 SINGER_STATE_KEY = "singer_state"
 
@@ -18,7 +21,7 @@ SINGER_STATE_KEY = "singer_state"
 class JobState(SystemModel):
     """Model class that represents the current state of a given job.
 
-    Modified during `meltano elt` or `meltano run` runs whenever a
+    Modified during `meltano el`, `meltano elt`, or `meltano run` runs whenever a
     STATE message is emitted by a Singer target. Also written and read
     by `meltano state` CLI invocations. Only holds the _current_ state
     for a given state_id. Full job run history is held by the Job model.

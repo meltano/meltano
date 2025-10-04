@@ -6,13 +6,12 @@ import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.job import Job as StateJob
 from meltano.core.job import JobFinder as StateJobFinder
 
 if t.TYPE_CHECKING:
-    import datetime
-
     from sqlalchemy.orm import Session
+
+    from meltano.core.job import Job as StateJob
 
 CRON_INTERVALS: dict[str, str | None] = {
     "@once": None,
@@ -215,6 +214,7 @@ class Schedule(NameEq, Canonical):
         name: str,
         interval: str | None,
         env: dict[str, str] | None = None,
+        **kwargs: t.Any,
     ):
         """Initialize a Schedule.
 
@@ -222,8 +222,9 @@ class Schedule(NameEq, Canonical):
             name: The name of the schedule.
             interval: The interval of the schedule.
             env: The env for this schedule.
+            kwargs: The keyword arguments to initialize the schedule with.
         """
-        super().__init__()
+        super().__init__(**kwargs)
 
         # Attributes will be listed in meltano.yml in this order:
         self.name = name
@@ -237,9 +238,9 @@ class Schedule(NameEq, Canonical):
         Returns:
             The cron expression.
         """
-        if self.interval:
-            return CRON_INTERVALS.get(self.interval, self.interval)
-        return None
+        return (
+            CRON_INTERVALS.get(self.interval, self.interval) if self.interval else None
+        )
 
 
 class ELTSchedule(Schedule):
@@ -248,7 +249,6 @@ class ELTSchedule(Schedule):
     extractor: str
     loader: str
     transform: str
-    start_date: datetime.datetime | None
 
     def __init__(
         self,
@@ -256,7 +256,6 @@ class ELTSchedule(Schedule):
         extractor: str,
         loader: str,
         transform: str,
-        start_date: datetime.datetime | None = None,
         **kwargs: t.Any,
     ):
         """Initialize a Schedule.
@@ -265,14 +264,12 @@ class ELTSchedule(Schedule):
             extractor: The name of the extractor.
             loader: The name of the loader.
             transform: The transform statement (eg: skip, only, run)
-            start_date: The start date of the schedule.
             kwargs: The keyword arguments to initialize the schedule with.
         """
         super().__init__(**kwargs)
         self.extractor = extractor
         self.loader = loader
         self.transform = transform
-        self.start_date = start_date
 
     @property
     def elt_args(self) -> list[str]:

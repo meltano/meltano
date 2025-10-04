@@ -10,6 +10,8 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import CHAR, INTEGER, VARCHAR, DateTime, TypeDecorator
 
+from meltano.core.utils import uuid7
+
 if t.TYPE_CHECKING:
     from sqlalchemy.engine.interfaces import Dialect
     from sqlalchemy.types import TypeEngine
@@ -71,7 +73,7 @@ class IntFlag(TypeDecorator):  # noqa: D101
         return int(value) if value is not None else value
 
 
-class GUID(TypeDecorator[t.Union[uuid.UUID, str]]):
+class GUID(TypeDecorator[uuid.UUID | str]):
     """Platform-independent GUID type.
 
     Uses PostgreSQL's UUID type, otherwise uses
@@ -171,7 +173,7 @@ class DateTimeUTC(TypeDecorator[datetime.datetime]):
         return value
 
 
-GUIDType = t.Annotated[uuid.UUID, mapped_column(GUID, default=uuid.uuid4)]
+GUIDType = t.Annotated[uuid.UUID, mapped_column(GUID, default=uuid7)]
 StateType = t.Annotated[
     dict[str, str],
     mapped_column(MutableDict.as_mutable(JSONEncodedDict)),
