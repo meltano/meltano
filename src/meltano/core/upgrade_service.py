@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import os
 import pathlib
 import subprocess
 import sys
 import typing as t
-from importlib.metadata import distribution
 
 import click
 
+from meltano.core._packaging import editable_installation
 from meltano.core.error import MeltanoError
 from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_plugins_service import PluginType
@@ -24,40 +23,11 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-class Pep610DirInfo(t.TypedDict):
-    """PEP 610 directory information."""
-
-    editable: bool
-
-
-class Pep610Data(t.TypedDict):
-    """PEP 610 data."""
-
-    url: str
-    dir_info: Pep610DirInfo
-
-
-def _get_pep610_data() -> Pep610Data | None:
-    dist = distribution("meltano")
-    if contents := dist.read_text("direct_url.json"):
-        return json.loads(contents)
-
-    return None
-
-
 def _check_editable_installation(*, force: bool) -> None:
-    if (pep610_data := _get_pep610_data()) is None:
-        return
-    if (  # pragma: no branch
-        (url := pep610_data.get("url"))
-        and (dir_info := pep610_data.get("dir_info", {}))
-        and dir_info.get("editable", False)
-        and not force
-    ):
-        meltano_dir = url.removeprefix("file://")
+    if not force and (editable_location := editable_installation()):
         raise AutomaticPackageUpgradeError(
             reason="it is installed from source",
-            instructions=f"navigate to `{meltano_dir}` and run `git pull`",
+            instructions=f"navigate to `{editable_location}` and run `git pull`",
         )
 
 

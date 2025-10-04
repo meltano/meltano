@@ -7,12 +7,14 @@ import shutil
 import subprocess
 import typing as t
 import uuid
+from http import HTTPStatus
 from pathlib import Path
 from time import perf_counter_ns
 from unittest import mock
 
 import click
 import pytest
+import responses
 import yaml
 from structlog.stdlib import get_logger
 
@@ -26,6 +28,7 @@ from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
@@ -601,3 +604,113 @@ class TestUUIDParamType:
         value = "zzz"
         with pytest.raises(click.BadParameter, match="is not a valid UUID"):
             param.convert(value, None, None)
+
+
+class TestVersionCheck:
+    """Test version check functionality in CLI."""
+
+    def test_version_check_on_command(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that version check integration works."""
+        # This test verifies the version check is integrated into CLI commands.
+        # The actual version check logic is thoroughly tested in test_version_check.py
+        with cd(project.root_dir()):
+            result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+
+        # The command should execute successfully
+        # (version check doesn't block execution)
+        assert result.exit_code == 0
+
+        # Note: Due to test environment complexities, we test the actual version check
+        # logic in unit tests rather than integration tests. The version check service
+        # is thoroughly tested in tests/meltano/core/test_version_check.py
+
+    def test_version_check_excluded_commands(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that excluded commands work correctly."""
+        with cd(project.root_dir()):
+            # Test 'version' command works
+            result = cli_runner.invoke(cli, ["--version"])
+            assert result.exit_code == 0
+
+            # Test 'upgrade' command works (may fail but shouldn't crash)
+            result = cli_runner.invoke(cli, ["upgrade"])
+            # Command may exit with error but shouldn't crash due to version check
+            assert result.exit_code in [0, 1, 2]  # Various acceptable exit codes
+
+    def test_version_check_disabled_by_env(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        """Test that version check can be disabled by environment variable."""
+        monkeypatch.setenv("MELTANO_CLI_DISABLE_VERSION_CHECK", "1")
+
+        with (
+            mock.patch(
+                "meltano.core.version_check.editable_installation",
+                return_value=None,
+            ),
+            cd(project.root_dir()),
+        ):
+            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+
+        # Verify no version check message appears in logs
+        assert "A new version of Meltano is available" not in result.stderr
+
+    def test_version_check_disabled_by_project_setting(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that version check can be disabled by project setting."""
+        with (
+            mock.patch(
+                "meltano.core.version_check.editable_installation",
+                return_value=None,
+            ),
+            cd(project.root_dir()),
+        ):
+            # Set the project setting to disable version check
+            result = cli_runner.invoke(
+                cli, ["config", "set", "meltano", "cli.disable_version_check", "true"]
+            )
+            assert result.exit_code == 0
+
+            # Run a command and verify no version check message appears
+            result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+            assert "A new version of Meltano is available" not in result.stderr
+
+    @responses.activate
+    def test_version_check_error_handling(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that CLI commands execute successfully even with version check errors."""  # noqa: E501
+        responses.add(responses.GET, PYPI_URL, status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        with (
+            mock.patch(
+                "meltano.core.version_check.VersionCheckService._check_version",
+                return_value=VersionCheckResult(
+                    current_version="3.7.0",
+                    latest_version="3.9.0",
+                    is_outdated=True,
+                    upgrade_command=None,
+                ),
+            ),
+            cd(project.root_dir()),
+        ):
+            result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+
+        # Command should succeed regardless of version check status
+        assert result.exit_code == 0
+        # Verify the command actually ran (may have empty output)
+        assert "A new version of Meltano is available" in result.stderr

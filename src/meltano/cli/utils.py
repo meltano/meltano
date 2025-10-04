@@ -26,6 +26,7 @@ from meltano.core.project_add_service import (
 from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+from meltano.core.version_check import VersionCheckService
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -42,6 +43,9 @@ if t.TYPE_CHECKING:
 setup_logging()
 
 logger = structlog.stdlib.get_logger(__name__)
+
+# Commands that should skip version check
+EXCLUDED_VERSION_CHECK_COMMANDS = {"version", "upgrade", "init"}
 
 
 class CliError(Exception):
@@ -575,7 +579,28 @@ class InstrumentedGroup(InstrumentedGroupMixin, DYMGroup):
     """Click group with telemetry instrumentation."""
 
 
-class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class _BaseMeltanoCommand(click.Command):
+    """Base class for all Meltano commands."""
+
+    def _perform_version_check(self, ctx: click.Context) -> None:
+        """Perform version check if conditions are met."""
+        # Skip version check for certain commands
+        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
+            return
+
+        # Skip if project not available or version check disabled
+        project: Project | None = ctx.obj.get("project")
+        if project is None or not ctx.obj.get("version_check_enabled", False):
+            return
+
+        version_service = VersionCheckService(project)
+
+        if (result := version_service.check_version()) and result.is_outdated:
+            # Display version update message
+            logger.warning(version_service.format_update_message(result))
+
+
+class InstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command that automatically fires telemetry events when invoked.
 
     Both starting and ending events are fired. The ending event fired is
@@ -586,6 +611,10 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+
         if ctx.obj.get("tracker"):
             tracker = ctx.obj["tracker"]
             tracker.add_contexts(CliContext.from_click_context(ctx))
@@ -600,7 +629,7 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
             super().invoke(ctx)
 
 
-class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command with partial telemetry instrumentation.
 
     Only automatically fires a 'start' event.
@@ -610,6 +639,10 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)

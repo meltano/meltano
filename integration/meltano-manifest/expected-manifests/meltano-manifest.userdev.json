@@ -32,6 +32,7 @@
     "KMS_PUBLIC_KEY_PATH": "utilities/kms/Publickey.pem",
     "KMS_SECTRETS_PATH": "secrets.yml",
     "MELTANO_AUTO_INSTALL": "true",
+    "MELTANO_CLI_DISABLE_VERSION_CHECK": "false",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
     "MELTANO_CLI_LOG_FORMAT": "colored",
     "MELTANO_CLI_LOG_LEVEL": "info",

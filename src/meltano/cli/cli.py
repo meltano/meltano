@@ -151,6 +151,9 @@ def cli(
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
         ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
+
+        # Store project and setup for version check in subcommands
+        ctx.obj["version_check_enabled"] = True
     except ProjectNotFound:
         ctx.obj["project"] = None
     except EmptyMeltanoFileException:
