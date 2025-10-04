@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import typing as t
 from datetime import datetime, timedelta, timezone
+from http import HTTPStatus
 from unittest import mock
 
 import pytest
@@ -89,12 +90,7 @@ class TestVersionCheckService:
                 "name": "meltano",
             }
         }
-        responses.add(
-            responses.GET,
-            PYPI_URL,
-            json=pypi_response,
-            status=200,
-        )
+        responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         latest_version = version_service._fetch_latest_version()
         assert latest_version == "3.9.0"
@@ -137,12 +133,7 @@ class TestVersionCheckService:
                 "name": "meltano",
             }
         }
-        responses.add(
-            responses.GET,
-            PYPI_URL,
-            json=pypi_response,
-            status=200,
-        )
+        responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
             "meltano.core.version_check.importlib.metadata.version",
@@ -163,16 +154,9 @@ class TestVersionCheckService:
         version_service: VersionCheckService,
     ) -> None:
         """Test handling of PyPI API failure."""
-        responses.add(
-            responses.GET,
-            PYPI_URL,
-            status=500,
-        )
+        responses.add(responses.GET, PYPI_URL, status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        assert version_service.check_version() is None
 
-        latest_version = version_service.check_version()
-        assert latest_version is None
-
-    @responses.activate
     def test_check_version_invalid_version(
         self,
         version_service: VersionCheckService,
@@ -198,12 +182,7 @@ class TestVersionCheckService:
                 "name": "meltano",
             }
         }
-        responses.add(
-            responses.GET,
-            PYPI_URL,
-            json=pypi_response,
-            status=200,
-        )
+        responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
             "meltano.core.version_check.importlib.metadata.version",
@@ -278,12 +257,7 @@ class TestVersionCheckService:
                 "name": "meltano",
             }
         }
-        responses.add(
-            responses.GET,
-            PYPI_URL,
-            json=pypi_response,
-            status=200,
-        )
+        responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
             "meltano.core.version_check.importlib.metadata.version",
