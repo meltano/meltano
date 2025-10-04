@@ -17,7 +17,6 @@ import structlog.stdlib
 from packaging.version import InvalidVersion, parse
 
 from meltano import __version__
-from meltano.core.utils import get_no_color_flag
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -202,9 +201,6 @@ class VersionCheckService:
         if not result.is_outdated:
             return ""
 
-        # Use plain text format if no color is requested
-        no_color = get_no_color_flag()
-
         lines = [
             f"A new version of Meltano is available (v{result.latest_version})!",
             f"You are currently running v{result.current_version}.",
@@ -215,10 +211,4 @@ class VersionCheckService:
             "For more information, visit: https://docs.meltano.com/guide/installation",
         ]
 
-        message = "\n".join(lines)
-
-        if not no_color:
-            # Add some color formatting for terminals that support it
-            message = f"\033[94m{message}\033[0m"  # Blue text
-
-        return message
+        return "\n".join(lines)

@@ -600,9 +600,7 @@ class _BaseMeltanoCommand(click.Command):
             result = version_service.check_version()
             if result and result.is_outdated:
                 # Display version update message
-                click.echo()  # Empty line for better formatting
-                click.echo(version_service.format_update_message(result))
-                click.echo()  # Empty line for better formatting
+                logger.warning(version_service.format_update_message(result))
         except Exception:
             # Don't let version check errors block CLI execution
             logger.debug("Failed to perform version check", exc_info=True)

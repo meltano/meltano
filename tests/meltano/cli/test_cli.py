@@ -615,7 +615,7 @@ class TestVersionCheck:
         # This test verifies the version check is integrated into CLI commands.
         # The actual version check logic is thoroughly tested in test_version_check.py
         with cd(project.root_dir()):
-            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+            result = cli_runner.invoke(cli, ["config", "list", "meltano"])
 
         # The command should execute successfully
         # (version check doesn't block execution)
@@ -653,8 +653,8 @@ class TestVersionCheck:
         with cd(project.root_dir()):
             result = cli_runner.invoke(cli, ["config", "meltano", "list"])
 
-        # Verify no version check message appears
-        assert "A new version of Meltano is available" not in result.output
+        # Verify no version check message appears in logs
+        assert "A new version of Meltano is available" not in result.stderr
 
     def test_version_check_disabled_by_project_setting(
         self,
@@ -665,13 +665,13 @@ class TestVersionCheck:
         with cd(project.root_dir()):
             # Set the project setting to disable version check
             result = cli_runner.invoke(
-                cli, ["config", "meltano", "set", "cli.disable_version_check", "true"]
+                cli, ["config", "set", "meltano", "cli.disable_version_check", "true"]
             )
             assert result.exit_code == 0
 
             # Run a command and verify no version check message appears
-            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
-            assert "A new version of Meltano is available" not in result.output
+            result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+            assert "A new version of Meltano is available" not in result.stderr
 
     def test_version_check_error_handling(
         self,
@@ -680,11 +680,9 @@ class TestVersionCheck:
     ) -> None:
         """Test that CLI commands execute successfully even with version check errors."""  # noqa: E501
         with cd(project.root_dir()):
-            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+            result = cli_runner.invoke(cli, ["config", "list", "meltano"])
 
         # Command should succeed regardless of version check status
         assert result.exit_code == 0
-        # Verify the command actually ran
-        assert (
-            "meltano" in result.output or result.output == ""
-        )  # May have empty output
+        # Verify the command actually ran (may have empty output)
+        assert "meltano" in result.output or result.output == ""
