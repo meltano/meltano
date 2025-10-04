@@ -220,29 +220,55 @@ class TestVersionCheckService:
 
         assert result is None
 
-    def test_format_update_message(self, version_service: VersionCheckService):
+    @pytest.mark.parametrize(
+        ("result", "expected_message"),
+        (
+            pytest.param(
+                VersionCheckResult(
+                    current_version="3.7.0",
+                    latest_version="3.9.0",
+                    is_outdated=True,
+                ),
+                (
+                    "A new version of Meltano is available (v3.9.0) and you are "
+                    "currently running v3.7.0. For more information, visit: https://docs.meltano.com/getting-started/installation."
+                ),
+                id="outdated",
+            ),
+            pytest.param(
+                VersionCheckResult(
+                    current_version="3.9.0",
+                    latest_version="3.9.0",
+                    is_outdated=False,
+                ),
+                "",
+                id="up-to-date",
+            ),
+            pytest.param(
+                VersionCheckResult(
+                    current_version="3.7.0",
+                    latest_version="3.9.0",
+                    is_outdated=True,
+                    upgrade_command="pip install --upgrade meltano",
+                ),
+                (
+                    "A new version of Meltano is available (v3.9.0) and you are "
+                    "currently running v3.7.0. To upgrade: "
+                    "`pip install --upgrade meltano`. For more information, visit: https://docs.meltano.com/getting-started/installation."
+                ),
+                id="outdated-with-upgrade-command",
+            ),
+        ),
+    )
+    def test_format_update_message(
+        self,
+        version_service: VersionCheckService,
+        result: VersionCheckResult,
+        expected_message: str,
+    ):
         """Test formatting of update message."""
-        result = VersionCheckResult(
-            current_version="3.7.0",
-            latest_version="3.9.0",
-            is_outdated=True,
-            upgrade_command="pip install --upgrade meltano",
-        )
-
         message = version_service.format_update_message(result)
-        assert "A new version of Meltano is available (v3.9.0)" in message
-        assert "you are currently running v3.7.0." in message
-        assert "pip install --upgrade meltano" in message
-        assert "https://docs.meltano.com/getting-started/installation" in message
-
-        # Test no message for up-to-date version
-        result_up_to_date = VersionCheckResult(
-            current_version="3.9.0",
-            latest_version="3.9.0",
-            is_outdated=False,
-        )
-        message = version_service.format_update_message(result_up_to_date)
-        assert message == ""
+        assert message == expected_message
 
     @responses.activate
     def test_check_version_uses_cache(
