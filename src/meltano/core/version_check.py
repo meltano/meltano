@@ -9,7 +9,6 @@ import sys
 import typing as t
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 import platformdirs
 import requests
@@ -19,6 +18,8 @@ from packaging.version import InvalidVersion, parse
 from meltano import __version__
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -74,11 +75,7 @@ class VersionCheckService:
 
         # Check project setting if available
         if self.project is not None:
-            try:
-                return not self.project.settings.get("cli.disable_version_check")
-            except Exception:
-                # If setting doesn't exist or error, default to checking
-                logger.debug("Failed to get version check setting", exc_info=True)
+            return not self.project.settings.get("cli.disable_version_check")
 
         return True
 
@@ -91,17 +88,13 @@ class VersionCheckService:
         if not self._cache_file.exists():
             return None
 
-        try:
-            with self._cache_file.open(encoding="utf-8") as f:
-                cache_data = json.load(f)
+        with self._cache_file.open(encoding="utf-8") as f:
+            cache_data = json.load(f)
 
-            # Check if cache is still valid
-            check_time = datetime.fromisoformat(cache_data["check_timestamp"])
-            if datetime.now(timezone.utc) - check_time < CACHE_DURATION:
-                return cache_data
-
-        except Exception:
-            logger.debug("Failed to load version cache", exc_info=True)
+        # Check if cache is still valid
+        check_time = datetime.fromisoformat(cache_data["check_timestamp"])
+        if datetime.now(timezone.utc) - check_time < CACHE_DURATION:
+            return cache_data
 
         return None
 
@@ -112,12 +105,9 @@ class VersionCheckService:
             "check_timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
-        try:
-            self._cache_file.parent.mkdir(parents=True, exist_ok=True)
-            with self._cache_file.open("w", encoding="utf-8") as f:
-                json.dump(cache_data, f)
-        except Exception:
-            logger.debug("Failed to save version cache", exc_info=True)
+        self._cache_file.parent.mkdir(parents=True, exist_ok=True)
+        with self._cache_file.open("w", encoding="utf-8") as f:
+            json.dump(cache_data, f)
 
     def _fetch_latest_version(self) -> str | None:
         """Fetch the latest version from PyPI."""
@@ -130,27 +120,7 @@ class VersionCheckService:
             logger.debug("Failed to fetch latest version from PyPI", exc_info=True)
             return None
 
-    def _get_upgrade_command(self) -> str:
-        """Get the appropriate upgrade command based on installation method."""
-        # Check if running in a virtual environment
-        in_venv = sys.prefix != sys.base_prefix
-
-        # Try to detect installation method
-        # Check for uv
-        if Path(sys.executable).parent.joinpath("uv").exists():
-            return "uv pip install --upgrade meltano"
-
-        # Check for pipx
-        pipx_home = os.environ.get("PIPX_HOME", str(Path.home() / ".local/pipx"))
-        if Path(pipx_home).exists() and "pipx" in sys.executable:
-            return "pipx upgrade meltano"
-
-        # Default to pip
-        if in_venv:
-            return "pip install --upgrade meltano"
-        return "pip install --user --upgrade meltano"
-
-    def check_version(self) -> VersionCheckResult | None:
+    def _check_version(self) -> VersionCheckResult | None:
         """Check if a newer version of Meltano is available."""
         if not self.should_check_version():
             return None
@@ -162,8 +132,7 @@ class VersionCheckService:
             return None
 
         # Try to get latest version from cache first
-        cache_data = self._load_cache()
-        if cache_data:
+        if cache_data := self._load_cache():
             latest_version = cache_data["latest_version"]
         else:
             # Fetch from PyPI
@@ -187,7 +156,10 @@ class VersionCheckService:
             )
             return None
 
-        upgrade_command = self._get_upgrade_command() if is_outdated else None
+        # TODO: get upgrade command in a reliable and cross-platform way
+        # Maybe check out https://github.com/aj-white/piplexed for inspiration
+        # and consider using `uv tool dir` and `pipx environment`.
+        upgrade_command = None
 
         return VersionCheckResult(
             current_version=current_version,
@@ -201,14 +173,22 @@ class VersionCheckService:
         if not result.is_outdated:
             return ""
 
-        lines = [
-            f"A new version of Meltano is available (v{result.latest_version})!",
-            f"You are currently running v{result.current_version}.",
-            "",
-            "To upgrade:",
-            f"  {result.upgrade_command}",
-            "",
-            "For more information, visit: https://docs.meltano.com/guide/installation",
-        ]
+        message = (
+            f"A new version of Meltano is available (v{result.latest_version}) "
+            f"and you are currently running v{result.current_version}. "
+        )
 
-        return "\n".join(lines)
+        if result.upgrade_command:
+            message += f"To upgrade: `{result.upgrade_command}`. "
+
+        message += "For more information, visit: https://docs.meltano.com/getting-started/installation."
+
+        return message
+
+    def check_version(self) -> VersionCheckResult | None:
+        """Check if a newer version of Meltano is available."""
+        try:
+            return self._check_version()
+        except Exception:
+            logger.debug("Failed to check version", exc_info=True)
+            return None

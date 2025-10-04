@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -17,6 +17,9 @@ from meltano.core.version_check import (
     VersionCheckResult,
     VersionCheckService,
 )
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestVersionCheckService:
@@ -137,55 +140,6 @@ class TestVersionCheckService:
         cache_data = version_service._load_cache()
         assert cache_data is None
 
-    def test_get_upgrade_command(
-        self,
-        version_service: VersionCheckService,
-        monkeypatch: pytest.MonkeyPatch,
-    ):
-        """Test detection of appropriate upgrade command."""
-        # Test default (pip)
-        command = version_service._get_upgrade_command()
-        assert "pip install" in command
-
-        # Test with uv installed
-        def mock_exists_uv(self):
-            return self.name == "uv"
-
-        with mock.patch("pathlib.Path.exists", mock_exists_uv):
-            command = version_service._get_upgrade_command()
-            assert command == "uv pip install --upgrade meltano"
-
-        # Test pipx detection
-        monkeypatch.setenv("PIPX_HOME", str(Path.home() / ".local/pipx"))
-
-        def mock_exists_pipx(self):
-            # Mock pipx home directory to exist
-            return str(self) == str(Path.home() / ".local/pipx")
-
-        # Mock sys.executable to be in a pipx path
-        with (
-            mock.patch(
-                "sys.executable",
-                str(Path.home() / ".local/pipx/venvs/meltano/bin/python"),
-            ),
-            mock.patch("pathlib.Path.exists", mock_exists_pipx),
-        ):
-            command = version_service._get_upgrade_command()
-            assert command == "pipx upgrade meltano"
-
-        # Test when not in venv and no pipx/uv present
-        def mock_exists_none(self):  # noqa: ARG001
-            return False
-
-        with (
-            mock.patch("sys.prefix", "/usr"),
-            mock.patch("sys.base_prefix", "/usr"),
-            mock.patch("pathlib.Path.exists", mock_exists_none),
-        ):
-            command = version_service._get_upgrade_command()
-            assert "--user" in command
-            assert command == "pip install --user --upgrade meltano"
-
     @responses.activate
     def test_check_version_outdated(
         self,
@@ -214,7 +168,7 @@ class TestVersionCheckService:
         assert result.current_version == "3.7.0"
         assert result.latest_version == "3.9.0"
         assert result.is_outdated
-        assert result.upgrade_command is not None
+        assert result.upgrade_command is None
 
     @responses.activate
     def test_check_version_up_to_date(
@@ -277,10 +231,10 @@ class TestVersionCheckService:
         )
 
         message = version_service.format_update_message(result)
-        assert "A new version of Meltano is available (v3.9.0)!" in message
-        assert "You are currently running v3.7.0." in message
+        assert "A new version of Meltano is available (v3.9.0)" in message
+        assert "you are currently running v3.7.0." in message
         assert "pip install --upgrade meltano" in message
-        assert "https://docs.meltano.com/guide/installation" in message
+        assert "https://docs.meltano.com/getting-started/installation" in message
 
         # Test no message for up-to-date version
         result_up_to_date = VersionCheckResult(
@@ -315,10 +269,12 @@ class TestVersionCheckService:
         )
 
         result1 = version_service.check_version()
+        assert result1 is not None
         assert result1.latest_version == "3.9.0"
         assert len(responses.calls) == 1
 
         # Second check - should use cache
         result2 = version_service.check_version()
+        assert result2 is not None
         assert result2.latest_version == "3.9.0"
         assert len(responses.calls) == 1  # No additional API call

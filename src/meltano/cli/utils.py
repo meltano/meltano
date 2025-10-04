@@ -26,6 +26,7 @@ from meltano.core.project_add_service import (
 from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+from meltano.core.version_check import VersionCheckService
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -592,18 +593,11 @@ class _BaseMeltanoCommand(click.Command):
         if project is None or not ctx.obj.get("version_check_enabled", False):
             return
 
-        try:
-            from meltano.core.version_check import VersionCheckService
+        version_service = VersionCheckService(project)
 
-            version_service = VersionCheckService(project)
-
-            result = version_service.check_version()
-            if result and result.is_outdated:
-                # Display version update message
-                logger.warning(version_service.format_update_message(result))
-        except Exception:
-            # Don't let version check errors block CLI execution
-            logger.debug("Failed to perform version check", exc_info=True)
+        if (result := version_service.check_version()) and result.is_outdated:
+            # Display version update message
+            logger.warning(version_service.format_update_message(result))
 
 
 class InstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
