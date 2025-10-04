@@ -16,6 +16,8 @@ import requests
 import structlog.stdlib
 from packaging.version import parse
 
+from meltano.core._packaging import editable_installation
+
 if t.TYPE_CHECKING:
     from pathlib import Path
 
@@ -65,6 +67,9 @@ class VersionCheckService:
     def should_check_version(self) -> bool:
         """Determine if version check should be performed."""
         # Check environment variable first
+        if editable_installation() is not None:
+            return False
+
         if os.environ.get("MELTANO_CLI_DISABLE_VERSION_CHECK", "").lower() in (
             "1",
             "true",

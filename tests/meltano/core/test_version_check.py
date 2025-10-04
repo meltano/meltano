@@ -26,6 +26,15 @@ if t.TYPE_CHECKING:
 class TestVersionCheckService:
     """Test the VersionCheckService class."""
 
+    @pytest.fixture(autouse=True)
+    def not_editable(self):
+        """Mock the installation to appear as if it is not editable."""
+        with mock.patch(
+            "meltano.core.version_check.editable_installation",
+            return_value=None,
+        ):
+            yield
+
     @pytest.fixture
     def version_service(self, tmp_path: Path) -> VersionCheckService:
         """Create a VersionCheckService instance for testing."""
