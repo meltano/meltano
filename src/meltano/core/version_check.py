@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import os
 import sys
@@ -13,9 +14,7 @@ from datetime import datetime, timedelta, timezone
 import platformdirs
 import requests
 import structlog.stdlib
-from packaging.version import InvalidVersion, parse
-
-from meltano import __version__
+from packaging.version import parse
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -125,7 +124,7 @@ class VersionCheckService:
         if not self.should_check_version():
             return None
 
-        current_version = __version__
+        current_version = importlib.metadata.version("meltano")
 
         # Skip check for development versions
         if self._is_development_version(current_version):
@@ -144,17 +143,8 @@ class VersionCheckService:
             self._save_cache(latest_version)
 
         # Compare versions
-        try:
-            current = parse(current_version)
-            latest = parse(latest_version)
-            is_outdated = current < latest
-        except InvalidVersion:
-            logger.debug(
-                "Invalid version comparison: %s vs %s",
-                current_version,
-                latest_version,
-            )
-            return None
+        current = parse(current_version)
+        latest = parse(latest_version)
 
         # TODO: get upgrade command in a reliable and cross-platform way
         # Maybe check out https://github.com/aj-white/piplexed for inspiration
@@ -164,7 +154,7 @@ class VersionCheckService:
         return VersionCheckResult(
             current_version=current_version,
             latest_version=latest_version,
-            is_outdated=is_outdated,
+            is_outdated=current < latest,
             upgrade_command=upgrade_command,
         )
 

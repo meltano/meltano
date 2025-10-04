@@ -99,18 +99,6 @@ class TestVersionCheckService:
         latest_version = version_service._fetch_latest_version()
         assert latest_version == "3.9.0"
 
-    @responses.activate
-    def test_fetch_latest_version_failure(self, version_service: VersionCheckService):
-        """Test handling of PyPI API failure."""
-        responses.add(
-            responses.GET,
-            PYPI_URL,
-            status=500,
-        )
-
-        latest_version = version_service._fetch_latest_version()
-        assert latest_version is None
-
     def test_cache_operations(self, version_service: VersionCheckService):
         """Test cache save and load operations."""
         # Test saving cache
@@ -141,14 +129,8 @@ class TestVersionCheckService:
         assert cache_data is None
 
     @responses.activate
-    def test_check_version_outdated(
-        self,
-        version_service: VersionCheckService,
-        monkeypatch: pytest.MonkeyPatch,
-    ):
+    def test_check_version_outdated(self, version_service: VersionCheckService) -> None:
         """Test version check when current version is outdated."""
-        monkeypatch.setattr("meltano.core.version_check.__version__", "3.7.0")
-
         pypi_response = {
             "info": {
                 "version": "3.9.0",
@@ -162,7 +144,12 @@ class TestVersionCheckService:
             status=200,
         )
 
-        result = version_service.check_version()
+        with mock.patch(
+            "meltano.core.version_check.importlib.metadata.version",
+            return_value="3.7.0",
+        ):
+            result = version_service.check_version()
+
         assert result is not None
         assert isinstance(result, VersionCheckResult)
         assert result.current_version == "3.7.0"
@@ -171,14 +158,40 @@ class TestVersionCheckService:
         assert result.upgrade_command is None
 
     @responses.activate
+    def test_check_version_fetch_latest_version_failure(
+        self,
+        version_service: VersionCheckService,
+    ) -> None:
+        """Test handling of PyPI API failure."""
+        responses.add(
+            responses.GET,
+            PYPI_URL,
+            status=500,
+        )
+
+        latest_version = version_service.check_version()
+        assert latest_version is None
+
+    @responses.activate
+    def test_check_version_invalid_version(
+        self,
+        version_service: VersionCheckService,
+    ) -> None:
+        """Test version check when current version is invalid."""
+        with mock.patch(
+            "meltano.core.version_check.importlib.metadata.version",
+            return_value="invalid",
+        ):
+            result = version_service.check_version()
+
+        assert result is None
+
+    @responses.activate
     def test_check_version_up_to_date(
         self,
         version_service: VersionCheckService,
-        monkeypatch: pytest.MonkeyPatch,
-    ):
+    ) -> None:
         """Test version check when current version is up to date."""
-        monkeypatch.setattr("meltano.core.version_check.__version__", "3.9.0")
-
         pypi_response = {
             "info": {
                 "version": "3.9.0",
@@ -192,7 +205,12 @@ class TestVersionCheckService:
             status=200,
         )
 
-        result = version_service.check_version()
+        with mock.patch(
+            "meltano.core.version_check.importlib.metadata.version",
+            return_value="3.9.0",
+        ):
+            result = version_service.check_version()
+
         assert result is not None
         assert result.current_version == "3.9.0"
         assert result.latest_version == "3.9.0"
@@ -213,12 +231,14 @@ class TestVersionCheckService:
     def test_check_version_development(
         self,
         version_service: VersionCheckService,
-        monkeypatch: pytest.MonkeyPatch,
     ):
         """Test version check skips development versions."""
-        monkeypatch.setattr("meltano.core.version_check.__version__", "0.0.0")
+        with mock.patch(
+            "meltano.core.version_check.importlib.metadata.version",
+            return_value="0.0.0",
+        ):
+            result = version_service.check_version()
 
-        result = version_service.check_version()
         assert result is None
 
     def test_format_update_message(self, version_service: VersionCheckService):
@@ -249,11 +269,8 @@ class TestVersionCheckService:
     def test_check_version_uses_cache(
         self,
         version_service: VersionCheckService,
-        monkeypatch: pytest.MonkeyPatch,
     ):
         """Test that version check uses cached data when available."""
-        monkeypatch.setattr("meltano.core.version_check.__version__", "3.7.0")
-
         # First check - should hit PyPI
         pypi_response = {
             "info": {
@@ -268,13 +285,23 @@ class TestVersionCheckService:
             status=200,
         )
 
-        result1 = version_service.check_version()
+        with mock.patch(
+            "meltano.core.version_check.importlib.metadata.version",
+            return_value="3.7.0",
+        ):
+            result1 = version_service.check_version()
+
         assert result1 is not None
         assert result1.latest_version == "3.9.0"
         assert len(responses.calls) == 1
 
         # Second check - should use cache
-        result2 = version_service.check_version()
+        with mock.patch(
+            "meltano.core.version_check.importlib.metadata.version",
+            return_value="3.7.0",
+        ):
+            result2 = version_service.check_version()
+
         assert result2 is not None
         assert result2.latest_version == "3.9.0"
         assert len(responses.calls) == 1  # No additional API call
