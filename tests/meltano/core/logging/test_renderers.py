@@ -316,27 +316,33 @@ class TestMeltanoConsoleRenderer:
     def test_console_output(
         self,
         subtests: SubTests,
-        subject: MeltanoConsoleRenderer,
+        formatter: StructuredExceptionFormatter,
         exception: PluginException,
         expected_output: str,
     ) -> None:
         def key_val(**kwargs) -> str:
             return " ".join(f"{k}={v}" for k, v in kwargs.items())
 
+        renderer = MeltanoConsoleRenderer(
+            plugin_exception_renderer=formatter,
+            colors=False,
+            include_keys={"key"},
+        )
+
         with subtests.test(msg="error"):
-            out = subject(None, "error", {"plugin_exception": exception})
+            out = renderer(None, "error", {"plugin_exception": exception})
             assert out == expected_output + "\n" + key_val(
                 plugin_exc_message="'Custom exception message'",
                 plugin_exc_type="CustomException",
             )
 
         with subtests.test(msg="warning"):
-            out = subject(None, "warning", {"plugin_exception": exception})
+            out = renderer(None, "warning", {"plugin_exception": exception})
             assert out == key_val(
                 plugin_exc_message="'Custom exception message'",
                 plugin_exc_type="CustomException",
             )
 
         with subtests.test(msg="no exception"):
-            out = subject(None, "warning", {"key": "value"})
+            out = renderer(None, "warning", {"key": "value"})
             assert out == key_val(key="value")
