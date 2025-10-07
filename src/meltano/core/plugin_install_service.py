@@ -520,6 +520,8 @@ def get_pip_install_args(
     Returns:
         The list of pip install arguments for the given plugin.
     """
+    # Fallback: use pip_url from meltano.yml
+    logger.debug("Installing %s from pip_url", plugin.name)
     with project.settings.feature_flag(
         FeatureFlags.STRICT_ENV_VAR_MODE,
         raise_error=False,
@@ -629,6 +631,7 @@ async def install_pip_plugin(
     clean: bool = False,
     force: bool = False,
     env: Mapping[str, str] | None = None,
+    use_locked: bool = True,
     **kwargs,  # noqa: ANN003, ARG001
 ) -> None:
     """Install the plugin with pip.
@@ -639,30 +642,92 @@ async def install_pip_plugin(
         clean: Flag to clean install.
         force: Whether to ignore the Python version required by plugins.
         env: Environment variables to use when expanding the pip install args.
+        use_locked: Whether to use locked dependencies from pylock if available.
         kwargs: Unused additional arguments for the installation of the plugin.
 
     Raises:
         ValueError: If the venv backend is not supported.
     """
-    pip_install_args = get_pip_install_args(project, plugin, env=env)
-    backend = project.settings.get("venv.backend")
+    try:
+        # Check if locked dependencies exist and should be used
+        # Look for separate pylock.<plugin-name>.toml file (variant-agnostic)
+        pylock_file = None
+        if use_locked:
+            # Get the plugins directory for this plugin type
+            plugins_dir = project.root_plugins_dir(plugin.type.value)
+            # Look for pylock.<plugin-name>.toml
+            pylock_filename = f"pylock.{plugin.name}.toml"
+            pylock_path = plugins_dir / pylock_filename
 
-    if backend == "virtualenv":  # pragma: no cover
-        service = VenvService.from_plugin(project, plugin)
-    elif backend == "uv":
-        service = UvVenvService.from_plugin(project, plugin)
-    else:  # pragma: no cover
-        msg = f"Unsupported venv backend: {backend}"
-        raise ValueError(msg)
+            if pylock_path.exists():
+                pylock_file = pylock_path
+                logger.debug(
+                    "Found pylock file for %s at: %s",
+                    plugin.name,
+                    pylock_file,
+                )
+            else:
+                logger.debug("No pylock file found at: %s", pylock_path)
 
-    await service.install(
-        pip_install_args=("--ignore-requires-python", *pip_install_args)
-        if force and backend == "virtualenv"
-        else pip_install_args,
-        clean=clean,
-        env={
-            **os.environ,
-            **project.dotenv_env,
-            **project.meltano.env,
-        },
-    )
+        # Determine install args and fingerprint args
+        fingerprint_args = None
+        if pylock_file:
+            try:
+                logger.info(
+                    "Installing %s from locked dependencies",
+                    plugin.name,
+                )
+                # For fingerprinting, use a stable reference based on file content
+                # This prevents reinstalls when the file content hasn't changed
+                import hashlib
+
+                pylock_content_hash = hashlib.sha256(
+                    pylock_file.read_bytes(),
+                ).hexdigest()
+                # Fingerprint uses stable hash format
+                fingerprint_args = [f"pylock:{pylock_content_hash}"]
+                # Actual install uses the pylock file
+                pip_install_args = ["-r", str(pylock_file)]
+
+            except Exception as err:
+                logger.warning(
+                    "Failed to use locked dependencies for %s: %s. "
+                    "Falling back to pip_url",
+                    plugin.name,
+                    err,
+                )
+                pip_install_args = get_pip_install_args(project, plugin, env=env)
+        else:
+            if not use_locked:
+                logger.debug("Locked dependencies disabled for %s", plugin.name)
+            else:
+                logger.debug("No locked dependencies found for %s", plugin.name)
+
+            pip_install_args = get_pip_install_args(project, plugin, env=env)
+
+        backend = project.settings.get("venv.backend")
+
+        if backend == "virtualenv":  # pragma: no cover
+            service = VenvService.from_plugin(project, plugin)
+        elif backend == "uv":
+            service = UvVenvService.from_plugin(project, plugin)
+        else:  # pragma: no cover
+            msg = f"Unsupported venv backend: {backend}"
+            raise ValueError(msg)
+
+        await service.install(
+            pip_install_args=("--ignore-requires-python", *pip_install_args)
+            if force and backend == "virtualenv"
+            else pip_install_args,
+            clean=clean,
+            env={
+                **os.environ,
+                **project.dotenv_env,
+                **project.meltano.env,
+            },
+            fingerprint_args=fingerprint_args,
+        )
+
+    finally:
+        # No cleanup needed - using pylock file directly from plugins directory
+        pass
