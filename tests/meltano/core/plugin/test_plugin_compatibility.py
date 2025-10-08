@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.resources
 import json
+from unittest import mock
 
 import pytest
 from jsonschema import ValidationError, validate
@@ -110,11 +111,14 @@ class TestPluginCompatibility:
         )
 
         # This should work if current version is in range
-        current = get_meltano_version()
-        if current >= "1.0.0" and current < "2.0.0":
+        with mock.patch("meltano.core.utils.get_meltano_version", return_value="1.0.0"):
             plugin.ensure_compatible()
-        # Note: If the current version is outside this range, it would raise an error
-        # but we can't predict what version is running during tests
+
+        with (
+            mock.patch("meltano.core.utils.get_meltano_version", return_value="2.0.0"),
+            pytest.raises(IncompatibleMeltanoVersionError),
+        ):
+            plugin.ensure_compatible()
 
     def test_variant_requires_meltano(self):
         """Test that Variant class supports requires_meltano field."""
@@ -210,6 +214,7 @@ class TestPluginCompatibility:
             f"Project requires Meltano ==999.0.0, but {current_version} is installed"
         )
         assert str(error) == expected_message
+        assert isinstance(error, IncompatibleMeltanoVersionError)
         assert error.required_version == "==999.0.0"
         assert error.current_version == current_version
 
