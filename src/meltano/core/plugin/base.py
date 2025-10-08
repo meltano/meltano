@@ -17,7 +17,7 @@ from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
-from meltano.core.utils import NotFound, check_meltano_compatibility, find_named
+from meltano.core.utils import NotFound, find_named
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -718,15 +718,6 @@ class BasePlugin(HookObject):
             True if the plugin should be added to the config file, False otherwise.
         """
         return True
-
-    def ensure_compatible(self) -> None:
-        """Check if this plugin is compatible with the current Meltano version.
-
-        Raises:
-            IncompatibleMeltanoVersionError: If the plugin requires a different
-                Meltano version than the one currently installed.
-        """
-        check_meltano_compatibility(getattr(self, "requires_meltano", None))
 
     def exec_args(
         self,
