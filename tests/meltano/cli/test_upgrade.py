@@ -45,7 +45,7 @@ class TestCliUpgrade:
         )
         with monkeypatch.context() as m:
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(dist_path),
             )
             result = cli_runner.invoke(cli, ["upgrade"])
@@ -106,7 +106,7 @@ class TestCliUpgrade:
         # An editable should not be upgraded automatically
         with monkeypatch.context() as m:
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(dist_path),
             )
             result = cli_runner.invoke(cli, ["upgrade", "package"])
@@ -122,7 +122,7 @@ class TestCliUpgrade:
         # A Docker install should not be upgraded automatically
         with monkeypatch.context(), mock.patch("pathlib.Path.exists") as mock_exists:
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(tmp_path / "not-a-package"),
             )
             mock_exists.return_value = True
@@ -139,7 +139,7 @@ class TestCliUpgrade:
         # Meltano installed in a Nox test session should not be upgraded automatically
         with monkeypatch.context():
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(tmp_path / "not-a-package"),
             )
             m.setenv("NOX_CURRENT_SESSION", "tests")
@@ -207,10 +207,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "set",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 "orchestrate/dags/meltano.py",
                 "false",
@@ -234,10 +233,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "unset",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 "orchestrate/dags/meltano.py",
             ],
@@ -268,10 +266,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "set",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 json.dumps(
                     {

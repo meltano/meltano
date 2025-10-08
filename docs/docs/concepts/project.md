@@ -27,6 +27,8 @@ which contains your project configuration and tells Meltano that a particular di
 
 The only required property is `version`, which currently always holds the value `1`. You can find a formal JSON Schema for the specification on [SchemaStore.org](https://schemastore.org) or directly in the main repository [here](https://raw.githubusercontent.com/meltano/meltano/main/src/meltano/schemas/meltano.schema.json), which can be useful for code generation by many tools like [datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator) or [swagger-codegen](https://github.com/swagger-api/swagger-codegen).
 
+You can customize the YAML formatting of this file (indentation, spacing, etc.) using Meltano's [user YAML configuration](/guide/user-yaml-config).
+
 ### Configuration
 
 At the root of `meltano.yml`, and usually at the top of the file, you will find project-specific configuration.
@@ -62,7 +64,7 @@ When a plugin is added using `meltano add`, the `pip_url` is automatically repea
 
 In order to support version-specific pip constraint files, the pip_url value can optionally be parameterized using the
 `${MELTANO__PYTHON_VERSION}` variable. This is a special variable populated by Meltano with the specific version of Python used to
-install the plugin and will inject the major and minor versions (e.g. 3.9, 3.10, etc.).
+install the plugin and will inject the major and minor versions (e.g. 3.10, 3.11, etc.).
 
 #### Inheriting plugin definitions
 

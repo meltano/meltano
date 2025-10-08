@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from functools import cached_property
 from pathlib import Path
 
-import fasteners  # type: ignore[import-untyped]
+import fasteners
 import structlog
 from dotenv import dotenv_values
 
@@ -85,6 +85,7 @@ class Project(Versioned):
         environment: Environment | None = None,
         *,
         readonly: bool = False,
+        dotenv_file: Path | None = None,
     ):
         """Initialize a `Project` instance.
 
@@ -92,6 +93,7 @@ class Project(Versioned):
             root: The root directory of the project.
             environment: The active Meltano environment.
             readonly: Whether the project is in read-only mode.
+            dotenv_file: The path to the .env file to use.
         """
         self.root = Path(root).resolve()
         self.environment: Environment | None = environment
@@ -99,6 +101,7 @@ class Project(Versioned):
         self.sys_dir_root = Path(
             os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
+        self.dotenv_file = dotenv_file
 
     def refresh(self, **kwargs: t.Any) -> None:
         """Refresh the project instance to reflect external changes.
@@ -277,6 +280,7 @@ class Project(Versioned):
         project_root: Path | str | None = None,
         *,
         activate: bool = True,
+        dotenv_file: Path | None = None,
     ) -> Project:
         """Find a Project.
 
@@ -286,6 +290,7 @@ class Project(Versioned):
                 directory and it's parents.
             activate: Save the found project so that future calls to `find`
                 will continue to use this project.
+            dotenv_file: The path to the .env file to use.
 
         Returns:
             the found project
@@ -301,12 +306,12 @@ class Project(Versioned):
         readonly = truthy(os.getenv(PROJECT_READONLY_ENV, "false"))
 
         if project_root := project_root or os.getenv(PROJECT_ROOT_ENV):
-            project = Project(project_root, readonly=readonly)
+            project = Project(project_root, readonly=readonly, dotenv_file=dotenv_file)
             if not project.meltanofile.exists():
                 raise ProjectNotFound(project)
         else:
             for directory in walk_parent_directories():
-                project = Project(directory, readonly=readonly)
+                project = Project(directory, readonly=readonly, dotenv_file=dotenv_file)
                 if project.meltanofile.exists():
                     break
             if not project.meltanofile.exists():
@@ -396,6 +401,12 @@ class Project(Versioned):
         Returns:
             the path to this project's .env file
         """
+        if self.dotenv_file:
+            return (
+                self.dotenv_file
+                if self.dotenv_file.is_absolute()
+                else self.root.joinpath(self.dotenv_file)
+            )
         return self.root.joinpath(".env")
 
     @cached_property

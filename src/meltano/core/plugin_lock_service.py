@@ -8,12 +8,13 @@ from hashlib import sha256
 
 from structlog.stdlib import get_logger
 
-from meltano.core.plugin.base import PluginRef, StandalonePlugin
+from meltano.core.plugin.base import StandalonePlugin
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
+    from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 

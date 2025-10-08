@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import typing as t
 
 import structlog
@@ -10,6 +11,11 @@ import structlog
 from meltano.core.error import ProjectReadonly
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
+
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -21,7 +27,7 @@ logger = structlog.get_logger(__name__)
 class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
 
-    config_override: t.ClassVar[dict[str, t.Any]] = {}
+    config_override: t.ClassVar[dict[str, t.Any]] = {}  # type: ignore[misc]
     supports_environments = False
 
     def __init__(
@@ -57,7 +63,7 @@ class ProjectSettingsService(SettingsService):
             **self.env_override,
         }
 
-        self.config_override = {
+        self.config_override = {  # type: ignore[misc]
             **self.__class__.config_override,
             **self.config_override,
         }
@@ -70,7 +76,7 @@ class ProjectSettingsService(SettingsService):
             )
 
     @property
-    def project_settings_service(self):  # noqa: ANN201
+    def project_settings_service(self) -> Self:
         """Get the settings service for this project.
 
         For ProjectSettingsService, just returns self.
@@ -145,7 +151,7 @@ class ProjectSettingsService(SettingsService):
         return self.project.config_service.settings
 
     @property
-    def meltano_yml_config(self):  # noqa: ANN201
+    def meltano_yml_config(self) -> dict[str, t.Any]:
         """Return current configuration in `meltano.yml`.
 
         Returns:
@@ -153,7 +159,7 @@ class ProjectSettingsService(SettingsService):
         """
         return self.project.config_service.current_config
 
-    def update_meltano_yml_config(self, config) -> None:  # noqa: ANN001
+    def update_meltano_yml_config(self, config: dict[str, t.Any]) -> None:
         """Update configuration in `meltano.yml`.
 
         Args:
@@ -161,7 +167,7 @@ class ProjectSettingsService(SettingsService):
         """
         self.project.config_service.update_config(config)
 
-    def process_config(self, config) -> dict:  # noqa: ANN001
+    def process_config(self, config: dict[str, t.Any]) -> dict[str, t.Any]:
         """Process configuration dict for presentation in `meltano config meltano`.
 
         Args:

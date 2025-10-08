@@ -9,8 +9,7 @@ To begin, download or copy the [meltano.yml](/integration/example-library/meltan
 ## Add a few plugins
 
 ```shell
-meltano add tap-gitlab
-meltano add target-jsonl
+meltano add tap-gitlab target-jsonl
 ```
 
 ## Add some environments

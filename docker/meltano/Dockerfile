@@ -1,6 +1,10 @@
-ARG PYTHON_VERSION="3.9"
+ARG PYTHON_VERSION="3.13"
 
 FROM python:${PYTHON_VERSION}-slim
+
+LABEL org.opencontainers.image.source=https://github.com/meltano/meltano
+LABEL org.opencontainers.image.description="Meltano: Your DataOps OS. The declarative code-first data integration engine that powers your wildest data and ML-powered product ideas."
+LABEL org.opencontainers.image.licenses=MIT
 
 # Meltano project directory - this is where you should mount your Meltano project
 ARG WORKDIR="/project"
@@ -30,6 +34,6 @@ ENV PATH="/venv/bin:${PATH}"
 
 # Installing the application from a pre-built wheel in the dist directory
 RUN --mount=type=bind,source=dist,target=/tmp/meltano-dist \
-    uv pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
+    uv pip install "meltano[azure,gcs,mssql,postgres,s3] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
 
 ENTRYPOINT ["meltano"]

@@ -82,6 +82,8 @@ settings:
     value: error
   - label: Critical
     value: critical
+  - label: Disabled
+    value: disabled
   value: info
   env_specific: true
   description: Log level for the CLI
@@ -103,6 +105,10 @@ settings:
     value: plain
   value: colored
   description: Short-hand for the log format to use
+- name: cli.disable_version_check
+  kind: boolean
+  value: false
+  description: Whether to disable checking for Meltano updates on CLI commands. Can also be controlled via MELTANO_CLI_DISABLE_VERSION_CHECK environment variable.
 
 # Snowplow Tracking
 - name: snowplow.collector_endpoints

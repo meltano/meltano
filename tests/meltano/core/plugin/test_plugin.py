@@ -301,7 +301,7 @@ class TestProjectPlugin:
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["minimal"])
 
         assert plugin.name == "tap-example"
-        assert plugin.variant is Variant.ORIGINAL_NAME
+        assert plugin.variant is Variant.DEFAULT_NAME
         assert plugin.pip_url is None
         assert not plugin.config
         assert not plugin.is_custom()
@@ -450,7 +450,7 @@ class TestProjectPlugin:
     def test_variant(self, project: Project) -> None:
         # Without a variant set, the "original" name is used
         plugin: ProjectPlugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
-        assert plugin.variant == Variant.ORIGINAL_NAME
+        assert plugin.variant == Variant.DEFAULT_NAME
 
         base_plugin = project.hub_service.find_base_plugin(
             PluginType.EXTRACTORS,

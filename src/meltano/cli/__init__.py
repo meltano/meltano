@@ -23,6 +23,7 @@ from meltano.cli import (
     invoke,
     job,
     lock,
+    logs,
     remove,
     run,
     schedule,
@@ -54,6 +55,7 @@ cli.add_command(initialize.init)
 cli.add_command(install.install)
 cli.add_command(invoke.invoke)
 cli.add_command(lock.lock)
+cli.add_command(logs.logs)
 cli.add_command(remove.remove)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
@@ -66,7 +68,7 @@ cli.add_command(job.job)
 
 # Holds the exit code for error reporting during process exiting. In
 # particular, a function registered by the `atexit` module uses this value.
-exit_code: None | int = None
+exit_code: int | None = None
 
 atexit_handler_registered = False
 exit_code_reported = False
@@ -77,9 +79,9 @@ setup_logging()
 logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to \
+Need help fixing this problem? Visit https://melta.no/ for troubleshooting steps, or to \
 join our friendly Slack community.
-"""
+"""  # noqa: E501
 
 
 def handle_meltano_error(error: MeltanoError) -> t.NoReturn:

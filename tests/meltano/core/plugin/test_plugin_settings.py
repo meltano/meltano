@@ -25,7 +25,6 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
-    import sys
     from collections.abc import Callable, Generator
 
     from sqlalchemy.orm import Session
@@ -34,12 +33,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
 
-    if sys.version_info < (3, 10):
-        from typing_extensions import TypeAlias
-    else:
-        from typing import TypeAlias  # noqa: ICN003
-
-    PluginSettingsServiceFactory: TypeAlias = Callable[
+    PluginSettingsServiceFactory: t.TypeAlias = Callable[
         [ProjectPlugin],
         PluginSettingsService,
     ]
@@ -71,7 +65,7 @@ def env_var():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project: Project):
     expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -435,7 +429,7 @@ class TestPluginSettingsService:
         assert subject.get("schema") is None
 
         subject.set("schema", "default", store=SettingValueStore.DOTENV)
-        value, metadata = subject.get_with_metadata("schema")
+        _value, _metadata = subject.get_with_metadata("schema")
 
         # Env is the default
         assert_env_value("default", "TARGET_MOCK_SCHEMA")

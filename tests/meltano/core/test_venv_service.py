@@ -11,10 +11,40 @@ import pytest
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv
+from meltano.core.venv_service import (
+    UvVenvService,
+    VenvService,
+    VirtualEnv,
+    fingerprint,
+)
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+
+
+def test_fingerprint_with_python_path():
+    """Test that fingerprint includes Python path when provided."""
+    import sys
+
+    pip_args = ["package==1.0.0", "another-package"]
+
+    fp1 = fingerprint(pip_args)
+    fp2 = fingerprint(pip_args, "/usr/bin/python3.11")
+
+    assert fp1 != fp2
+
+    fp3 = fingerprint(pip_args, "/usr/bin/python3.11")
+    assert fp2 == fp3
+
+    fp4 = fingerprint(pip_args, "/usr/bin/python3.12")
+    assert fp2 != fp4
+
+    fp5 = fingerprint(pip_args, None)
+    assert fp1 == fp5
+
+    # Test that sys.executable doesn't change fingerprint
+    fp6 = fingerprint(pip_args, sys.executable)
+    assert fp1 == fp6
 
 
 class TestVenvService:
@@ -115,12 +145,9 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        fingerprint = (venv_dir / ".meltano_plugin_fingerprint").read_text()
-        assert (
-            fingerprint
-            # sha256 of "example"
-            == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
-        )
+        fingerprint_content = (venv_dir / ".meltano_plugin_fingerprint").read_text()
+        expected_fingerprint = fingerprint(["example"], subject.venv.python_path)
+        assert fingerprint_content == expected_fingerprint
 
         # ensure that log file was created and is not empty
         self.assert_pip_log_file(subject)
@@ -167,6 +194,23 @@ class TestVenvService:
         assert not subject.requires_clean_install(["example"])
         assert subject.requires_clean_install(["example==0.1.0"])
         assert subject.requires_clean_install(["example", "another-package"])
+
+    @pytest.mark.asyncio
+    async def test_requires_clean_install_python_change(
+        self, subject: VenvService
+    ) -> None:
+        await subject.install(["example"], clean=True)
+        assert not subject.requires_clean_install(["example"])
+
+        original_python = subject.venv.python_path
+        try:
+            subject.venv.python_path = "/fake/test/python"
+            assert subject.requires_clean_install(["example"])
+
+            subject.venv.python_path = original_python
+            assert not subject.requires_clean_install(["example"])
+        finally:
+            subject.venv.python_path = original_python
 
     async def test_python_setting(self, project: Project) -> None:
         plugin_python = "test-python-executable-plugin-level"
@@ -232,7 +276,7 @@ class TestVirtualEnv:
             mock.patch("platform.system", return_value="commodore64"),
             pytest.raises(
                 MeltanoError,
-                match="(?i)Platform 'commodore64'.*?not supported.",
+                match=r"(?i)Platform 'commodore64'.*?not supported.",
             ),
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
@@ -276,3 +320,63 @@ class TestUvVenvService(TestVenvService):
             ),
         ):
             await subject.install(["cowsay"])
+
+    async def test_error_logging_creates_log_file(
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
+    ) -> None:
+        """Test that error handling creates log file with details."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock(spec=Process)
+            original_err = AsyncSubprocessError(
+                "Something went wrong",
+                process,
+                stderr="Some error",
+            )
+            result_err = await subject.handle_installation_error(original_err)
+
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)
+
+            assert log_file_path.exists()
+            assert "Some error" in log_file_path.read_text()
+
+    async def test_error_logging_empty_stderr(
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
+    ) -> None:
+        """Test error logging when stderr is empty."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock(spec=Process)
+            process.stderr = None
+            original_err = AsyncSubprocessError("Another error", process)
+
+            await subject.handle_installation_error(original_err)
+
+            assert log_file_path.exists()
+            assert log_file_path.read_text() == ""
+
+    async def test_error_logging_handles_write_failure(
+        self,
+        subject: UvVenvService,
+    ) -> None:
+        """Test that log write failures are handled gracefully."""
+        process = mock.Mock(spec=Process)
+        process.stderr = mock.AsyncMock(return_value="Some error")
+
+        # Mock the log writing to fail
+        with mock.patch.object(
+            subject,
+            "_write_error_log",
+            side_effect=OSError("Permission denied"),
+        ):
+            original_err = AsyncSubprocessError("Something went wrong", process)
+            result_err = await subject.handle_installation_error(original_err)
+
+            # Should still return the installation error, not the log error
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)

@@ -583,7 +583,7 @@
           },
           "state": {
             "type": "string",
-            "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
+            "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano el or meltano elt."
           },
           "select": {
             "type": "array",
@@ -607,6 +607,13 @@
             "type": "boolean",
             "description": "A boolean that determines if the catalog cache should be used or ignored.",
             "default": true
+          },
+          "log_parser": {
+            "type": "string",
+            "description": "The log parser to use for the extractor.",
+            "enum": [
+              "singer-sdk"
+            ]
           }
         }
       },
@@ -638,7 +645,8 @@
                     "batch",
                     "test",
                     "log-based",
-                    "schema-flattening"
+                    "schema-flattening",
+                    "structured-logging"
                   ]
                 }
               }
@@ -668,7 +676,8 @@
                     "soft-delete",
                     "hard-delete",
                     "datatype-failsafe",
-                    "schema-flattening"
+                    "schema-flattening",
+                    "structured-logging"
                   ]
                 }
               },
@@ -970,8 +979,7 @@
             "extractor",
             "loader",
             "transform",
-            "interval",
-            "start_date"
+            "interval"
           ]
         }
       ],

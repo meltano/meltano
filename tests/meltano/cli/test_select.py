@@ -8,6 +8,8 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.utils import CliError
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import (
     ListSelectedExecutor,
     SelectedNode,
@@ -29,8 +31,20 @@ class TestCliSelect:
         ),
     )
     @pytest.mark.usefixtures("project")
-    def test_update_select_pattern(self, cli_runner, tap, environment) -> None:
+    def test_update_select_pattern(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        environment: str | None,
+    ) -> None:
         environment_flag = () if environment is None else ("--environment", environment)
+        # first, reset to defaults
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "reset", tap.name],
+            input="y\n",
+        )
+        assert_cli_runner(result)
         # add select pattern
         result = cli_runner.invoke(
             cli,
@@ -40,7 +54,7 @@ class TestCliSelect:
         # verify pattern was added
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
@@ -54,11 +68,89 @@ class TestCliSelect:
         # verify select pattern removed
         result = cli_runner.invoke(
             cli,
-            [*environment_flag, "config", "--extras", tap.name],
+            [*environment_flag, "config", "print", "--extras", tap.name],
         )
         assert_cli_runner(result)
         json_config = json.loads(result.stdout)
         assert "mock.*" not in json_config["_select"]
+
+    @pytest.mark.parametrize(
+        "environment",
+        (
+            pytest.param(None, id="no-environment"),
+            pytest.param("dev", id="dev"),
+        ),
+    )
+    @pytest.mark.usefixtures("project")
+    def test_clear_select_patterns(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        environment: str | None,
+    ) -> None:
+        environment_flag = () if environment is None else ("--environment", environment)
+        # first, reset to defaults
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "reset", tap.name],
+            input="y\n",
+        )
+        assert_cli_runner(result)
+        # clearing leaves defaults as they were
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "--clear"],
+        )
+        assert_cli_runner(result)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "print", "--extras", tap.name],
+        )
+        assert_cli_runner(result)
+        json_config = json.loads(result.stdout)
+        assert json_config["_select"] == ["*.*"]
+        # add multiple select patterns
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "users", "*"],
+        )
+        assert_cli_runner(result)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "posts", "id"],
+        )
+        assert_cli_runner(result)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "--exclude", "posts", "secret"],
+        )
+        assert_cli_runner(result)
+        # verify patterns were added
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "print", "--extras", tap.name],
+        )
+        assert_cli_runner(result)
+        json_config = json.loads(result.stdout)
+        assert "users.*" in json_config["_select"]
+        assert "posts.id" in json_config["_select"]
+        assert "!posts.secret" in json_config["_select"]
+        # clear all select patterns
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "select", tap.name, "--clear"],
+        )
+        assert_cli_runner(result)
+        # verify all select patterns were removed (reverted to default)
+        result = cli_runner.invoke(
+            cli,
+            [*environment_flag, "config", "print", "--extras", tap.name],
+        )
+        assert_cli_runner(result)
+        json_config = json.loads(result.stdout)
+        # After clearing, custom patterns are removed and we revert to default behavior
+        # The config command shows resolved config, so _select will be ["*.*"]
+        assert json_config["_select"] == ["*.*"]
 
     @pytest.mark.usefixtures("project")
     def test_select_list(
@@ -191,4 +283,32 @@ class TestCliSelect:
 
         json_result = json.loads(result.stdout)
         assert json_result["enabled_patterns"] == ["users.id", "!users.name"]
-        assert json_result["entities"] == entities
+        assert json_result["streams"] == entities
+
+    def test_select_list_catalog_not_found(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        async def load_catalog(*args, **kwargs):  # noqa: ARG001
+            raise FileNotFoundError
+
+        monkeypatch.setattr(
+            SelectService,
+            "load_catalog",
+            load_catalog,
+        )
+
+        result = cli_runner.invoke(
+            cli, ["--no-environment", "select", tap.name, "--list"]
+        )
+
+        assert result.exit_code == 1
+        assert isinstance(result.exception, CliError)
+        assert isinstance(result.exception.__cause__, PluginExecutionError)
+        assert result.exception.__cause__.args[0] == (
+            "Could not find catalog. Verify that the tap supports discovery mode and "
+            "advertises the `discover` capability as well as either `catalog` or "
+            "`properties`"
+        )

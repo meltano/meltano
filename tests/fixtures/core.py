@@ -6,7 +6,7 @@ import logging
 import os
 import shutil
 import typing as t
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
@@ -42,6 +42,8 @@ if t.TYPE_CHECKING:
     from collections.abc import Callable, Generator
 
     from requests.adapters import BaseAdapter
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 current_dir = Path(__file__).parent
 
@@ -1914,7 +1916,7 @@ def plugin_invoker_factory(project, plugin_settings_service_factory):
 
 
 @pytest.fixture(scope="class")
-def tap(project_add_service):
+def tap(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1926,7 +1928,7 @@ def tap(project_add_service):
 
 
 @pytest.fixture(scope="class")
-def alternative_tap(project_add_service, tap):
+def alternative_tap(project_add_service: ProjectAddService, tap: ProjectPlugin):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1939,7 +1941,7 @@ def alternative_tap(project_add_service, tap):
 
 
 @pytest.fixture(scope="class")
-def inherited_tap(project_add_service, tap):
+def inherited_tap(project_add_service: ProjectAddService, tap: ProjectPlugin):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1955,7 +1957,7 @@ def inherited_tap(project_add_service, tap):
 
 
 @pytest.fixture(scope="class")
-def nonpip_tap(project_add_service):
+def nonpip_tap(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1967,7 +1969,7 @@ def nonpip_tap(project_add_service):
 
 
 @pytest.fixture(scope="class")
-def target(project_add_service):
+def target(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(PluginType.LOADERS, "target-mock")
     except PluginAlreadyAddedException as err:
@@ -1975,7 +1977,7 @@ def target(project_add_service):
 
 
 @pytest.fixture(scope="class")
-def alternative_target(project_add_service):
+def alternative_target(project_add_service: ProjectAddService):
     # We don't load the `target` fixture here since this ProjectPlugin should
     # have a BasePlugin parent, not the `target` ProjectPlugin
     try:
@@ -1989,7 +1991,7 @@ def alternative_target(project_add_service):
 
 
 @pytest.fixture(scope="class")
-def dbt(project_add_service):
+def dbt(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
     except PluginAlreadyAddedException as err:
@@ -2005,7 +2007,7 @@ def transformer(project_add_service: ProjectAddService):
 
 
 @pytest.fixture(scope="class")
-def utility(project_add_service):
+def utility(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(PluginType.UTILITIES, "utility-mock")
     except PluginAlreadyAddedException as err:
@@ -2031,13 +2033,11 @@ def elt_schedule(
 ):
     try:
         return schedule_service.add_elt(
-            None,
             "elt-schedule-mock",
             extractor=tap.name,
             loader=target.name,
             transform="skip",
             interval="@daily",
-            start_date=datetime.datetime.now(datetime.timezone.utc),
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule
@@ -2139,7 +2139,7 @@ def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree
 
 
 @pytest.fixture(scope="class")
-def mapper(project_add_service):
+def mapper(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(
             PluginType.MAPPERS,
@@ -2185,10 +2185,16 @@ def num_params() -> int:
     return 10
 
 
+class Payloads(t.NamedTuple):
+    mock_state_payloads: list[dict[str, dict]]
+    mock_error_payload: dict[str, str]
+    mock_empty_payload: dict[str, t.Any]
+
+
 @pytest.fixture
-def payloads(num_params):
-    mock_payloads_dict = {
-        "mock_state_payloads": [
+def payloads(num_params: int) -> Payloads:
+    return Payloads(
+        mock_state_payloads=[
             {
                 "singer_state": {
                     f"bookmark-{idx_i}": idx_i + idx_j for idx_j in range(num_params)
@@ -2196,31 +2202,34 @@ def payloads(num_params):
             }
             for idx_i in range(num_params)
         ],
-        "mock_error_payload": {"error": "failed"},
-        "mock_empty_payload": {},
-    }
-    payloads = namedtuple("payloads", mock_payloads_dict)
-    return payloads(**mock_payloads_dict)
+        mock_error_payload={"error": "failed"},
+        mock_empty_payload={},
+    )
+
+
+class StateIds(t.NamedTuple):
+    single_incomplete_state_id: str
+    single_complete_state_id: str
+    multiple_incompletes_state_id: str
+    multiple_completes_state_id: str
+    single_complete_then_multiple_incompletes_state_id: str
+    single_incomplete_then_multiple_completes_state_id: str
 
 
 @pytest.fixture
-def state_ids(
-    num_params,  # noqa: ARG001
-):
-    state_id_dict = {
-        "single_incomplete_state_id": create_state_id("single-incomplete"),
-        "single_complete_state_id": create_state_id("single-complete"),
-        "multiple_incompletes_state_id": create_state_id("multiple-incompletes"),
-        "multiple_completes_state_id": create_state_id("multiple-completes"),
-        "single_complete_then_multiple_incompletes_state_id": create_state_id(
+def state_ids():
+    return StateIds(
+        single_incomplete_state_id=create_state_id("single-incomplete"),
+        single_complete_state_id=create_state_id("single-complete"),
+        multiple_incompletes_state_id=create_state_id("multiple-incompletes"),
+        multiple_completes_state_id=create_state_id("multiple-completes"),
+        single_complete_then_multiple_incompletes_state_id=create_state_id(
             "single-complete-then-multiple-incompletes",
         ),
-        "single_incomplete_then_multiple_completes_state_id": create_state_id(
+        single_incomplete_then_multiple_completes_state_id=create_state_id(
             "single-incomplete-then-multiple-completes",
         ),
-    }
-    state_ids = namedtuple("state_ids", state_id_dict)
-    return state_ids(**state_id_dict)
+    )
 
 
 @pytest.fixture
@@ -2237,21 +2246,29 @@ def mock_time():
     return _mock_time()
 
 
+class JobArgs(t.NamedTuple):
+    complete_job_args: dict[str, t.Any]
+    incomplete_job_args: dict[str, t.Any]
+
+
 @pytest.fixture
-def job_args():
-    job_args_dict = {
-        "complete_job_args": {"state": State.SUCCESS, "payload_flags": Payload.STATE},
-        "incomplete_job_args": {
+def job_args() -> JobArgs:
+    return JobArgs(
+        complete_job_args={"state": State.SUCCESS, "payload_flags": Payload.STATE},
+        incomplete_job_args={
             "state": State.FAIL,
             "payload_flags": Payload.INCOMPLETE_STATE,
         },
-    }
-    job_args = namedtuple("job_args", job_args_dict)
-    return job_args(**job_args_dict)
+    )
 
 
 @pytest.fixture
-def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
+def state_ids_with_jobs(
+    state_ids: StateIds,
+    job_args: JobArgs,
+    payloads: Payloads,
+    mock_time: t.Generator[datetime.datetime, None, None],
+) -> dict[str, list[Job]]:
     jobs = {
         state_ids.single_incomplete_state_id: [
             Job(
@@ -2328,10 +2345,10 @@ def jobs(state_ids_with_jobs):
 
 @pytest.fixture
 def state_ids_with_expected_states(
-    state_ids,
-    payloads,
-    state_ids_with_jobs,
-):
+    state_ids: StateIds,
+    payloads: Payloads,
+    state_ids_with_jobs: dict[str, list[Job]],
+) -> list[tuple[str, dict]]:
     final_state = {}
     for state in payloads.mock_state_payloads:
         merge(state, final_state)

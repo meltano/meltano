@@ -9,11 +9,10 @@ from urllib.parse import urlparse
 import click
 import requests
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import PluginTypeArg, get_install_options, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
-    PluginTypeArg,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
@@ -28,6 +27,7 @@ from meltano.core.utils import run_async
 from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -107,9 +107,11 @@ def _load_yaml_from_ref(
     ),
 )
 @click.option(
-    "--update",
+    "--update/--no-update",
     is_flag=True,
+    default=True,
     help="Update an existing plugin.",
+    hidden=True,
 )
 @install
 @no_install
@@ -126,12 +128,12 @@ async def add(
     project: Project,
     plugin: tuple[str, ...],
     install_plugins: InstallPlugins,
-    plugin_type: PluginType | None = None,
-    inherit_from: str | None = None,
-    variant: str | None = None,
-    as_name: str | None = None,
-    plugin_yaml: dict | None = None,
-    python: str | None = None,
+    plugin_type: PluginType | None,
+    inherit_from: str | None,
+    variant: str | None,
+    as_name: str | None,
+    plugin_yaml: dict | None,
+    python: str | None,
     **flags: bool,
 ) -> None:
     """Add a plugin to your project.

@@ -39,18 +39,18 @@ client.create_bucket(Bucket="meltano")
 ## Configure meltano to use S3 for state.
 
 ```shell
-meltano config meltano set state_backend.uri "s3://meltano/state"
+meltano config set meltano state_backend.uri "s3://meltano/state"
 
-meltano config meltano set state_backend.s3.aws_access_key_id "minioadmin"
-meltano config meltano set state_backend.s3.aws_secret_access_key "minioadmin"
-meltano config meltano set state_backend.s3.endpoint_url "http://127.0.0.1:9000"
+meltano config set meltano state_backend.s3.aws_access_key_id "minioadmin"
+meltano config set meltano state_backend.s3.aws_secret_access_key "minioadmin"
+meltano config set meltano state_backend.s3.endpoint_url "http://127.0.0.1:9000"
 ```
 
 ## Configure the tap and target
 
 ```shell
-meltano config tap-gitlab set start_date 2022-11-01T00:00:01Z
-meltano config target-jsonl set do_timestamp_file false
+meltano config set tap-gitlab start_date 2022-11-01T00:00:01Z
+meltano config set target-jsonl do_timestamp_file false
 ```
 
 ## Run a job

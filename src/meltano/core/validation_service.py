@@ -8,22 +8,23 @@ import typing as t
 from abc import ABCMeta, abstractmethod
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import Self  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Self
 
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
 
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
 EXIT_CODE_OK = 0
-
-T = t.TypeVar("T", bound="ValidationsRunner")
 
 
 class ValidationOutcome(StrEnum):
@@ -122,11 +123,11 @@ class ValidationsRunner(metaclass=ABCMeta):
 
     @classmethod
     def collect(
-        cls: type[T],
+        cls,
         project: Project,
         *,
         select_all: bool = True,
-    ) -> dict[str, T]:
+    ) -> dict[str, Self]:
         """Collect all tests for CLI invocation.
 
         Args:

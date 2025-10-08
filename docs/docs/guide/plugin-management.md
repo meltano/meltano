@@ -5,6 +5,11 @@ layout: doc
 sidebar_position: 2
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
 where your [project](/concepts/project) and pipelines are composed of [plugins](/concepts/plugins) of [different types](/concepts/plugins#types), most notably **extractors** ([Singer](https://singer.io) taps), **loaders** ([Singer](https://singer.io) targets), and **utilities** (like [dbt](https://www.getdbt.com) for transformations, [Airflow](https://airflow.apache.org/)/[Dagster](https://dagster.io/)/etc. for orchestration, and much more on [MeltanoHub](https://hub.meltano.com/utilities/)).
 
@@ -34,6 +39,18 @@ refer to the ["Plugin inheritance" section](#plugin-inheritance).
 [Discoverable plugins](/concepts/plugins#discoverable-plugins) can be added to your project by simply providing
 [`meltano add`](/reference/command-line-interface#add) with their name. Meltano will automatically detect the plugin type:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
 ```bash
 # Simplified syntax - plugin type is automatically detected
 meltano add <name>
@@ -43,12 +60,8 @@ meltano add tap-gitlab        # Automatically detected as extractor
 meltano add target-postgres   # Automatically detected as loader
 meltano add dbt-snowflake     # Automatically detected as utility
 meltano add airflow           # Automatically detected as utility
-```
 
-You can explicitly specify the plugin type for disambiguation when needed:
-
-```bash
-# Explicit plugin type specification
+# Explicit plugin type specification for disambiguation when needed
 meltano add --plugin-type <type> <name>
 
 # For example:
@@ -58,15 +71,24 @@ meltano add --plugin-type utility dbt-snowflake
 meltano add --plugin-type utility airflow
 ```
 
-The original positional syntax is still supported but deprecated:
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
 
 ```bash
-# Deprecated syntax (will be removed in v4)
 meltano add <type> <name>
 
 # For example:
-meltano add extractor tap-gitlab  # Will show deprecation warning
+meltano add extractor tap-gitlab
 meltano add loader target-postgres
+meltano add utility dbt-snowflake
+meltano add utility airflow
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
@@ -116,6 +138,18 @@ has the same effect as adding it using [`meltano add`](/reference/command-line-i
 If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are available,
 you can choose a specific (non-default) variant using the `--variant` option on [`meltano add`](/reference/command-line-interface#add):
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
 ```bash
 # With automatic type detection
 meltano add <name> --variant <variant>
@@ -125,9 +159,23 @@ meltano add target-postgres --variant=transferwise  # Type automatically detecte
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type loader target-postgres --variant=transferwise
+```
 
-# Deprecated positional syntax
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano add loader <name> --variant <variant>
+
+# For example:
 meltano add loader target-postgres --variant=transferwise
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 As you might expect, this will be reflected in the `variant` and `pip_url` properties in your [`meltano.yml` project file](/concepts/project#plugins):
@@ -155,6 +203,18 @@ Alternatively, if you'd like to give the plugin a more descriptive name in your 
 you can use the `--inherit-from` (or `--as`) option on [`meltano add`](/reference/command-line-interface#add)
 to explicitly inherit from the discoverable plugin instead:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
 ```bash
 # With automatic type detection
 meltano add <name> --inherit-from <discoverable-name>
@@ -166,7 +226,17 @@ meltano add --plugin-type <type> <name> --inherit-from <discoverable-name>
 # Or equivalently:
 meltano add --plugin-type <type> <discoverable-name> --as <name>
 
-# Deprecated positional syntax
+# For example:
+meltano add tap-postgres--billing --inherit-from tap-postgres
+meltano add tap-postgres --as tap-postgres--billing
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
 meltano add <type> <name> --inherit-from <discoverable-name>
 # Or equivalently:
 meltano add <type> <discoverable-name> --as <name>
@@ -174,6 +244,11 @@ meltano add <type> <discoverable-name> --as <name>
 # For example:
 meltano add extractor tap-postgres--billing --inherit-from tap-postgres
 meltano add extractor tap-postgres --as tap-postgres--billing
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 The corresponding [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
@@ -197,9 +272,36 @@ If you'd like to use multiple [variants](#variants) of the same discoverable plu
 Since plugins in your project need to have unique names, a discoverable plugin can only be shadowed once,
 but it can be inherited from multiple times, with each plugin free to choose its own variant:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add target-snowflake --variant=transferwise --as target-snowflake--transferwise
+meltano add target-snowflake --variant=meltanolabs --as target-snowflake--meltanolabs
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add loader target-snowflake --variant=transferwise --as target-snowflake--transferwise
-meltano add loader target-snowflake --variant=meltano --as target-snowflake--meltano
+meltano add loader target-snowflake --variant=meltanolabs --as target-snowflake--meltanolabs
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 Assuming a regular (shadowing) `target-snowflake` was added before using `meltano add loader target-snowflake`,
@@ -240,6 +342,36 @@ just like when shadowing with a `name` but no `variant`.
 like arbitrary Singer taps and targets,
 can be added to your project using the `--custom` option on [`meltano add`](/reference/command-line-interface#add):
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --custom <name>
+
+# For example:
+meltano add --custom tap-covid-19
+meltano add --custom target-bigquery--custom
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom tap-covid-19
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --custom <type> <name>
 
@@ -251,6 +383,11 @@ meltano add --custom loader target-bigquery--custom
 # and ensure that interactive mode is enabled so that Meltano can ask you
 # additional questions about the plugin and get your answers over STDIN:
 docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 Since Meltano doesn't have the [base plugin description](/concepts/plugins#project-plugins) for the package in question yet,
@@ -379,6 +516,32 @@ To add a new plugin to your project that [inherits from an existing plugin](/con
 so that it can reuse the same package but override (parts of) its configuration,
 you can use the `--inherit-from` option on [`meltano add`](/reference/command-line-interface#add):
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add <name> --inherit-from <existing-name>
+
+# For example:
+meltano add tap-ga--client-foo --inherit-from tap-google-analytics
+meltano add tap-ga--client-bar --inherit-from tap-google-analytics
+meltano add tap-ga--client-foo--project-baz --inherit-from tap-ga--client-foo
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add <type> <name> --inherit-from <existing-name>
 
@@ -386,6 +549,11 @@ meltano add <type> <name> --inherit-from <existing-name>
 meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 meltano add extractor tap-ga--client-bar --inherit-from tap-google-analytics
 meltano add extractor tap-ga--client-foo--project-baz --inherit-from tap-ga--client-foo
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 The corresponding [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
@@ -546,22 +714,45 @@ RUN meltano install
 
 You can remove a [plugin](/concepts/project#plugins) from your Meltano [project](/concepts/project) by using [`meltano remove`](/reference/command-line-interface#remove). The plugin type is automatically inferred from the plugin name, so you no longer need to specify the type explicitly.
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
 ```bash
-# New syntax (recommended) - plugin type is automatically inferred
+# Plugin type is automatically inferred
 meltano remove <name>
 meltano remove <name> <name_two>
-
-# Deprecated syntax - will be removed in v4
-meltano remove <type> <name>
-meltano remove <type> <name> <name_two>
 
 # For example:
 meltano remove tap-gitlab
 meltano remove target-postgres target-csv
+```
 
-# Deprecated syntax:
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano remove <type> <name>
+meltano remove <type> <name> <name_two>
+
+# For example:
 meltano remove extractor tap-gitlab
 meltano remove loader target-postgres target-csv
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 Since the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project) determines the plugins that make up your project, you can still manually remove a [plugin](/concepts/plugins#project-plugins) from your project by deleting its entry from this file. Traces of the plugin may remain in the other locations mentioned above.

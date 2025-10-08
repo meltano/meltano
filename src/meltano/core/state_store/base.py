@@ -27,7 +27,7 @@ class StateIDLockedError(Exception):
     """A job attempted to acquire a lock on an already-locked state ID."""
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(slots=True)
 class MeltanoState:
     """State object."""
 

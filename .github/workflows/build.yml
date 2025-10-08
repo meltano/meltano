@@ -2,6 +2,8 @@ name: Build
 
 on:
   push:
+    branches-ignore:
+    - 'gh-readonly-queue/**'
     paths:
     - .github/actions/docker-build-scan-push/action.yml
     - .github/workflows/build.yml
@@ -21,7 +23,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write  # Needed to upload artifacts to the release
   id-token: write  # Needed for OIDC PyPI publishing
 
 jobs:
@@ -34,17 +35,15 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         persist-credentials: false
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
-      with:
-        version: ">=0.6.15"
+      uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
 
     - name: Set up Python
-      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
       with:
         python-version: 3.x
 
@@ -74,7 +73,7 @@ jobs:
       id: baipp
 
   build_docker:
-    name: Docker Images
+    name: Docker Images (${{ matrix.slim && 'Slim' || 'Full' }}, Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     needs: build
     permissions:
@@ -83,17 +82,19 @@ jobs:
       packages: write
       security-events: write
     env:
-      DEFAULT_PYTHON: "3.9"  # will be used in 'latest' images
+      DEFAULT_PYTHON: "3.10"  # will be used in 'latest' images
 
     strategy:
       fail-fast: false
       matrix:
         python-version:
-        - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
         - "3.13"
+        slim:
+        - false
+        - true
 
     steps:
     - name: Set the workflow inputs
@@ -102,23 +103,22 @@ jobs:
       # regardless of what event triggered it.
       run: |
         echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         persist-credentials: false
     - name: Setup uv
-      uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
-      with:
-        version: ">=0.6"
+      uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
 
     - name: Generate tags
       id: generate-tags
       run: >
         python scripts/generate_docker_tags.py
         --git-sha ${{ github.sha }}
-        -v ${NEEDS_BUILD_OUTPUTS_VERSION}
-        -p ${{ matrix.python-version }}
-        -d ${{ env.DEFAULT_PYTHON }}
-        -r ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
+        --package-version ${NEEDS_BUILD_OUTPUTS_VERSION}
+        --python-version ${{ matrix.python-version }}
+        --default-python ${{ env.DEFAULT_PYTHON }}
+        --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
+        ${{ matrix.slim && '--slim' || '' }}
         > tags
       env:
         NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
@@ -162,6 +162,7 @@ jobs:
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}
+        slim: ${{ matrix.slim }}
 
   pypi_release:
     name: Publish to PyPI
@@ -174,24 +175,15 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       with:
         persist-credentials: false
 
     - name: Download artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
       with:
         name: Packages
         path: dist
 
-    - name: Upload wheel to release
-      uses: svenstaro/upload-release-action@81c65b7cd4de9b2570615ce3aad67a41de5b1a13 # 2.11.2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: dist/*.whl
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
-
     - name: Publish
-      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
+      uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0

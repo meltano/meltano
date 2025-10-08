@@ -5,6 +5,11 @@ layout: getting_started
 sidebar_position: 5
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
@@ -22,7 +27,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.9, 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1.  Create and navigate to a directory to hold your Meltano projects:
 
@@ -174,25 +179,57 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
     - If an extractor is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 
-    ```bash
-    # Simplified syntax - plugin type is automatically detected
-    meltano add <plugin name>
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
 
-    # For example:
-    meltano add tap-gitlab  # Automatically detected as extractor
+```bash
+# Simplified syntax - plugin type is automatically detected
+meltano add <plugin name>
 
-    # If you have a preference for a non-default variant, select it using `--variant`:
-    meltano add tap-gitlab --variant=singer-io
+# For example:
+meltano add tap-gitlab  # Automatically detected as extractor
 
-    # Explicit plugin type for disambiguation:
-    meltano add --plugin-type extractor tap-gitlab
+# If you have a preference for a non-default variant, select it using `--variant`:
+meltano add tap-gitlab --variant=singer-io
 
-    # Deprecated positional syntax:
-    meltano add extractor tap-gitlab
+# Explicit plugin type for disambiguation:
+meltano add --plugin-type extractor tap-gitlab
 
-    # If you're using Docker, don't forget to mount the project directory:
-    docker run -v $(pwd):/project -w /project meltano/meltano add tap-gitlab
-    ```
+# If you're using Docker, don't forget to mount the project directory:
+docker run -v $(pwd):/project -w /project meltano/meltano add tap-gitlab
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano add extractor <plugin name>
+
+# For example:
+meltano add extractor tap-gitlab
+
+# If you have a preference for a non-default variant, select it using `--variant`:
+meltano add extractor tap-gitlab --variant=singer-io
+
+# If you're using Docker, don't forget to mount the project directory:
+docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
     This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
@@ -216,17 +253,51 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
             - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
-                  ```bash
-                  meltano add --custom extractor <tap name>
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
 
-                  # For example:
-                  meltano add --custom extractor tap-covid-19
+```bash
+meltano add --custom <tap name>
 
-                  # If you're using Docker, don't forget to mount the project directory,
-                  # and ensure that interactive mode is enabled so that Meltano can ask you
-                  # additional questions about the plugin and get your answers over STDIN:
-                  docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
-                  ```
+# For example:
+meltano add --custom tap-covid-19
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom tap-covid-19
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano add --custom extractor <tap name>
+
+# For example:
+meltano add --custom extractor tap-covid-19
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
                   Meltano will now ask you some additional questions to learn more about the plugin.
 
@@ -394,7 +465,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
 
   <p><strong>What if I already have a catalog file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have already generated a <a href="https://hub.meltano.com/singer/spec#catalog-files">catalog file</a>.</p>
-  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
+  <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#el">`meltano el`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
 :::
 
 1. Find out whether the extractor supports entity selection, and if so, what entities and attributes are available, using [`meltano select --list --all`](/reference/command-line-interface#select):
@@ -574,23 +645,53 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
             - If a loader is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 
-                  ```bash
-                  # Simplified syntax - plugin type is automatically detected
-                  meltano add <plugin name>
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
 
-                  # For this example, we'll use the default variant:
-                  meltano add target-postgres  # Automatically detected as loader
+```bash
+# Simplified syntax - plugin type is automatically detected
+meltano add <plugin name>
 
-                  # Or if you just want to use a non-default variant you can use this,
-                  # selected using `--variant`:
-                  meltano add target-postgres --variant=datamill-co
+# For this example, we'll use the default variant:
+meltano add target-postgres  # Automatically detected as loader
 
-                  # Explicit plugin type for disambiguation:
-                  meltano add --plugin-type loader target-postgres
+# Or if you just want to use a non-default variant you can use this,
+# selected using `--variant`:
+meltano add target-postgres --variant=datamill-co
 
-                  # Deprecated positional syntax:
-                  meltano add loader target-postgres
-                  ```
+# Explicit plugin type for disambiguation:
+meltano add --plugin-type loader target-postgres
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano add loader <plugin name>
+
+# For this example, we'll use the default variant:
+meltano add loader target-postgres
+
+# Or if you just want to use a non-default variant you can use this,
+# selected using `--variant`:
+meltano add loader target-postgres --variant=datamill-co
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
 :::info
 
@@ -616,17 +717,51 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
         - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
-              ```bash
-              meltano add --custom loader <target name>
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
 
-              # For example:
-              meltano add --custom loader target-bigquery
+```bash
+meltano add --custom <target name>
 
-              # If you're using Docker, don't forget to mount the project directory,
-              # and ensure that interactive mode is enabled so that Meltano can ask you
-              # additional questions about the plugin and get your answers over STDIN:
-              docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom loader target-bigquery
-              ```
+# For example:
+meltano add --custom target-bigquery
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom target-bigquery
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano add --custom loader <target name>
+
+# For example:
+meltano add --custom loader target-bigquery
+
+# If you're using Docker, don't forget to mount the project directory,
+# and ensure that interactive mode is enabled so that Meltano can ask you
+# additional questions about the plugin and get your answers over STDIN:
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom loader target-bigquery
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
               Meltano will now ask you some additional questions to learn more about the plugin.
 
@@ -826,7 +961,7 @@ meltano state get dev:tap-gitlab-to-target-postgres
 
 :::
 
-There is also the [`meltano elt`](/reference/command-line-interface#elt) command which is a more rigid command for running only EL pipelines.
+There is also the [`meltano el`](/reference/command-line-interface#el) command which is a more rigid command for running only EL pipelines.
 
 Or directly using the `meltano invoke`, which only executes a single plugin at a time.
 This can be useful for debugging a failing extractor or loader.
@@ -893,16 +1028,39 @@ schedules:
 
 1. Add the [Apache Airflow](https://airflow.apache.org/) utility to your project using [`meltano add`](/reference/command-line-interface#add), which will be responsible for managing the schedule and executing the appropriate `meltano run` commands:
 
-   ```bash
-   # Simplified syntax - plugin type is automatically detected
-   meltano add airflow  # Automatically detected as utility
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
 
-   # Explicit plugin type for disambiguation:
-   meltano add --plugin-type utility airflow
+```bash
+# Simplified syntax - plugin type is automatically detected
+meltano add airflow  # Automatically detected as utility
 
-   # Deprecated positional syntax:
-   meltano add utility airflow
-   ```
+# Explicit plugin type for disambiguation:
+meltano add --plugin-type utility airflow
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
+meltano add utility airflow
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
+```
 
    This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 

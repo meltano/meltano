@@ -90,7 +90,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         requires: dict[PluginType, list[PluginRequirement]] | None = None,
         requires_meltano: str | None = None,
         config: dict[str, t.Any] | None = None,
-        default_variant: str = Variant.ORIGINAL_NAME,
+        default_variant: str = Variant.DEFAULT_NAME,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):

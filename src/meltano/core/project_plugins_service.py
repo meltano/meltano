@@ -39,8 +39,25 @@ class DefinitionSource(enum.Flag):
     LOCAL = ~HUB  # type: ignore[operator]  # https://github.com/python/mypy/issues/18410
 
 
+class AddedPluginFlags(enum.Flag):
+    """Flags for added plugins."""
+
+    ADDED = enum.auto()
+    NOT_ADDED = enum.auto()
+    UPDATED = enum.auto()
+
+
 class PluginAlreadyAddedException(Exception):
-    """Raised when a plugin is already added to the project."""
+    """Raised when a plugin is already added to the project.
+
+    This exception is raised in two scenarios:
+    1. When attempting to add a plugin that already exists (update=False)
+    2. When attempting to update a plugin with a different variant (update=True)
+
+    The second scenario prevents accidental variant changes that could lead to
+    incompatible plugin configurations. Users must explicitly remove the old plugin
+    before adding a new variant.
+    """
 
     def __init__(self, plugin: PluginRef, new_plugin: PluginRef):
         """Create a new Plugin Already Added Exception.
@@ -81,7 +98,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
             instruction = "Check https://hub.meltano.com/ for available plugins"
         else:
             instruction = (
-                "Try running `meltano lock --update --all` to ensure your plugins are "
+                "Try running `meltano lock --update` to ensure your plugins are "
                 "up to date, or add a `namespace` to your plugin if it is a custom one"
             )
 
@@ -140,17 +157,48 @@ class ProjectPluginsService:  # (too many methods, attributes)
         with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
-    def add_to_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
+    def add_to_file_with_flags(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        update: bool = False,
+    ) -> tuple[ProjectPlugin, AddedPluginFlags]:
         """Add plugin to `meltano.yml`.
+
+        This method handles adding plugins to the project configuration with the
+        following logic:
+
+        1. **Plugin Variant Handling**: When a plugin with the same name already exists,
+           the behavior depends on the `update` parameter and variant comparison:
+
+           - If `update=False` (default): Always raises `PluginAlreadyAddedException`
+           - If `update=True` and variants match: Updates the existing plugin
+           - If `update=True` but variants differ: Raises `PluginAlreadyAddedException`
+
+           This design prevents accidental variant changes, which could lead to
+           incompatible plugin configurations. To change variants, users must
+           explicitly remove the old plugin first.
+
+        2. **Update Process**: When updating (same variant), the method preserves
+           existing configuration via `keep_config=True` to maintain user settings.
+
+        3. **New Plugin Addition**: If no existing plugin is found, the plugin is
+           added to the appropriate plugin type list in the configuration.
 
         Args:
             plugin: The plugin to add.
+            update: Whether to update the plugin if it already exists in the file
+                and it is the same variant. Note: Updates are only allowed for
+                plugins with matching variants to prevent configuration conflicts.
 
         Raises:
-            PluginAlreadyAddedException: If the plugin is already added.
+            PluginAlreadyAddedException: If the plugin is already added and either:
+                - `update=False` (default behavior)
+                - `update=True` but the new plugin has a different variant than
+                  the existing plugin (prevents accidental variant changes)
 
         Returns:
-            The added plugin.
+            The added plugin and flags indicating the operation result.
         """
         # FIXME: `should_add_to_file` is a method from `BasePlugin`, which is
         #        not a subclass of `ProjectPlugin`. I've left this call to it
@@ -158,11 +206,16 @@ class ProjectPluginsService:  # (too many methods, attributes)
         #        that relies on it, but something is definitely wrong here.
         #        We default to `True` for `ProjectPlugin` objects.
         if not getattr(plugin, "should_add_to_file", lambda: True)():
-            return plugin
+            return plugin, AddedPluginFlags.NOT_ADDED
 
         with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
-            raise PluginAlreadyAddedException(existing_plugin, plugin)
+            # Prevent updates when variants differ to avoid configuration conflicts
+            if not update or existing_plugin.variant != plugin.variant:
+                raise PluginAlreadyAddedException(existing_plugin, plugin)
+
+            updated, _ = self.update_plugin(plugin, keep_config=True)
+            return updated, AddedPluginFlags.UPDATED
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
@@ -170,7 +223,25 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
             plugins[plugin.type].append(plugin)
 
-        return plugin
+        return plugin, AddedPluginFlags.ADDED
+
+    def add_to_file(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        update: bool = False,
+    ) -> ProjectPlugin:
+        """Add plugin to `meltano.yml`.
+
+        Args:
+            plugin: The plugin to add.
+            update: Whether to update the plugin if it already exists in the file
+                and it is the same variant.
+
+        Returns:
+            The added plugin.
+        """
+        return self.add_to_file_with_flags(plugin, update=update)[0]
 
     def remove_from_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Remove plugin from `meltano.yml`.
@@ -235,7 +306,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         for plugin in self.plugins(ensure_parent=False):
             if (
-                plugin.name == plugin_name  # (with too much logic)
+                plugin.name == plugin_name
                 and (plugin_type is None or plugin.type == plugin_type)
                 and (
                     invokable is None
@@ -459,7 +530,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update
-            p_idx, p_outdated = next(
+            p_idx, _p_outdated = next(
                 (
                     (idx, plg)
                     for idx, plg in enumerate(environment.config.plugins[plugin.type])

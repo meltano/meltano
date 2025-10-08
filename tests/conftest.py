@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import typing as t
-from collections import Counter, abc
+from collections import Counter
 from copy import deepcopy
 from http import HTTPStatus
 
@@ -13,8 +13,10 @@ import requests
 from requests.adapters import BaseAdapter
 
 from meltano.core.plugin.base import PluginType
+from meltano.core.user_config import _reset_user_config_service
 
 if t.TYPE_CHECKING:
+    from collections import abc
     from collections.abc import Callable
 
     from meltano.core.project import Project
@@ -46,6 +48,8 @@ BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
 def pytest_runtest_setup(item) -> None:
+    _reset_user_config_service()
+
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database

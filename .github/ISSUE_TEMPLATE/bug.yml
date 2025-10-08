@@ -19,9 +19,9 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.8.0"
+      placeholder: "4.0.0b4"
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: python_version
     attributes:
@@ -32,11 +32,10 @@ body:
         - "3.12"
         - "3.11"
         - "3.10"
-        - "3.9"
-        - "3.8 or earlier (unsupported)"
+        - "3.9 or earlier (unsupported)"
         - "NA"
     validations:
-      required: true
+      required: false
   - type: dropdown
     id: scope
     attributes:
@@ -44,7 +43,9 @@ body:
       description: Functionality this bug affects
       options:
         - CLI (options, error messages, logging, etc.)
+        - State management (`meltano state`, state backends, etc.)
         - Configuration (settings parsing, validation, etc.)
+        - Documentation
         - Other
     validations:
       required: true
@@ -79,7 +80,7 @@ body:
             variant: my-variant
             pip_url: ...
     validations:
-      required: true
+      required: false
   - type: input
     id: slack_or_linen
     attributes:

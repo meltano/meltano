@@ -10,13 +10,14 @@ from structlog.stdlib import get_logger
 
 from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.db import project_engine
+from meltano.core.error import MeltanoError
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
 from meltano.core.state_store.db import DBStateStoreManager
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
@@ -41,6 +42,23 @@ __all__ = [
 logger = get_logger(__name__)
 
 SYSTEMDB = "systemdb"
+
+
+class StateBackendNotFoundError(MeltanoError):
+    """No state backend found for the given scheme."""
+
+    def __init__(self, scheme: str):
+        """Create a new NoStateBackendFoundError.
+
+        Args:
+            scheme: The scheme of the StateBackend.
+        """
+        self.scheme = scheme
+        super().__init__(
+            f"No state backend found for scheme '{scheme}', available backends are: "
+            ", ".join(StateBackend.backends()),
+            instruction="Install the add-on that provides it",
+        )
 
 
 class StateBackend:
@@ -83,9 +101,7 @@ class StateBackend:
         try:
             manager = self.addon.get(self.scheme)
         except KeyError:
-            msg = f"No state backend found for scheme '{self.scheme}'. "
-            msg += "Available backends: " + ", ".join(self.backends())
-            raise ValueError(msg) from None
+            raise StateBackendNotFoundError(self.scheme) from None
 
         logger.info("Using %s add-on state backend", manager.__name__)
         return manager

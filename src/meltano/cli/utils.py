@@ -19,29 +19,33 @@ from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin.base import PluginDefinition, PluginType
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
-from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
-    ProjectAddService,
 )
+from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+from meltano.core.version_check import VersionCheckService
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
     from meltano.core.project_plugins_service import ProjectPluginsService
 
 setup_logging()
 
 logger = structlog.stdlib.get_logger(__name__)
+
+# Commands that should skip version check
+EXCLUDED_VERSION_CHECK_COMMANDS = {"version", "upgrade", "init"}
 
 
 class CliError(Exception):
@@ -68,7 +72,7 @@ def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
     *,
-    update: bool = False,
+    flags: AddedPluginFlags = AddedPluginFlags.ADDED,
 ) -> None:
     """Print added plugin."""
     descriptor = plugin.type.descriptor
@@ -77,17 +81,15 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    action, preposition = (
-        (
-            "Updated" if plugin.should_add_to_file() else "Updating",
-            "in",
-        )
-        if update
-        else (
-            "Added" if plugin.should_add_to_file() else "Adding",
-            "to",
-        )
-    )
+    match flags:
+        case AddedPluginFlags.ADDED:
+            action, preposition = "Added", "to"
+        case AddedPluginFlags.UPDATED:
+            action, preposition = "Updated", "in"
+        case AddedPluginFlags.NOT_ADDED:
+            action, preposition = "Initialized", "in"
+        case _:  # pragma: no cover
+            t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",
@@ -310,10 +312,8 @@ def add_plugin(  # noqa: ANN201
         plugin_name = plugin_attrs.pop("name")
         variant = plugin_attrs.pop("variant", variant)
 
-    plugin: ProjectContext | PluginRef
-
     try:
-        plugin = add_service.add(
+        plugin, flags = add_service.add_with_flags(
             plugin_type,
             plugin_name,
             variant=variant,
@@ -323,9 +323,9 @@ def add_plugin(  # noqa: ANN201
             python=python,
             **plugin_attrs,
         )
-        print_added_plugin(plugin, update=update)
+        print_added_plugin(plugin, flags=flags)
     except PluginAlreadyAddedException as err:
-        plugin = err.plugin
+        plugin = err.plugin  # type: ignore[assignment]
         click.secho(
             (
                 f"{plugin_type.descriptor.capitalize()} '{plugin_name}' "
@@ -369,17 +369,6 @@ def add_plugin(  # noqa: ANN201
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new "
                 f"--inherit-from {plugin.name}",
             )
-    except LockfileAlreadyExistsError as exc:
-        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method
-        # should return! Results in `KeyError: venv_name`
-        plugin = exc.plugin
-        click.secho(
-            f"Plugin definition is already locked at {exc.path}.",
-            fg="yellow",
-        )
-        click.echo(
-            "You can remove the file manually to avoid using a stale definition.",
-        )
 
     click.echo()
 
@@ -476,8 +465,8 @@ def activate_environment(  # noqa: D417
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
-    if ctx.obj.get("selected_environment"):
-        project.activate_environment(ctx.obj["selected_environment"])
+    if env := ctx.obj.get("selected_environment"):
+        project.activate_environment(env)
         # Update the project context being used for telemetry:
         project_ctx = next(
             ctx
@@ -590,7 +579,28 @@ class InstrumentedGroup(InstrumentedGroupMixin, DYMGroup):
     """Click group with telemetry instrumentation."""
 
 
-class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class _BaseMeltanoCommand(click.Command):
+    """Base class for all Meltano commands."""
+
+    def _perform_version_check(self, ctx: click.Context) -> None:
+        """Perform version check if conditions are met."""
+        # Skip version check for certain commands
+        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
+            return
+
+        # Skip if project not available or version check disabled
+        project: Project | None = ctx.obj.get("project")
+        if project is None or not ctx.obj.get("version_check_enabled", False):
+            return
+
+        version_service = VersionCheckService(project)
+
+        if (result := version_service.check_version()) and result.is_outdated:
+            # Display version update message
+            logger.warning(version_service.format_update_message(result))
+
+
+class InstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command that automatically fires telemetry events when invoked.
 
     Both starting and ending events are fired. The ending event fired is
@@ -601,6 +611,10 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+
         if ctx.obj.get("tracker"):
             tracker = ctx.obj["tracker"]
             tracker.add_contexts(CliContext.from_click_context(ctx))
@@ -615,7 +629,7 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
             super().invoke(ctx)
 
 
-class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command with partial telemetry instrumentation.
 
     Only automatically fires a 'start' event.
@@ -625,6 +639,10 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
@@ -637,23 +655,6 @@ class AutoInstallBehavior(StrEnum):
     install = auto()
     no_install = auto()
     only_install = auto()
-
-
-class PluginTypeArg(click.Choice):
-    """A click parameter that converts a string to a PluginType."""
-
-    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
-        """Initialize the PluginTypeArg."""
-        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
-
-    def convert(
-        self,
-        value: str,
-        param: click.Parameter | None,  # noqa: ARG002
-        ctx: click.Context | None,  # noqa: ARG002
-    ) -> PluginType:
-        """Convert the value to a PluginType."""
-        return PluginType.from_cli_argument(value)
 
 
 def infer_plugin_type(plugin_name: str) -> PluginType:

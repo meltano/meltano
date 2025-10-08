@@ -8,7 +8,11 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import (
+    PluginTypeArg,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
@@ -17,11 +21,9 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
-from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
-    PluginInvoker,
     UnknownCommandError,
     invoker_factory,
 )
@@ -31,6 +33,9 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.cli.params import InstallPlugins
+    from meltano.core.plugin import PluginType
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -55,7 +60,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--plugin-type",
-    type=click.Choice(PluginType.cli_arguments()),
+    type=PluginTypeArg(),
     default=None,
 )
 @click.option(
@@ -85,7 +90,7 @@ async def invoke(
     project: Project,
     ctx: click.Context,
     *,
-    plugin_type: str,
+    plugin_type: PluginType | None,
     dump: str,
     list_commands: bool,
     plugin_name: str,
@@ -106,14 +111,12 @@ async def invoke(
     except ValueError:
         command_name = None
 
-    ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None
-
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         plugin = project.plugins.find_plugin(
             plugin_name,
-            plugin_type=ptype,
+            plugin_type=plugin_type,
             invokable=True,
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))

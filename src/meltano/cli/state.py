@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import json.decoder
 import re
 import typing as t
 from datetime import datetime as dt
@@ -97,7 +98,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             return next(parser.find_blocks()).state_service  # type: ignore[union-attr]
         except Exception:
             logger.warning("No plugins found for provided state_id.")
-    # If provided state_id does not match convention (i.e., run via "meltano elt"),
+    # If provided state_id does not match convention (i.e., run via "meltano el"),
     # use the standalone StateService in the CLI context.
     return None
 
@@ -190,7 +191,7 @@ def move_state(
     dst_state_id: str,
 ) -> None:
     """Move state to another job ID, clearing the original."""
-    # Retrieve state for moveing
+    # Retrieve state for moving
     state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
@@ -306,6 +307,56 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
     )
     retrieved_state = state_service.get_state(state_id)
     click.echo(json.dumps(retrieved_state))
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="edit")
+@prompt_for_confirmation(
+    prompt="This will overwrite the state's current value. Continue?",
+)
+@click.argument("state-id")
+@pass_project(migrate=True)
+@click.pass_context
+def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
+    """Edit state in your default text editor.
+
+    The state must be valid JSON with a top-level 'singer_state' key:
+    {
+        "singer_state": {
+            "bookmarks": {...}
+        }
+    }
+    """
+    state_service: StateService = (
+        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+
+    current_state = state_service.get_state(state_id)
+    if not current_state:
+        logger.info("No state found for %s. Creating new state.", state_id)
+        current_state = {}
+
+    initial_content = json.dumps(current_state, indent=2)
+    if edited_content := click.edit(initial_content, extension=".json"):
+        edited_content = edited_content.strip()
+    else:
+        logger.info("Edit cancelled - no changes made")
+        ctx.exit(0)
+
+    if not edited_content:
+        logger.info("Empty content provided - no changes made")
+        ctx.exit(0)
+
+    initial_json = json.loads(initial_content)
+    if json.loads(edited_content) == initial_json:
+        logger.info("No changes detected")
+        ctx.exit(0)
+
+    state_service.set_state(state_id, edited_content)
+    logger.info(
+        "State for %s was successfully updated at %s",
+        state_id,
+        dt.now(tz=tz.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
+    )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
