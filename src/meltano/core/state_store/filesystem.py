@@ -4,11 +4,13 @@
 
 from __future__ import annotations
 
+import dataclasses
 import glob
 import os
 import platform
 import re
 import shutil
+import sys
 import typing as t
 from abc import abstractmethod
 from base64 import b64decode, b64encode
@@ -21,8 +23,15 @@ from urllib.parse import urlparse
 
 import smart_open
 import structlog
+import upath
+from upath.implementations.local import FilePath
 
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable, Iterator
@@ -606,3 +615,169 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
             ):
                 state_ids.add(state_id)
         return list(state_ids)
+
+
+_T = t.TypeVar("_T", bound=upath.UPath)
+
+
+@dataclasses.dataclass
+class FSSpecStateStoreManager(StateStoreManager, t.Generic[_T]):
+    """State backend for FSSpec."""
+
+    label: t.ClassVar[str] = "FSSpec"
+
+    uri: str
+    lock_retry_seconds: int | None = None
+    lock_timeout_seconds: int | None = None
+
+    def __post_init__(self) -> None:
+        """Post-initialize the FSSpecStateStoreManager."""
+        self._parsed = urlparse(self.uri)
+        self._uri = self.uri
+        self._path: _T | None = None
+
+    @abstractmethod
+    def get_upath(self) -> _T:
+        """Get the UPath instance for the state store manager."""
+        ...
+
+    @property
+    def path(self) -> _T:
+        """The path in the filesystem where state should be stored."""
+        if self._path is None:
+            self._path = self.get_upath()
+        return self._path
+
+    def get_path(self, state_id: str, filename: str | None = None) -> _T:
+        """Get the path for the given state_id and filename.
+
+        Args:
+            state_id: the state_id to get path for
+            filename: the name of the file to get path for
+
+        Returns:
+            The constructed path.
+        """
+        return (
+            self.path.joinpath(state_id, filename)
+            if filename
+            else self.path.joinpath(state_id)
+        )
+
+    def get_state_path(self, state_id: str) -> _T:
+        """Get the path to the file/blob storing complete state for the given state_id.
+
+        Args:
+            state_id: the state_id to get path for
+
+        Returns:
+            the path to the file/blob storing complete state for the given state_id.
+        """
+        return self.get_path(state_id, filename="state.json")
+
+    def get_lock_path(self, state_id: str) -> _T:
+        """Get the path to the lock file for the given state_id.
+
+        Args:
+            state_id: the state_id to get path for
+
+        Returns:
+            The path to the lock file for the given state_id.
+        """
+        return self.get_path(state_id, filename="lock")
+
+    def is_locked(self, state_id: str) -> bool:
+        """Indicate whether the given state_id is currently locked.
+
+        Args:
+            state_id: the state_id to check
+
+        Returns:
+            True if locked, else False
+
+        Raises:
+            Exception: if error not indicating file is not found is thrown
+        """
+        lock_path = self.get_lock_path(state_id)
+        try:
+            with lock_path.open() as reader:
+                locked_at = datetime.fromtimestamp(
+                    float(reader.read()),
+                    tz=timezone.utc,
+                )
+                if locked_at < (
+                    datetime.now(timezone.utc)
+                    - timedelta(seconds=self.lock_timeout_seconds)
+                ):
+                    self.delete(lock_path)
+                    return False
+                return True
+        except FileNotFoundError:
+            return False
+
+    def create_state_id_dir_if_not_exists(self, state_id: str) -> None:
+        """Create the directory for a given state_id.
+
+        Args:
+            state_id: the state_id to create the dir for
+        """
+        self.get_state_path(state_id).parent.mkdir(parents=True, exist_ok=True)
+
+    @override
+    def set(self, state: MeltanoState) -> None:
+        logger.info("Writing state to %s", self.label)
+        self.get_state_path(state.state_id).write_text(state.json())
+
+    @override
+    def get(self, state_id: str) -> MeltanoState | None:
+        logger.info("Reading state from %s", self.label)
+        try:
+            with self.get_state_path(state_id).open() as reader:
+                return MeltanoState.from_file(state_id, reader)
+        except FileNotFoundError:
+            logger.info("No state found for %s.", state_id)
+            return None
+
+    @override
+    def delete(self, state_id: str) -> None:
+        self.get_state_path(state_id).unlink(missing_ok=True)
+
+    @override
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
+        return [
+            path.name
+            for path in self.path.glob("*")
+            if path.is_dir() and path.joinpath("state.json").exists()
+        ]
+
+    @override
+    @contextmanager
+    def acquire_lock(
+        self,
+        state_id: str,
+        *,
+        retry_seconds: int,
+    ) -> Generator[None, None, None]:
+        lock_path = self.get_lock_path(state_id)
+        try:
+            self.create_state_id_dir_if_not_exists(state_id)
+
+            while self.is_locked(state_id):
+                sleep(retry_seconds)
+            with lock_path.open("w") as writer:
+                writer.write(str(datetime.now(timezone.utc).timestamp()))
+            yield
+        finally:
+            self.delete_file(lock_path)
+
+
+@dataclasses.dataclass
+class LocalStateStoreManager(FSSpecStateStoreManager[FilePath]):
+    """State backend for local filesystem."""
+
+    label: t.ClassVar[str] = "Local"
+
+    @override
+    def get_upath(self) -> FilePath:
+        """Get the UPath instance for the state store manager."""
+        return FilePath.from_uri(self.uri)

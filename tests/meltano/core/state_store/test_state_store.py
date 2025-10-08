@@ -5,7 +5,6 @@ import sys
 import typing as t
 from unittest import mock
 
-import moto
 import pytest
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
@@ -264,36 +263,37 @@ class TestS3StateBackend:
         aws_secret_access_key: str,
         s3_uri: str,
     ) -> None:
+        from_settings = state_store_manager_from_project_settings
+        set_ = project.settings.set
+
         # AWS S3 (credentials in URI)
-        project.settings.set(["state_backend", "uri"], s3_uri)
-        s3_state_store = state_store_manager_from_project_settings(project.settings)
+        set_(["state_backend", "uri"], s3_uri)
+        s3_state_store = from_settings(project.settings)
         assert isinstance(s3_state_store, S3StateStoreManager)
-        assert s3_state_store.bucket == bucket
-        assert s3_state_store.prefix == f"/{prefix}"
         assert s3_state_store.aws_access_key_id == aws_access_key_id
         assert s3_state_store.aws_secret_access_key == aws_secret_access_key
+        assert s3_state_store.path.storage_options["key"] == aws_access_key_id
+        assert s3_state_store.path.storage_options["secret"] == aws_secret_access_key
+        assert s3_state_store.path.storage_options["endpoint_url"] is None
+        # assert s3_state_store.path.anchor == ""
+        # assert s3_state_store.path.
 
         # AWS S3 (credentials provided directly)
-        project.settings.set(
-            ["state_backend", "uri"],
-            "s3://some_bucket/some/path",
-        )
-        project.settings.set(
-            ["state_backend", "s3", "aws_access_key_id"],
-            "a_different_id",
-        )
-        project.settings.set(
-            ["state_backend", "s3", "aws_secret_access_key"],
-            "a_different_key",
-        )
-        s3_state_store_direct_creds = state_store_manager_from_project_settings(
-            project.settings,
-        )
-        assert isinstance(s3_state_store_direct_creds, S3StateStoreManager)
-        assert s3_state_store_direct_creds.aws_access_key_id == "a_different_id"
-        assert (
-            s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
-        )
+        set_(["state_backend", "uri"], "s3://some_bucket/some/path")
+        set_(["state_backend", "s3", "aws_access_key_id"], "a_different_id")
+        set_(["state_backend", "s3", "aws_secret_access_key"], "a_different_key")
+        set_(["state_backend", "s3", "endpoint_url"], "https://mys3service.com")
+
+        direct_creds = from_settings(project.settings)
+        assert isinstance(direct_creds, S3StateStoreManager)
+        assert direct_creds.aws_access_key_id == "a_different_id"
+        assert direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
+        assert direct_creds.endpoint_url == "https://mys3service.com"
+
+        storage_options = direct_creds.path.storage_options
+        assert storage_options["key"] == "a_different_id"
+        assert storage_options["secret"] == "a_different_key"  # noqa: S105
+        assert storage_options["endpoint_url"] == "https://mys3service.com"
 
     def test_missing_aws_secret_access_key(
         self,
@@ -309,7 +309,7 @@ class TestS3StateBackend:
         )
 
         with pytest.raises(InvalidStateBackendConfigurationException):
-            _ = manager.client
+            _ = manager.path
 
     def test_missing_aws_access_key_id(
         self,
@@ -325,16 +325,9 @@ class TestS3StateBackend:
         )
 
         with pytest.raises(InvalidStateBackendConfigurationException):
-            _ = manager.client
+            _ = manager.path
 
-    def test_get(
-        self,
-        project: Project,
-        monkeypatch: pytest.MonkeyPatch,
-        bucket: str,
-        prefix: str,
-        s3_uri: str,
-    ) -> None:
+    def test_get(self, project: Project, s3_uri: str) -> None:
         project.settings.set(["state_backend", "uri"], s3_uri)
 
         s3_state_store = state_store_manager_from_project_settings(project.settings)
@@ -343,29 +336,19 @@ class TestS3StateBackend:
         state_id = "test_state_id"
         state = MeltanoState(state_id=state_id, completed_state={"key": "value"})
 
-        with moto.mock_aws():
-            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-            monkeypatch.delenv("AWS_PROFILE", raising=False)
-            s3_state_store.client.create_bucket(Bucket=bucket)
+        # Mock the path's open method to return a file-like object
+        mock_file = mock.mock_open(read_data=state.json())
+        mock_path = mock.Mock()
+        mock_path.open = mock_file
 
-            state_key = f"{prefix}/{state_id}/state.json"
-            s3_state_store.client.put_object(
-                Bucket=bucket,
-                Key=state_key,
-                Body=state.json(),
-                ContentType="application/json",
-            )
-
+        with mock.patch.object(
+            s3_state_store,
+            "get_state_path",
+            return_value=mock_path,
+        ):
             assert s3_state_store.get(state_id=state_id) == state
 
-    def test_set(
-        self,
-        project: Project,
-        monkeypatch: pytest.MonkeyPatch,
-        bucket: str,
-        prefix: str,
-        s3_uri: str,
-    ) -> None:
+    def test_set(self, project: Project, s3_uri: str) -> None:
         project.settings.set(["state_backend", "uri"], s3_uri)
 
         s3_state_store = state_store_manager_from_project_settings(project.settings)
@@ -374,20 +357,23 @@ class TestS3StateBackend:
         state_id = "test_state_id"
         state = MeltanoState(state_id=state_id, completed_state={"key": "value"})
 
-        with moto.mock_aws():
-            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-            monkeypatch.delenv("AWS_PROFILE", raising=False)
-            s3_state_store.client.create_bucket(Bucket=bucket)
+        # Mock the path's write_text method to capture the written data
+        mock_path = mock.Mock()
+        written_data: str | None = None
 
+        def capture_write(data: str) -> None:
+            nonlocal written_data
+            written_data = data
+
+        mock_path.write_text.side_effect = capture_write
+
+        with mock.patch.object(
+            s3_state_store,
+            "get_state_path",
+            return_value=mock_path,
+        ):
             s3_state_store.set(state)
 
-            state_key = f"{prefix}/{state_id}/state.json"
-            response = s3_state_store.client.get_object(Bucket=bucket, Key=state_key)
-            assert (
-                MeltanoState.from_file(
-                    state_id=state_id,
-                    file_obj=response["Body"],
-                )
-                == state
-            )
-            assert response["ContentType"] == "application/json"
+            # Verify write_text was called with the state JSON
+            mock_path.write_text.assert_called_once_with(state.json())
+            assert written_data == state.json()
