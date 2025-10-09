@@ -12,7 +12,6 @@ from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
-    from io import TextIOWrapper
 
 
 class UnsupportedStateBackendURIError(Exception):
@@ -54,7 +53,7 @@ class MeltanoState:
         )
 
     @classmethod
-    def from_file(cls, state_id: str, file_obj: TextIOWrapper) -> MeltanoState:
+    def from_file(cls, state_id: str, file_obj: t.TextIO) -> MeltanoState:
         """Create MeltanoState from a file-like object containing state json.
 
         Args:
