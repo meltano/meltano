@@ -5,6 +5,9 @@ layout: doc
 sidebar_position: 1
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Meltano provides a command line interface (CLI) that makes it easy to manage your [project](/concepts/project), [plugins](/guide/plugin-management), and [EL(T) pipelines](/guide/integration).
 To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
 For a better understanding of command line documentation syntax, the [docopt](http://docopt.org/) standard is useful.
@@ -56,7 +59,7 @@ When adding a new plugin, it will:
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
 1. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
 1. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts))
-1. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
+1. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <name>`](#install), which will:
   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
   1. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
 5. If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the --force-install flag to `meltano add`.
@@ -895,25 +898,40 @@ The `init` command does not run relative to a [Meltano Environment](https://docs
 
 Installs dependencies of your project based on the **meltano.yml** file.
 
-You can install plugins by simply providing their names without specifying their type. Meltano will automatically detect the plugin type:
+The bare command will install all plugins:
 
 ```bash
-meltano install tap-github target-postgres
+meltano install
 ```
 
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-:::warning[Deprecated Syntax]
+<Tabs className="meltano-tabs" groupId="meltano-version">
+  <TabItem className="meltano-tab-content" value="v4" label="Meltano v4+" default>
 
-The following syntax forms are deprecated and will be removed in Meltano v4:
+```bash
+# Install specific plugins by name (automatically detects type)
+meltano install tap-github target-postgres
 
-| Deprecated Syntax | Use Instead |
-| --- | --- |
-| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
-| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
+# Install plugins by type
+meltano install --plugin-type=extractor tap-gitlab
+```
 
-:::
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="legacy" label="Legacy (pre-v4)">
+
+```bash
+# Using dash syntax
+meltano install - tap-github target-postgres
+
+# Using positional type argument
+meltano install extractor tap-gitlab
+meltano install <plugin_type> <plugin_name>
+```
+
+  </TabItem>
+</Tabs>
 
 To only install plugins for a particular schedule specify the `--schedule` argument.
 This can be useful in CI test workflows or for deployments that need to install plugins before every run.
@@ -939,7 +957,6 @@ meltano install
 # Install specific plugins (recommended - automatically detects type)
 meltano install tap-github target-postgres
 meltano install tap-gitlab
-meltano install - tap-gitlab target-postgres  # Deprecated syntax
 
 # Install plugins by type
 meltano install --plugin-type=extractor tap-gitlab
