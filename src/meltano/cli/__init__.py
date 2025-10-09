@@ -93,7 +93,7 @@ def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
     Raises:
         CliError: always.
     """
-    raise CliError(str(error), exit_code=error.exit_code()) from error
+    raise CliError(str(error), exit_code=error.exit_code()) from None
 
 
 def _run_cli() -> None:
