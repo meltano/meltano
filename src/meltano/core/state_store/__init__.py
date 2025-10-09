@@ -56,7 +56,7 @@ class StateBackendNotFoundError(MeltanoError):
         self.scheme = scheme
         super().__init__(
             f"No state backend found for scheme '{scheme}', available backends are: "
-            ", ".join(StateBackend.backends()),
+            f"{', '.join(StateBackend.backends())}",
             instruction="Install the add-on that provides it",
         )
 
