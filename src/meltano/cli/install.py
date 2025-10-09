@@ -79,12 +79,7 @@ async def install(
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
-    plugin_names, plugin_type = validate_plugin_type_args(
-        plugin,
-        plugin_type,
-        ctx,
-        support_any=True,
-    )
+    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
 
     try:
         if plugin_type:

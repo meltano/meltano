@@ -210,12 +210,6 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.config = copy.deepcopy(config or {})
         self.extras = extras
 
-        if "profiles" in extras:
-            logger.warning(
-                "Plugin configuration profiles are no longer supported, ignoring "  # noqa: G004
-                f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
-            )
-
     def __repr__(self) -> str:
         """Return a string representation of the project plugin."""
         return (

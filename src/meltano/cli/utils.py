@@ -671,8 +671,6 @@ def validate_plugin_type_args(
     plugin: tuple[str, ...],
     plugin_type: PluginType | None,
     ctx: click.Context,
-    *,
-    support_any: bool = False,
 ) -> tuple[tuple[str, ...], PluginType | None]:
     """Validate plugin type arguments and return processed values.
 
@@ -699,22 +697,6 @@ def validate_plugin_type_args(
             "Passing the plugin type as the first positional argument is deprecated "
             "and will be removed in Meltano v4. "
             "Please use the --plugin-type option instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return plugin_names, plugin_type
-
-    if support_any and plugin[0] == "-":
-        if plugin_type is not None:
-            msg = "Use only --plugin-type to specify plugin type"
-            raise click.UsageError(msg, ctx=ctx)
-
-        plugin_names = plugin[1:]
-        plugin_type = None
-        warnings.warn(
-            'Using "-" to specify plugins of any type is '
-            "deprecated and will be removed in Meltano v4. "
-            "It is no longer necessary to use this argument.",
             DeprecationWarning,
             stacklevel=2,
         )

@@ -93,7 +93,7 @@ class BookmarkWriter:
         except Exception:  # pragma: no cover
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated: %s",
+                "incremental state has not been updated",
                 exc_info=True,
             )
         else:
