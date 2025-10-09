@@ -21,12 +21,6 @@ if t.TYPE_CHECKING:
 class TestLock:
     @pytest.mark.order(0)
     @pytest.mark.usefixtures("project")
-    def test_lock_all_deprecation(self, cli_runner: CliRunner) -> None:
-        with pytest.warns(DeprecationWarning, match="The --all flag is deprecated"):
-            cli_runner.invoke(cli, ["lock", "--all"])
-
-    @pytest.mark.order(1)
-    @pytest.mark.usefixtures("project")
     def test_lock_no_plugins(self, cli_runner: CliRunner) -> None:
         exception_message = "No matching plugin(s) found"
 
@@ -36,7 +30,7 @@ class TestLock:
         result = cli_runner.invoke(cli, ["lock", "--update"])
         assert exception_message == str(result.exception)
 
-    @pytest.mark.order(2)
+    @pytest.mark.order(1)
     @pytest.mark.usefixtures("tap", "target")
     def test_lockfile_exists(
         self,
@@ -52,7 +46,7 @@ class TestLock:
         assert "Lockfile exists for loader target-mock" in result.stdout
         assert "Locked definition" not in result.stdout
 
-    @pytest.mark.order(3)
+    @pytest.mark.order(2)
     def test_lockfile_update(
         self,
         cli_runner: CliRunner,
@@ -88,7 +82,7 @@ class TestLock:
         assert new_setting.name == "foo"
         assert new_setting.value == "bar"
 
-    @pytest.mark.order(4)
+    @pytest.mark.order(3)
     @pytest.mark.usefixtures("tap", "inherited_tap", "hub_endpoints")
     def test_lockfile_update_extractors(
         self,
