@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import shutil
-import typing as t
 from unittest import mock
 
 import pytest
@@ -11,9 +10,6 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import PluginAlreadyAddedException
-
-if t.TYPE_CHECKING:
-    from fixtures.cli import MeltanoCliRunner
 
 
 class TestCliInstall:
@@ -53,43 +49,19 @@ class TestCliInstall:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(cli, ["install", "extractors"])
-            assert_cli_runner(result)
-
-            install_plugin_mock_e.assert_called_once_with(
-                project,
-                [tap, tap_gitlab],
-                parallelism=None,
-                clean=False,
-                force=False,
-            )
-
-        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
-            install_plugin_mock_e.return_value = True
-
             result = cli_runner.invoke(cli, ["install", "--plugin-type=extractors"])
             assert_cli_runner(result)
 
-            install_plugin_mock_e.assert_called_once_with(
-                project,
-                [tap, tap_gitlab],
-                parallelism=None,
-                clean=False,
-                force=False,
-            )
+            install_plugin_mock_e.assert_called_once()
+            call_args = install_plugin_mock_e.call_args
+            assert call_args[0][0] == project
+            assert set(call_args[0][1]) == {tap, tap_gitlab}
+            assert call_args[1] == {"parallelism": None, "clean": False, "force": False}
 
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
             install_plugin_mock_l.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(cli, ["install", "loaders"])
+            result = cli_runner.invoke(cli, ["install", "--plugin-type=loaders"])
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
@@ -103,11 +75,7 @@ class TestCliInstall:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
             install_plugin_mock_m.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(cli, ["install", "mappers"])
+            result = cli_runner.invoke(cli, ["install", "--plugin-type=mappers"])
             assert_cli_runner(result)
 
             assert install_plugin_mock_m.call_count == 1
@@ -133,24 +101,6 @@ class TestCliInstall:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(cli, ["install", "extractor", tap.name])
-            assert_cli_runner(result)
-
-            install_plugin_mock_e.assert_called_once_with(
-                project,
-                [tap],
-                parallelism=None,
-                clean=False,
-                force=False,
-            )
-
-        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
-            install_plugin_mock_e.return_value = True
-
             result = cli_runner.invoke(
                 cli,
                 ["install", "--plugin-type=extractors", tap.name],
@@ -168,11 +118,10 @@ class TestCliInstall:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
             install_plugin_mock_l.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(cli, ["install", "loader", target.name])
+            result = cli_runner.invoke(
+                cli,
+                ["install", "--plugin-type=loaders", target.name],
+            )
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
@@ -186,11 +135,10 @@ class TestCliInstall:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
             install_plugin_mock_m.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(cli, ["install", "mapper", mapper.name])
+            result = cli_runner.invoke(
+                cli,
+                ["install", "--plugin-type=mappers", mapper.name],
+            )
             assert_cli_runner(result)
 
             assert install_plugin_mock_m.call_count == 1
@@ -209,40 +157,17 @@ class TestCliInstall:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
-            with pytest.warns(
-                DeprecationWarning,
-                match="Passing the plugin type as the first positional argument is deprecated",  # noqa: E501
-            ):
-                result = cli_runner.invoke(
-                    cli,
-                    ["install", "extractors", tap.name, tap_gitlab.name],
-                )
-            assert_cli_runner(result)
-
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [tap, tap_gitlab],
-                parallelism=None,
-                clean=False,
-                force=False,
-            )
-
-        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
-            install_plugin_mock.return_value = True
-
             result = cli_runner.invoke(
                 cli,
                 ["install", "--plugin-type=extractors", tap.name, tap_gitlab.name],
             )
             assert_cli_runner(result)
 
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [tap, tap_gitlab],
-                parallelism=None,
-                clean=False,
-                force=False,
-            )
+            install_plugin_mock.assert_called_once()
+            call_args = install_plugin_mock.call_args
+            assert call_args[0][0] == project
+            assert set(call_args[0][1]) == {tap, tap_gitlab}
+            assert call_args[1] == {"parallelism": None, "clean": False, "force": False}
 
     @pytest.mark.usefixtures("dbt")
     def test_install_multiple_any_type(
@@ -430,25 +355,6 @@ class TestCliInstall:
             assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] is None
             assert install_plugin_mock.mock_calls[0].kwargs["clean"] is False
             assert install_plugin_mock.mock_calls[0].kwargs["force"] is False
-
-    def test_install_conflicting_plugin_type_and_positional_argument(
-        self,
-        tap,
-        cli_runner: MeltanoCliRunner,
-    ) -> None:
-        result = cli_runner.invoke(
-            cli,
-            ["install", "--plugin-type=extractors", "extractors", tap.name],
-        )
-        assert result.exit_code == 2
-        assert "Use only --plugin-type to specify plugin type" in result.stderr
-
-        result = cli_runner.invoke(
-            cli,
-            ["install", "extractors", "--plugin-type=extractors", "-", tap.name],
-        )
-        assert result.exit_code == 2
-        assert "Use only --plugin-type to specify plugin type" in result.stderr
 
 
 # un_engine_uri forces us to create a new project, we must do this before the

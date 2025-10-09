@@ -237,7 +237,7 @@ meltano add target-jsonl
 ```
 
 ```bash
-meltano add loader target-jsonl
+meltano add target-jsonl
 ```
 
 ```mdx-code-block
@@ -348,7 +348,7 @@ meltano add --custom tap-jsonplaceholder
 ```
 
 ```bash
-meltano add --custom extractor tap-jsonplaceholder
+meltano add --custom tap-jsonplaceholder
 ```
 
 ```mdx-code-block
@@ -407,7 +407,7 @@ meltano add --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```bash
-meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+meltano add --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```mdx-code-block
@@ -448,7 +448,7 @@ meltano add --update --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```bash
-meltano add --update --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+meltano add --update --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```mdx-code-block
@@ -482,7 +482,7 @@ meltano add target-jsonl
 ```
 
 ```bash
-meltano add loader target-jsonl
+meltano add target-jsonl
 ```
 
 ```mdx-code-block
