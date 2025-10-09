@@ -297,13 +297,6 @@ class ProjectPluginsService:  # (too many methods, attributes)
         Raises:
             PluginNotFoundError: If the plugin is not found.
         """
-        if "@" in plugin_name:
-            plugin_name, profile_name = plugin_name.split("@", 2)
-            logger.warning(
-                "Plugin configuration profiles are no longer supported, "  # noqa: G004
-                f"ignoring `@{profile_name}` in plugin name.",
-            )
-
         for plugin in self.plugins(ensure_parent=False):
             if (
                 plugin.name == plugin_name
