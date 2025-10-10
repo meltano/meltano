@@ -47,6 +47,7 @@ jobs:
         - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py311-ubuntu-psycopg2' }
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py312-ubuntu-psycopg2' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py313-ubuntu-psycopg2' }
+        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py314-ubuntu-psycopg2' }
         - { python-version: '3.10', os: ubuntu-latest, backend-db: mssql, id: 'py310-ubuntu-mssql' }
         - { python-version: '3.11', os: ubuntu-latest, backend-db: mssql, id: 'py311-ubuntu-mssql' }
         - { python-version: '3.12', os: ubuntu-latest, backend-db: mssql, id: 'py312-ubuntu-mssql' }
