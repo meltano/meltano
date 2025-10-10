@@ -183,16 +183,9 @@ def lock(
 
             # Lock dependencies if needed
             if strategy.lock_dependencies:
-                # Get pip_url from strategy or from saved definition
-                pip_url = strategy.pip_url
-                if not pip_url and hasattr(plugin_lock, "variant"):
-                    from meltano.core.plugin.base import StandalonePlugin
-
-                    locked_def = StandalonePlugin.from_variant(
-                        plugin_lock.variant,
-                        plugin_lock.definition,
-                    )
-                    pip_url = locked_def.pip_url
+                # Get pip_url from plugin in meltano.yml (source of truth)
+                # Fall back to strategy.pip_url for custom/inherited plugins
+                pip_url = strategy.pip_url or plugin.pip_url
 
                 if pip_url:
                     if plugin_lock.pylock_path.exists() and not update:
