@@ -166,7 +166,7 @@ class TestCliUpgrade:
 
         assert "Nothing to update" in result.stdout
 
-        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        result = cli_runner.invoke(cli, ["add", "--plugin-type=files", "airflow"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
 
@@ -255,7 +255,7 @@ class TestCliUpgrade:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
-        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        result = cli_runner.invoke(cli, ["add", "--plugin-type=files", "airflow"])
         assert_cli_runner(result)
 
         file_path = project.root_dir("orchestrate/dags/meltano.py")

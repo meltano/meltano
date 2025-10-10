@@ -11,7 +11,6 @@ from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
-    validate_plugin_type_args,
 )
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
@@ -79,7 +78,7 @@ async def install(
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
-    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
+    plugin_names = plugin
 
     try:
         if plugin_type:

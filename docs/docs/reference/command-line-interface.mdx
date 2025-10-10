@@ -103,16 +103,6 @@ meltano add --plugin-type extractor tap-gitlab
 meltano add --plugin-type loader target-postgres
 ```
 
-The original positional syntax is still supported but deprecated:
-
-```bash
-# Deprecated syntax (still works but will be removed in v4)
-meltano add <type> <name>
-
-# For example:
-meltano add extractor tap-gitlab  # Will show deprecation warning
-meltano add loader target-postgres
-```
 
 :::info Automatic Plugin Type Detection
 Meltano automatically detects plugin types based on naming conventions:
@@ -139,9 +129,6 @@ meltano add target-postgres --variant transferwise
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type loader target-postgres --variant transferwise
-
-# Deprecated positional syntax
-meltano add loader target-postgres --variant transferwise
 ```
 
 To add a [custom plugin](/concepts/plugins#custom-plugins) using a [custom plugin definition](/concepts/project#custom-plugin-definitions), use the `--custom` flag:
@@ -155,9 +142,6 @@ meltano add --custom tap-covid-19  # Automatically detected as extractor
 
 # With explicit type specification for disambiguation
 meltano add --custom --plugin-type extractor tap-covid-19
-
-# Deprecated positional syntax
-meltano add --custom extractor tap-covid-19
 
 # If you're using Docker, don't forget to mount the project directory,
 # and ensure that interactive mode is enabled so that Meltano can ask you
@@ -176,9 +160,6 @@ meltano add tap-ga--client-foo --inherit-from tap-google-analytics  # Automatica
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type extractor tap-ga--client-foo --inherit-from tap-google-analytics
-
-# Deprecated positional syntax
-meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
 
 To add a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file as a [custom plugin](/concepts/plugins#custom-plugins), use the `--from-ref` option referencing a URL or local path:
@@ -199,9 +180,6 @@ meltano add tap-shopify --from-ref tap-shopify--matatika.yml
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
-
-# Deprecated positional syntax
-meltano add extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
 
 # The plugin name specified in the command is superseded by the value in the
 # plugin definition file - using the same name is just a formality
@@ -224,10 +202,10 @@ This will update the plugin lock file and `meltano.yml` entry, without overwriti
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
 ```bash
-meltano add <type> <name> --no-install
+meltano add <name> --no-install
 
 # For example:
-meltano add extractor tap-shopify --no-install
+meltano add tap-shopify --no-install
 ```
 
 By default, plugins that use Python use the version of Python that was used to run Meltano. This behavior can be overridden using the `python` attribute, which can be set [for all plugins](/reference/settings#project-python), or on a [per-plugin basis](/reference/settings#plugin-python).
@@ -235,13 +213,13 @@ By default, plugins that use Python use the version of Python that was used to r
 When adding a new plugin, the Python version can be specified using the `--python` option:
 
 ```bash
-meltano add <type> <name> --python <Python version or path>
+meltano add <name> --python <Python version or path>
 ```
 
 For example, to add `tap-github` using Python 3.12 (assuming `python3.12` is installed and on your `$PATH`):
 
 ```bash
-meltano add extractor tap-github --python python3.12
+meltano add tap-github --python python3.12
 ```
 
 Then regardless of the Python version used when the plugin is installed, `tap-gitlab` and any plugin which inherits from it will use Python 3.12.
@@ -960,9 +938,8 @@ meltano install tap-gitlab
 
 # Install plugins by type
 meltano install --plugin-type=extractor tap-gitlab
-meltano install extractors  # Deprecated syntax
+meltano install --plugin-type=extractors  # Install all extractors
 meltano install --plugin-type=extractor tap-gitlab tap-adwords
-meltano install extractors tap-gitlab tap-adwords  # Deprecated syntax
 
 # Install plugins for a specific schedule
 meltano install --schedule=<schedule_name>
@@ -1177,13 +1154,9 @@ Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from 
 ### How to Use
 
 ```bash
-# New syntax (recommended) - plugin type is automatically inferred
+# Plugin type is automatically inferred
 meltano remove <name>
 meltano remove <name> <name_two>
-
-# Deprecated syntax - will be removed in v4
-meltano remove <type> <name>
-meltano remove <type> <name> <name_two>
 ```
 
 ### Using `remove` with Environments
@@ -1193,13 +1166,9 @@ The `remove` command does not run relative to a [Meltano Environment](https://do
 ### Examples
 
 ```bash
-# New syntax - plugin type is automatically inferred
+# Plugin type is automatically inferred
 meltano remove tap-gitlab
 meltano remove target-postgres target-csv
-
-# Deprecated syntax - will be removed in v4
-meltano remove extractor tap-gitlab
-meltano remove loader target-postgres target-csv
 ```
 
 ## `run`

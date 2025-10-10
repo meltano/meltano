@@ -30,9 +30,6 @@ meltano add dbt-snowflake  # Automatically detected as utility
 
 # Explicit plugin type for disambiguation:
 # meltano add --plugin-type utility dbt-snowflake
-
-# Deprecated positional syntax:
-# meltano add utility dbt-snowflake
 ```
 
 After dbt is installed you can configure it using `config` CLI commands, [Meltano environments](/concepts/environments) or environment variables:
