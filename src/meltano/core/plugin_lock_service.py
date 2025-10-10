@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
+import shutil
 import sys
 import tempfile
 import typing as t
 from hashlib import sha256
-from pathlib import Path as PathlibPath
+from pathlib import Path
 
 from structlog.stdlib import get_logger
 
@@ -21,7 +23,6 @@ else:
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable
-    from pathlib import Path
 
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -54,11 +55,11 @@ async def lock_plugin_dependencies(pip_url: str) -> str | None:
             delete=False,
         ) as f:
             f.write(f"{pip_url}\n")
-            requirements_in = PathlibPath(f.name)
+            requirements_in = Path(f.name)
 
         # Create output path for pylock.toml
         # uv requires the filename to match pylock.*.toml pattern
-        temp_dir = PathlibPath(tempfile.mkdtemp())
+        temp_dir = Path(tempfile.mkdtemp())
         pylock_file = temp_dir / "pylock.toml"
 
         # Run uv pip compile with pylock.toml format
@@ -113,8 +114,6 @@ async def lock_plugin_dependencies(pip_url: str) -> str | None:
 
     finally:
         # Clean up temp files
-        import shutil
-
         if requirements_in:
             requirements_in.unlink(missing_ok=True)
         if pylock_file and pylock_file.parent.exists():
@@ -192,8 +191,6 @@ class PluginLock:
         Raises:
             Exception: If dependency locking or saving fails.
         """
-        import asyncio
-
         if not pip_url:
             logger.debug("No pip_url provided, skipping dependency locking")
             return
@@ -202,13 +199,6 @@ class PluginLock:
         pylock_content = asyncio.run(lock_plugin_dependencies(pip_url))
         if pylock_content:
             # Parse to get package count for logging
-            import sys
-
-            if sys.version_info >= (3, 11):
-                import tomllib
-            else:
-                import tomli as tomllib
-
             pylock_data = tomllib.loads(pylock_content)
             logger.info(
                 "Locked %d packages for %s",
