@@ -163,21 +163,18 @@ class PluginLock:
         """Save the plugin definition lockfile (JSON).
 
         This saves the .lock file containing the plugin definition.
+
+        Raises:
+            TypeError: If the lock data cannot be serialized to JSON.
+            ValueError: If the lock data is invalid.
         """
         locked_def = StandalonePlugin.from_variant(self.variant, self.definition)
 
-        # Save the main lock file (JSON, without pylock)
+        # Save the main lock file (JSON)
         with self.path.open("w") as lockfile:
-            try:
-                canonical_data = locked_def.canonical()
-                json.dump(canonical_data, lockfile, indent=2)
-                lockfile.write("\n")
-            except (TypeError, ValueError) as err:
-                logger.exception(
-                    "Failed to serialize lock file to JSON: %s",
-                    err,
-                )
-                raise
+            canonical_data = locked_def.canonical()
+            json.dump(canonical_data, lockfile, indent=2)
+            lockfile.write("\n")
 
     def save_dependencies(self, pip_url: str) -> None:
         """Save the locked dependencies (pylock.toml).
@@ -187,6 +184,9 @@ class PluginLock:
 
         Args:
             pip_url: The pip URL to lock dependencies for.
+
+        Raises:
+            Exception: If dependency locking or saving fails.
         """
         import asyncio
 
@@ -195,39 +195,32 @@ class PluginLock:
             return
 
         logger.debug("Starting dependency lock for %s", pip_url)
-        try:
-            pylock_content = asyncio.run(lock_plugin_dependencies(pip_url))
-            if pylock_content:
-                # Parse to get package count for logging
-                import sys
+        pylock_content = asyncio.run(lock_plugin_dependencies(pip_url))
+        if pylock_content:
+            # Parse to get package count for logging
+            import sys
 
-                if sys.version_info >= (3, 11):
-                    import tomllib
-                else:
-                    import tomli as tomllib
+            if sys.version_info >= (3, 11):
+                import tomllib
+            else:
+                import tomli as tomllib
 
-                pylock_data = tomllib.loads(pylock_content)
-                logger.info(
-                    "Locked %d packages for %s",
-                    len(pylock_data.get("packages", [])),
-                    self.plugin.name,
-                )
-
-                # Save the pylock.toml file
-                # Use pylock.<plugin-name>.toml format (uv compatible)
-                # Note: plugin.name includes suffixes like --1, --2 for
-                # inherited plugins
-                lock_dir = self.path.parent
-                pylock_filename = f"pylock.{self.plugin.name}.toml"
-                pylock_path = lock_dir / pylock_filename
-                pylock_path.write_text(pylock_content)
-                logger.debug("Saved pylock to: %s", pylock_path)
-        except Exception as err:
-            logger.exception(
-                "Failed to lock dependencies for %s: %s",
+            pylock_data = tomllib.loads(pylock_content)
+            logger.info(
+                "Locked %d packages for %s",
+                len(pylock_data.get("packages", [])),
                 self.plugin.name,
-                err,
             )
+
+            # Save the pylock.toml file
+            # Use pylock.<plugin-name>.toml format (uv compatible)
+            # Note: plugin.name includes suffixes like --1, --2 for
+            # inherited plugins
+            lock_dir = self.path.parent
+            pylock_filename = f"pylock.{self.plugin.name}.toml"
+            pylock_path = lock_dir / pylock_filename
+            pylock_path.write_text(pylock_content)
+            logger.debug("Saved pylock to: %s", pylock_path)
 
     def save(self, *, lock_dependencies: bool = False) -> None:
         """Save the plugin lockfile.
