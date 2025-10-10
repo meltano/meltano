@@ -30,30 +30,6 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def _convert_datetimes_to_str(obj: t.Any) -> t.Any:  # noqa: ANN401
-    """Recursively convert datetime objects to ISO format strings.
-
-    Also handles other types that can't be JSON serialized like CommentedMap.
-
-    Args:
-        obj: The object to convert (dict, list, datetime, or other).
-
-    Returns:
-        The converted object with datetimes as strings and plain Python types.
-    """
-    from datetime import datetime
-
-    from ruamel.yaml.comments import CommentedMap, CommentedSeq
-
-    if isinstance(obj, datetime):
-        return obj.isoformat()
-    if isinstance(obj, (dict, CommentedMap)):
-        return {key: _convert_datetimes_to_str(value) for key, value in obj.items()}
-    if isinstance(obj, (list, CommentedSeq)):
-        return [_convert_datetimes_to_str(item) for item in obj]
-    return obj
-
-
 async def lock_plugin_dependencies(pip_url: str) -> str | None:
     """Lock plugin dependencies using uv pip compile to pylock.toml format.
 
