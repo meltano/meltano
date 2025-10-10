@@ -173,6 +173,7 @@ class PluginLock:
             plugin: The plugin to lock.
         """
         self.project = project
+        self.plugin = plugin
         self.definition = plugin.definition
         self.variant = self.definition.find_variant(plugin.variant)
 
@@ -234,20 +235,21 @@ class PluginLock:
                 logger.info(
                     "Locked %d packages for %s",
                     len(pylock_data.get("packages", [])),
-                    self.definition.name,
+                    self.plugin.name,
                 )
 
                 # Save the pylock.toml file
-                # Use pylock.<plugin-name>.toml format (uv compatible, variant-agnostic)
+                # Use pylock.<plugin-name>.toml format (uv compatible)
+                # Note: plugin.name includes suffixes like --1, --2 for inherited plugins
                 lock_dir = self.path.parent
-                pylock_filename = f"pylock.{self.definition.name}.toml"
+                pylock_filename = f"pylock.{self.plugin.name}.toml"
                 pylock_path = lock_dir / pylock_filename
                 pylock_path.write_text(pylock_content)
                 logger.debug("Saved pylock to: %s", pylock_path)
         except Exception as err:
             logger.error(
                 "Failed to lock dependencies for %s: %s",
-                self.definition.name,
+                self.plugin.name,
                 err,
                 exc_info=True,
             )
