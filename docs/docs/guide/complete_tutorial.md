@@ -214,16 +214,16 @@ docker run -v $(pwd):/project -w /project meltano/meltano add tap-gitlab
 ```
 
 ```bash
-meltano add extractor <plugin name>
+meltano add <plugin name>
 
 # For example:
-meltano add extractor tap-gitlab
+meltano add tap-gitlab
 
 # If you have a preference for a non-default variant, select it using `--variant`:
-meltano add extractor tap-gitlab --variant=singer-io
+meltano add tap-gitlab --variant=singer-io
 
 # If you're using Docker, don't forget to mount the project directory:
-docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
+docker run -v $(pwd):/project -w /project meltano/meltano add tap-gitlab
 ```
 
 ```mdx-code-block
@@ -678,14 +678,14 @@ meltano add --plugin-type loader target-postgres
 ```
 
 ```bash
-meltano add loader <plugin name>
+meltano add <plugin name>
 
 # For this example, we'll use the default variant:
-meltano add loader target-postgres
+meltano add target-postgres
 
 # Or if you just want to use a non-default variant you can use this,
 # selected using `--variant`:
-meltano add loader target-postgres --variant=datamill-co
+meltano add target-postgres --variant=datamill-co
 ```
 
 ```mdx-code-block
@@ -1054,7 +1054,7 @@ meltano add --plugin-type utility airflow
 ```
 
 ```bash
-meltano add utility airflow
+meltano add airflow
 ```
 
 ```mdx-code-block
@@ -1123,7 +1123,7 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
 1. Install the dbt transformer to your project:
 
    ```bash
-   meltano add transformer dbt-postgres
+   meltano add dbt-postgres
    ```
 
 1. Configure dbt-postgres

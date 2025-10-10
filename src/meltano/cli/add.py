@@ -17,7 +17,6 @@ from meltano.cli.utils import (
     add_required_plugins,
     check_dependencies_met,
     infer_plugin_type,
-    validate_plugin_type_args,
 )
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -143,7 +142,7 @@ async def add(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
+    plugin_names = plugin
 
     if as_name:
         # `add <type> <inherit-from> --as <name>``

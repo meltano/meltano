@@ -77,13 +77,13 @@ meltano add --plugin-type utility airflow
 ```
 
 ```bash
-meltano add <type> <name>
+meltano add <name>
 
 # For example:
-meltano add extractor tap-gitlab
-meltano add loader target-postgres
-meltano add utility dbt-snowflake
-meltano add utility airflow
+meltano add tap-gitlab
+meltano add target-postgres
+meltano add dbt-snowflake
+meltano add airflow
 ```
 
 ```mdx-code-block

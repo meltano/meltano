@@ -6,7 +6,6 @@ import os
 import signal
 import sys
 import typing as t
-import warnings
 from contextlib import contextmanager
 from enum import Enum, auto
 
@@ -665,41 +664,3 @@ def infer_plugin_type(plugin_name: str) -> PluginType:
         return PluginType.LOADERS
 
     return PluginType.UTILITIES
-
-
-def validate_plugin_type_args(
-    plugin: tuple[str, ...],
-    plugin_type: PluginType | None,
-    ctx: click.Context,
-) -> tuple[tuple[str, ...], PluginType | None]:
-    """Validate plugin type arguments and return processed values.
-
-    Raises click.UsageError if both positional plugin type and --plugin-type flag
-    are provided. Returns tuple of (plugin_names, plugin_type).
-
-    Args:
-        plugin: The plugin arguments tuple
-        plugin_type: The plugin type from --plugin-type flag
-        ctx: Click context
-        support_any: Whether to support the "-" (ANY) argument for install command
-    """
-    if not plugin:
-        return plugin, plugin_type
-
-    if plugin[0] in PluginType.cli_arguments():
-        if plugin_type is not None:
-            msg = "Use only --plugin-type to specify plugin type"
-            raise click.UsageError(msg, ctx=ctx)
-
-        plugin_names = plugin[1:]
-        plugin_type = PluginType.from_cli_argument(plugin[0])
-        warnings.warn(
-            "Passing the plugin type as the first positional argument is deprecated "
-            "and will be removed in Meltano v4. "
-            "Please use the --plugin-type option instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return plugin_names, plugin_type
-
-    return plugin, plugin_type

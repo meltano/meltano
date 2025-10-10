@@ -184,7 +184,6 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::ResourceWarning",
-  "ignore:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning",  # https://github.com/meltano/meltano/issues/7066
 ]
 log_cli = true
 log_cli_format = "%(message)s"
