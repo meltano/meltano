@@ -10,10 +10,7 @@ import structlog
 
 from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd
-from meltano.core.plugin_lock_service import (
-    PluginLock,
-    PluginLockService,
-)
+from meltano.core.plugin_lock_service import PluginLock
 from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
@@ -41,6 +38,7 @@ class LockStrategy:
 
 def _determine_lock_strategy(
     plugin: ProjectPlugin,
+    *,
     should_lock_deps: bool,
 ) -> LockStrategy:
     """Determine what should be locked for this plugin.
@@ -61,7 +59,10 @@ def _determine_lock_strategy(
     if is_inherited and not has_custom_pip_url:
         return LockStrategy(
             skip=True,
-            message=f"{descriptor.capitalize()} is an inherited plugin without custom pip_url",
+            message=(
+                f"{descriptor.capitalize()} is an inherited plugin "
+                "without custom pip_url"
+            ),
         )
 
     # Custom or inherited with custom pip_url: only lock dependencies
@@ -74,7 +75,10 @@ def _determine_lock_strategy(
         if not should_lock_deps:
             return LockStrategy(
                 skip=True,
-                message=f"Skipping dependency lock for {descriptor} (--no-lock-dependencies)",
+                message=(
+                    f"Skipping dependency lock for {descriptor} "
+                    "(--no-lock-dependencies)"
+                ),
             )
         return LockStrategy(
             lock_dependencies=True,
@@ -119,8 +123,6 @@ def lock(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    lock_service = PluginLockService(project)
-
     try:
         with project.plugins.use_preferred_source(DefinitionSource.ANY):
             # Make it a list so source preference is not lazily evaluated.
@@ -149,7 +151,7 @@ def lock(
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
 
         # Determine lock strategy for this plugin
-        strategy = _determine_lock_strategy(plugin, should_lock_deps)
+        strategy = _determine_lock_strategy(plugin, should_lock_deps=should_lock_deps)
 
         # Skip if strategy says so
         if strategy.skip:

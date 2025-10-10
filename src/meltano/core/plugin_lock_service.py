@@ -30,8 +30,8 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def _convert_datetimes_to_str(obj: t.Any) -> t.Any:
-    """Recursively convert datetime objects to ISO format strings for JSON serialization.
+def _convert_datetimes_to_str(obj: t.Any) -> t.Any:  # noqa: ANN401
+    """Recursively convert datetime objects to ISO format strings.
 
     Also handles other types that can't be JSON serialized like CommentedMap.
 
@@ -197,10 +197,9 @@ class PluginLock:
                 json.dump(canonical_data, lockfile, indent=2)
                 lockfile.write("\n")
             except (TypeError, ValueError) as err:
-                logger.error(
+                logger.exception(
                     "Failed to serialize lock file to JSON: %s",
                     err,
-                    exc_info=True,
                 )
                 raise
 
@@ -240,18 +239,18 @@ class PluginLock:
 
                 # Save the pylock.toml file
                 # Use pylock.<plugin-name>.toml format (uv compatible)
-                # Note: plugin.name includes suffixes like --1, --2 for inherited plugins
+                # Note: plugin.name includes suffixes like --1, --2 for
+                # inherited plugins
                 lock_dir = self.path.parent
                 pylock_filename = f"pylock.{self.plugin.name}.toml"
                 pylock_path = lock_dir / pylock_filename
                 pylock_path.write_text(pylock_content)
                 logger.debug("Saved pylock to: %s", pylock_path)
         except Exception as err:
-            logger.error(
+            logger.exception(
                 "Failed to lock dependencies for %s: %s",
                 self.plugin.name,
                 err,
-                exc_info=True,
             )
 
     def save(self, *, lock_dependencies: bool = False) -> None:

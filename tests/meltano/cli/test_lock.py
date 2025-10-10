@@ -102,6 +102,7 @@ class TestLock:
         assert "Locked definition for extractor tap-mock" in result.stdout
         assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
 
+    @pytest.mark.usefixtures("project")
     def test_lock_plugin_not_found(self, cli_runner: CliRunner) -> None:
         result = cli_runner.invoke(cli, ["lock", "not-a-plugin"])
         assert result.exit_code == 1
