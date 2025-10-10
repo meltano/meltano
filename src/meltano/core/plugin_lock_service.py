@@ -159,6 +159,10 @@ class PluginLock:
             variant_name=self.variant.name,
         )
 
+        # Path to pylock file for this plugin
+        pylock_filename = f"pylock.{self.plugin.name}.toml"
+        self.pylock_path = self.path.parent / pylock_filename
+
     def save_definition(self) -> None:
         """Save the plugin definition lockfile (JSON).
 

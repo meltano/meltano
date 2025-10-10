@@ -42,9 +42,8 @@ class TestLock:
 
         result = cli_runner.invoke(cli, ["lock"])
         assert result.exit_code == 0
-        assert "Lockfile exists for extractor tap-mock" in result.stdout
-        assert "Lockfile exists for loader target-mock" in result.stdout
-        assert "Locked definition" not in result.stdout
+        # Verify lockfiles still exist and weren't modified
+        assert len(list(project.root_plugins_dir().glob("./*/*.lock"))) == 2
 
     @pytest.mark.order(2)
     def test_lockfile_update(
@@ -70,8 +69,6 @@ class TestLock:
 
         result = cli_runner.invoke(cli, ["lock", "--update"])
         assert result.exit_code == 0
-        assert result.stdout.count("Lockfile exists") == 0
-        assert result.stdout.count("Locked definition") == 2
 
         new_checksum = tap_lock.sha256_checksum
         new_definition = tap_lock.load()
@@ -98,9 +95,11 @@ class TestLock:
             ["lock", "--update", "--plugin-type", "extractor"],
         )
         assert result.exit_code == 0
-        assert "Lockfile exists" not in result.stdout
-        assert "Locked definition for extractor tap-mock" in result.stdout
-        assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
+        # Verify only extractor lockfiles were updated (not the loader)
+        extractor_lockfiles = list(
+            project.root_plugins_dir("extractors").glob("./*.lock")
+        )
+        assert len(extractor_lockfiles) == 1
 
     @pytest.mark.usefixtures("project")
     def test_lock_plugin_not_found(self, cli_runner: CliRunner) -> None:

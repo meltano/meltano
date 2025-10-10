@@ -146,7 +146,7 @@ def lock(
 
     should_lock_deps = not no_lock_dependencies
 
-    click.echo(f"Locking {len(plugins)} plugin(s)...")
+    logger.info("Locking %d plugin(s)", len(plugins))
     for plugin in plugins:
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
 
@@ -155,7 +155,7 @@ def lock(
 
         # Skip if strategy says so
         if strategy.skip:
-            click.secho(strategy.message, fg="yellow")
+            logger.info(strategy.message)
             continue
 
         # Ensure plugin has parent (unless it's custom)
@@ -166,21 +166,22 @@ def lock(
 
         plugin_lock = PluginLock(project, plugin)
 
-        # Check for existing lockfile when locking definition
-        if strategy.lock_definition and plugin_lock.path.exists() and not update:
-            relative_path = plugin_lock.path.relative_to(project.root)
-            click.secho(
-                f"Lockfile exists for {descriptor} at {relative_path}",
-                fg="red",
-            )
-            continue
-
         # Execute the locking operations
         try:
+            # Lock definition if needed
             if strategy.lock_definition:
-                plugin_lock.save_definition()
-                click.secho(f"Locked definition for {descriptor}", fg="green")
+                if plugin_lock.path.exists() and not update:
+                    relative_path = plugin_lock.path.relative_to(project.root)
+                    logger.warning(
+                        "Lockfile exists for %s at %s",
+                        descriptor,
+                        relative_path,
+                    )
+                else:
+                    plugin_lock.save_definition()
+                    logger.info("Locked definition for %s", descriptor)
 
+            # Lock dependencies if needed
             if strategy.lock_dependencies:
                 # Get pip_url from strategy or from saved definition
                 pip_url = strategy.pip_url
@@ -194,13 +195,22 @@ def lock(
                     pip_url = locked_def.pip_url
 
                 if pip_url:
-                    plugin_lock.save_dependencies(pip_url)
-                    click.secho(f"Locked dependencies for {descriptor}", fg="green")
+                    if plugin_lock.pylock_path.exists() and not update:
+                        relative_path = plugin_lock.pylock_path.relative_to(
+                            project.root,
+                        )
+                        logger.warning(
+                            "Pylock exists for %s at %s",
+                            descriptor,
+                            relative_path,
+                        )
+                    else:
+                        plugin_lock.save_dependencies(pip_url)
 
             tracked_plugins.append((plugin, None))
 
         except Exception as err:
-            click.secho(f"Failed to lock {descriptor}: {err}", fg="red")
+            logger.exception("Failed to lock %s: %s", descriptor, err)
             continue
 
     tracker.add_contexts(PluginsTrackingContext(tracked_plugins))
