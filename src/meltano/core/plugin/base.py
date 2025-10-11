@@ -282,6 +282,7 @@ class Variant(NameEq, Canonical):
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         env: dict[str, str] | None = None,
+        pylock: dict | None = None,
         **extras,  # noqa: ANN003
     ):
         """Create a new Variant.
@@ -304,6 +305,7 @@ class Variant(NameEq, Canonical):
             commands: The commands of the variant.
             requires: Other plugins this plugin depends on.
             env: Environment variables to inject into plugins runtime context.
+            pylock: Locked dependencies in pylock.toml format (PEP 751).
             extras: Additional keyword arguments.
         """
         super().__init__(
@@ -323,6 +325,7 @@ class Variant(NameEq, Canonical):
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
             env=env or {},
+            pylock=pylock,
             extras=extras,
         )
 
@@ -508,6 +511,7 @@ class PluginDefinition(PluginRef):
             commands=plugin.commands,
             requires=plugin.requires,
             env=plugin.env,
+            pylock=plugin.pylock if hasattr(plugin, "pylock") else None,
             **plugin.extras,
         )
 
@@ -804,6 +808,7 @@ class StandalonePlugin(Canonical):
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         env: dict[str, str] | None = None,
+        pylock: dict | None = None,
         **extras,  # noqa: ANN003
     ):
         """Create a locked plugin.
@@ -828,6 +833,7 @@ class StandalonePlugin(Canonical):
             commands: The commands of the plugin.
             requires: Other plugins this plugin depends on.
             env: Environment variables to inject into plugins runtime context.
+            pylock: Locked dependencies in pylock.toml format (PEP 751).
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
@@ -849,6 +855,7 @@ class StandalonePlugin(Canonical):
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
             env=env or {},
+            pylock=pylock,
             extras=extras,
         )
 

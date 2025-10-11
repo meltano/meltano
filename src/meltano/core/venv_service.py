@@ -13,10 +13,11 @@ import sys
 import typing as t
 from asyncio.subprocess import Process
 from collections.abc import Awaitable, Callable
-from functools import cache, cached_property
+from functools import cached_property
 
 import structlog
 
+from meltano.core._packaging import find_uv
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
@@ -40,41 +41,6 @@ else:
 logger = structlog.stdlib.get_logger(__name__)
 
 StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[str | None]]
-
-
-@cache
-def find_uv() -> str:
-    """Find the `uv` executable.
-
-    Tries to import the `uv` package and use its `find_uv_bin` function to find the
-    `uv` executable. If that fails, falls back to using the `uv` executable on the
-    system PATH. If it can't be found on the PATH, returns `"uv"`.
-
-    Adapted from https://github.com/wntrblm/nox/blob/55c7eaf2eb03feb4a4b79e74966c542b75d61401/nox/virtualenv.py#L42-L54.
-
-    Copyright 2016 Alethea Katherine Flowers
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
-    Returns:
-        A string representing the path to the `uv` executable.
-
-    Raises:
-        MeltanoError: The `uv` executable could not be found.
-    """
-    from uv import find_uv_bin
-
-    return find_uv_bin()
 
 
 class VirtualEnv:
@@ -334,6 +300,7 @@ class VenvService:
         *,
         clean: bool = False,
         env: dict[str, str | None] | None = None,
+        fingerprint_args: Sequence[str] | None = None,
     ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
 
@@ -341,8 +308,15 @@ class VenvService:
             pip_install_args: Arguments passed to `pip install`.
             clean: Whether to not attempt to use an existing virtual environment.
             env: Environment variables to pass to the subprocess.
+            fingerprint_args: Optional separate args to use for fingerprinting.
+                If not provided, pip_install_args will be used.
         """
-        if not clean and self.requires_clean_install(pip_install_args):
+        # Use fingerprint_args if provided, otherwise use pip_install_args
+        args_for_fingerprint = (
+            fingerprint_args if fingerprint_args else pip_install_args
+        )
+
+        if not clean and self.requires_clean_install(args_for_fingerprint):
             logger.debug(
                 f"Packages for '{self.namespace}/{self.name}' have changed so "  # noqa: G004
                 "performing a clean install.",
@@ -352,7 +326,7 @@ class VenvService:
         self.clean_run_files()
 
         await self._pip_install(pip_install_args=pip_install_args, clean=clean, env=env)
-        self.venv.write_fingerprint(pip_install_args)
+        self.venv.write_fingerprint(args_for_fingerprint)
 
     def requires_clean_install(self, pip_install_args: Sequence[str]) -> bool:
         """Determine whether a clean install is needed.

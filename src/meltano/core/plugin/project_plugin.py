@@ -89,6 +89,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         commands: dict[str, Command] | None = None,
         requires: dict[PluginType, list[PluginRequirement]] | None = None,
         config: dict[str, t.Any] | None = None,
+        pylock: dict | None = None,
         default_variant: str = Variant.DEFAULT_NAME,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
@@ -111,6 +112,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             commands: Plugin commands.
             requires: Plugin requirements.
             config: Plugin configuration.
+            pylock: Locked dependencies in pylock.toml format (PEP 751).
             default_variant: Default variant for this plugin.
             env: Environment variables to inject into plugins runtime context.
             extras: Extra keyword arguments.
@@ -143,6 +145,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 settings_group_validation=settings_group_validation,
                 settings=settings,
                 requires=requires,
+                pylock=pylock,
                 **extras,
             )
 
@@ -163,6 +166,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.variant = variant
         self.pip_url = pip_url
         self.python = str(python) if python else None
+        self.pylock = pylock
         self.executable = executable
         self.capabilities = capabilities
         self.settings_group_validation = settings_group_validation

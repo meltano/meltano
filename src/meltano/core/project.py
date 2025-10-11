@@ -37,6 +37,7 @@ if t.TYPE_CHECKING:
     from meltano.core._types import StrPath
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
     from meltano.core.plugin.base import PluginRef
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -638,6 +639,20 @@ class Project(Versioned):
         return self.root_plugins_dir(
             plugin_type,
             f"{filename}.lock",
+            make_dirs=make_dirs,
+        )
+
+    @makedirs
+    def pylock(self, plugin_ref: ProjectPlugin, *, make_dirs: bool = True) -> Path:
+        """Path to the project pylock file.
+
+        Args:
+            plugin_ref: The plugin reference.
+            make_dirs: Whether to create the directory hierarchy if it doesn't exist.
+        """
+        return self.root_plugins_dir(
+            plugin_ref.type,
+            f"pylock.{plugin_ref.name}.toml",
             make_dirs=make_dirs,
         )
 
