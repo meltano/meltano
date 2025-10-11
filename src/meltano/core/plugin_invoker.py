@@ -100,7 +100,7 @@ class ExecutableNotFoundError(InvokerError):
             f"Executable '{executable}' could not be found. "
             f"{plugin_type_descriptor} '{plugin.name}' may not have "
             "been installed yet using "
-            f"`meltano install {plugin_type} {plugin.name}`, "
+            f"`meltano install --plugin-type {plugin_type} {plugin.name}`, "
             "or the executable name may be incorrect.",
         )
 
