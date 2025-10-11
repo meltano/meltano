@@ -281,6 +281,7 @@ class Variant(NameEq, Canonical):
         settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        requires_meltano: str | None = None,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):
@@ -303,6 +304,8 @@ class Variant(NameEq, Canonical):
             settings: The settings of the variant.
             commands: The commands of the variant.
             requires: Other plugins this plugin depends on.
+            requires_meltano: A version specifier for the Meltano version required by
+                this plugin.
             env: Environment variables to inject into plugins runtime context.
             extras: Additional keyword arguments.
         """
@@ -322,6 +325,7 @@ class Variant(NameEq, Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            requires_meltano=requires_meltano,
             env=env or {},
             extras=extras,
         )
@@ -507,6 +511,7 @@ class PluginDefinition(PluginRef):
             settings=plugin.settings,
             commands=plugin.commands,
             requires=plugin.requires,
+            requires_meltano=plugin.requires_meltano,
             env=plugin.env,
             **plugin.extras,
         )
@@ -803,6 +808,7 @@ class StandalonePlugin(Canonical):
         settings: list | None = None,
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
+        requires_meltano: str | None = None,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):
@@ -827,6 +833,8 @@ class StandalonePlugin(Canonical):
             settings: The settings of the plugin.
             commands: The commands of the plugin.
             requires: Other plugins this plugin depends on.
+            requires_meltano: A version specifier for the Meltano version required by
+                this plugin.
             env: Environment variables to inject into plugins runtime context.
             extras: Additional attributes to set on the plugin.
         """
@@ -848,6 +856,7 @@ class StandalonePlugin(Canonical):
             settings=list(map(SettingDefinition.parse, settings or [])),
             commands=Command.parse_all(commands),
             requires=PluginRequirement.parse_all(requires),
+            requires_meltano=requires_meltano,
             env=env or {},
             extras=extras,
         )
@@ -914,6 +923,7 @@ class StandalonePlugin(Canonical):
             settings=variant.settings,
             commands=variant.commands,
             requires=variant.requires,
+            requires_meltano=variant.requires_meltano,
             env=variant.env,
             **{**plugin_def.extras, **variant.extras},
         )

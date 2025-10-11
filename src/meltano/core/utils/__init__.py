@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import functools
 import hashlib
+import importlib.metadata
 import math
 import os
 import platform
@@ -27,6 +28,7 @@ from pathlib import Path
 import dateparser
 import flatten_dict
 import structlog
+from packaging.specifiers import SpecifierSet
 from requests.auth import HTTPBasicAuth
 
 from meltano.core.error import MeltanoError
@@ -104,6 +106,23 @@ class NotFound(Exception):
             super().__init__(f"{name} was not found.")
         else:
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
+
+
+class IncompatibleMeltanoVersionError(Exception):
+    """A component is incompatible with the Meltano version."""
+
+    def __init__(self, message: str, required_version: str, current_version: str):
+        """Initialize the error.
+
+        Args:
+            message: The error message.
+            required_version: The version required by the component.
+            current_version: The version of Meltano.
+        """
+        super().__init__(message)
+
+        self.required_version = required_version
+        self.current_version = current_version
 
 
 def run_async(func: Callable[..., Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
@@ -900,6 +919,34 @@ def parse_date(date_string: str) -> str:
         return _parsed.isoformat()
 
     return date_string
+
+
+@functools.lru_cache
+def get_meltano_version() -> str:
+    """Get the version of Meltano.
+
+    Returns:
+        The version of Meltano.
+    """
+    return importlib.metadata.version("meltano")
+
+
+def check_meltano_compatibility(required: str | None) -> None:
+    """Check if the provided version is compatible with the current Meltano version.
+
+    Args:
+        required: The version required by the project.
+
+    Returns:
+        True if the provided version is compatible with the current Meltano version.
+    """
+    if not required:
+        return
+
+    current = get_meltano_version()
+    if not SpecifierSet(required).contains(current):
+        message = f"Project requires Meltano {required}, but {current} is installed"
+        raise IncompatibleMeltanoVersionError(message, required, current)
 
 
 def new_project_id() -> uuid.UUID:
