@@ -653,12 +653,7 @@ async def install_pip_plugin(
         # Look for separate pylock.<plugin-name>.toml file (variant-agnostic)
         pylock_file = None
         if use_locked:
-            # Get the plugins directory for this plugin type
-            plugins_dir = project.root_plugins_dir(plugin.type.value)
-            # Look for pylock.<plugin-name>.toml
-            pylock_filename = f"pylock.{plugin.name}.toml"
-            pylock_path = plugins_dir / pylock_filename
-
+            pylock_path = project.pylock(plugin)
             if pylock_path.exists():
                 pylock_file = pylock_path
                 logger.debug(
