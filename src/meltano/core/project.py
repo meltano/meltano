@@ -643,7 +643,12 @@ class Project(Versioned):
         )
 
     @makedirs
-    def pylock(self, plugin_ref: ProjectPlugin, *, make_dirs: bool = True) -> Path:
+    def plugin_pylock(
+        self,
+        plugin_ref: ProjectPlugin,
+        *,
+        make_dirs: bool = True,
+    ) -> Path:
         """Path to the project pylock file.
 
         Args:
