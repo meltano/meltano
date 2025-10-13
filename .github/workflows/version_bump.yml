@@ -45,7 +45,7 @@ jobs:
       with:
         python-version: "3.x"
 
-    - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+    - uses: astral-sh/setup-uv@3259c6206f993105e3a61b142c2d97bf4b9ef83d # v7.1.0
 
     - name: Bump version
       id: cz-bump
@@ -66,7 +66,7 @@ jobs:
     - name: Draft Release
       id: draft-release
       if: ${{ github.event.inputs.prerelease == 'none' }}
-      uses: softprops/action-gh-release@62c96d0c4e8a889135c1f3a25910db8dbe0e85f7 # v2.3.4
+      uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2.4.1
       with:
         draft: true
         body_path: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}
