@@ -520,7 +520,7 @@ wheels = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.34.0"
+version = "0.34.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -530,9 +530,9 @@ dependencies = [
     { name = "ruamel-yaml" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9e/48/be9cb9144328042b66110ed58eabdbba0f64eded54be1a659ec72a5d939e/check_jsonschema-0.34.0.tar.gz", hash = "sha256:7ff811bbd6d3936a9729375fb1e42835ecdc3758d837e2c67330c738a8b4945f", size = 310166, upload-time = "2025-09-18T01:46:26.117Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/fd/c2bd16532a2e5ad3318d62b0295ca9274ac3e09f795d6e2adff1174663c0/check_jsonschema-0.34.1.tar.gz", hash = "sha256:024ca6b1d645fdc33025f915ea4aa72a84df002b12209ee172a7bfd089f34832", size = 321581, upload-time = "2025-10-13T06:12:56.348Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/60/ac05c3366833b04af1901c776730f0daba5bb5d8dc805706a77938e37661/check_jsonschema-0.34.0-py3-none-any.whl", hash = "sha256:7acb8abf31e28abedca4572435a94e6cf5392aa750b926c77e450d1088389aee", size = 295042, upload-time = "2025-09-18T01:46:24.243Z" },
+    { url = "https://files.pythonhosted.org/packages/24/02/be2d0ece34f83baf64cfcb6a806c161a150a87d45ba2a1828bcff8f99615/check_jsonschema-0.34.1-py3-none-any.whl", hash = "sha256:39f3faea89a26e7de6c8090bc53dceecd30029a6daf04db7e5807a2142ef54b6", size = 306941, upload-time = "2025-10-13T06:12:53.539Z" },
 ]
 
 [[package]]
