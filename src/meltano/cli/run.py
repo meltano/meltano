@@ -21,6 +21,7 @@ from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.plugin_command import InvokerCommand
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents
@@ -130,6 +131,11 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 @install
 @no_install
 @only_install
+@click.option(
+    "--locked",
+    is_flag=True,
+    help="Run with locked plugins.",
+)
 @pass_project(migrate=True)
 @click.pass_context
 @run_async
@@ -149,6 +155,7 @@ async def run(
     timeout: int | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
+    locked: bool,
 ) -> None:
     """Run a set of command blocks in series.
 
@@ -188,19 +195,21 @@ async def run(
         state_strategy=state_strategy,
     )
 
+    plugin_source = DefinitionSource.LOCAL if locked else DefinitionSource.ANY
     try:
-        parser = BlockParser(
-            logger,
-            project,
-            blocks,
-            full_refresh=full_refresh,
-            refresh_catalog=refresh_catalog,
-            no_state_update=no_state_update,
-            force=force,
-            state_id_suffix=state_id_suffix,
-            state_strategy=_state_strategy,
-            run_id=run_id,
-        )
+        with project.plugins.use_preferred_source(plugin_source):
+            parser = BlockParser(
+                logger,
+                project,
+                blocks,
+                full_refresh=full_refresh,
+                refresh_catalog=refresh_catalog,
+                no_state_update=no_state_update,
+                force=force,
+                state_id_suffix=state_id_suffix,
+                state_strategy=_state_strategy,
+                run_id=run_id,
+            )
         parsed_blocks = list(parser.find_blocks(0))
         if not parsed_blocks:
             tracker.track_command_event(CliEvent.aborted)

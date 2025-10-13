@@ -27,6 +27,7 @@ from meltano.core.plugin_invoker import (
     UnknownCommandError,
     invoker_factory,
 )
+from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
@@ -83,6 +84,11 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 @install
 @no_install
 @only_install
+@click.option(
+    "--locked",
+    is_flag=True,
+    help="Invoke with locked plugins.",
+)
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -98,6 +104,7 @@ async def invoke(
     install_plugins: InstallPlugins,
     containers: bool,
     print_var: tuple[str, ...],
+    locked: bool,
 ) -> None:
     """Invoke a plugin's executable with specified arguments.
 
@@ -113,12 +120,14 @@ async def invoke(
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
+    plugin_source = DefinitionSource.LOCAL if locked else DefinitionSource.ANY
     try:
-        plugin = project.plugins.find_plugin(
-            plugin_name,
-            plugin_type=plugin_type,
-            invokable=True,
-        )
+        with project.plugins.use_preferred_source(plugin_source):
+            plugin = project.plugins.find_plugin(
+                plugin_name,
+                plugin_type=plugin_type,
+                invokable=True,
+            )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
         tracker.track_command_event(CliEvent.inflight)
     except PluginNotFoundError:

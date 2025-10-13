@@ -8,6 +8,7 @@ import typing as t
 
 from meltano.core.plugin import BasePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_lock_service import PluginLockBehavior
 from meltano.core.project_plugins_service import (
     DefinitionSource,
     PluginAlreadyAddedException,
@@ -96,7 +97,10 @@ class ProjectAddService:
             )
 
             if lock and not plugin.is_custom():
-                self.project.plugins.lock_service.save(plugin, exists_ok=True)
+                self.project.plugins.lock_service.save(
+                    plugin,
+                    if_exists=PluginLockBehavior.UPDATE,
+                )
 
             return plugin, flags
 

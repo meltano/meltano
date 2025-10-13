@@ -13,7 +13,7 @@ from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
-from meltano.core.plugin_lock_service import PluginLockService
+from meltano.core.plugin_lock_service import PluginLockBehavior, PluginLockService
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
@@ -551,7 +551,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             PluginParentNotFoundError: If the parent plugin is not found.
         """
         try:
-            return self.project.hub_service.get_base_plugin(
+            base_plugin = self.project.hub_service.get_base_plugin(
                 plugin,
                 variant_name=plugin.variant,
             )
@@ -559,6 +559,18 @@ class ProjectPluginsService:  # (too many methods, attributes)
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
             raise
+
+        if_exists = (
+            PluginLockBehavior.SKIP
+            if DefinitionSource.LOCKFILE in self._prefer_source
+            else (
+                PluginLockBehavior.UPDATE
+                if self._prefer_source == DefinitionSource.HUB
+                else PluginLockBehavior.FAIL
+            )
+        )
+        self.lock_service.save(base_plugin, if_exists=if_exists)
+        return base_plugin
 
     def find_parent(
         self,
@@ -594,13 +606,12 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         if DefinitionSource.LOCKFILE in self._prefer_source:
             try:
-                return (
-                    self.locked_definition_service.get_base_plugin(
-                        plugin,
-                        variant_name=plugin.variant,
-                    ),
-                    DefinitionSource.LOCKFILE,
+                base_plugin = self.locked_definition_service.get_base_plugin(
+                    plugin,
+                    variant_name=plugin.variant,
                 )
+                logger.debug("Found lockfile for plugin", name=plugin.name)
+                return (base_plugin, DefinitionSource.LOCKFILE)
             except PluginNotFoundError as lockfile_exc:
                 error = lockfile_exc
 

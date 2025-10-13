@@ -10,6 +10,7 @@ import pytest
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_lock_service import PluginLockBehavior
 from meltano.core.project_plugins_service import (
     DefinitionSource,
     PluginDefinitionNotFoundError,
@@ -45,7 +46,7 @@ def modified_lockfile(project: Project):
 class TestProjectPluginsService:
     @pytest.fixture(autouse=True)
     def setup(self, project: Project, tap) -> None:
-        project.plugins.lock_service.save(tap, exists_ok=True)
+        project.plugins.lock_service.save(tap, if_exists=PluginLockBehavior.UPDATE)
         project.plugins._prefer_source = DefinitionSource.ANY
 
     @pytest.mark.order(0)

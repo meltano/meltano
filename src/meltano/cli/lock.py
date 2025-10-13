@@ -9,10 +9,6 @@ import structlog
 
 from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd
-from meltano.core.plugin_lock_service import (
-    LockfileAlreadyExistsError,
-    PluginLockService,
-)
 from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
@@ -52,16 +48,7 @@ def lock(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    lock_service = PluginLockService(project)
-
-    try:
-        with project.plugins.use_preferred_source(DefinitionSource.ANY):
-            # Make it a list so source preference is not lazily evaluated.
-            plugins = list(project.plugins.plugins())
-    except Exception:
-        tracker.track_command_event(CliEvent.aborted)
-        raise
-
+    plugins = list(project.plugins.plugins(ensure_parent=False))
     if plugin_name:
         plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
 
@@ -75,32 +62,18 @@ def lock(
         errmsg = "No matching plugin(s) found"
         raise CliError(errmsg)
 
-    click.echo(f"Locking {len(plugins)} plugin(s)...")
+    preferred_source = DefinitionSource.HUB if update else DefinitionSource.ANY
     for plugin in plugins:
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
         if plugin.is_custom():
-            click.secho(f"{descriptor.capitalize()} is a custom plugin", fg="yellow")
+            logger.warning("Custom %s does not need to be locked", descriptor)
         elif plugin.inherit_from is not None:
-            click.secho(
-                f"{descriptor.capitalize()} is an inherited plugin",
-                fg="yellow",
-            )
+            logger.warning("Inherited %s does not need to be locked", descriptor)
         else:
             plugin.parent = None
-            with project.plugins.use_preferred_source(DefinitionSource.HUB):
+            with project.plugins.use_preferred_source(preferred_source):
                 plugin = project.plugins.ensure_parent(plugin)
-            try:
-                lock_service.save(plugin, exists_ok=update)
-            except LockfileAlreadyExistsError as err:
-                relative_path = err.path.relative_to(project.root)
-                click.secho(
-                    f"Lockfile exists for {descriptor} at {relative_path}",
-                    fg="red",
-                )
-                continue
-
-            tracked_plugins.append((plugin, None))
-            click.secho(f"Locked definition for {descriptor}", fg="green")
+                tracked_plugins.append((plugin, None))
 
     tracker.add_contexts(PluginsTrackingContext(tracked_plugins))
     tracker.track_command_event(CliEvent.completed)

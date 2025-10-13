@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 import json
 import typing as t
 from hashlib import sha256
@@ -19,6 +20,14 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
+
+
+class PluginLockBehavior(enum.Enum):
+    """The behavior of the plugin lock service."""
+
+    FAIL = enum.auto()
+    SKIP = enum.auto()
+    UPDATE = enum.auto()
 
 
 class LockfileAlreadyExistsError(Exception):
@@ -122,13 +131,13 @@ class PluginLockService:
         self,
         plugin: ProjectPlugin,
         *,
-        exists_ok: bool = False,
+        if_exists: PluginLockBehavior = PluginLockBehavior.FAIL,
     ) -> None:
         """Save the plugin lockfile.
 
         Args:
             plugin: The plugin definition to save.
-            exists_ok: Whether raise an exception if the lockfile already exists.
+            if_exists: The behavior to take if the lockfile already exists.
 
         Raises:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
@@ -136,13 +145,18 @@ class PluginLockService:
         """
         plugin_lock = PluginLock(self.project, plugin)
 
-        if plugin_lock.path.exists() and not exists_ok:
-            raise LockfileAlreadyExistsError(
-                f"Lockfile already exists: {plugin_lock.path}",  # noqa: EM102
-                plugin_lock.path,
-                plugin,
-            )
+        if plugin_lock.path.exists():
+            if if_exists is PluginLockBehavior.SKIP:
+                logger.debug("Lockfile exists", path=plugin_lock.path)
+                return
+            if if_exists is PluginLockBehavior.FAIL:
+                raise LockfileAlreadyExistsError(
+                    f"Lockfile already exists: {plugin_lock.path}",  # noqa: EM102
+                    plugin_lock.path,
+                    plugin,
+                )
 
+        logger.info("Updating lockfile for %s", plugin.name, path=plugin_lock.path)
         plugin_lock.save()
 
         logger.debug("Locked plugin definition", path=plugin_lock.path)

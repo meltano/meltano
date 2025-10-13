@@ -10,6 +10,7 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLock,
+    PluginLockBehavior,
     PluginLockService,
 )
 
@@ -110,4 +111,8 @@ class TestPluginLockService:
         with pytest.raises(LockfileAlreadyExistsError) as exc_info:
             subject.save(plugin)
 
+        assert isinstance(exc_info.value, LockfileAlreadyExistsError)
         assert exc_info.value.plugin == plugin
+
+        subject.save(plugin, if_exists=PluginLockBehavior.SKIP)
+        assert plugin_lock.path.exists()
