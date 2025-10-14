@@ -18,8 +18,6 @@ from meltano.core.project_plugins_service import PluginType
 from meltano.core.state_service import StateService
 
 if t.TYPE_CHECKING:
-    from sqlalchemy.engine import Engine
-
     from meltano.core.project import Project
 
 
@@ -72,16 +70,6 @@ class AutomaticPackageUpgradeError(Exception):
 class UpgradeService:
     """Meltano upgrade service."""
 
-    def __init__(self, engine: Engine, project: Project):
-        """Initialize the Meltano upgrade service.
-
-        Args:
-            engine: The SQLAlchemy engine to be used for the upgrade.
-            project: The Meltano project.
-        """
-        self.project = project
-        self.engine = engine
-
     def _upgrade_package(self, pip_url: str | None, *, force: bool) -> bool:
         _check_editable_installation(force=force)
         _check_docker_installation()
@@ -132,22 +120,25 @@ class UpgradeService:
         click.echo()
         return True
 
-    def update_files(self) -> None:
+    def update_files(self, *, project: Project) -> None:
         """Update the files managed by Meltano inside the current project.
+
+        Args:
+            project: The Meltano project.
 
         Raises:
             MeltanoError: Failed to upgrade plugins.
         """
         click.secho("Updating files managed by plugins...", fg="blue")
 
-        file_plugins = self.project.plugins.get_plugins_of_type(PluginType.FILES)
+        file_plugins = project.plugins.get_plugins_of_type(PluginType.FILES)
         if not file_plugins:
             click.echo("Nothing to update")
             return
 
         success = asyncio.run(
             install_plugins(
-                self.project,
+                project,
                 file_plugins,
                 reason=PluginInstallReason.UPGRADE,
             ),
@@ -155,30 +146,39 @@ class UpgradeService:
         if not success:
             raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
 
-    def migrate_database(self) -> None:
+    def migrate_database(self, *, project: Project) -> None:
         """Migrate the Meltano database.
+
+        Args:
+            project: The Meltano project.
 
         Raises:
             UpgradeError: The migration failed.
         """
         click.secho("Applying migrations to system database...", fg="blue")
 
+        from meltano.core.db import project_engine
         from meltano.core.migration_service import MigrationError, MigrationService
 
+        engine, _ = project_engine(project)
+
         try:
-            migration_service = MigrationService(self.engine)
+            migration_service = MigrationService(engine)
             migration_service.upgrade()
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def migrate_state(self) -> None:
+    def migrate_state(self, *, project: Project) -> None:
         """Move cloud state files to deduplicated prefix paths.
+
+        Args:
+            project: The Meltano project.
 
         See: https://github.com/meltano/meltano/issues/7938
         """
         from meltano.core.state_store.filesystem import CloudStateStoreManager
 
-        state_service = StateService(project=self.project)
+        state_service = StateService(project=project)
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):
             click.secho("Applying migrations to project state...", fg="blue")
@@ -202,13 +202,20 @@ class UpgradeService:
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, *, skip_package: bool = False, **kwargs) -> None:  # noqa: ANN003
+    def upgrade(
+        self,
+        *,
+        project: Project,
+        skip_package: bool = False,
+        **kwargs: t.Any,
+    ) -> None:
         """Upgrade Meltano.
 
         Note: this is not actually called as part of the `meltano upgrade` command
         but is useful for testing and debugging upgrade logic.
 
         Args:
+            project: The Meltano project.
             skip_package: Whether the Meltano package should be upgraded.
             kwargs: Keyword arguments for `UpgradeService.upgrade_package`.
         """
@@ -225,11 +232,11 @@ class UpgradeService:
 
             click.echo()
 
-        self.update_files()
+        self.update_files(project=project)
         click.echo()
-        self.migrate_database()
+        self.migrate_database(project=project)
         click.echo()
-        self.migrate_state()
+        self.migrate_state(project=project)
         click.echo()
         click.secho(
             "Meltano and your Meltano project have been upgraded!"
