@@ -86,11 +86,9 @@ def lock(
                 fg="yellow",
             )
         else:
-            plugin.parent = None
-            with project.plugins.use_preferred_source(DefinitionSource.HUB):
-                plugin = project.plugins.ensure_parent(plugin)
+            # The lock service will fetch from Hub internally
             try:
-                lock_service.save(plugin, exists_ok=update)
+                lock_service.save(plugin, exists_ok=update, fetch_from_hub=True)
             except LockfileAlreadyExistsError as err:
                 relative_path = err.path.relative_to(project.root)
                 click.secho(

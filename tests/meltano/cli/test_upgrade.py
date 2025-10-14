@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import platform
-import shutil
 import typing as t
 from importlib.metadata import PathDistribution
 from unittest import mock
@@ -185,8 +184,8 @@ class TestCliUpgrade:
         # Update file if changed
         file_path.write_text("Overwritten!")
 
-        # The behavior being tested assumes that the file is not locked.
-        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
+        # In the new architecture, lockfiles are required for plugin resolution.
+        # Ensure the lockfile exists before upgrading.
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
@@ -202,7 +201,7 @@ class TestCliUpgrade:
         assert "Nothing to update" in output
         assert file_path.read_text() == file_content
 
-        # Don't update file if automatic updating is
+        # Don't update file if automatic updating is disabled
         result = cli_runner.invoke(
             cli,
             [
@@ -220,7 +219,6 @@ class TestCliUpgrade:
 
         file_path.write_text("Overwritten!")
 
-        cli_runner.invoke(cli, ("lock", "airflow"))
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)

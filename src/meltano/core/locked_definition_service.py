@@ -39,7 +39,8 @@ class LockedDefinitionService(PluginRepository):
         Args:
             plugin_type: The plugin type.
             plugin_name: The plugin name.
-            variant_name: The plugin variant name.
+            variant_name: The plugin variant name. If "default" or None, will find
+                the first available lockfile for this plugin.
 
         Returns:
             The plugin definition.
@@ -47,11 +48,22 @@ class LockedDefinitionService(PluginRepository):
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
         """
-        path = self.project.plugin_lock_path(
-            plugin_type,
-            plugin_name,
-            variant_name=variant_name,
-        )
+        from meltano.core.plugin.base import Variant
+
+        # If variant is "default" or None, find the first available lockfile
+        if variant_name in (None, Variant.DEFAULT_NAME):
+            plugin_dir = self.project.root_plugins_dir(plugin_type.value)
+            lockfiles = list(plugin_dir.glob(f"{plugin_name}--*.lock"))
+            if not lockfiles:
+                raise PluginNotFoundError(PluginRef(plugin_type, plugin_name))
+            path = lockfiles[0]  # Use the first found lockfile
+        else:
+            path = self.project.plugin_lock_path(
+                plugin_type,
+                plugin_name,
+                variant_name=variant_name,
+            )
+
         try:
             standalone = StandalonePlugin.parse_json_file(path)
         except FileNotFoundError as err:

@@ -12,7 +12,7 @@ import structlog
 from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
@@ -30,13 +30,12 @@ class DefinitionSource(enum.Flag):
     """The source of a plugin definition."""
 
     NONE = 0
-    HUB = enum.auto()
     CUSTOM = enum.auto()
     LOCKFILE = enum.auto()
     INHERITED = enum.auto()
 
-    ANY = HUB | CUSTOM | LOCKFILE | INHERITED
-    LOCAL = ~HUB  # type: ignore[operator]  # https://github.com/python/mypy/issues/18410
+    ANY = CUSTOM | LOCKFILE | INHERITED
+    LOCAL = ANY  # All sources are now local
 
 
 class AddedPluginFlags(enum.Flag):
@@ -78,31 +77,49 @@ class PluginDefinitionNotFoundError(MeltanoError):
         self,
         plugin: ProjectPlugin,
         error: Exception | None,
-        source: DefinitionSource,
+        source: DefinitionSource,  # noqa: ARG002
     ):
         """Initialize a new error.
 
         Args:
             plugin: The plugin that was not found.
             error: The error that was raised, if any.
-            source: The sources searched for the plugin.
+            source: The sources searched for the plugin (unused).
         """
         reason = (
             str(error)
             if error
             else f"No definition found for {plugin.type.descriptor} {plugin.name}"
         )
-        instruction = None
-
-        if DefinitionSource.HUB in source:
-            instruction = "Check https://hub.meltano.com/ for available plugins"
-        else:
-            instruction = (
-                "Try running `meltano lock --update` to ensure your plugins are "
-                "up to date, or add a `namespace` to your plugin if it is a custom one"
-            )
+        instruction = (
+            "Try running `meltano lock --update` to ensure your plugins are "
+            "up to date, or add a `namespace` to your plugin if it is a "
+            "custom one"
+        )
 
         super().__init__(reason=reason, instruction=instruction)
+
+
+class PluginDefinitionNotLockedException(MeltanoError):
+    """Raised when a plugin definition is not locked."""
+
+    def __init__(self, plugin: ProjectPlugin):
+        """Initialize a new error.
+
+        Args:
+            plugin: The plugin that is not locked.
+        """
+        super().__init__(
+            reason=(
+                f"No lockfile found for {plugin.type.descriptor} "
+                f"'{plugin.name}'. The plugin must be locked before it can "
+                f"be used."
+            ),
+            instruction=(
+                f"Run 'meltano lock {plugin.name}' to create a lockfile for "
+                f"this plugin."
+            ),
+        )
 
 
 class AmbiguousMappingName(MeltanoError):
@@ -538,28 +555,6 @@ class ProjectPluginsService:  # (too many methods, attributes)
             else:
                 environment.config.plugins[plugin.type][p_idx] = plugin
 
-    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> BasePlugin:
-        """Get the parent plugin from the hub.
-
-        Args:
-            plugin: The plugin to get the parent of.
-
-        Returns:
-            The parent plugin.
-
-        Raises:
-            PluginParentNotFoundError: If the parent plugin is not found.
-        """
-        try:
-            return self.project.hub_service.get_base_plugin(
-                plugin,
-                variant_name=plugin.variant,
-            )
-        except PluginNotFoundError as err:
-            if plugin.inherit_from:
-                raise PluginParentNotFoundError(plugin, err) from err
-            raise
-
     def find_parent(
         self,
         plugin: ProjectPlugin,
@@ -578,16 +573,19 @@ class ProjectPluginsService:  # (too many methods, attributes)
         error: Exception | None = None
         if (
             plugin.inherit_from
-            and not plugin.is_variant_set
+            # and not plugin.is_variant_set
             and DefinitionSource.INHERITED in self._prefer_source
         ):
             try:
-                return (
-                    self.find_plugin(
-                        plugin.inherit_from,
-                        plugin_type=plugin.type,
-                    ),
-                    DefinitionSource.INHERITED,
+                # Find the inherited plugin and return it
+                # Note: We don't call ensure_parent here to avoid requiring
+                # lockfiles during inherited plugin resolution. The caller
+                # should call ensure_parent if they need the full parent chain.
+                for p in self.plugins(ensure_parent=False):
+                    if p.name == plugin.inherit_from and p.type == plugin.type:
+                        return (p, DefinitionSource.INHERITED)
+                raise PluginNotFoundError(
+                    PluginRef(plugin.type, plugin.inherit_from),
                 )
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
@@ -603,12 +601,6 @@ class ProjectPluginsService:  # (too many methods, attributes)
                 )
             except PluginNotFoundError as lockfile_exc:
                 error = lockfile_exc
-
-        if DefinitionSource.HUB in self._prefer_source:
-            try:
-                return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
-            except Exception as hub_exc:
-                error = hub_exc
 
         raise PluginDefinitionNotFoundError(
             plugin,
@@ -648,6 +640,15 @@ class ProjectPluginsService:  # (too many methods, attributes)
             plugin.parent = self.get_parent(plugin)
 
         return plugin
+
+    def lock(self, plugin: ProjectPlugin, *, update: bool = False) -> None:
+        """Lock a plugin.
+
+        Args:
+            plugin: The plugin to lock.
+            update: Whether to update the lockfile if it already exists.
+        """
+        self.lock_service.save(plugin, exists_ok=update, fetch_from_hub=True)
 
     def get_transformer(self) -> ProjectPlugin:
         """Get first available Transformer plugin.

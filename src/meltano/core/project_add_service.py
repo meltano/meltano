@@ -80,6 +80,34 @@ class ProjectAddService:
             default_variant=Variant.DEFAULT_NAME,
         )
 
+        # If lock is True and the plugin is not custom and not inherited,
+        # create the lockfile first by fetching from Hub. This ensures the lockfile
+        # exists before we try to resolve the parent.
+        # Inherited plugins don't need lockfiles - they inherit from other plugins.
+        if lock and not plugin.is_custom() and not plugin.inherit_from:
+            from meltano.core.plugin.error import PluginNotFoundError
+            from meltano.core.project_plugins_service import (
+                PluginDefinitionNotFoundError,
+            )
+
+            try:
+                plugin_lock = self.project.plugins.lock_service.save(
+                    plugin,
+                    exists_ok=True,
+                    fetch_from_hub=True,
+                )
+                # Update the plugin's variant to match what was actually locked
+                # This ensures that later lookups use the same variant name
+                if plugin_lock and not plugin.is_variant_set:
+                    plugin.variant = plugin_lock.variant.name
+            except PluginNotFoundError as err:
+                # Wrap Hub's PluginNotFoundError in PluginDefinitionNotFoundError
+                raise PluginDefinitionNotFoundError(
+                    plugin,
+                    err,
+                    DefinitionSource.LOCKFILE,
+                ) from err
+
         with self.project.plugins.use_preferred_source(DefinitionSource.ANY):
             self.project.plugins.ensure_parent(plugin)
 
@@ -94,9 +122,6 @@ class ProjectAddService:
                 plugin,
                 update=update,
             )
-
-            if lock and not plugin.is_custom():
-                self.project.plugins.lock_service.save(plugin, exists_ok=True)
 
             return plugin, flags
 

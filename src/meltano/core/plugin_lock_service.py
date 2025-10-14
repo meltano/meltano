@@ -40,15 +40,32 @@ class LockfileAlreadyExistsError(Exception):
 class PluginLock:
     """Plugin lockfile."""
 
-    def __init__(self, project: Project, plugin: ProjectPlugin) -> None:
+    def __init__(
+        self,
+        project: Project,
+        plugin: ProjectPlugin,
+        *,
+        fetch_from_hub: bool = False,
+    ) -> None:
         """Create a new PluginLock.
 
         Args:
             project: The project.
             plugin: The plugin to lock.
+            fetch_from_hub: Whether to fetch the plugin definition from the Hub.
         """
         self.project = project
-        self.definition = plugin.definition
+
+        # If fetch_from_hub is True, fetch the definition from Hub
+        if fetch_from_hub:
+            self.definition = project.hub_service.find_definition(
+                plugin.type,
+                plugin.inherit_from or plugin.name,
+                variant_name=plugin.variant,
+            )
+        else:
+            self.definition = plugin.definition
+
         self.variant = self.definition.find_variant(plugin.variant)
 
         self.path = self.project.plugin_lock_path(
@@ -123,18 +140,24 @@ class PluginLockService:
         plugin: ProjectPlugin,
         *,
         exists_ok: bool = False,
-    ) -> None:
+        fetch_from_hub: bool = True,
+    ) -> PluginLock:
         """Save the plugin lockfile.
 
         Args:
             plugin: The plugin definition to save.
             exists_ok: Whether raise an exception if the lockfile already exists.
+            fetch_from_hub: Whether to fetch the latest definition from the Hub.
+                Defaults to True to ensure lockfiles contain up-to-date definitions.
+
+        Returns:
+            The PluginLock that was saved.
 
         Raises:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
                 flagged for overwriting.
         """
-        plugin_lock = PluginLock(self.project, plugin)
+        plugin_lock = PluginLock(self.project, plugin, fetch_from_hub=fetch_from_hub)
 
         if plugin_lock.path.exists() and not exists_ok:
             raise LockfileAlreadyExistsError(
@@ -146,3 +169,5 @@ class PluginLockService:
         plugin_lock.save()
 
         logger.debug("Locked plugin definition", path=plugin_lock.path)
+
+        return plugin_lock

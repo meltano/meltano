@@ -99,7 +99,8 @@ class TestPluginLockService:
         plugin_lock = PluginLock(project, plugin)
         assert not plugin_lock.path.exists()
 
-        subject.save(plugin)
+        # Don't fetch from Hub since this is a test plugin with a custom definition
+        subject.save(plugin, fetch_from_hub=False)
         assert plugin_lock.path.exists()
 
         with plugin_lock.path.open() as lock_file:
@@ -108,6 +109,6 @@ class TestPluginLockService:
             assert lock_json["baz"] == "qux"
 
         with pytest.raises(LockfileAlreadyExistsError) as exc_info:
-            subject.save(plugin)
+            subject.save(plugin, fetch_from_hub=False)
 
         assert exc_info.value.plugin == plugin

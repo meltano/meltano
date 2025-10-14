@@ -24,6 +24,7 @@ from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.logging.formatters import get_default_foreign_pre_chain
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
@@ -43,7 +44,6 @@ if t.TYPE_CHECKING:
 
     from requests.adapters import BaseAdapter
 
-    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 current_dir = Path(__file__).parent
 
@@ -1929,6 +1929,19 @@ def tap(project_add_service: ProjectAddService):
 
 @pytest.fixture(scope="class")
 def alternative_tap(project_add_service: ProjectAddService, tap: ProjectPlugin):
+    # Create a lockfile for the singer-io variant first
+
+    singer_io_plugin = ProjectPlugin(
+        PluginType.EXTRACTORS,
+        "tap-mock",
+        variant="singer-io",
+    )
+    project_add_service.project.plugins.lock_service.save(
+        singer_io_plugin,
+        exists_ok=True,
+        fetch_from_hub=True,
+    )
+
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1977,9 +1990,13 @@ def target(project_add_service: ProjectAddService):
 
 
 @pytest.fixture(scope="class")
-def alternative_target(project_add_service: ProjectAddService):
-    # We don't load the `target` fixture here since this ProjectPlugin should
-    # have a BasePlugin parent, not the `target` ProjectPlugin
+def alternative_target(
+    project_add_service: ProjectAddService,
+    target: ProjectPlugin,  # noqa: ARG001
+):
+    # We need the `target` fixture to ensure the lockfile for target-mock exists,
+    # even though this ProjectPlugin will have a BasePlugin parent from the lockfile,
+    # not the `target` ProjectPlugin directly
     try:
         return project_add_service.add(
             PluginType.LOADERS,
