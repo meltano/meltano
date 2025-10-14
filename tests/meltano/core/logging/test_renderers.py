@@ -273,27 +273,19 @@ class TestStructuredExceptionFormatter:
 
 
 class TestPluginInstallFormatter:
-    @pytest.fixture
-    def formatter(self) -> PluginInstallFormatter:
-        return PluginInstallFormatter(
-            force_terminal=False,
-            width=80,
-            no_color=True,
-        )
-
     def test_render(
         self,
-        formatter: PluginInstallFormatter,
+        install_formatter: PluginInstallFormatter,
         expected_install_output: str,
         install_state: PluginInstallState,
     ) -> None:
         buffer = StringIO()
-        formatter.format(buffer, install_state)
+        install_formatter.format(buffer, install_state)
         assert buffer.getvalue() == expected_install_output
 
     def test_render_without_details(
         self,
-        formatter: PluginInstallFormatter,
+        install_formatter: PluginInstallFormatter,
         install_state: PluginInstallState,
     ) -> None:
         buffer = StringIO()
@@ -303,7 +295,7 @@ class TestPluginInstallFormatter:
             status=install_state.status,
             details=None,
         )
-        formatter.format(buffer, state)
+        install_formatter.format(buffer, state)
         assert buffer.getvalue() == ""
 
 
