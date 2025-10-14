@@ -243,8 +243,15 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
             kwargs: Keyword arguments to pass to the parent class.
         """
         super().__init__(*args, **kwargs)
-        self._error_formatter = plugin_error_renderer or PluginErrorFormatter()
-        self._install_formatter = plugin_install_renderer or PluginInstallFormatter()
+        colors = kwargs.get("colors")
+        self._error_formatter = (
+            plugin_error_renderer  # or construct one with the right flags
+            or PluginErrorFormatter(no_color=not colors)
+        )
+        self._install_formatter = (
+            plugin_install_renderer  # or construct one with the right flags
+            or PluginInstallFormatter(no_color=not colors)
+        )
         self._all_keys = all_keys
         self._include_keys = include_keys
 
