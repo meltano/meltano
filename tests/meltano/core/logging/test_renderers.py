@@ -291,6 +291,21 @@ class TestPluginInstallFormatter:
         formatter.format(buffer, install_state)
         assert buffer.getvalue() == expected_install_output
 
+    def test_render_without_details(
+        self,
+        formatter: PluginInstallFormatter,
+        install_state: PluginInstallState,
+    ) -> None:
+        buffer = StringIO()
+        state = PluginInstallState(
+            plugin=install_state.plugin,
+            reason=install_state.reason,
+            status=install_state.status,
+            details=None,
+        )
+        formatter.format(buffer, state)
+        assert buffer.getvalue() == ""
+
 
 class TestMeltanoConsoleRenderer:
     @pytest.fixture
