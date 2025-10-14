@@ -16,6 +16,7 @@ from rich.text import Text
 from rich.traceback import PathHighlighter
 
 from meltano.core.logging.models import PluginException
+from meltano.core.plugin_install_service import PluginInstallState
 
 if t.TYPE_CHECKING:
     from collections.abc import MutableMapping
@@ -26,14 +27,15 @@ if t.TYPE_CHECKING:
     from meltano.core.logging.models import TracebackFrame
 
 
+ColorSystem: t.TypeAlias = t.Literal["auto", "standard", "256", "truecolor", "windows"]
+
+
 @dataclass
-class StructuredExceptionFormatter:
+class PluginErrorFormatter:
     """A renderer for Singer exceptions using the rich package."""
 
     no_color: bool | None = None
-    color_system: t.Literal["auto", "standard", "256", "truecolor", "windows"] = (
-        "truecolor"
-    )
+    color_system: ColorSystem = "truecolor"
     force_terminal: bool | None = None
     width: int | None = None
     legacy_windows: bool | None = None
@@ -159,6 +161,46 @@ class StructuredExceptionFormatter:
         Console(**kwargs).print(self.render_exception(exc, plugin_name=plugin_name))
 
 
+@dataclass
+class PluginInstallFormatter:
+    """A renderer for PluginInstallState using the rich package."""
+
+    no_color: bool | None = None
+    force_terminal: bool | None = None
+    width: int | None = None
+    color_system: ColorSystem = "truecolor"
+    legacy_windows: bool | None = None
+
+    @group()
+    def render_install_state(self, install_state: PluginInstallState) -> RenderResult:
+        """Render the install state."""
+        if install_state.details:
+            panel = Panel(
+                Text(install_state.details),
+                title=f"Installation {install_state.status}",
+                subtitle=install_state.message,
+                border_style="traceback.border",
+                expand=True,
+                padding=(0, 1),
+            )
+            yield Constrain(panel, self.width)
+
+    def format(
+        self,
+        sio: t.TextIO,
+        install_state: PluginInstallState,
+        **kwargs: t.Any,
+    ) -> None:
+        """Render the install state to the console."""
+        kwargs.setdefault("file", sio)
+        kwargs.setdefault("no_color", self.no_color)
+        kwargs.setdefault("force_terminal", self.force_terminal)
+        kwargs.setdefault("width", self.width)
+        kwargs.setdefault("color_system", self.color_system)
+        kwargs.setdefault("legacy_windows", self.legacy_windows)
+        Console(**kwargs).print(self.render_install_state(install_state))
+
+
 class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
     """Custom console renderer that handles our own data structures."""
 
@@ -172,6 +214,8 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         "stack",
         "exception",
         "exc_info",
+        # Internal structured logging
+        "install_state",
         # Plugin subprocess
         "name",
         # Plugin structured logging
@@ -182,7 +226,8 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
     def __init__(
         self,
         *args,  # noqa: ANN002
-        plugin_exception_renderer: StructuredExceptionFormatter | None = None,
+        plugin_error_renderer: PluginErrorFormatter | None = None,
+        plugin_install_renderer: PluginInstallFormatter | None = None,
         all_keys: bool | None = None,
         include_keys: set[str] | None = None,
         **kwargs,  # noqa: ANN003
@@ -191,15 +236,15 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
 
         Args:
             args: Arguments to pass to the parent class.
-            plugin_exception_renderer: The renderer to use for plugin exceptions.
+            plugin_error_renderer: The renderer to use for plugin exceptions.
+            plugin_install_renderer: The renderer to use for plugin installations.
             all_keys: Whether to include all keys in the output.
             include_keys: Whether to include specific keys in the output.
             kwargs: Keyword arguments to pass to the parent class.
         """
         super().__init__(*args, **kwargs)
-        self._plugin_exception_formatter = (
-            plugin_exception_renderer or StructuredExceptionFormatter()
-        )
+        self._error_formatter = plugin_error_renderer or PluginErrorFormatter()
+        self._install_formatter = plugin_install_renderer or PluginInstallFormatter()
         self._all_keys = all_keys
         self._include_keys = include_keys
 
@@ -244,11 +289,21 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
                 # Render the regular log message
                 regular_output = super().__call__(logger, name, event_dict)
                 # Then render the exception
-                self._plugin_exception_formatter.format(
+                self._error_formatter.format(
                     sio,
                     exc,
                     plugin_name=event_dict.get("string_id"),
                 )
                 return sio.getvalue() + "\n" + regular_output
+
+        if (
+            (install_state := event_dict.pop("install_state", None))  # WOLOLO
+            and isinstance(install_state, PluginInstallState)
+        ):
+            sio = StringIO()
+
+            # Render the install state
+            self._install_formatter.format(sio, install_state)
+            return sio.getvalue() + "\n" + super().__call__(logger, name, event_dict)
 
         return super().__call__(logger, name, event_dict)

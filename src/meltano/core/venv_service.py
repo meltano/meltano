@@ -303,7 +303,7 @@ class VenvService:
             self.project.venvs_dir(namespace, name, make_dirs=False),
             python=python or project.settings.get("python"),
         )
-        self.pip_log_path = self.project.logs_dir(
+        self.install_log_path = self.project.logs_dir(
             "pip",
             self.namespace,
             self.name,
@@ -522,7 +522,7 @@ class VenvService:
             "pip",
             "install",
             "--log",
-            str(self.pip_log_path),
+            str(self.install_log_path),
             *pip_install_args,
             extract_stderr=extract_stderr,
             env=env,
@@ -545,28 +545,6 @@ class VenvService:
             "--yes",
             package,
             extract_stderr=_extract_stderr,
-        )
-
-    async def handle_installation_error(
-        self,
-        err: AsyncSubprocessError,
-    ) -> AsyncSubprocessError:
-        """Handle an error that occurred during installation.
-
-        Args:
-            err: The error that occurred during installation.
-
-        Returns:
-            The error that occurred during installation with additional context.
-        """
-        logger.info(
-            "Logged pip install output to %s",
-            self.pip_log_path,
-        )
-        return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'",
-            err.process,
-            stderr=await err.stderr,
         )
 
     async def _pip_install(
@@ -610,14 +588,11 @@ class VenvService:
 
             return (await proc.stdout.read()).decode("utf-8", errors="replace")
 
-        try:
-            return await self.install_pip_args(
-                pip_install_args,
-                extract_stderr=extract_stderr,
-                env=env,
-            )
-        except AsyncSubprocessError as err:
-            raise await self.handle_installation_error(err) from err
+        return await self.install_pip_args(
+            pip_install_args,
+            extract_stderr=extract_stderr,
+            env=env,
+        )
 
     async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
         """List the installed dependencies."""
@@ -705,53 +680,6 @@ class UvVenvService(VenvService):
             f"--python={self.exec_path('python')}",
             package,
         )
-
-    @override
-    async def handle_installation_error(
-        self,
-        err: AsyncSubprocessError,
-    ) -> AsyncSubprocessError:
-        """Handle an error that occurred during installation.
-
-        Args:
-            err: The subprocess error that occurred during installation.
-
-        Returns:
-            The error that occurred during installation with additional context.
-        """
-        self.pip_log_path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            await self._write_error_log(err)
-        except OSError as log_err:
-            logger.debug(
-                "Failed to write installation error to log file %s: %s",
-                self.pip_log_path,
-                log_err,
-            )
-        else:
-            logger.info(
-                "Logged uv pip install output to %s",
-                self.pip_log_path,
-            )
-        return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'",
-            err.process,
-            stderr=await err.stderr,
-        )
-
-    async def _write_error_log(self, err: AsyncSubprocessError) -> None:
-        """Write error details to the log file."""
-        import anyio
-
-        stderr_content = await err.stderr
-
-        async with await anyio.open_file(
-            self.pip_log_path,
-            "a",
-            encoding="utf-8",
-        ) as log_file:
-            if stderr_content:
-                await log_file.write(stderr_content)
 
     @override
     async def create_venv(

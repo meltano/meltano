@@ -8,10 +8,7 @@ import click
 import structlog
 
 from meltano.cli.params import PluginTypeArg, pass_project
-from meltano.cli.utils import (
-    CliError,
-    PartialInstrumentedCmd,
-)
+from meltano.cli.utils import PartialInstrumentedCmd
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import install_plugins
@@ -114,7 +111,7 @@ async def install(
     )
     if not success:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError("Failed to install plugin(s)")  # noqa: EM101
+        ctx.exit(1)
     tracker.track_command_event(CliEvent.completed)
 
 
