@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import enum
 import functools
+import hashlib
 import logging
 import os
 import shlex
@@ -531,6 +532,8 @@ def get_pip_install_args(
     Returns:
         The list of pip install arguments for the given plugin.
     """
+    # Fallback: use pip_url from meltano.yml
+    logger.debug("Installing %s from pip_url", plugin.name)
     with project.settings.feature_flag(
         FeatureFlags.STRICT_ENV_VAR_MODE,
         raise_error=False,
@@ -640,6 +643,7 @@ async def install_pip_plugin(
     clean: bool = False,
     force: bool = False,
     env: Mapping[str, str] | None = None,
+    use_locked: bool = True,
     **kwargs,  # noqa: ANN003, ARG001
 ) -> None:
     """Install the plugin with pip.
@@ -650,12 +654,25 @@ async def install_pip_plugin(
         clean: Flag to clean install.
         force: Whether to ignore the Python version required by plugins.
         env: Environment variables to use when expanding the pip install args.
+        use_locked: Whether to use locked dependencies from pylock if available.
         kwargs: Unused additional arguments for the installation of the plugin.
 
     Raises:
         ValueError: If the venv backend is not supported.
     """
-    pip_install_args = get_pip_install_args(project, plugin, env=env)
+    if use_locked and (pylock := project.plugin_pylock(plugin)).is_file():
+        pylock_content_hash = hashlib.sha256(pylock.read_bytes()).hexdigest()
+        logger.debug(
+            "Installing from locked dependencies for %s at: %s",
+            plugin.name,
+            pylock,
+        )
+        fingerprint_args = [f"pylock:{pylock_content_hash}"]
+        pip_install_args = ["-r", str(pylock)]
+    else:
+        fingerprint_args = None
+        pip_install_args = get_pip_install_args(project, plugin, env=env)
+
     backend = project.settings.get("venv.backend")
 
     if backend == "virtualenv":  # pragma: no cover
@@ -676,4 +693,5 @@ async def install_pip_plugin(
             **project.dotenv_env,
             **project.meltano.env,
         },
+        fingerprint_args=fingerprint_args,
     )
