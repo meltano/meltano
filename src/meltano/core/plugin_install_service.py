@@ -130,6 +130,17 @@ class PluginInstallState:
             case _:
                 return "Installation failed"
 
+    def __structlog__(self) -> dict[str, t.Any]:
+        """Convert the PluginInstallState to a dictionary."""
+        return {
+            "plugin_type": self.plugin.type.value,
+            "plugin_name": self.plugin.name,
+            "reason": self.reason.value,
+            "status": self.status.value,
+            "message": self.message,
+            "details": self.details,
+        }
+
 
 def with_semaphore(func):  # noqa: ANN001, ANN201
     """Gate access to the method using its class's semaphore.
@@ -564,7 +575,7 @@ def install_status_update(install_state: PluginInstallState) -> None:
                 "%s. %s.",
                 install_state.verb,
                 install_state.message,
-                details=install_state.details,
+                install_state=install_state,
             )
         case PluginInstallStatus.WARNING:  # pragma: no cover
             logger.warning(install_state.message)
