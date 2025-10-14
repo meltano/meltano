@@ -1890,10 +1890,14 @@ When called without arguments, this will:
 meltano upgrade
 meltano upgrade --skip-package # Skip upgrading the Meltano package
 
-meltano upgrade package # Only upgrade Meltano package
+meltano upgrade package # Only upgrade Meltano package (can run outside project directory)
 meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
 ```
+
+### Project Directory Requirements
+
+The `upgrade` command and its subcommands require you to run them from within a Meltano project directory, with the exception of `meltano upgrade package`, which can be run from anywhere since it only upgrades the Meltano package itself.
 
 ### Using `upgrade` with Environments
 
