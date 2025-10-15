@@ -13,7 +13,6 @@ from meltano.core.plugin_lock_service import PluginLock
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
 
-    from meltano.core.hub import MeltanoHubService
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -52,9 +51,13 @@ class TestLock:
         cli_runner: CliRunner,
         project: Project,
         tap: ProjectPlugin,
-        hub_endpoints: MeltanoHubService,
+        hub_endpoints: dict[str, dict],
     ) -> None:
-        tap_lock = PluginLock(project, tap)
+        tap_lock = PluginLock(
+            project,
+            plugin_definition=tap.definition,
+            variant_name=tap.variant,
+        )
 
         assert tap_lock.path.exists()
         old_checksum = tap_lock.sha256_checksum

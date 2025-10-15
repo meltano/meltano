@@ -62,7 +62,11 @@ def plugin():
 class TestPluginLock:
     @pytest.fixture
     def subject(self, project: Project, plugin: ProjectPlugin):
-        return PluginLock(project, plugin)
+        return PluginLock(
+            project,
+            plugin_definition=plugin.definition,
+            variant_name=plugin.variant,
+        )
 
     def test_path(self, subject: PluginLock) -> None:
         assert subject.path.parts[-3:] == (
@@ -96,7 +100,11 @@ class TestPluginLockService:
         project: Project,
         plugin: ProjectPlugin,
     ) -> None:
-        plugin_lock = PluginLock(project, plugin)
+        plugin_lock = PluginLock(
+            project,
+            plugin_definition=plugin.definition,
+            variant_name=plugin.variant,
+        )
         assert not plugin_lock.path.exists()
 
         subject.save(plugin)

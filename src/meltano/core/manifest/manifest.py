@@ -216,7 +216,11 @@ class Manifest:
             "dict[str, list[Mapping[str, t.Any]]]",
             {
                 plugin_type.value: [
-                    PluginLock(self.project, plugin).load(create=True, loader=json.load)
+                    PluginLock(
+                        self.project,
+                        plugin_definition=plugin.definition,
+                        variant_name=plugin.variant,
+                    ).load(create=True, loader=json.load)
                     for plugin in plugins
                 ]
                 for (plugin_type, plugins) in plugins.items()
