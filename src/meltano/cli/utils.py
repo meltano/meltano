@@ -270,12 +270,11 @@ def add_plugin(  # noqa: ANN201
     *,
     python: str | None = None,
     add_service: ProjectAddService,
-    variant=None,  # noqa: ANN001
-    inherit_from=None,  # noqa: ANN001
-    custom=False,  # noqa: ANN001
-    update=False,  # noqa: ANN001
-    lock=True,  # noqa: ANN001
-    plugin_yaml=None,  # noqa: ANN001
+    variant: str | None = None,
+    inherit_from: str | None = None,
+    custom: bool = False,
+    update: bool = False,
+    plugin_yaml: dict | None = None,
 ):
     """Add Plugin to given Project."""
     if custom:
@@ -317,7 +316,6 @@ def add_plugin(  # noqa: ANN201
             plugin_name,
             variant=variant,
             inherit_from=inherit_from,
-            lock=lock,
             update=update,
             python=python,
             **plugin_attrs,

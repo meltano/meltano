@@ -261,6 +261,7 @@ class Variant(NameEq, Canonical):
     """A variant of a plugin."""
 
     name: str | None
+    deprecated: bool | None
 
     ORIGINAL_NAME = "original"
     DEFAULT_NAME = "default"
@@ -447,16 +448,16 @@ class PluginDefinition(PluginRef):
 
         return self.get_variant(variant_or_name)
 
-    def variant_label(self, variant):  # noqa: ANN001, ANN201
+    def variant_label(self, variant_name: str | Variant | None) -> str:
         """Return label for specified variant.
 
         Args:
-            variant: The variant.
+            variant_name: The name of the variant.
 
         Returns:
             The label for the variant.
         """
-        variant = self.find_variant(variant)
+        variant = self.find_variant(variant_name)
 
         label = variant.name or Variant.ORIGINAL_NAME
 
@@ -481,11 +482,13 @@ class PluginDefinition(PluginRef):
     def from_standalone(
         cls: type[PluginDefinition],
         plugin: StandalonePlugin,
+        **extras: t.Any,
     ) -> PluginDefinition:
         """Create a new PluginDefinition from a StandalonePlugin.
 
         Args:
             plugin: The plugin.
+            extras: Additional keyword arguments.
 
         Returns:
             The new PluginDefinition.
@@ -511,6 +514,7 @@ class PluginDefinition(PluginRef):
             requires=plugin.requires,
             env=plugin.env,
             **plugin.extras,
+            **extras,
         )
 
 

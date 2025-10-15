@@ -9,7 +9,6 @@ from meltano.core.plugin.base import BasePlugin, PluginDefinition, PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
-    PluginLock,
     PluginLockService,
 )
 
@@ -46,7 +45,7 @@ def plugin():
     parent_plugin = ProjectPlugin(
         base_plugin.type,
         base_plugin.name,
-        variant=variant,
+        variant="meltano",
     )
     parent_plugin.parent = base_plugin
 
@@ -59,63 +58,25 @@ def plugin():
     return plugin
 
 
-class TestPluginLock:
-    @pytest.fixture
-    def subject(self, project: Project, plugin: ProjectPlugin):
-        return PluginLock(
-            project,
-            plugin_definition=plugin.definition,
-            variant_name=plugin.variant,
-        )
-
-    def test_path(self, subject: PluginLock) -> None:
-        assert subject.path.parts[-3:] == (
-            "plugins",
-            "extractors",
-            "tap-locked--meltano.lock",
-        )
-
-    @pytest.mark.order(before="test_load")
-    def test_save(self, subject: PluginLock) -> None:
-        assert not subject.path.exists()
-        subject.save()
-        assert subject.path.exists()
-
-    def test_load(self, subject: PluginLock, plugin: ProjectPlugin) -> None:
-        subject.save()
-        loaded = subject.load()
-        assert loaded.name == plugin.inherit_from
-        assert loaded.variant == plugin.variant.name
-        assert loaded.settings == plugin.settings
-
-
 class TestPluginLockService:
     @pytest.fixture
     def subject(self, project: Project):
         return PluginLockService(project)
 
-    def test_save(
-        self,
-        subject: PluginLockService,
-        project: Project,
-        plugin: ProjectPlugin,
-    ) -> None:
-        plugin_lock = PluginLock(
-            project,
-            plugin_definition=plugin.definition,
+    def test_save(self, subject: PluginLockService, plugin: ProjectPlugin) -> None:
+        plugin_lock_path = subject.plugin_lock_path(
+            plugin=plugin,
             variant_name=plugin.variant,
         )
-        assert not plugin_lock.path.exists()
+        assert not plugin_lock_path.exists()
 
         subject.save(plugin)
-        assert plugin_lock.path.exists()
+        assert plugin_lock_path.exists()
 
-        with plugin_lock.path.open() as lock_file:
+        with plugin_lock_path.open() as lock_file:
             lock_json = json.load(lock_file)
             assert lock_json["foo"] == "bar"
             assert lock_json["baz"] == "qux"
 
-        with pytest.raises(LockfileAlreadyExistsError) as exc_info:
+        with pytest.raises(LockfileAlreadyExistsError):
             subject.save(plugin)
-
-        assert exc_info.value.plugin == plugin

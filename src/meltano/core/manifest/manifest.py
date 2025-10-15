@@ -22,7 +22,7 @@ from meltano import schemas
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_lock_service import PluginLock
+from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.utils import (
     EnvVarMissingBehavior,
     MergeStrategy,
@@ -212,15 +212,12 @@ class Manifest:
         plugins: dict[PluginType, list[ProjectPlugin]],
         manifest: dict[str, t.Any],
     ) -> None:
+        lock_service = PluginLockService(self.project)
         locked_plugins = t.cast(
             "dict[str, list[Mapping[str, t.Any]]]",
             {
                 plugin_type.value: [
-                    PluginLock(
-                        self.project,
-                        plugin_definition=plugin.definition,
-                        variant_name=plugin.variant,
-                    ).load(create=True, loader=json.load)
+                    lock_service.get_standalone_data(plugin=plugin)
                     for plugin in plugins
                 ]
                 for (plugin_type, plugins) in plugins.items()

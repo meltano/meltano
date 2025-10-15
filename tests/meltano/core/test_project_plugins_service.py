@@ -8,7 +8,7 @@ from copy import deepcopy
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginType
-from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import (
     DefinitionSource,
@@ -46,7 +46,6 @@ class TestProjectPluginsService:
     @pytest.fixture(autouse=True)
     def setup(self, project: Project, tap) -> None:
         project.plugins.lock_service.save(tap, exists_ok=True)
-        project.plugins._prefer_source = DefinitionSource.ANY
 
     @pytest.mark.order(0)
     def test_plugins(self, project) -> None:
@@ -184,7 +183,7 @@ class TestProjectPluginsService:
         with pytest.raises(PluginDefinitionNotFoundError) as excinfo:
             assert project.plugins.get_parent(nonexistent_parent)
 
-        assert isinstance(excinfo.value.__cause__, PluginParentNotFoundError)
+        assert isinstance(excinfo.value.__cause__, PluginNotFoundError)
 
     def test_update_plugin(self, project: Project, tap) -> None:
         # update a tap with a random value

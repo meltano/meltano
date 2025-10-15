@@ -448,10 +448,7 @@ class TestCliAdd:
                 ],
             )
             assert res.exit_code == 1
-            assert (
-                "Could not find parent plugin for extractor 'tap-foo': "
-                "Extractor 'tap-bar' is not known to Meltano"
-            ) in str(res.exception)
+            assert ("Extractor 'tap-bar' is not known to Meltano") in str(res.exception)
 
     @pytest.mark.usefixtures("reset_project_context")
     def test_add_custom(self, project: Project, cli_runner) -> None:
