@@ -260,6 +260,8 @@ class PluginRef(Canonical):
 class Variant(NameEq, Canonical):
     """A variant of a plugin."""
 
+    name: str | None
+
     ORIGINAL_NAME = "original"
     DEFAULT_NAME = "default"
 
@@ -422,7 +424,7 @@ class PluginDefinition(PluginRef):
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: str | Variant | None = None):  # noqa: ANN201
+    def find_variant(self, variant_or_name: str | Variant | None = None) -> Variant:
         """Find the variant with the given name or variant.
 
         Args:

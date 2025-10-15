@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-    from meltano.core.plugin.base import PluginRef
+    from meltano.core.plugin.base import PluginDefinition, PluginRef, Variant
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -40,16 +40,23 @@ class LockfileAlreadyExistsError(Exception):
 class PluginLock:
     """Plugin lockfile."""
 
-    def __init__(self, project: Project, plugin: ProjectPlugin) -> None:
+    def __init__(
+        self,
+        project: Project,
+        *,
+        plugin_definition: PluginDefinition,
+        variant_name: str | None = None,
+    ) -> None:
         """Create a new PluginLock.
 
         Args:
             project: The project.
-            plugin: The plugin to lock.
+            plugin_definition: The plugin definition to lock.
+            variant_name: The variant name to lock.
         """
         self.project = project
-        self.definition = plugin.definition
-        self.variant = self.definition.find_variant(plugin.variant)
+        self.definition = plugin_definition
+        self.variant = self.definition.find_variant(variant_name)
 
         self.path = self.project.plugin_lock_path(
             self.definition.type,
@@ -118,31 +125,62 @@ class PluginLockService:
         """
         self.project = project
 
+    def save_definition(
+        self,
+        *,
+        path: Path,
+        variant: Variant,
+        definition: PluginDefinition,
+    ) -> None:
+        """Save the plugin lockfile."""
+        locked_def = StandalonePlugin.from_variant(variant, definition)
+
+        with path.open("w") as lockfile:
+            json.dump(locked_def.canonical(), lockfile, indent=2)
+            lockfile.write("\n")
+
     def save(
         self,
         plugin: ProjectPlugin,
         *,
         exists_ok: bool = False,
+        fetch_from_hub: bool = False,
     ) -> None:
         """Save the plugin lockfile.
 
         Args:
             plugin: The plugin definition to save.
             exists_ok: Whether raise an exception if the lockfile already exists.
+            fetch_from_hub: Whether to fetch the plugin definition from the Hub.
 
         Raises:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
                 flagged for overwriting.
         """
-        plugin_lock = PluginLock(self.project, plugin)
-
-        if plugin_lock.path.exists() and not exists_ok:
-            raise LockfileAlreadyExistsError(
-                f"Lockfile already exists: {plugin_lock.path}",  # noqa: EM102
-                plugin_lock.path,
-                plugin,
+        if fetch_from_hub:
+            definition = self.project.hub_service.find_definition(
+                plugin.type,
+                plugin.inherit_from or plugin.name,
+                plugin.variant,
             )
+        else:
+            definition = plugin.definition
 
-        plugin_lock.save()
+        variant = definition.find_variant(plugin.variant)
+        path = self.project.plugin_lock_path(
+            definition.type,
+            definition.name,
+            variant_name=variant.name,
+        )
 
-        logger.debug("Locked plugin definition", path=plugin_lock.path)
+        if path.exists() and not exists_ok:
+            msg = f"Lockfile already exists: {path}"
+            raise LockfileAlreadyExistsError(msg, path, plugin)
+
+        self.save_definition(
+            path=path,
+            variant=variant,
+            definition=definition,
+        )
+
+        logger.debug("Locked plugin definition", path=path)
