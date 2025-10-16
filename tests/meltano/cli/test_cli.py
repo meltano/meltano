@@ -88,24 +88,6 @@ class TestCli:
             Project.deactivate()
             shutil.rmtree(project.root)
 
-    @pytest.fixture
-    def incompatible_file_project(
-        self,
-        tmp_path: Path,
-        project_init_service: ProjectInitService,
-    ) -> t.Generator[Project, None, None]:
-        os.chdir(tmp_path)
-        project = project_init_service.init(activate=False)
-        Project._default = None
-        with project.meltano_update() as meltano:
-            meltano.version = 999
-
-        try:
-            yield project
-        finally:
-            Project.deactivate()
-            shutil.rmtree(project.root)
-
     @pytest.mark.order(0)
     def test_activate_project(self, test_cli_project, cli_runner, pushd) -> None:
         project = test_cli_project
@@ -122,18 +104,6 @@ class TestCli:
         pushd(empty_project.root)
         with pytest.raises(EmptyMeltanoFileException):
             cli_runner.invoke(cli, ["config"], catch_exceptions=False)
-
-    @pytest.mark.order(1)
-    def test_incompatible_meltano_file_error(
-        self,
-        incompatible_file_project: Project,
-        cli_runner: MeltanoCliRunner,
-        pushd,
-    ) -> None:
-        pushd(incompatible_file_project.root)
-        result = cli_runner.invoke(cli, ["config"])
-        assert result.exit_code == 3
-        assert "This Meltano project is incompatible" in result.output
 
     @pytest.mark.order(1)
     def test_incompatible_meltano_error(

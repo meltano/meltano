@@ -48,7 +48,6 @@ class TestProjectFiles:
     def test_resolve_subfiles(self, project_files) -> None:
         assert project_files._meltano_file_path == (project_files.root / "meltano.yml")
         assert project_files.meltano == {
-            "version": 1,
             "default_environment": "test-meltano-environment",
             "database_uri": "sqlite:///.meltano/meltano.db",
             "include_paths": [
@@ -149,7 +148,6 @@ class TestProjectFiles:
     @pytest.mark.order(5)
     def test_load(self, project_files) -> None:
         expected_result = {
-            "version": 1,
             "default_environment": "test-meltano-environment",
             "database_uri": "sqlite:///.meltano/meltano.db",
             "include_paths": [
@@ -364,7 +362,6 @@ class TestProjectFiles:
     @pytest.mark.order(7)
     def test_preserve_format(self, project_files) -> None:
         meltano_config = project_files.load()
-        meltano_config["version"] = 3
         meltano_config["schedules"][0]["transform"] = "only"
         meltano_config["schedules"][0].yaml_add_eol_comment(
             "Only update dbt models\n",
@@ -377,7 +374,6 @@ class TestProjectFiles:
 
         expected_contents = """\
             # Top-level comment
-            version: 3
             default_environment: test-meltano-environment
             database_uri: sqlite:///.meltano/meltano.db
 
@@ -435,6 +431,7 @@ class TestProjectFiles:
               - name: target-meltano-yml
               - name: modified-target-subconfig-1-yml
 
+            version: 2
         """
 
         assert contents == dedent(expected_contents)

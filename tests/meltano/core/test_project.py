@@ -8,7 +8,6 @@ from multiprocessing.pool import ThreadPool
 
 import pytest
 
-from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import ProjectNotFound
 from meltano.core.project import PROJECT_ROOT_ENV, Project
 from meltano.core.utils import IncompatibleMeltanoVersionError, get_meltano_version
@@ -143,14 +142,6 @@ class TestProject:
 
 class TestIncompatibleProject:
     @pytest.fixture
-    def increase_version(self, project):
-        with project.meltano_update() as meltano:
-            meltano["version"] += 1
-        yield
-        with project.meltano_update() as meltano:
-            meltano["version"] -= 1
-
-    @pytest.fixture
     def increase_requires_meltano(self, project):
         with project.meltano_update() as meltano:
             meltano["requires_meltano"] = "==999.0.0"
@@ -166,11 +157,6 @@ class TestIncompatibleProject:
         yield
         with project.meltano_update() as meltano:
             meltano["requires_meltano"] = None
-
-    @pytest.mark.usefixtures("increase_version")
-    def test_incompatible(self, project) -> None:
-        with pytest.raises(IncompatibleVersionError):
-            Project.activate(project)
 
     @pytest.mark.usefixtures("increase_requires_meltano")
     def test_incompatible_requires_meltano(self, project) -> None:

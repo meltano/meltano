@@ -7,7 +7,9 @@
   "additionalProperties": false,
   "properties": {
     "version": {
-      "const": 1
+      "const": 1,
+      "deprecated": true,
+      "description": "DEPRECATED: The meltano.yml version field is deprecated and will be removed in a future release. Please remove it from your meltano.yml file. To specify Meltano version requirements, use 'requires_meltano' instead."
     },
     "annotations": {
       "$ref": "#/$defs/annotations"

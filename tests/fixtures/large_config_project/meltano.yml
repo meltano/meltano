@@ -1,4 +1,3 @@
-version: 1
 # This line is a comment
 project_id: large-yaml-config-for-the-large-config-project
 send_anonymous_usage_stats: false

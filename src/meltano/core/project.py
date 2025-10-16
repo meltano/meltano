@@ -16,7 +16,6 @@ import structlog
 from dotenv import dotenv_values
 
 from meltano.core import yaml
-from meltano.core.behavior.versioned import Versioned
 from meltano.core.config_service import ConfigService
 from meltano.core.environment import Environment
 from meltano.core.error import (
@@ -70,10 +69,9 @@ def walk_parent_directories() -> Generator[Path, None, None]:
         directory = parent_directory
 
 
-class Project(Versioned):
+class Project:
     """Represents a Meltano project."""
 
-    __version__ = 1
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
@@ -217,7 +215,6 @@ class Project(Versioned):
         """
         import ctypes
 
-        project.ensure_compatible()
         check_meltano_compatibility(project.meltano.requires_meltano)
 
         # create a symlink to our current binary

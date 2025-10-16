@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import typing as t
+import warnings
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
@@ -34,7 +35,7 @@ class MeltanoFile(Canonical):
 
     def __init__(
         self,
-        version: int = VERSION,
+        version: int | None = None,
         plugins: dict[str, dict] | None = None,
         schedules: list[dict] | None = None,
         environments: list[dict] | None = None,
@@ -47,7 +48,7 @@ class MeltanoFile(Canonical):
         """Construct a new MeltanoFile object from meltano.yml file.
 
         Args:
-            version: The meltano.yml version, currently always 1.
+            version: The meltano.yml version, currently always 1. (Deprecated)
             requires_meltano: The version of Meltano required by this project.
             plugins: Plugin configuration for this project.
             schedules: Schedule configuration for this project.
@@ -56,6 +57,17 @@ class MeltanoFile(Canonical):
             env: Environment variables for this project.
             extras: Additional configuration for this project.
         """
+        # Warn if version was explicitly provided in meltano.yml
+        if version is not None:
+            warnings.warn(
+                "The 'version' field in meltano.yml is deprecated and will be "
+                "removed in a future release. Please remove it from your "
+                "meltano.yml file. To specify Meltano version requirements, "
+                "use 'requires_meltano' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             version=version,

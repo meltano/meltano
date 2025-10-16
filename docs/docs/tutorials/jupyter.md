@@ -80,7 +80,6 @@ plugins:
 To connect to datasources across different plugins it is useful to expose the connection details using environment variables. Meltano is able to do so in the meltano.yml. Here is an example configuration using plain text connection details:
 
 ```yaml
-version: 1
 default_environment: dev
 environments:
 - name: dev
