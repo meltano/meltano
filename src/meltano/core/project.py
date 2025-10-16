@@ -229,7 +229,7 @@ class Project(Versioned):
                             f"present in {Path(sys.executable).parent!s}",
                         )
                 else:
-                    logger.warning(
+                    logger.debug(
                         "Failed to create symlink to 'meltano.exe': "
                         "administrator privilege required",
                     )

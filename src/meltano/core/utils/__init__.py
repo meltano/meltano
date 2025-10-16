@@ -390,7 +390,7 @@ def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: Callable[..., Path]):  # noqa: ANN201, D103
+def makedirs(func: Callable[..., Path]) -> Callable[..., Path]:  # noqa: D103
     @functools.wraps(func)
     def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)

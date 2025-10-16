@@ -13,7 +13,6 @@ from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLockService,
 )
-from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
@@ -55,9 +54,8 @@ def lock(
     lock_service = PluginLockService(project)
 
     try:
-        with project.plugins.use_preferred_source(DefinitionSource.ANY):
-            # Make it a list so source preference is not lazily evaluated.
-            plugins = list(project.plugins.plugins())
+        # Make it a list so source preference is not lazily evaluated.
+        plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
@@ -87,10 +85,8 @@ def lock(
             )
         else:
             plugin.parent = None
-            with project.plugins.use_preferred_source(DefinitionSource.HUB):
-                plugin = project.plugins.ensure_parent(plugin)
             try:
-                lock_service.save(plugin, exists_ok=update)
+                lock_service.save(plugin, exists_ok=update, fetch_from_hub=True)
             except LockfileAlreadyExistsError as err:
                 relative_path = err.path.relative_to(project.root)
                 click.secho(

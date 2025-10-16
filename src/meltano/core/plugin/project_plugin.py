@@ -70,6 +70,8 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     variant: str | None
     executable: str
     python: str | None
+    definition: PluginDefinition
+    variant: str | None
 
     config_files: dict[str, str]
 

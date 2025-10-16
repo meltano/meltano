@@ -12,7 +12,7 @@ import structlog
 from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
@@ -30,13 +30,11 @@ class DefinitionSource(enum.Flag):
     """The source of a plugin definition."""
 
     NONE = 0
-    HUB = enum.auto()
     CUSTOM = enum.auto()
     LOCKFILE = enum.auto()
     INHERITED = enum.auto()
 
-    ANY = HUB | CUSTOM | LOCKFILE | INHERITED
-    LOCAL = ~HUB  # type: ignore[operator]  # https://github.com/python/mypy/issues/18410
+    LOCAL = CUSTOM | LOCKFILE | INHERITED
 
 
 class AddedPluginFlags(enum.Flag):
@@ -74,34 +72,19 @@ class PluginAlreadyAddedException(Exception):
 class PluginDefinitionNotFoundError(MeltanoError):
     """Raised when no plugin definition is found."""
 
-    def __init__(
-        self,
-        plugin: ProjectPlugin,
-        error: Exception | None,
-        source: DefinitionSource,
-    ):
+    def __init__(self, plugin: ProjectPlugin, error: Exception | None):
         """Initialize a new error.
 
         Args:
             plugin: The plugin that was not found.
             error: The error that was raised, if any.
-            source: The sources searched for the plugin.
         """
         reason = (
             str(error)
             if error
             else f"No definition found for {plugin.type.descriptor} {plugin.name}"
         )
-        instruction = None
-
-        if DefinitionSource.HUB in source:
-            instruction = "Check https://hub.meltano.com/ for available plugins"
-        else:
-            instruction = (
-                "Try running `meltano lock --update` to ensure your plugins are "
-                "up to date, or add a `namespace` to your plugin if it is a custom one"
-            )
-
+        instruction = "Check https://hub.meltano.com/ for available plugins"
         super().__init__(reason=reason, instruction=instruction)
 
 
@@ -538,28 +521,6 @@ class ProjectPluginsService:  # (too many methods, attributes)
             else:
                 environment.config.plugins[plugin.type][p_idx] = plugin
 
-    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> BasePlugin:
-        """Get the parent plugin from the hub.
-
-        Args:
-            plugin: The plugin to get the parent of.
-
-        Returns:
-            The parent plugin.
-
-        Raises:
-            PluginParentNotFoundError: If the parent plugin is not found.
-        """
-        try:
-            return self.project.hub_service.get_base_plugin(
-                plugin,
-                variant_name=plugin.variant,
-            )
-        except PluginNotFoundError as err:
-            if plugin.inherit_from:
-                raise PluginParentNotFoundError(plugin, err) from err
-            raise
-
     def find_parent(
         self,
         plugin: ProjectPlugin,
@@ -579,7 +540,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         if (
             plugin.inherit_from
             and not plugin.is_variant_set
-            and DefinitionSource.INHERITED in self._prefer_source
+            and self.supports_source(DefinitionSource.INHERITED)
         ):
             try:
                 return (
@@ -592,7 +553,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
 
-        if DefinitionSource.LOCKFILE in self._prefer_source:
+        if self.supports_source(DefinitionSource.LOCKFILE):
             try:
                 return (
                     self.locked_definition_service.get_base_plugin(
@@ -604,17 +565,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             except PluginNotFoundError as lockfile_exc:
                 error = lockfile_exc
 
-        if DefinitionSource.HUB in self._prefer_source:
-            try:
-                return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
-            except Exception as hub_exc:
-                error = hub_exc
-
-        raise PluginDefinitionNotFoundError(
-            plugin,
-            error,
-            self._prefer_source,
-        ) from error
+        raise PluginDefinitionNotFoundError(plugin, error) from error
 
     def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | BasePlugin:
         """Get plugin's parent plugin.
@@ -664,6 +615,17 @@ class ProjectPluginsService:  # (too many methods, attributes)
         ):
             return transformer
         raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101
+
+    def supports_source(self, source: DefinitionSource) -> bool:
+        """Check if the project supports a given source of definition.
+
+        Args:
+            source: The source to check.
+
+        Returns:
+            True if the project supports the source, False otherwise.
+        """
+        return source in self._prefer_source
 
     @contextmanager
     def use_preferred_source(

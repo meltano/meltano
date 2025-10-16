@@ -8,10 +8,7 @@ import typing as t
 
 from meltano.core.plugin import BasePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import (
-    DefinitionSource,
-    PluginAlreadyAddedException,
-)
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -57,7 +54,6 @@ class ProjectAddService:
         plugin_type: PluginType,
         plugin_name: str,
         *,
-        lock: bool = True,
         update: bool = False,
         **attrs: t.Any,
     ) -> tuple[ProjectPlugin, AddedPluginFlags]:
@@ -66,7 +62,6 @@ class ProjectAddService:
         Args:
             plugin_type: The type of the plugin to add.
             plugin_name: The name of the plugin to add.
-            lock: Whether to generate a lockfile for the plugin.
             update: Whether to update the plugin.
             attrs: Additional attributes to add to the plugin.
 
@@ -79,33 +74,30 @@ class ProjectAddService:
             **attrs,
             default_variant=Variant.DEFAULT_NAME,
         )
+        self.project.plugins.ensure_parent(plugin)
 
-        with self.project.plugins.use_preferred_source(DefinitionSource.ANY):
-            self.project.plugins.ensure_parent(plugin)
+        # If we are inheriting from a base plugin definition,
+        # repeat the variant and pip_url in meltano.yml
+        parent = plugin.parent
+        if isinstance(parent, BasePlugin):
+            plugin.variant = parent.variant
+            plugin.pip_url = parent.pip_url
 
-            # If we are inheriting from a base plugin definition,
-            # repeat the variant and pip_url in meltano.yml
-            parent = plugin.parent
-            if isinstance(parent, BasePlugin):
-                plugin.variant = parent.variant
-                plugin.pip_url = parent.pip_url
+        plugin, flags = self.project.plugins.add_to_file_with_flags(
+            plugin,
+            update=update,
+        )
 
-            plugin, flags = self.project.plugins.add_to_file_with_flags(
-                plugin,
-                update=update,
-            )
+        if not plugin.is_custom():
+            self.project.plugins.lock_service.save(plugin, exists_ok=True)
 
-            if lock and not plugin.is_custom():
-                self.project.plugins.lock_service.save(plugin, exists_ok=True)
-
-            return plugin, flags
+        return plugin, flags
 
     def add(
         self,
         plugin_type: PluginType,
         plugin_name: str,
         *,
-        lock: bool = True,
         update: bool = False,
         **attrs: t.Any,
     ) -> ProjectPlugin:
@@ -124,7 +116,6 @@ class ProjectAddService:
         plugin, _flags = self.add_with_flags(
             plugin_type,
             plugin_name,
-            lock=lock,
             update=update,
             **attrs,
         )
