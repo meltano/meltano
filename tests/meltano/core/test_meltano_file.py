@@ -108,4 +108,4 @@ class TestMeltanoFile:
                 environments=[],
                 jobs=[],
             )
-            assert meltano_file.version is None
+            assert meltano_file.version == 1  # Uses default

@@ -19,6 +19,7 @@ if t.TYPE_CHECKING:
     from meltano.core.schedule import Schedule
 
 VERSION = 1
+_VERSION_SENTINEL = object()
 
 
 class MeltanoFile(Canonical):
@@ -35,7 +36,7 @@ class MeltanoFile(Canonical):
 
     def __init__(
         self,
-        version: int | None = None,
+        version: int | object = _VERSION_SENTINEL,
         plugins: dict[str, dict] | None = None,
         schedules: list[dict] | None = None,
         environments: list[dict] | None = None,
@@ -58,7 +59,7 @@ class MeltanoFile(Canonical):
             extras: Additional configuration for this project.
         """
         # Warn if version was explicitly provided in meltano.yml
-        if version is not None:
+        if version is not _VERSION_SENTINEL:
             warnings.warn(
                 "The 'version' field in meltano.yml is deprecated and will be "
                 "removed in a future release. Please remove it from your "
@@ -67,6 +68,9 @@ class MeltanoFile(Canonical):
                 DeprecationWarning,
                 stacklevel=2,
             )
+        else:
+            # Use the default version if not provided
+            version = VERSION
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
