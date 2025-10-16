@@ -179,6 +179,130 @@ class TestCliState:
                     assert_cli_runner(result)
                     assert state_service.get_state(state_id) == state_payload
 
+    def test_set_invalid_json(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that invalid JSON is rejected with a clear error message."""
+        state_id = state_ids[0]
+        invalid_json = "{ invalid json"
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, invalid_json],
+            )
+            assert result.exit_code == 1
+            assert "Invalid JSON provided" in result.stderr
+
+    def test_set_invalid_state_format(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that state without 'singer_state' key is rejected."""
+        state_id = state_ids[0]
+        invalid_state = {"invalid": "state"}
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, json.dumps(invalid_state)],
+            )
+            assert result.exit_code == 1
+            assert "Invalid state format" in result.stderr
+            assert "singer_state" in result.stderr
+
+    def test_set_invalid_state_from_file(
+        self,
+        tmp_path: Path,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that invalid state from file is rejected."""
+        state_id = state_ids[0]
+        invalid_state = {"invalid": "state"}
+        filepath = tmp_path / "invalid-state.json"
+
+        with filepath.open("w") as state_file:
+            json.dump(invalid_state, state_file)
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, "--input-file", filepath],
+            )
+            assert result.exit_code == 1
+            assert "Invalid state format" in result.stderr
+            assert "singer_state" in result.stderr
+
+    def test_set_no_validate_flag(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that --no-validate flag bypasses validation and emits warning."""
+        state_id = state_ids[0]
+        invalid_state = {"invalid": "state"}
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "state",
+                    "set",
+                    "--force",
+                    "--no-validate",
+                    state_id,
+                    json.dumps(invalid_state),
+                ],
+            )
+            assert_cli_runner(result)
+            # Check that a warning was logged
+            assert "Skipping state validation" in result.stderr
+            assert "Invalid state may cause issues" in result.stderr
+            # Verify the invalid state was actually set
+            assert state_service.get_state(state_id) == invalid_state
+
+    def test_set_no_validate_from_file(
+        self,
+        tmp_path: Path,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that --no-validate works with --input-file."""
+        state_id = state_ids[0]
+        invalid_state = {"invalid": "state"}
+        filepath = tmp_path / "invalid-state.json"
+
+        with filepath.open("w") as state_file:
+            json.dump(invalid_state, state_file)
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "state",
+                    "set",
+                    "--force",
+                    "--no-validate",
+                    state_id,
+                    "--input-file",
+                    filepath,
+                ],
+            )
+            assert_cli_runner(result)
+            # Check that a warning was logged
+            assert "Skipping state validation" in result.stderr
+            # Verify the invalid state was actually set
+            assert state_service.get_state(state_id) == invalid_state
+
     def test_merge_from_string(
         self,
         state_service: StateService,

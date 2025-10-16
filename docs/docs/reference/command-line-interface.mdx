@@ -1871,28 +1871,44 @@ meltano state move original-tap-postgres-to-target-jsonl variant-tap-postgres-to
 
 Set state for a job.
 
+By default, `meltano state set` validates that the provided state is valid Singer state with a top-level `singer_state` key. This helps catch configuration errors before they cause unexpected full refreshes in future pipeline runs.
+
 #### How to use
 
 ```bash
 # Read state from a file
-# Meltano will prompt for confirmation.
+# Meltano will prompt for confirmation and validate the state format.
 meltano state set <state_id> --input-file <file>
 
 # Read state from a file, overriding confirmation prompt.
 meltano state set --force <state_id> --input-file <file>
 
 # Read state from a command-line argument
-# Meltano will prompt for confirmation.
+# Meltano will prompt for confirmation and validate the state format.
 meltano state set <state_id> <RAW STATE JSON>
 
 # Read state from a command-line argument, overriding confirmation prompt.
 meltano state set --force <state_id> <RAW STATE JSON>
+
+# Skip validation (not recommended)
+meltano state set --force --no-validate <state_id> <RAW STATE JSON>
 ```
 
 #### Parameters
 
 - The `--input-file` option specifies a file to read the state from.
 - The `--force` option will disable confirmation prompts. _Use with caution._
+- The `--no-validate` option will skip state format validation. _Use with caution._ This should only be used in edge cases where you need to set non-standard state. Invalid state may cause issues in future pipeline runs.
+
+:::warning Validation Behavior
+
+By default, `meltano state set` validates that:
+- The provided value is valid JSON
+- The JSON contains a top-level `singer_state` key
+
+If validation fails, you'll see a clear error message. You can bypass validation with `--no-validate`, but this is not recommended as invalid state may cause unexpected full refreshes in subsequent runs.
+
+:::
 
 #### Examples
 
@@ -1907,6 +1923,16 @@ meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"pro
 # These two lines have the same effect as the one line above.
 echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
 meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
+
+# Example of validation error
+meltano state set --force dev:tap-gitlab-to-target-jsonl '{"invalid": "state"}'
+# Error: Invalid state format: singer_state not found in top level of provided state.
+# State must be valid JSON with a top-level 'singer_state' key.
+# Use --no-validate to bypass this check.
+
+# Bypass validation for edge cases (not recommended)
+meltano state set --force --no-validate dev:tap-gitlab-to-target-jsonl '{"custom": "format"}'
+# WARNING: Skipping state validation. Invalid state may cause issues in future runs.
 ```
 
 ### Using `state` with Environments

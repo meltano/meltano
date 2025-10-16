@@ -264,6 +264,11 @@ def merge_state(
     type=click.Path(exists=True, path_type=Path),
     help="Set state from json file containing Singer state.",
 )
+@click.option(
+    "--no-validate",
+    is_flag=True,
+    help="Skip validation of state structure (not recommended).",
+)
 @click.argument("state-id")
 @click.argument("state", type=str, required=False)
 @pass_project(migrate=True)
@@ -274,6 +279,7 @@ def set_state(
     state_id: str,
     state: str | None,
     input_file: Path | None,
+    no_validate: bool,  # noqa: FBT001
 ) -> None:
     """Set state."""
     state_service: StateService = (
@@ -285,11 +291,31 @@ def set_state(
     }
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
-    if input_file:
-        with input_file.open() as state_f:
-            state_service.set_state(state_id, state_f.read())
-    elif state:
-        state_service.set_state(state_id, state)
+
+    if no_validate:
+        logger.warning(
+            "Skipping state validation. Invalid state may cause issues in future runs.",
+        )
+
+    try:
+        if input_file:
+            with input_file.open() as state_f:
+                state_service.set_state(
+                    state_id, state_f.read(), validate=not no_validate
+                )
+        elif state:
+            state_service.set_state(state_id, state, validate=not no_validate)
+    except json.JSONDecodeError as e:
+        msg = f"Invalid JSON provided: {e}"
+        raise click.ClickException(msg) from e
+    except InvalidJobStateError as e:
+        msg = (
+            f"Invalid state format: {e}. "
+            "State must be valid JSON with a top-level 'singer_state' key. "
+            "Use --no-validate to bypass this check."
+        )
+        raise click.ClickException(msg) from e
+
     logger.info(
         f"State for {state_id} was successfully set "  # noqa: G004
         f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
