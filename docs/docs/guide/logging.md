@@ -70,6 +70,7 @@ A few key points to note:
 Here's an annotated example of a logging.yaml file:
 
 ```yaml
+version: 1
 disable_existing_loggers: false
 
 formatters:
@@ -145,6 +146,7 @@ level info written to a log file behind scenes incase you need to debug somethin
 file like:
 
 ```yaml
+version: 1
 disable_existing_loggers: false
 
 formatters:
@@ -184,6 +186,7 @@ For example, to log to a file called `meltano.log` in JSON format, while also re
 the console you could use the following `logging.yaml` config:
 
 ```yaml
+version: 1
 disable_existing_loggers: false
 
 formatters:
@@ -215,6 +218,7 @@ If instead you wanted the console output to log in JSON format because your logg
 you could use the following config:
 
 ```yaml
+version: 1
 disable_existing_loggers: false
 
 formatters:
@@ -241,6 +245,7 @@ and collect it with the Datadog Agent.
 To do so you'll want to use a `logging.yaml` config that writes directly to a file like in the previously examples:
 
 ```yaml
+version: 1
 disable_existing_loggers: false
 
 formatters:
@@ -293,6 +298,7 @@ For Google Cloud Logging (stackdriver) the default json log format is sufficient
 sufficient:
 
 ```yaml
+version: 1
 disable_existing_loggers: false
 
 formatters:
@@ -342,6 +348,7 @@ cat meltano.log | jq -c 'select(.string_id == "tap-gitlab" and .stdio == "stderr
 When DEBUG level logging is enabled, a plugin's stdout logs can be very verbose. For extractors, these can include the raw [Singer](/reference/glossary/#singer) messages. To exclude them, you can set the `meltano.plugins` logger to the `INFO` level.
 
 ```yaml
+version: 1
 disable_existing_loggers: no
 
 loggers:
