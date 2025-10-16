@@ -197,6 +197,24 @@ class TestCliState:
             assert result.exit_code == 1
             assert "Invalid JSON provided" in result.stderr
 
+    def test_set_empty_state_string(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that empty string input for state is rejected with a clear error message."""
+        state_id = state_ids[0]
+        empty_state = ""
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, empty_state],
+            )
+            assert result.exit_code == 1
+            assert "Invalid JSON provided" in result.stderr or "State cannot be empty" in result.stderr
+
     def test_set_invalid_state_format(
         self,
         state_service: StateService,
@@ -211,6 +229,25 @@ class TestCliState:
             result = cli_runner.invoke(
                 cli,
                 ["state", "set", "--force", state_id, json.dumps(invalid_state)],
+            )
+            assert result.exit_code == 1
+            assert "Invalid state format" in result.stderr
+            assert "singer_state" in result.stderr
+
+    def test_set_nested_singer_state_key(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that state with nested 'singer_state' key is rejected."""
+        state_id = state_ids[0]
+        nested_state = {"outer": {"singer_state": {}}}
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, json.dumps(nested_state)],
             )
             assert result.exit_code == 1
             assert "Invalid state format" in result.stderr
