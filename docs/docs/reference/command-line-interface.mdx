@@ -1674,6 +1674,59 @@ meltano state clear --force dev:tap-gitlab-to-target-jsonl
 
 Retrieve state for a given `state_id`.
 
+<Tabs className="meltano-tabs" groupId="meltano-version">
+  <TabItem className="meltano-tab-content" value="v4" label="Meltano v4+" default>
+
+:::info Output Format Change in v4
+
+In Meltano v4, the default output format for `meltano state get` changed from pretty-printed (indented) JSON to compact single-line JSON. This makes the output directly compatible with `meltano state set` without manual reformatting.
+
+- **Default behavior (v4+)**: Compact single-line JSON, ready to pipe or paste into `meltano state set`
+- **Legacy behavior (v3)**: Pretty-printed indented JSON for human readability
+
+To get the legacy pretty-printed format in v4, use `--format=pretty`.
+
+:::
+
+#### How to use
+
+```bash
+# Get state in compact format (default - ready for meltano state set)
+meltano state get <state_id>
+
+# Get state in pretty-printed format for human readability
+meltano state get <state_id> --format=pretty
+```
+
+#### Parameters
+
+- The `--format` option controls the output format:
+  - `json` (default): Compact single-line JSON, ready to use with `meltano state set`
+  - `pretty`: Human-readable indented JSON (legacy v3 behavior)
+
+#### Examples
+
+```bash
+# Get state in compact format (default)
+meltano state get dev:tap-gitlab-to-target-jsonl
+
+# Get state in pretty format
+meltano state get dev:tap-gitlab-to-target-jsonl --format=pretty
+
+# Round-trip example: copy state from one state ID to another
+meltano state get dev:tap-gitlab-to-target-jsonl | \
+  meltano state set --force prod:tap-gitlab-to-target-jsonl "$(cat)"
+
+# Save state to a file in compact format
+meltano state get dev:tap-gitlab-to-target-jsonl > state-backup.json
+
+# Restore state from a file
+meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file state-backup.json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="legacy" label="Legacy (pre-v4)">
+
 #### How to use
 
 ```bash
@@ -1686,6 +1739,17 @@ meltano state get <state_id>
 # Print the state that would be used in the next run of dev:tap-gitlab-to-target-jsonl
 meltano state get dev:tap-gitlab-to-target-jsonl
 ```
+
+:::note Legacy Behavior
+
+In Meltano v3 and earlier, `meltano state get` outputs pretty-printed (indented) JSON by default. To use this output with `meltano state set`, you needed to manually reformat it to compact JSON.
+
+In Meltano v4+, the default changed to compact single-line JSON that's directly compatible with `meltano state set`.
+
+:::
+
+  </TabItem>
+</Tabs>
 
 ### list
 

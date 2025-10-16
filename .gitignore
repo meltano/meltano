@@ -146,3 +146,4 @@ setup.py
 
 # Ruff
 .ruff_cache/
+test-project/

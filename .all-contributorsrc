@@ -1408,6 +1408,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "iamlorax",
+      "name": "iamlorax",
+      "avatar_url": "https://avatars.githubusercontent.com/u/116229492?v=4",
+      "profile": "https://github.com/iamlorax",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
