@@ -658,16 +658,10 @@ async def _run_transform(
 
 
 def _find_extractor(project: Project, extractor_name: str) -> PluginDefinition:
-    try:
-        return project.plugins.locked_definition_service.find_definition(
-            PluginType.EXTRACTORS,
-            extractor_name,
-        )
-    except PluginNotFoundError:
-        return project.hub_service.find_definition(
-            PluginType.EXTRACTORS,
-            extractor_name,
-        )
+    return project.plugins.locked_definition_service.find_definition(
+        PluginType.EXTRACTORS,
+        extractor_name,
+    )
 
 
 def _find_transform_for_extractor(

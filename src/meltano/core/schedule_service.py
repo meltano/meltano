@@ -7,9 +7,9 @@ import typing as t
 import structlog
 
 from meltano.core.error import MeltanoError
-from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.schedule import (
     CRON_INTERVALS,
     ELTSchedule,
