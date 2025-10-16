@@ -255,6 +255,18 @@ def merge_state(
     )
 
 
+def _read_state_from_file(
+    ctx: click.Context,
+    param: click.Option,  # noqa: ARG001
+    value: Path | None,
+) -> None:
+    if value is None:
+        return
+
+    with value.open() as state_f:
+        ctx.params["state"] = state_f.read()
+
+
 @meltano_state.command(cls=InstrumentedCmd, name="set")
 @prompt_for_confirmation(
     prompt="This will overwrite the state's current value. Continue?",
@@ -262,6 +274,8 @@ def merge_state(
 @click.option(
     "--input-file",
     type=click.Path(exists=True, path_type=Path),
+    callback=_read_state_from_file,
+    expose_value=False,
     help="Set state from json file containing Singer state.",
 )
 @click.option(
@@ -277,38 +291,23 @@ def set_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: str | None,
-    input_file: Path | None,
+    state: str,
     no_validate: bool,  # noqa: FBT001
 ) -> None:
     """Set state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    mutually_exclusive_options = {
-        "--input-file": input_file,
-        "STATE": state,
-    }
-    if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
-        raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
 
     if no_validate:
         logger.warning(
             "Skipping state validation. Invalid state may cause issues in future runs.",
         )
 
-    set_state = partial(
-        state_service.set_state,
-        state_id=state_id,
-        validate=not no_validate,
-    )
+    state = state or ""
 
     try:
-        if input_file:
-            with input_file.open() as state_f:
-                set_state(new_state=state_f.read())
-        elif state:
-            set_state(new_state=state)
+        state_service.set_state(state_id, state, validate=not no_validate)
     except json.JSONDecodeError as e:
         msg = f"Invalid JSON provided: {e}"
         raise click.ClickException(msg) from e
