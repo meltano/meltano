@@ -213,7 +213,10 @@ class TestCliState:
                 ["state", "set", "--force", state_id, empty_state],
             )
             assert result.exit_code == 1
-            assert "Invalid JSON provided" in result.stderr or "State cannot be empty" in result.stderr
+            assert (
+                "Invalid JSON provided" in result.stderr
+                or "State cannot be empty" in result.stderr
+            )
 
     def test_set_invalid_state_format(
         self,
