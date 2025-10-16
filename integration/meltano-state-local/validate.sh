@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091
 
 set -euo pipefail
 
@@ -13,4 +14,4 @@ meltano state get dev:tap-gitlab-to-target-jsonl | grep "singer_state"
 
 meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"bookmark-1": 0}}'
 
-meltano state get dev:tap-gitlab-to-target-jsonl | grep '{"singer_state": {"bookmark-1": 0}}'
+meltano state get dev:tap-gitlab-to-target-jsonl | grep '{"singer_state":{"bookmark-1":0}}'
