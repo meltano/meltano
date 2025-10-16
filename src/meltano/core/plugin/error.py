@@ -25,21 +25,6 @@ class PluginNotFoundError(Exception):
         )
 
 
-class PluginParentNotFoundError(Exception):
-    """Base exception when a plugin's parent could not be found."""
-
-    def __init__(self, plugin: PluginRef, parent_not_found_error: Exception) -> None:
-        """Initialize exception for when plugin's parent could not be found."""
-        self.plugin = plugin
-        self.parent_not_found_error = parent_not_found_error
-
-    def __str__(self) -> str:  # noqa: D105
-        return (
-            f"Could not find parent plugin for {self.plugin.type.descriptor} "
-            f"'{self.plugin.name}': {self.parent_not_found_error}"
-        )
-
-
 class PluginNotSupportedError(Exception):
     """Base exception when a plugin is not supported for some operation."""
 

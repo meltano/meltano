@@ -779,6 +779,22 @@
           },
           {
             "$ref": "#/$defs/plugins/mapper_specific"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "about",
+                    "stream-maps",
+                    "structured-logging"
+                  ]
+                }
+              }
+            }
           }
         ],
         "unevaluatedProperties": false

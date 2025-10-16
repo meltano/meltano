@@ -13,7 +13,15 @@ import structlog.processors
 from meltano.core.logging.models import PluginException, TracebackFrame
 from meltano.core.logging.renderers import (
     MeltanoConsoleRenderer,
-    StructuredExceptionFormatter,
+    PluginErrorFormatter,
+    PluginInstallFormatter,
+)
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_install_service import (
+    PluginInstallReason,
+    PluginInstallState,
+    PluginInstallStatus,
 )
 
 if t.TYPE_CHECKING:
@@ -62,8 +70,22 @@ def exception() -> PluginException:
 
 
 @pytest.fixture
-def formatter() -> StructuredExceptionFormatter:
-    return StructuredExceptionFormatter(
+def install_state() -> PluginInstallState:
+    return PluginInstallState(
+        plugin=ProjectPlugin(name="tap-mock", plugin_type=PluginType.EXTRACTORS),
+        reason=PluginInstallReason.INSTALL,
+        status=PluginInstallStatus.ERROR,
+        message="Custom exception message",
+        details=(
+            "This is multi-line error message.\n\nDetails of the error are "
+            "contained here."
+        ),
+    )
+
+
+@pytest.fixture
+def error_formatter() -> PluginErrorFormatter:
+    return PluginErrorFormatter(
         force_terminal=False,
         width=80,
         no_color=True,
@@ -73,7 +95,18 @@ def formatter() -> StructuredExceptionFormatter:
 
 
 @pytest.fixture
-def expected_output() -> str:
+def install_formatter() -> PluginInstallFormatter:
+    return PluginInstallFormatter(
+        force_terminal=False,
+        width=80,
+        no_color=True,
+        color_system="auto",
+        legacy_windows=False,
+    )
+
+
+@pytest.fixture
+def expected_exception_output() -> str:
     return dedent("""\
         ╭─────────────────────────────── Error details ────────────────────────────────╮
         │                                                                              │
@@ -98,6 +131,17 @@ def expected_output() -> str:
         During handling of the above exception, another exception occurred:
 
         ValueError: An invalid value was provided
+    """)
+
+
+@pytest.fixture
+def expected_install_output() -> str:
+    return dedent("""\
+        ╭───────────────────────────── Installation error ─────────────────────────────╮
+        │ This is multi-line error message.                                            │
+        │                                                                              │
+        │ Details of the error are contained here.                                     │
+        ╰────────────────────────── Custom exception message ──────────────────────────╯
     """)
 
 
@@ -150,17 +194,17 @@ class TestPluginException:
 
 
 class TestStructuredExceptionFormatter:
-    def test_simple_exception(self, formatter: StructuredExceptionFormatter) -> None:
+    def test_simple_exception(self, error_formatter: PluginErrorFormatter) -> None:
         exception = PluginException(
             type="CustomException",
             module="my_package.my_module",
             message="Custom exception message",
         )
         buffer = StringIO()
-        formatter.format(buffer, exception)
+        error_formatter.format(buffer, exception)
         assert buffer.getvalue() == "CustomException: Custom exception message\n"
 
-    def test_no_tracebacks(self, formatter: StructuredExceptionFormatter) -> None:
+    def test_no_tracebacks(self, error_formatter: PluginErrorFormatter) -> None:
         exception = PluginException(
             type="CustomException",
             module="my_package.my_module",
@@ -172,14 +216,14 @@ class TestStructuredExceptionFormatter:
             ),
         )
         buffer = StringIO()
-        formatter.format(buffer, exception)
+        error_formatter.format(buffer, exception)
         assert buffer.getvalue() == (
             "CustomException: Custom exception message\n\n"
             "The above exception was the direct cause of the following exception:\n\n"
             "ValueError: Invalid value provided\n"
         )
 
-    def test_hidden_tracebacks(self, formatter: StructuredExceptionFormatter) -> None:
+    def test_hidden_tracebacks(self, error_formatter: PluginErrorFormatter) -> None:
         expected_output = dedent("""\
         ╭─────────────────────────────── Error details ────────────────────────────────╮
         │                                                                              │
@@ -214,41 +258,70 @@ class TestStructuredExceptionFormatter:
             ],
         )
         buffer = StringIO()
-        formatter.format(buffer, exception)
+        error_formatter.format(buffer, exception)
         assert buffer.getvalue() == expected_output
 
     def test_render(
         self,
-        formatter: StructuredExceptionFormatter,
+        error_formatter: PluginErrorFormatter,
         exception: PluginException,
-        expected_output: str,
+        expected_exception_output: str,
     ) -> None:
         buffer = StringIO()
-        formatter.format(buffer, exception)
-        assert buffer.getvalue() == expected_output
+        error_formatter.format(buffer, exception)
+        assert buffer.getvalue() == expected_exception_output
+
+
+class TestPluginInstallFormatter:
+    def test_render(
+        self,
+        install_formatter: PluginInstallFormatter,
+        expected_install_output: str,
+        install_state: PluginInstallState,
+    ) -> None:
+        buffer = StringIO()
+        install_formatter.format(buffer, install_state)
+        assert buffer.getvalue() == expected_install_output
+
+    def test_render_without_details(
+        self,
+        install_formatter: PluginInstallFormatter,
+        install_state: PluginInstallState,
+    ) -> None:
+        buffer = StringIO()
+        state = PluginInstallState(
+            plugin=install_state.plugin,
+            reason=install_state.reason,
+            status=install_state.status,
+            details=None,
+        )
+        install_formatter.format(buffer, state)
+        assert buffer.getvalue() == ""
 
 
 class TestMeltanoConsoleRenderer:
     @pytest.fixture
     def subject(
         self,
-        formatter: StructuredExceptionFormatter,
+        error_formatter: PluginErrorFormatter,
+        install_formatter: PluginInstallFormatter,
     ) -> MeltanoConsoleRenderer:
         return MeltanoConsoleRenderer(
-            plugin_exception_renderer=formatter,
+            plugin_error_renderer=error_formatter,
+            plugin_install_renderer=install_formatter,
             colors=False,
             all_keys=True,
         )
 
     def test_included_keys(
         self,
-        formatter: StructuredExceptionFormatter,
+        error_formatter: PluginErrorFormatter,
         exception: PluginException,
         subtests: SubTests,
     ) -> None:
         make_renderer = functools.partial(
             MeltanoConsoleRenderer,
-            plugin_exception_renderer=formatter,
+            plugin_error_renderer=error_formatter,
             colors=False,
         )
 
@@ -313,25 +386,25 @@ class TestMeltanoConsoleRenderer:
             # Extra keys (included)
             assert "foo=bar" in result
 
-    def test_console_output(
+    def test_console_output_from_plugin_error(
         self,
         subtests: SubTests,
-        formatter: StructuredExceptionFormatter,
+        error_formatter: PluginErrorFormatter,
         exception: PluginException,
-        expected_output: str,
+        expected_exception_output: str,
     ) -> None:
         def key_val(**kwargs) -> str:
             return " ".join(f"{k}={v}" for k, v in kwargs.items())
 
         renderer = MeltanoConsoleRenderer(
-            plugin_exception_renderer=formatter,
+            plugin_error_renderer=error_formatter,
             colors=False,
             include_keys={"key"},
         )
 
         with subtests.test(msg="error"):
             out = renderer(None, "error", {"plugin_exception": exception})
-            assert out == expected_output + "\n" + key_val(
+            assert out == expected_exception_output + "\n" + key_val(
                 plugin_exc_message="'Custom exception message'",
                 plugin_exc_type="CustomException",
             )
@@ -346,3 +419,17 @@ class TestMeltanoConsoleRenderer:
         with subtests.test(msg="no exception"):
             out = renderer(None, "warning", {"key": "value"})
             assert out == key_val(key="value")
+
+    def test_console_output_from_plugin_install(
+        self,
+        install_formatter: PluginInstallFormatter,
+        expected_install_output: str,
+        install_state: PluginInstallState,
+    ) -> None:
+        renderer = MeltanoConsoleRenderer(
+            plugin_install_renderer=install_formatter,
+            colors=False,
+        )
+
+        out = renderer(None, "install", {"install_state": install_state})
+        assert out == expected_install_output + "\n"

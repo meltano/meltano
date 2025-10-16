@@ -354,4 +354,4 @@ class TestPluginInvoker:
         error_msg = str(error)
         assert "Executable 'missing-executable' could not be found" in error_msg
         assert "Extractor 'test-tap'" in error_msg
-        assert "meltano install extractor test-tap" in error_msg
+        assert "meltano install --plugin-type extractor test-tap" in error_msg

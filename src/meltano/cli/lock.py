@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-import warnings
 
 import click
 import structlog
@@ -14,7 +13,6 @@ from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
     PluginLockService,
 )
-from meltano.core.project_plugins_service import DefinitionSource
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
@@ -30,13 +28,6 @@ logger = structlog.get_logger(__name__)
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
 @click.option(
-    "--all",
-    "all_plugins",
-    is_flag=True,
-    hidden=True,
-    help="DEPRECATED: All plugins are now locked by default.",
-)
-@click.option(
     "--plugin-type",
     type=PluginTypeArg(),
     help="Lock only the plugins of the given type.",
@@ -49,7 +40,6 @@ def lock(
     project: Project,
     ctx: click.Context,
     *,
-    all_plugins: bool,
     plugin_type: PluginType | None,
     plugin_name: tuple[str, ...],
     update: bool,
@@ -61,19 +51,11 @@ def lock(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    if all_plugins:
-        warnings.warn(
-            "The --all flag is deprecated and is no longer needed",
-            DeprecationWarning,
-            stacklevel=0,
-        )
-
     lock_service = PluginLockService(project)
 
     try:
-        with project.plugins.use_preferred_source(DefinitionSource.ANY):
-            # Make it a list so source preference is not lazily evaluated.
-            plugins = list(project.plugins.plugins())
+        # Make it a list so source preference is not lazily evaluated.
+        plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
@@ -103,10 +85,8 @@ def lock(
             )
         else:
             plugin.parent = None
-            with project.plugins.use_preferred_source(DefinitionSource.HUB):
-                plugin = project.plugins.ensure_parent(plugin)
             try:
-                lock_service.save(plugin, exists_ok=update)
+                lock_service.save(plugin, exists_ok=update, fetch_from_hub=True)
             except LockfileAlreadyExistsError as err:
                 relative_path = err.path.relative_to(project.root)
                 click.secho(

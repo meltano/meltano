@@ -6,7 +6,6 @@ import os
 import signal
 import sys
 import typing as t
-import warnings
 from contextlib import contextmanager
 from enum import Enum, auto
 
@@ -271,12 +270,11 @@ def add_plugin(  # noqa: ANN201
     *,
     python: str | None = None,
     add_service: ProjectAddService,
-    variant=None,  # noqa: ANN001
-    inherit_from=None,  # noqa: ANN001
-    custom=False,  # noqa: ANN001
-    update=False,  # noqa: ANN001
-    lock=True,  # noqa: ANN001
-    plugin_yaml=None,  # noqa: ANN001
+    variant: str | None = None,
+    inherit_from: str | None = None,
+    custom: bool = False,
+    update: bool = False,
+    plugin_yaml: dict | None = None,
 ):
     """Add Plugin to given Project."""
     if custom:
@@ -318,7 +316,6 @@ def add_plugin(  # noqa: ANN201
             plugin_name,
             variant=variant,
             inherit_from=inherit_from,
-            lock=lock,
             update=update,
             python=python,
             **plugin_attrs,
@@ -665,59 +662,3 @@ def infer_plugin_type(plugin_name: str) -> PluginType:
         return PluginType.LOADERS
 
     return PluginType.UTILITIES
-
-
-def validate_plugin_type_args(
-    plugin: tuple[str, ...],
-    plugin_type: PluginType | None,
-    ctx: click.Context,
-    *,
-    support_any: bool = False,
-) -> tuple[tuple[str, ...], PluginType | None]:
-    """Validate plugin type arguments and return processed values.
-
-    Raises click.UsageError if both positional plugin type and --plugin-type flag
-    are provided. Returns tuple of (plugin_names, plugin_type).
-
-    Args:
-        plugin: The plugin arguments tuple
-        plugin_type: The plugin type from --plugin-type flag
-        ctx: Click context
-        support_any: Whether to support the "-" (ANY) argument for install command
-    """
-    if not plugin:
-        return plugin, plugin_type
-
-    if plugin[0] in PluginType.cli_arguments():
-        if plugin_type is not None:
-            msg = "Use only --plugin-type to specify plugin type"
-            raise click.UsageError(msg, ctx=ctx)
-
-        plugin_names = plugin[1:]
-        plugin_type = PluginType.from_cli_argument(plugin[0])
-        warnings.warn(
-            "Passing the plugin type as the first positional argument is deprecated "
-            "and will be removed in Meltano v4. "
-            "Please use the --plugin-type option instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return plugin_names, plugin_type
-
-    if support_any and plugin[0] == "-":
-        if plugin_type is not None:
-            msg = "Use only --plugin-type to specify plugin type"
-            raise click.UsageError(msg, ctx=ctx)
-
-        plugin_names = plugin[1:]
-        plugin_type = None
-        warnings.warn(
-            'Using "-" to specify plugins of any type is '
-            "deprecated and will be removed in Meltano v4. "
-            "It is no longer necessary to use this argument.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return plugin_names, plugin_type
-
-    return plugin, plugin_type

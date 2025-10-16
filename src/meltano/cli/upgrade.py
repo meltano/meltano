@@ -9,7 +9,6 @@ import click
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
-from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
 
@@ -23,9 +22,8 @@ if t.TYPE_CHECKING:
     default_if_no_args=True,
     short_help="Upgrade Meltano and your entire project to the latest version.",
 )
-@pass_project()
 @click.pass_context
-def upgrade(ctx: click.Context, project: Project) -> None:
+def upgrade(ctx: click.Context) -> None:
     """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
@@ -37,9 +35,8 @@ def upgrade(ctx: click.Context, project: Project) -> None:
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """  # noqa: D301
-    engine, _ = project_engine(project)  # (unreachable code)
-    upgrade_service = UpgradeService(engine, project)  # (unreachable code)
-    ctx.obj["upgrade_service"] = upgrade_service  # (unreachable code)
+    upgrade_service = UpgradeService()
+    ctx.obj["upgrade_service"] = upgrade_service
 
 
 @upgrade.command(
@@ -66,8 +63,15 @@ def upgrade(ctx: click.Context, project: Project) -> None:
     default=False,
     help="Skip updating the Meltano package.",
 )
+@pass_project()
 @click.pass_context
-def all_(ctx: click.Context, pip_url: str, force: bool, skip_package: bool) -> None:  # noqa: FBT001
+def all_(
+    ctx: click.Context,
+    project: Project,
+    pip_url: str,
+    force: bool,  # noqa: FBT001
+    skip_package: bool,  # noqa: FBT001
+) -> None:
     """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
@@ -82,14 +86,14 @@ def all_(ctx: click.Context, pip_url: str, force: bool, skip_package: bool) -> N
     upgrade_service: UpgradeService = ctx.obj["upgrade_service"]
 
     if skip_package:
-        upgrade_service.update_files()
+        upgrade_service.update_files(project=project)
 
         click.echo()
-        upgrade_service.migrate_database()
+        upgrade_service.migrate_database(project=project)
 
         click.echo()
 
-        upgrade_service.migrate_state()
+        upgrade_service.migrate_state(project=project)
         if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")
@@ -141,17 +145,19 @@ def package(ctx: click.Context, **kwargs: t.Any) -> None:
     cls=InstrumentedCmd,
     short_help="Update files managed by file bundles only.",
 )
+@pass_project()
 @click.pass_context
-def files(ctx: click.Context) -> None:
+def files(ctx: click.Context, project: Project) -> None:
     """Update files managed by file bundles only."""
-    ctx.obj["upgrade_service"].update_files()
+    ctx.obj["upgrade_service"].update_files(project=project)
 
 
 @upgrade.command(
     cls=InstrumentedCmd,
     short_help="Apply migrations to system database only.",
 )
+@pass_project()
 @click.pass_context
-def database(ctx: click.Context) -> None:
+def database(ctx: click.Context, project: Project) -> None:
     """Apply migrations to system database only."""
-    ctx.obj["upgrade_service"].migrate_database()
+    ctx.obj["upgrade_service"].migrate_database(project=project)

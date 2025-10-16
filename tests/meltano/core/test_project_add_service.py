@@ -183,7 +183,7 @@ class TestProjectAddService:
                 f"tap-mock{STATE_ID_COMPONENT_DELIMITER}",
             )
 
-    @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
+    @mock.patch("meltano.core.plugin_lock_service.PluginLockService.save")
     def test_add_update(
         self,
         lock_save: mock.MagicMock,
@@ -228,7 +228,7 @@ class TestProjectAddService:
         assert updated.canonical().items() >= updated_attrs.items()
         assert updated.config_with_extras
 
-    @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
+    @mock.patch("meltano.core.plugin_lock_service.PluginLockService.save")
     def test_add_update_custom(
         self,
         lock_save: mock.MagicMock,

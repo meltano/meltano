@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.0.0b4"
+version = "4.0.0rc1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10,<3.15"
@@ -16,6 +16,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
@@ -181,7 +182,6 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::ResourceWarning",
-  "ignore:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning",  # https://github.com/meltano/meltano/issues/7066
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -251,7 +251,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.0.0b4"
+version = "4.0.0rc1"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
