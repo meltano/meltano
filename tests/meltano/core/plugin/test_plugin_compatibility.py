@@ -18,7 +18,7 @@ from meltano.core.plugin.base import (
 )
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin_lock_service import PluginLock
+from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.utils import IncompatibleMeltanoVersionError, get_meltano_version
 
 
@@ -174,6 +174,7 @@ class TestPluginCompatibility:
             namespace="tap_test",
             requires_meltano=">=2.0.0",
         )
+        lock_service = PluginLockService(project)
 
         # Create a mock plugin definition for the lockfile
         plugin_def = PluginDefinition(
@@ -187,11 +188,10 @@ class TestPluginCompatibility:
         plugin._variant = plugin_def.variants[0]
 
         # Create and save lockfile
-        lock = PluginLock(project, plugin)
-        lock.save()
+        path = lock_service.save(plugin)
 
         # Read and verify lockfile content
-        with lock.path.open() as f:
+        with path.open() as f:
             lockfile_data = json.load(f)
 
         assert lockfile_data["requires_meltano"] == ">=2.0.0"
