@@ -297,14 +297,18 @@ def set_state(
             "Skipping state validation. Invalid state may cause issues in future runs.",
         )
 
+    set_state = partial(
+        state_service.set_state,
+        state_id=state_id,
+        validate=not no_validate,
+    )
+
     try:
         if input_file:
             with input_file.open() as state_f:
-                state_service.set_state(
-                    state_id, state_f.read(), validate=not no_validate
-                )
+                set_state(new_state=state_f.read())
         elif state:
-            state_service.set_state(state_id, state, validate=not no_validate)
+            set_state(new_state=state)
     except json.JSONDecodeError as e:
         msg = f"Invalid JSON provided: {e}"
         raise click.ClickException(msg) from e

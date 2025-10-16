@@ -202,21 +202,20 @@ class TestCliState:
         state_service: StateService,
         state_ids: list[str],
         cli_runner: MeltanoCliRunner,
+        tmp_path: Path,
     ) -> None:
-        """Test that empty string input for state is rejected with a clear error message."""
+        """Test that empty string input for state is rejected with a clear message."""
         state_id = state_ids[0]
-        empty_state = ""
+        filepath = tmp_path / "empty-state.json"
+        filepath.write_text("")
 
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             result = cli_runner.invoke(
                 cli,
-                ["state", "set", "--force", state_id, empty_state],
+                ["state", "set", "--force", state_id, "--input-file", filepath],
             )
             assert result.exit_code == 1
-            assert (
-                "Invalid JSON provided" in result.stderr
-                or "State cannot be empty" in result.stderr
-            )
+            assert "Invalid JSON provided" in result.stderr
 
     def test_set_invalid_state_format(
         self,
