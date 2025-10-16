@@ -298,15 +298,27 @@ def set_state(
 
 @meltano_state.command(cls=InstrumentedCmd, name="get")
 @click.argument("state-id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "pretty"], case_sensitive=False),
+    default="json",
+    help=(
+        "Output format: 'json' for compact single-line (default, ready for "
+        "meltano state set), 'pretty' for human-readable indented format."
+    ),
+)
 @pass_project(migrate=True)
 @click.pass_context
-def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
+def get_state(ctx: click.Context, project: Project, state_id: str, format: str) -> None:  # noqa: A002
     """Get state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
     retrieved_state = state_service.get_state(state_id)
-    click.echo(json.dumps(retrieved_state))
+    if format == "pretty":
+        click.echo(json.dumps(retrieved_state, indent=2))
+    else:
+        click.echo(json.dumps(retrieved_state, separators=(",", ":")))
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="edit")
