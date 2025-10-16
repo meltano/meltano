@@ -84,9 +84,8 @@ class StateService:
                 started_at=now,
                 ended_at=now,
             )
-        if isinstance(job, Job):
-            return job
-        raise TypeError("job must be of type Job or of type str")  # noqa: EM101
+
+        return job
 
     @property
     def state_store_manager(self) -> StateStoreManager:
@@ -113,9 +112,8 @@ class StateService:
             InvalidJobStateError: if supplied state is not valid singer state
         """
         if SINGER_STATE_KEY not in state:
-            raise InvalidJobStateError(
-                f"{SINGER_STATE_KEY} not found in top level of provided state",  # noqa: EM102
-            )
+            msg = f"{SINGER_STATE_KEY} not found in top level of provided state"
+            raise InvalidJobStateError(msg)
 
     def add_state(
         self,
@@ -123,7 +121,7 @@ class StateService:
         new_state: str,
         payload_flags: Payload = Payload.STATE,
         *,
-        validate=True,  # noqa: ANN001
+        validate: bool = True,
     ) -> None:
         """Add state for the given Job.
 
@@ -134,15 +132,17 @@ class StateService:
             payload_flags: the payload_flags to set for the job
             validate: whether to validate the supplied state
         """
-        new_state_dict = json.loads(new_state)
+        new_state_dict: dict = json.loads(new_state)
         if validate:
             self.validate_state(new_state_dict)
         state_to_add_to = self._get_or_create_job(job)
-        state_to_add_to.payload = json.loads(new_state)
+        state_to_add_to.payload = new_state_dict
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)  # type: ignore[arg-type]
         logger.debug(
-            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",  # noqa: G004
+            "Added to state %s state payload %s",
+            state_to_add_to.job_name,
+            new_state_dict,
         )
         partial_state = (
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
@@ -189,7 +189,7 @@ class StateService:
             validate=validate,
         )
 
-    def clear_state(self, state_id, *, save: bool = True) -> None:  # noqa: ANN001, ARG002
+    def clear_state(self, state_id: str, *, save: bool = True) -> None:  # noqa: ARG002
         """Clear the state for the state_id.
 
         Args:
