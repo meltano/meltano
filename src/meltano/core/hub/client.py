@@ -277,6 +277,7 @@ class MeltanoHubService(PluginRepository):
                 variant_name,
             ) from variant_key_err
 
+        logger.info("Fetching plugin definition from Meltano Hub", url=url)
         response = self._get(url)
 
         try:

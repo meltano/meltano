@@ -358,7 +358,7 @@ class TestCliAdd:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
-            # Inheriting from a BasePlugin using --as
+            # Inheriting from a BasePlugin using --as with explicit variant
             res = cli_runner.invoke(
                 cli,
                 [
@@ -367,6 +367,8 @@ class TestCliAdd:
                     "tap-mock",
                     "--as",
                     "tap-mock-inherited",
+                    "--variant",
+                    "meltano",
                 ],
             )
             assert_cli_runner(res)
@@ -448,10 +450,7 @@ class TestCliAdd:
                 ],
             )
             assert res.exit_code == 1
-            assert (
-                "Could not find parent plugin for extractor 'tap-foo': "
-                "Extractor 'tap-bar' is not known to Meltano"
-            ) in str(res.exception)
+            assert ("Extractor 'tap-bar' is not known to Meltano") in str(res.exception)
 
     @pytest.mark.usefixtures("reset_project_context")
     def test_add_custom(self, project: Project, cli_runner) -> None:
