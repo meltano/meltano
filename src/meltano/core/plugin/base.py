@@ -461,11 +461,11 @@ class PluginDefinition(PluginRef):
 
         label = variant.name or Variant.ORIGINAL_NAME
 
-        if variant == self.variants[0] and self.is_default_variant is not False:
-            return f"{label} (default)"
-
         if variant.deprecated:
             return f"{label} (deprecated)"
+
+        if variant == self.variants[0] and self.is_default_variant is not False:
+            return f"{label} (default)"
 
         return label
 
