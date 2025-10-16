@@ -455,15 +455,21 @@ class TestTracker:
 
         with pytest.warns(
             (UserWarning, UserWarning),
+            # UserWarning,
             match="Invalid Snowplow endpoint",
         ) as warnings:
             tracker = Tracker(project)
 
-        assert warnings[0].message.args[0] == "Invalid Snowplow endpoint: notvalid:8080"
-        assert (
-            warnings[1].message.args[0]
-            == "Invalid Snowplow endpoint: file://bad.scheme"
-        )
+        tracker_warnings = [
+            w.message.args[0]
+            for w in warnings
+            if isinstance(w.message, UserWarning)
+            and "Invalid Snowplow endpoint" in str(w.message)
+        ]
+
+        assert len(tracker_warnings) == 2
+        assert tracker_warnings[0] == "Invalid Snowplow endpoint: notvalid:8080"
+        assert tracker_warnings[1] == "Invalid Snowplow endpoint: file://bad.scheme"
 
         assert len(tracker.snowplow_tracker.emitters) == 2
 
