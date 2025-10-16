@@ -68,7 +68,8 @@ class TestPluginLockService:
             plugin=plugin,
             variant_name=plugin.variant,
         )
-        assert not plugin_lock_path.exists()
+        # Clean up any existing lockfile from previous tests
+        plugin_lock_path.unlink(missing_ok=True)
 
         subject.save(plugin)
         assert plugin_lock_path.exists()
@@ -80,3 +81,66 @@ class TestPluginLockService:
 
         with pytest.raises(LockfileAlreadyExistsError):
             subject.save(plugin)
+
+    def test_get_standalone_data_without_lockfile(
+        self,
+        subject: PluginLockService,
+        plugin: ProjectPlugin,
+    ) -> None:
+        """Test get_standalone_data when lock file doesn't exist.
+
+        This tests the fallback path (line 228) where StandalonePlugin.from_variant
+        is called to generate the standalone data when no lock file exists.
+        """
+        # Ensure no lock file exists (remove it if a previous test created it)
+        plugin_lock_path = subject.plugin_lock_path(
+            plugin=plugin,
+            variant_name=plugin.variant,
+        )
+        plugin_lock_path.unlink(missing_ok=True)
+
+        # Call get_standalone_data - should use the fallback path (line 228)
+        standalone_data = subject.get_standalone_data(plugin)
+
+        # Verify the data is correctly generated from the variant
+        assert isinstance(standalone_data, dict)
+        assert standalone_data["name"] == "tap-locked"
+        assert standalone_data["namespace"] == "tap_locked"
+        assert standalone_data["pip_url"] == "meltano-tap-locked"
+        assert standalone_data["repo"] == "https://gitlab.com/meltano/tap-locked"
+        # Should include both definition-level and variant-level attributes
+        assert standalone_data["foo"] == "bar"
+        assert standalone_data["baz"] == "qux"
+
+        # Verify that no lock file was created by this call
+        assert not plugin_lock_path.exists()
+
+    def test_get_standalone_data_with_lockfile(
+        self,
+        subject: PluginLockService,
+        plugin: ProjectPlugin,
+    ) -> None:
+        """Test get_standalone_data when lock file exists.
+
+        This tests that when a lock file exists, it's loaded from disk
+        rather than generated from the variant.
+        """
+        plugin_lock_path = subject.plugin_lock_path(
+            plugin=plugin,
+            variant_name=plugin.variant,
+        )
+
+        # Save the lock file (use exists_ok=True in case a previous test created it)
+        subject.save(plugin, exists_ok=True)
+        assert plugin_lock_path.exists()
+
+        # Call get_standalone_data - should load from the existing lock file
+        standalone_data = subject.get_standalone_data(plugin)
+
+        # Verify the data matches what's in the lock file
+        assert isinstance(standalone_data, dict)
+        assert standalone_data["name"] == "tap-locked"
+        assert standalone_data["namespace"] == "tap_locked"
+        assert standalone_data["pip_url"] == "meltano-tap-locked"
+        assert standalone_data["foo"] == "bar"
+        assert standalone_data["baz"] == "qux"
