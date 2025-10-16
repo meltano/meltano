@@ -328,6 +328,98 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert json.loads(result.stdout) == expected_state
 
+    def test_get_default_format_is_compact(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+        state_ids_with_expected_states: list[tuple[str, dict]],
+    ) -> None:
+        """Test that default output format is compact (single-line JSON)."""
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            for state_id, expected_state in state_ids_with_expected_states:
+                result = cli_runner.invoke(cli, ["state", "get", state_id])
+                assert_cli_runner(result)
+                # Compact JSON should not contain newlines except the trailing one
+                assert result.stdout.count("\n") == 1
+                # Should not contain spaces after separators
+                assert ": " not in result.stdout
+                assert ", " not in result.stdout
+                # Should still be valid JSON
+                assert json.loads(result.stdout) == expected_state
+
+    def test_get_format_json_option(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+        state_ids_with_expected_states: list[tuple[str, dict]],
+    ) -> None:
+        """Test that --format json explicitly produces compact output."""
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            for state_id, expected_state in state_ids_with_expected_states:
+                result = cli_runner.invoke(
+                    cli,
+                    ["state", "get", state_id, "--format", "json"],
+                )
+                assert_cli_runner(result)
+                # Compact JSON should not contain newlines except the trailing one
+                assert result.stdout.count("\n") == 1
+                # Should use compact separators
+                assert ": " not in result.stdout
+                assert ", " not in result.stdout
+                # Should still be valid JSON
+                assert json.loads(result.stdout) == expected_state
+
+    def test_get_format_pretty_option(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+        state_ids_with_expected_states: list[tuple[str, dict]],
+    ) -> None:
+        """Test that --format pretty produces human-readable indented output."""
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            for state_id, expected_state in state_ids_with_expected_states:
+                result = cli_runner.invoke(
+                    cli,
+                    ["state", "get", state_id, "--format", "pretty"],
+                )
+                assert_cli_runner(result)
+                # Pretty JSON should contain multiple newlines (more than just trailing)
+                assert result.stdout.count("\n") > 1
+                # Should be valid JSON
+                assert json.loads(result.stdout) == expected_state
+
+    def test_get_set_roundtrip(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+        state_ids: list[str],
+    ) -> None:
+        """Test that output from 'state get' can be directly used in 'state set'."""
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            for state_id in state_ids:
+                # Get the current state
+                get_result = cli_runner.invoke(cli, ["state", "get", state_id])
+                assert_cli_runner(get_result)
+
+                # Use the output directly in set command for a new state ID
+                new_state_id = f"{state_id}-roundtrip-test"
+                set_result = cli_runner.invoke(
+                    cli,
+                    [
+                        "state",
+                        "set",
+                        "--force",
+                        new_state_id,
+                        get_result.stdout.strip(),
+                    ],
+                )
+                assert_cli_runner(set_result)
+
+                # Verify the new state matches the original
+                original_state = state_service.get_state(state_id)
+                copied_state = state_service.get_state(new_state_id)
+                assert copied_state == original_state
+
     def test_clear(
         self,
         state_service: StateService,
