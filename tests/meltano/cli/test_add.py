@@ -358,7 +358,7 @@ class TestCliAdd:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
-            # Inheriting from a BasePlugin using --as
+            # Inheriting from a BasePlugin using --as with explicit variant
             res = cli_runner.invoke(
                 cli,
                 [
@@ -367,28 +367,23 @@ class TestCliAdd:
                     "tap-mock",
                     "--as",
                     "tap-mock-inherited",
+                    "--variant",
+                    "meltano",
                 ],
             )
             assert_cli_runner(res)
+            assert "Inherit from:\ttap-mock, variant meltano (default)\n" in res.stdout
 
-            # Determine which variant is actually the default (can vary due to
-            # non-deterministic ordering when loading hub data)
             inherited = project.plugins.find_plugin(
                 plugin_type=PluginType.EXTRACTORS,
                 plugin_name="tap-mock-inherited",
             )
-            expected_variant = inherited.variant
-
-            # Check that the output matches the actual variant selected
-            message = f"Inherit from:\ttap-mock, variant {expected_variant} (default)\n"
-            assert message in res.stdout
-
             assert inherited.inherit_from == "tap-mock"
-            assert inherited.variant in ("meltano", "singer-io")
+            assert inherited.variant == "meltano"
             assert inherited.parent == project.hub_service.find_base_plugin(
                 plugin_type=PluginType.EXTRACTORS,
                 plugin_name="tap-mock",
-                variant=expected_variant,
+                variant="meltano",
             )
 
             # Inheriting from a BasePlugin using --inherit-from and --variant
