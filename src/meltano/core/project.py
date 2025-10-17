@@ -181,7 +181,7 @@ class Project:
         Returns:
             A `ProjectDirsService` instance for this project.
         """
-        return ProjectDirsService(root=self.root, sys_dir=self.sys_dir_root)
+        return ProjectDirsService.from_project(self)
 
     @cached_property
     def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:

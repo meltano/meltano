@@ -6,6 +6,7 @@ import json
 import typing as t
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -32,7 +33,7 @@ class JobFactory:
         self,
         session: Session,
         *,
-        job_name: str = "tap-gitlab target-postgres",
+        job_name: str = "tap-gitlab-target-postgres",
         state: State = State.SUCCESS,
         run_id: str | None = None,
         log_content: str = "Test log content\nLine 2\nLine 3",
@@ -214,7 +215,7 @@ class TestLogsShow:
     ):
         """Test error when no logs are found."""
         job = Job(
-            job_name="tap-gitlab target-postgres",
+            job_name="tap-gitlab-target-postgres",
             state=State.SUCCESS,
             started_at=datetime.now(timezone.utc),
         )
@@ -336,3 +337,24 @@ class TestLogsShow:
         # This would require mocking the legacy_logs_dir method
         # to return a valid path and creating logs there
         # Placeholder for legacy log test
+
+    def test_logs_directory(
+        self,
+        session: Session,
+        cli_runner: MeltanoCliRunner,
+        job_factory: JobFactory,
+    ):
+        """Test showing the logs directory."""
+        job = job_factory.create(
+            session,
+            state=State.SUCCESS,
+            log_content="Is this in the right directory?",
+        )
+        result = cli_runner.invoke(cli, ["logs", "dir"])
+        assert result.exit_code == 0
+
+        path = Path(result.stdout.strip())
+        assert path.parent.is_dir()
+
+        log_path = path / "elt" / job.job_name / str(job.run_id) / "elt.log"
+        assert log_path.read_text() == "Is this in the right directory?"
