@@ -303,12 +303,6 @@ class VenvService:
             self.project.venvs_dir(namespace, name, make_dirs=False),
             python=python or project.settings.get("python"),
         )
-        self.install_log_path = self.project.logs_dir(
-            "pip",
-            self.namespace,
-            self.name,
-            "pip.log",
-        ).resolve()
 
     @classmethod
     def from_plugin(cls, project: Project, plugin: ProjectPlugin) -> Self:
@@ -327,6 +321,20 @@ class VenvService:
             namespace=plugin.type,
             name=plugin.plugin_dir_name,
         )
+
+    @property
+    def install_log_path(self) -> Path:
+        """Return the path to the install log file.
+
+        Returns:
+            The path to the install log file.
+        """
+        return self.project.logs_dir(
+            "pip",
+            self.namespace,
+            self.name,
+            "install.log",
+        ).resolve()
 
     async def install(
         self,
