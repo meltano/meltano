@@ -409,7 +409,19 @@ def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: Callable[..., Path]) -> Callable[..., Path]:  # noqa: D103
+P = t.ParamSpec("P")
+
+
+def makedirs(func: Callable[P, Path]) -> Callable[P, Path]:
+    """Decorator to create directories for a given path.
+
+    Decorates a function that returns a path and creates the directories for the path
+    if the `make_dirs` keyword argument is True.
+
+    Args:
+        func: The function to decorate.
+    """
+
     @functools.wraps(func)
     def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
