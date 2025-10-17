@@ -335,7 +335,15 @@ class TestMeltanoConsoleRenderer:
                 "name": "tap-mock",
                 # Plugin structured logging
                 "plugin_exception": exception,
-                "metric_info": {"key": "value"},
+                "metric_info": {
+                    "type": "counter",
+                    "metric": "record_count",
+                    "value": 1500,
+                    "tags": {
+                        "stream": "users",
+                        "tap": "tap-example",
+                    },
+                },
                 # Extra keys
                 "job_name": "dev:tap-mock-to-target-mock",
                 "run_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -433,3 +441,22 @@ class TestMeltanoConsoleRenderer:
 
         out = renderer(None, "install", {"install_state": install_state})
         assert out == expected_install_output + "\n"
+
+    def test_console_output_from_metric_info(
+        self,
+        subject: MeltanoConsoleRenderer,
+    ) -> None:
+        event_dict = {
+            "metric_info": {
+                "type": "counter",
+                "metric": "record_count",
+                "value": 1500,
+                "tags": {
+                    "stream": "users",
+                    "tap": "tap-example",
+                },
+            }
+        }
+        out = subject(None, "info", event_dict)
+        assert "metric_name=record_count" in out
+        assert "metric_value=1500" in out
