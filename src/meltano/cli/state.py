@@ -255,6 +255,18 @@ def merge_state(
     )
 
 
+def _read_state_from_file(
+    ctx: click.Context,
+    param: click.Option,  # noqa: ARG001
+    value: Path | None,
+) -> None:
+    if value is None:
+        return
+
+    with value.open() as state_f:
+        ctx.params["state"] = state_f.read()
+
+
 @meltano_state.command(cls=InstrumentedCmd, name="set")
 @prompt_for_confirmation(
     prompt="This will overwrite the state's current value. Continue?",
@@ -262,7 +274,14 @@ def merge_state(
 @click.option(
     "--input-file",
     type=click.Path(exists=True, path_type=Path),
+    callback=_read_state_from_file,
+    expose_value=False,
     help="Set state from json file containing Singer state.",
+)
+@click.option(
+    "--no-validate",
+    is_flag=True,
+    help="Skip validation of state structure (not recommended).",
 )
 @click.argument("state-id")
 @click.argument("state", type=str, required=False)
@@ -272,24 +291,34 @@ def set_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: str | None,
-    input_file: Path | None,
+    state: str,
+    no_validate: bool,  # noqa: FBT001
 ) -> None:
     """Set state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
-    mutually_exclusive_options = {
-        "--input-file": input_file,
-        "STATE": state,
-    }
-    if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
-        raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
-    if input_file:
-        with input_file.open() as state_f:
-            state_service.set_state(state_id, state_f.read())
-    elif state:
-        state_service.set_state(state_id, state)
+
+    if no_validate:
+        logger.warning(
+            "Skipping state validation. Invalid state may cause issues in future runs.",
+        )
+
+    state = state or ""
+
+    try:
+        state_service.set_state(state_id, state, validate=not no_validate)
+    except json.JSONDecodeError as e:
+        msg = f"Invalid JSON provided: {e}"
+        raise click.ClickException(msg) from e
+    except InvalidJobStateError as e:
+        msg = (
+            f"Invalid state format: {e}. "
+            "State must be valid JSON with a top-level 'singer_state' key. "
+            "Use --no-validate to bypass this check."
+        )
+        raise click.ClickException(msg) from e
+
     logger.info(
         f"State for {state_id} was successfully set "  # noqa: G004
         f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
