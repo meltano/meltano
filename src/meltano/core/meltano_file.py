@@ -58,6 +58,9 @@ class MeltanoFile(Canonical):
             env: Environment variables for this project.
             extras: Additional configuration for this project.
         """
+        # Track whether version was explicitly provided
+        self._version_explicitly_provided = version is not _VERSION_SENTINEL
+
         # Warn if version was explicitly provided in meltano.yml
         if version is not _VERSION_SENTINEL:
             warnings.warn(
@@ -132,6 +135,20 @@ class MeltanoFile(Canonical):
             else:
                 result.append(ELTSchedule(**schedule))
         return result
+
+    def __iter__(self):  # noqa: ANN204
+        """Return an iterator over the attributes.
+
+        Excludes version if not explicitly provided.
+
+        Yields:
+            An iterator over the attributes set on the current instance.
+        """
+        for key, val in super().__iter__():
+            # Skip version field if it wasn't explicitly provided
+            if key == "version" and not self._version_explicitly_provided:
+                continue
+            yield (key, val)
 
     @staticmethod
     def load_environments(environments: Iterable[dict]) -> list[Environment]:

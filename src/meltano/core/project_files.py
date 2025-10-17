@@ -292,8 +292,13 @@ class ProjectFiles:
         # Make sure that the top-level keys are in the same order as the original files
         sorted_file_dicts = self._restore_file_key_order(file_dicts)
 
+        # Ensure meltano.yml is always present, even if empty
+        meltano_file_path = str(self._meltano_file_path)
+        if meltano_file_path not in sorted_file_dicts:
+            sorted_file_dicts[meltano_file_path] = CommentedMap()
+
         # Copy comments from the original config to the new config
-        config.copy_attributes(sorted_file_dicts[str(self._meltano_file_path)])
+        config.copy_attributes(sorted_file_dicts[meltano_file_path])
         self._copy_yaml_attributes(sorted_file_dicts)
         return sorted_file_dicts
 
