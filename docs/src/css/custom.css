@@ -1258,3 +1258,13 @@ pre {
 .DocSearch-Screen-Icon {
   display: none
 }
+
+/* Ensure code blocks scroll horizontally instead of expanding page width */
+article .theme-code-block {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+
+article {
+  overflow-x: hidden !important;
+}
