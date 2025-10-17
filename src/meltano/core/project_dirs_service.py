@@ -5,6 +5,8 @@ from __future__ import annotations
 import typing as t
 from dataclasses import KW_ONLY, dataclass
 
+import platformdirs
+
 from meltano.core.utils import makedirs, sanitize_filename
 
 if t.TYPE_CHECKING:
@@ -12,6 +14,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core._types import StrPath
     from meltano.core.plugin.base import PluginRef
+    from meltano.core.project import Project
 
 
 @dataclass
@@ -25,6 +28,11 @@ class ProjectDirsService:
 
     sys_dir: Path
     """The system directory root of the project."""
+
+    @classmethod
+    def from_project(cls, project: Project) -> ProjectDirsService:
+        """Create a ProjectDirsService from a Project."""
+        return cls(root=project.root, sys_dir=project.sys_dir_root)
 
     def root_dir(self, *joinpaths: StrPath) -> Path:
         """Return the root directory of this project, optionally joined with path.
@@ -77,7 +85,7 @@ class ProjectDirsService:
         return self.meltano("run", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def logs(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
+    def logs(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
         """Path to the `logs` directory in `.meltano`.
 
         Args:
@@ -87,7 +95,8 @@ class ProjectDirsService:
         Returns:
             Resolved path to `logs` dir optionally joined to given paths.
         """
-        return self.meltano("logs", *joinpaths, make_dirs=make_dirs)
+        logs_path = platformdirs.user_log_path("meltano")
+        return logs_path.joinpath(*joinpaths)
 
     @makedirs
     def job(

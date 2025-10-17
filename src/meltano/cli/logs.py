@@ -280,3 +280,15 @@ def show_log(
         raise CliError(msg) from e
 
     tracker.track_command_event(CliEvent.completed)
+
+
+@logs.command(
+    cls=PartialInstrumentedCmd,
+    name="dir",
+    short_help="Show the directory of the logs.",
+)
+@pass_project()
+def directory(project: Project) -> None:
+    """Show the directory of the logs."""
+    logs_dir = project.dirs.logs(make_dirs=False)
+    click.echo(logs_dir)
