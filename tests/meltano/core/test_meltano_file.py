@@ -109,3 +109,41 @@ class TestMeltanoFile:
                 jobs=[],
             )
             assert meltano_file.version == 1  # Uses default
+
+    def test_version_not_serialized_when_not_provided(self) -> None:
+        """Test that version field is not serialized when not explicitly provided."""
+        meltano_file = MeltanoFile(
+            plugins={},
+            schedules=[],
+            environments=[],
+            jobs=[],
+        )
+
+        # Convert to dict (simulates serialization)
+        serialized = dict(meltano_file)
+
+        # Version should not be in the serialized output
+        assert "version" not in serialized
+        # But the attribute should still be accessible
+        assert meltano_file.version == 1
+
+    def test_version_serialized_when_explicitly_provided(self) -> None:
+        """Test that version field is serialized when explicitly provided."""
+        with pytest.warns(
+            DeprecationWarning,
+            match="The 'version' field in meltano.yml is deprecated",
+        ):
+            meltano_file = MeltanoFile(
+                version=1,
+                plugins={},
+                schedules=[],
+                environments=[],
+                jobs=[],
+            )
+
+        # Convert to dict (simulates serialization)
+        serialized = dict(meltano_file)
+
+        # Version should be in the serialized output
+        assert "version" in serialized
+        assert serialized["version"] == 1
