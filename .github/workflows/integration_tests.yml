@@ -29,7 +29,7 @@ concurrency:
 
 env:
   FORCE_COLOR: "1"
-  UV_EXCLUDE_NEWER: "2025-10-14"
+  UV_EXCLUDE_NEWER: "2025-10-17"
 
 jobs:
   validate:
