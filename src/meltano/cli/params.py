@@ -143,10 +143,11 @@ class pass_project:  # noqa: N801
 
             project = ctx.obj["project"]
             if not project:
-                raise CliError(
-                    f"`{ctx.command_path}` must be run inside a Meltano project.\n"  # noqa: EM102
-                    "Use `meltano init <project_directory>` to create one.",
+                msg = (
+                    f"`{ctx.command_path}` must be run inside a Meltano project.\n"
+                    "Use `meltano init <project_directory>` to create one."
                 )
+                raise click.UsageError(msg, ctx=ctx)
 
             # register the system database connection
             engine, _ = project_engine(project, default=True)
