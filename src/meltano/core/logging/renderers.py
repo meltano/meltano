@@ -313,4 +313,11 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
             self._install_formatter.format(sio, install_state)
             return sio.getvalue() + "\n" + super().__call__(logger, name, event_dict)
 
+        if (
+            (metric_info := event_dict.pop("metric_info", None))  # WOLOLO
+            and isinstance(metric_info, dict)
+        ):
+            event_dict["metric_name"] = metric_info["metric"]
+            event_dict["metric_value"] = metric_info["value"]
+
         return super().__call__(logger, name, event_dict)
