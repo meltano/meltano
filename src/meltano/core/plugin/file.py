@@ -67,7 +67,7 @@ class FilePlugin(BasePlugin):
         # This ignores plugin inheritance, but that's fine because the file contents
         # are bundled with the package, so they should be the same for all plugins that
         # share a pip_url.
-        venv = VirtualEnv(project.plugin_dir(self, "venv"))
+        venv = VirtualEnv(project.plugin_dir(self, "venv"))  # type: ignore[arg-type]
         bundle_dir = venv.site_packages_dir / "bundle"
 
         return {

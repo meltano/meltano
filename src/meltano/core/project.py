@@ -24,6 +24,7 @@ from meltano.core.error import (
     ProjectReadonly,
 )
 from meltano.core.hub import MeltanoHubService
+from meltano.core.project_dirs_service import ProjectDirsService
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -31,7 +32,6 @@ from meltano.core.utils import (
     check_meltano_compatibility,
     get_meltano_version,
     makedirs,
-    sanitize_filename,
     truthy,
 )
 
@@ -173,6 +173,15 @@ class Project:
             A `MeltanoHubService` instance for this project.
         """
         return MeltanoHubService(self)
+
+    @cached_property
+    def dirs(self) -> ProjectDirsService:
+        """Get the project directories service.
+
+        Returns:
+            A `ProjectDirsService` instance for this project.
+        """
+        return ProjectDirsService(root=self.root, sys_dir=self.sys_dir_root)
 
     @cached_property
     def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
@@ -380,7 +389,7 @@ class Project:
         Returns:
             project root joined with provided subdirs and/or file
         """
-        return self.root.joinpath(*joinpaths)
+        return self.dirs.root_dir(*joinpaths)
 
     @property
     def meltanofile(self) -> Path:
@@ -451,7 +460,7 @@ class Project:
         self.refresh()
 
     @makedirs
-    def meltano_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
+    def meltano_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
         """Path to the project `.meltano` directory.
 
         Args:
@@ -461,33 +470,7 @@ class Project:
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
         """
-        return self.sys_dir_root.joinpath(*joinpaths)
-
-    @makedirs
-    def analyze_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
-        """Path to the project `analyze` directory.
-
-        Args:
-            joinpaths: Paths to join to the `analyze` directory.
-            make_dirs: Whether to create the directory hierarchy if it doesn't exist.
-
-        Returns:
-            Resolved path to `analyze` dir optionally joined to given paths.
-        """
-        return self.root_dir("analyze", *joinpaths)
-
-    @makedirs
-    def extract_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
-        """Path to the project `extract` directory.
-
-        Args:
-            joinpaths: Paths to join to the `extract` directory.
-            make_dirs: Whether to create the directory hierarchy if it doesn't exist.
-
-        Returns:
-            Resolved path to `extract` dir optionally joined to given paths.
-        """
-        return self.root_dir("extract", *joinpaths)
+        return self.dirs.meltano(*joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def venvs_dir(self, *prefixes: StrPath, make_dirs: bool = True) -> Path:
@@ -500,7 +483,7 @@ class Project:
         Returns:
             Resolved path to `venv` dir optionally prepended with given prefixes.
         """
-        return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
+        return self.dirs.venvs(*prefixes, make_dirs=make_dirs)
 
     @makedirs
     def run_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
@@ -513,7 +496,7 @@ class Project:
         Returns:
             Resolved path to `run` dir optionally joined to given paths.
         """
-        return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
+        return self.dirs.run(*joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def logs_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
@@ -526,7 +509,7 @@ class Project:
         Returns:
             Resolved path to `logs` dir optionally joined to given paths.
         """
-        return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
+        return self.dirs.logs(*joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def job_dir(
@@ -545,12 +528,7 @@ class Project:
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.run_dir(
-            "elt",
-            sanitize_filename(state_id),
-            *joinpaths,
-            make_dirs=make_dirs,
-        )
+        return self.dirs.job(state_id, *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def job_logs_dir(
@@ -569,12 +547,7 @@ class Project:
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.logs_dir(
-            "elt",
-            sanitize_filename(state_id),
-            *joinpaths,
-            make_dirs=make_dirs,
-        )
+        return self.dirs.job_logs(state_id, *joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def plugin_dir(
@@ -593,15 +566,10 @@ class Project:
         Returns:
             Resolved path to plugin installation dir optionally joined to given paths.
         """
-        return self.meltano_dir(
-            plugin.type,
-            plugin.plugin_dir_name,
-            *joinpaths,
-            make_dirs=make_dirs,
-        )
+        return self.dirs.plugin(plugin, *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def root_plugins_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
+    def root_plugins_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
         """Path to the project `plugins` directory.
 
         Args:
@@ -611,7 +579,7 @@ class Project:
         Returns:
             Path to the project `plugins` directory.
         """
-        return self.root_dir("plugins", *joinpaths)
+        return self.dirs.root_plugins(*joinpaths, make_dirs=make_dirs)
 
     @makedirs
     def plugin_lock_path(
@@ -633,14 +601,10 @@ class Project:
         Returns:
             Path to the plugin lock file.
         """
-        filename = f"{plugin_name}"
-
-        if variant_name:
-            filename = f"{filename}--{variant_name}"
-
-        return self.root_plugins_dir(
+        return self.dirs.plugin_lock_path(
             plugin_type,
-            f"{filename}.lock",
+            plugin_name,
+            variant_name=variant_name,
             make_dirs=make_dirs,
         )
 
