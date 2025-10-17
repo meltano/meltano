@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import errno
-import importlib.metadata
 import os
 import sys
 import threading
@@ -17,7 +16,6 @@ import structlog
 from dotenv import dotenv_values
 
 from meltano.core import yaml
-from meltano.core.behavior.versioned import Versioned
 from meltano.core.config_service import ConfigService
 from meltano.core.environment import Environment
 from meltano.core.error import (
@@ -29,7 +27,13 @@ from meltano.core.hub import MeltanoHubService
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.utils import makedirs, sanitize_filename, truthy
+from meltano.core.utils import (
+    check_meltano_compatibility,
+    get_meltano_version,
+    makedirs,
+    sanitize_filename,
+    truthy,
+)
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
@@ -65,10 +69,9 @@ def walk_parent_directories() -> Generator[Path, None, None]:
         directory = parent_directory
 
 
-class Project(Versioned):
+class Project:
     """Represents a Meltano project."""
 
-    __version__ = 1
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
@@ -175,14 +178,14 @@ class Project(Versioned):
     def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
         return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
 
-    @cached_property
+    @property
     def user_agent(self) -> str:
         """Get the user agent for this project.
 
         Returns:
             the user agent string for this project
         """
-        return f"Meltano/{importlib.metadata.version('meltano')}"
+        return f"Meltano/{get_meltano_version()}"
 
     @property
     def env(self) -> dict[str, str]:
@@ -212,7 +215,7 @@ class Project(Versioned):
         """
         import ctypes
 
-        project.ensure_compatible()
+        check_meltano_compatibility(project.meltano.requires_meltano)
 
         # create a symlink to our current binary
         try:
@@ -659,3 +662,11 @@ class Project(Versioned):
             Project hash.
         """
         return self.root.__hash__()
+
+    def __repr__(self) -> str:
+        """Project representation.
+
+        Returns:
+            Project representation.
+        """
+        return f"Project({self.root!r})"

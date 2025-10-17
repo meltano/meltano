@@ -94,7 +94,6 @@ Next steps:
 This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
 ```yml
-version: 1
 default_environment: dev
 project_id: <unique-GUID>
 environments:
@@ -339,7 +338,6 @@ meltano select tap-github commits commit_timestamp
 This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml
-version: 1
 default_environment: dev
 environments:
 - name: dev

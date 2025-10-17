@@ -19,7 +19,6 @@ eliminates the need for managing and toggling between multiple `.env` files.
 A set of environment definitions looks like this within `meltano.yml`:
 
 ```yaml
-version: 1
 default_environment: dev
 project_id: 9f8ac2b3-58ae-4db0-b20a-d9f5431c5d93
 environments:

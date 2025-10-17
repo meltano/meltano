@@ -101,7 +101,6 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
 
    ```yml
-   version: 1
    default_environment: dev
    project_id: <random UUID>
    environments:

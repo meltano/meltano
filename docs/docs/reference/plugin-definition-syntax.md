@@ -255,6 +255,30 @@ See the full in the [`requires` section](#requires) above.
 
 See the full in the [`requires` section](#requires) above.
 
+## `requires_meltano`
+
+Optional. A version specifier for the Meltano version required by this plugin. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error when attempting to invoke the plugin.
+
+This field uses the same syntax as Python package version specifiers and supports complex version requirements.
+
+Examples:
+
+```yaml
+# Require Meltano 3.0 or higher
+requires_meltano: ">=3.0.0"
+
+# Require Meltano 3.x (3.0 or higher, but less than 4.0)
+requires_meltano: ">=3.0.0,<4.0.0"
+
+# Require exactly Meltano 3.5.0
+requires_meltano: "==3.5.0"
+
+# Require Meltano 3.6 or higher, but less than 3.8
+requires_meltano: ">=3.6.0,<3.8.0"
+```
+
+Note: This field should only be present in plugin lockfiles, not in `meltano.yml` for plugins from Meltano Hub. It is primarily used by the Hub to indicate compatibility requirements for specific plugin versions.
+
 ## `commands`
 
 The [commands](/concepts/project#plugin-commands) that are available for this plugin.

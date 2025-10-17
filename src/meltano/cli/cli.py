@@ -11,18 +11,15 @@ from pathlib import Path
 import click
 import structlog
 
-from meltano import (
-    __version__,
-)
+from meltano import __version__
 from meltano.cli.utils import InstrumentedGroup
-from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, LogFormat, setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
-from meltano.core.utils import get_no_color_flag
+from meltano.core.utils import IncompatibleMeltanoVersionError, get_no_color_flag
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -160,9 +157,10 @@ def cli(
         if ctx.invoked_subcommand != "init":
             raise
         ctx.obj["project"] = None
-    except IncompatibleVersionError:
+    except IncompatibleMeltanoVersionError as e:
         click.secho(
-            "This Meltano project is incompatible with this version of `meltano`.",
+            f"You're using {e.current_version}, but this project requires "
+            f"{e.required_version}.",
             fg="yellow",
         )
         click.echo(

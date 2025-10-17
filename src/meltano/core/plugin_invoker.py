@@ -181,6 +181,7 @@ class PluginInvoker:
         self.project = project
         self.tracker = Tracker(project)
         self.plugin = plugin
+        self.plugin.ensure_compatible()
         self.context = context
         self.output_handlers = output_handlers
         self.venv_service: VenvService | None
