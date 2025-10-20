@@ -16,6 +16,8 @@ updates:
         - "patch"
     commit-message:
       prefix: "ci: "
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -30,6 +32,8 @@ updates:
           - "*"
     commit-message:
       prefix: "ci: "
+    cooldown:
+      default-days: 7
   - package-ecosystem: uv
     versioning-strategy: increase-if-necessary
     directory: "/"
@@ -50,6 +54,8 @@ updates:
     commit-message:
       prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
+    cooldown:
+      default-days: 7
   - package-ecosystem: npm
     versioning-strategy: increase
     directory: "docs"
@@ -70,9 +76,13 @@ updates:
     commit-message:
       prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
+    cooldown:
+      default-days: 7
   - package-ecosystem: "docker-compose"
     directory: "tests/fixtures/docker/"
     schedule:
       interval: "monthly"
       time: "12:00"
       timezone: "Etc/UTC"
+    cooldown:
+      default-days: 7
