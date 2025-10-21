@@ -291,11 +291,11 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
                 ),
             ),
         ]
-        
+
         # Pass columns to parent constructor
         kwargs["columns"] = columns
         super().__init__(*args, **kwargs)
-        
+
         colors = kwargs.get("colors")
         self._error_formatter = (
             plugin_error_renderer  # or construct one with the right flags
