@@ -242,7 +242,60 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
             include_keys: Whether to include specific keys in the output.
             kwargs: Keyword arguments to pass to the parent class.
         """
+        # Create custom columns for better formatting
+        columns = [
+            structlog.dev.Column(
+                "timestamp",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style="dim",
+                    reset_style="",
+                    value_repr=str,
+                ),
+            ),
+            structlog.dev.Column(
+                "level",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style="bold",
+                    reset_style="",
+                    value_repr=str,
+                ),
+            ),
+            structlog.dev.Column(
+                "name",  # This creates the plugin name column
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style="cyan",
+                    reset_style="",
+                    value_repr=str,
+                ),
+            ),
+            structlog.dev.Column(
+                "event",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style="",
+                    reset_style="",
+                    value_repr=str,
+                ),
+            ),
+            # Default column for remaining fields
+            structlog.dev.Column(
+                "",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style="",
+                    reset_style="",
+                    value_repr=str,
+                ),
+            ),
+        ]
+        
+        # Pass columns to parent constructor
+        kwargs["columns"] = columns
         super().__init__(*args, **kwargs)
+        
         colors = kwargs.get("colors")
         self._error_formatter = (
             plugin_error_renderer  # or construct one with the right flags
