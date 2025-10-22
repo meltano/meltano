@@ -36,6 +36,7 @@ from meltano.cli import (
 from meltano.cli import compile as compile_module
 from meltano.cli.cli import cli
 from meltano.cli.utils import CliError
+from meltano.core._compat import MeltanoInternalDeprecationWarning
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.logging import setup_logging
 
@@ -125,6 +126,7 @@ def main() -> None:
     # Mark the current process as executed via the CLI
     logging.captureWarnings(capture=True)
     warnings.filterwarnings("once", category=DeprecationWarning)
+    warnings.filterwarnings("ignore", category=MeltanoInternalDeprecationWarning)
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
     try:
         _run_cli()

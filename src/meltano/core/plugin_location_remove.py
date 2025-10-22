@@ -150,7 +150,7 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
             plugin: The plugin to remove.
             project: The Meltano project.
         """
-        lockfile_dir = project.root_plugins_dir(plugin.type)
+        lockfile_dir = project.root_plugins_dir(plugin.type)  # type: ignore[deprecated]
         glob_expr = f"{plugin.name}*.lock"
         super().__init__(
             plugin,
@@ -186,7 +186,7 @@ class InstallationRemoveManager(PluginLocationRemoveManager):
             plugin: The plugin to remove.
             project: The Meltano project.
         """
-        path = project.plugin_dir(plugin, make_dirs=False)
+        path = project.plugin_dir(plugin, make_dirs=False)  # type: ignore[deprecated]
         super().__init__(plugin, str(path.parent.relative_to(project.root)))
         self.path = path
 

@@ -183,6 +183,7 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::ResourceWarning",
+  "once::meltano.core._compat.MeltanoInternalDeprecationWarning",
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -269,6 +270,7 @@ enable_error_code = [
   "redundant-expr",
   "truthy-bool",
   "exhaustive-match",
+  "deprecated",
 ]
 incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
 files = [
@@ -297,7 +299,6 @@ module = [
   "meltano.core.behavior.canonical",
   "meltano.core.behavior.hookable",
   "meltano.core.behavior.name_eq",
-  "meltano.core.behavior.versioned",
   "meltano.core.behavior.visitor",
   "meltano.core.block.extract_load",
   "meltano.core.block.plugin_command",
