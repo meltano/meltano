@@ -1541,7 +1541,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0.1,<2" },
     { name = "pyyaml", specifier = ">=6.0.2,<7" },
     { name = "requests", specifier = ">=2.32.3,<3" },
-    { name = "rich", specifier = ">=14.0,<14.2" },
+    { name = "rich", specifier = ">=14.0,<14.3" },
     { name = "ruamel-yaml", specifier = ">=0.18.6,<0.19" },
     { name = "smart-open", specifier = ">=7.0.5,<8" },
     { name = "snowplow-tracker", specifier = ">=1.0.4,<2" },
