@@ -90,6 +90,6 @@ repos:
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.3
+    rev: 0.9.4
     hooks:
       - id: uv-lock
