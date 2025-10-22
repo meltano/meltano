@@ -140,6 +140,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#9385](https://github.com/meltano/meltano/issues/9385) Use tabs to exemplify new and legacy syntax for `meltano add`
 - [#9381](https://github.com/meltano/meltano/issues/9381) Document that Snowflake is a supported state backend
 - [#9370](https://github.com/meltano/meltano/issues/9370) The "most straightforward" way to install Meltano now is uv
+- [#9597](https://github.com/meltano/meltano/issues/9597) docs: Document usage of uv environment variables
 
 ### 📦 Packaging changes
 
