@@ -101,7 +101,7 @@ class ProjectSettingsService(SettingsService):
             project_id = None
 
         if project_id is None:
-            analytics_path = self.project.meltano_dir() / "analytics.json"
+            analytics_path = self.project.meltano_dir() / "analytics.json"  # type: ignore[deprecated]
             try:
                 with analytics_path.open() as analytics_json_file:
                     project_id = json.load(analytics_json_file)["project_id"]

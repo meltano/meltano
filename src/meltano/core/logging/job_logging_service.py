@@ -52,7 +52,7 @@ class JobLoggingService:  # noqa: D101
         Returns:
             The logs directory for the given state ID.
         """
-        return self.project.job_logs_dir(state_id, *joinpaths, make_dirs=make_dirs)
+        return self.project.job_logs_dir(state_id, *joinpaths, make_dirs=make_dirs)  # type: ignore[deprecated]
 
     def generate_log_name(
         self,
@@ -162,7 +162,7 @@ class JobLoggingService:  # noqa: D101
             log_path.unlink()
 
     def legacy_logs_dir(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
-        job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)
+        job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)  # type: ignore[deprecated]
         return job_dir if job_dir.exists() else None
 
     def logs_dirs(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102

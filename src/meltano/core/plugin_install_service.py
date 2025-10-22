@@ -437,7 +437,7 @@ class PluginInstallService:
             return False, message
 
         venv = VirtualEnv(
-            self.project.plugin_dir(plugin, "venv", make_dirs=False),
+            self.project.plugin_dir(plugin, "venv", make_dirs=False),  # type: ignore[deprecated]
             python=plugin.python or self.project.settings.get("python"),
         )
         message = "Requirements have not changed"
