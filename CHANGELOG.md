@@ -93,6 +93,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#9555](https://github.com/meltano/meltano/issues/9555) Declare support for Python 3.14
 - [#9550](https://github.com/meltano/meltano/issues/9550) Allow uv 0.9
 - [#9513](https://github.com/meltano/meltano/issues/9513) Allow Click 8.3
+- [#9596](https://github.com/meltano/meltano/issues/9596) Allow Rich 14.2
 - [#9496](https://github.com/meltano/meltano/issues/9496) Restore support for Click 8.1
 - [#9472](https://github.com/meltano/meltano/issues/9472) Require Click 8.2+ and use new generic `click.Choice` support
 - [#9449](https://github.com/meltano/meltano/issues/9449) Pin core `click` and `sqlalchemy` dependencies to their minor versions
