@@ -62,7 +62,7 @@ class PluginLockService:
         variant_name: str | None = None,
     ) -> Path:
         """Get the path to the plugin lockfile from a type, name, and variant."""
-        return self.project.plugin_lock_path(
+        return self.project.plugin_lock_path(  # type: ignore[deprecated]
             plugin_type,
             plugin_name,
             variant_name=variant_name,
