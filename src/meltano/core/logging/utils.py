@@ -197,9 +197,6 @@ def default_config(
                 "level": logging.ERROR,
             },
             "urllib3": {
-                "level": logging.INFO,
-            },
-            "urllib3.connection": {
                 "level": logging.ERROR,
             },
             "asyncio": {
