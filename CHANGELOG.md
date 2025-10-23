@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### 🐛 Fixes
 
-- [#9600](https://github.com/meltano/meltano/issues/9600) Fix plugin definition only once when locking plugins with `meltano lock`
+- [#9600](https://github.com/meltano/meltano/issues/9600) Fetch plugin definition only once when locking plugins with `meltano lock`
 
 ### ⚙️ Under the Hood
 
