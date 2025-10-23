@@ -1,136 +1,47 @@
 ---
 slug: 2025-q3-updates-and-changes
 title: 2025 Q3 Updates and Changes
-date: 2025-10-17
+date: 2025-09-30
 ---
 
 ## Meltano
 
-We're excited to announce the release of Meltano 4.0! This major version includes improvements to logging, state management, and developer experience.
+We've released Meltano [3.8](https://github.com/meltano/meltano/releases/tag/v3.8.0) and [3.9](https://github.com/meltano/meltano/releases/tag/v3.9.0).
 
-See the [v4.0.0 migration guide](/guide/v4-migration) for detailed upgrade instructions. To upgrade to the latest version, follow the [installation guide](/getting-started/installation).
+These include improvements to the CLI:
 
-### Distribution
+- `meltano add`, `meltano install` and `meltano remove` no longer require specifying a plugin type.
+- `meltano add` is now idempotent instead of failing if the plugin already exists.
+- Run IDs now have time-ordered UUIDv7 values.
 
-#### Python 3.10+ Required
+You can read the complete release notes [on GitHub](https://github.com/meltano/meltano/releases/).
 
-- Python 3.9 [reaches end of life on 2025-10](https://devguide.python.org/versions/), and the Python ecosystem is moving on to newer versions. To keep up with the latest features and security fixes, we've dropped support for
-Python 3.9.
-- Python 3.14 (released 2025-10-07) is now officially supported.
+## MeltanoHub
 
-#### Docker images
+### Extractors
 
-The `psycopg2` extra has been removed from Meltano's Docker images to reduce image size. This package is maintained but not receiving any new feature, so the psycopg3 package is preferred.
+We added 8 new extractors during Q3 2025:
 
-New "slim" Docker images are available. These images are smaller than the default images and only include the essential packages for running Meltano. See https://hub.docker.com/r/meltano/meltano/tags for the full list of tags.
+* Added the Matatika variant of tap-baidu - [Hub Link](https://hub.meltano.com/extractors/tap-baidu--matatika/)
+* Added the Automattic variant of tap-wordpress-org - [Hub Link](https://hub.meltano.com/extractors/tap-wordpress-org--automattic/)
+* Added the ella6882 variant of tap-meltwater - [Hub Link](https://hub.meltano.com/extractors/tap-meltwater--ella6882/)
+* Added the Blueprint Data variant of tap-dune - [Hub Link](https://hub.meltano.com/extractors/tap-dune--blueprint-data/)
+* Added the ella6882 variant of tap-reprise - [Hub Link](https://hub.meltano.com/extractors/tap-reprise--ella6882/)
+* Added the celine-eu variant of tap-grib - [Hub Link](https://hub.meltano.com/extractors/tap-grib--celine-eu/)
+* Added the celine-eu variant of tap-geo - [Hub Link](https://hub.meltano.com/extractors/tap-geo--celine-eu/)
+* Added the Broscorp variant of tap-tempo - [Hub Link](https://hub.meltano.com/extractors/tap-tempo--broscorp-net/)
 
-### Logging
+### Loaders
 
-#### Structured Logging
-
-Meltano will now parse and render structured logs from plugins that advertise the `structured_logging` capability. Among other things, this means:
-
-- that plugin exceptions will be rendered in the console output
-- the log level as emitted by the plugin will be honored
-
-New and up-to-date extractors and loaders based on the Singer SDK now advertise the `structured_logging` capability, so they're compatible with Meltano 4.0 structured logging out of the box.
-
-```bash
-/projects $ meltano init try-meltano-4
-/projects $ cd try-meltano-4
-/projects/try-meltano-4 $ meltano add tap-fedidb target-csv
-/projects/try-meltano-4 $ meltano select tap-fedidb # select all streams and properties
-/projects/try-meltano-4 $ meltano select tap-fedidb --exclude servers # but exclude the servers stream
-/projects/try-meltano-4 $ meltano run tap-fedidb target-csv
-2025-10-17T18:38:59.967561Z [info     ] Environment 'dev' is active
-2025-10-17T18:39:00.114214Z [info     ] Running job with name 'dev:tap-fedidb-to-target-csv' and run ID '0199f377-d1cd-73b5-8cf3-21501d1df1b1'
-2025-10-17T18:39:00.172674Z [info     ] Using systemdb state backend
-2025-10-17T18:39:00.387700Z [info     ] tap-fedidb v0.5.0, Meltano SDK v0.50.2 name=tap-fedidb
-2025-10-17T18:39:00.387986Z [info     ] Skipping parse of env var settings... name=tap-fedidb
-2025-10-17T18:39:00.388546Z [info     ] Beginning full_table sync of 'popular_accounts' name=tap-fedidb
-2025-10-17T18:39:00.404188Z [info     ] target-csv v0.2.1, Meltano SDK v0.50.2 name=target-csv
-2025-10-17T18:39:00.404340Z [info     ] Skipping parse of env var settings... name=target-csv
-2025-10-17T18:39:00.407237Z [info     ] Writing to destination file '/projects/try-meltano-4/popular_accounts.csv'... name=target-csv
-2025-10-17T18:39:00.655493Z [info     ] METRIC                         metric_name=http_request_duration metric_value=0.262111 name=tap-fedidb
-2025-10-17T18:39:00.687525Z [info     ] METRIC                         metric_name=http_request_count metric_value=1 name=tap-fedidb
-2025-10-17T18:39:00.687787Z [info     ] METRIC                         metric_name=sync_duration metric_value=0.2988448143005371 name=tap-fedidb
-2025-10-17T18:39:00.687899Z [info     ] METRIC                         metric_name=record_count metric_value=136 name=tap-fedidb
-2025-10-17T18:39:00.687992Z [info     ] Skipping deselected stream 'servers'. name=tap-fedidb
-2025-10-17T18:39:00.688076Z [info     ] Beginning full_table sync of 'software' name=tap-fedidb
-2025-10-17T18:39:00.697430Z [info     ] Writing to destination file '/projects/try-meltano-4/software.csv'... name=target-csv
-2025-10-17T18:39:00.920552Z [info     ] METRIC                         metric_name=http_request_duration metric_value=0.229912 name=tap-fedidb
-2025-10-17T18:39:00.944498Z [info     ] METRIC                         metric_name=http_request_count metric_value=1 name=tap-fedidb
-2025-10-17T18:39:00.944842Z [info     ] METRIC                         metric_name=sync_duration metric_value=0.25652623176574707 name=tap-fedidb
-2025-10-17T18:39:00.945004Z [info     ] METRIC                         metric_name=record_count metric_value=63 name=tap-fedidb
-2025-10-17T18:39:00.975334Z [info     ] Reader 'target-csv' completed processing 203 lines of input (2 schemas, 199 records, 0 batch manifests, 2 state messages, 0 activate version messages). name=target-csv
-2025-10-17T18:39:00.981157Z [info     ] Appending 136 records to file... name=target-csv
-2025-10-17T18:39:00.981449Z [info     ] Appending 63 records to file... name=target-csv
-2025-10-17T18:39:00.984365Z [info     ] METRIC                         metric_name=batch_processing_time metric_value=0.0030138492584228516 name=target-csv
-2025-10-17T18:39:00.984991Z [info     ] METRIC                         metric_name=batch_processing_time metric_value=0.0040929317474365234 name=target-csv
-2025-10-17T18:39:00.993061Z [info     ] METRIC                         metric_name=record_count metric_value=136 name=target-csv
-2025-10-17T18:39:00.993263Z [info     ] METRIC                         metric_name=record_count metric_value=63 name=target-csv
-2025-10-17T18:39:00.999113Z [info     ] Using systemdb state backend
-2025-10-17T18:39:01.002207Z [info     ] Incremental state has been updated at 2025-10-17 18:39:01.002179+00:00.
-2025-10-17T18:39:01.028876Z [info     ] Block run completed
-2025-10-17T18:39:01.029042Z [info     ] Run completed
-```
-
-Also, plugin subprocess loggers have been renamed to `meltano.plugins.<stream>.<type>.<name>`, where `<stream>` is either `stdout` or `stderr`. This separates standard output and error streams into distinct loggers.
-
-#### Subcommand
-
-A new `meltano logs` command has been added to view and manage job logs:
-
-```bash
-meltano logs --help
-```
-
-#### Console Output
-
-The default console logger now displays fewer keys to reduce visual clutter. The keys can customized using a logging configuration file. This should make it easier to read the logs and focus on the important information.
-
-Note that the [JSON formatter](/reference/command-line-interface#log-configurations) still includes all the keys.
-
-#### Storage
-
-Meltano now stores logs in a platform-appropriate location following OS conventions. Check the location in your platform with the `meltano logs dir` command.
-
-### Configuration Management
-
-The order of positional arguments for `meltano config` subcommands has changed. The plugin name now comes after the subcommand:
-
-```bash
-# Old
-meltano config <plugin_name> set <setting> <value>
-
-# New
-meltano config set <plugin_name> <setting> <value>
-```
-
-### Other Improvements
-
-- Plugin definitions are now automatically locked if the lockfile is missing. This removes the need to run `meltano lock` for working on a legacy project.
-- A new `meltano state edit` command has been added to manually edit the state of a given state ID.
-- The `meltano state get` and `meltano state set` commands now output and accept state in a more compact format.
-- Loaders now support the `meltano config test` command to test the loader's configuration.
-- Support for custom .env file locations has been added: `meltano --env-file <path> ...`.
-- A new `requires_meltano` key has been added to the project level of the meltano.yml file. This key can be used to require a specific version of Meltano to be installed.
-
-### Thank You
-
-Thank you to all the contributors who made this release possible!
-
-For the complete list of changes, see the [full release notes](https://github.com/meltano/meltano/releases/tag/v4.0.0).
+* Added the Definite.app vairant of target-ducklake - [Hub Link](https://hub.meltano.com/loaders/target-ducklake--definite)
 
 ## SDK
 
-We shipped 5 minor releases of the SDK during Q3:
+We shipped 3 minor releases of the SDK during Q3:
 
 * [v0.48.0](https://github.com/meltano/sdk/releases/tag/v0.48.0)
 * [v0.49.0](https://github.com/meltano/sdk/releases/tag/v0.49.0)
 * [v0.50.0](https://github.com/meltano/sdk/releases/tag/v0.50.0)
-* [v0.51.0](https://github.com/meltano/sdk/releases/tag/v0.51.0)
-* [v0.52.0](https://github.com/meltano/sdk/releases/tag/v0.52.0)
 
 Among other things, these releases shipped the following changes:
 
