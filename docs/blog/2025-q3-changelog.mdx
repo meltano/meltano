@@ -1,0 +1,50 @@
+---
+slug: 2025-q3-updates-and-changes
+title: 2025 Q3 Updates and Changes
+date: 2025-09-30
+---
+
+## Meltano
+
+We've released Meltano [3.8](https://github.com/meltano/meltano/releases/tag/v3.8.0) and [3.9](https://github.com/meltano/meltano/releases/tag/v3.9.0).
+
+These include improvements to the CLI:
+
+- `meltano add`, `meltano install` and `meltano remove` no longer require specifying a plugin type.
+- `meltano add` is now idempotent instead of failing if the plugin already exists.
+- Run IDs now have time-ordered UUIDv7 values.
+
+You can read the complete release notes [on GitHub](https://github.com/meltano/meltano/releases/).
+
+## MeltanoHub
+
+### Extractors
+
+We added 8 new extractors during Q3 2025:
+
+* Added the Matatika variant of tap-baidu - [Hub Link](https://hub.meltano.com/extractors/tap-baidu--matatika/)
+* Added the Automattic variant of tap-wordpress-org - [Hub Link](https://hub.meltano.com/extractors/tap-wordpress-org--automattic/)
+* Added the ella6882 variant of tap-meltwater - [Hub Link](https://hub.meltano.com/extractors/tap-meltwater--ella6882/)
+* Added the Blueprint Data variant of tap-dune - [Hub Link](https://hub.meltano.com/extractors/tap-dune--blueprint-data/)
+* Added the ella6882 variant of tap-reprise - [Hub Link](https://hub.meltano.com/extractors/tap-reprise--ella6882/)
+* Added the celine-eu variant of tap-grib - [Hub Link](https://hub.meltano.com/extractors/tap-grib--celine-eu/)
+* Added the celine-eu variant of tap-geo - [Hub Link](https://hub.meltano.com/extractors/tap-geo--celine-eu/)
+* Added the Broscorp variant of tap-tempo - [Hub Link](https://hub.meltano.com/extractors/tap-tempo--broscorp-net/)
+
+### Loaders
+
+* Added the Definite.app vairant of target-ducklake - [Hub Link](https://hub.meltano.com/loaders/target-ducklake--definite)
+
+## SDK
+
+We shipped 3 minor releases of the SDK during Q3:
+
+* [v0.48.0](https://github.com/meltano/sdk/releases/tag/v0.48.0)
+* [v0.49.0](https://github.com/meltano/sdk/releases/tag/v0.49.0)
+* [v0.50.0](https://github.com/meltano/sdk/releases/tag/v0.50.0)
+
+Among other things, these releases shipped the following changes:
+
+* Structured logging Support
+* Python 3.14 Support
+* Automatic schema generation from OpenAPI specifications
