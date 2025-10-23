@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.0.1 (2025-10-23)
+
+### 🐛 Fixes
+
+- [#9600](https://github.com/meltano/meltano/issues/9600) Fix plugin definition only once when locking plugins with `meltano lock`
+
+### ⚙️ Under the Hood
+
+- [#9599](https://github.com/meltano/meltano/issues/9599) Filter out `urllib3` logs below the error level
+
 ## v4.0.0 (2025-10-17)
 
 ### BREAKING CHANGES
