@@ -106,6 +106,29 @@ def test_flatten() -> None:
     assert result == expected_flat
 
 
+def test_unflatten() -> None:
+    from meltano.core.utils import unflatten
+
+    # Test basic dot notation unflatten (matches original flatten_dict behavior)
+    flat_config = {"_update.orchestrate/dags/meltano.py": False}
+    # Note: The dot in ".py" is also split, matching original flatten_dict behavior
+    expected_nested = {"_update": {"orchestrate/dags/meltano": {"py": False}}}
+    result = unflatten(flat_config, "dot")
+    assert result == expected_nested
+
+    # Test multiple levels
+    flat_config = {"a.b.c": 1, "a.b.d": 2, "a.e": 3}
+    expected_nested = {"a": {"b": {"c": 1, "d": 2}, "e": 3}}
+    result = unflatten(flat_config, "dot")
+    assert result == expected_nested
+
+    # Test that flatten and unflatten are inverses
+    original = {"foo": {"bar": {"baz": "value"}}}
+    flattened = flatten(original, "dot")
+    unflattened = unflatten(flattened, "dot")
+    assert unflattened == original
+
+
 @pytest.mark.parametrize(
     ("input_value", "env", "kwargs", "expected_output"),
     (
