@@ -117,7 +117,7 @@ jobs:
         --git-sha ${{ github.sha }}
         --package-version ${NEEDS_BUILD_OUTPUTS_VERSION}
         --python-version ${{ matrix.python-version }}
-        --default-python ${{ env.DEFAULT_PYTHON }}
+        --default-python ${DEFAULT_PYTHON}
         --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
         ${{ matrix.slim && '--slim' || '' }}
         > tags

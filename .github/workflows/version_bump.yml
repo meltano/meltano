@@ -24,6 +24,10 @@ on:
         - beta
         - rc
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   create_release_branch_pr:
     name: Create Release Pull Request
@@ -46,6 +50,8 @@ jobs:
         python-version: "3.x"
 
     - uses: astral-sh/setup-uv@3259c6206f993105e3a61b142c2d97bf4b9ef83d # v7.1.0
+      with:
+        enable-cache: false
 
     - name: Bump version
       id: cz-bump

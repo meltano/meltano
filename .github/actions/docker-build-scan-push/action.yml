@@ -59,11 +59,13 @@ runs:
       id: dockerfile-path
       shell: bash
       run: |
-        if [[ "${{ inputs.slim }}" == "true" ]]; then
+        if [[ "${INPUTS_SLIM}" == "true" ]]; then
           echo "path=docker/meltano/Dockerfile.slim" >> $GITHUB_OUTPUT
         else
           echo "path=docker/meltano/Dockerfile" >> $GITHUB_OUTPUT
         fi
+      env:
+        INPUTS_SLIM: ${{ inputs.slim }}
 
     - name: Build the image for all supported architectures
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
