@@ -111,7 +111,7 @@ class ScheduleService:
         name: str,
         extractor: str,
         loader: str,
-        transform: str,
+        transform: t.Literal["skip", "only", "run"],
         interval: str,
         **env: str,
     ) -> ELTSchedule:
