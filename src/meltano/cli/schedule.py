@@ -33,7 +33,6 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
-    from meltano.core.schedule import Schedule
     from meltano.core.task_sets import TaskSets
 
 
@@ -61,7 +60,7 @@ def _add_elt(
     name: str,
     extractor: str,
     loader: str,
-    transform: str,
+    transform: t.Literal["skip", "only", "run"],
     interval: str,
 ) -> None:
     """Add a new legacy elt schedule."""
@@ -142,7 +141,7 @@ def add(
     job: str | None,
     extractor: str | None,
     loader: str | None,
-    transform: str,
+    transform: t.Literal["skip", "only", "run"],
     interval: str,
 ) -> None:
     """Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
@@ -322,64 +321,6 @@ def remove(ctx: click.Context, name: str) -> None:
     ctx.obj["schedule_service"].remove_schedule(name)
 
 
-def _update_job_schedule(
-    candidate: JobSchedule,
-    job: str | None,
-    interval: str | None = None,
-) -> Schedule:
-    """Update an existing job schedule.
-
-    Args:
-        candidate: The schedule to update.
-        job: The name of the job to run.
-        interval: The interval of the schedule.
-
-    Raises:
-        click.ClickException: If the schedule is not a scheduled job.
-
-    Returns:
-        The updated schedule.
-    """
-    if job:
-        candidate.job = job
-    if interval:
-        candidate.interval = interval
-    return candidate
-
-
-def _update_elt_schedule(
-    candidate: ELTSchedule,
-    extractor: str | None,
-    loader: str | None,
-    transform: str | None,
-    interval: str | None,
-) -> Schedule:
-    """Update an elt schedule.
-
-    Args:
-        candidate: The schedule to update.
-        extractor: The name of the extractor to use.
-        loader: The name of the loader to use.
-        transform: The transform flag to use.
-        interval: The interval of the schedule.
-
-    Raises:
-        click.ClickException: If the schedule is not a scheduled elt task.
-
-    Returns:
-        The updated schedule.
-    """
-    if extractor:
-        candidate.extractor = extractor
-    if loader:
-        candidate.loader = loader
-    if transform:
-        candidate.transform = transform
-    if interval:
-        candidate.interval = interval
-    return candidate
-
-
 @schedule.command(
     cls=PartialInstrumentedCmd,
     name="set",
@@ -411,7 +352,7 @@ def set_cmd(
     job: str | None,
     extractor: str | None,
     loader: str | None,
-    transform: str | None,
+    transform: t.Literal["skip", "only", "run"] | None,
 ) -> None:
     """Update a schedule.
 
@@ -419,29 +360,30 @@ def set_cmd(
         meltano schedule set <name> [--interval <interval>] [--job <job>] [--extractor <extractor>] [--loader <loader>] [--transform <transform>]
     """  # noqa: E501
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
-    candidate = schedule_service.find_schedule(name)
+    match candidate := schedule_service.find_schedule(name):
+        case JobSchedule():
+            if extractor or loader or transform:
+                msg = "Cannot mix --job with --extractor/--loader/--transform"
+                raise click.UsageError(msg)
+            if interval:
+                candidate.interval = interval
+            if job:
+                candidate.job = job
+        case ELTSchedule():
+            if job:
+                msg = "Cannot mix --job with --extractor/--loader/--transform"
+                raise click.UsageError(msg)
+            if interval:
+                candidate.interval = interval
+            if extractor:
+                candidate.extractor = extractor
+            if loader:
+                candidate.loader = loader
+            if transform:
+                candidate.transform = transform
+        case _:  # pragma: no cover
+            msg = f"Invalid schedule type: {type(candidate)}"
+            raise ValueError(msg)
 
-    if isinstance(candidate, JobSchedule):
-        if extractor or loader or transform:
-            raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
-            )
-        updated = _update_job_schedule(candidate, job, interval)
-    elif isinstance(candidate, ELTSchedule):
-        if job:
-            raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
-            )
-        updated = _update_elt_schedule(
-            candidate,
-            extractor,
-            loader,
-            transform,
-            interval,
-        )
-    else:  # pragma: no cover
-        msg = f"Invalid schedule type: {type(candidate)}"
-        raise ValueError(msg)
-
-    schedule_service.update_schedule(updated)
+    schedule_service.update_schedule(candidate)
     click.echo(f"Updated schedule '{name}'")
