@@ -160,7 +160,7 @@ class ELTContext(ELContextProtocol):
             The job dir, if a Job is provided, else None.
         """
         if self.job:
-            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
+            return self.project.job_dir(self.job.job_name, str(self.job.run_id))  # type: ignore[deprecated]
 
         return None
 

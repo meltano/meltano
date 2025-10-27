@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.0.0rc1"
+version = "4.0.1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10,<3.15"
@@ -48,7 +48,7 @@ dependencies = [
   "python-dotenv>=1.0.1,<2",
   "pyyaml>=6.0.2,<7",
   "requests>=2.32.3,<3",
-  "rich>=14.0,<14.2",
+  "rich>=14.0,<14.3",
   "ruamel.yaml>=0.18.6,<0.19",
   "smart-open>=7.0.5,<8",
   "snowplow-tracker>=1.0.4,<2",
@@ -183,6 +183,7 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::ResourceWarning",
+  "once::meltano.core._compat.MeltanoInternalDeprecationWarning",
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -252,7 +253,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.0.0rc1"
+version = "4.0.1"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
@@ -269,6 +270,7 @@ enable_error_code = [
   "redundant-expr",
   "truthy-bool",
   "exhaustive-match",
+  "deprecated",
 ]
 incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
 files = [
@@ -297,7 +299,6 @@ module = [
   "meltano.core.behavior.canonical",
   "meltano.core.behavior.hookable",
   "meltano.core.behavior.name_eq",
-  "meltano.core.behavior.versioned",
   "meltano.core.behavior.visitor",
   "meltano.core.block.extract_load",
   "meltano.core.block.plugin_command",
@@ -310,15 +311,6 @@ module = [
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
-]
-
-[[tool.mypy.overrides]]
-ignore_missing_imports = true
-module = [
-  "click_default_group.*",  # https://github.com/click-contrib/click-default-group/issues/26
-  "click_didyoumean.*",     # Unreleased, https://github.com/click-contrib/click-didyoumean/commit/048b275077382e5a80bdf05b02830013eb37ddd1
-  "flatten_dict.*",         # Stale package, https://github.com/ianlini/flatten-dict
-  "smart_open.*",           # https://github.com/piskvorky/smart_open/issues/772
 ]
 
 [build-system]

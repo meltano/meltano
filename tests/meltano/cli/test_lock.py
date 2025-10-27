@@ -39,11 +39,18 @@ class TestLock:
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         assert len(lockfiles) == 2
 
-        result = cli_runner.invoke(cli, ["lock"])
+        result = cli_runner.invoke(
+            cli,
+            [
+                "--log-level=debug",
+                "--log-format=uncolored",
+                "lock",
+            ],
+        )
         assert result.exit_code == 0
-        assert "Lockfile exists for extractor tap-mock" in result.stdout
-        assert "Lockfile exists for loader target-mock" in result.stdout
-        assert "Locked definition" not in result.stdout
+        assert "Lockfile exists for extractor tap-mock" in result.stderr
+        assert "Lockfile exists for loader target-mock" in result.stderr
+        assert "Locked definition" not in result.stderr
 
     @pytest.mark.order(2)
     def test_lockfile_update(
@@ -72,11 +79,18 @@ class TestLock:
             },
         )
 
-        result = cli_runner.invoke(cli, ["lock", "--update"])
+        result = cli_runner.invoke(
+            cli,
+            [
+                "--log-level=debug",
+                "--log-format=uncolored",
+                "lock",
+                "--update",
+            ],
+        )
         assert result.exit_code == 0
-        assert result.stdout.count("Lockfile exists") == 0
-        assert result.stdout.count("Locked definition") == 2
-
+        assert result.stderr.count("Lockfile exists") == 0
+        assert result.stderr.count("Locked definition") == 2
         new_definition = subject.load_definition(
             plugin_type=tap.type,
             plugin_name=tap.name,
@@ -102,12 +116,19 @@ class TestLock:
 
         result = cli_runner.invoke(
             cli,
-            ["lock", "--update", "--plugin-type", "extractor"],
+            [
+                "--log-level=debug",
+                "--log-format=uncolored",
+                "lock",
+                "--update",
+                "--plugin-type",
+                "extractor",
+            ],
         )
         assert result.exit_code == 0
-        assert "Lockfile exists" not in result.stdout
-        assert "Locked definition for extractor tap-mock" in result.stdout
-        assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
+        assert "Lockfile exists" not in result.stderr
+        assert "Locked definition for extractor tap-mock" in result.stderr
+        assert "Extractor tap-mock-inherited is an inherited plugin" in result.stderr
 
     def test_lock_plugin_not_found(self, cli_runner: CliRunner) -> None:
         result = cli_runner.invoke(cli, ["lock", "not-a-plugin"])

@@ -1,7 +1,7 @@
 {
   "name": "docs.meltano.com",
   "license": "MIT",
-  "version": "4.0.0rc1",
+  "version": "4.0.1",
   "description": "https://meltano.com",
   "private": true,
   "scripts": {
@@ -28,7 +28,7 @@
   "homepage": "https://meltano.com",
   "dependencies": {
     "@docusaurus/core": "3.1.0",
-    "@docusaurus/plugin-google-gtag": "^3.9.1",
+    "@docusaurus/plugin-google-gtag": "^3.9.2",
     "@docusaurus/preset-classic": "3.1.0",
     "@mdx-js/react": "^3.1.1",
     "clsx": "^2.1.1",
@@ -38,9 +38,9 @@
     "swiper": "^12.0.2"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.9.1",
+    "@docusaurus/module-type-aliases": "3.9.2",
     "docusaurus-plugin-sass": "^0.2.6",
-    "eslint": "^9.37.0",
+    "eslint": "^9.38.0",
     "eslint-config-wesbos": "^4.3.2",
     "eslint-plugin-react": "^7.37.5",
     "postcss-import": "^16.1.1",

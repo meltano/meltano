@@ -37,9 +37,12 @@ Most of Meltano's features are available without installing any additional packa
 
 The following extras add support for different [system database](/concepts/project/#system-database) types, which function as the default [state backend](/concepts/state_backends):
 
-- `mssql` - Microsoft SQL Server.
-- `psycopg2` - PostgreSQL. It uses the legacy `psycopg2` driver.
-- `postgres` - PostgreSQL. It uses the modern `psycopg` driver.
+- [`mssql` - Microsoft SQL Server](https://docs.sqlalchemy.org/en/20/dialects/mssql.html#module-sqlalchemy.dialects.mssql.pymssql).
+- [`postgres` - PostgreSQL. It uses the modern `psycopg` driver](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg).
+
+:::warning
+<p>The <code>psycopg2</code> extra is supported, but the package won't receive any new features, so we recommend using the <code>postgres</code> extra instead.</p>
+:::
 
 To use these system databases, Meltano must be installed with the matching [optional component](#installing-optional-components)
 

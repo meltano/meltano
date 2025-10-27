@@ -300,7 +300,7 @@ class VenvService:
         self.namespace = namespace
         self.name = name
         self.venv = VirtualEnv(
-            self.project.venvs_dir(namespace, name, make_dirs=False),
+            self.project.venvs_dir(namespace, name, make_dirs=False),  # type: ignore[deprecated]
             python=python or project.settings.get("python"),
         )
 
@@ -386,7 +386,7 @@ class VenvService:
 
     def clean_run_files(self) -> None:
         """Destroy cached configuration files, if they exist."""
-        run_dir = self.project.run_dir(self.name, make_dirs=False)
+        run_dir = self.project.run_dir(self.name, make_dirs=False)  # type: ignore[deprecated]
 
         try:
             for path in run_dir.iterdir():
