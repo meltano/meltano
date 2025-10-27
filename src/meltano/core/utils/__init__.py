@@ -327,7 +327,22 @@ def to_env_var(*xs: str) -> str:
     return "_".join(re.sub(r"[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | Callable = "tuple"):  # noqa: ANN201
+@t.overload
+def flatten(d: dict, reducer: t.Literal["dot"]) -> dict[str, t.Any]: ...
+
+
+@t.overload
+def flatten(d: dict, reducer: t.Literal["env_var"]) -> dict[str, str]: ...
+
+
+@t.overload
+def flatten(d: dict, reducer: t.Literal["tuple"]) -> dict[tuple[str, ...], str]: ...
+
+
+def flatten(
+    d: dict,
+    reducer: t.Literal["dot", "env_var", "tuple"] | Callable = "tuple",
+) -> dict[str, t.Any]:
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Args:
@@ -369,7 +384,10 @@ def flatten(d: dict, reducer: str | Callable = "tuple"):  # noqa: ANN201
     return {reducer(*key): value for key, value in flattened.items()}
 
 
-def unflatten(d: dict, splitter: str | Callable = "tuple") -> dict:
+def unflatten(
+    d: dict,
+    splitter: t.Literal["tuple", "dot"] | Callable[[str], tuple[str, ...]] = "dot",
+) -> dict[str, t.Any]:
     """Unflatten a dictionary with dot-separated keys into a nested dictionary.
 
     Args:
