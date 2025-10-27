@@ -313,15 +313,6 @@ module = [
   "meltano.core.utils.*",
 ]
 
-[[tool.mypy.overrides]]
-ignore_missing_imports = true
-module = [
-  "click_default_group.*",  # https://github.com/click-contrib/click-default-group/issues/26
-  "click_didyoumean.*",     # Unreleased, https://github.com/click-contrib/click-didyoumean/commit/048b275077382e5a80bdf05b02830013eb37ddd1
-  "flatten_dict.*",         # Stale package, https://github.com/ianlini/flatten-dict
-  "smart_open.*",           # https://github.com/piskvorky/smart_open/issues/772
-]
-
 [build-system]
 requires = ["hatchling==1.27.0"]
 build-backend = "hatchling.build"
