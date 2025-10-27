@@ -31,6 +31,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_service import SettingsService
 
@@ -877,8 +878,12 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         Returns:
             A dictionary of flattened configuration.
         """
+        # TODO: Remove this cast when we have a better way to get the settings service
+        # type or when we figure how the settings service type should be narrowed
+        # per-manager.
+        settings_service = t.cast("PluginSettingsService", self.settings_service)
         if self._flat_config is None:
-            self._flat_config = flatten(self.settings_service.environment_config, "dot")  # type: ignore[attr-defined]
+            self._flat_config = flatten(settings_service.environment_config, "dot")
         return self._flat_config
 
     def ensure_supported(self, method: str = "get") -> None:

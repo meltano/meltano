@@ -197,7 +197,6 @@ class Manifest:
                     for x in self.project.project_files.include_paths
                 ),
             ),
-            "dot",
         )
         if self.check_schema:
             self._validate_against_manifest_schema(
