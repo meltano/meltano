@@ -20,7 +20,7 @@ import structlog
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Generator, Iterable, Sequence
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -215,6 +215,49 @@ class VirtualEnv:
         """
         self.plugin_fingerprint_path.write_text(self.get_fingerprint(pip_install_args))
 
+    def exec_path(self, executable: str) -> Path:
+        """Return the absolute path for the given executable in the virtual environment.
+
+        Args:
+            executable: The path to the executable relative to the venv bin directory.
+
+        Returns:
+            The venv bin directory joined to the provided executable.
+        """
+        absolute_executable = self.bin_dir / executable
+        if platform.system() != "Windows":
+            return absolute_executable
+
+        # On Windows, try using the '.exe' suffixed version if it exists. Use the
+        # regular executable path as a fallback (and for backwards compatibility).
+        absolute_executable_windows = absolute_executable.with_suffix(".exe")
+        return (
+            absolute_executable_windows
+            if absolute_executable_windows.exists()
+            else absolute_executable
+        )
+
+    def requires_install(self, pip_install_args: Sequence[str]) -> bool:
+        """Determine whether a clean install is needed.
+
+        Args:
+            pip_install_args: The arguments being passed to `pip install`.
+
+        Returns:
+            Whether the virtual environment needs to be installed.
+        """
+
+        # A generator is used to perform the checks lazily
+        def checks() -> Generator[bool, None, None]:
+            # The Python installation used to create this venv no longer exists
+            yield not self.exec_path("python").exists()
+            # The fingerprint of the venv does not match the pip install args
+            existing_fingerprint = self.read_fingerprint()
+            yield existing_fingerprint is None
+            yield existing_fingerprint != self.get_fingerprint(pip_install_args)
+
+        return any(checks())
+
 
 async def _extract_stderr(_) -> None:
     return None  # pragma: no cover
@@ -300,7 +343,7 @@ class VenvService:
         self.namespace = namespace
         self.name = name
         self.venv = VirtualEnv(
-            self.project.venvs_dir(namespace, name, make_dirs=False),  # type: ignore[deprecated]
+            self.project.dirs.venvs(namespace, name, make_dirs=False),
             python=python or project.settings.get("python"),
         )
 
@@ -372,21 +415,11 @@ class VenvService:
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
         """
-
-        # A generator is used to perform the checks lazily
-        def checks():  # noqa: ANN202
-            # The Python installation used to create this venv no longer exists
-            yield not self.exec_path("python").exists()
-            # The fingerprint of the venv does not match the pip install args
-            existing_fingerprint = self.venv.read_fingerprint()
-            yield existing_fingerprint is None
-            yield existing_fingerprint != self.venv.get_fingerprint(pip_install_args)
-
-        return any(checks())
+        return self.venv.requires_install(pip_install_args)
 
     def clean_run_files(self) -> None:
         """Destroy cached configuration files, if they exist."""
-        run_dir = self.project.run_dir(self.name, make_dirs=False)  # type: ignore[deprecated]
+        run_dir = self.project.dirs.run(self.name, make_dirs=False)
 
         try:
             for path in run_dir.iterdir():
@@ -493,18 +526,7 @@ class VenvService:
         Returns:
             The venv bin directory joined to the provided executable.
         """
-        absolute_executable = self.venv.bin_dir / executable
-        if platform.system() != "Windows":
-            return absolute_executable
-
-        # On Windows, try using the '.exe' suffixed version if it exists. Use the
-        # regular executable path as a fallback (and for backwards compatibility).
-        absolute_executable_windows = absolute_executable.with_suffix(".exe")
-        return (
-            absolute_executable_windows
-            if absolute_executable_windows.exists()
-            else absolute_executable
-        )
+        return self.venv.exec_path(executable)
 
     async def install_pip_args(
         self,
