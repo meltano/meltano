@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.1.0 (2025-10-29)
+
+### 🐛 Fixes
+
+- [#9613](https://github.com/meltano/meltano/issues/9613) Auto-install plugin if existing virtualenv is broken
+
+### 📚 Documentation Improvements
+
+- [#9603](https://github.com/meltano/meltano/issues/9603) Add an admonition for `psycopg2` and link to SQLAlchemy docs
+
 ## v4.0.1 (2025-10-23)
 
 ### 🐛 Fixes
