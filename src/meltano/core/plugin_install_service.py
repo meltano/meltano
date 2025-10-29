@@ -437,14 +437,10 @@ class PluginInstallService:
             return False, message
 
         venv = VirtualEnv(
-            self.project.plugin_dir(plugin, "venv", make_dirs=False),  # type: ignore[deprecated]
+            self.project.dirs.plugin(plugin, "venv", make_dirs=False),
             python=plugin.python or self.project.settings.get("python"),
         )
-        message = "Requirements have not changed"
-        return (
-            venv.get_fingerprint(pip_install_args) != venv.read_fingerprint(),
-            message,
-        )
+        return venv.requires_install(pip_install_args), "Requirements have not changed"
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
