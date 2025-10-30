@@ -106,6 +106,14 @@ class LineWriter:
         """
         self.__out.writeline(line.rstrip())
 
+    def set_log_parser(self, *, log_parser: str | None) -> None:
+        """Set the log parser.
+
+        Args:
+            log_parser: The log parser to use.
+        """
+        self.__out.log_parser = log_parser
+
 
 class FileDescriptorWriter:
     """File Descriptor Writer."""

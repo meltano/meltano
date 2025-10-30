@@ -15,6 +15,7 @@ from meltano.core.utils import human_size
 
 if t.TYPE_CHECKING:
     from meltano.core.elt_context import ELTContext
+    from meltano.core.logging.output_logger import LineWriter
     from meltano.core.plugin_invoker import PluginInvoker
 
 
@@ -212,10 +213,10 @@ class SingerRunner(Runner):  # noqa: D101
 
     async def run(  # noqa: D102
         self,
-        extractor_log=None,  # noqa: ANN001
-        loader_log=None,  # noqa: ANN001
-        extractor_out=None,  # noqa: ANN001
-        loader_out=None,  # noqa: ANN001
+        extractor_log: LineWriter | None = None,
+        loader_log: LineWriter | None = None,
+        extractor_out: LineWriter | None = None,
+        loader_out: LineWriter | None = None,
     ) -> None:
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
@@ -228,6 +229,11 @@ class SingerRunner(Runner):  # noqa: D101
             tap.prepared(self.context.session),
             target.prepared(self.context.session),
         ):
+            if extractor_log:
+                extractor_log.set_log_parser(log_parser=tap.get_log_parser())
+            if loader_log:
+                loader_log.set_log_parser(log_parser=target.get_log_parser())
+
             await self.invoke(
                 tap,
                 target,
