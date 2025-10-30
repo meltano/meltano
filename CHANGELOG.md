@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.1.0 (2025-10-30)
+
+### 🐛 Fixes
+
+- [#9617](https://github.com/meltano/meltano/issues/9617) Default smart-open logs to the warning level and above
+- [#9618](https://github.com/meltano/meltano/issues/9618) `meltano el/elt` now also supports log parsing
+
 ## v4.0.2 (2025-10-29)
 
 ### 🐛 Fixes
