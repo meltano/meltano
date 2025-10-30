@@ -27,10 +27,8 @@ from meltano.core.state_store import (
     state_store_manager_from_project_settings,
 )
 from meltano.core.state_store.azure.backend import AZStorageStateStoreManager
-from meltano.core.state_store.filesystem import (
-    InvalidStateBackendConfigurationException,
-    _LocalFilesystemStateStoreManager,
-)
+from meltano.core.state_store.base import MissingStateBackendSettingsError
+from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
 from meltano.core.state_store.google.backend import GCSStateStoreManager
 from meltano.core.state_store.s3.backend import S3StateStoreManager
 
@@ -308,7 +306,7 @@ class TestS3StateBackend:
             lock_timeout_seconds=10,
         )
 
-        with pytest.raises(InvalidStateBackendConfigurationException):
+        with pytest.raises(MissingStateBackendSettingsError):
             _ = manager.client
 
     def test_missing_aws_access_key_id(
@@ -324,7 +322,7 @@ class TestS3StateBackend:
             lock_timeout_seconds=10,
         )
 
-        with pytest.raises(InvalidStateBackendConfigurationException):
+        with pytest.raises(MissingStateBackendSettingsError):
             _ = manager.client
 
     def test_get(

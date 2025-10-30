@@ -31,10 +31,6 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class InvalidStateBackendConfigurationException(Exception):
-    """State backend configuration is invalid."""
-
-
 class BaseFilesystemStateStoreManager(StateStoreManager):
     """Base class for filesystem state backends."""
 
