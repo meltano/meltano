@@ -210,6 +210,9 @@ def default_config(
             "azure.core.pipeline.policies.http_logging_policy": {
                 "level": logging.WARNING,
             },
+            "smart_open": {
+                "level": logging.WARNING,
+            },
         },
     }
 
