@@ -14,7 +14,6 @@ from importlib import resources
 from operator import getitem
 from tempfile import NamedTemporaryFile
 
-import flatten_dict
 import structlog
 import yaml
 
@@ -30,6 +29,7 @@ from meltano.core.utils import (
     default_deep_merge_strategies,
     expand_env_vars,
     get_no_color_flag,
+    unflatten,
 )
 
 if t.TYPE_CHECKING:
@@ -183,7 +183,7 @@ class Manifest:
 
     @cached_property
     def _project_files(self) -> dict[str, t.Any]:
-        project_files = flatten_dict.unflatten(
+        project_files = unflatten(
             deep_merge(
                 yaml.load(
                     self._meltano_file,
@@ -197,7 +197,6 @@ class Manifest:
                     for x in self.project.project_files.include_paths
                 ),
             ),
-            "dot",
         )
         if self.check_schema:
             self._validate_against_manifest_schema(
