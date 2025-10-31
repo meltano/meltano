@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.0.4 (2025-10-31)
+
+### 🐛 Fixes
+
+- [#9621](https://github.com/meltano/meltano/issues/9621) Handle stringification of nested date values in plugin configuration
+
 ## v4.0.3 (2025-10-30)
 
 ### 🐛 Fixes
