@@ -50,6 +50,7 @@ class TestCliSchedule:
         assert_cli_runner(res)
         schedule = schedule_service.schedules()[0]
 
+        assert isinstance(schedule, ELTSchedule)
         assert schedule.name == "elt-schedule-mock"
         assert schedule.extractor == "tap-mock"
         assert schedule.loader == "target-mock"
@@ -78,6 +79,7 @@ class TestCliSchedule:
         assert_cli_runner(res)
         schedule = schedule_service.schedules()[1]
 
+        assert isinstance(schedule, JobSchedule)
         assert schedule.name == "job-schedule-mock"
         assert schedule.job == "mock-job"
         assert schedule.interval == "@yearly"  # not anytime soon ;)
@@ -104,6 +106,7 @@ class TestCliSchedule:
         assert_cli_runner(res)
         schedule = schedule_service.schedules()[1]
 
+        assert isinstance(schedule, JobSchedule)
         assert schedule.name == "job-schedule-mock"
         assert schedule.job == "mock-job"
         assert schedule.interval == "@yearly"  # not anytime soon ;)
@@ -223,10 +226,24 @@ class TestCliSchedule:
                 ["schedule", "set", job_schedule.name, "--job", "mock-job-renamed"],
             )
             assert res.exit_code == 0
-            assert (
-                schedule_service.find_schedule(job_schedule.name).job
-                == "mock-job-renamed"
+            schedule = schedule_service.find_schedule(job_schedule.name)
+            assert isinstance(schedule, JobSchedule)
+            assert schedule.job == "mock-job-renamed"
+
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "schedule",
+                    "set",
+                    elt_schedule.name,
+                    "--extractor",
+                    "mock-tap-renamed",
+                ],
             )
+            assert res.exit_code == 0
+            schedule = schedule_service.find_schedule(elt_schedule.name)
+            assert isinstance(schedule, ELTSchedule)
+            assert schedule.extractor == "mock-tap-renamed"
 
             res = cli_runner.invoke(
                 cli,
@@ -239,10 +256,9 @@ class TestCliSchedule:
                 ],
             )
             assert res.exit_code == 0
-            assert (
-                schedule_service.find_schedule(elt_schedule.name).loader
-                == "mock-target-renamed"
-            )
+            schedule = schedule_service.find_schedule(elt_schedule.name)
+            assert isinstance(schedule, ELTSchedule)
+            assert schedule.loader == "mock-target-renamed"
 
             # interval applies to both and should always work
             res = cli_runner.invoke(
@@ -284,7 +300,7 @@ class TestCliSchedule:
                     "mock-target-renamed",
                 ],
             )
-            assert res.exit_code == 1
+            assert res.exit_code == 2
             assert "Cannot mix --job" in res.stderr
             assert isinstance(
                 schedule_service.find_schedule(job_schedule.name),
@@ -295,7 +311,7 @@ class TestCliSchedule:
                 cli,
                 ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"],
             )
-            assert res.exit_code == 1
+            assert res.exit_code == 2
             assert "Cannot mix --job" in res.stderr
             assert isinstance(
                 schedule_service.find_schedule(elt_schedule.name),
