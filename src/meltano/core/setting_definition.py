@@ -27,10 +27,34 @@ if t.TYPE_CHECKING:
 
     from ruamel.yaml import Node, Representer, ScalarNode
 
-VALUE_PROCESSORS = {
+
+class SettingValueJSONEncoder(json.JSONEncoder):
+    """JSON encoder for setting values."""
+
+    def default(self, obj: t.Any) -> t.Any:  # noqa: ANN401
+        """Return the JSON representation of the setting value.
+
+        Args:
+            obj: The setting value to encode.
+        """
+        if isinstance(obj, (date, datetime)):
+            return obj.isoformat()
+        return super().default(obj)
+
+
+def json_dumps(obj: t.Any) -> str:  # noqa: ANN401
+    """Dump an object to a JSON string.
+
+    Args:
+        obj: The object to dump.
+    """
+    return json.dumps(obj, cls=SettingValueJSONEncoder)
+
+
+VALUE_PROCESSORS: dict[str, Callable[[t.Any], t.Any]] = {
     "nest_object": utils.nest_object,
     "upcase_string": lambda vlu: vlu.upper(),
-    "stringify": lambda vlu: vlu if isinstance(vlu, str) else json.dumps(vlu),
+    "stringify": lambda vlu: vlu if isinstance(vlu, str) else json_dumps(vlu),
     "parse_date": utils.parse_date,
 }
 
@@ -549,4 +573,4 @@ class SettingDefinition(NameEq, Canonical):
         if not self.kind or self.kind in (SettingKind.STRING, SettingKind.DECIMAL):
             return str(value)
 
-        return json.dumps(value)
+        return json_dumps(value)

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import re
+from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
 
 import pytest
@@ -154,6 +156,43 @@ class TestSettingDefinition:
             cast_back = setting_definition.cast_value(result)
             assert cast_back == decimal_val
             assert isinstance(cast_back, Decimal)
+
+    def test_stringify_complex_object(self) -> None:
+        """Test that complex objects stringify correctly."""
+        setting_definition = SettingDefinition(
+            name="test_setting",
+            kind=SettingKind.OBJECT,
+        )
+        value = {
+            "a_string": "a_value",
+            "a_date": date(2025, 1, 1),
+            "a_datetime": datetime(2025, 1, 1, 12, tzinfo=timezone.utc),
+            "a_list": [1, 2, 3],
+            "a_dict": {
+                "a_nested_string": "a_nested_value",
+                "a_nested_date": date(2025, 1, 1),
+                "a_nested_datetime": datetime(2025, 1, 1, 12, tzinfo=timezone.utc),
+                "a_nested_list": [1, 2, 3],
+            },
+        }
+
+        result = setting_definition.stringify_value(value)
+        assert isinstance(result, str)
+
+        read_back = json.loads(result)
+        assert read_back["a_date"] == "2025-01-01"
+        assert read_back["a_datetime"] == "2025-01-01T12:00:00+00:00"
+        assert read_back["a_list"] == [1, 2, 3]
+        assert read_back["a_dict"]["a_nested_string"] == "a_nested_value"
+        assert read_back["a_dict"]["a_nested_date"] == "2025-01-01"
+        assert read_back["a_dict"]["a_nested_datetime"] == "2025-01-01T12:00:00+00:00"
+        assert read_back["a_dict"]["a_nested_list"] == [1, 2, 3]
+
+        with pytest.raises(
+            TypeError,
+            match="Object of type object is not JSON serializable",
+        ):
+            setting_definition.stringify_value({"non_serializable": object()})
 
     @pytest.mark.parametrize(
         ("setting_definition"),
