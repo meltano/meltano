@@ -37,8 +37,8 @@ if PYTEST_BACKEND == "sqlite":
     pytest_plugins.append("fixtures.db.sqlite")
 elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
-elif PYTEST_BACKEND == "postgresql_psycopg3":
-    pytest_plugins.append("fixtures.db.postgresql_psycopg3")
+elif PYTEST_BACKEND == "postgresql_psycopg2":
+    pytest_plugins.append("fixtures.db.postgresql_psycopg2")
 elif PYTEST_BACKEND == "mssql":
     pytest_plugins.append("fixtures.db.mssql")
 else:

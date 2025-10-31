@@ -5,6 +5,7 @@ import os
 
 import pytest
 import sqlalchemy
+import sqlalchemy.exc
 from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool
 
@@ -27,12 +28,13 @@ def engine_uri(worker_id: str) -> str:
     database = f"{os.getenv('POSTGRES_DB', 'pytest_meltano')}_{worker_id}"
 
     # create the database
-    engine_uri = f"postgresql+psycopg://{user}:{password}@{host}:{port}/postgres"
+    engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
     engine = create_engine(
         engine_uri,
         isolation_level="AUTOCOMMIT",
         poolclass=NullPool,
+        future=True,
     )
     recreate_database(engine, database)
 
-    return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
+    return f"postgresql://{user}:{password}@{host}:{port}/{database}"

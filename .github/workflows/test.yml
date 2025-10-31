@@ -43,16 +43,16 @@ jobs:
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py312-ubuntu-sqlite' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py313-ubuntu-sqlite' }
         - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py314-ubuntu-sqlite' }
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py310-ubuntu-psycopg3' }
-        - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py311-ubuntu-psycopg3' }
-        - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py312-ubuntu-psycopg3' }
-        - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py313-ubuntu-psycopg3' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg3, id: 'py314-ubuntu-psycopg3' }
+        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg3' }
+        - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py311-ubuntu-psycopg3' }
+        - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py312-ubuntu-psycopg3' }
+        - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py313-ubuntu-psycopg3' }
+        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py314-ubuntu-psycopg3' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
         - { python-version: '3.13', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
         # Additional tests for supported platforms and backends
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg2' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py314-ubuntu-psycopg2' }
+        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py310-ubuntu-psycopg2' }
+        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py314-ubuntu-psycopg2' }
         - { python-version: '3.10', os: ubuntu-latest, backend-db: mssql, id: 'py310-ubuntu-mssql' }
         - { python-version: '3.14', os: ubuntu-latest, backend-db: mssql, id: 'py314-ubuntu-mssql' }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
@@ -93,7 +93,7 @@ jobs:
         SKIP_LOGIN: true
 
     - name: Start Postgres Container
-      if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg3')
+      if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg2')
       run: >
         docker compose -f .github/workflows/resources/docker-compose.postgres.yaml up -d --wait --quiet-pull
 

@@ -108,9 +108,9 @@ def pytest_meltano(session: nox.Session) -> None:
     if backend_db == "mssql":
         extras.append("mssql")
     elif backend_db == "postgresql":
-        extras.append("psycopg2")
-    elif backend_db == "postgresql_psycopg3":
         extras.append("postgres")
+    elif backend_db == "postgresql_psycopg2":
+        extras.append("psycopg2")
 
     session.run_install(
         *UV_SYNC_COMMAND,
