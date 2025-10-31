@@ -37,6 +37,7 @@ from .catalog import (
     select_filter_metadata_rules,
     select_metadata_rules,
 )
+from .catalog_lock import catalog_lock
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -364,11 +365,14 @@ class SingerTap(SingerPlugin):
 
         if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
             custom_catalog_path = plugin_invoker.project.root / custom_catalog_filename
-            try:
-                shutil.copy(custom_catalog_path, catalog_path)
-            except OSError as err:
-                msg = f"Failed to copy catalog file: {err.strerror}"
-                raise PluginExecutionError(msg) from err
+            # Lock the destination catalog file during copy to prevent
+            # concurrent access while we're writing it
+            with catalog_lock(catalog_path):
+                try:
+                    shutil.copy(custom_catalog_path, catalog_path)
+                except OSError as err:
+                    msg = f"Failed to copy catalog file: {err.strerror}"
+                    raise PluginExecutionError(msg) from err
 
             logger.info("Using custom catalog in %s", custom_catalog_path)
             return catalog_path
@@ -407,20 +411,21 @@ class SingerTap(SingerPlugin):
         catalog_path = await self._get_catalog(plugin_invoker)
 
         # test for the result to be a valid catalog
-        try:
-            async with await anyio.open_file(catalog_path) as catalog_file:
-                json.loads(await catalog_file.read())
-        except Exception as err:
-            catalog_path.unlink()
-            msg = f"Catalog discovery failed: {err}"
-            if isinstance(err, json.JSONDecodeError):
-                logger.error(
-                    "Invalid JSON: %s [...]",
-                    err.doc[max(err.pos - 9, 0) : err.pos + 10],
-                )
-                msg = "Invalid catalog"
+        with catalog_lock(catalog_path):
+            try:
+                async with await anyio.open_file(catalog_path) as catalog_file:
+                    json.loads(await catalog_file.read())
+            except Exception as err:
+                catalog_path.unlink()
+                msg = f"Catalog discovery failed: {err}"
+                if isinstance(err, json.JSONDecodeError):
+                    logger.error(
+                        "Invalid JSON: %s [...]",
+                        err.doc[max(err.pos - 9, 0) : err.pos + 10],
+                    )
+                    msg = "Invalid catalog"
 
-            raise PluginExecutionError(msg) from err
+                raise PluginExecutionError(msg) from err
 
     async def run_discovery(
         self,
@@ -446,49 +451,57 @@ class SingerTap(SingerPlugin):
             )
         with StringIO("") as stderr_buff:
             try:
-                async with await anyio.open_file(catalog_path, mode="wb") as catalog:
-                    handle = await plugin_invoker.invoke_async(
-                        "--discover",
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE,
-                        universal_newlines=False,
-                    )
+                # Lock only the catalog file write operation to avoid blocking
+                # other operations for too long
+                with catalog_lock(catalog_path):
+                    async with await anyio.open_file(
+                        catalog_path,
+                        mode="wb",
+                    ) as catalog:
+                        handle = await plugin_invoker.invoke_async(
+                            "--discover",
+                            stdout=asyncio.subprocess.PIPE,
+                            stderr=asyncio.subprocess.PIPE,
+                            universal_newlines=False,
+                        )
 
-                    invoke_futures = [
-                        asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
-                        asyncio.ensure_future(handle.wait()),
-                    ]
-                    if (
-                        plugin_invoker.stderr_logger.isEnabledFor(logging.DEBUG)
-                        and handle.stderr is not None
-                    ):
-                        out = OutputLogger("discovery.log").out(
-                            self.name,
-                            plugin_invoker.stderr_logger.bind(type="discovery"),
-                            log_parser=plugin_invoker.get_log_parser(),
-                        )
-                        future = capture_subprocess_output(handle.stderr, out)
-                        invoke_futures.append(asyncio.ensure_future(future))
-                    else:
-                        invoke_futures.append(
+                        invoke_futures = [
                             asyncio.ensure_future(
-                                _stream_redirect(
-                                    handle.stderr,
-                                    stderr_buff,
-                                    write_str=True,
-                                ),
+                                _stream_redirect(handle.stdout, catalog),
                             ),
+                            asyncio.ensure_future(handle.wait()),
+                        ]
+                        if (
+                            plugin_invoker.stderr_logger.isEnabledFor(logging.DEBUG)
+                            and handle.stderr is not None
+                        ):
+                            out = OutputLogger("discovery.log").out(
+                                self.name,
+                                plugin_invoker.stderr_logger.bind(type="discovery"),
+                                log_parser=plugin_invoker.get_log_parser(),
+                            )
+                            future = capture_subprocess_output(handle.stderr, out)
+                            invoke_futures.append(asyncio.ensure_future(future))
+                        else:
+                            invoke_futures.append(
+                                asyncio.ensure_future(
+                                    _stream_redirect(
+                                        handle.stderr,
+                                        stderr_buff,
+                                        write_str=True,
+                                    ),
+                                ),
+                            )
+                        done, _ = await asyncio.wait(
+                            invoke_futures,
+                            return_when=asyncio.ALL_COMPLETED,
                         )
-                    done, _ = await asyncio.wait(
-                        invoke_futures,
-                        return_when=asyncio.ALL_COMPLETED,
-                    )
-                    if failed := [
-                        future for future in done if future.exception() is not None
-                    ]:
-                        failed_future = failed.pop()
-                        raise failed_future.exception()  # type: ignore[misc]
-                exit_code = handle.returncode
+                        if failed := [
+                            future for future in done if future.exception() is not None
+                        ]:
+                            failed_future = failed.pop()
+                            raise failed_future.exception()  # type: ignore[misc]
+                    exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
                 raise
@@ -573,34 +586,35 @@ class SingerTap(SingerPlugin):
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
 
-        try:
-            async with await anyio.open_file(catalog_path) as catalog_file:
-                catalog = json.loads(await catalog_file.read())
+        with catalog_lock(catalog_path):
+            try:
+                async with await anyio.open_file(catalog_path) as catalog_file:
+                    catalog = json.loads(await catalog_file.read())
 
-            if schema_rules:
-                SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
+                if schema_rules:
+                    SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
 
-            if metadata_rules:
-                self.warn_property_not_found(metadata_rules, catalog)
-                MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
+                if metadata_rules:
+                    self.warn_property_not_found(metadata_rules, catalog)
+                    MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
-            async with await anyio.open_file(catalog_path, "w") as catalog_f:
-                await catalog_f.write(json.dumps(catalog, indent=2))
+                async with await anyio.open_file(catalog_path, "w") as catalog_f:
+                    await catalog_f.write(json.dumps(catalog, indent=2))
 
-            if cache_key := self.catalog_cache_key(plugin_invoker):
-                catalog_cache_key_path.write_text(cache_key)
-            else:
-                with suppress(FileNotFoundError):
-                    catalog_cache_key_path.unlink()
-        except FileNotFoundError as err:
-            raise PluginExecutionError(
-                "Applying catalog rules failed: catalog file is missing.",  # noqa: EM101
-            ) from err
-        except Exception as err:
-            catalog_path.unlink()
-            raise PluginExecutionError(
-                f"Applying catalog rules failed: catalog file is invalid: {err}",  # noqa: EM102
-            ) from err
+                if cache_key := self.catalog_cache_key(plugin_invoker):
+                    catalog_cache_key_path.write_text(cache_key)
+                else:
+                    with suppress(FileNotFoundError):
+                        catalog_cache_key_path.unlink()
+            except FileNotFoundError as err:
+                raise PluginExecutionError(
+                    "Applying catalog rules failed: catalog file is missing.",  # noqa: EM101
+                ) from err
+            except Exception as err:
+                catalog_path.unlink()
+                raise PluginExecutionError(
+                    f"Applying catalog rules failed: catalog file is invalid: {err}",  # noqa: EM102
+                ) from err
 
     def catalog_cache_key(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Get a cache key for the catalog.
