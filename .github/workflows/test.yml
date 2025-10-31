@@ -11,6 +11,7 @@ on:
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
+      - .github/workflows/resources/docker-compose.postgres.yaml
   push:
     branches: [main]
     paths:
@@ -22,6 +23,7 @@ on:
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
+      - .github/workflows/resources/docker-compose.postgres.yaml
   workflow_dispatch:
     inputs: {}
 
