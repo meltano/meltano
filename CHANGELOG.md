@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.0.5 (2025-11-04)
+
+### 🐛 Fixes
+
+- [#9626](https://github.com/meltano/meltano/issues/9626) Expand environment variables in mapping configuration
+
+### ⚙️ Under the Hood
+
+- [#9627](https://github.com/meltano/meltano/issues/9627) Use pattern matching to update the schedule in `meltano schedule set`
+
+### 📦 Packaging changes
+
+- [#9609](https://github.com/meltano/meltano/issues/9609) Remove unmaintained dependency `flatten-dict`
+
 ## v4.0.4 (2025-10-31)
 
 ### 🐛 Fixes
