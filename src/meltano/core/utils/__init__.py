@@ -26,7 +26,6 @@ from operator import setitem
 from pathlib import Path
 
 import dateparser
-import flatten_dict
 import structlog
 from packaging.specifiers import SpecifierSet
 from requests.auth import HTTPBasicAuth
@@ -328,15 +327,27 @@ def to_env_var(*xs: str) -> str:
     return "_".join(re.sub(r"[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
-    """Flatten a dictionary with `dot` and `env_var` reducers.
+@t.overload
+def flatten(d: dict, reducer: t.Literal["dot"]) -> dict[str, t.Any]: ...
 
-    Wrapper around `flatten_dict.flatten`.
+
+@t.overload
+def flatten(d: dict, reducer: t.Literal["env_var"]) -> dict[str, str]: ...
+
+
+@t.overload
+def flatten(d: dict, reducer: t.Literal["tuple"]) -> dict[tuple[str, ...], str]: ...
+
+
+def flatten(
+    d: dict,
+    reducer: t.Literal["dot", "env_var", "tuple"] | Callable = "tuple",
+) -> dict[str, t.Any]:
+    """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Args:
         d: the dict to flatten
         reducer: the reducer to flatten with
-        **kwargs: additional kwargs to pass to flatten_dict.flatten
 
     Returns:
         the flattened dict
@@ -346,7 +357,63 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN0
     if reducer == "env_var":
         reducer = to_env_var
 
-    return flatten_dict.flatten(d, reducer, **kwargs)
+    def _flatten(obj: dict, parent_key: tuple = ()) -> dict:
+        """Recursively flatten a nested dictionary.
+
+        Args:
+            obj: the dictionary to flatten
+            parent_key: tuple of parent keys for nested recursion
+
+        Returns:
+            the flattened dictionary
+        """
+        items = []
+        for key, value in obj.items():
+            new_key = (*parent_key, key)
+            if isinstance(value, dict) and value:
+                items.extend(_flatten(value, new_key).items())
+            else:
+                items.append((new_key, value))
+        return dict(items)
+
+    flattened = _flatten(d)
+
+    # Apply the reducer to convert tuples to the desired key format
+    if reducer == "tuple":
+        return flattened
+    return {reducer(*key): value for key, value in flattened.items()}
+
+
+def unflatten(
+    d: dict,
+    splitter: t.Literal["tuple", "dot"] | Callable[[str], tuple[str, ...]] = "dot",
+) -> dict[str, t.Any]:
+    """Unflatten a dictionary with dot-separated keys into a nested dictionary.
+
+    Args:
+        d: the flattened dict to unflatten
+        splitter: the splitter to use for key separation. Can be "tuple", "dot",
+            or a callable that takes a key and returns a tuple of key parts.
+
+    Returns:
+        the nested dict
+    """
+    if splitter == "tuple":
+        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # noqa: E731
+    elif splitter == "dot":
+        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # noqa: E731
+
+    result = {}
+    for key, value in d.items():
+        key_parts = splitter(key)
+        current = result
+        for part in key_parts[:-1]:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        current[key_parts[-1]] = value
+
+    return result
 
 
 def compact(xs: Iterable) -> Iterable:
