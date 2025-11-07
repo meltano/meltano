@@ -163,12 +163,6 @@ meltano config <plugin> set _metadata <stream> replication-method <LOG_BASED|INC
 # For example:
 meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
 meltano config tap-postgres set _metadata other_stream replication-method FULL_TABLE
-
-# Set replication-method metadata for all streams
-meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
-
-# Set replication-method metadata for matching streams
-meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
 ```
 
 This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
@@ -177,16 +171,48 @@ This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`m
         extractors:
           - name: tap-postgres
             metadata:
+              # highlight-start
               some_stream_id:
                 replication-method: INCREMENTAL
                 replication-key: id
               other_stream:
                 replication-method: FULL_TABLE
+              # highlight-end
+```
+
+You can also set the `replication-method` metadata for all streams or matching streams at once using wildcards:
+
+```bash
+# Set replication-method metadata for all streams
+meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
+
+# Set replication-method metadata for matching streams
+meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
+```
+
+```yaml title="meltano.yml"
+        extractors:
+          - name: tap-postgres
+            metadata:
+              # highlight-start
               "*":
                 replication-method: INCREMENTAL
               "*_full":
                 replication-method: FULL_TABLE
+              # highlight-end
 ```
+
+:::info
+
+  <p><strong>Order Matters When Declaring Metadata Rules</strong></p>
+  <p>When using the `metadata` extractor extra, the order of the metadata rules matters. The last rule that matches a stream or property will be used.</p>
+
+  <br/>
+  <p>In the example above, if a stream matches both rules, the `replication-method` will be set to `FULL_TABLE`.</p>
+
+  <br/>
+  <p>This might change in the future, when metadata rules are applied in increasing order of specificity. See <a href="https://github.com/meltano/meltano/issues/9629">the GitHub issue tracking this</a> for more details.</p>
+:::
 
 ### Overriding schemas
 
