@@ -206,7 +206,7 @@ meltano config <EXTRACTOR_NAME> list
 Alternatively, you can use:
 
 ```bash
-meltano invoke <EXTRACTOR_NAME> --dump=config
+meltano invoke --dump=config <EXTRACTOR_NAME>
 ```
 
 #### Dumping Loader Configuration
@@ -222,7 +222,7 @@ meltano config <LOADER_NAME> list
 Instead of `meltano run ... --dump=catalog`, use:
 
 ```bash
-meltano invoke <EXTRACTOR_NAME> --dump=catalog
+meltano invoke --dump=catalog <EXTRACTOR_NAME>
 ```
 
 ### Meltano UI
