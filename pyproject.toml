@@ -182,6 +182,7 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::ResourceWarning",
+  "once::pytest.PytestUnhandledThreadExceptionWarning",
   "once::meltano.core._compat.MeltanoInternalDeprecationWarning",
   "once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning",
 ]
