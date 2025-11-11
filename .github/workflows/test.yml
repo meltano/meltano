@@ -33,6 +33,7 @@ concurrency:
 
 env:
   FORCE_COLOR: "1"
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
   UV_PYTHON_DOWNLOADS: "never"
 
 jobs:
@@ -45,6 +46,7 @@ jobs:
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py312-ubuntu-sqlite' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py313-ubuntu-sqlite' }
         - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py314-ubuntu-sqlite' }
+        - { python-version: '3.15', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py315-ubuntu-sqlite' }
         - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg3' }
         - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py311-ubuntu-psycopg3' }
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py312-ubuntu-psycopg3' }
