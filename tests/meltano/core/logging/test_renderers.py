@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import functools
 import json
-import typing as t
 from io import StringIO
 from textwrap import dedent
 
@@ -23,9 +22,6 @@ from meltano.core.plugin_install_service import (
     PluginInstallState,
     PluginInstallStatus,
 )
-
-if t.TYPE_CHECKING:
-    from pytest_subtests import SubTests
 
 
 @pytest.fixture(autouse=True)
@@ -317,7 +313,7 @@ class TestMeltanoConsoleRenderer:
         self,
         error_formatter: PluginErrorFormatter,
         exception: PluginException,
-        subtests: SubTests,
+        subtests: pytest.Subtests,
     ) -> None:
         make_renderer = functools.partial(
             MeltanoConsoleRenderer,
@@ -396,7 +392,7 @@ class TestMeltanoConsoleRenderer:
 
     def test_console_output_from_plugin_error(
         self,
-        subtests: SubTests,
+        subtests: pytest.Subtests,
         error_formatter: PluginErrorFormatter,
         exception: PluginException,
         expected_exception_output: str,
