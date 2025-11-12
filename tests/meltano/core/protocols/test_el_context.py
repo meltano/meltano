@@ -9,7 +9,7 @@ from meltano.core._protocols.el_context import ELContextProtocol
 from meltano.core._state import StateStrategy
 
 if t.TYPE_CHECKING:
-    from pytest_subtests import SubTests
+    import pytest
 
 
 @dataclass
@@ -20,7 +20,7 @@ class MyContext(ELContextProtocol):
 
 
 class TestELContextProtocol:
-    def test_should_merge_states(self, subtests: SubTests):
+    def test_should_merge_states(self, subtests: pytest.Subtests):
         def _(full_refresh: bool, state_strategy: StateStrategy):
             return MyContext(full_refresh, state_strategy)
 
@@ -42,7 +42,7 @@ class TestELContextProtocol:
         with subtests.test("Incremental & overwrite → overwrite"):
             assert not _(False, StateStrategy.overwrite).should_merge_states()
 
-    def test_should_refresh_catalog(self, subtests: SubTests):
+    def test_should_refresh_catalog(self, subtests: pytest.Subtests):
         def _(full_refresh: bool, refresh_catalog: bool):
             return MyContext(full_refresh, refresh_catalog=refresh_catalog)
 

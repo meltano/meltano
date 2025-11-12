@@ -127,13 +127,13 @@ testing = [
   "colorama>=0.4.4,<0.5",
   "faker>=37.4.2",
   "moto>=5.0.21,<6",
-  "pytest>=8.3.3,<9",
-  "pytest-asyncio>=1,<1.2",  # tests/meltano/core/job/test_job.py::TestJob::test_run_interrupted is failing with pytest-asyncio 1.2.0
+  "pytest>=9",
+  "pytest-asyncio>=1.3",
+  # "pytest-asyncio>=1,<1.2",  # tests/meltano/core/job/test_job.py::TestJob::test_run_interrupted is failing with pytest-asyncio 1.2.0
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
   "pytest-randomly>=3.16,<5.0",
   "pytest-structlog~=1.1",
-  "pytest-subtests>=0.14.2",
   "pytest-timeout>=2.4.0",
   "pytest-xdist~=3.6",
   "requests-mock>=1.12.1,<2",
@@ -165,7 +165,7 @@ include = ["src/meltano"]
 [tool.hatch.build.targets.wheel.sources]
 "src/meltano" = "meltano"
 
-[tool.pytest.ini_options]
+[tool.pytest]
 addopts = [
   "--doctest-modules",
   "-ra",
@@ -175,15 +175,15 @@ addopts = [
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
-  "error",
-  "ignore:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning",
-  "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
-  "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
-  "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
-  "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore::ResourceWarning",
-  "once::meltano.core._compat.MeltanoInternalDeprecationWarning",
-  "once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning",
+  'error',
+  '''ignore:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
+  'ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*',  # https://github.com/adamchainz/time-machine/issues/445
+  'ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*', # https://github.com/boto/boto3/issues/3889
+  'ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*',  # https://github.com/scrapinghub/dateparser/issues/1246
+  'ignore::pytest.PytestUnraisableExceptionWarning',
+  'ignore::ResourceWarning',
+  'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
+  'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -198,7 +198,7 @@ markers = [
   "concurrent: test requires true concurrency",
   "slow: slow test",
 ]
-minversion = "8"
+minversion = "9"
 testpaths = [
   "tests/",
 ]
