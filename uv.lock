@@ -832,11 +832,11 @@ wheels = [
 
 [[package]]
 name = "fasteners"
-version = "0.19"
+version = "0.20"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5f/d4/e834d929be54bfadb1f3e3b931c38e956aaa3b235a46a3c764c26c774902/fasteners-0.19.tar.gz", hash = "sha256:b4f37c3ac52d8a445af3a66bce57b33b5e90b97c696b7b984f530cf8f0ded09c", size = 24832, upload-time = "2023-09-19T17:11:20.228Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2d/18/7881a99ba5244bfc82f06017316ffe93217dbbbcfa52b887caa1d4f2a6d3/fasteners-0.20.tar.gz", hash = "sha256:55dce8792a41b56f727ba6e123fcaee77fd87e638a6863cec00007bfea84c8d8", size = 25087, upload-time = "2025-08-11T10:19:37.785Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/bf/fd60001b3abc5222d8eaa4a204cd8c0ae78e75adc688f33ce4bf25b7fafa/fasteners-0.19-py3-none-any.whl", hash = "sha256:758819cb5d94cdedf4e836988b74de396ceacb8e2794d21f82d131fd9ee77237", size = 18679, upload-time = "2023-09-19T17:11:18.725Z" },
+    { url = "https://files.pythonhosted.org/packages/51/ac/e5d886f892666d2d1e5cb8c1a41146e1d79ae8896477b1153a21711d3b44/fasteners-0.20-py3-none-any.whl", hash = "sha256:9422c40d1e350e4259f509fb2e608d6bc43c0136f79a00db1b49046029d0b3b7", size = 18702, upload-time = "2025-08-11T10:19:35.716Z" },
 ]
 
 [[package]]
@@ -1519,7 +1519,7 @@ requires-dist = [
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
     { name = "click-didyoumean", specifier = ">=0.3.1,<0.4" },
     { name = "dateparser", specifier = ">=1.2.1" },
-    { name = "fasteners", specifier = ">=0.19,<0.20" },
+    { name = "fasteners", specifier = ">=0.19,<0.21" },
     { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=1.31.0" },
     { name = "importlib-metadata", marker = "python_full_version < '3.12'", specifier = ">=5" },
     { name = "jinja2", specifier = ">=3.1.4,<4" },
