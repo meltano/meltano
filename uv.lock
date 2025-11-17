@@ -544,7 +544,7 @@ wheels = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.34.1"
+version = "0.35.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -554,9 +554,9 @@ dependencies = [
     { name = "ruamel-yaml" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c3/fd/c2bd16532a2e5ad3318d62b0295ca9274ac3e09f795d6e2adff1174663c0/check_jsonschema-0.34.1.tar.gz", hash = "sha256:024ca6b1d645fdc33025f915ea4aa72a84df002b12209ee172a7bfd089f34832", size = 321581, upload-time = "2025-10-13T06:12:56.348Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/ab/6dd807d9e6fd6bdd92801a7116de974563dff5f17fadfcba8f5ebc4919a3/check_jsonschema-0.35.0.tar.gz", hash = "sha256:e1078b6e42c5e05c1a807252ac5b26b8fa2c826bad57fe9f5dd15ea27d40e16e", size = 341699, upload-time = "2025-11-12T05:18:16.819Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/02/be2d0ece34f83baf64cfcb6a806c161a150a87d45ba2a1828bcff8f99615/check_jsonschema-0.34.1-py3-none-any.whl", hash = "sha256:39f3faea89a26e7de6c8090bc53dceecd30029a6daf04db7e5807a2142ef54b6", size = 306941, upload-time = "2025-10-13T06:12:53.539Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/ae/cf7946842416e497366d2842620e5772f3935792955daa0e3dfabfc86025/check_jsonschema-0.35.0-py3-none-any.whl", hash = "sha256:90339d73fa056174858dc8f5d64963f220c1e4a58e4c5382f08bacf1d758191e", size = 327764, upload-time = "2025-11-12T05:18:14.817Z" },
 ]
 
 [[package]]
@@ -1514,7 +1514,7 @@ requires-dist = [
     { name = "azure-storage-blob", marker = "extra == 'azure'", specifier = ">=12.24.0,<13" },
     { name = "backports-strenum", marker = "python_full_version < '3.11'", specifier = ">=1.3.1,<2" },
     { name = "boto3", marker = "extra == 's3'", specifier = ">=1.35,<1.41" },
-    { name = "check-jsonschema", specifier = ">=0.33,<0.35" },
+    { name = "check-jsonschema", specifier = ">=0.33,<0.36" },
     { name = "click", specifier = ">=8.1,!=8.2.2,<8.4" },
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
     { name = "click-didyoumean", specifier = ">=0.3.1,<0.4" },
