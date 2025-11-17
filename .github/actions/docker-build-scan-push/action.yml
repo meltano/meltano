@@ -35,7 +35,7 @@ runs:
       with:
         persist-credentials: false
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
@@ -50,7 +50,7 @@ runs:
         INPUTS_REGISTRY: ${{ inputs.registry }}
 
     - name: Download artifacts
-      uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
         name: Packages
         path: dist
@@ -106,7 +106,7 @@ runs:
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@a5605eb0943e46279cb4fbd9d44297355d3520ab # v7.0.2
+      uses: anchore/scan-action@568b89d27fc18c60e56937bff480c91c772cd993 # v7.1.0
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -114,7 +114,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@f443b600d91635bebf5b0d9ebc620189c0d6fba5 # v4.30.8
+      uses: github/codeql-action/upload-sarif@014f16e7ab1402f30e7c3329d33797e7948572db # v4.31.3
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
