@@ -207,6 +207,6 @@ class TestCliJob:
                 ["job", "list", "--format=json", "job-list-mock"],
             )
             assert_cli_runner(res)
-            output = json.loads(res.output)
+            output = json.loads(res.stdout)
             assert output["job_name"] == "job-list-mock"
             assert output["tasks"] == ["tap-mock target-mock"]

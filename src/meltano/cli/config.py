@@ -60,7 +60,7 @@ def _get_ctx_arg(*args: t.Any) -> click.core.Context:
     raise ValueError("No click.core.Context provided in *args")  # noqa: EM101
 
 
-def _get_store_choices() -> list[SettingValueStore]:
+def _get_store_choices() -> list[str]:
     """Get a list of valid choices for the --store flag.
 
     Returns:
@@ -68,7 +68,7 @@ def _get_store_choices() -> list[SettingValueStore]:
     """
     writables = SettingValueStore.writables()
     writables.remove(SettingValueStore.MELTANO_ENVIRONMENT)
-    return writables
+    return [w.value for w in writables]
 
 
 def _use_meltano_env(func):  # noqa: ANN001, ANN202
@@ -344,7 +344,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO,
+    default=SettingValueStore.AUTO.value,
 )
 @click.confirmation_option()
 @click.pass_context
@@ -379,7 +379,7 @@ def reset(ctx, store) -> None:  # noqa: ANN001
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO,
+    default=SettingValueStore.AUTO.value,
 )
 @click.pass_context
 @_use_meltano_env
@@ -393,6 +393,8 @@ def set_(
     from_file: t.TextIO,
 ) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
+    store = SettingValueStore(store)
+
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
 
@@ -469,7 +471,7 @@ async def test(
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO,
+    default=SettingValueStore.AUTO.value,
 )
 @click.pass_context
 @_use_meltano_env
