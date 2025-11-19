@@ -79,7 +79,7 @@ typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
-uv = { version = ">=0.1.24,<0.6", optional = true }
+uv = { version = ">=0.1.24,<0.10", optional = true }
 virtualenv = "^20.26.6"
 
 [tool.poetry.extras]
