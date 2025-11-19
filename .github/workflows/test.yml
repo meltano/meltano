@@ -106,6 +106,7 @@ jobs:
         PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
+        pipx inject poetry poetry-plugin-export
         poetry --version
 
     - name: Setup Python ${{ matrix.python-version }}
@@ -263,6 +264,7 @@ jobs:
         PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
+        pipx inject poetry poetry-plugin-export
         poetry --version
 
     - name: Set up Python
@@ -317,6 +319,7 @@ jobs:
         PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
+        pipx inject poetry poetry-plugin-export
         poetry --version
 
     - name: Setup Python
