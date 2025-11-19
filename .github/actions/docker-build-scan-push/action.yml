@@ -31,10 +31,10 @@ runs:
   using: 'composite'
   steps:
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
     - name: Prepare the tags
       id: prepare-tags
@@ -43,7 +43,7 @@ runs:
         echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ',')" >> $GITHUB_OUTPUT
 
     - name: Build the image for all supported architectures
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: docker/meltano
         build-args: |
@@ -60,7 +60,7 @@ runs:
         push: false
 
     - name: Load the amd64 image for scanning
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: docker/meltano
         build-args: |
@@ -79,7 +79,7 @@ runs:
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@v3
+      uses: anchore/scan-action@3aaf50d765cfcceafa51d322ccb790e40f6cd8c5 # v7.2.0
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -87,7 +87,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@e12f0178983d466f2f6028f5cc7a6d786fd97f4b # v4.31.4
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -105,7 +105,7 @@ runs:
         [ "$NUM_ISSUES" = '0' ] # Error if there are any alerts that are neither fixed nor dismissed
 
     - name: Login to the registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
       with:
         registry: ${{ inputs.registry }}
         username: ${{ inputs.username }}
@@ -113,7 +113,7 @@ runs:
 
     - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: docker/meltano
         build-args: |
