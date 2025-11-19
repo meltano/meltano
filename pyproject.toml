@@ -70,7 +70,7 @@ pyyaml = "^6.0.2"
 requests = "^2.32.3"
 rich = "^13.9.4"
 "ruamel.yaml" = "^0.18.6"
-setuptools = {version = "^75.6.0", python = ">=3.12"}
+setuptools = {version = ">=76.0.0,<81", python = ">=3.12"}
 smart-open = "^7.0.5"
 snowplow-tracker = "^1.0.4"
 sqlalchemy = "^2.0.35"
