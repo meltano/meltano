@@ -97,7 +97,7 @@ def lock(
                 fg="yellow",
             )
         else:
-            plugin.parent = None
+            plugin.parent = None  # type: ignore[assignment]
             with project.plugins.use_preferred_source(DefinitionSource.HUB):
                 plugin = project.plugins.ensure_parent(plugin)
             try:

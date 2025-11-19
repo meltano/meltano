@@ -22,7 +22,7 @@ repos:
           - "poetry==1.8.4"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
@@ -38,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.30.0
+    rev: 0.35.0
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -53,7 +53,7 @@ repos:
         args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         name: shellcheck

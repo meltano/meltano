@@ -36,7 +36,7 @@ class DefinitionSource(enum.Flag):
     INHERITED = enum.auto()
 
     ANY = HUB | CUSTOM | LOCKFILE | INHERITED
-    LOCAL = ~HUB
+    LOCAL = ~HUB  # type: ignore[operator]  # https://github.com/python/mypy/issues/18410
 
 
 class PluginAlreadyAddedException(Exception):

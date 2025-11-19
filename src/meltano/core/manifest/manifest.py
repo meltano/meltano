@@ -273,7 +273,7 @@ class Manifest:
             `NotImplemented` if the key is not "env"; `None` otherwise.
         """
         if key != "env":
-            return NotImplemented  # type: ignore[return-value]
+            return NotImplemented
         data[key] = self.sanitize_env_vars(  # noqa: RET503
             {
                 **expand_env_vars(

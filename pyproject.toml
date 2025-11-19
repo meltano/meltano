@@ -94,7 +94,7 @@ uv = ["uv"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = "1.35.76"}
+boto3-stubs = {extras = ["essential"], version = "1.35.90"}
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 mock = "^5.0.2"
@@ -130,6 +130,9 @@ filterwarnings = [
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
   "ignore::pytest.PytestUnraisableExceptionWarning",
+  'ignore:You are using a Python version .* past its end of life.*:FutureWarning',
+  'ignore:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
+  'ignore::boto3.exceptions.PythonDeprecationWarning',
 ]
 log_cli = 1
 log_cli_format = "%(message)s"

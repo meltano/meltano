@@ -479,7 +479,7 @@ class TestCliColors:
             result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
             assert result.exit_code == 0, result.exception
             assert result.stdout.strip() == expected_text
-            assert bool(ANSI_RE.match(result.stderr)) is log_colors_expected
+            assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
             assert result.exception is None
 
 
