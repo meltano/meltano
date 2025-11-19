@@ -130,8 +130,9 @@ filterwarnings = [
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
   "ignore::pytest.PytestUnraisableExceptionWarning",
-  'once:You are using a Python version .* past its end of life.*:FutureWarning',
-  'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
+  'ignore:You are using a Python version .* past its end of life.*:FutureWarning',
+  'ignore:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
+  'ignore::boto3.exceptions.PythonDeprecationWarning',
 ]
 log_cli = 1
 log_cli_format = "%(message)s"
