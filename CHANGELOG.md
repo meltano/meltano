@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.0.6 (2025-11-19)
+
+### 🐛 Fixes
+
+- [#9637](https://github.com/meltano/meltano/issues/9637) Bump `fasteners` to 0.20
+
+### 📚 Documentation Improvements
+
+- [#9634](https://github.com/meltano/meltano/issues/9634) Fix command syntax in troubleshooting docs -- _**Thanks @visch!**_
+
 ## v4.0.5 (2025-11-04)
 
 ### 🐛 Fixes
