@@ -200,13 +200,6 @@ Specifically, you will want to configure Airflow to:
   (or `AIRFLOW__CORE__EXECUTOR` environment variable) to `LocalExecutor`:
 
   <Tabs className="meltano-tabs" queryString="meltano-tabs">
-    <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
-
-  ```bash
-  meltano config airflow set core.executor LocalExecutor
-  ```
-
-    </TabItem>
     <TabItem className="meltano-tab-content" value="env" label="env" default>
 
   ```bash
