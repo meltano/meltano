@@ -5,12 +5,11 @@ ci:
     for more information, see https://pre-commit.ci
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
-  autoupdate_schedule: weekly
+  autoupdate_schedule: monthly
   skip:
     - uv-lock
-    - check-github-issue-templates
-    - check-github-issue-config
     - check-github-discussion-templates
+    - check-dependabot
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -40,24 +39,21 @@ repos:
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
-      - id: check-jsonschema
-        alias: check-github-issue-templates
-        name: validate GitHub issue templates
-        files: ^\.github/ISSUE_TEMPLATE/.*\.yml$
-        exclude: ^\.github/ISSUE_TEMPLATE/config\.yml$
-        args: ["--schemafile", "https://json.schemastore.org/github-issue-forms.json"]
-      - id: check-jsonschema
-        alias: check-github-issue-config
-        name: validate GitHub issue config
-        files: ^\.github/ISSUE_TEMPLATE/config\.yml$
-        args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
+      - id: check-github-issue-config
+      - id: check-github-issue-forms
       - id: check-jsonschema
         alias: check-github-discussion-templates
         name: validate GitHub discussion templates
         files: ^.github/DISCUSSION_TEMPLATE/.*\.yml$
         args: ["--schemafile", "https://json.schemastore.org/github-discussion.json"]
       - id: check-compose-spec
-      - id: check-dependabot
+      # TODO: Restore built-in check when https://github.com/SchemaStore/schemastore/pull/5167 ships into check-jsonschema
+      # - id: check-dependabot
+      - id: check-jsonschema
+        alias: check-dependabot
+        name: validate Dependabot configuration
+        files: ^.github/dependabot\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/dependabot-2.0.json"]
       - id: check-github-actions
       - id: check-github-workflows
 
