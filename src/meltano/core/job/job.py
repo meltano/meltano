@@ -278,7 +278,7 @@ class Job(SystemModel):
             self.start()
             self.save(session)
 
-            with self._handling_sigterm(session):
+            with self._handling_signals(session):
                 async with self._heartbeating(session):
                     yield
 
@@ -392,20 +392,57 @@ class Job(SystemModel):
                 await heartbeat_future
 
     @contextmanager
-    def _handling_sigterm(
+    def _handling_signals(
         self,
-        session: Session,  # noqa: ARG002
+        session: Session,
     ) -> Generator[None, None, None]:
-        def handler(*_) -> t.NoReturn:
-            sigterm_status = 143
-            raise SystemExit(sigterm_status)
+        """Handle SIGTERM and SIGINT to ensure graceful cleanup.
 
-        original_termination_handler = signal.signal(signal.SIGTERM, handler)
+        This handler ensures that when the process receives a termination signal,
+        the job is marked as FAIL and saved to the database before the process exits.
+        This prevents the job from being stuck in RUNNING state.
+
+        Args:
+            session: the session to use for writing to the db
+        """
+
+        def handler(signum: int, frame: t.Any) -> t.NoReturn:  # noqa: ARG001, ANN401
+            # Ensure job is marked as FAIL before exiting
+            if self.is_running():
+                error_msg = (
+                    "The process was terminated"
+                    if signum == signal.SIGTERM
+                    else "The process was interrupted"
+                )
+                self.fail(error=error_msg)
+                try:
+                    # Protect the commit from being interrupted
+                    old_sigterm = signal.signal(signal.SIGTERM, signal.SIG_IGN)
+                    old_sigint = signal.signal(signal.SIGINT, signal.SIG_IGN)
+                    try:
+                        self.save(session)
+                    finally:
+                        signal.signal(signal.SIGTERM, old_sigterm)
+                        signal.signal(signal.SIGINT, old_sigint)
+                except Exception:  # noqa: S110
+                    # If save fails, we still want to exit
+                    pass
+
+            # Raise the appropriate exception
+            if signum == signal.SIGTERM:
+                sigterm_status = 143
+                raise SystemExit(sigterm_status)
+            # SIGINT
+            raise KeyboardInterrupt
+
+        original_sigterm_handler = signal.signal(signal.SIGTERM, handler)
+        original_sigint_handler = signal.signal(signal.SIGINT, handler)
 
         try:
             yield
         finally:
-            signal.signal(signal.SIGTERM, original_termination_handler)
+            signal.signal(signal.SIGTERM, original_sigterm_handler)
+            signal.signal(signal.SIGINT, original_sigint_handler)
 
     def _error_message(self, err: BaseException) -> str:
         if isinstance(err, SystemExit):

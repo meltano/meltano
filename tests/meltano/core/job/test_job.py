@@ -141,6 +141,53 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was terminated"
 
+    @pytest.mark.asyncio
+    async def test_run_interrupted_state_persisted(self, session) -> None:
+        """Test that interrupted job state is persisted to the database.
+
+        This test verifies that when a job is interrupted, the state is
+        committed to the database in the signal handler, preventing the
+        "pipeline is already running" error on subsequent runs.
+        """
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
+            )
+
+        state_id = "test_interrupted_pipeline"
+        subject = Job(job_name=state_id)
+        subject.save(session)
+
+        # Install a signal handler that raises KeyboardInterrupt
+        def sigint_handler(signum: int, frame) -> None:  # noqa: ARG001
+            raise KeyboardInterrupt
+
+        original_handler = signal.signal(signal.SIGINT, sigint_handler)
+        try:
+            with pytest.raises(KeyboardInterrupt):
+                async with subject.run(session):
+                    signal.raise_signal(signal.SIGINT)
+        finally:
+            signal.signal(signal.SIGINT, original_handler)
+
+        # Verify the job was marked as FAIL
+        assert subject.state is State.FAIL
+        assert subject.ended_at is not None
+        assert subject.payload["error"] == "The process was interrupted"
+
+        # Verify the state was committed to the database by querying in a new session
+        from meltano.core.job.finder import JobFinder
+
+        # Check that there's no running job for this state_id
+        running_job = JobFinder(state_id).latest_running(session)
+        assert running_job is None, "Job should not be in RUNNING state after interrupt"
+
+        # Verify the job is in FAIL state in the database
+        failed_job = session.query(Job).filter_by(job_name=state_id).first()
+        assert failed_job is not None
+        assert failed_job.state is State.FAIL
+        assert failed_job.ended_at is not None
+
     def test_run_id(self, session) -> None:
         job = Job()
         run_id = job.run_id
