@@ -33,7 +33,7 @@ def editable_installation() -> str | None:
 
     if (  # pragma: no branch
         (url := pep610_data.get("url"))
-        and (dir_info := pep610_data.get("dir_info", {}))
+        and (dir_info := pep610_data.get("dir_info", {}))  # type: ignore[redundant-expr]
         and dir_info.get("editable", False)
     ):
         return url.removeprefix("file://")
