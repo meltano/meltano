@@ -584,18 +584,6 @@ wheels = [
 ]
 
 [[package]]
-name = "click-didyoumean"
-version = "0.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "click" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/30/ce/217289b77c590ea1e7c24242d9ddd6e249e52c795ff10fac2c50062c48cb/click_didyoumean-0.3.1.tar.gz", hash = "sha256:4f82fdff0dbe64ef8ab2279bd6aa3f6a99c3b28c05aa09cbfc07c9d7fbb5a463", size = 3089, upload-time = "2024-03-24T08:22:07.499Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/5b/974430b5ffdb7a4f1941d13d83c64a0395114503cc357c6b9ae4ce5047ed/click_didyoumean-0.3.1-py3-none-any.whl", hash = "sha256:5c4bb6007cfea5f2fd6583a2fb6701a22a41eb98957e63d0fac41c10e7c3117c", size = 3631, upload-time = "2024-03-24T08:22:06.356Z" },
-]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1374,7 +1362,6 @@ dependencies = [
     { name = "check-jsonschema" },
     { name = "click" },
     { name = "click-default-group" },
-    { name = "click-didyoumean" },
     { name = "dateparser" },
     { name = "fasteners" },
     { name = "importlib-metadata", marker = "python_full_version < '3.12'" },
@@ -1517,7 +1504,6 @@ requires-dist = [
     { name = "check-jsonschema", specifier = ">=0.33,<0.36" },
     { name = "click", specifier = ">=8.1,!=8.2.2,<8.4" },
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
-    { name = "click-didyoumean", specifier = ">=0.3.1,<0.4" },
     { name = "dateparser", specifier = ">=1.2.1" },
     { name = "fasteners", specifier = ">=0.19,<0.21" },
     { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=1.31.0" },

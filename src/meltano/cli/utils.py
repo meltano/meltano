@@ -12,8 +12,8 @@ from enum import Enum, auto
 import click
 import structlog
 from click_default_group import DefaultGroup
-from click_didyoumean import DYMGroup
 
+from meltano.cli._didyoumean import DYMGroup
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin.base import PluginDefinition, PluginType
