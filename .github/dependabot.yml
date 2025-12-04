@@ -1,15 +1,5 @@
 version: 2
-
 enable-beta-ecosystems: true
-
-multi-ecosystem-groups:
-  python:
-    commit-message:
-      prefix: "fix(deps): "
-      prefix-development: "chore(deps-dev): "
-    schedule:
-      interval: weekly
-
 updates:
   - package-ecosystem: pip
     directory: "/.github/workflows"
@@ -28,7 +18,6 @@ updates:
       prefix: "ci: "
     cooldown:
       default-days: 7
-
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -45,30 +34,7 @@ updates:
       prefix: "ci: "
     cooldown:
       default-days: 7
-
   - package-ecosystem: uv
-    versioning-strategy: lockfile-only
-    directory: "/"
-    schedule:
-      interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
-    labels: [dependencies]
-    groups:
-      development-dependencies:
-        dependency-type: development
-      runtime-dependencies:
-        dependency-type: production
-        update-types:
-        - "minor"
-        - "patch"
-    cooldown:
-      default-days: 7
-    multi-ecosystem-group: python
-    patterns: ["*"]
-
-  - package-ecosystem: pip
     versioning-strategy: increase-if-necessary
     directory: "/"
     schedule:
@@ -85,11 +51,11 @@ updates:
         update-types:
         - "minor"
         - "patch"
+    commit-message:
+      prefix: "chore(deps): "
+      prefix-development: "chore(deps-dev): "
     cooldown:
       default-days: 7
-    multi-ecosystem-group: python
-    patterns: ["*"]
-
   - package-ecosystem: npm
     versioning-strategy: increase
     directory: "docs"
@@ -112,7 +78,6 @@ updates:
       prefix-development: "chore(deps-dev): "
     cooldown:
       default-days: 7
-
   - package-ecosystem: "docker-compose"
     directory: "tests/fixtures/docker/"
     schedule:
