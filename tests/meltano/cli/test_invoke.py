@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import json
+import logging
 import platform
 import typing as t
 from unittest import mock
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+import structlog
 
 from meltano.cli import cli
+from meltano.cli.invoke import _LogOutputHandler
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -268,3 +271,107 @@ class TestCliInvoke:
             reason=PluginInstallReason.INSTALL,
         )
         mock_invoke.assert_not_called()
+
+
+class TestLogOutputHandler:
+    """Tests for the _LogOutputHandler class."""
+
+    def test_writeline_with_singer_sdk_log(self, caplog):
+        """Test parsing Singer SDK structured logs."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        singer_log = (
+            '{"level":"info","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
+            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":null,'
+            '"message":"Test message","extra":{"custom":"value"}}'
+        )
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(singer_log)
+
+        # Check that the log was parsed and the message was extracted
+        assert any("Test message" in record.message for record in caplog.records)
+
+    def test_writeline_with_unparseable_log(self, caplog):
+        """Test fallback for unparseable logs."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        plain_log = "This is a plain text log line"
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(plain_log)
+
+        # Check that the plain log was passed through
+        assert any(
+            "This is a plain text log line" in record.message
+            for record in caplog.records
+        )
+
+    def test_writeline_without_parser(self, caplog):
+        """Test that logs work without a parser configured."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser=None)
+
+        log_line = "Simple log message"
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(log_line)
+
+        # Check that the log was written
+        assert any("Simple log message" in record.message for record in caplog.records)
+
+    def test_writeline_empty_line(self, caplog):
+        """Test that empty lines are ignored."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser=None)
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline("")
+            handler.writeline("   ")
+
+        # No logs should be written for empty lines
+        assert len(caplog.records) == 0
+
+    def test_writeline_with_different_log_levels(self, caplog):
+        """Test parsing logs with different severity levels."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        error_log = (
+            '{"level":"error","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
+            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":null,'
+            '"message":"Error occurred","extra":{}}'
+        )
+        warning_log = (
+            '{"level":"warning","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
+            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":null,'
+            '"message":"Warning message","extra":{}}'
+        )
+
+        with caplog.at_level(logging.WARNING):
+            handler.writeline(error_log)
+            handler.writeline(warning_log)
+
+        # Check that both error and warning were logged
+        messages = [record.message for record in caplog.records]
+        assert any("Error occurred" in msg for msg in messages)
+        assert any("Warning message" in msg for msg in messages)
+
+    def test_writeline_preserves_extra_fields(self, caplog):
+        """Test that extra fields from parsed logs are preserved."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        log_with_extras = (
+            '{"level":"info","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
+            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":"users",'
+            '"message":"Processing stream","extra":{"record_count":100}}'
+        )
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(log_with_extras)
+
+        # Verify the message was logged
+        assert any("Processing stream" in record.message for record in caplog.records)

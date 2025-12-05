@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import typing as t
 
@@ -21,6 +22,7 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.logging.utils import capture_subprocess_output
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
@@ -158,6 +160,55 @@ async def invoke(
     sys.exit(exit_code)
 
 
+class _LogOutputHandler:
+    """Output handler for parsing plugin logs in invoke command."""
+
+    def __init__(self, logger, log_parser=None):  # noqa: ANN001, ANN204
+        """Initialize the log output handler.
+
+        Args:
+            logger: Structured logger to write parsed logs to.
+            log_parser: Name of the log parser to use for structured parsing.
+        """
+        self.logger = logger
+        self.log_parser = log_parser
+        from meltano.core.logging.parsers import get_parser_factory
+
+        self._parser_factory = get_parser_factory()
+
+    def writeline(self, line: str) -> None:
+        """Write a line using structured logging if possible.
+
+        Args:
+            line: Log line to write.
+        """
+        line = line.rstrip()
+        if not line:
+            return
+
+        # Try to parse the line if we have a parser configured
+        if self.log_parser and (
+            parsed_record := self._parser_factory.parse_line(
+                line,
+                self.log_parser,
+            )
+        ):
+            # Log with parsed level and structured data
+            extra = {**parsed_record.extra}
+            if parsed_record.logger_name:
+                extra["plugin_logger"] = parsed_record.logger_name
+
+            self.logger.log(
+                parsed_record.level,
+                parsed_record.message,
+                plugin_exception=parsed_record.exception,
+                **extra,
+            )
+        else:
+            # Fallback to simple logging
+            self.logger.info(line)
+
+
 async def _invoke(  # noqa: ANN202
     *,
     invoker: PluginInvoker,
@@ -191,9 +242,34 @@ async def _invoke(  # noqa: ANN202
                     *plugin_args,
                 )
             else:
-                handle = await invoker.invoke_async(*plugin_args, command=command_name)
+                # Capture stderr for log parsing
+                handle = await invoker.invoke_async(
+                    *plugin_args,
+                    command=command_name,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Get the log parser for structured logging
+                log_parser = invoker.get_log_parser()
+
+                # Set up stderr logger with log parsing
+                stderr_logger = invoker.stderr_logger.bind(
+                    stdio="stderr",
+                    cmd_type="command",
+                )
+
+                # Create output handler for stderr
+                stderr_out = _LogOutputHandler(stderr_logger, log_parser=log_parser)
+
+                # Capture stderr output asynchronously
+                stderr_future = asyncio.create_task(
+                    capture_subprocess_output(handle.stderr, stderr_out),
+                )
+
                 with propagate_stop_signals(handle):
                     exit_code = await handle.wait()
+                    # Wait for stderr capture to complete
+                    await stderr_future
 
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(str(err)) from err
