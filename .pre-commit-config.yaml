@@ -28,6 +28,7 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: debug-statements
+      - id: no-commit-to-branch
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.35.0
