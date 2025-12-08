@@ -281,10 +281,18 @@ class TestLogOutputHandler:
         logger = structlog.stdlib.get_logger("test")
         handler = _LogOutputHandler(logger, log_parser="singer-sdk")
 
-        singer_log = (
-            '{"level":"info","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
-            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":null,'
-            '"message":"Test message","extra":{"custom":"value"}}'
+        singer_log = json.dumps(
+            {
+                "level": "info",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": None,
+                "message": "Test message",
+                "extra": {"custom": "value"},
+            },
         )
 
         with caplog.at_level(logging.INFO):
@@ -339,15 +347,31 @@ class TestLogOutputHandler:
         logger = structlog.stdlib.get_logger("test")
         handler = _LogOutputHandler(logger, log_parser="singer-sdk")
 
-        error_log = (
-            '{"level":"error","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
-            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":null,'
-            '"message":"Error occurred","extra":{}}'
+        error_log = json.dumps(
+            {
+                "level": "error",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": None,
+                "message": "Error occurred",
+                "extra": {},
+            },
         )
-        warning_log = (
-            '{"level":"warning","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
-            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":null,'
-            '"message":"Warning message","extra":{}}'
+        warning_log = json.dumps(
+            {
+                "level": "warning",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": None,
+                "message": "Warning message",
+                "extra": {},
+            },
         )
 
         with caplog.at_level(logging.WARNING):
@@ -364,10 +388,18 @@ class TestLogOutputHandler:
         logger = structlog.stdlib.get_logger("test")
         handler = _LogOutputHandler(logger, log_parser="singer-sdk")
 
-        log_with_extras = (
-            '{"level":"info","pid":123,"logger_name":"tap-test","ts":1234567890.0,'
-            '"thread_name":"MainThread","app_name":"singer-sdk","stream_name":"users",'
-            '"message":"Processing stream","extra":{"record_count":100}}'
+        log_with_extras = json.dumps(
+            {
+                "level": "info",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": "users",
+                "message": "Processing stream",
+                "extra": {"record_count": 100},
+            },
         )
 
         with caplog.at_level(logging.INFO):
