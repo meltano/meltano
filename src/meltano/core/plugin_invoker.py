@@ -198,8 +198,8 @@ class PluginInvoker:
 
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
-            config_dir or self.project.plugin_dir(plugin),  # type: ignore[deprecated]
-            run_dir or self.project.run_dir(plugin.name),  # type: ignore[deprecated]
+            config_dir or self.project.dirs.plugin(plugin),  # type: ignore[deprecated]
+            run_dir or self.project.dirs.run(plugin.name),  # type: ignore[deprecated]
         )
 
         self.settings_service = plugin_settings_service or PluginSettingsService(
@@ -427,7 +427,7 @@ class PluginInvoker:
         if self.venv_service:
             # Switch to plugin-specific venv
             venv = VirtualEnv(
-                self.project.venvs_dir(  # type: ignore[deprecated]
+                self.project.dirs.venvs(  # type: ignore[deprecated]
                     self.plugin.type,
                     self.plugin.name,
                     make_dirs=False,
