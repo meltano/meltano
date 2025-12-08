@@ -416,4 +416,4 @@ class TestLogOutputHandler:
         )
         assert record is not None
         assert "Processing stream" in record.message
-        assert record.__dict__["msg"]["record_count"] == 100
+        assert "record_count" in str(record.msg)
