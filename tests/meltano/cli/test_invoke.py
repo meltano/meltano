@@ -406,4 +406,14 @@ class TestLogOutputHandler:
             handler.writeline(log_with_extras)
 
         # Verify the message was logged
-        assert any("Processing stream" in record.message for record in caplog.records)
+        record = next(
+            (
+                record
+                for record in caplog.records
+                if "Processing stream" in record.message
+            ),
+            None,
+        )
+        assert record is not None
+        assert "Processing stream" in record.message
+        assert record.__dict__["msg"]["record_count"] == 100
