@@ -321,7 +321,7 @@ To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.js
 The `meltano config` command structure changed in Meltano v4. The subcommand now comes _before_ the plugin name:
 
 - **New format**: `meltano config list <plugin>`, `meltano config set <plugin> <setting> <value>`
-- **Old format**: `meltano config <plugin> list`, `meltano config <plugin> set <setting> <value>`
+- **Old format**: `meltano config list <plugin>`, `meltano config set <plugin> <setting> <value>`
 
 :::
 
@@ -430,8 +430,8 @@ When setting a config value that contains the character `$`, you can avoid expan
 escaping it with `\` or using single quotes:
 
 ```bash
-meltano config <plugin> set <name> "@\$a"
-meltano config <plugin> set <name> '@$a'
+meltano config set <plugin> <name> "@\$a"
+meltano config set <plugin> <name> '@$a'
 ```
 
 #### Sensitive values
@@ -441,7 +441,7 @@ By default, values for sensitive settings are redacted from the output of `melta
 # `--safe` is the effective default, whether the flag is present or not
 meltano config --safe <plugin>
 meltano config --safe <plugin> list
-meltano config <plugin> list
+meltano config list <plugin>
 
 meltano config --unsafe <plugin>
 meltano config --unsafe <plugin> list
@@ -454,10 +454,10 @@ meltano config --unsafe <plugin> set --interactive
 Nested properties can be set (and unset) by specifying a list of property names:
 
 ```bash
-meltano config <plugin> set <property> <subproperty> <value>
-meltano config <plugin> set <property> <deep> <nesting> <value>
+meltano config set <plugin> <property> <subproperty> <value>
+meltano config set <plugin> <property> <deep> <nesting> <value>
 
-meltano config <plugin> unset <property> <subproperty>
+meltano config unset <plugin> <property> <subproperty>
 ```
 
 This will result in the following configuration being passed on to the plugin:
@@ -473,11 +473,11 @@ This will result in the following configuration being passed on to the plugin:
 
 ##### Dot separator
 
-Note that `meltano config <plugin> list` always displays full config keys
+Note that `meltano config list <plugin>` always displays full config keys
 with nesting represented by the `.` separator, matching the internal flattened representation:
 
 ```bash
-meltano config <plugin> list
+meltano config list <plugin>
 # => <property>.<subproperty>
 # => <property>.<deep>.<nesting>
 ```
@@ -486,14 +486,14 @@ You can also set nested properties using the `.` separator, but specifying a lis
 since this will result in the nesting being reflected in the plugin's `config` object in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
 
 ```bash
-meltano config <plugin> set <property> <deep> <nesting> <value>
+meltano config set <plugin> <property> <deep> <nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>:
 #      <deep>:
 #        <nesting>: <value>
 
-meltano config <plugin> set <property>.<deep>.<nesting> <value>
+meltano config set <plugin> <property>.<deep>.<nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>.<deep>.<nesting>: <value>
@@ -511,7 +511,7 @@ The `config` command can accept the `--environment` flag to target a specific [M
 
 In the context of `meltano config`, [plugin extras](/guide/configuration#plugin-extras) are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the [environment variables](/guide/configuration#configuring-settings) that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin name, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
 
-By default, `meltano config <plugin>` and `meltano config <plugin> list` only take into account regular plugin settings.
+By default, `meltano config <plugin>` and `meltano config list <plugin>` only take into account regular plugin settings.
 An `--extras` flag can be passed to view or list only extras instead.
 
 Be aware that `meltano config <plugin> reset` resets both regular settings _and_ extras.
@@ -519,16 +519,16 @@ Be aware that `meltano config <plugin> reset` resets both regular settings _and_
 ```bash
 # List all extras for the specified plugin with their names,
 # environment variables, and current values
-meltano config <plugin> list --extras
+meltano config list <plugin> --extras
 
 # View the plugin's current extras
 meltano config --extras <plugin>
 
 # Set value of extra `<extra>` to `<value>` through the `_<extra>` setting
-meltano config <plugin> set _<extra> <value>
+meltano config set <plugin> _<extra> <value>
 
 # Unset extra `<extra>`
-meltano config <plugin> unset _<extra>
+meltano config unset <plugin> _<extra>
 
 # Reset regular settings _and_ extras
 meltano config <plugin> reset
@@ -542,16 +542,16 @@ Interactive config supports the same options as the direct `set` command (i.e. `
 
 ```bash
 # Configure plugin interactively
-meltano config <plugin> set --interactive
+meltano config set <plugin> --interactive
 
 # Configure settings for specific environment interactively
 meltano --environment=prod config <plugin> set --interactive
 
 # Configure settings and extras interactively
-meltano config <plugin> set --interactive --extras
+meltano config set <plugin> --interactive --extras
 
 # Configure specific store interactively
-meltano config <plugin> set --interactive --store=dotenv
+meltano config set <plugin> --interactive --store=dotenv
 ```
 
 ### How to use: Read setting value from a file
@@ -563,10 +563,10 @@ The `--from-file` option can be used to read a configuration value from a file o
 
 ```bash
 # Set setting `<name>` to the contents of `./file.txt`.
-meltano config <plugin> set <name> --from-file ./file.txt
+meltano config set <plugin> <name> --from-file ./file.txt
 
 # Set setting `<name>` to the value returned by `uuidgen`.
-uuidgen | meltano config <plugin> set <name> --from-file -
+uuidgen | meltano config set <plugin> <name> --from-file -
 ```
 
 :::info
@@ -577,9 +577,9 @@ uuidgen | meltano config <plugin> set <name> --from-file -
 Values for sensitive settings (defined as `sensitive: true`) are redacted in the output of the following commands:
 
 ```bash
-meltano config <plugin> list
+meltano config list <plugin>
 meltano config set <name> <value>
-meltano config <plugin> set --interactive
+meltano config set <plugin> --interactive
 ```
 
 ## `docs`

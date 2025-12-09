@@ -191,12 +191,12 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _catalog <path>
+meltano config set <extractor> _catalog <path>
 
 meltano el <extractor> <loader> --catalog <path>
 
 # For example:
-meltano config tap-gitlab set _catalog extract/tap-gitlab.catalog.json
+meltano config set tap-gitlab _catalog extract/tap-gitlab.catalog.json
 
 meltano el tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
 
@@ -246,10 +246,10 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _load_schema <schema>
+meltano config set <extractor> _load_schema <schema>
 
 # For example:
-meltano config tap-gitlab set _load_schema gitlab_data
+meltano config set tap-gitlab _load_schema gitlab_data
 
 ```
 
@@ -310,13 +310,13 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _metadata <stream> <key> <value>
-meltano config <extractor> set _metadata <stream> <property> <key> <value>
+meltano config set <extractor> _metadata <stream> <key> <value>
+meltano config set <extractor> _metadata <stream> <property> <key> <value>
 
 # For example:
-meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
-meltano config tap-postgres set _metadata some_stream_id replication-key created_at
-meltano config tap-postgres set _metadata some_stream_id created_at is-replication-key true
+meltano config set tap-postgres _metadata some_stream_id replication-method INCREMENTAL
+meltano config set tap-postgres _metadata some_stream_id replication-key created_at
+meltano config set tap-postgres _metadata some_stream_id created_at is-replication-key true
 
 ```
 
@@ -387,12 +387,12 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _schema <entity> <attribute> <schema description>
-meltano config <extractor> set _schema <entity> <attribute> <key> <value>
+meltano config set <extractor> _schema <entity> <attribute> <schema description>
+meltano config set <extractor> _schema <entity> <attribute> <key> <value>
 
 # For example:
-meltano config tap-postgres set _metadata some_stream_id created_at type '["string", "null"]'
-meltano config tap-postgres set _metadata some_stream_id created_at format date-time
+meltano config set tap-postgres _metadata some_stream_id created_at type '["string", "null"]'
+meltano config set tap-postgres _metadata some_stream_id created_at format date-time
 ```
 
   </TabItem>
@@ -457,17 +457,17 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
+meltano config set <extractor> _select '["<entity>.<attribute>", ...]'
 
 meltano select <extractor> <entity> <attribute>
 
 # For example:
 # Stream-only patterns (both lines are equivalent)
-meltano config tap-gitlab set _select '["project_members", "commits"]'
-meltano config tap-gitlab set _select '["project_members.*", "commits.*"]'
+meltano config set tap-gitlab _select '["project_members", "commits"]'
+meltano config set tap-gitlab _select '["project_members.*", "commits.*"]'
 
 # Mix of stream-only and specific properties
-meltano config tap-gitlab set _select '["project_members", "commits.id", "commits.author_name"]'
+meltano config set tap-gitlab _select '["project_members", "commits.id", "commits.author_name"]'
 
 # Using meltano select command
 meltano select tap-gitlab project_members "*"  # All properties
@@ -511,7 +511,7 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config tap-smoke-test set _select '["animals\\.data.id","animals\\.data.verified"]'
+meltano config set tap-smoke-test _select '["animals\\.data.id","animals\\.data.verified"]'
 
 meltano select tap-smoke-test 'animals\.data' id
 meltano select tap-smoke-test 'animals\.data' verified
@@ -592,18 +592,18 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _select_filter '["<entity>", ...]'
-meltano config <extractor> set _select_filter '["!<entity>", ...]'
+meltano config set <extractor> _select_filter '["<entity>", ...]'
+meltano config set <extractor> _select_filter '["!<entity>", ...]'
 
 meltano el <extractor> <loader> --select <entity>
 meltano el <extractor> <loader> --exclude <entity>
 
 # For example:
 # Include only specific streams (most common use case)
-meltano config tap-gitlab set _select_filter '["commits", "issues"]'
+meltano config set tap-gitlab _select_filter '["commits", "issues"]'
 
 # Exclude specific streams
-meltano config tap-gitlab set _select_filter '["!project_members", "!logs"]'
+meltano config set tap-gitlab _select_filter '["!project_members", "!logs"]'
 
 # More commonly used via CLI options:
 meltano el tap-gitlab target-jsonl --select commits        # Process only commits stream
@@ -688,12 +688,12 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _state <path>
+meltano config set <extractor> _state <path>
 
 meltano el <extractor> <loader> --state <path>
 
 # For example:
-meltano config tap-gitlab set _state extract/tap-gitlab.state.json
+meltano config set tap-gitlab _state extract/tap-gitlab.state.json
 
 meltano el tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 ```
@@ -738,10 +738,10 @@ extractors:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <extractor> set _use_cached_catalog false
+meltano config set <extractor> _use_cached_catalog false
 
 # For example:
-meltano config tap-gitlab set _use_cached_catalog false
+meltano config set tap-gitlab _use_cached_catalog false
 ```
 
   </TabItem>
@@ -803,10 +803,10 @@ loaders:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <loader> set _dialect <dialect>
+meltano config set <loader> _dialect <dialect>
 
 # For example:
-meltano config target-example-db set _dialect example-db
+meltano config set target-example-db _dialect example-db
 ```
 
   </TabItem>
@@ -879,10 +879,10 @@ transforms:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <transform> set _package_name <name>
+meltano config set <transform> _package_name <name>
 
 # For example:
-meltano config dbt-facebook-ads set _package_name facebook_ads
+meltano config set dbt-facebook-ads _package_name facebook_ads
 ```
 
   </TabItem>
@@ -932,10 +932,10 @@ transforms:
 
 ```bash
 {% raw %}
-meltano config <transform> set _vars <key> <value>
+meltano config set <transform> _vars <key> <value>
 
 # For example
-meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+meltano config set --plugin-type=transform tap-gitlab _vars schema "{{ env_var('DBT_SOURCE_SCHEMA') }}"
 {% endraw %}
 
 ```
@@ -1033,11 +1033,11 @@ files:
   <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
-meltano config <bundle> set _update <path> <true/false>
+meltano config set <bundle> _update <path> <true/false>
 
 # For example:
-meltano config --plugin-type=files dbt set _update transform/dbt_project.yml false
-meltano config --plugin-type=files dbt set _update profiles/*.yml true
+meltano config set --plugin-type=files dbt _update transform/dbt_project.yml false
+meltano config set --plugin-type=files dbt _update profiles/*.yml true
 ```
 
   </TabItem>

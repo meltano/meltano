@@ -55,7 +55,7 @@ The state backend settings for your Meltano project can be configured much the s
 The main setting is `state_backend.uri` which is set to the special keyword string `systemdb` by default.
 This will tell Meltano to store state in the same backend database as it stores other project data.
 
-It can be changed by running `meltano config meltano set state_backend.uri <URI for desired state backend>` or by directly editing a project's `meltano.yml` to add the following:
+It can be changed by running `meltano config set meltano state_backend.uri <URI for desired state backend>` or by directly editing a project's `meltano.yml` to add the following:
 
 ```yaml
 state_backend:
@@ -69,7 +69,7 @@ To store state on the local filesystem, set the `state_backend.uri` setting to `
 For example, to store state directly on the local filesystem at the path `${MELTANO_SYS_DIR_ROOT}/state`, run:
 
 ```bash
-meltano config meltano set state_backend.uri 'file:///${MELTANO_SYS_DIR_ROOT}/state'
+meltano config set meltano state_backend.uri 'file:///${MELTANO_SYS_DIR_ROOT}/state'
 ```
 
 Note the single quotes which prevent the early expansion of the environment variable.
@@ -269,10 +269,10 @@ You can migrate state from one backend to another backend using the [`meltano st
 
 For example if you've been storing state in Meltano's system database and would like to migrate to S3, you'll need to first store state in a local json file, configure the S3 state backend, and then set state for your job using the local json file.
 
-So to migrate state for a job with the state ID `dev:tap-github-to-target-jsonl`, you first need to ensure that your meltano project is configured to use the source state backend that currently holds the job state. For this example, we'll use `systemdb` as our source. To check the current configuration, run `meltano config meltano list` and then find the value for `state_backend.uri`:
+So to migrate state for a job with the state ID `dev:tap-github-to-target-jsonl`, you first need to ensure that your meltano project is configured to use the source state backend that currently holds the job state. For this example, we'll use `systemdb` as our source. To check the current configuration, run `meltano config list meltano` and then find the value for `state_backend.uri`:
 
 ```shell
-$ meltano config meltano list | grep state_backend.uri
+$ meltano config list meltano | grep state_backend.uri
 
 state_backend.uri [env: MELTANO_STATE_BACKEND_URI] current value: 'systemdb' (default)
 ```
@@ -286,13 +286,13 @@ $ meltano state get dev:tap-github-to-target-jsonl > dev:tap-github-to-target-js
 Now we need to reconfigure our meltano project to use the new destination state backend. For this example, we'll use an S3 bucket with the name `meltano` and store state under the prefix `state`.
 
 ```shell
-$ meltano config meltano set state_backend.uri "s3://meltano/state"
+$ meltano config set meltano state_backend.uri "s3://meltano/state"
 Meltano setting 'state_backend.uri' was set in `.env`: 's3://meltano/state'
 
-$ meltano config meltano set state_backend.s3.aws_access_key_id <AWS_ACCESS_KEY_ID>
+$ meltano config set meltano state_backend.s3.aws_access_key_id <AWS_ACCESS_KEY_ID>
 Meltano setting 'state_backend.s3.aws_access_key_id' was set in `.env`: '(redacted)'
 
-$ meltano config meltano set state_backend.s3.aws_secret_access_key <AWS_SECRET_ACCESS_KEY>
+$ meltano config set meltano state_backend.s3.aws_secret_access_key <AWS_SECRET_ACCESS_KEY>
 Meltano setting 'state_backend.s3.aws_secret_access_key' was set in `.env`: '(redacted)'
 ```
 

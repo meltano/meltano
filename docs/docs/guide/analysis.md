@@ -55,7 +55,7 @@ meltano install superset
 If you’re running Superset for the first time in a new environment, generate a new SECRET_KEY to increase security:
 
 ```bash
-meltano config superset set SECRET_KEY $(openssl rand -base64 42)
+meltano config set superset SECRET_KEY $(openssl rand -base64 42)
 ```
 
 ### Admin User
