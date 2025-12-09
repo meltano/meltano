@@ -395,9 +395,23 @@ class TestLogOutputHandler:
             handler.writeline(warning_log)
 
         # Check that both error and warning were logged
-        messages = [record.message for record in caplog.records]
-        assert any("Error occurred" in msg for msg in messages)
-        assert any("Warning message" in msg for msg in messages)
+        error_record = next(
+            (record for record in caplog.records if "Error occurred" in record.message),
+            None,
+        )
+        assert error_record is not None
+        assert error_record.levelname == "ERROR"
+
+        warning_record = next(
+            (
+                record
+                for record in caplog.records
+                if "Warning message" in record.message
+            ),
+            None,
+        )
+        assert warning_record is not None
+        assert warning_record.levelname == "WARNING"
 
     def test_writeline_preserves_extra_fields(self, caplog: pytest.LogCaptureFixture):
         """Test that extra fields from parsed logs are preserved."""
