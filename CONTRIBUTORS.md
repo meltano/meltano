@@ -1,4 +1,4 @@
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/emoji-key)):
 
 > [!IMPORTANT]
 > This list is not exhaustive and may be currently missing many contributors from the old [GitLab repository](https://gitlab.com/meltano/meltano). Let us know if you discover someone's missing!
