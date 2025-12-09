@@ -267,7 +267,7 @@ In most deployments, it should be rare for the same pipeline to be running in pa
 
 You can migrate state from one backend to another backend using the [`meltano state get` and `meltano state set` commands](/reference/command-line-interface#state).
 
-For example if you've been storing state in Meltano's system database and would like to migrate to S3, you'll need to first store state in a local json file, configure the S3 state backend, and then set state for your job using the local json file.
+For example if you've been storing state in Meltano's system database and would like to migrate to S3, you'll need to first store state in a local JSON file, configure the S3 state backend, and then set state for your job using the local JSON file.
 
 So to migrate state for a job with the state ID `dev:tap-github-to-target-jsonl`, you first need to ensure that your meltano project is configured to use the source state backend that currently holds the job state. For this example, we'll use `systemdb` as our source. To check the current configuration, run `meltano config list meltano` and then find the value for `state_backend.uri`:
 
