@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### ⚙️ Under the Hood
 
-- [#9665](https://github.com/meltano/meltano/issues/9665) Remove dependency one `click-didyoumean`
+- [#9665](https://github.com/meltano/meltano/issues/9665) Remove dependency on `click-didyoumean`
 
 ### 📚 Documentation Improvements
 
