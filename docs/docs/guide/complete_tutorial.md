@@ -372,26 +372,26 @@ _To learn more about managing the configuration of your plugins, refer to the [C
 1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
    ```bash
-   meltano config <plugin> set --interactive
+   meltano config set <plugin> --interactive
 
    # For example:
-   meltano config tap-gitlab set --interactive
+   meltano config set tap-gitlab --interactive
    ```
 
 Follow the prompts to step through all available settings, or select an individual setting to configure.
 
 You can also optionally use the `list`, `set` and `unset` commands directly to view and change plugin configuration:
 
-- Find out what settings your extractor supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
+- Find out what settings your extractor supports using [`meltano config list <plugin>`](/reference/command-line-interface#config):
 
   ```bash
-  meltano config <plugin> list
+  meltano config list <plugin>
 
   # For example:
-  meltano config tap-gitlab list
+  meltano config list tap-gitlab
   ```
 
-- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
+- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config set <plugin>`](/reference/command-line-interface#config):
 
 :::info
 
@@ -400,12 +400,12 @@ You can also optionally use the `list`, `set` and `unset` commands directly to v
 :::
 
 ```bash
-meltano config <plugin> set <setting> <value>
+meltano config set <plugin> <setting> <value>
 
 # For example:
-meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-meltano config tap-gitlab set start_date 2024-03-01T00:00:00Z
-meltano config tap-gitlab set private_token my_private_token
+meltano config set tap-gitlab projects "meltano/meltano meltano/tap-gitlab"
+meltano config set tap-gitlab start_date 2024-03-01T00:00:00Z
+meltano config set tap-gitlab private_token my_private_token
 ```
 
 This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
@@ -569,20 +569,20 @@ Most database extractors, on the other hand, support two or more of the followin
 
   1. Find out which replication methods (i.e. options for the `replication-method` [stream metadata](https://hub.meltano.com/singer/spec#metadata) key) the extractor supports by checking its documentation or the README in its repository.
 
-  1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config <plugin> set`](/reference/command-line-interface#config) and the extractor's [`metadata` extra](/concepts/plugins#metadata-extra):
+  1. Set the desired `replication-method` metadata for each [selected entity](#select-entities-and-attributes-to-extract) using [`meltano config set <plugin>`](/reference/command-line-interface#config) and the extractor's [`metadata` extra](/concepts/plugins#metadata-extra):
 
      ```bash
-     meltano config <plugin> set _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
+     meltano config set <plugin> _metadata <entity> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
 
      # For example:
-     meltano config tap-postgres set _metadata some_entity_id replication-method INCREMENTAL
-     meltano config tap-postgres set _metadata other_entity replication-method FULL_TABLE
+     meltano config set tap-postgres _metadata some_entity_id replication-method INCREMENTAL
+     meltano config set tap-postgres _metadata other_entity replication-method FULL_TABLE
 
      # Set replication-method metadata for all entities
-     meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
+     meltano config set tap-postgres _metadata '*' replication-method INCREMENTAL
 
      # Set replication-method metadata for matching entities
-     meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
+     meltano config set tap-postgres _metadata '*_full' replication-method FULL_TABLE
      ```
 
      As you can see in the example, entity identifiers can contain wildcards (`*`) to match multiple entities at once.
@@ -590,11 +590,11 @@ Most database extractors, on the other hand, support two or more of the followin
      If you've set a table's `replication-method` to `INCREMENTAL`, also choose a [Replication Key](/guide/integration#replication-key) by setting the `replication-key` metadata:
 
      ```bash
-     meltano config <plugin> set _metadata <entity> replication-key <column>
+     meltano config set <plugin> _metadata <entity> replication-key <column>
 
      # For example:
-     meltano config tap-postgres set _metadata some_entity_id replication-key updated_at
-     meltano config tap-postgres set _metadata some_entity_id replication-key id
+     meltano config set tap-postgres _metadata some_entity_id replication-key updated_at
+     meltano config set tap-postgres _metadata some_entity_id replication-key id
      ```
 
      This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
@@ -833,35 +833,35 @@ _To learn more about managing the configuration of your plugins, refer to the [C
 1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
    ```bash
-   meltano config <plugin> set --interactive
+   meltano config set <plugin> --interactive
 
    # For example:
-   meltano config target-postgres set --interactive
+   meltano config set target-postgres --interactive
    ```
 
 Follow the prompts to step through all available settings, or select an individual setting to configure.
 
 You can also optionally use the `list`, `set` and `unset` commands directly to view and change plugin configuration:
 
-- Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
+- Find out what settings your loader supports using [`meltano config list <plugin>`](/reference/command-line-interface#config):
 
   ```bash
-  meltano config <plugin> list
+  meltano config list <plugin>
 
   # For example:
-  meltano config target-postgres list
+  meltano config list target-postgres
   ```
 
-- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
+- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config set <plugin>`](/reference/command-line-interface#config):
 
   ```bash
-  meltano config <plugin> set <setting> <value>
+  meltano config set <plugin> <setting> <value>
 
   # For example:
-  meltano config target-postgres set user meltano
-  meltano config target-postgres set password meltano
-  meltano config target-postgres set dbname warehouse
-  meltano config target-postgres set default_target_schema public
+  meltano config set target-postgres user meltano
+  meltano config set target-postgres password meltano
+  meltano config set target-postgres dbname warehouse
+  meltano config set target-postgres default_target_schema public
   ```
 
 :::info
@@ -1128,15 +1128,15 @@ Refer to the [transformers page](https://hub.meltano.com/transformers/) on Melta
 1. Configure dbt-postgres
 
    ```bash
-   meltano config dbt-postgres list
+   meltano config list dbt-postgres
 
    # For example:
-   meltano config dbt-postgres set host localhost
-   meltano config dbt-postgres set user meltano
-   meltano config dbt-postgres set password meltano
-   meltano config dbt-postgres set port 5432
-   meltano config dbt-postgres set dbname warehouse
-   meltano config dbt-postgres set schema analytics
+   meltano config set dbt-postgres host localhost
+   meltano config set dbt-postgres user meltano
+   meltano config set dbt-postgres password meltano
+   meltano config set dbt-postgres port 5432
+   meltano config set dbt-postgres dbname warehouse
+   meltano config set dbt-postgres schema analytics
    ```
 
 1. Once dbt has been installed and configured in your Meltano project, you will see the `/transform` directory populated with dbt artifacts.

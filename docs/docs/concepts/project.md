@@ -356,7 +356,7 @@ used to [configure Meltano and its plugins](/guide/configuration#configuring-set
 Typically, this file is used to store configuration that is environment-specific or sensitive,
 and should not be stored in [`meltano.yml`](#meltano-yml-project-file) and checked into version control.
 
-[`meltano config <plugin> set`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
+[`meltano config set <plugin>`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
 In a newly initialized project, this file will be included in [`.gitignore`](#gitignore) by default.
 
@@ -393,7 +393,7 @@ While you would usually not want to modify the system database directly, knowing
 Meltano's CLI utilizes the following tables:
 
 - `runs` table: One row for each [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config set <plugin>`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
 
 ### Support for other database types
 

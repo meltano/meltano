@@ -22,7 +22,7 @@ If you encounter some trouble running a pipeline, read our [troubleshooting tips
 
 As described in the [Configuration guide](/guide/configuration#configuration-layers), [`meltano run`](/reference/command-line-interface#run) will determine the configuration of your extractor + loader pairs and any optional utilities (e.g. dbt) by looking in [**the environment**](/guide/configuration#configuring-settings), your project's [**`.env` file**](/concepts/project#env), the [system database](/concepts/project#system-database), and finally your [**`meltano.yml` project file**](/concepts/project#meltano-yml-project-file), falling back to a default value if nothing was found.
 
-You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/reference/command-line-interface#config) will print the current configuration in JSON format.
+You can use [`meltano config list <plugin>`](/reference/command-line-interface#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/reference/command-line-interface#config) will print the current configuration in JSON format.
 
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
 
@@ -158,11 +158,11 @@ which can be treated like a `_metadata` setting with
 `_metadata.<stream>.<key>` and `_metadata.<stream>.<property>.<key>`.
 
 ```bash
-meltano config <plugin> set _metadata <stream> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
+meltano config set <plugin> _metadata <stream> replication-method <LOG_BASED|INCREMENTAL|FULL_TABLE>
 
 # For example:
-meltano config tap-postgres set _metadata some_stream_id replication-method INCREMENTAL
-meltano config tap-postgres set _metadata other_stream replication-method FULL_TABLE
+meltano config set tap-postgres _metadata some_stream_id replication-method INCREMENTAL
+meltano config set tap-postgres _metadata other_stream replication-method FULL_TABLE
 ```
 
 This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
@@ -184,10 +184,10 @@ You can also set the `replication-method` metadata for all streams or matching s
 
 ```bash
 # Set replication-method metadata for all streams
-meltano config tap-postgres set _metadata '*' replication-method INCREMENTAL
+meltano config set tap-postgres _metadata '*' replication-method INCREMENTAL
 
 # Set replication-method metadata for matching streams
-meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
+meltano config set tap-postgres _metadata '*_full' replication-method FULL_TABLE
 ```
 
 ```yaml title="meltano.yml"
@@ -391,7 +391,7 @@ In addition to [variables available to all plugins](/guide/configuration#availab
 - `MELTANO_EXTRACTOR_NAME`: the extractor's `name`, e.g. `tap-gitlab`
 - `MELTANO_EXTRACTOR_NAMESPACE`: the extractor's `namespace`, e.g. `tap_gitlab`
 - `MELTANO_EXTRACT_<SETTING_NAME>`: one environment variable for each of the extractor's settings and [extras](/guide/configuration#plugin-extras), e.g. `MELTANO_EXTRACT_PRIVATE_TOKEN` for the `private_token` setting, and `MELTANO_EXTRACT__LOAD_SCHEMA` for the [`load_schema` extra](/concepts/plugins#load-schema-extra)
-- `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
+- `<SETTING_ENV>`: all of the extractor's regular configuration environment variables, as listed by `meltano config list <plugin>`, e.g. `TAP_GITLAB_API_URL` for the `api_url` setting
 
 #### Loader variables
 
@@ -400,7 +400,7 @@ Additionally, the following variables describing the [loader](/concepts/plugins#
 - `MELTANO_LOADER_NAME`: the loader's `name`, e.g. `target-postgres`
 - `MELTANO_LOADER_NAMESPACE`: the loader's `namespace`, e.g. `postgres`
 - `MELTANO_LOAD_<SETTING_NAME>`: one environment variable for each of the loader's settings and [extras](/guide/configuration#plugin-extras), e.g. `MELTANO_LOAD_SCHEMA` for the `schema` setting, and `MELTANO_LOAD__DIALECT` for the [`dialect` extra](/concepts/plugins#dialect-extra)
-- `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config <plugin> list`, e.g. `TARGET_POSTGRES_HOST` for the `host` setting
+- `<SETTING_ENV>`: all of the loader's regular configuration environment variables, as listed by `meltano config list <plugin>`, e.g. `TARGET_POSTGRES_HOST` for the `host` setting
 
 #### Transform variables
 

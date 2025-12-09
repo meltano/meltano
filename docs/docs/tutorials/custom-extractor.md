@@ -589,7 +589,7 @@ _**It is best practice not to store sensitive values directly in `meltano.yml`.*
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
 for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting is set to `sensitive: true` and then
-run [`meltano config <plugin> set password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
+run [`meltano config set <plugin> password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
 setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
 You may use any of the following to configure setting values (in order of precedence):

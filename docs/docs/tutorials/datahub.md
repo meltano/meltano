@@ -78,8 +78,8 @@ Configuring the Utility by setting the GMS endpoint for the datahub CLI running 
       gms_host: http://localhost:8080
 ```
 
-or alternatively run the equal CLI command
-`meltano config datahub set gms_host http://localhost:8080`
+or alternatively run the equivalent CLI command
+`meltano config set datahub gms_host http://localhost:8080`
 
 . If you have MSA turned on, you will need an access token, and configure the `gms_auth` attribute as well:
 
@@ -95,7 +95,7 @@ or alternatively run the equal CLI command
 
 Alternatively, run
 
-`meltano config datahub set gms_auth myToken`
+`meltano config set datahub gms_auth myToken`
 
 ## Setting Recipes
 

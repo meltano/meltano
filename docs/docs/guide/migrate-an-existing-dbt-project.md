@@ -31,7 +31,7 @@ See the [transform data guide](/guide/transformation#install-dbt) for more detai
 Or use the [interactive config flag](/reference/command-line-interface#how-to-use-interactive-config) to follow prompts.
 
 ```
-meltano config dbt-snowflake set --interactive
+meltano config set dbt-snowflake --interactive
 ```
 
 Once you've configured your transformer you should be able to run the following command to test your connection and credentials.

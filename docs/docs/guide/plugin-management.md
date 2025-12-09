@@ -946,13 +946,13 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
    meltano install target-postgres
    ```
 
-1. View the current configuration using [`meltano config <name> list`](/reference/command-line-interface#config) to see if it is still valid:
+1. View the current configuration using [`meltano config list <name>`](/reference/command-line-interface#config) to see if it is still valid:
 
    ```bash
-   meltano config <name> list
+   meltano config list <name>
 
    # For example:
-   meltano config target-postgres list
+   meltano config list target-postgres
    ```
 
    Because different variants often use different setting names,
@@ -987,13 +987,13 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
    you can unset the old setting and set the new one using [`meltano config`](/reference/command-line-interface#config):
 
    ```bash
-   meltano config <name> unset <old_setting>
-   meltano config <name> set <setting> <value>
+   meltano config unset <name> <old_setting>
+   meltano config set <name> <setting> <value>
 
    # For example:
-   meltano config target-postgres unset postgres_password
-   meltano config target-postgres set password my_password
+   meltano config unset target-postgres postgres_password
+   meltano config set target-postgres password my_password
    ```
 
-   Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
+   Keep doing this until `meltano config list <name>` shows a valid configuration for the new variant,
    without any of the old variant's settings remaining as [custom settings](/guide/configuration#custom-settings).
