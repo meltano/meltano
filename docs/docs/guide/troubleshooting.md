@@ -58,7 +58,7 @@ If you have a failure using Meltano's execution commands (`invoke`, `elt`, `run`
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set cli log_level debug
+meltano config set meltano cli log_level debug
 ```
 
   </TabItem>
@@ -200,7 +200,7 @@ meltano state get <STATE_ID>
 Instead of `meltano run ... --dump=extractor-config`, use:
 
 ```bash
-meltano config <EXTRACTOR_NAME> list
+meltano config list <EXTRACTOR_NAME>
 ```
 
 Alternatively, you can use:
@@ -214,7 +214,7 @@ meltano invoke --dump=config <EXTRACTOR_NAME>
 Instead of `meltano run ... --dump=loader-config`, use:
 
 ```bash
-meltano config <LOADER_NAME> list
+meltano config list <LOADER_NAME>
 ```
 
 #### Dumping Catalog

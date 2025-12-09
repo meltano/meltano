@@ -1417,6 +1417,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "MarleTangible",
+      "name": "MarleTangible",
+      "avatar_url": "https://avatars.githubusercontent.com/u/107574310?v=4",
+      "profile": "https://github.com/MarleTangible",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

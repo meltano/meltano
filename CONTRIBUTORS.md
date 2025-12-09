@@ -1,4 +1,4 @@
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks go to these wonderful people ([emoji key](https://allcontributors.org/emoji-key)):
 
 > [!IMPORTANT]
 > This list is not exhaustive and may be currently missing many contributors from the old [GitLab repository](https://gitlab.com/meltano/meltano). Let us know if you discover someone's missing!
@@ -195,6 +195,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mahangu"><img src="https://avatars.githubusercontent.com/u/10125810?v=4?s=100" width="100px;" alt="Mahangu Weerasinghe"/><br /><sub><b>Mahangu Weerasinghe</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=mahangu" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://linkedin.com/in/ddobrinskiy"><img src="https://avatars.githubusercontent.com/u/29500178?v=4?s=100" width="100px;" alt="David Dobrinskiy"/><br /><sub><b>David Dobrinskiy</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=ddobrinskiy" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/iamlorax"><img src="https://avatars.githubusercontent.com/u/116229492?v=4?s=100" width="100px;" alt="iamlorax"/><br /><sub><b>iamlorax</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=iamlorax" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MarleTangible"><img src="https://avatars.githubusercontent.com/u/107574310?v=4?s=100" width="100px;" alt="MarleTangible"/><br /><sub><b>MarleTangible</b></sub></a><br /><a href="https://github.com/meltano/meltano/issues?q=author%3AMarleTangible" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
