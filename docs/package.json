@@ -1,7 +1,7 @@
 {
   "name": "docs.meltano.com",
   "license": "MIT",
-  "version": "4.0.6",
+  "version": "4.1.0",
   "description": "https://meltano.com",
   "private": true,
   "scripts": {

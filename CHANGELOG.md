@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.1.0 (2025-12-09)
+
+### ⚙️ Under the Hood
+
+- [#9665](https://github.com/meltano/meltano/issues/9665) Remove dependency one `click-didyoumean`
+
+### 📚 Documentation Improvements
+
+- [#9675](https://github.com/meltano/meltano/issues/9675) Update `meltano config` examples to use new command syntax/order
+
+### 📦 Packaging changes
+
+- [#9673](https://github.com/meltano/meltano/issues/9673) Bump build requirement hatchling to 1.28.0
+
 ## v4.0.6 (2025-11-19)
 
 ### 🐛 Fixes
