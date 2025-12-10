@@ -8,8 +8,8 @@ ci:
   autoupdate_schedule: monthly
   skip:
     - uv-lock
+    # TODO: Remove after https://github.com/python-jsonschema/check-jsonschema/pull/626 is released
     - check-github-discussion-templates
-    - check-dependabot
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -42,19 +42,15 @@ repos:
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
       - id: check-github-issue-config
       - id: check-github-issue-forms
+      # TODO: Update after https://github.com/python-jsonschema/check-jsonschema/pull/626 is released
+      # - id: check-github-discussion
       - id: check-jsonschema
         alias: check-github-discussion-templates
         name: validate GitHub discussion templates
         files: ^.github/DISCUSSION_TEMPLATE/.*\.yml$
         args: ["--schemafile", "https://json.schemastore.org/github-discussion.json"]
       - id: check-compose-spec
-      # TODO: Restore built-in check when https://github.com/SchemaStore/schemastore/pull/5167 ships into check-jsonschema
-      # - id: check-dependabot
-      - id: check-jsonschema
-        alias: check-dependabot
-        name: validate Dependabot configuration
-        files: ^.github/dependabot\.yml$
-        args: ["--schemafile", "https://json.schemastore.org/dependabot-2.0.json"]
+      - id: check-dependabot
       - id: check-github-actions
       - id: check-github-workflows
 
