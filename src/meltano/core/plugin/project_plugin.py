@@ -177,6 +177,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.requires = PluginRequirement.parse_all(requires)
         self.requires_meltano = requires_meltano
         self.env = env or {}
+        self.auto_selected_python: str | None = None
 
         self._fallbacks.update(
             [

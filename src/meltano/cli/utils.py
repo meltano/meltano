@@ -25,6 +25,7 @@ from meltano.core.project_add_service import (
 from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+from meltano.core.utils.python_compatibility import get_current_python_version
 from meltano.core.version_check import VersionCheckService
 
 if sys.version_info >= (3, 11):
@@ -111,6 +112,21 @@ def print_added_plugin(
 
     if docs_url := plugin.docs:
         click.echo(f"Documentation:\t{docs_url}")
+
+    # Display Python version auto-selection message
+    if plugin.auto_selected_python:
+        click.echo()
+        click.secho(
+            f"Note: The current Python version ({get_current_python_version()}) "
+            f"is not supported by this plugin.",
+            fg="yellow",
+        )
+        click.echo(
+            f"Automatically configured to use {plugin.auto_selected_python} instead.",
+        )
+        click.echo(
+            "This can be changed by setting the 'python' property in meltano.yml.",
+        )
 
 
 def _prompt_plugin_namespace(plugin_type, plugin_name):  # noqa: ANN001, ANN202
