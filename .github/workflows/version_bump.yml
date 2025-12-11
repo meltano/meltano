@@ -28,6 +28,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   create_release_branch_pr:
     name: Create Release Pull Request
