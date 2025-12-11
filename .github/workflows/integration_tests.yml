@@ -30,6 +30,8 @@ concurrency:
 env:
   FORCE_COLOR: "1"
 
+permissions: {}
+
 jobs:
   validate:
     name: Integration Tests
