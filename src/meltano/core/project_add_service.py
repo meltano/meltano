@@ -9,6 +9,7 @@ import typing as t
 from meltano.core.plugin import BasePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.utils.python_compatibility import determine_plugin_python_version
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -82,6 +83,16 @@ class ProjectAddService:
         if isinstance(parent, BasePlugin):
             plugin.variant = parent.variant
             plugin.pip_url = parent.pip_url
+
+            # Auto-configure Python version if current version is not supported
+            # Only auto-set if user didn't explicitly provide --python flag
+            if "python" not in attrs or attrs["python"] is None:
+                python_version, auto = determine_plugin_python_version(parent._variant)
+
+                if auto and python_version:
+                    plugin.python = python_version
+                    # Mark that this was auto-selected for display purposes
+                    plugin.auto_selected_python = python_version
 
         plugin, flags = self.project.plugins.add_to_file_with_flags(
             plugin,
