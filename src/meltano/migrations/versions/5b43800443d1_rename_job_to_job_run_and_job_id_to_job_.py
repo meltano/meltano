@@ -8,6 +8,7 @@ Create Date: 2022-06-29 14:28:51.673195
 
 from __future__ import annotations
 
+import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -18,10 +19,22 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.alter_column("job", "job_id", new_column_name="job_name")
+    # MySQL requires existing_type for column renames
+    op.alter_column(
+        "job",
+        "job_id",
+        new_column_name="job_name",
+        existing_type=sa.String(1024),
+    )
     op.rename_table("job", "runs")
 
 
 def downgrade() -> None:
     op.rename_table("runs", "job")
-    op.alter_column("job", "job_name", new_column_name="job_id")
+    # MySQL requires existing_type for column renames
+    op.alter_column(
+        "job",
+        "job_name",
+        new_column_name="job_id",
+        existing_type=sa.String(1024),
+    )

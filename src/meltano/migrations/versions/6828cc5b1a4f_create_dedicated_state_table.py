@@ -29,7 +29,7 @@ from meltano.migrations.utils.dialect_typing import (
 
 # revision identifiers, used by Alembic.
 revision = "6828cc5b1a4f"
-down_revision = "f4c225a9492f"
+down_revision = "5b43800443d1"
 branch_labels = None
 depends_on = None
 

@@ -1,7 +1,7 @@
 """Add `last_heartbeat_at` column to `job` table.
 
 Revision ID: d135f52a6f49
-Revises: e4fbabc3fed6
+Revises: 367228df6a43
 Create Date: 2021-01-14 12:45:55.821947
 
 """
@@ -18,7 +18,7 @@ from meltano.migrations.utils.dialect_typing import (
 
 # revision identifiers, used by Alembic.
 revision = "d135f52a6f49"
-down_revision = "e4fbabc3fed6"
+down_revision = "367228df6a43"
 branch_labels = None
 depends_on = None
 
@@ -31,4 +31,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_column("user", "last_heartbeat_at")
+    op.drop_column("job", "last_heartbeat_at")

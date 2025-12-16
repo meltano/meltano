@@ -1,7 +1,7 @@
 """Add run_id to Job.
 
 Revision ID: 53e97221d99f
-Revises: 6ef30ab7b8e5
+Revises: b4c05e463b53
 Create Date: 2019-10-10 13:12:55.147164
 
 """
@@ -18,7 +18,7 @@ from meltano.migrations import GUID
 
 # revision identifiers, used by Alembic.
 revision = "53e97221d99f"
-down_revision = "6ef30ab7b8e5"
+down_revision = "b4c05e463b53"
 branch_labels = None
 depends_on = None
 

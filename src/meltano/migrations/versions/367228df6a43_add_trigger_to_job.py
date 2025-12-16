@@ -1,7 +1,7 @@
 """Add 'trigger' to Job.
 
 Revision ID: 367228df6a43
-Revises: 87d9638f6ac6
+Revises: 53e97221d99f
 Create Date: 2020-02-19 14:40:30.229756
 
 """
@@ -18,7 +18,7 @@ from meltano.migrations.utils.dialect_typing import (
 
 # revision identifiers, used by Alembic.
 revision = "367228df6a43"
-down_revision = "87d9638f6ac6"
+down_revision = "53e97221d99f"
 branch_labels = None
 depends_on = None
 
