@@ -23,11 +23,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.output_logger import OutputLogger
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.setting_definition import (
-    SettingDefinition,
-    SettingKind,
-    SettingValueJSONEncoder,
-)
+from meltano.core.setting_definition import SettingDefinition, SettingKind, json_dumps
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
@@ -589,7 +585,7 @@ class SingerTap(SingerPlugin):
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
             async with await anyio.open_file(catalog_path, "w") as catalog_f:
-                await catalog_f.write(json.dumps(catalog, indent=2))
+                await catalog_f.write(json_dumps(catalog, indent=2))
 
             if cache_key := self.catalog_cache_key(plugin_invoker):
                 catalog_cache_key_path.write_text(cache_key)
@@ -639,7 +635,7 @@ class SingerTap(SingerPlugin):
             "_metadata": extras["_metadata"],
         }
 
-        key_json = json.dumps(key_dict, cls=SettingValueJSONEncoder)
+        key_json = json_dumps(key_dict)
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S324
 
