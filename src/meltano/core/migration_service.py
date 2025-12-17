@@ -11,6 +11,8 @@ import structlog
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from alembic.runtime.migration import MigrationContext
     from alembic.script import ScriptDirectory
     from sqlalchemy.engine import Engine
@@ -30,13 +32,23 @@ class MigrationUneededException(Exception):
 class MigrationService:
     """Migration service."""
 
-    def __init__(self, engine: Engine) -> None:
+    def __init__(
+        self,
+        engine: Engine,
+        *,
+        lock_path: Path = LOCK_PATH,
+        migration_directory: Path = MIGRATION_DIR,
+    ) -> None:
         """Initialize the migration service.
 
         Args:
             engine: The sqlalchemy engine to use for the migration and checks.
+            lock_path: The path to the database migration lock file.
+            migration_directory: The path to the database migration root directory.
         """
         self.engine = engine
+        self.lock_path = lock_path
+        self.migration_directory = migration_directory
 
     def ensure_migration_needed(
         self,
@@ -60,15 +72,13 @@ class MigrationService:
             if rev.revision == target_revision:
                 raise MigrationUneededException
 
-    def upgrade(  # too many expression and too complex
-        self,
-        *,
-        silent: bool = False,
-    ) -> None:
+    def upgrade(self, *, silent: bool = False) -> None:
         """Upgrade to the latest revision.
 
         Args:
             silent: If true, don't print anything.
+            lock_path: The path to the database migration lock file.
+            migration_directory: The path to the database migration root directory.
 
         Raises:
             MigrationError: If the upgrade fails.
@@ -83,7 +93,7 @@ class MigrationService:
 
             # this connection is used in `env.py` for the migrations
             cfg.attributes["connection"] = conn
-            cfg.set_main_option("script_location", str(MIGRATION_DIR))
+            cfg.set_main_option("script_location", str(self.migration_directory))
             script = ScriptDirectory.from_config(cfg)
             # let's make sure we actually need to migrate
 
@@ -96,7 +106,7 @@ class MigrationService:
 
             try:
                 # try to find the locked version
-                head = LOCK_PATH.read_text().strip()
+                head = self.lock_path.read_text().strip()
                 self.ensure_migration_needed(script, context, head)
 
                 if not silent:
