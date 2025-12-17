@@ -186,7 +186,7 @@ class Project:
 
     @cached_property
     def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
-        return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
+        return fasteners.InterProcessLock(self.dirs.run().joinpath("meltano.yml.lock"))
 
     @property
     def user_agent(self) -> str:
@@ -235,7 +235,7 @@ class Project:
                 # Admin privileges are required to create symlinks on Windows
                 if ctypes.windll.shell32.IsUserAnAdmin():  # type: ignore[attr-defined]
                     if executable.is_file():
-                        project.run_dir().joinpath("bin").symlink_to(executable)  # type: ignore[deprecated]
+                        project.dirs.run().joinpath("bin").symlink_to(executable)
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "  # noqa: G004
@@ -249,7 +249,7 @@ class Project:
             else:
                 executable = Path(sys.executable).parent / "meltano"
                 if executable.is_file():
-                    project.run_dir().joinpath("bin").symlink_to(executable)  # type: ignore[deprecated]
+                    project.dirs.run().joinpath("bin").symlink_to(executable)
         except FileExistsError:
             pass
         except OSError as error:

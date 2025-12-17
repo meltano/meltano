@@ -90,7 +90,7 @@ class MeltanoFilePlugin(FilePlugin):  # noqa: D101
         Returns:
             True if the file was written, False otherwise.
         """
-        project_path = project.root_dir(relative_path)
+        project_path = project.dirs.root_dir(relative_path)
         if project_path.exists() and not any(
             project_path.match(path) for path in self.overwrite
         ):

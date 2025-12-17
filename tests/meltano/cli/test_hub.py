@@ -3,6 +3,8 @@ from __future__ import annotations
 import typing as t
 from unittest import mock
 
+import requests_mock
+
 from asserts import assert_cli_runner
 from meltano.cli import cli
 
@@ -10,7 +12,6 @@ if t.TYPE_CHECKING:
     from collections import Counter
 
     from click.testing import CliRunner
-    from requests_mock import Mocker as RequestsMocker
 
     from meltano.core.project import Project
 
@@ -43,14 +44,12 @@ class TestCliHub:
         project: Project,
         cli_runner: CliRunner,
         hub_request_counter: Counter,
-        requests_mock: RequestsMocker,
     ) -> None:
         hub_api = project.hub_service.hub_api_url
-        requests_mock.get(
-            hub_api,
-            exc=ConnectionError("Connection refused"),
-        )
-        result = cli_runner.invoke(cli, ("hub", "ping"))
-        assert f"Error: Failed to connect to the Hub at {hub_api!r}" in result.stderr
+        with requests_mock.Mocker(session=project.hub_service.session) as m:
+            m.get(hub_api, exc=ConnectionError("Connection refused"))
+            result = cli_runner.invoke(cli, ("hub", "ping"))
+
         assert result.exit_code == 1
+        assert f"Error: Failed to connect to the Hub at {hub_api!r}" in result.stderr
         assert not hub_request_counter
