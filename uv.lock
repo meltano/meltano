@@ -1419,7 +1419,7 @@ wheels = [
 
 [[package]]
 name = "meltano"
-version = "4.0.7"
+version = "4.0.8"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },

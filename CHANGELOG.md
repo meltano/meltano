@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.0.8 (2025-12-17)
+
+### 🐛 Fixes
+
+- [#9688](https://github.com/meltano/meltano/issues/9688) Fixed typo in migration error message
+- [#9687](https://github.com/meltano/meltano/issues/9687) Serialize nested date-time values in plugin configuration
+- [#9669](https://github.com/meltano/meltano/issues/9669) Parse plugin logs coming out during `meltano invoke`
+
+### ⚙️ Under the Hood
+
+- [#9689](https://github.com/meltano/meltano/issues/9689) Use the `Project.dirs` API in more places
+
 ## v4.0.7 (2025-12-09)
 
 ### ⚙️ Under the Hood
