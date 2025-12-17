@@ -89,5 +89,7 @@ jobs:
         postgres:13
 
     - name: Run integration tests
+      env:
+        INTEGRATION_TEST_NAME: ${{ matrix.integration_test }}
       run: |
-        uv run bash integration/validate.sh ${{ matrix.integration_test }}
+        uv run bash integration/validate.sh $INTEGRATION_TEST_NAME

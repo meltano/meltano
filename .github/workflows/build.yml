@@ -99,10 +99,12 @@ jobs:
     steps:
     - name: Set the workflow inputs
       id: set-inputs
+      env:
+        REGISTRY: ${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}
       # This step makes it so that the same workflow inputs can be accessed
       # regardless of what event triggered it.
       run: |
-        echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
+        echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       with:
         persist-credentials: false
@@ -113,15 +115,17 @@ jobs:
       id: generate-tags
       run: >
         python scripts/generate_docker_tags.py
-        --git-sha ${{ github.sha }}
+        --git-sha $GITHUB_SHA
         --package-version ${NEEDS_BUILD_OUTPUTS_VERSION}
-        --python-version ${{ matrix.python-version }}
+        --python-version $PYTHON_VERSION
         --default-python ${DEFAULT_PYTHON}
         --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
-        ${{ matrix.slim && '--slim' || '' }}
         > tags
       env:
+        DOCKER_TAGS_SLIM: ${{ matrix.slim && '1' || '0' }}
+        GITHUB_SHA: ${{ github.sha }}
         NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
+        PYTHON_VERSION: ${{ matrix.python-version }}
         STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Assemble image tags
@@ -139,13 +143,15 @@ jobs:
       run: |
         if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "ghcr.io" ]]; then
           echo "username=${GITHUB_ACTOR}" >> $GITHUB_OUTPUT
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+          echo "password=${GITHUB_TOKEN}" >> $GITHUB_OUTPUT
         fi
         if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "docker.io" ]]; then
           echo "username=meltano" >> $GITHUB_OUTPUT
-          echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
+          echo "password=${DOCKERHUB_TOKEN}" >> $GITHUB_OUTPUT
         fi
       env:
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version
