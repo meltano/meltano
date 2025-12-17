@@ -17,7 +17,6 @@ import typing as t
 import unicodedata
 import uuid
 from collections.abc import Mapping, Sequence
-from contextlib import suppress
 from copy import copy, deepcopy
 from datetime import date, datetime, time, timezone
 from enum import IntEnum

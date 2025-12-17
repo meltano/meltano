@@ -101,7 +101,7 @@ class ProjectInitService:
         """
         # explicitly create the .meltano directory if it doesn't exist
         click.secho("Creating .meltano folder", fg="blue")
-        project.meltano_dir().mkdir(parents=True, exist_ok=True)  # type: ignore[deprecated]
+        project.dirs.meltano().mkdir(parents=True, exist_ok=True)
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 

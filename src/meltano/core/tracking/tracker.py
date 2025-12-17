@@ -437,7 +437,7 @@ class Tracker:  # - too many (public) methods
         Returns:
             Path to 'analytics.json' file.
         """
-        return self.project.meltano_dir() / "analytics.json"
+        return self.project.dirs.meltano().joinpath("analytics.json")
 
     def load_saved_telemetry_settings(self) -> TelemetrySettings:
         """Get settings from the 'analytics.json' file.

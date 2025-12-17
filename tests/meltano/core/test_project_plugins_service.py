@@ -22,7 +22,7 @@ if t.TYPE_CHECKING:
 
 @pytest.fixture
 def modified_lockfile(project: Project):
-    lockfile_path = project.plugin_lock_path(
+    lockfile_path = project.dirs.plugin_lock_path(
         PluginType.EXTRACTORS,
         "tap-mock",
         variant_name="meltano",
@@ -138,7 +138,10 @@ class TestProjectPluginsService:
         alternative_target,
     ) -> None:
         # The behavior being tested here assumes that no lockfiles exist.
-        shutil.rmtree(project.plugins.project.root_dir("plugins"), ignore_errors=True)
+        shutil.rmtree(
+            project.plugins.project.dirs.root_dir("plugins"),
+            ignore_errors=True,
+        )
         # name="tap-mock", variant="meltano"
         # Shadows base plugin with correct variant
         parent = project.plugins.get_parent(tap)
