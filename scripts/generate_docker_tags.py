@@ -15,6 +15,7 @@ python scripts/generate_docker_tags.py \
 from __future__ import annotations
 
 import argparse
+import os
 
 from packaging.version import Version
 
@@ -28,7 +29,9 @@ def main() -> None:
     parser.add_argument("-d", "--default-python", required=True)
     parser.add_argument("--git-sha")
     parser.add_argument(
-        "--slim", action="store_true", help="Generate tags for slim images"
+        "--slim",
+        action="store_true",
+        help="Generate tags for slim images",
     )
     args = parser.parse_args()
 
@@ -37,7 +40,8 @@ def main() -> None:
     tags = []
 
     # Add suffix for slim images
-    suffix = "-slim" if args.slim else ""
+    slim = args.slim or os.getenv("DOCKER_TAGS_SLIM") == "1"
+    suffix = "-slim" if slim else ""
 
     # To save space, only publish the `latest` tag for each
     # images to the GitHub registry
