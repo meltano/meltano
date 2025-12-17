@@ -23,7 +23,11 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.output_logger import OutputLogger
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.setting_definition import SettingDefinition, SettingKind
+from meltano.core.setting_definition import (
+    SettingDefinition,
+    SettingKind,
+    SettingValueJSONEncoder,
+)
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
@@ -593,14 +597,12 @@ class SingerTap(SingerPlugin):
                 with suppress(FileNotFoundError):
                     catalog_cache_key_path.unlink()
         except FileNotFoundError as err:
-            raise PluginExecutionError(
-                "Applying catalog rules failed: catalog file is missing.",  # noqa: EM101
-            ) from err
+            msg = "Applying catalog rules failed: catalog file is missing."
+            raise PluginExecutionError(msg) from err
         except Exception as err:
             catalog_path.unlink()
-            raise PluginExecutionError(
-                f"Applying catalog rules failed: catalog file is invalid: {err}",  # noqa: EM102
-            ) from err
+            msg = f"Applying catalog rules failed: catalog file is invalid: {err}"
+            raise PluginExecutionError(msg) from err
 
     def catalog_cache_key(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Get a cache key for the catalog.
@@ -637,7 +639,7 @@ class SingerTap(SingerPlugin):
             "_metadata": extras["_metadata"],
         }
 
-        key_json = json.dumps(key_dict)
+        key_json = json.dumps(key_dict, cls=SettingValueJSONEncoder)
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S324
 

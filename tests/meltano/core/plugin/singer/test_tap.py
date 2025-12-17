@@ -7,6 +7,7 @@ import subprocess
 import sys
 import typing as t
 from contextlib import contextmanager, suppress
+from datetime import date, datetime, timezone
 from unittest import mock
 from unittest.mock import AsyncMock
 
@@ -1251,3 +1252,56 @@ class TestSingerTap:
         else:
             assert len(caplog.records) == 0
             assert syserr + sysout == ""
+
+    @pytest.mark.asyncio
+    async def test_before_configure_datetime_serialization(
+        self,
+        subject: SingerTap,
+        session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+    ) -> None:
+        """Test that before_configure properly serializes datetime objects to JSON.
+
+        This is a regression test for the bug where YAML-parsed dates (datetime.date
+        objects) would fail JSON serialization with "Object of type date is not
+        JSON serializable".
+
+        The bug would occur when YAML parses "2025-01-01" as datetime.date(2025, 1, 1)
+        and then json.dumps() fails when trying to serialize it.
+        """
+        invoker = plugin_invoker_factory(subject)
+
+        # Create a config with datetime objects like YAML would parse them
+        config_with_dates = {
+            "test": "mock",
+            "date_value": date(2025, 1, 1),
+            "datetime_value": datetime(2025, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+            "nested": {
+                "date_in_object": date(2024, 12, 31),
+            },
+            "list": [
+                {"name": "item1", "date": date(2025, 2, 1)},
+            ],
+        }
+
+        # Directly test that before_configure can handle datetime objects
+        # by temporarily setting plugin_config_processed and calling the hook
+        invoker.plugin_config_processed = config_with_dates
+
+        async with invoker.prepared(session):
+            # Manually call before_configure with our datetime-containing config
+            invoker.plugin_config_processed = config_with_dates
+            await subject.before_configure(invoker, session)
+
+            # Read the written config file to verify dates were serialized correctly
+            config_path = invoker.files["config"]
+            async with await anyio.open_file(config_path, "r") as config_file:
+                written_config = json.loads(await config_file.read())
+
+            # Verify dates were serialized to ISO format strings
+            # Without the fix, json.dumps() would raise:
+            # TypeError: Object of type date is not JSON serializable
+            assert written_config["date_value"] == "2025-01-01"
+            assert written_config["datetime_value"] == "2025-01-01T12:00:00+00:00"
+            assert written_config["nested"]["date_in_object"] == "2024-12-31"
+            assert written_config["list"][0]["date"] == "2025-02-01"

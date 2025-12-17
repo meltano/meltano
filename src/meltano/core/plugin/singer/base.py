@@ -11,7 +11,7 @@ import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.constants import LOG_PARSER_SINGER_SDK
 from meltano.core.plugin import BasePlugin
-from meltano.core.setting_definition import SettingDefinition
+from meltano.core.setting_definition import SettingDefinition, SettingValueJSONEncoder
 from meltano.core.utils import nest_object, uuid7
 
 if t.TYPE_CHECKING:
@@ -111,7 +111,13 @@ class SingerPlugin(BasePlugin):
         config_path = invoker.files["config"]
         async with await anyio.open_file(config_path, "w") as config_file:
             config = invoker.plugin_config_processed
-            await config_file.write(json.dumps(config, indent=2))
+            await config_file.write(
+                json.dumps(
+                    config,
+                    cls=SettingValueJSONEncoder,
+                    indent=2,
+                )
+            )
 
         logger.debug("Created configuration at %s", config_path)
 
