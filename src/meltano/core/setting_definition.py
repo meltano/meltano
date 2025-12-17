@@ -22,6 +22,11 @@ if sys.version_info >= (3, 11):
 else:
     from backports.strenum import StrEnum
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
@@ -31,24 +36,27 @@ if t.TYPE_CHECKING:
 class SettingValueJSONEncoder(json.JSONEncoder):
     """JSON encoder for setting values."""
 
-    def default(self, obj: t.Any) -> t.Any:  # noqa: ANN401
+    @override
+    def default(self, o: t.Any) -> t.Any:
         """Return the JSON representation of the setting value.
 
         Args:
-            obj: The setting value to encode.
+            o: The setting value to encode.
         """
-        if isinstance(obj, (date, datetime)):
-            return obj.isoformat()
-        return super().default(obj)
+        if isinstance(o, (date, datetime)):
+            return o.isoformat()
+        return super().default(o)
 
 
-def json_dumps(obj: t.Any) -> str:  # noqa: ANN401
+def json_dumps(obj: t.Any, **kwargs: t.Any) -> str:  # noqa: ANN401
     """Dump an object to a JSON string.
 
     Args:
         obj: The object to dump.
+        kwargs: Additional keyword arguments to pass to json.dumps.
     """
-    return json.dumps(obj, cls=SettingValueJSONEncoder)
+    kwargs.setdefault("cls", SettingValueJSONEncoder)
+    return json.dumps(obj, **kwargs)
 
 
 VALUE_PROCESSORS: dict[str, Callable[[t.Any], t.Any]] = {

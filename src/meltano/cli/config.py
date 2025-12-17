@@ -31,6 +31,7 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin_test_service import PluginTestServiceFactory
+from meltano.core.setting_definition import SettingValueJSONEncoder
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
@@ -315,7 +316,7 @@ def print_config(
                 redacted=safe,
                 redacted_value="*****",
             )
-            click.echo(json.dumps(json_config, indent=2))
+            click.echo(json.dumps(json_config, cls=SettingValueJSONEncoder, indent=2))
         case "env":
             env = settings.as_env(
                 extras=extras,
