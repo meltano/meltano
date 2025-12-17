@@ -106,15 +106,15 @@ class MigrationService:
                 if silent:
                     migration_logger.setLevel(original_log_level)
             except FileNotFoundError as ex:
-                raise MigrationError(
-                    "Cannot upgrade the system database, revision lock not found.",  # noqa: EM101
-                ) from ex
+                err_msg = "Cannot upgrade the system database, revision lock not found."
+                raise MigrationError(err_msg) from ex
             except MigrationUneededException:
                 if not silent:
                     click.secho("System database up-to-date.")
             except Exception as ex:
                 logger.exception(str(ex))
-                raise MigrationError(
-                    "Cannot upgrade the system database. It might be corrupted or "  # noqa: EM101
-                    "was created before database migrations where introduced (v0.34.0)",
-                ) from ex
+                err_msg = (
+                    "Cannot upgrade the system database. It might be corrupted or "
+                    "was created before database migrations were introduced (v0.34.0)"
+                )
+                raise MigrationError(err_msg) from ex
