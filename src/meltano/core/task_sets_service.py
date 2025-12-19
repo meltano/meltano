@@ -77,7 +77,7 @@ class TaskSetsService:
         Raises:
             JobNotFoundError: If the TaskSet with the given name does not exist.
         """
-        for job in self.list():
+        for job in self.list_task_sets():
             if job.name == name:
                 with self.project.meltano_update() as meltano:
                     logger.debug("removing job", name=job.name)
@@ -94,7 +94,7 @@ class TaskSetsService:
         Raises:
             JobNotFoundError: If the TaskSet with the given name does not exist.
         """
-        for idx, job in enumerate(self.list()):
+        for idx, job in enumerate(self.list_task_sets()):
             if job.name == task_sets.name:
                 with self.project.meltano_update() as meltano:
                     logger.debug("updating job", name=job.name)
@@ -119,7 +119,7 @@ class TaskSetsService:
                 return job
         raise JobNotFoundError(name)
 
-    def list(self) -> list[TaskSets]:
+    def list_task_sets(self) -> list[TaskSets]:
         """List all TaskSets in the project.
 
         Returns:

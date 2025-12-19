@@ -144,6 +144,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=1.16.0,<2",
+  "ty>=0.0.4",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -290,7 +291,6 @@ warn_unused_ignores = true
 ignore_errors = true
 module = [
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
-  "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
   # Meltano Core submodules
   "meltano.core.behavior.canonical",
@@ -299,7 +299,6 @@ module = [
   "meltano.core.behavior.visitor",
   "meltano.core.block.extract_load",
   "meltano.core.block.plugin_command",
-  "meltano.core.block.singer",
   "meltano.core.plugin.base",
   "meltano.core.plugin.dbt.*",
   "meltano.core.plugin.meltano_file",
@@ -308,6 +307,39 @@ module = [
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
+]
+
+[tool.ty.src]
+include = [
+  "src/",
+]
+exclude = [
+  "src/meltano/cli/elt.py",
+  "src/meltano/cli/utils.py",
+  "src/meltano/core/behavior/canonical.py",
+  "src/meltano/core/behavior/hookable.py",
+  "src/meltano/core/behavior/name_eq.py",
+  "src/meltano/core/block/extract_load.py",
+  "src/meltano/core/block/plugin_command.py",
+  "src/meltano/core/environment_service.py",
+  "src/meltano/core/job/job.py",
+  "src/meltano/core/manifest/manifest.py",
+  "src/meltano/core/plugin/airflow.py",
+  "src/meltano/core/plugin/base.py",
+  "src/meltano/core/plugin/singer/base.py",
+  "src/meltano/core/plugin/singer/catalog.py",
+  "src/meltano/core/plugin/meltano_file.py",
+  "src/meltano/core/plugin/project_plugin.py",
+  "src/meltano/core/project_plugins_service.py",
+  "src/meltano/core/runner/dbt.py",
+  "src/meltano/core/runner/singer.py",
+  "src/meltano/core/schedule.py",
+  "src/meltano/core/schedule_service.py",
+  "src/meltano/core/settings_store.py",
+  "src/meltano/core/sqlalchemy.py",
+  "src/meltano/core/tracking/**",
+  "src/meltano/core/utils/**",
+  "src/meltano/migrations/**",
 ]
 
 [build-system]
