@@ -4,4 +4,4 @@ from __future__ import annotations
 
 import importlib.resources
 
-root = importlib.resources.files(__package__)
+root = importlib.resources.files("meltano.core.bundle")
