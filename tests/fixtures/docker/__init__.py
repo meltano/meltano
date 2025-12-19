@@ -24,4 +24,6 @@ def docker_compose_file() -> str:
     Returns:
         The absolute path to the `docker-compose.yml` file used by `pytest-docker`.
     """
-    return str(importlib.resources.files(__package__) / "docker-compose.yml")
+    return str(
+        importlib.resources.files("tests.fixtures.docker") / "docker-compose.yml"
+    )
