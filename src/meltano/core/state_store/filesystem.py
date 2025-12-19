@@ -9,6 +9,7 @@ import os
 import platform
 import re
 import shutil
+import sys
 import typing as t
 from abc import abstractmethod
 from base64 import b64decode, b64encode
@@ -23,6 +24,11 @@ import smart_open
 import structlog
 
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable, Iterator
@@ -254,6 +260,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             state_id: the state_id to create the dir/prefix for
         """
 
+    @override
     @contextmanager
     def acquire_lock(
         self,
@@ -282,6 +289,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         finally:
             self.delete_file(lock_path)
 
+    @override
     @abstractmethod
     def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
@@ -294,6 +302,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
+    @override
     def get(self, state_id: str) -> MeltanoState | None:
         """Get current state for the given state_id.
 
@@ -316,6 +325,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                 return None
             raise e
 
+    @override
     def set(self, state: MeltanoState) -> None:
         """Set state for the given state_id.
 
@@ -330,14 +340,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             writer.write(state.json())
 
     @abstractmethod
-    def delete_file(self, file_or_dir_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path.
 
         Args:
-            file_or_dir_path: the path to delete.
+            file_path: the path to delete.
         """
         ...
 
+    @override
     def delete(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
@@ -352,6 +363,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
 
     label: str = "Local Filesystem"
 
+    @override
     def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
@@ -362,6 +374,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         self._state_path = self.parsed.path
         Path(self._state_path).mkdir(parents=True, exist_ok=True)
 
+    @override
     @staticmethod
     def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
@@ -374,6 +387,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return isinstance(err, FileNotFoundError)
 
+    @override
     @property
     def client(self) -> None:
         """Get a client for performing fs operations.
@@ -383,6 +397,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return None
 
+    @override
     @property
     def state_dir(self) -> str:
         """Get the path that state should be stored at.
@@ -392,8 +407,8 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return self._state_path
 
-    @staticmethod
-    def join_path(*components: str) -> str:
+    @override
+    def join_path(self, *components: str) -> str:
         """Join path components in filesystem-dependent manner.
 
         Overrides base join_path method in favor of os.path.join()
@@ -406,6 +421,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return os.path.join(*components)
 
+    @override
     def create_state_id_dir_if_not_exists(self, state_id: str) -> None:
         """Create the directory for a given state_id.
 
@@ -414,6 +430,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
+    @override
     def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
 
@@ -435,23 +452,25 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
             )
         ]
 
-    def delete_file(self, file_or_dir_path: str) -> None:
+    @override
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path, if it exists.
 
         Args:
-            file_or_dir_path: the path to delete.
+            file_path: the path to delete.
 
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
         try:
-            shutil.rmtree(file_or_dir_path)
+            shutil.rmtree(file_path)
         except NotADirectoryError:
-            os.remove(file_or_dir_path)
+            os.remove(file_path)
         except Exception as e:
             if not self.is_file_not_found_error(e):
                 raise e
 
+    @override
     def delete(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
@@ -468,6 +487,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
     label: str = "Local Windows Filesystem"
     delimiter = "\\"
 
+    @override
     def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
@@ -478,6 +498,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
         self._state_path = self.parsed.netloc
         Path(self._state_path).mkdir(parents=True, exist_ok=True)
 
+    @override
     def get_path(self, state_id: str, filename: str | None = None) -> str:
         """Get the path for the given state_id and filename.
 
@@ -495,6 +516,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
             else self.join_path(self.state_dir, state_id)
         )
 
+    @override
     def get_state_ids(self, pattern: str | None = None) -> set[str]:
         """Get list of state_ids stored in the backend.
 
@@ -542,6 +564,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         super().__init__(**kwargs)
         self.prefix = prefix or self.parsed.path
 
+    @override
     @property
     def state_dir(self) -> str:
         """Get the prefix that state should be stored at.
@@ -551,6 +574,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
 
+    @override
     def uri_with_path(self, path: str) -> str:
         """Build uri with the given path included.
 
@@ -584,6 +608,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         """
         ...
 
+    @override
     def get_state_ids(self, pattern: str | None = None) -> list[str]:
         """Get list of state_ids stored in the backend.
 

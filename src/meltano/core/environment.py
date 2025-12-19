@@ -81,7 +81,7 @@ class EnvironmentPluginConfig(PluginRef):
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
-    def config_with_extras(self):  # noqa: ANN201
+    def config_with_extras(self) -> dict[str, t.Any]:
         """Get plugin configuration values from the Meltano environment.
 
         Returns:

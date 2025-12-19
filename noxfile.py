@@ -30,7 +30,7 @@ import nox
 nox.needs_version = ">=2025.2.9"
 nox.options.default_venv_backend = "uv"
 nox.options.sessions = [
-    "mypy",
+    "typing",
     "pre-commit",
     "pytest",
 ]
@@ -166,8 +166,8 @@ def pre_commit(session: nox.Session) -> None:
     python=main_python_version,
     tags=("lint",),
 )
-def mypy(session: nox.Session) -> None:
-    """Run mypy type checking.
+def typing(session: nox.Session) -> None:
+    """Run mypy and ty type checking.
 
     Args:
         session: Nox session.
@@ -182,4 +182,5 @@ def mypy(session: nox.Session) -> None:
         "--extra=containers",
         env=_install_env(session),
     )
+    session.run("ty", "check", *session.posargs)
     session.run("mypy", *session.posargs)

@@ -32,14 +32,14 @@ class TestTaskSetsService:
         for job in jobs:
             subject.add(job)
 
-        assert subject.list() == jobs
+        assert subject.list_task_sets() == jobs
 
         # verify that we can not add a job with the same name
         with pytest.raises(JobAlreadyExistsError):
             subject.add(jobs[0])
 
     def test_update(self, subject: TaskSetsService, create_task_set) -> None:
-        job = subject.list()[0]
+        job = subject.list_task_sets()[0]
         job.tasks = ["tap-mock target-mock updated:addition"]
         subject.update(job)
 
@@ -51,9 +51,9 @@ class TestTaskSetsService:
 
     @pytest.mark.usefixtures("create_task_set")
     def test_remove(self, subject: TaskSetsService) -> None:
-        jobs = subject.list()
+        jobs = subject.list_task_sets()
         subject.remove(jobs[0].name)
-        assert subject.list() == jobs[1:]
+        assert subject.list_task_sets() == jobs[1:]
         assert subject.exists(jobs[0].name) is False
 
         # verify that we can not remove a job that does not exist
@@ -62,7 +62,7 @@ class TestTaskSetsService:
 
     @pytest.mark.usefixtures("create_task_set")
     def test_get(self, subject: TaskSetsService) -> None:
-        jobs = subject.list()
+        jobs = subject.list_task_sets()
 
         assert subject.get(jobs[0].name) == jobs[0]
 
@@ -72,7 +72,7 @@ class TestTaskSetsService:
 
     @pytest.mark.usefixtures("create_task_set")
     def test_exists(self, subject: TaskSetsService) -> None:
-        job = subject.list()[0]
+        job = subject.list_task_sets()[0]
         assert subject.exists(job.name)
         assert not subject.exists("non-existent")
 
@@ -82,7 +82,7 @@ class TestTaskSetsService:
         for job in expected_jobs:
             subject.add(job)
 
-        result = subject.list()
+        result = subject.list_task_sets()
 
         for job in expected_jobs:
             assert job in result
