@@ -204,9 +204,6 @@ class PluginSettingsService(SettingsService):
 
         Args:
             config_with_extras: Configuration to update.
-
-        Raises:
-            NoActiveEnvironment: If called when no environment is active.
         """
         assert self.environment_plugin_config is not None  # noqa: S101
         self.environment_plugin_config.config_with_extras = config_with_extras
