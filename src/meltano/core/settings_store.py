@@ -23,8 +23,10 @@ from meltano.core.utils import flatten, pop_at_path, set_at_path
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import Self  # noqa: ICN003
 else:
     from backports.strenum import StrEnum
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
@@ -143,7 +145,7 @@ class SettingValueStore(StrEnum):
     AUTO = enum.auto()
 
     @classmethod
-    def readables(cls) -> list[SettingValueStore]:
+    def readables(cls: type[Self]) -> list[Self]:
         """Return list of readable SettingValueStore instances.
 
         Returns:
@@ -152,7 +154,7 @@ class SettingValueStore(StrEnum):
         return list(cls)
 
     @classmethod
-    def writables(cls) -> list[SettingValueStore]:
+    def writables(cls: type[Self]) -> list[Self]:
         """Return list of writable SettingValueStore instances.
 
         Returns:
@@ -161,7 +163,7 @@ class SettingValueStore(StrEnum):
         return [store for store in cls if store.writable]
 
     @property
-    def manager(self) -> type[SettingsStoreManager]:
+    def manager(self: Self) -> type[SettingsStoreManager]:
         """Return store manager for this store.
 
         Returns:
@@ -170,15 +172,15 @@ class SettingValueStore(StrEnum):
         # ordering here is not significant, other than being consistent with
         # the order of precedence.
         managers: dict[str, type[SettingsStoreManager]] = {
-            self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
-            self.ENV: EnvStoreManager,
-            self.DOTENV: DotEnvStoreManager,
-            self.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,
-            self.MELTANO_YML: MeltanoYmlStoreManager,
-            self.DB: DbStoreManager,
-            self.INHERITED: InheritedStoreManager,
-            self.DEFAULT: DefaultStoreManager,
-            self.AUTO: AutoStoreManager,
+            SettingValueStore.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
+            SettingValueStore.ENV: EnvStoreManager,
+            SettingValueStore.DOTENV: DotEnvStoreManager,
+            SettingValueStore.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,
+            SettingValueStore.MELTANO_YML: MeltanoYmlStoreManager,
+            SettingValueStore.DB: DbStoreManager,
+            SettingValueStore.INHERITED: InheritedStoreManager,
+            SettingValueStore.DEFAULT: DefaultStoreManager,
+            SettingValueStore.AUTO: AutoStoreManager,
         }
         return managers[self]
 
@@ -860,6 +862,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     """Configuration stored in an environment within `meltano.yml`."""
 
     label = "the active environment in `meltano.yml`"
+    settings_service: PluginSettingsService
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialise MeltanoEnvStoreManager instance.
@@ -881,9 +884,8 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         # TODO: Remove this cast when we have a better way to get the settings service
         # type or when we figure how the settings service type should be narrowed
         # per-manager.
-        settings_service = t.cast("PluginSettingsService", self.settings_service)
         if self._flat_config is None:
-            self._flat_config = flatten(settings_service.environment_config, "dot")
+            self._flat_config = flatten(self.settings_service.environment_config, "dot")
         return self._flat_config
 
     def ensure_supported(self, method: str = "get") -> None:
@@ -913,11 +915,11 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         Raises:
             StoreNotSupportedError: if the project is in read-only mode.
         """
-        config = deepcopy(self.settings_service.environment_config)  # type: ignore[attr-defined]
+        config = deepcopy(self.settings_service.environment_config)
         yield config
 
         try:
-            self.settings_service.update_meltano_environment_config(config)  # type: ignore[attr-defined]
+            self.settings_service.update_meltano_environment_config(config)
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err) from err
 
@@ -1129,7 +1131,7 @@ class InheritedStoreManager(SettingsStoreManager):
             kwargs: Keyword arguments to pass to parent class.
         """
         super().__init__(settings_service, *args, **kwargs)
-        self._kwargs = {**kwargs, "expand_env_vars": False}
+        self._kwargs: dict[str, t.Any] = {**kwargs, "expand_env_vars": False}
         self.bulk = bulk
         self._config_with_metadata: dict | None = None
 
@@ -1259,7 +1261,10 @@ class AutoStoreManager(SettingsStoreManager):
         """
         super().__init__(*args, **kwargs)
         self.cache = cache
-        self._kwargs = {"settings_service": self.settings_service, **kwargs}
+        self._kwargs: dict[str, t.Any] = {
+            "settings_service": self.settings_service,
+            **kwargs,
+        }
         self._managers: dict[SettingValueStore, SettingsStoreManager] = {}
 
     def manager_for(self, store: SettingValueStore) -> SettingsStoreManager:
