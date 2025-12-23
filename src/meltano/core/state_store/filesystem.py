@@ -330,11 +330,11 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             writer.write(state.json())
 
     @abstractmethod
-    def delete_file(self, file_or_dir_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path.
 
         Args:
-            file_or_dir_path: the path to delete.
+            file_path: the path to delete.
         """
         ...
 
@@ -435,19 +435,19 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
             )
         ]
 
-    def delete_file(self, file_or_dir_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path, if it exists.
 
         Args:
-            file_or_dir_path: the path to delete.
+            file_path: the path to delete.
 
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
         try:
-            shutil.rmtree(file_or_dir_path)
+            shutil.rmtree(file_path)
         except NotADirectoryError:
-            os.remove(file_or_dir_path)
+            os.remove(file_path)
         except Exception as e:
             if not self.is_file_not_found_error(e):
                 raise e

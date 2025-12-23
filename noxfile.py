@@ -182,4 +182,5 @@ def mypy(session: nox.Session) -> None:
         "--extra=containers",
         env=_install_env(session),
     )
+    session.run("ty", "check", *session.posargs)
     session.run("mypy", *session.posargs)

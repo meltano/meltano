@@ -81,14 +81,14 @@ def _list_all_jobs(  # noqa: D417
                 {
                     "jobs": [
                         {"job_name": tset.name, "tasks": tset.tasks}
-                        for tset in task_sets_service.list()
+                        for tset in task_sets_service.list_task_sets()
                     ],
                 },
                 indent=2,
             ),
         )
     elif list_format == "text":
-        for task_set in task_sets_service.list():
+        for task_set in task_sets_service.list_task_sets():
             click.echo(f"{task_set.name}: {task_set.tasks}")
     tracker: Tracker = ctx.obj["tracker"]
     tracker.track_command_event(CliEvent.completed)
