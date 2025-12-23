@@ -262,6 +262,7 @@ class Variant(NameEq, Canonical):
 
     name: str | None
     deprecated: bool | None
+    supported_python_versions: list[str] | None
 
     ORIGINAL_NAME = "original"
     DEFAULT_NAME = "default"
@@ -286,6 +287,7 @@ class Variant(NameEq, Canonical):
         requires: dict[PluginType, list] | None = None,
         requires_meltano: str | None = None,
         env: dict[str, str] | None = None,
+        supported_python_versions: list[str] | None = None,
         **extras,  # noqa: ANN003
     ):
         """Create a new Variant.
@@ -310,6 +312,8 @@ class Variant(NameEq, Canonical):
             requires_meltano: A version specifier for the Meltano version required by
                 this plugin.
             env: Environment variables to inject into plugins runtime context.
+            supported_python_versions: List of supported Python versions (e.g.,
+                ['3.10', '3.11', '3.12']).
             extras: Additional keyword arguments.
         """
         super().__init__(
@@ -330,6 +334,7 @@ class Variant(NameEq, Canonical):
             requires=PluginRequirement.parse_all(requires),
             requires_meltano=requires_meltano,
             env=env or {},
+            supported_python_versions=supported_python_versions,
             extras=extras,
         )
 
@@ -517,6 +522,7 @@ class PluginDefinition(PluginRef):
             commands=plugin.commands,
             requires=plugin.requires,
             requires_meltano=plugin.requires_meltano,
+            supported_python_versions=plugin.supported_python_versions,
             env=plugin.env,
             **plugin.extras,
             **extras,
@@ -816,6 +822,7 @@ class StandalonePlugin(Canonical):
         requires: dict[PluginType, list] | None = None,
         requires_meltano: str | None = None,
         env: dict[str, str] | None = None,
+        supported_python_versions: list[str] | None = None,
         **extras,  # noqa: ANN003
     ):
         """Create a locked plugin.
@@ -842,6 +849,8 @@ class StandalonePlugin(Canonical):
             requires_meltano: A version specifier for the Meltano version required by
                 this plugin.
             env: Environment variables to inject into plugins runtime context.
+            supported_python_versions: List of supported Python versions (e.g.,
+                ['3.10', '3.11', '3.12']).
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
@@ -864,6 +873,7 @@ class StandalonePlugin(Canonical):
             requires=PluginRequirement.parse_all(requires),
             requires_meltano=requires_meltano,
             env=env or {},
+            supported_python_versions=supported_python_versions,
             extras=extras,
         )
 
@@ -930,6 +940,7 @@ class StandalonePlugin(Canonical):
             commands=variant.commands,
             requires=variant.requires,
             requires_meltano=variant.requires_meltano,
+            supported_python_versions=variant.supported_python_versions,
             env=variant.env,
             **{**plugin_def.extras, **variant.extras},
         )
