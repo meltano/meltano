@@ -163,12 +163,12 @@ plugins:
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
 
-You can use `meltano config target-postgres` to check the configuration, including the default settings not visible in the project file.
+You can use `meltano config print target-postgres` to check the configuration, including the default settings not visible in the project file.
 
 <Termy>
 
 ```console
-$ meltano config target-postgres
+$ meltano config print target-postgres
 {
 &ensp;&ensp;&ensp;&ensp;"add_record_metadata": true,
 &ensp;&ensp;&ensp;&ensp;"database": "postgres",
