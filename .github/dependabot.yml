@@ -5,9 +5,6 @@ updates:
     directory: "/.github/workflows"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       default:
@@ -22,9 +19,6 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       actions:
@@ -39,9 +33,6 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       development-dependencies:
@@ -56,14 +47,13 @@ updates:
       prefix-development: "chore(deps-dev): "
     cooldown:
       default-days: 7
+    allow:
+      - dependency-type: "all"
   - package-ecosystem: npm
     versioning-strategy: increase
     directory: "docs"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       development-dependencies:
@@ -81,8 +71,6 @@ updates:
   - package-ecosystem: "docker-compose"
     directory: "tests/fixtures/docker/"
     schedule:
-      interval: "monthly"
-      time: "12:00"
-      timezone: "Etc/UTC"
+      interval: monthly
     cooldown:
       default-days: 7
