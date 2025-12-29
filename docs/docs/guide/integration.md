@@ -22,9 +22,9 @@ If you encounter some trouble running a pipeline, read our [troubleshooting tips
 
 As described in the [Configuration guide](/guide/configuration#configuration-layers), [`meltano run`](/reference/command-line-interface#run) will determine the configuration of your extractor + loader pairs and any optional utilities (e.g. dbt) by looking in [**the environment**](/guide/configuration#configuring-settings), your project's [**`.env` file**](/concepts/project#env), the [system database](/concepts/project#system-database), and finally your [**`meltano.yml` project file**](/concepts/project#meltano-yml-project-file), falling back to a default value if nothing was found.
 
-You can use [`meltano config list <plugin>`](/reference/command-line-interface#config) to list all available settings with their names, environment variables, and current values. [`meltano config <plugin>`](/reference/command-line-interface#config) will print the current configuration in JSON format.
+You can use [`meltano config list <plugin>`](/reference/command-line-interface#config) to list all available settings with their names, environment variables, and current values. [`meltano config print <plugin>`](/reference/command-line-interface#config) will print the current configuration in JSON format.
 
-If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config test <plugin>`](/reference/command-line-interface#config).
 
 ## Extractor catalog generation
 
@@ -333,7 +333,7 @@ meltano run ...
 TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano run ...
 ```
 
-To verify that these environment variables will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running `meltano run`.
+To verify that these environment variables will be picked up by Meltano as you intended, you can test them with [`meltano config print <plugin>`](/reference/command-line-interface#config) before running `meltano run`.
 
 ## Running pipelines with `elt`
 

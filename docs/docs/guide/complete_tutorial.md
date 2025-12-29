@@ -428,13 +428,13 @@ Sensitive configuration (like `private_token`) will instead be stored in your pr
 export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
 ```
 
-1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config <plugin>`](/reference/command-line-interface#config):
+1. Optionally, verify that the configuration looks like what the Singer tap expects according to its documentation using [`meltano config print <plugin>`](/reference/command-line-interface#config):
 
    ```bash
-   meltano config <plugin>
+   meltano config print <plugin>
 
    # For example:
-   meltano config tap-gitlab
+   meltano config print tap-gitlab
    ```
 
    This will show the current configuration:
@@ -890,13 +890,13 @@ Sensitive configuration information (such as `password`) will instead be stored 
 export TARGET_POSTGRES_PASSWORD=meltano
 ```
 
-1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/reference/command-line-interface#config):
+1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config print <plugin>`](/reference/command-line-interface#config):
 
    ```bash
-   meltano config <plugin>
+   meltano config print <plugin>
 
    # For example:
-   meltano config target-postgres
+   meltano config print target-postgres
    ```
 
    This will show the current configuration:

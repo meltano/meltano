@@ -511,10 +511,10 @@ The `config` command can accept the `--environment` flag to target a specific [M
 
 In the context of `meltano config`, [plugin extras](/guide/configuration#plugin-extras) are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the [environment variables](/guide/configuration#configuring-settings) that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin name, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
 
-By default, `meltano config <plugin>` and `meltano config list <plugin>` only take into account regular plugin settings.
+By default, `meltano config print <plugin>` and `meltano config list <plugin>` only take into account regular plugin settings.
 An `--extras` flag can be passed to view or list only extras instead.
 
-Be aware that `meltano config <plugin> reset` resets both regular settings _and_ extras.
+Be aware that `meltano config reset <plugin>` resets both regular settings _and_ extras.
 
 ```bash
 # List all extras for the specified plugin with their names,
@@ -522,7 +522,7 @@ Be aware that `meltano config <plugin> reset` resets both regular settings _and_
 meltano config list <plugin> --extras
 
 # View the plugin's current extras
-meltano config --extras <plugin>
+meltano config print <plugin> --extras
 
 # Set value of extra `<extra>` to `<value>` through the `_<extra>` setting
 meltano config set <plugin> _<extra> <value>
@@ -531,7 +531,7 @@ meltano config set <plugin> _<extra> <value>
 meltano config unset <plugin> _<extra>
 
 # Reset regular settings _and_ extras
-meltano config <plugin> reset
+meltano config reset <plugin>
 ```
 
 ### How to use: Interactive config
