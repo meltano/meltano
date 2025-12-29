@@ -204,7 +204,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
 
-  mypy:
+  typing:
     name: "Static type checking"
     runs-on: ubuntu-latest
 
@@ -226,6 +226,6 @@ jobs:
       run: |
         uv tool install nox
 
-    - name: Run mypy
+    - name: Run typing
       run: |
-        nox -rs mypy
+        nox -rs typing
