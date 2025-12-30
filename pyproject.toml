@@ -350,7 +350,6 @@ build-backend = "hatchling.build"
 [tool.ruff]
 line-length = 88
 required-version = ">=0.13"
-target-version = "py310"
 
 [tool.ruff.lint]
 future-annotations = true
