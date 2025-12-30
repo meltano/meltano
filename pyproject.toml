@@ -365,6 +365,7 @@ select = [
   "ARG",   # flake8-unused-arguments
   "ASYNC", # flake8-async
   "B",     # flake8-bugbear
+  "BLE",   # flake8-blind-except
   "C4",    # flake8-comprehensions
   "COM",   # flake8-commas
   "D",     # pydocstyle/flake8-docstrings
@@ -402,6 +403,7 @@ select = [
   "T20",   # flake8-print
   "TC",    # flake8-type-checking
   "TID",   # flake8-tidy-imports
+  "TRY",   # tryceratops
   "UP",    # pyupgrade
   "W",     # pycodestyle (warning)
   "YTT",   # flake8-2020

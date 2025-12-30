@@ -30,7 +30,7 @@ def exc_info() -> OptExcInfo:
     """Fake a valid exc_info."""
     my_var = "my_value"  # noqa: F841
     try:
-        raise ValueError("Not a real error")  # noqa: EM101
+        raise ValueError("Not a real error")  # noqa: EM101, TRY003, TRY301
     except ValueError:
         return sys.exc_info()
 
@@ -41,7 +41,7 @@ def deep_exc_info() -> OptExcInfo:
 
     def level_5():
         local_var_5 = "level_5_value"  # noqa: F841
-        raise ValueError("Deep stack error")  # noqa: EM101
+        raise ValueError("Deep stack error")  # noqa: EM101, TRY003
 
     def level_4():
         local_var_4 = "level_4_value"  # noqa: F841

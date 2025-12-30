@@ -454,7 +454,7 @@ def _apply_scaffold(
     for key, sub_trie in trie.items():
         if key == "[]":
             if not isinstance(manifest_component, list):
-                raise TypeError(
+                raise TypeError(  # noqa: TRY003
                     "Expected list during manifest scaffolding, "  # noqa: EM102
                     f"got {type(manifest_component)}",
                 )
@@ -466,7 +466,7 @@ def _apply_scaffold(
                 manifest_component.setdefault(key, [] if "[]" in sub_trie else {}),
             )
         else:
-            raise TypeError(
+            raise TypeError(  # noqa: TRY003
                 "Expected dict during manifest scaffolding, "  # noqa: EM102
                 f"got {type(manifest_component)}",
             )

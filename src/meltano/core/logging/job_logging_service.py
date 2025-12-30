@@ -87,7 +87,7 @@ class JobLoggingService:  # noqa: D101
         except OSError:
             # Don't stop the Job running if you can not open the log file
             # for writing: just return /dev/null
-            logger.error(
+            logger.error(  # noqa: TRY400
                 f"Could open log file {log_file_name!r} for writing. "  # noqa: G004
                 "Using `/dev/null`",
             )
@@ -108,18 +108,18 @@ class JobLoggingService:  # noqa: D101
             latest_log = next(iter(self.get_all_logs(state_id)))
 
             if latest_log.stat().st_size > MAX_FILE_SIZE:
-                raise SizeThresholdJobLogException(
+                raise SizeThresholdJobLogException(  # noqa: TRY003
                     f"The log file size exceeds '{MAX_FILE_SIZE}'",  # noqa: EM102
                 )
 
             with latest_log.open() as f:
                 return f.read()
         except StopIteration:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Could not find any log for job with ID '{state_id}'",  # noqa: EM102
             ) from None
         except FileNotFoundError as ex:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",  # noqa: EM102
             ) from ex
 
@@ -129,11 +129,11 @@ class JobLoggingService:  # noqa: D101
             latest_log = next(iter(self.get_all_logs(state_id)))
             return str(latest_log.resolve())
         except StopIteration:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Could not find any log for job with ID '{state_id}'",  # noqa: EM102
             ) from None
         except FileNotFoundError as ex:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",  # noqa: EM102
             ) from ex
 

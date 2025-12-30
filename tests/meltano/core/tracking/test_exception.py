@@ -64,8 +64,8 @@ def test_simple_exception_context() -> None:
 
     ex = ValueError(msg)
     try:
-        raise ex
-    except Exception:
+        raise ex  # noqa: TRY301
+    except Exception:  # noqa: BLE001
         ctx = ExceptionContext()
 
     assert is_valid_exception_context(ctx.data)
@@ -110,16 +110,16 @@ def test_complex_exception_context() -> None:
             nonlocal file_not_found_error
             file_not_found_error = ex
             line_nums.append(1 + inspect.currentframe().f_lineno)
-            raise ValueError("that path was a bad value") from ex  # noqa: EM101
+            raise ValueError("that path was a bad value") from ex  # noqa: EM101, TRY003
 
     try:
         try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             _function_to_deepen_traceback()
-        except Exception:
+        except Exception:  # noqa: BLE001
             line_nums.append(1 + inspect.currentframe().f_lineno)
             raise CustomException from None
-    except Exception:
+    except Exception:  # noqa: BLE001
         ctx = ExceptionContext()
 
     assert is_valid_exception_context(ctx.data)

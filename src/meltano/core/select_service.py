@@ -68,7 +68,7 @@ class SelectService:  # noqa: D101
         try:
             catalog = await self.load_catalog(session, refresh=refresh)
         except FileNotFoundError as err:
-            raise PluginExecutionError(
+            raise PluginExecutionError(  # noqa: TRY003
                 "Could not find catalog. Verify that the tap supports discovery "  # noqa: EM101
                 "mode and advertises the `discover` capability as well as either "
                 "`catalog` or `properties`",

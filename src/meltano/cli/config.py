@@ -161,7 +161,7 @@ def _get_ctx_arg(*args: t.Any) -> click.Context:
     for arg in args:
         if isinstance(arg, click.Context):
             return arg
-    raise ValueError("No clickContext provided in *args")  # noqa: EM101
+    raise ValueError("No clickContext provided in *args")  # noqa: EM101, TRY003
 
 
 def _get_store_choices() -> list[str]:
@@ -608,7 +608,7 @@ async def test(
 
     if invoker is None:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Testing of the Meltano project configuration is not supported")  # noqa: EM101
+        raise CliError("Testing of the Meltano project configuration is not supported")  # noqa: EM101, TRY003
 
     plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
 

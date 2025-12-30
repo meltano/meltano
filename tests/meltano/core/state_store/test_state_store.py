@@ -188,10 +188,10 @@ class TestGCSStateBackend:
         file_path = "some/path"
 
         def _not_found(*args, **kwargs):  # noqa: ARG001
-            raise NotFound("No such object: ...")  # noqa: EM101
+            raise NotFound("No such object: ...")  # noqa: EM101, TRY003
 
         def _other_error(*args, **kwargs):  # noqa: ARG001
-            raise RuntimeError("Something went wrong")  # noqa: EM101
+            raise RuntimeError("Something went wrong")  # noqa: EM101, TRY003
 
         # Mock default credentials
         mock_credentials = AnonymousCredentials()

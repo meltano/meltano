@@ -208,13 +208,13 @@ async def run(
             return
     except Exception as parser_err:
         tracker.track_command_event(CliEvent.aborted)
-        raise parser_err
+        raise parser_err  # noqa: TRY201
 
     if validate_block_sets(logger, parsed_blocks):
         logger.debug("All ExtractLoadBlocks validated, starting execution.")
     else:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Some ExtractLoadBlocks set failed validation.")  # noqa: EM101
+        raise CliError("Some ExtractLoadBlocks set failed validation.")  # noqa: EM101, TRY003
 
     await install_plugins(
         project,
@@ -239,7 +239,7 @@ async def run(
     except asyncio.TimeoutError:
         run_end_time = time.perf_counter()
         total_duration = run_end_time - run_start_time
-        logger.error(
+        logger.error(  # noqa: TRY400
             "Run timed out",
             timeout_seconds=timeout,
             duration_seconds=round(total_duration, 3),
@@ -248,7 +248,7 @@ async def run(
         ctx.exit(1)
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
-        raise err
+        raise err  # noqa: TRY201
     finally:
         run_end_time = time.perf_counter()
         total_duration = run_end_time - run_start_time
@@ -296,7 +296,7 @@ async def _run_blocks(
         except RunnerError as err:
             block_end_time = time.perf_counter()
             block_duration = block_end_time - block_start_time
-            logger.error(
+            logger.error(  # noqa: TRY400
                 "Block run completed",
                 set_number=idx,
                 block_type=blk_name,
@@ -323,7 +323,7 @@ async def _run_blocks(
             # make sure we also fire block failed events for all other exceptions
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
-            raise bare_err
+            raise bare_err  # noqa: TRY201
 
         block_end_time = time.perf_counter()
         block_duration = block_end_time - block_start_time

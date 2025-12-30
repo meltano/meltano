@@ -148,7 +148,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             if self.is_file_not_found_error(e):
                 logger.debug("File not found: %s", file_path, exc_info=e)
             else:
-                raise e
+                raise e  # noqa: TRY201
 
     def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
         """List all files in the backend.

@@ -96,7 +96,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             blocks = [match["tap"], match["target"]]
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service  # type: ignore[union-attr]
-        except Exception:
+        except Exception:  # noqa: BLE001
             logger.warning("No plugins found for provided state_id.")
     # If provided state_id does not match convention (i.e., run via "meltano el"),
     # use the standalone StateService in the CLI context.

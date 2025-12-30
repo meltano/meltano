@@ -229,7 +229,7 @@ class Out:
         except ignored_errors:
             raise
         except RunnerError as err:
-            logger.error(str(err))
+            logger.error(str(err))  # noqa: TRY400
             raise
         except Exception as err:
             logger.error(str(err), exc_info=True)  # noqa: G201

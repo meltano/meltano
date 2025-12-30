@@ -69,7 +69,7 @@ class BookmarkWriter:
         new_state = {}
         try:
             new_state = json.loads(line)
-        except Exception:
+        except Exception:  # noqa: BLE001
             logger.warning(
                 "Received state is invalid, incremental state has not been updated",
             )
@@ -81,7 +81,7 @@ class BookmarkWriter:
 
         try:
             job.save(self.session)
-        except Exception as e:  # pragma: no cover
+        except Exception as e:  # pragma: no cover  # noqa: BLE001
             logger.warning("Failed to persist job to the system database: %s", e)
 
         try:
@@ -90,7 +90,7 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception:  # pragma: no cover
+        except Exception:  # pragma: no cover  # noqa: BLE001
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
                 "incremental state has not been updated",

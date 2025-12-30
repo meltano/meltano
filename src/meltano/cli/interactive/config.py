@@ -329,8 +329,8 @@ class InteractiveConfig:
                     )
                     click.echo()
                     click.pause()
-                    return InteractionStatus.SKIP
-                except Exception as e:
+                    return InteractionStatus.SKIP  # noqa: TRY300
+                except Exception as e:  # noqa: BLE001
                     self.tracker.track_command_event(CliEvent.inflight)
                     click.secho(f"Failed to set value: {e}", fg="red")
 

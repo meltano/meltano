@@ -466,7 +466,7 @@ class ELTContextBuilder:
             plugin = self.project.plugins.get_plugin(plugin_ref)
         except PluginNotFoundError as err:
             if plugin_ref.name == "dbt":
-                raise PluginNotFoundError(
+                raise PluginNotFoundError(  # noqa: TRY003
                     "Transformer 'dbt' not found.\n"  # noqa: EM101
                     "Use of the legacy 'dbt' Transformer is deprecated in favor of "
                     "new adapter specific implementations (e.g. 'dbt-snowflake') "

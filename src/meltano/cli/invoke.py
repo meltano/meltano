@@ -151,7 +151,7 @@ async def invoke(
         )
     except Exception as invoke_err:
         tracker.track_command_event(CliEvent.failed)
-        raise invoke_err
+        raise invoke_err  # noqa: TRY201
 
     if exit_code == 0:
         tracker.track_command_event(CliEvent.completed)
@@ -274,7 +274,7 @@ async def _invoke(  # noqa: ANN202
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(str(err)) from err
     except AsyncSubprocessError as err:
-        logger.error(await err.stderr)
+        logger.error(await err.stderr)  # noqa: TRY400
         raise
     finally:
         session.close()
@@ -306,7 +306,7 @@ async def dump_file(invoker: PluginInvoker, file_id: str) -> None:
     try:
         content = await invoker.dump(file_id)
     except FileNotFoundError as err:
-        raise CliError(f"Could not find {file_id}") from err  # noqa: EM102
+        raise CliError(f"Could not find {file_id}") from err  # noqa: EM102, TRY003
     except Exception as err:
-        raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102
+        raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102, TRY003
     print(content)  # noqa: T201

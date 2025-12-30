@@ -83,7 +83,7 @@ class SingerSDKLogParser(LogParser):
                 exception=PluginException.from_dict(exception) if exception else None,
             )
 
-        except Exception:
+        except Exception:  # noqa: BLE001
             return None
 
 

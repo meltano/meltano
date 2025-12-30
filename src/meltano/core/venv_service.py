@@ -104,7 +104,7 @@ class VirtualEnv:
         """
         self._system = platform.system()
         if self._system not in self._SUPPORTED_PLATFORMS:
-            raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+            raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
         self.root = root.resolve()
         self.python_path = python or sys.executable
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
@@ -123,7 +123,7 @@ class VirtualEnv:
             return self.root / "lib"
         if self._system == "Windows":
             return self.root / "Lib"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
 
     @cached_property
     def bin_dir(self) -> Path:
@@ -139,7 +139,7 @@ class VirtualEnv:
             return self.root / "bin"
         if self._system == "Windows":
             return self.root / "Scripts"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
 
     @cached_property
     def site_packages_dir(self) -> Path:
@@ -159,7 +159,7 @@ class VirtualEnv:
             )
         if self._system == "Windows":
             return self.lib_dir / "site-packages"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
 
     @cached_property
     def python_version_tuple(self) -> tuple[int, int, int]:
@@ -287,7 +287,7 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
     await run.wait()
 
     if run.returncode != 0:
-        raise AsyncSubprocessError(
+        raise AsyncSubprocessError(  # noqa: TRY003
             "Command failed",  # noqa: EM101
             process=run,
             stderr=await extract_stderr(run),
@@ -486,7 +486,7 @@ class VenvService:
         try:
             return await self.create_venv(extract_stderr=extract_stderr)
         except AsyncSubprocessError as err:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",  # noqa: EM102
                 process=err.process,
                 stderr=await err.stderr,
@@ -512,7 +512,7 @@ class VenvService:
         try:
             return await self._pip_install(("--upgrade", "pip"), env=env)
         except AsyncSubprocessError as err:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 "Failed to upgrade pip to the latest version.",  # noqa: EM101
                 err.process,
             ) from err

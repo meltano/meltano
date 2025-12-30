@@ -64,8 +64,8 @@ def validate_block_sets(
             log.debug("validating ExtractLoadBlock.", set_number=idx)
             try:
                 blk.validate_set()
-            except Exception as err:
-                log.error("Validation failed.", err=err)
+            except Exception as err:  # noqa: BLE001
+                log.error("Validation failed.", err=err)  # noqa: TRY400
                 return False
     return True
 
@@ -132,10 +132,10 @@ class BlockParser:  # noqa: D101
             try:
                 plugin = self.project.plugins.find_plugin(parsed_name)
             except PluginNotFoundError as e:
-                raise click.ClickException(f"Block {name} not found") from e  # noqa: EM102
+                raise click.ClickException(f"Block {name} not found") from e  # noqa: EM102, TRY003
 
             if plugin and task_sets_service.exists(name):
-                raise click.ClickException(
+                raise click.ClickException(  # noqa: TRY003
                     f"Ambiguous reference to '{name}' which matches a job "  # noqa: EM102
                     "name AND a plugin name.",
                 )
@@ -228,7 +228,7 @@ class BlockParser:  # noqa: D101
                 )
                 cur += 1
             else:
-                raise BlockSetValidationError(
+                raise BlockSetValidationError(  # noqa: TRY003
                     "Unknown command type or bad block sequence at index "  # noqa: EM102
                     f"{cur + 1}, starting block '{plugin.name}'",
                 )
@@ -308,7 +308,7 @@ class BlockParser:  # noqa: D101
                         "Found unexpected mapper plugin name. ",
                         plugin_name=plugin.name,
                     )
-                    raise BlockSetValidationError(
+                    raise BlockSetValidationError(  # noqa: TRY003
                         f"Expected unique mappings name not the mapper plugin "  # noqa: EM102
                         f"name: {plugin.name}.",
                     )
@@ -325,7 +325,7 @@ class BlockParser:  # noqa: D101
                     plugin_type=plugin.type,
                     plugin_name=plugin.name,
                 )
-                raise BlockSetValidationError(
+                raise BlockSetValidationError(  # noqa: TRY003
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",  # noqa: EM102
                 )
-        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101
+        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101, TRY003

@@ -163,7 +163,7 @@ def add(
     Read more at https://docs.meltano.com/reference/command-line-interface#schedule
     """  # noqa: D301, E501
     if job and (extractor or loader):
-        raise click.ClickException(
+        raise click.ClickException(  # noqa: TRY003
             "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
         )
 
@@ -172,9 +172,9 @@ def add(
         return
 
     if not extractor:
-        raise click.UsageError("Missing --extractor")  # noqa: EM101
+        raise click.UsageError("Missing --extractor")  # noqa: EM101, TRY003
     if not loader:
-        raise click.UsageError("Missing --loader")  # noqa: EM101
+        raise click.UsageError("Missing --loader")  # noqa: EM101, TRY003
 
     _add_elt(ctx, name, extractor, loader, transform, interval)
 
@@ -259,7 +259,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:
                     )
                 else:  # pragma: no cover
                     msg = f"Invalid schedule type: {type(txt_schedule)}"
-                    raise ValueError(msg)
+                    raise ValueError(msg)  # noqa: TRY004
 
         elif list_format == "json":
             job_schedules = []
@@ -279,7 +279,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:
                     )
                 else:  # pragma: no cover
                     msg = f"Invalid schedule type: {type(json_schedule)}"
-                    raise ValueError(msg)
+                    raise ValueError(msg)  # noqa: TRY004
 
             click.echo(
                 json.dumps(

@@ -288,7 +288,7 @@ class Tracker:  # - too many (public) methods
         """
         try:
             return tzlocal.get_localzone_name()
-        except Exception:
+        except Exception:  # noqa: BLE001
             return datetime.now().astimezone().tzname()
 
     def add_contexts(self, *extra_contexts) -> None:  # noqa: ANN002
@@ -343,7 +343,7 @@ class Tracker:  # - too many (public) methods
                     context=self.contexts,
                 ),
             )
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             logger.debug(
                 "Failed to submit unstruct event to Snowplow, error",
                 err=format_exception(err),
@@ -421,7 +421,7 @@ class Tracker:  # - too many (public) methods
                 ),
             )
             self.snowplow_tracker.flush()
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             logger.debug(
                 (
                     "Failed to submit 'telemetry_state_change' unstruct event "

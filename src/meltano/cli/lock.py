@@ -88,7 +88,7 @@ def lock(
                 lock_service.save(plugin, exists_ok=update, fetch_from_hub=True)
             except LockfileAlreadyExistsError as err:
                 relative_path = err.path.relative_to(project.root)
-                logger.error(
+                logger.error(  # noqa: TRY400
                     "Lockfile exists for %s at %s",
                     descriptor,
                     relative_path,

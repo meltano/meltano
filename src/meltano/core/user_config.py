@@ -144,7 +144,7 @@ class UserConfigService:
                     with self.config_path.open() as config_file:
                         data = yaml.load(config_file) or {}
                 except Exception as err:
-                    logger.error(
+                    logger.error(  # noqa: TRY400
                         "Failed to read user config",
                         config_path=str(self.config_path),
                         error=str(err),

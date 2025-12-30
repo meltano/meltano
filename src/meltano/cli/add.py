@@ -156,7 +156,7 @@ async def add(
         PluginType.ORCHESTRATORS,
     }:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102
+        raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102, TRY003
 
     plugin_refs: list[PluginRef] = [
         PluginRef(
@@ -171,7 +171,7 @@ async def add(
     )
     if not dependencies_met:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(f"Failed to install plugin(s): {err}")  # noqa: EM102
+        raise CliError(f"Failed to install plugin(s): {err}")  # noqa: EM102, TRY003
 
     add_service = ProjectAddService(project)
 
@@ -218,7 +218,7 @@ async def add(
 
     if success is False:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError("Failed to install plugin(s)")  # noqa: EM101
+        raise CliError("Failed to install plugin(s)")  # noqa: EM101, TRY003
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)

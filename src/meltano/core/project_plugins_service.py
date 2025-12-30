@@ -254,7 +254,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         """
         try:
             self.find_plugin(plugin_name)
-            return True
+            return True  # noqa: TRY300
         except PluginNotFoundError:
             return False
 
@@ -492,7 +492,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
                 plugins[plugin.type][idx] = plugin
 
-                return plugin, outdated
+                return plugin, outdated  # noqa: TRY300
             except StopIteration as stop:
                 raise PluginNotFoundError(plugin) from stop
 
@@ -614,7 +614,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             None,
         ):
             return transformer
-        raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101
+        raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101, TRY003
 
     def supports_source(self, source: DefinitionSource) -> bool:
         """Check if the project supports a given source of definition.

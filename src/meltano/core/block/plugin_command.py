@@ -141,7 +141,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
             self.context.session.close()
         if exitcode := self.process_future.result():
             command = self.command or self.command_args[0]
-            raise RunnerError(
+            raise RunnerError(  # noqa: TRY003
                 f"`{self.name} {command}` failed with exit code: {exitcode}",  # noqa: EM102
             )
 

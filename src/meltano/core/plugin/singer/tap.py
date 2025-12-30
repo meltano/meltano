@@ -315,7 +315,7 @@ class SingerTap(SingerPlugin):
         try:
             state = state_service.get_state(job_name)
         except Exception as err:  # pragma: no cover
-            logger.error(
+            logger.error(  # noqa: TRY400
                 err.args[0],
                 state_backend=state_service.state_store_manager.label,
             )
@@ -414,7 +414,7 @@ class SingerTap(SingerPlugin):
             catalog_path.unlink()
             msg = f"Catalog discovery failed: {err}"
             if isinstance(err, json.JSONDecodeError):
-                logger.error(
+                logger.error(  # noqa: TRY400
                     "Invalid JSON: %s [...]",
                     err.doc[max(err.pos - 9, 0) : err.pos + 10],
                 )
@@ -440,7 +440,7 @@ class SingerTap(SingerPlugin):
             Exception: if any other exception occurs.
         """
         if "discover" not in plugin_invoker.capabilities:
-            raise PluginLacksCapabilityError(
+            raise PluginLacksCapabilityError(  # noqa: TRY003
                 f"Extractor '{self.name}' does not support catalog discovery "  # noqa: EM102
                 "(the `discover` capability is not advertised)",
             )
@@ -487,7 +487,7 @@ class SingerTap(SingerPlugin):
                         future for future in done if future.exception() is not None
                     ]:
                         failed_future = failed.pop()
-                        raise failed_future.exception()  # type: ignore[misc]
+                        raise failed_future.exception()  # type: ignore[misc]  # noqa: TRY301
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
@@ -496,7 +496,7 @@ class SingerTap(SingerPlugin):
             if exit_code != 0:
                 catalog_path.unlink()
                 stderr_buff.seek(0)
-                raise PluginExecutionError(
+                raise PluginExecutionError(  # noqa: TRY003
                     "Catalog discovery failed: command "  # noqa: EM102
                     f"{plugin_invoker.exec_args('--discover')} returned "
                     f"{exit_code} with stderr:\n {stderr_buff.read()}",
@@ -546,7 +546,7 @@ class SingerTap(SingerPlugin):
             "catalog" not in plugin_invoker.capabilities
             and "properties" not in plugin_invoker.capabilities
         ):
-            raise PluginLacksCapabilityError(
+            raise PluginLacksCapabilityError(  # noqa: TRY003
                 f"Extractor '{self.name}' does not support entity selection "  # noqa: EM102
                 "or catalog metadata and schema rules",
             )

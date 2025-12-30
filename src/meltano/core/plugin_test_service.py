@@ -84,7 +84,7 @@ class ExtractorTestService(PluginTestService):
                 stderr=asyncio.subprocess.STDOUT,
                 **kwargs,
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             return False, str(exc)
 
         record_message_received: bool = False
@@ -143,7 +143,7 @@ class LoaderTestService(PluginTestService):
                 stderr=asyncio.subprocess.STDOUT,
                 **kwargs,
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             return False, str(exc)
 
         # Generate test Singer messages
@@ -189,12 +189,12 @@ class LoaderTestService(PluginTestService):
                     "Successfully processed test data for loader "
                     f"'{self.plugin_invoker.plugin.name}'.",
                 )
-            return (
+            return (  # noqa: TRY300
                 False,
                 last_line or "Loader failed to process test data.",
             )
 
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             return False, str(exc)
         finally:
             process.terminate()

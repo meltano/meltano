@@ -83,13 +83,13 @@ async def install_dbt_plugin(
         logger.info(f"Adding dbt model to '{dbt_project_path}'...")  # noqa: G004
         transform_add_service.update_dbt_project(plugin)
     except PluginNotFoundError as ex:
-        raise PluginInstallError(
+        raise PluginInstallError(  # noqa: TRY003
             "Transformer 'dbt' is not installed. "  # noqa: EM101
             "Run `meltano add transformer dbt` to add it to your project.",
         ) from ex
     except FileNotFoundError as ex:
         relative_path = Path(ex.filename).relative_to(project.root)
-        raise PluginInstallError(
+        raise PluginInstallError(  # noqa: TRY003
             f"File '{relative_path}' could not be found. "  # noqa: EM102
             "Run `meltano add files files-dbt` to set up a dbt project.",
         ) from ex

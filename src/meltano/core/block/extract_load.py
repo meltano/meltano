@@ -473,17 +473,17 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             BlockSetValidationError: if the block set is not valid.
         """
         if not self.blocks:
-            raise BlockSetValidationError("No blocks in set.")  # noqa: EM101
+            raise BlockSetValidationError("No blocks in set.")  # noqa: EM101, TRY003
 
         if self.head.consumer:
-            raise BlockSetValidationError("first block in set should not be consumer")  # noqa: EM101
+            raise BlockSetValidationError("first block in set should not be consumer")  # noqa: EM101, TRY003
 
         if self.tail.producer:
-            raise BlockSetValidationError("last block in set should not be a producer")  # noqa: EM101
+            raise BlockSetValidationError("last block in set should not be a producer")  # noqa: EM101, TRY003
 
         for block in self.intermediate:
             if not block.consumer or not block.producer:
-                raise BlockSetValidationError(
+                raise BlockSetValidationError(  # noqa: TRY003
                     "intermediate blocks must be producers AND consumers",  # noqa: EM101
                 )
 
@@ -675,7 +675,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                         block.stdin,
                     )  # link previous blocks stdout with current blocks stdin
                 else:
-                    raise BlockSetValidationError(
+                    raise BlockSetValidationError(  # noqa: TRY003
                         "run step requires input but has no upstream",  # noqa: EM101
                     )
 
@@ -801,7 +801,7 @@ class ELBExecutionManager:
         else:
             logger.warning("Intermediate block in sequence failed.")
             await self._stop_all_blocks(start_idx)
-            raise RunnerError(
+            raise RunnerError(  # noqa: TRY003
                 (
                     "Unexpected completion sequence in ExtractLoadBlock set. "  # noqa: EM101
                     "Intermediate block (likely a mapper) failed."
@@ -870,24 +870,24 @@ def _check_exit_codes(
     """
     if producer_code:
         if consumer_code:
-            raise RunnerError(
+            raise RunnerError(  # noqa: TRY003
                 "Extractor and loader failed",  # noqa: EM101
                 {
                     PluginType.EXTRACTORS: producer_code,
                     PluginType.LOADERS: consumer_code,
                 },
             )
-        raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})  # noqa: EM101
+        raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})  # noqa: EM101, TRY003
 
     if consumer_code:
-        raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})  # noqa: EM101
+        raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})  # noqa: EM101, TRY003
 
     if failed_mappers := [
         {mapper_id: exit_code}
         for mapper_id, exit_code in intermediate_codes.items()
         if exit_code
     ]:
-        raise RunnerError("Mappers failed", failed_mappers)  # noqa: EM101
+        raise RunnerError("Mappers failed", failed_mappers)  # noqa: EM101, TRY003
 
 
 def generate_state_id(
@@ -911,7 +911,7 @@ def generate_state_id(
         RunnerError: if the project does not have an active environment.
     """
     if not project.environment:
-        raise RunnerError(
+        raise RunnerError(  # noqa: TRY003
             "No active environment for invocation, but requested state ID",  # noqa: EM101
         )
 
@@ -922,7 +922,7 @@ def generate_state_id(
     ]
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
-        raise RunnerError(
+        raise RunnerError(  # noqa: TRY003
             "Cannot generate a state ID from components containing the "  # noqa: EM102
             f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )

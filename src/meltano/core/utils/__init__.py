@@ -732,7 +732,7 @@ def hash_sha256(value: str | bytes) -> str:
         ValueError: If we are blindly passed a value that is None.
     """
     if value is None:
-        raise ValueError("Cannot hash None.")  # noqa: EM101
+        raise ValueError("Cannot hash None.")  # noqa: EM101, TRY003
     if isinstance(value, str):
         value = value.encode()
     return hashlib.sha256(value).hexdigest()
@@ -798,7 +798,7 @@ def strtobool(val: str) -> bool:
     if val in {"n", "no", "f", "false", "off", "0"}:
         return False
 
-    raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
+    raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102, TRY003
 
 
 def get_boolean_env_var(env_var: str, *, default: bool = False) -> bool:

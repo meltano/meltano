@@ -67,11 +67,11 @@ class ProjectInitService:
                 )
                 raise ProjectInitServiceError(msg) from ex
         except PermissionError as ex:
-            raise ProjectInitServiceError(
+            raise ProjectInitServiceError(  # noqa: TRY003
                 f"Permission denied to create '{self.project_directory}'.",  # noqa: EM102
             ) from ex
         except Exception as ex:
-            raise ProjectInitServiceError(
+            raise ProjectInitServiceError(  # noqa: TRY003
                 f"Could not create directory '{self.project_directory}'. {ex}",  # noqa: EM102
             ) from ex
 

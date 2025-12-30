@@ -114,7 +114,7 @@ class EnvironmentContext(SelfDescribingJson):
         """
         try:
             freedesktop_data = platform.freedesktop_os_release()
-        except Exception:
+        except Exception:  # noqa: BLE001
             freedesktop_data = defaultdict(type(None))
 
         return {

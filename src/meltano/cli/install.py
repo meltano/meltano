@@ -134,6 +134,6 @@ def _get_schedule_plugins(project: Project, schedule_name: str) -> set[ProjectPl
                 )
     else:  # pragma: no cover
         msg = f"Invalid schedule type: {type(schedule_obj)}"
-        raise ValueError(msg)
+        raise ValueError(msg)  # noqa: TRY004
 
     return schedule_plugins

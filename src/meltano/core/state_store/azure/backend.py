@@ -41,7 +41,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         self.storage_account_url = storage_account_url
 
         if not self.parsed.hostname:
-            raise MeltanoError(
+            raise MeltanoError(  # noqa: TRY003
                 f"Azure state backend URI must include a container name: {self.uri}",  # noqa: EM102
                 "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",
             )
@@ -88,7 +88,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         if self.connection_string:
             return BlobServiceClient.from_connection_string(self.connection_string)
 
-        raise MeltanoError(
+        raise MeltanoError(  # noqa: TRY003
             "Azure state backend requires a connection string "  # noqa: EM101
             "or an account URL to use host credentials",
             "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
@@ -111,7 +111,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             blob_client.delete_blob()
         except Exception as e:
             if not self.is_file_not_found_error(e):
-                raise e
+                raise e  # noqa: TRY201
 
     def list_all_files(
         self,

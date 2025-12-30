@@ -362,7 +362,7 @@ class TestAZStorageStateStoreManager:
         try:
             with subject.get_reader("nonexistent"):
                 got_reader = True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
@@ -382,7 +382,7 @@ class TestAZStorageStateStoreManager:
         try:
             with subject.get_reader("nonexistent"):
                 got_reader = True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
@@ -438,7 +438,7 @@ class TestS3StateStoreManager:
             try:
                 with subject.get_reader("does_not_exist"):
                     got_reader = True
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
@@ -449,7 +449,7 @@ class TestS3StateStoreManager:
             try:
                 with subject.get_reader("does_not_exist"):
                     got_reader = True
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
@@ -714,7 +714,7 @@ class TestGCSStateStoreManager:
         try:
             with subject.get_reader("nonexistent"):
                 got_reader = True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
@@ -732,7 +732,7 @@ class TestGCSStateStoreManager:
         try:
             with subject.get_reader("nonexistent"):
                 got_reader = True
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 

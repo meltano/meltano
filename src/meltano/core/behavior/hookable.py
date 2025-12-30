@@ -118,4 +118,4 @@ class HookObject(metaclass=Hookable):
                         f"{hook_name} hook '{hook_func.__name__}' has failed: {err}",  # noqa: G004
                     )
                 else:
-                    raise err
+                    raise err  # noqa: TRY201

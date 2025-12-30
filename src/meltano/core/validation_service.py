@@ -93,7 +93,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         try:
             self.tests_selection[name] = True
         except KeyError as exc:
-            raise KeyError(
+            raise KeyError(  # noqa: TRY003
                 f"Plugin {self.plugin_name} does not have a test named '{name}'",  # noqa: EM102
             ) from exc
 

@@ -248,7 +248,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         except Exception as e:
             if self.is_file_not_found_error(e):
                 return False
-            raise e
+            raise e  # noqa: TRY201
 
     def create_state_id_dir_if_not_exists(self, state_id: str) -> None:
         """Create the directory or prefix for a given state_id.
@@ -323,7 +323,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             if self.is_file_not_found_error(e):
                 logger.info("No state found for %s.", state_id)
                 return None
-            raise e
+            raise e  # noqa: TRY201
 
     @override
     def set(self, state: MeltanoState) -> None:
@@ -468,7 +468,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
             os.remove(file_path)
         except Exception as e:
             if not self.is_file_not_found_error(e):
-                raise e
+                raise e  # noqa: TRY201
 
     @override
     def delete(self, state_id: str) -> None:

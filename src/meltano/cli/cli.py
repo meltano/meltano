@@ -122,7 +122,7 @@ def cli(
         try:
             os.chdir(cwd)
         except OSError as ex:
-            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex  # noqa: EM102
+            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex  # noqa: EM102, TRY002, TRY003
 
     try:
         project = Project.find(dotenv_file=env_file)

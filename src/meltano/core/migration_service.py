@@ -122,7 +122,7 @@ class MigrationService:
                 if not silent:
                     click.secho("System database up-to-date.")
             except Exception as ex:
-                logger.exception(str(ex))
+                logger.exception(str(ex))  # noqa: TRY401
                 err_msg = (
                     "Cannot upgrade the system database. It might be corrupted or "
                     "was created before database migrations were introduced (v0.34.0)"

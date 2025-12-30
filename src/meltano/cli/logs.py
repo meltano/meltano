@@ -229,7 +229,7 @@ def show_log(
 
         if not job:
             msg = f"No job found with log ID '{log_id}'"
-            raise CliError(msg)
+            raise CliError(msg)  # noqa: TRY301
 
         # Display job metadata
         click.echo(job_logging_service.format_job_info(job, output_format))
@@ -243,7 +243,7 @@ def show_log(
                 f"Log file not found for job run '{log_id}'. The log may have "
                 "been cleaned up or the job may not have generated logs."
             )
-            raise CliError(msg)
+            raise CliError(msg)  # noqa: TRY301
 
         # Handle tail mode
         if tail:

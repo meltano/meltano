@@ -41,7 +41,7 @@ class SnowplowMicro:
         """Ping the Snowplow Micro service."""
         try:
             self.get("all")
-        except Exception:  # pragma: no cover
+        except Exception:  # pragma: no cover  # noqa: BLE001
             return False
 
         return True

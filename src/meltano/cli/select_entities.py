@@ -148,7 +148,7 @@ async def select(
                 remove=remove,
             )
     except PluginExecutionError as err:
-        raise CliError(f"Cannot list the selected properties: {err}") from err  # noqa: EM102
+        raise CliError(f"Cannot list the selected properties: {err}") from err  # noqa: EM102, TRY003
 
 
 def clear_selections(project: Project, extractor: str) -> None:

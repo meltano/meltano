@@ -83,7 +83,7 @@ class UpgradeService:
         )
 
         if run.returncode != 0:
-            raise UpgradeError("Failed to upgrade `meltano`.", run)  # noqa: EM101
+            raise UpgradeError("Failed to upgrade `meltano`.", run)  # noqa: EM101, TRY003
 
         return True
 
@@ -144,7 +144,7 @@ class UpgradeService:
             ),
         )
         if not success:
-            raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
+            raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101, TRY003
 
     def migrate_database(self, *, project: Project) -> None:
         """Migrate the Meltano database.

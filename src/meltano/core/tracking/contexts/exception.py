@@ -102,7 +102,7 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
     """
     try:
         str_path = tb.tb_frame.f_code.co_filename
-    except Exception:
+    except Exception:  # noqa: BLE001
         return None
 
     if str_path == "<stdin>":

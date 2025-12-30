@@ -361,7 +361,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         try:
             value = self.settings_service.config_override[name]
             self.log(f"Read key '{name}' from config override: {value!r}")
-            return value, {}
+            return value, {}  # noqa: TRY300
         except KeyError:
             return None, {}
 
@@ -961,7 +961,7 @@ class DbStoreManager(SettingsStoreManager):
     def session(self) -> Session:
         """Database session."""
         if not self._session:
-            raise StoreNotSupportedError("No database session provided")  # noqa: EM101
+            raise StoreNotSupportedError("No database session provided")  # noqa: EM101, TRY003
 
         return self._session
 
@@ -1008,7 +1008,7 @@ class DbStoreManager(SettingsStoreManager):
                 )
 
             self.log(f"Read key '{name}' from system database: {value!r}")
-            return value, {}
+            return value, {}  # noqa: TRY300
         except (sqlalchemy.orm.exc.NoResultFound, KeyError):
             return None, {}
 
@@ -1156,7 +1156,7 @@ class InheritedStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if no setting_def is passed.
         """
         if not setting_def:
-            raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101
+            raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101, TRY003
 
         value, metadata = self.get_with_metadata(setting_def.name)
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:  # type: ignore[redundant-expr]
@@ -1319,7 +1319,7 @@ class AutoStoreManager(SettingsStoreManager):
         try:
             manager = self.manager_for(store)
             manager.ensure_supported(method)
-            return True
+            return True  # noqa: TRY300
         except StoreNotSupportedError:
             return False
 
@@ -1471,7 +1471,7 @@ class AutoStoreManager(SettingsStoreManager):
         store = self.auto_store(name, setting_def=setting_def)
         logger.debug(f"AutoStoreManager returned store '{store}'")  # noqa: G004
         if store is None:
-            raise StoreNotSupportedError("No storage method available")  # noqa: EM101
+            raise StoreNotSupportedError("No storage method available")  # noqa: EM101, TRY003
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)

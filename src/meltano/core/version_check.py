@@ -120,7 +120,7 @@ class VersionCheckService:
             response.raise_for_status()
             data = response.json()
             return data["info"]["version"]
-        except Exception:
+        except Exception:  # noqa: BLE001
             logger.debug("Failed to fetch latest version from PyPI", exc_info=True)
             return None
 
@@ -184,6 +184,6 @@ class VersionCheckService:
         """Check if a newer version of Meltano is available."""
         try:
             return self._check_version()
-        except Exception:
+        except Exception:  # noqa: BLE001
             logger.debug("Failed to check version", exc_info=True)
             return None
