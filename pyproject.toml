@@ -373,8 +373,12 @@ select = [
   "E",     # pycodestyle (error)
   "EM",    # flake8-errmsg
   "ERA",   # flake8-eradicate
+  "EXE",   # flake8-executable
   "F",     # pyflakes
+  "FA",    # flake8-future-annotations
   "FBT",   # flake8-boolean-trap
+  "FLY",   # flynt
+  "FURB",  # refurb
   "G",     # flake8-logging-format
   "I",     # isort
   "ICN",   # flake8-import-conventions
@@ -394,6 +398,7 @@ select = [
   "RUF",   # Ruff specific rules
   "S",     # flake8-bandit
   "SIM",   # flake8-simplify
+  "SLOT",  # flake8-slots
   "T10",   # flake8-debugger
   "T20",   # flake8-print
   "TC",    # flake8-type-checking

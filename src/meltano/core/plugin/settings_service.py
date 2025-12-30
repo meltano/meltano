@@ -149,7 +149,7 @@ class PluginSettingsService(SettingsService):
             Namespace for setting value records in system database.
         """
         # "default" is included for legacy reasons
-        return ".".join((self.plugin.type, self.plugin.name, "default"))
+        return f"{self.plugin.type}.{self.plugin.name}.default"
 
     @property
     def setting_definitions(self) -> list[SettingDefinition]:

@@ -302,13 +302,13 @@ class TestCli:
         project = test_cli_project
         with cd(project.root_dir()):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
-            assert Path().resolve() == project.root_dir()
+            assert Path.cwd() == project.root_dir()
 
         with cd(project.root_dir()):
             assert_cli_runner(
                 cli_runner.invoke(cli, ("--cwd", str(tmp_path), "dragon")),
             )
-            assert Path().resolve() == tmp_path
+            assert Path.cwd() == tmp_path
 
         with cd(project.root_dir()):
             filepath = tmp_path / "file.txt"
@@ -330,7 +330,7 @@ class TestCli:
         with cd(project.root_dir()):
             dirpath.mkdir()
             assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
-            assert Path().resolve() == dirpath
+            assert Path.cwd() == dirpath
 
     def test_env_file_option(
         self,
