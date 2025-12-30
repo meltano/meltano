@@ -84,7 +84,7 @@ class TestSettingDefinition:
             ("3.14159", Decimal("3.14159")),
             ("123.45", Decimal("123.45")),
             ("0.001", Decimal("0.001")),
-            ("0", Decimal("0")),
+            ("0", Decimal(0)),
             ("0.0", Decimal("0.0")),
             ("-42.5", Decimal("-42.5")),
             ("1640995200.123", Decimal("1640995200.123")),
@@ -142,7 +142,7 @@ class TestSettingDefinition:
 
         test_cases = [
             (Decimal("3.14159"), "3.14159"),
-            (Decimal("0"), "0"),
+            (Decimal(0), "0"),
             (Decimal("123.45"), "123.45"),
             (Decimal("1640995200.123"), "1640995200.123"),
             (Decimal("-42.5"), "-42.5"),
