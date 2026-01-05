@@ -592,7 +592,7 @@ If you have gotten this far... _**Congrats!** You are now a proud Singer tap dev
 
 ### Make it discoverable
 
-Once you have your tap published to PyPI or tagged one or more GitHub releases, consider
+Once you have your tap published to PyPI or have tagged one or more GitHub releases, consider
 [making it discoverable](/contribute/plugins#making-a-custom-plugin-discoverable)
 for other users of Meltano.
 
