@@ -30,7 +30,7 @@ These Singer taps and targets can be cumbersome to run manually so the easiest w
 
 The following steps will demonstrate how to implement a custom extractor to extract data from a JSON placeholder REST API to a JSONL file using Meltano and the Meltano SDK. You can check out the complete custom extractor code on this [GitHub repo](https://github.com/vicradon/tap-jsonplaceholder).
 
-There a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
+There are a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
 
 1. [Python3](https://www.python.org/downloads/) for running Python-based scripts.
 2. [uv] for dependency management in your custom extractor. It's a fast and feature-rich Python package manager that simplifies the process of installing Python programs that need to be added to `PATH` (e.g., Meltano).
