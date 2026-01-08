@@ -27,6 +27,11 @@ run_benchmark() {
     echo "======================================================================"
     # Copy benchmark back from temp location
     cp "$TEMP_BENCHMARK" benchmark_state_backend.py
+    # Sync dependencies for the current version
+    echo "Installing dependencies for $version..."
+    uv sync --quiet 2>&1 | tail -5
+    echo ""
+    echo "Running benchmark..."
     uv run python benchmark_state_backend.py
     echo ""
 }
