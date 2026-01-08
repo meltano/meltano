@@ -86,19 +86,23 @@ def benchmark_state_backend_creation(iterations: int = 18) -> float:
     Returns:
         Total time in seconds
     """
+    import enum
+
     start = time.time()
 
     # Handle both v3.6.0 (enum) and v3.7+ (class) implementations
-    try:
+    is_enum = isinstance(StateBackend, type) and issubclass(StateBackend, enum.Enum)
+
+    if is_enum:
+        # v3.6.0 enum-based implementation
+        for _ in range(iterations):
+            backend = StateBackend.S3
+            _ = backend.value
+    else:
         # v3.7+ class-based implementation
         for _ in range(iterations):
             backend = StateBackend("s3")
             _ = backend.scheme
-    except TypeError:
-        # v3.6.0 enum-based implementation - StateBackend is an enum
-        for _ in range(iterations):
-            backend = StateBackend.S3
-            _ = backend.value
 
     end = time.time()
 

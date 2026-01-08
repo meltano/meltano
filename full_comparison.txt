@@ -1,0 +1,1 @@
+Running comparison (this will take 5-10 minutes due to dependency installation)... ./compare_versions.sh

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to compare performance across different Meltano versions
+# Script to compare performance across different Meltano versions using uvx
 
 set -e
 
@@ -8,62 +8,37 @@ echo "Performance Comparison Script"
 echo "======================================================================"
 echo ""
 
-# Save current branch
-CURRENT_BRANCH=$(git branch --show-current)
-echo "Current branch: $CURRENT_BRANCH"
-echo ""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BENCHMARK_SCRIPT="$SCRIPT_DIR/benchmark_state_backend.py"
 
-# Copy benchmark script to temp location (it doesn't exist in old versions)
-TEMP_BENCHMARK=$(mktemp)
-cp benchmark_state_backend.py "$TEMP_BENCHMARK"
-echo "Saved benchmark script to temporary location"
-echo ""
-
-# Function to run benchmark
+# Function to run benchmark with a specific Meltano version
 run_benchmark() {
     local version=$1
-    echo "======================================================================"
-    echo "Testing $version"
-    echo "======================================================================"
-    # Copy benchmark back from temp location
-    cp "$TEMP_BENCHMARK" benchmark_state_backend.py
+    local label=$2
 
-    # Detect package manager (poetry for v3.6.0, uv for v3.7.9+)
-    if [ -f "poetry.lock" ]; then
-        echo "Using poetry for $version with Python 3.10..."
-        poetry env use python3.10 2>&1 | tail -3
-        poetry install --quiet 2>&1 | tail -5
-        echo ""
-        echo "Running benchmark..."
-        poetry run python benchmark_state_backend.py
+    echo "======================================================================"
+    echo "Testing $label"
+    echo "======================================================================"
+
+    if [ "$version" = "current" ]; then
+        echo "Using current branch with Python 3.10..."
+        uv run -p 3.10 python "$BENCHMARK_SCRIPT"
     else
-        echo "Using uv for $version with Python 3.10..."
-        uv python pin 3.10 2>&1 | tail -3
-        uv sync --quiet 2>&1 | tail -5
-        echo ""
-        echo "Running benchmark..."
-        uv run python benchmark_state_backend.py
+        echo "Installing Meltano $version with Python 3.10 via uvx..."
+        uvx --with "meltano==$version" --python 3.10 python "$BENCHMARK_SCRIPT"
     fi
+
     echo ""
 }
 
 # Test v3.6.0
-echo "Switching to v3.6.0..."
-git checkout v3.6.0 2>&1 | grep -v "^Note:" || true
-run_benchmark "v3.6.0 (baseline - fast)"
+run_benchmark "3.6.0" "v3.6.0 (baseline - fast)"
 
 # Test v3.7.9
-echo "Switching to v3.7.9..."
-git checkout v3.7.9 2>&1 | grep -v "^Note:" || true
-run_benchmark "v3.7.9 (regression - slow)"
+run_benchmark "3.7.9" "v3.7.9 (regression - slow)"
 
 # Test current branch
-echo "Switching back to $CURRENT_BRANCH..."
-git checkout "$CURRENT_BRANCH" 2>&1 | grep -v "^Note:" || true
-run_benchmark "$CURRENT_BRANCH (with fix)"
-
-# Clean up
-rm -f "$TEMP_BENCHMARK"
+run_benchmark "current" "Current Branch (with fix)"
 
 echo "======================================================================"
 echo "Comparison Complete"
@@ -72,4 +47,4 @@ echo ""
 echo "Summary:"
 echo "- v3.6.0: Baseline performance (no addon system)"
 echo "- v3.7.9: Performance regression (addon system without optimization)"
-echo "- $CURRENT_BRANCH: Performance restored (lazy initialization + caching)"
+echo "- Current: Performance restored (lazy initialization + caching)"
