@@ -68,7 +68,11 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
     )
 
     with monkeypatch.context() as m:
-        m.setattr(StateBackend.addon, "installed", entry_points)
+        # Ensure addon is initialized first, then monkeypatch it
+        addon = StateBackend._ensure_addon()
+        m.setattr(addon, "installed", entry_points)
+        # Clear the backends cache to force re-evaluation
+        StateBackend._backends_cache = None
         assert "custom" in StateBackend.backends()
 
         state_store = state_store_manager_from_project_settings(project.settings)

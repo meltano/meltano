@@ -19,6 +19,9 @@ if t.TYPE_CHECKING:
 
 T = t.TypeVar("T")
 
+# Module-level cache to avoid repeated package scans across all MeltanoAddon instances
+_ENTRY_POINTS_CACHE: dict[str, EntryPoints] = {}
+
 
 class MeltanoAddon(t.Generic[T]):
     """A Meltano add-on with packaging plugins."""
@@ -33,12 +36,16 @@ class MeltanoAddon(t.Generic[T]):
 
     @cached_property
     def installed(self) -> EntryPoints:
-        """List installed add-ons.
+        """List installed add-ons with module-level caching.
 
         Returns:
             List of available add-ons.
         """
-        return entry_points(group=self.entry_point_group)
+        if self.entry_point_group not in _ENTRY_POINTS_CACHE:
+            _ENTRY_POINTS_CACHE[self.entry_point_group] = entry_points(
+                group=self.entry_point_group,
+            )
+        return _ENTRY_POINTS_CACHE[self.entry_point_group]
 
     def get_all(self) -> t.Generator[T, None, None]:
         """Get all add-ons.

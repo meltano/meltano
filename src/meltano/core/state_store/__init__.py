@@ -64,9 +64,9 @@ class StateBackendNotFoundError(MeltanoError):
 class StateBackend:
     """State backend."""
 
-    addon: MeltanoAddon[type[StateStoreManager]] = MeltanoAddon(
-        "meltano.state_backends",
-    )
+    # Lazy initialization: only create addon when needed, not at module import time
+    _addon: t.ClassVar[MeltanoAddon[type[StateStoreManager]] | None] = None
+    _backends_cache: t.ClassVar[list[str] | None] = None
 
     def __init__(self, scheme: str) -> None:
         """Create a new StateBackend.
@@ -77,16 +77,30 @@ class StateBackend:
         self.scheme = scheme
 
     @classmethod
+    def _ensure_addon(cls) -> MeltanoAddon[type[StateStoreManager]]:
+        """Lazy initialize addon singleton.
+
+        Returns:
+            The initialized MeltanoAddon instance.
+        """
+        if cls._addon is None:
+            cls._addon = MeltanoAddon("meltano.state_backends")
+        return cls._addon
+
+    @classmethod
     def backends(cls) -> list[str]:
-        """List available state backends.
+        """List available state backends with caching.
 
         Returns:
             List of available state backends.
         """
-        return [
-            SYSTEMDB,
-            *(ep.name for ep in cls.addon.installed),
-        ]
+        if cls._backends_cache is None:
+            addon = cls._ensure_addon()
+            cls._backends_cache = [
+                SYSTEMDB,
+                *(ep.name for ep in addon.installed),
+            ]
+        return cls._backends_cache
 
     @property
     def manager(self) -> type[StateStoreManager]:
@@ -98,8 +112,9 @@ class StateBackend:
         Raises:
             ValueError: If no state backend is found for the scheme.
         """
+        addon = self._ensure_addon()
         try:
-            manager = self.addon.get(self.scheme)
+            manager = addon.get(self.scheme)
         except KeyError:
             raise StateBackendNotFoundError(self.scheme) from None
 
