@@ -22,10 +22,6 @@ from __future__ import annotations
 
 import sys
 import time
-from pathlib import Path
-
-# Add src to path so we can import meltano
-sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from meltano.core.state_store import StateBackend
 
