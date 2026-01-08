@@ -1,13 +1,11 @@
 ci:
   autofix_commit_msg: |
-    [pre-commit.ci] auto fixes from pre-commit.ci hooks
+    chore: auto fixes from pre-commit.ci hooks
 
     for more information, see https://pre-commit.ci
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: monthly
-  skip:
-    - uv-lock
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
