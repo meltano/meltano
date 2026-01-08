@@ -30,13 +30,15 @@ run_benchmark() {
 
     # Detect package manager (poetry for v3.6.0, uv for v3.7.9+)
     if [ -f "poetry.lock" ]; then
-        echo "Using poetry for $version..."
+        echo "Using poetry for $version with Python 3.10..."
+        poetry env use python3.10 2>&1 | tail -3
         poetry install --quiet 2>&1 | tail -5
         echo ""
         echo "Running benchmark..."
         poetry run python benchmark_state_backend.py
     else
-        echo "Using uv for $version..."
+        echo "Using uv for $version with Python 3.10..."
+        uv python pin 3.10 2>&1 | tail -3
         uv sync --quiet 2>&1 | tail -5
         echo ""
         echo "Running benchmark..."
