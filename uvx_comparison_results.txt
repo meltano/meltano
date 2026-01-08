@@ -1,0 +1,1 @@
+Running comparison with uvx (this should be much faster)... ./compare_versions.sh
