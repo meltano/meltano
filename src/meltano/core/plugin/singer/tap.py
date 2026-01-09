@@ -16,7 +16,6 @@ from hashlib import sha1
 from io import StringIO
 from itertools import takewhile
 
-import anyio
 import structlog
 
 from meltano.core.behavior.hookable import hook
@@ -288,9 +287,8 @@ class SingerTap(SingerPlugin):
             session=elt_context.session,  # type: ignore[arg-type]
             job_name=elt_context.job.job_name,
         ):
-            async with await anyio.open_file(state_path, "w") as state_file:
-                content = json.dumps(state, indent=2)
-                await state_file.write(content)
+            with state_path.open("w") as state_file:
+                json.dump(state, state_file, indent=2)
         else:
             logger.warning("No state was found, complete import.")
 
@@ -408,8 +406,8 @@ class SingerTap(SingerPlugin):
 
         # test for the result to be a valid catalog
         try:
-            async with await anyio.open_file(catalog_path) as catalog_file:
-                json.loads(await catalog_file.read())
+            with catalog_path.open() as catalog_file:
+                json.load(catalog_file)
         except Exception as err:
             catalog_path.unlink()
             msg = f"Catalog discovery failed: {err}"
@@ -446,7 +444,7 @@ class SingerTap(SingerPlugin):
             )
         with StringIO("") as stderr_buff:
             try:
-                async with await anyio.open_file(catalog_path, mode="wb") as catalog:
+                with catalog_path.open(mode="wb") as catalog:
                     handle = await plugin_invoker.invoke_async(
                         "--discover",
                         stdout=asyncio.subprocess.PIPE,
@@ -574,8 +572,8 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
 
         try:
-            async with await anyio.open_file(catalog_path) as catalog_file:
-                catalog = json.loads(await catalog_file.read())
+            with catalog_path.open() as catalog_file:
+                catalog = json.load(catalog_file)
 
             if schema_rules:
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
@@ -584,8 +582,8 @@ class SingerTap(SingerPlugin):
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
-            async with await anyio.open_file(catalog_path, "w") as catalog_f:
-                await catalog_f.write(json_dumps(catalog, indent=2))
+            with catalog_path.open("w") as catalog_f:
+                catalog_f.write(json_dumps(catalog, indent=2))
 
             if cache_key := self.catalog_cache_key(plugin_invoker):
                 catalog_cache_key_path.write_text(cache_key)
