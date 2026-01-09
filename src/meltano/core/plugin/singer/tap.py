@@ -438,6 +438,7 @@ class SingerTap(SingerPlugin):
                 f"Extractor '{self.name}' does not support catalog discovery "  # noqa: EM102
                 "(the `discover` capability is not advertised)",
             )
+        logger.info("Running catalog discovery")
         with StringIO("") as stderr_buff:
             try:
                 with catalog_path.open(mode="wb") as catalog:
