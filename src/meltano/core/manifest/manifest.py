@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
 import typing as t
 from collections import defaultdict
 from collections.abc import Mapping
@@ -12,8 +11,8 @@ from contextlib import suppress
 from functools import cached_property, reduce
 from importlib import resources
 from operator import getitem
-from tempfile import NamedTemporaryFile
 
+import jsonschema
 import structlog
 import yaml
 
@@ -28,7 +27,6 @@ from meltano.core.utils import (
     deep_merge,
     default_deep_merge_strategies,
     expand_env_vars,
-    get_no_color_flag,
     unflatten,
 )
 
@@ -149,37 +147,32 @@ class Manifest:
             manifest_schema = json.load(manifest_schema_file)
         self._env_locations = meltano_config_env_locations(manifest_schema)
 
-    @staticmethod
     def _validate_against_manifest_schema(
+        self,
         instance_name: str,
         instance_path: Path,
         instance_data: dict[str, t.Any],
     ) -> None:
-        with NamedTemporaryFile(suffix=".json") as schema_instance_file:
-            schema_instance_file.write(json.dumps(instance_data).encode())
-            schema_instance_file.flush()
-            proc = subprocess.run(
-                (
-                    "check-jsonschema",
-                    "--color",
-                    "never" if get_no_color_flag() else "always",
-                    "--schemafile",
-                    str(MANIFEST_SCHEMA_PATH),
-                    schema_instance_file.name,
-                ),
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
+        with MANIFEST_SCHEMA_PATH.open() as schema_file:
+            schema = json.load(schema_file)
+
+        validator = jsonschema.Draft7Validator(schema)
+        errors = list(validator.iter_errors(instance_data))
+
+        if errors:
+            error_messages = ["Schema validation errors were encountered."]
+            for error in errors:
+                if error.absolute_path:
+                    path = "::$." + ".".join(str(p) for p in error.absolute_path)
+                else:
+                    path = "::$"
+                error_messages.append(f"  {instance_path}{path}: {error.message}")
+
+            formatted_errors = "\n".join(error_messages)
+            logger.warning(
+                f"Failed to validate {instance_name} against Meltano manifest "  # noqa: G004
+                f"schema ({MANIFEST_SCHEMA_PATH}):\n{formatted_errors}",
             )
-            if proc.returncode:
-                jsonschema_checker_message = proc.stdout.strip().replace(
-                    schema_instance_file.name,
-                    str(instance_path),
-                )
-                logger.warning(
-                    f"Failed to validate {instance_name} against Meltano manifest "  # noqa: G004
-                    f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}",
-                )
 
     @cached_property
     def _project_files(self) -> dict[str, t.Any]:

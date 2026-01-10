@@ -151,6 +151,75 @@ class TestCompile:
             },
         ]
 
+    def test_no_schema_violation_with_lint(
+        self,
+        manifest_dir: Path,
+        cli_runner: CliRunner,
+        log: StructuredLogCapture,
+    ) -> None:
+        """Test that valid schemas pass validation without warnings."""
+        result = cli_runner.invoke(
+            cli,
+            ("--environment=dev", "compile", "--lint"),
+        )
+        assert result.exit_code == 0
+        # Verify that no schema validation warnings were logged
+        warning_events = [e for e in log.events if e.get("level") == "warning"]
+        schema_warnings = [
+            e for e in warning_events if "Failed to validate" in e.get("event", "")
+        ]
+        assert len(schema_warnings) == 0, (
+            "Expected no schema validation warnings for valid project, "
+            f"but found: {[e.get('event')[:100] for e in schema_warnings]}"
+        )
+        # Verify manifest files were created successfully
+        assert {x.name for x in manifest_dir.iterdir()} == {
+            "meltano-manifest.dev.json",
+        }
+
+    def test_warn_nested_schema_violation(
+        self,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+        log: StructuredLogCapture,
+    ) -> None:
+        original_yaml_load = manifest.yaml.load
+
+        def patch(*args, **kwargs):
+            project_files = original_yaml_load(*args, **kwargs)
+            # Create a nested schema violation by adding a plugin with invalid 'name'
+            # The 'name' field should be a string, but we'll set it to an integer
+            if "plugins" not in project_files:
+                project_files["plugins"] = {}
+            if "extractors" not in project_files["plugins"]:
+                project_files["plugins"]["extractors"] = []
+            # Add a plugin with an invalid name (integer instead of string)
+            project_files["plugins"]["extractors"].append({"name": 12345})
+            return project_files
+
+        monkeypatch.setenv("NO_COLOR", "1")
+
+        with mock.patch.object(manifest.yaml, "load", side_effect=patch):
+            result = cli_runner.invoke(
+                cli,
+                ("--environment=dev", "compile", "--lint", f"--directory={tmp_path}"),
+            )
+        assert result.exit_code == 0
+        # Verify that we logged warnings about schema violations
+        warning_events = [e for e in log.events if e.get("level") == "warning"]
+        assert len(warning_events) >= 1
+        # Check that at least one warning contains a nested path (with ::$.)
+        # This format indicates absolute_path was non-empty (line 166 was executed)
+        nested_path_found = any(
+            "::$." in event.get("event", "") and "plugins" in event.get("event", "")
+            for event in warning_events
+        )
+        assert nested_path_found, (
+            "Expected to find nested path in validation errors. "
+            f"Events: {[e.get('event')[:100] for e in warning_events]}"
+        )
+
     # First option tests default behavior.
     # The "--no-lint" flag has no effect as it is the default
     @pytest.mark.parametrize(
