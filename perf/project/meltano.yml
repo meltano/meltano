@@ -1,0 +1,159 @@
+default_environment: dev
+project_id: 019ba0c4-064f-7b15-92ff-60abac4a6a54
+environments:
+- name: dev
+- name: staging
+- name: prod
+send_anonymous_usage_stats: false
+plugins:
+  extractors:
+  # Refresh with:
+  # meltano add tap-mysql --python python3.10 --from-ref path/to/matatika-catalog/matatika-catalog-core/src/main/resources/plugins/extractors/tap-mysql--matatika.yml
+  - name: tap-mysql
+    namespace: tap_mysql
+    python: python3.10
+    label: MySQL - MariaDB
+    variant: matatika
+    docs: ${websiteBaseUrl}/data-details/tap-mysql/
+    repo: https://github.com/Matatika/pipelinewise-tap-mysql
+    pip_url: git+https://github.com/Matatika/pipelinewise-tap-mysql.git@v1.0.0 cryptography
+    description: "MySQL and MariaDB are popular open-source relational database management
+      systems.\n\nMySQL and MariaDB are powerful and flexible database management
+      system that allows users to store, organize, and retrieve data efficiently.
+      It is widely used in web applications and is known for its reliability, scalability,
+      and ease of use. MySQL and MariaDB support a wide range of programming languages
+      and platforms, making it a popular choice for developers and businesses of all
+      sizes. It offers features such as transaction support, replication, and clustering,
+      and can be used for a variety of applications, from small personal projects
+      to large enterprise systems. Overall, MySQL/MariaDB is a versatile and reliable
+      database management system that is widely used in the industry."
+    logo_url: /assets/logos/extractors/mysql.png
+    capabilities:
+    - catalog
+    - discover
+    - state
+    settings_group_validation:
+    - - host
+      - port
+      - user
+      - password
+    settings:
+    - name: host
+      value: localhost
+      label: Host
+      description: The hostname or IP address of the MySQL/MariaDB server.
+      # required: true
+    - name: port
+      kind: integer
+      value: 3306
+      label: Port
+      description: The port number to use for the connection.
+    - name: user
+      label: User
+      description: The username to use for authentication.
+      # required: true
+    - name: password
+      label: Password
+      description: The password to use for authentication.
+      sensitive: true
+      # required: true
+    - name: database
+      label: Database
+      description: The name of the database to connect to.
+    - name: cursorclass
+      label: Cursor Class
+      description: The class to use for the cursor.
+    - name: server_id
+      kind: integer
+      label: Server ID
+      description: The server ID to use for replication.
+    - name: filter_dbs
+      label: Filter DBs
+      description: A list of databases to include or exclude from replication.
+    - name: use_gtid
+      kind: boolean
+      value: false
+      label: Use GTID
+      description: Whether to use global transaction identifiers for replication.
+    - name: engine
+      value: mysql
+      label: Engine
+      description: The storage engine to use for the connection.
+    - name: ssl
+      kind: boolean
+      value: false
+      label: SSL
+      description: Whether to use SSL encryption for the connection.
+      value_post_processor: stringify
+    - name: ssl_ca
+      label: SSL CA
+      description: The path to the SSL CA certificate file.
+    - name: ssl_cert
+      label: SSL Certificate
+      description: The path to the SSL certificate file.
+    - name: ssl_key
+      label: SSL Key
+      description: The path to the SSL key file.
+    - name: internal_hostname
+      label: Internal Hostname
+      description: The internal hostname to use for the connection.
+    - name: session_sqls
+      kind: array
+      value:
+      - SET @@session.time_zone='+0:00'
+      - SET @@session.wait_timeout=28800
+      - SET @@session.net_read_timeout=3600
+      - SET @@session.innodb_lock_wait_timeout=3600
+      label: Session SQLs
+      description: A list of SQL statements to execute when the connection is established.
+    - name: ssh_tunnel.host
+      kind: string
+      label: SSH Tunnel Host
+      description: Address of the bastion host, this is the host we'll connect to
+        via ssh
+    - name: ssh_tunnel.port
+      kind: integer
+      value: 22
+      label: SSH Tunnel Port
+      description: Port to connect to bastion host
+    - name: ssh_tunnel.private_key
+      kind: string
+      label: SSH Tunnel Private Key
+      description: A base64 encoded Private Key for authentication to the bastion
+        host w/ key pair auth
+      sensitive: true
+      # encoding: base64
+    - name: ssh_tunnel.private_key_password
+      kind: string
+      label: SSH Tunnel Private Key Password
+      description: Private Key Password, leave None if no password is set
+      sensitive: true
+    - name: ssh_tunnel.username
+      kind: string
+      label: SSH Tunnel Username
+      description: Username to connect to bastion host
+    - name: ssh_tunnel.password
+      kind: string
+      label: SSH Tunnel Password
+      description: Password to connect to bastion host w/ basic auth
+      sensitive: true
+    - name: ssh_tunnel.host_setting_name
+      value: host
+      hidden: true
+    - name: ssh_tunnel.port_setting_name
+      value: port
+      hidden: true
+    config:
+      host: localhost
+      user: meltano
+      database: testdb
+    metadata:
+      '*':
+        replication-method: FULL_TABLE
+  loaders:
+  - name: target-duckdb
+    variant: jwills
+    pip_url: target-duckdb~=0.8
+version: 1
+venv:
+  backend: uv
