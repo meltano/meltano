@@ -112,6 +112,9 @@ def print_added_plugin(
     if docs_url := plugin.docs:
         click.echo(f"Documentation:\t{docs_url}")
 
+    if plugin.python:
+        click.echo(f"Python Version:\t{plugin.python}")
+
 
 def _prompt_plugin_namespace(plugin_type, plugin_name):  # noqa: ANN001, ANN202
     click.secho(
