@@ -205,6 +205,9 @@ def default_config(
             "asyncio": {
                 "level": logging.INFO,
             },
+            "alembic": {
+                "level": logging.WARNING,
+            },
             # Azure HTTP logs at info level are too noisy; see
             # https://github.com/meltano/meltano/issues/7723
             "azure.core.pipeline.policies.http_logging_policy": {
