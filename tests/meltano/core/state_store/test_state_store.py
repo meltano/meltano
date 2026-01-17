@@ -9,21 +9,21 @@ import moto
 import pytest
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
-from azure.storage.blob._shared.authentication import (
-    SharedKeyCredentialPolicy,
-)
+from azure.storage.blob._shared.authentication import SharedKeyCredentialPolicy
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import NotFound
 from google.cloud.storage import Blob
 
 from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_store import (
     SYSTEMDB,
     DBStateStoreManager,
     MeltanoState,
     StateBackend,
     StateBackendNotFoundError,
+    _settings_to_manager_kwargs,
     state_store_manager_from_project_settings,
 )
 from meltano.core.state_store.azure.backend import AZStorageStateStoreManager
@@ -73,6 +73,54 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
 
         state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(state_store, DummyStateStoreManager)
+
+
+@pytest.mark.parametrize(
+    ("setting", "namespace", "expected"),
+    (
+        pytest.param(
+            SettingDefinition(name="state_backend.custom.username"),
+            "custom",
+            {"username": "test"},
+            id="simple-setting",
+        ),
+        pytest.param(
+            SettingDefinition(name="state_backend.other.username"),
+            "other",
+            {"username": "test"},
+            id="other-namespace",
+        ),
+        pytest.param(
+            SettingDefinition(name="state_backend.custom.has.nested.setting"),
+            "custom",
+            {"setting": "test"},
+            id="nested-tail",
+        ),
+        pytest.param(
+            SettingDefinition(name="state_backend.custom.has.nested.setting"),
+            "custom",
+            {"has": {"nested": {"setting": "test"}}},
+            id="nested-setting",
+            marks=pytest.mark.xfail,
+        ),
+    ),
+)
+def test_settings_to_manager_kwargs(
+    monkeypatch: pytest.MonkeyPatch,
+    project: Project,
+    setting: SettingDefinition,
+    namespace: str,
+    expected: dict[str, t.Any],
+) -> None:
+    project.settings.set(["state_backend", "uri"], "custom://")
+    monkeypatch.setattr(project.config_service.addon, "get_all", lambda: [setting])
+    project.settings.set(setting.name, "test")
+
+    kwargs = _settings_to_manager_kwargs(settings=project.settings, namespace=namespace)
+    assert kwargs.pop("uri") == "custom://"
+    assert kwargs.pop("lock_timeout_seconds") is not None
+    assert kwargs.pop("lock_retry_seconds") is not None
+    assert kwargs == expected
 
 
 class TestSystemDBStateBackend:
@@ -170,15 +218,22 @@ class TestGCSStateBackend:
     @pytest.fixture
     def manager(self, project: Project) -> GCSStateStoreManager:
         project.settings.set(["state_backend", "uri"], "gs://my-bucket")
+        project.settings.unset(["state_backend", "gcs", "application_credentials_json"])
+        project.settings.unset(["state_backend", "gcs", "application_credentials_path"])
         return state_store_manager_from_project_settings(project.settings)
 
     def test_manager_from_settings(self, project: Project) -> None:
         # GCS
         project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
+        project.settings.set(
+            ["state_backend", "gcs", "application_credentials_path"],
+            "path/to/credentials.json",
+        )
         gs_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(gs_state_store, GCSStateStoreManager)
         assert gs_state_store.bucket == "some_container"
         assert gs_state_store.prefix == "/some/path"
+        assert gs_state_store.application_credentials_path == "path/to/credentials.json"
 
     def test_delete_error(
         self,
