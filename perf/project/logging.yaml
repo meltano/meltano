@@ -1,0 +1,19 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  structured_plain_no_locals:
+    (): meltano.core.logging.console_log_formatter
+    colors: false
+    show_locals: false
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: structured_plain_no_locals
+    stream: "ext://sys.stderr"
+
+root:
+  level: INFO
+  handlers: [console]
