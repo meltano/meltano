@@ -1,7 +1,30 @@
-# CHANGELOG
+## v4.0.9 (2026-01-19)
 
-All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
+### ✨ New
+
+- [#9686](https://github.com/meltano/meltano/issues/9686) Remove stale tables used by long-removed UI/API
+
+### 🐛 Fixes
+
+- [#9744](https://github.com/meltano/meltano/issues/9744) Handle `python` attribute when present in plugin YAML added with `meltano add <name> --from-ref ...`
+- [#9734](https://github.com/meltano/meltano/issues/9734) Filter out Alembic logs of level INFO and below
+- [#9732](https://github.com/meltano/meltano/issues/9732) Bump virtualenv from 20.35.4 to 20.36.1
+
+### ⚙️ Under the Hood
+
+- [#9710](https://github.com/meltano/meltano/issues/9710) Enable Ruff `EXE`, `FA`, `FLY`, `FURB` and `SLOT` rules
+- [#9698](https://github.com/meltano/meltano/issues/9698) Add more type-safety to settings management
+- [#9697](https://github.com/meltano/meltano/issues/9697) Use explicit package names to load resource files (e.g. `initialize.yml`) instead of unreliable `__package__`
+
+### 📚 Documentation Improvements
+
+- [#9729](https://github.com/meltano/meltano/issues/9729) Lock file maintenance
+- [#9717](https://github.com/meltano/meltano/issues/9717) Update docs mentioning how to publish a custom plugin to Meltano Hub
+- [#9707](https://github.com/meltano/meltano/issues/9707) Fix `meltano config <plugin>` examples to use the correct syntax `meltano config print <plugin>`
+
+### 📦 Packaging changes
+
+- [#9711](https://github.com/meltano/meltano/issues/9711) Removed license classifier made redundant by PEP 639
 
 ## v4.0.8 (2025-12-17)
 
