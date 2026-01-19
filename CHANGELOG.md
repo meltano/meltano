@@ -1,8 +1,9 @@
+# CHANGELOG
+
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
+
 ## v4.0.9 (2026-01-19)
-
-### ✨ New
-
-- [#9686](https://github.com/meltano/meltano/issues/9686) Remove stale tables used by long-removed UI/API
 
 ### 🐛 Fixes
 
