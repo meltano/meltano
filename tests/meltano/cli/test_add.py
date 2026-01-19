@@ -690,35 +690,26 @@ class TestCliAdd:
                 install_plugin_mock.assert_not_called()
 
     @pytest.mark.parametrize(
-        "ref",
+        ("ref", "expected_python"),
         (
-            plugin_ref,
-            plugin_ref_with_python,
-            (
-                "https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/"
-                f"{plugin_ref.relative_to(plugins_dir)}"
-            ),
+            (plugin_ref, None),
+            (plugin_ref_with_python, "3.12"),
         ),
         ids=(
             "local",
             "local with python",
-            "remote",
         ),
     )
     @pytest.mark.usefixtures("reset_project_context")
     @mock.patch("meltano.cli.params.install_plugins")
-    @mock.patch("meltano.cli.add.requests.get")
-    def test_add_from_ref(
+    def test_add_from_local_ref(
         self,
-        ref_request_mock,
-        install_plugin_mock,
-        ref,
-        project,
-        cli_runner,
+        install_plugin_mock: mock.AsyncMock,
+        ref: str,
+        expected_python: str | None,
+        project: Project,
+        cli_runner: CliRunner,
     ) -> None:
-        ref_request_mock.return_value.status_code = 200
-        ref_request_mock.return_value.text = plugin_ref.read_text()
-
         install_plugin_mock.return_value = True
 
         plugin_name = plugin_ref.parent.name
@@ -744,6 +735,64 @@ class TestCliAdd:
         )
         assert plugin.name == plugin_name
         assert plugin.variant == "test"
+        assert plugin.python == expected_python
+
+        assert install_plugin_mock.call_count == 1
+        assert install_plugin_mock.call_args.args[0] == project
+        assert install_plugin_mock.call_args.args[1] == [plugin]
+        assert install_plugin_mock.call_args.kwargs["reason"] == PluginInstallReason.ADD
+        assert install_plugin_mock.call_args.kwargs["force"] is False
+
+    @pytest.mark.usefixtures("reset_project_context")
+    @mock.patch("meltano.cli.params.install_plugins")
+    @mock.patch("meltano.cli.add.requests.get")
+    def test_add_from_remote_ref(
+        self,
+        ref_request_mock: mock.MagicMock,
+        install_plugin_mock: mock.AsyncMock,
+        project: Project,
+        cli_runner: CliRunner,
+    ) -> None:
+        ref_request_mock.return_value.status_code = 200
+        ref_request_mock.return_value.text = plugin_ref.read_text()
+
+        install_plugin_mock.return_value = True
+
+        plugin_name = plugin_ref.parent.name
+        plugin_type = PluginType(plugin_ref.parents[1].name)
+
+        ref = f"https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/{plugin_ref.relative_to(plugins_dir)}"
+
+        res = cli_runner.invoke(
+            cli,
+            [
+                "add",
+                f"--plugin-type={plugin_type.singular}",
+                plugin_name,
+                "--from-ref",
+                ref,
+            ],
+        )
+        assert_cli_runner(res)
+
+        assert f"Added {plugin_type.singular} '{plugin_name}'" in res.output
+
+        plugin = project.plugins.find_plugin(
+            plugin_name,
+            plugin_type=plugin_type,
+        )
+        assert plugin.name == plugin_name
+        assert plugin.variant == "test"
+
+        assert install_plugin_mock.call_count == 1
+        assert install_plugin_mock.call_args.args[0] == project
+        assert install_plugin_mock.call_args.args[1] == [plugin]
+        assert install_plugin_mock.call_args.kwargs["reason"] == PluginInstallReason.ADD
+        assert install_plugin_mock.call_args.kwargs["force"] is False
+
+        assert ref_request_mock.call_count == 1
+        assert ref_request_mock.call_args.args[0] == ref
+        assert isinstance(ref_request_mock.call_args.kwargs["timeout"], int)
 
     @pytest.mark.usefixtures("reset_project_context")
     @pytest.mark.parametrize(
