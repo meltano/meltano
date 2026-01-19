@@ -26,6 +26,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
+plugin_ref_with_python = plugins_dir / "extractors" / "tap-custom" / "has_python.yml"
 fails_on_windows = pytest.mark.xfail(
     platform.system() == "Windows",
     reason="Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -692,6 +693,7 @@ class TestCliAdd:
         "ref",
         (
             plugin_ref,
+            plugin_ref_with_python,
             (
                 "https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/"
                 f"{plugin_ref.relative_to(plugins_dir)}"
@@ -699,6 +701,7 @@ class TestCliAdd:
         ),
         ids=(
             "local",
+            "local with python",
             "remote",
         ),
     )
