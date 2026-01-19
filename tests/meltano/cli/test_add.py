@@ -199,10 +199,10 @@ class TestCliAdd:
         )
         assert_cli_runner(res)
 
-        with project.root_dir("transform/packages.yml").open() as packages_file:
+        with project.dirs.root_dir("transform/packages.yml").open() as packages_file:
             packages_yaml = yaml.safe_load(packages_file)
 
-        with project.root_dir("transform/dbt_project.yml").open() as project_file:
+        with project.dirs.root_dir("transform/dbt_project.yml").open() as project_file:
             project_yaml = yaml.safe_load(project_file)
 
         assert {
@@ -245,7 +245,7 @@ class TestCliAdd:
         # File has been created
         assert "Created orchestrate/dags/meltano.py" in output
 
-        file_path = project.root_dir("orchestrate/dags/meltano.py")
+        file_path = project.dirs.root_dir("orchestrate/dags/meltano.py")
         assert file_path.is_file()
 
         # File has "managed" header
@@ -270,7 +270,7 @@ class TestCliAdd:
         # File has been created
         assert "Created docker-compose.yml" in output
 
-        file_path = project.root_dir("docker-compose.yml")
+        file_path = project.dirs.root_dir("docker-compose.yml")
         assert file_path.is_file()
 
         # File does not have "managed" header
@@ -279,8 +279,8 @@ class TestCliAdd:
     @fails_on_windows
     def test_add_files_that_already_exists(self, project: Project, cli_runner) -> None:
         # dbt lockfile was created in an upstream test. Need to remove.
-        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
-        project.root_dir("transform/dbt_project.yml").write_text("Exists!")
+        shutil.rmtree(project.dirs.root_dir("plugins/files"), ignore_errors=True)
+        project.dirs.root_dir("transform/dbt_project.yml").write_text("Exists!")
         result = cli_runner.invoke(cli, ["add", "--plugin-type=files", "dbt"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
@@ -290,7 +290,7 @@ class TestCliAdd:
             in output
         )
         assert "Created transform/dbt_project (dbt).yml" in output
-        assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
+        assert project.dirs.root_dir("transform/dbt_project (dbt).yml").is_file()
 
     def test_add_missing(self, project: Project, cli_runner) -> None:
         res = cli_runner.invoke(cli, ["add", "--plugin-type=extractor", "tap-unknown"])
@@ -357,7 +357,7 @@ class TestCliAdd:
             project.plugins.remove_from_file(tap)
 
         # Remove all lockfiles
-        shutil.rmtree(project.root_plugins_dir(), ignore_errors=True)
+        shutil.rmtree(project.dirs.root_plugins(), ignore_errors=True)
 
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -655,7 +655,7 @@ class TestCliAdd:
                 assert plugin.variant == default_variant
 
                 # check plugin lock file is added
-                plugins_dir = project.root_dir("plugins")
+                plugins_dir = project.dirs.root_plugins()
                 assert plugins_dir.joinpath(
                     f"{plugin_type}/{plugin_name}--{default_variant}.lock",
                 ).exists()
