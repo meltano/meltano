@@ -104,18 +104,21 @@ class TestCompile:
         self,
         project: Project,
         cli_runner: CliRunner,
-        monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
         log: StructuredLogCapture,
     ) -> None:
+        """Test schema validation warnings for root-level errors.
+
+        This test verifies that root-level schema violations (like adding
+        'invalid_key' at the top level) are reported with the '::$' format,
+        indicating the error is at the document root.
+        """
         original_yaml_load = manifest.yaml.load
 
         def patch(*args, **kwargs):
             project_files = original_yaml_load(*args, **kwargs)
             project_files["invalid_key"] = None
             return project_files
-
-        monkeypatch.setenv("NO_COLOR", "1")
 
         with mock.patch.object(manifest.yaml, "load", side_effect=patch):
             result = cli_runner.invoke(
@@ -180,10 +183,15 @@ class TestCompile:
     def test_warn_nested_schema_violation(
         self,
         cli_runner: CliRunner,
-        monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
         log: StructuredLogCapture,
     ) -> None:
+        """Test schema validation warnings for nested path errors.
+
+        This test verifies that nested schema violations (like adding a plugin
+        with an invalid 'name' type) are reported with the '::$.<path>' format,
+        indicating the full JSON path to the error location.
+        """
         original_yaml_load = manifest.yaml.load
 
         def patch(*args, **kwargs):
@@ -198,26 +206,30 @@ class TestCompile:
             project_files["plugins"]["extractors"].append({"name": 12345})
             return project_files
 
-        monkeypatch.setenv("NO_COLOR", "1")
-
         with mock.patch.object(manifest.yaml, "load", side_effect=patch):
             result = cli_runner.invoke(
                 cli,
                 ("--environment=dev", "compile", "--lint", f"--directory={tmp_path}"),
             )
         assert result.exit_code == 0
-        # Verify that we logged warnings about schema violations
-        warning_events = [e for e in log.events if e.get("level") == "warning"]
-        assert len(warning_events) >= 1
-        # Check that at least one warning contains a nested path (with ::$.)
-        # This format indicates absolute_path was non-empty (line 166 was executed)
+        # Filter to schema validation warnings specifically
+        schema_warnings = [
+            e
+            for e in log.events
+            if e.get("level") == "warning"
+            and "Failed to validate" in e.get("event", "")
+        ]
+        assert len(schema_warnings) >= 1, (
+            "Expected at least one schema validation warning"
+        )
+        # Check that the warning contains a nested path (with ::$.)
         nested_path_found = any(
             "::$." in event.get("event", "") and "plugins" in event.get("event", "")
-            for event in warning_events
+            for event in schema_warnings
         )
         assert nested_path_found, (
             "Expected to find nested path in validation errors. "
-            f"Events: {[e.get('event')[:100] for e in warning_events]}"
+            f"Events: {[e.get('event')[:100] for e in schema_warnings]}"
         )
 
     # First option tests default behavior.
