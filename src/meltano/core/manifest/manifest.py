@@ -51,6 +51,7 @@ logger = structlog.getLogger(__name__)
 
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
 MANIFEST_SCHEMA_PATH = resources.files(schemas) / "meltano.schema.json"
+SCHEMA_VALIDATION_LOG_PREFIX = "Failed to validate"
 
 Trie: t.TypeAlias = dict[str, "Trie"]
 PluginsByType: t.TypeAlias = Mapping[str, list[Mapping[str, t.Any]]]
@@ -166,7 +167,7 @@ class Manifest:
     ) -> None:
         errors = sorted(
             self._schema_validator.iter_errors(instance_data),
-            key=lambda e: list(e.absolute_path),
+            key=lambda e: tuple(str(p) for p in e.absolute_path),
         )
 
         if errors:
@@ -180,8 +181,8 @@ class Manifest:
 
             formatted_errors = "\n".join(error_messages)
             logger.warning(
-                f"Failed to validate {instance_name} against Meltano manifest "  # noqa: G004
-                f"schema ({MANIFEST_SCHEMA_PATH}):\n{formatted_errors}",
+                f"{SCHEMA_VALIDATION_LOG_PREFIX} {instance_name} against Meltano "  # noqa: G004
+                f"manifest schema ({MANIFEST_SCHEMA_PATH}):\n{formatted_errors}",
             )
 
     @cached_property

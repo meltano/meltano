@@ -23,6 +23,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 schema_path = manifest.MANIFEST_SCHEMA_PATH
+schema_validation_log_prefix = manifest.SCHEMA_VALIDATION_LOG_PREFIX
 
 SECURE_VALUE = "a-very-secure-value"
 
@@ -40,7 +41,8 @@ def get_schema_warnings(log: StructuredLogCapture) -> list[dict[str, t.Any]]:
     return [
         e
         for e in log.events
-        if e.get("level") == "warning" and "Failed to validate" in e.get("event", "")
+        if e.get("level") == "warning"
+        and schema_validation_log_prefix in e.get("event", "")
     ]
 
 
