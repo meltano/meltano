@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import typing as t
 from pathlib import Path
@@ -32,6 +33,15 @@ def check_indent(json_path: Path, indent: int) -> None:
     # `json.dumps` should produce the same text, usually. This isn't true in
     # general, but it's sufficient for our use in the tests here.
     assert json.dumps(json.loads(text), indent=indent if indent > 0 else None) == text
+
+
+def get_schema_warnings(log: StructuredLogCapture) -> list[dict[str, t.Any]]:
+    """Return schema validation warning log events."""
+    return [
+        e
+        for e in log.events
+        if e.get("level") == "warning" and "Failed to validate" in e.get("event", "")
+    ]
 
 
 class TestCompile:
@@ -167,10 +177,7 @@ class TestCompile:
         )
         assert result.exit_code == 0
         # Verify that no schema validation warnings were logged
-        warning_events = [e for e in log.events if e.get("level") == "warning"]
-        schema_warnings = [
-            e for e in warning_events if "Failed to validate" in e.get("event", "")
-        ]
+        schema_warnings = get_schema_warnings(log)
         assert len(schema_warnings) == 0, (
             "Expected no schema validation warnings for valid project, "
             f"but found: {[e.get('event')[:100] for e in schema_warnings]}"
@@ -213,23 +220,21 @@ class TestCompile:
             )
         assert result.exit_code == 0
         # Filter to schema validation warnings specifically
-        schema_warnings = [
-            e
-            for e in log.events
-            if e.get("level") == "warning"
-            and "Failed to validate" in e.get("event", "")
-        ]
+        schema_warnings = get_schema_warnings(log)
         assert len(schema_warnings) >= 1, (
             "Expected at least one schema validation warning"
         )
-        # Check that the warning contains a nested path (with ::$.)
+        # Check that the warning contains the full nested JSON path.
+        # The path should match: ::$.plugins.extractors.<index>.name
+        # where <index> depends on existing extractors in the project fixture.
+        expected_pattern = r"::\$\.plugins\.extractors\.\d+\.name"
         nested_path_found = any(
-            "::$." in event.get("event", "") and "plugins" in event.get("event", "")
+            re.search(expected_pattern, event.get("event", ""))
             for event in schema_warnings
         )
         assert nested_path_found, (
-            "Expected to find nested path in validation errors. "
-            f"Events: {[e.get('event')[:100] for e in schema_warnings]}"
+            f"Expected to find pattern '{expected_pattern}' in validation errors. "
+            f"Events: {[e.get('event') for e in schema_warnings]}"
         )
 
     # First option tests default behavior.

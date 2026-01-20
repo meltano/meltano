@@ -148,9 +148,15 @@ class Manifest:
         self._env_locations = meltano_config_env_locations(self._manifest_schema)
 
     @cached_property
-    def _schema_validator(self) -> jsonschema.Draft7Validator:
-        """Return a cached Draft7Validator for the manifest schema."""
-        return jsonschema.Draft7Validator(self._manifest_schema)
+    def _schema_validator(self) -> jsonschema.protocols.Validator:
+        """Return a cached validator for the manifest schema.
+
+        The validator class is automatically determined from the schema's
+        $schema field using jsonschema.validators.validator_for().
+        """
+        validator_cls = jsonschema.validators.validator_for(self._manifest_schema)
+        validator_cls.check_schema(self._manifest_schema)
+        return validator_cls(self._manifest_schema)
 
     def _validate_against_manifest_schema(
         self,
@@ -158,7 +164,10 @@ class Manifest:
         instance_path: Path,
         instance_data: dict[str, t.Any],
     ) -> None:
-        errors = list(self._schema_validator.iter_errors(instance_data))
+        errors = sorted(
+            self._schema_validator.iter_errors(instance_data),
+            key=lambda e: list(e.absolute_path),
+        )
 
         if errors:
             error_messages = ["Schema validation errors were encountered."]
