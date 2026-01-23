@@ -56,6 +56,9 @@ updates:
       interval: weekly
     labels: [dependencies]
     groups:
+      docusaurus:
+        patterns:
+          - "docusaurus/**"
       development-dependencies:
         dependency-type: development
       runtime-dependencies:
