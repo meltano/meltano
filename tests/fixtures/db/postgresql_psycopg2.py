@@ -28,7 +28,7 @@ def engine_uri(worker_id: str) -> str:
     database = f"{os.getenv('POSTGRES_DB', 'pytest_meltano')}_{worker_id}"
 
     # create the database
-    engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
+    engine_uri = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/postgres"
     engine = create_engine(
         engine_uri,
         isolation_level="AUTOCOMMIT",
@@ -37,4 +37,4 @@ def engine_uri(worker_id: str) -> str:
     )
     recreate_database(engine, database)
 
-    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
+    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
