@@ -1,6 +1,6 @@
 services:
   postgres:
-    # NOTE: Support for PostgreSQL 14 ends on Nov 2026, bump to 14 after that
+    # NOTE: Support for PostgreSQL 14 ends on Nov 2026
     # https://endoflife.date/postgresql
     image: postgres:14
     container_name: postgres
