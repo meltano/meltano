@@ -58,15 +58,15 @@ updates:
     groups:
       docusaurus:
         patterns:
-          - "docusaurus/**"
+          - "@docusaurus/**"
       development-dependencies:
         dependency-type: development
         exclude-patterns:
-          - "docusaurus/**"
+          - "@docusaurus/**"
       runtime-dependencies:
         dependency-type: production
         exclude-patterns:
-          - "docusaurus/**"
+          - "@docusaurus/**"
         update-types:
         - "minor"
         - "patch"
