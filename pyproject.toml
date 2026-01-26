@@ -3,7 +3,7 @@ name = "meltano"
 version = "4.0.9"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
-requires-python = ">=3.10,<3.16"
+requires-python = ">=3.10"
 readme = "README.md"
 license = "MIT"
 license-files = [
