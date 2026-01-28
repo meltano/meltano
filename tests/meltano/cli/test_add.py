@@ -15,8 +15,11 @@ from fixtures.cli import plugins_dir
 from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
+from meltano.core.plugin.base import PluginDefinition
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
+from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.utils.python_compatibility import get_current_python_version
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
@@ -655,7 +658,7 @@ class TestCliAdd:
                 assert plugin.variant == default_variant
 
                 # check plugin lock file is added
-                plugins_dir = project.dirs.root_plugins()
+                plugins_dir = project.dirs.root_dir("plugins")
                 assert plugins_dir.joinpath(
                     f"{plugin_type}/{plugin_name}--{default_variant}.lock",
                 ).exists()
@@ -1021,3 +1024,207 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
                 force=False,
             )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_with_python_version_auto_selection(
+        self,
+        project: Project,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that Python version is auto-selected when not supported."""
+        # Set supported versions to older versions to trigger auto-selection
+        # If current version is in our test list, use different versions
+        supported_versions = ["3.8", "3.9"]
+
+        mock_variant = Variant(
+            name="meltano",
+            pip_url="tap-example",
+            supported_python_versions=supported_versions,
+        )
+
+        mock_definition = PluginDefinition(
+            plugin_type=PluginType.EXTRACTORS,
+            name="tap-example",
+            namespace="tap_example",
+            variant="meltano",
+            variants=[mock_variant],
+        )
+
+        # Create a BasePlugin from the definition
+        mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
+
+        with mock.patch(
+            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+        ) as mock_get_base:
+            mock_get_base.return_value = mock_base_plugin
+
+            with mock.patch("meltano.cli.params.install_plugins") as install_mock:
+                install_mock.return_value = True
+                res = cli_runner.invoke(
+                    cli,
+                    ["add", "extractor", "tap-example"],
+                )
+
+                assert res.exit_code == 0, res.stdout
+                plugin = project.plugins.find_plugin(
+                    "tap-example",
+                    plugin_type=PluginType.EXTRACTORS,
+                )
+
+                # Should auto-select the highest supported version
+                highest_version = supported_versions[-1]
+                assert plugin.python == f"python{highest_version}"
+                assert f"Python Version:\tpython{highest_version}" in res.stdout
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_with_supported_python_version(
+        self,
+        project: Project,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that Python version is not auto-selected when supported."""
+        from meltano.core.plugin.base import PluginDefinition, Variant
+        from meltano.core.plugin.factory import base_plugin_factory
+
+        # Create a mock plugin definition with current version in supported list
+        current_version = get_current_python_version()
+
+        mock_variant = Variant(
+            name="meltano",
+            pip_url="tap-example",
+            supported_python_versions=[current_version, "3.10", "3.11"],
+        )
+
+        mock_definition = PluginDefinition(
+            plugin_type=PluginType.EXTRACTORS,
+            name="tap-example",
+            namespace="tap_example",
+            variant="meltano",
+            variants=[mock_variant],
+        )
+
+        # Create a BasePlugin from the definition
+        mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
+
+        with mock.patch(
+            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+        ) as mock_get_base:
+            mock_get_base.return_value = mock_base_plugin
+
+            with mock.patch("meltano.cli.params.install_plugins") as install_mock:
+                install_mock.return_value = True
+                res = cli_runner.invoke(
+                    cli,
+                    ["add", "extractor", "tap-example"],
+                )
+
+                assert res.exit_code == 0, res.stdout
+                plugin = project.plugins.find_plugin(
+                    "tap-example",
+                    plugin_type=PluginType.EXTRACTORS,
+                )
+
+                # Should not set python property
+                assert plugin.python is None
+                assert "not supported" not in res.stdout
+                assert "Automatically configured" not in res.stdout
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_with_explicit_python_flag(
+        self,
+        project: Project,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that explicit --python flag overrides auto-selection."""
+        from meltano.core.plugin.base import PluginDefinition, Variant
+        from meltano.core.plugin.factory import base_plugin_factory
+
+        # Create a mock plugin definition with restricted Python versions
+        mock_variant = Variant(
+            name="meltano",
+            pip_url="tap-example",
+            supported_python_versions=["3.8", "3.9"],
+        )
+
+        mock_definition = PluginDefinition(
+            plugin_type=PluginType.EXTRACTORS,
+            name="tap-example",
+            namespace="tap_example",
+            variant="meltano",
+            variants=[mock_variant],
+        )
+
+        # Create a BasePlugin from the definition
+        mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
+
+        with mock.patch(
+            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+        ) as mock_get_base:
+            mock_get_base.return_value = mock_base_plugin
+
+            with mock.patch("meltano.cli.params.install_plugins") as install_mock:
+                install_mock.return_value = True
+                res = cli_runner.invoke(
+                    cli,
+                    ["add", "extractor", "tap-example", "--python", "python3.10"],
+                )
+
+                assert res.exit_code == 0, res.stdout
+                plugin = project.plugins.find_plugin(
+                    "tap-example",
+                    plugin_type=PluginType.EXTRACTORS,
+                )
+
+                # Should use explicit value, not auto-selected
+                assert plugin.python == "python3.10"
+                assert "Automatically configured" not in res.stdout
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_with_no_python_restrictions(
+        self,
+        project: Project,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test plugin with no Python version restrictions."""
+        from meltano.core.plugin.base import PluginDefinition, Variant
+        from meltano.core.plugin.factory import base_plugin_factory
+
+        # Create a mock plugin definition without supported_python_versions
+        mock_variant = Variant(
+            name="meltano",
+            pip_url="tap-example",
+            # No supported_python_versions set
+        )
+
+        mock_definition = PluginDefinition(
+            plugin_type=PluginType.EXTRACTORS,
+            name="tap-example",
+            namespace="tap_example",
+            variant="meltano",
+            variants=[mock_variant],
+        )
+
+        # Create a BasePlugin from the definition
+        mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
+
+        with mock.patch(
+            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+        ) as mock_get_base:
+            mock_get_base.return_value = mock_base_plugin
+
+            with mock.patch("meltano.cli.params.install_plugins") as install_mock:
+                install_mock.return_value = True
+                res = cli_runner.invoke(
+                    cli,
+                    ["add", "extractor", "tap-example"],
+                )
+
+                assert res.exit_code == 0, res.stdout
+                plugin = project.plugins.find_plugin(
+                    "tap-example",
+                    plugin_type=PluginType.EXTRACTORS,
+                )
+
+                # Should not set python property
+                assert plugin.python is None
+                assert "not supported" not in res.stdout

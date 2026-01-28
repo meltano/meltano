@@ -6,9 +6,12 @@ import enum
 import sys
 import typing as t
 
+import structlog
+
 from meltano.core.plugin import BasePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.utils.python_compatibility import determine_plugin_python_version
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -19,6 +22,8 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin import PluginType
     from meltano.core.project import Project
     from meltano.core.project_plugins_service import AddedPluginFlags
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginAddedReason(StrEnum):
@@ -82,6 +87,20 @@ class ProjectAddService:
         if isinstance(parent, BasePlugin):
             plugin.variant = parent.variant
             plugin.pip_url = parent.pip_url
+
+            # Auto-configure Python version if current version is not supported
+            # Only auto-set if user didn't explicitly provide --python flag
+            if (
+                (attrs.get("python") is None)  # User didn't explicitly provide --python
+                and (python_version := determine_plugin_python_version(parent._variant))
+            ):
+                plugin.python = python_version
+                logger.warning(
+                    "The current Python version is not supported by this plugin. "
+                    "Automatically configured to use %s instead.",
+                    python_version,
+                    name=plugin.name,
+                )
 
         plugin, flags = self.project.plugins.add_to_file_with_flags(
             plugin,

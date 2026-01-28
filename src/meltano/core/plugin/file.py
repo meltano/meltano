@@ -67,7 +67,7 @@ class FilePlugin(BasePlugin):
         # This ignores plugin inheritance, but that's fine because the file contents
         # are bundled with the package, so they should be the same for all plugins that
         # share a pip_url.
-        venv = VirtualEnv(project.plugin_dir(self, "venv"))  # type: ignore[arg-type,deprecated]
+        venv = VirtualEnv(project.dirs.plugin(self, "venv"))  # type: ignore[arg-type]
         bundle_dir = venv.site_packages_dir / "bundle"
 
         return {
@@ -149,7 +149,7 @@ class FilePlugin(BasePlugin):
         Returns:
             True if the file was written, False otherwise.
         """
-        project_path = project.root_dir(relative_path)  # type: ignore[deprecated]
+        project_path = project.dirs.root_dir(relative_path)
         if project_path.exists() and project_path.read_text() == content:
             return False
 
@@ -194,7 +194,7 @@ class FilePlugin(BasePlugin):
         """
 
         def rename_if_exists(relative_path: Path) -> Path:
-            if not project.root_dir(relative_path).exists():  # type: ignore[deprecated]
+            if not project.dirs.root_dir(relative_path).exists():
                 return relative_path
 
             logger.info(
