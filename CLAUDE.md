@@ -21,11 +21,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Install with extras: `uv sync --extra=azure --extra=gcs --extra=s3 --extra=postgres --extra=mssql`
 
 ### Testing
+- Run specific test: `uv run pytest tests/path/to/test.py::test_function`
 - Run all tests: `nox -t test` or `nox -s pytest`
 - Run tests with coverage: `nox -s pytest` (coverage included by default)
 - Generate coverage report: `nox -s coverage -- report --show-missing`
 - Run with specific backend: `PYTEST_BACKEND=postgresql nox -s pytest`
-- Run specific test: `pytest tests/path/to/test.py::test_function`
 
 ### Linting and Formatting
 - Run all linting: `nox -t lint` or `nox -s pre-commit`
