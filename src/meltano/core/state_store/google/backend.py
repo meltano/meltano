@@ -23,7 +23,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class GCSStateStoreManager(CloudStateStoreManager):
     """State backend for Google Cloud Storage."""
 
-    label: str = "Google Cloud Storage"
+    label = "Google Cloud Storage"
 
     def __init__(
         self,
