@@ -77,6 +77,16 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
 
 @pytest.mark.parametrize(
     ("setting", "namespace", "expected"),
+    # NOTE: The "nested-setting" parametrized case below is currently xfail because
+    # `_settings_to_manager_kwargs` does *not* yet support materializing dotted
+    # setting names into nested dictionaries.
+    #
+    # Current contract:
+    # - Backends may rely on only the last path component (`parts[-1]`) being used
+    #   as the key in the kwargs dict, i.e. settings remain "flattened".
+    #
+    # If/when nested settings are supported, update `_settings_to_manager_kwargs`
+    # to materialize nested dicts and convert that xfail case into a passing test.
     (
         pytest.param(
             SettingDefinition(name="state_backend.custom.username"),
@@ -101,7 +111,14 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
             "custom",
             {"has": {"nested": {"setting": "test"}}},
             id="nested-setting",
-            marks=pytest.mark.xfail,
+            marks=pytest.mark.xfail(
+                reason=(
+                    "Nested settings are not yet supported; "
+                    "`_settings_to_manager_kwargs` only exposes the last path "
+                    "component as the key. See comment above for the intended contract."
+                ),
+                strict=True,
+            ),
         ),
     ),
 )
