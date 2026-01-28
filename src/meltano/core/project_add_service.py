@@ -90,8 +90,10 @@ class ProjectAddService:
 
             # Auto-configure Python version if current version is not supported
             # Only auto-set if user didn't explicitly provide --python flag
-            if (attrs.get("python") is None) and (
-                python_version := determine_plugin_python_version(parent._variant)
+            if (
+                (attrs.get("python") is None)
+                and parent._variant is not None
+                and (python_version := determine_plugin_python_version(parent._variant))
             ):
                 plugin.python = python_version
                 logger.warning(
