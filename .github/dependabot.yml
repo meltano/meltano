@@ -56,10 +56,17 @@ updates:
       interval: weekly
     labels: [dependencies]
     groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/**"
       development-dependencies:
         dependency-type: development
+        exclude-patterns:
+          - "@docusaurus/**"
       runtime-dependencies:
         dependency-type: production
+        exclude-patterns:
+          - "@docusaurus/**"
         update-types:
         - "minor"
         - "patch"

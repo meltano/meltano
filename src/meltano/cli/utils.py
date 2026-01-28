@@ -309,6 +309,7 @@ def add_plugin(  # noqa: ANN201
 
         plugin_name = plugin_attrs.pop("name")
         variant = plugin_attrs.pop("variant", variant)
+        python = plugin_attrs.pop("python", python)
 
     try:
         plugin, flags = add_service.add_with_flags(

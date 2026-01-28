@@ -1,9 +1,9 @@
 [project]
 name = "meltano"
-version = "4.0.8"
+version = "4.0.9"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
-requires-python = ">=3.10,<3.16"
+requires-python = ">=3.10"
 readme = "README.md"
 license = "MIT"
 license-files = [
@@ -46,7 +46,7 @@ dependencies = [
   "pyyaml>=6.0.2,<7",
   "requests>=2.32.3,<3",
   "rich>=14.0,<14.3",
-  "ruamel.yaml>=0.18.6,<0.19",
+  "ruamel.yaml>=0.18.6,<0.20",
   "smart-open>=7.0.5,<8",
   "snowplow-tracker>=1.0.4,<2",
   "sqlalchemy>=2.0.35,<2.1",
@@ -251,7 +251,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.0.8"
+version = "4.0.9"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
@@ -463,4 +463,8 @@ ignore = [
 ]
 
 [tool.uv]
-required-version = ">=0.6.15"
+override-dependencies = [
+  "sqlalchemy>=2.0.0.dev0,<2.2",
+]
+prerelease = "if-necessary-or-explicit"
+required-version = ">=0.9.17"

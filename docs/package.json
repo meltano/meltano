@@ -1,7 +1,7 @@
 {
   "name": "docs.meltano.com",
   "license": "MIT",
-  "version": "4.0.8",
+  "version": "4.0.9",
   "description": "https://meltano.com",
   "private": true,
   "scripts": {
@@ -44,7 +44,7 @@
     "eslint-config-wesbos": "^4.3.2",
     "eslint-plugin-react": "^7.37.5",
     "postcss-import": "^16.1.1",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.0",
     "sass": "^1.97.1",
     "tailwindcss": "^3.4.19"
   },
