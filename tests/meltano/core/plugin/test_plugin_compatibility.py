@@ -165,6 +165,36 @@ class TestPluginCompatibility:
         # The requires_meltano should be in the first variant
         assert plugin_def.variants[0].requires_meltano == ">=3.5.0"
 
+    def test_standalone_from_variant_preserves_supported_python_versions(self):
+        """Test that StandalonePlugin.from_variant preserves supported_python_versions."""  # noqa: E501
+        variant = Variant(
+            name="test-variant",
+            supported_python_versions=["3.11", "3.12"],
+        )
+        plugin_def = PluginDefinition(
+            PluginType.EXTRACTORS,
+            "tap-test",
+            "tap_test",
+        )
+        standalone = StandalonePlugin.from_variant(variant, plugin_def)
+        assert standalone.supported_python_versions == ["3.11", "3.12"]
+
+    def test_definition_from_standalone_preserves_supported_python_versions(self):
+        """Test that PluginDefinition.from_standalone preserves supported_python_versions."""  # noqa: E501
+        standalone = StandalonePlugin(
+            plugin_type="extractors",
+            name="tap-test",
+            namespace="tap_test",
+            supported_python_versions=["3.10", "3.11", "3.12"],
+        )
+        plugin_def = PluginDefinition.from_standalone(standalone)
+        # The supported_python_versions should be in the first variant
+        assert plugin_def.variants[0].supported_python_versions == [
+            "3.10",
+            "3.11",
+            "3.12",
+        ]
+
     def test_lockfile_serialization_includes_requires_meltano(self, project):
         """Test that plugin lockfiles include requires_meltano field."""
         # Create a plugin with requires_meltano
@@ -285,6 +315,7 @@ class TestPluginCompatibility:
         )
 
         canonical_data = plugin.canonical()
+        assert isinstance(canonical_data, dict)
         assert canonical_data["requires_meltano"] == ">=1.0.0"
 
     def test_json_schema_validates_plugin_requires_meltano(self):

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
 import typing as t
 from collections import defaultdict
 from collections.abc import Mapping
@@ -12,8 +11,8 @@ from contextlib import suppress
 from functools import cached_property, reduce
 from importlib import resources
 from operator import getitem
-from tempfile import NamedTemporaryFile
 
+import jsonschema
 import structlog
 import yaml
 
@@ -28,7 +27,6 @@ from meltano.core.utils import (
     deep_merge,
     default_deep_merge_strategies,
     expand_env_vars,
-    get_no_color_flag,
     unflatten,
 )
 
@@ -53,6 +51,7 @@ logger = structlog.getLogger(__name__)
 
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
 MANIFEST_SCHEMA_PATH = resources.files(schemas) / "meltano.schema.json"
+SCHEMA_VALIDATION_LOG_PREFIX = "Failed to validate"
 
 Trie: t.TypeAlias = dict[str, "Trie"]
 PluginsByType: t.TypeAlias = Mapping[str, list[Mapping[str, t.Any]]]
@@ -146,40 +145,45 @@ class Manifest:
         self.check_schema = check_schema
         self.redact_secrets = redact_secrets
         with MANIFEST_SCHEMA_PATH.open() as manifest_schema_file:
-            manifest_schema = json.load(manifest_schema_file)
-        self._env_locations = meltano_config_env_locations(manifest_schema)
+            self._manifest_schema = json.load(manifest_schema_file)
+        self._env_locations = meltano_config_env_locations(self._manifest_schema)
 
-    @staticmethod
+    @cached_property
+    def _schema_validator(self) -> jsonschema.protocols.Validator:
+        """Return a cached validator for the manifest schema.
+
+        The validator class is automatically determined from the schema's
+        $schema field using jsonschema.validators.validator_for().
+        """
+        validator_cls = jsonschema.validators.validator_for(self._manifest_schema)
+        validator_cls.check_schema(self._manifest_schema)
+        return validator_cls(self._manifest_schema)
+
     def _validate_against_manifest_schema(
+        self,
         instance_name: str,
         instance_path: Path,
         instance_data: dict[str, t.Any],
     ) -> None:
-        with NamedTemporaryFile(suffix=".json") as schema_instance_file:
-            schema_instance_file.write(json.dumps(instance_data).encode())
-            schema_instance_file.flush()
-            proc = subprocess.run(
-                (
-                    "check-jsonschema",
-                    "--color",
-                    "never" if get_no_color_flag() else "always",
-                    "--schemafile",
-                    str(MANIFEST_SCHEMA_PATH),
-                    schema_instance_file.name,
-                ),
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
+        errors = sorted(
+            self._schema_validator.iter_errors(instance_data),
+            key=lambda e: tuple(str(p) for p in e.absolute_path),
+        )
+
+        if errors:
+            error_messages = ["Schema validation errors were encountered."]
+            for error in errors:
+                if error.absolute_path:
+                    path = "::$." + ".".join(str(p) for p in error.absolute_path)
+                else:
+                    path = "::$"
+                error_messages.append(f"  {instance_path}{path}: {error.message}")
+
+            formatted_errors = "\n".join(error_messages)
+            logger.warning(
+                f"{SCHEMA_VALIDATION_LOG_PREFIX} {instance_name} against Meltano "  # noqa: G004
+                f"manifest schema ({MANIFEST_SCHEMA_PATH}):\n{formatted_errors}",
             )
-            if proc.returncode:
-                jsonschema_checker_message = proc.stdout.strip().replace(
-                    schema_instance_file.name,
-                    str(instance_path),
-                )
-                logger.warning(
-                    f"Failed to validate {instance_name} against Meltano manifest "  # noqa: G004
-                    f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}",
-                )
 
     @cached_property
     def _project_files(self) -> dict[str, t.Any]:
