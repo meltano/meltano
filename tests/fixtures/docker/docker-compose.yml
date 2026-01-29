@@ -1,6 +1,6 @@
 services:
   snowplow:
-    image: "snowplow/snowplow-micro:3.0.1-distroless"
+    image: "snowplow/snowplow-micro:2.3.0-distroless"
     user: "1000:0"
     command: --collector-config /config/micro.conf --iglu /config/iglu.json
     ports:
