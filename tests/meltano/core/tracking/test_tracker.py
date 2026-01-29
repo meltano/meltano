@@ -301,6 +301,10 @@ class TestTracker:
     def test_default_send_anonymous_usage_stats(self, project: Project) -> None:
         assert Tracker(project).send_anonymous_usage_stats
 
+    @pytest.mark.xfail(
+        reason="Latest Snowplow Micro made this quite flaky",
+        strict=False,
+    )
     @pytest.mark.usefixtures("project")
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
