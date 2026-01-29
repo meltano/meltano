@@ -295,7 +295,7 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
                     key_style=None,  # No key label, just the value
                     value_style=styles.kv_key,  # Cyan color
                     reset_style=styles.reset,
-                    value_repr=str,
+                    value_repr=self._repr_name,
                     width=self.DEFAULT_NAME_COLUMN_WIDTH,
                 ),
             ),
@@ -336,6 +336,10 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         )
         self._all_keys = all_keys
         self._include_keys = include_keys
+
+    def _repr_name(self, name: t.Any) -> str:  # noqa: ANN401
+        """Render the name to a string."""
+        return name or self.DEFAULT_PLUGIN_NAME
 
     def __call__(
         self,

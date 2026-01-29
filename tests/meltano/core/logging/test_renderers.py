@@ -480,20 +480,40 @@ class TestMeltanoConsoleRenderer:
             colors=False,
         )
 
-        event_dict = {
+        # No "name" key - should default to "meltano"
+        event_dict_missing_name = {
             "timestamp": "2021-01-01T00:00:00Z",
             "level": "info",
             "event": "Something happened",
-            # No "name" key - should default to "meltano"
         }
 
-        result = renderer(None, "info", event_dict)
+        result = renderer(None, "info", event_dict_missing_name)
         # "meltano" should appear as a column (default value)
         assert "meltano" in result
         # It should NOT appear as key=value
         assert "name=meltano" not in result
         # The event should be rendered
         assert "Something happened" in result
+
+        # `None` "name" key - should default to "meltano"
+        event_dict_none_name = {
+            "timestamp": "2021-01-01T00:00:00Z",
+            "level": "info",
+            "event": "Something happened",
+            "name": None,
+        }
+        result = renderer(None, "info", event_dict_none_name)
+        assert "meltano" in result
+
+        # Empty "name" key - should default to "meltano"
+        event_dict_empty_name = {
+            "timestamp": "2021-01-01T00:00:00Z",
+            "level": "info",
+            "event": "Something happened",
+            "name": "",
+        }
+        result = renderer(None, "info", event_dict_empty_name)
+        assert "meltano" in result
 
     def test_plugin_name_column(
         self,
