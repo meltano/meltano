@@ -7,7 +7,7 @@ import uuid
 from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
-from time import sleep
+from time import monotonic, sleep
 from unittest import mock
 
 import pytest
@@ -305,14 +305,26 @@ class TestTracker:
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
-        event_summary = snowplow.all()
-        assert event_summary["good"] > 0
+        # Events are sent asynchronously; poll until they appear or timeout
+        timeout, interval = 5.0, 0.05
+        deadline = monotonic() + timeout
+        event_summary: dict[str, int] | None = None
+        good_events: list[dict[str, t.Any]] = []
+        while monotonic() < deadline:
+            event_summary = snowplow.all()
+            if event_summary["good"] > 0:
+                good_events = snowplow.good()
+                break
+            sleep(interval)
+        assert event_summary is not None
+        assert event_summary["good"] > 0, (
+            f"No good events received within {timeout}s (good={event_summary['good']}, "
+            f"bad={event_summary['bad']})"
+        )
         assert event_summary["bad"] == 0
 
         exit_event = next(
-            x["event"]
-            for x in snowplow.good()
-            if x["event"]["event_name"] == "exit_event"
+            x["event"] for x in good_events if x["event"]["event_name"] == "exit_event"
         )
         assert exit_event["unstruct_event"]["data"]["data"]["exit_code"] == 1
 
