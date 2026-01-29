@@ -400,34 +400,39 @@ class TestMeltanoConsoleRenderer:
         exception: PluginException,
         expected_exception_output: str,
     ) -> None:
+        def key_val(*cols, **kwargs) -> str:
+            elems = (
+                *cols,
+                *(f"{k}={v}" for k, v in kwargs.items()),
+            )
+            return " ".join(elems)
+
         renderer = MeltanoConsoleRenderer(
             plugin_error_renderer=error_formatter,
             colors=False,
             include_keys={"key"},
         )
+        meltano_col = f"{'meltano':<12}"
 
         with subtests.test(msg="error"):
             out = renderer(None, "error", {"plugin_exception": exception})
-            # Exception output is followed by the log line with columns
-            assert expected_exception_output in out
-            assert "plugin_exc_message=" in out
-            assert "plugin_exc_type=" in out
-            # Default name column should show "meltano"
-            assert "meltano" in out
-            assert "name=meltano" not in out  # Column, not key=value
+            assert out == expected_exception_output + "\n" + key_val(
+                meltano_col,
+                plugin_exc_message="'Custom exception message'",
+                plugin_exc_type="CustomException",
+            )
 
         with subtests.test(msg="warning"):
             out = renderer(None, "warning", {"plugin_exception": exception})
-            assert "plugin_exc_message=" in out
-            assert "plugin_exc_type=" in out
-            # Default name column should show "meltano"
-            assert "meltano" in out
+            assert out == key_val(
+                meltano_col,
+                plugin_exc_message="'Custom exception message'",
+                plugin_exc_type="CustomException",
+            )
 
         with subtests.test(msg="no exception"):
             out = renderer(None, "warning", {"key": "value"})
-            assert "key=value" in out
-            # Default name column should show "meltano"
-            assert "meltano" in out
+            assert out == key_val(meltano_col, key="value")
 
     def test_console_output_from_plugin_install(
         self,
