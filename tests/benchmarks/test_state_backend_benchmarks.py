@@ -107,7 +107,6 @@ class TestStateBackendBenchmarks:
     def test_local_filesystem_repeated_updates_partial_state(
         self,
         subject: _LocalFilesystemStateStoreManager,
-        benchmark,
     ) -> None:
         """Benchmark repeated update() calls with partial state (locking path).
 
@@ -115,13 +114,10 @@ class TestStateBackendBenchmarks:
         updates with no completed_state payload, so we can compare against the
         optimized complete-state path under similar load.
         """
-        state = MeltanoState(
-            state_id="test-partial-repeated",
-            partial_state={"singer_state": {"bookmark": 1}},
-            completed_state={},
-        )
-
-        def do_update() -> None:
+        for i in range(50):
+            state = MeltanoState(
+                state_id="test-partial-repeated",
+                partial_state={"singer_state": {"bookmark": i}},
+                completed_state={},
+            )
             subject.update(state)
-
-        benchmark(do_update)

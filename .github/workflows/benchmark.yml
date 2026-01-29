@@ -55,4 +55,4 @@ jobs:
       uses: CodSpeedHQ/action@dbda7111f8ac363564b0c51b992d4ce76bb89f2f # v4.5.2
       with:
         mode: walltime
-        run: uv run pytest tests/benchmarks/ --codspeed
+        run: uv run pytest tests/benchmarks/ --codspeed -p no:randomly
