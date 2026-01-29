@@ -4,14 +4,14 @@ on:
   pull_request:
     paths:
       - src/**
-      - tests/benchmark/**
+      - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
   push:
     branches: [main]
     paths:
       - src/**
-      - tests/benchmark/**
+      - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
   workflow_dispatch:
