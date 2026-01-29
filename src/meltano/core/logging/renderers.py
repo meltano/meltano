@@ -204,6 +204,10 @@ class PluginInstallFormatter:
 class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
     """Custom console renderer that handles our own data structures."""
 
+    DEFAULT_NAME_COLUMN_WIDTH: t.ClassVar[int] = 12
+    DEFAULT_EVENT_COLUMN_WIDTH: t.ClassVar[int] = 30
+    DEFAULT_PLUGIN_NAME: t.ClassVar[str] = "meltano"
+
     default_keys: t.ClassVar[set[str]] = {
         # Base keys
         "timestamp",
@@ -242,8 +246,86 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
             include_keys: Whether to include specific keys in the output.
             kwargs: Keyword arguments to pass to the parent class.
         """
-        super().__init__(*args, **kwargs)
-        colors = kwargs.get("colors")
+        # Extract color settings from kwargs before passing to parent
+        # (colors is ignored when passing custom columns)
+        colors = kwargs.pop("colors", True)
+        force_colors = kwargs.pop("force_colors", False)
+        # Discard any existing columns since we build our own
+        kwargs.pop("columns", None)
+
+        # Get column styles based on color settings
+        styles = self.get_default_column_styles(colors, force_colors)
+
+        # Build level styles for LogLevelColumnFormatter
+        level_styles = {
+            "debug": styles.level_debug,
+            "info": styles.level_info,
+            "warning": styles.level_warn,
+            "warn": styles.level_warn,
+            "error": styles.level_error,
+            "critical": styles.level_critical,
+            "exception": styles.level_exception,
+            "notset": styles.level_notset,
+        }
+
+        # Build custom columns with plugin name column
+        columns = [
+            # Timestamp column
+            structlog.dev.Column(
+                "timestamp",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style=styles.timestamp,
+                    reset_style=styles.reset,
+                    value_repr=str,
+                ),
+            ),
+            # Level column
+            structlog.dev.Column(
+                "level",
+                structlog.dev.LogLevelColumnFormatter(
+                    level_styles=level_styles,
+                    reset_style=styles.reset,
+                ),
+            ),
+            # Name column (plugin name)
+            structlog.dev.Column(
+                "name",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,  # No key label, just the value
+                    value_style=styles.kv_key,  # Cyan color
+                    reset_style=styles.reset,
+                    value_repr=self._repr_name,
+                    width=self.DEFAULT_NAME_COLUMN_WIDTH,
+                ),
+            ),
+            # Event column
+            structlog.dev.Column(
+                "event",
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=None,
+                    value_style=styles.bright,  # Bold
+                    reset_style=styles.reset,
+                    value_repr=str,
+                    width=self.DEFAULT_EVENT_COLUMN_WIDTH,
+                ),
+            ),
+            # Default formatter for remaining keys
+            structlog.dev.Column(
+                "",  # Empty key = default formatter
+                structlog.dev.KeyValueColumnFormatter(
+                    key_style=styles.kv_key,
+                    value_style=styles.kv_value,
+                    reset_style=styles.reset,
+                    value_repr=self._repr,
+                ),
+            ),
+        ]
+
+        # Pass columns to parent (NOT colors, since columns takes precedence)
+        # We've already popped colors, force_colors, and columns from kwargs above
+        super().__init__(*args, columns=columns, **kwargs)  # type: ignore[misc]
+
         self._error_formatter = (
             plugin_error_renderer  # or construct one with the right flags
             or PluginErrorFormatter(no_color=not colors)
@@ -254,6 +336,10 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         )
         self._all_keys = all_keys
         self._include_keys = include_keys
+
+    def _repr_name(self, name: t.Any) -> str:  # noqa: ANN401
+        """Render the name to a string."""
+        return name or self.DEFAULT_PLUGIN_NAME
 
     def __call__(
         self,
@@ -273,6 +359,9 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         Returns:
             The rendered event dictionary.
         """
+        # Set default plugin name if not present
+        event_dict.setdefault("name", self.DEFAULT_PLUGIN_NAME)
+
         if self._include_keys:
             event_dict = {
                 k: v
