@@ -25,6 +25,8 @@ if t.TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
 
+    from pytest_codspeed import BenchmarkFixture
+
 
 def on_windows() -> bool:
     return "Windows" in platform.system()
@@ -55,6 +57,7 @@ class TestStateBackendBenchmarks:
     def test_local_filesystem_update_complete_state(
         self,
         subject: _LocalFilesystemStateStoreManager,
+        benchmark: BenchmarkFixture,
     ) -> None:
         """Benchmark update() with complete state (optimized path, no locking).
 
@@ -66,12 +69,17 @@ class TestStateBackendBenchmarks:
             partial_state={},
             completed_state={"singer_state": {"bookmark": 1}},
         )
-        subject.update(state)
+
+        def do_update() -> None:
+            subject.update(state)
+
+        benchmark(do_update)
 
     @pytest.mark.benchmark
     def test_local_filesystem_update_partial_state(
         self,
         subject: _LocalFilesystemStateStoreManager,
+        benchmark: BenchmarkFixture,
     ) -> None:
         """Benchmark update() with partial state (requires locking).
 
@@ -83,41 +91,8 @@ class TestStateBackendBenchmarks:
             partial_state={"singer_state": {"bookmark": 1}},
             completed_state={},
         )
-        subject.update(state)
 
-    @pytest.mark.benchmark
-    def test_local_filesystem_repeated_updates_complete_state(
-        self,
-        subject: _LocalFilesystemStateStoreManager,
-    ) -> None:
-        """Benchmark 50 update() calls with complete state.
-
-        Simulates frequent STATE messages during a normal ELT run.
-        With optimization, this should be fast (no locking overhead).
-        """
-        for i in range(50):
-            state = MeltanoState(
-                state_id="test-repeated",
-                partial_state={},
-                completed_state={"singer_state": {"bookmark": i}},
-            )
+        def do_update() -> None:
             subject.update(state)
 
-    @pytest.mark.benchmark
-    def test_local_filesystem_repeated_updates_partial_state(
-        self,
-        subject: _LocalFilesystemStateStoreManager,
-    ) -> None:
-        """Benchmark repeated update() calls with partial state (locking path).
-
-        This stresses the locking-heavy code path by issuing many partial-state
-        updates with no completed_state payload, so we can compare against the
-        optimized complete-state path under similar load.
-        """
-        for i in range(50):
-            state = MeltanoState(
-                state_id="test-partial-repeated",
-                partial_state={"singer_state": {"bookmark": i}},
-                completed_state={},
-            )
-            subject.update(state)
+        benchmark(do_update)
