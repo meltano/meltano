@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import asyncio.subprocess
-import inspect
 import json
 import logging
 import shutil
@@ -51,9 +50,9 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-async def _stream_redirect(
+async def _stream_redirect_async(
     stream: asyncio.StreamReader | None,
-    *file_like_objs,  # noqa: ANN002
+    *file_like_objs: anyio.AsyncFile,
     write_str: bool = False,
 ) -> None:
     """Redirect stream to a file like obj.
@@ -67,10 +66,26 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            if inspect.iscoroutinefunction(file_like_obj.write):
-                await file_like_obj.write(data.decode(encoding) if write_str else data)
-            else:
-                file_like_obj.write(data.decode(encoding) if write_str else data)
+            await file_like_obj.write(data.decode(encoding) if write_str else data)
+
+
+async def _stream_redirect_sync(
+    stream: asyncio.StreamReader | None,
+    *file_like_objs: t.IO,
+    write_str: bool = False,
+) -> None:
+    """Redirect stream to a file like obj.
+
+    Args:
+        stream: the stream to redirect
+        file_like_objs: the objects to redirect the stream to
+        write_str: if True, stream is written as str
+    """
+    encoding = sys.getdefaultencoding()
+    while stream and not stream.at_eof():
+        data = await stream.readline()
+        for file_like_obj in file_like_objs:
+            file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
 def config_metadata_rules(config: dict[str, t.Any]) -> list[MetadataRule]:
@@ -455,7 +470,12 @@ class SingerTap(SingerPlugin):
                     )
 
                     invoke_futures = [
-                        asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
+                        asyncio.ensure_future(
+                            _stream_redirect_async(
+                                handle.stdout,
+                                catalog,
+                            )
+                        ),
                         asyncio.ensure_future(handle.wait()),
                     ]
                     if (
@@ -472,7 +492,7 @@ class SingerTap(SingerPlugin):
                     else:
                         invoke_futures.append(
                             asyncio.ensure_future(
-                                _stream_redirect(
+                                _stream_redirect_sync(
                                     handle.stderr,
                                     stderr_buff,
                                     write_str=True,

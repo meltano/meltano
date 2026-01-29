@@ -1026,11 +1026,15 @@ class TestSingerTap:
                 return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=False)),
             ),
             mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect",
-            ) as stream_mock,
+                "meltano.core.plugin.singer.tap._stream_redirect_async",
+            ) as async_stream_mock,
+            mock.patch(
+                "meltano.core.plugin.singer.tap._stream_redirect_sync",
+            ) as sync_stream_mock,
         ):
             await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock.call_count == 2
+            assert async_stream_mock.call_count == 1
+            assert sync_stream_mock.call_count == 1
 
         with (
             mock.patch.object(
@@ -1040,7 +1044,7 @@ class TestSingerTap:
                 return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
             ),
             mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect",
+                "meltano.core.plugin.singer.tap._stream_redirect_async",
             ) as stream_mock2,
         ):
             await subject.run_discovery(invoker, catalog_path)
@@ -1058,7 +1062,7 @@ class TestSingerTap:
                 return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
             ),
             mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect",
+                "meltano.core.plugin.singer.tap._stream_redirect_async",
             ) as stream_mock3,
             mock.patch(
                 "meltano.core.plugin.singer.tap.capture_subprocess_output",
