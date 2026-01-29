@@ -336,6 +336,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             Exception: if error not indicating file is not found is thrown
         """
         logger.info("Writing state to %s", self.label)
+        self.create_state_id_dir_if_not_exists(state.state_id)
         with self.get_writer(self.get_state_path(state.state_id)) as writer:
             writer.write(state.json())
 

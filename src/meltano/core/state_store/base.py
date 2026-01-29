@@ -122,13 +122,20 @@ class StateStoreManager(ABC):
         Args:
             state: the state to set.
         """
-        state_to_write = state
-        with self.acquire_lock(state.state_id, retry_seconds=1):
-            if not state.is_complete() and (current_state := self.get(state.state_id)):
-                current_state.merge_partial(state)
-                state_to_write = current_state
+        # For complete states, no merging is needed - write directly without locking.
+        # This is the common case during normal ELT runs and avoids the overhead
+        # of file-based locking on every STATE message.
+        if state.is_complete():
+            self.set(state)
+            return
 
-            self.set(state_to_write)
+        # For partial states, we need to read-merge-write atomically
+        with self.acquire_lock(state.state_id, retry_seconds=1):
+            if current_state := self.get(state.state_id):
+                current_state.merge_partial(state)
+                self.set(current_state)
+            else:
+                self.set(state)
 
     @t.final
     def clear(self, state_id: str) -> None:
