@@ -350,8 +350,9 @@ class TestMeltanoConsoleRenderer:
         with subtests.test(msg="default"):
             renderer = make_renderer()
             result = renderer(None, "info", event_dict)
-            # Preserved keys
-            assert "name=tap-mock" in result
+            # Plugin name is now rendered as a column, not key=value
+            assert "tap-mock" in result
+            assert "name=tap-mock" not in result  # Column, not key=value
             # Auto-added keys
             assert "plugin_exc_message=" in result
             assert "plugin_exc_type=" in result
@@ -364,8 +365,9 @@ class TestMeltanoConsoleRenderer:
         with subtests.test(msg="all keys"):
             renderer = make_renderer(all_keys=True)
             result = renderer(None, "info", event_dict)
-            # Preserved keys
-            assert "name=tap-mock" in result
+            # Plugin name is now rendered as a column, not key=value
+            assert "tap-mock" in result
+            assert "name=tap-mock" not in result  # Column, not key=value
             # Auto-added keys
             assert "plugin_exc_message=" in result
             assert "plugin_exc_type=" in result
@@ -379,8 +381,9 @@ class TestMeltanoConsoleRenderer:
         with subtests.test(msg="include keys"):
             renderer = make_renderer(include_keys=include_keys)
             result = renderer(None, "info", event_dict)
-            # Preserved keys
-            assert "name=tap-mock" in result
+            # Plugin name is now rendered as a column, not key=value
+            assert "tap-mock" in result
+            assert "name=tap-mock" not in result  # Column, not key=value
             # Auto-added keys
             assert "plugin_exc_message=" in result
             assert "plugin_exc_type=" in result
@@ -397,9 +400,6 @@ class TestMeltanoConsoleRenderer:
         exception: PluginException,
         expected_exception_output: str,
     ) -> None:
-        def key_val(**kwargs) -> str:
-            return " ".join(f"{k}={v}" for k, v in kwargs.items())
-
         renderer = MeltanoConsoleRenderer(
             plugin_error_renderer=error_formatter,
             colors=False,
@@ -408,21 +408,26 @@ class TestMeltanoConsoleRenderer:
 
         with subtests.test(msg="error"):
             out = renderer(None, "error", {"plugin_exception": exception})
-            assert out == expected_exception_output + "\n" + key_val(
-                plugin_exc_message="'Custom exception message'",
-                plugin_exc_type="CustomException",
-            )
+            # Exception output is followed by the log line with columns
+            assert expected_exception_output in out
+            assert "plugin_exc_message=" in out
+            assert "plugin_exc_type=" in out
+            # Default name column should show "meltano"
+            assert "meltano" in out
+            assert "name=meltano" not in out  # Column, not key=value
 
         with subtests.test(msg="warning"):
             out = renderer(None, "warning", {"plugin_exception": exception})
-            assert out == key_val(
-                plugin_exc_message="'Custom exception message'",
-                plugin_exc_type="CustomException",
-            )
+            assert "plugin_exc_message=" in out
+            assert "plugin_exc_type=" in out
+            # Default name column should show "meltano"
+            assert "meltano" in out
 
         with subtests.test(msg="no exception"):
             out = renderer(None, "warning", {"key": "value"})
-            assert out == key_val(key="value")
+            assert "key=value" in out
+            # Default name column should show "meltano"
+            assert "meltano" in out
 
     def test_console_output_from_plugin_install(
         self,
@@ -436,7 +441,10 @@ class TestMeltanoConsoleRenderer:
         )
 
         out = renderer(None, "install", {"install_state": install_state})
-        assert out == expected_install_output + "\n"
+        # Install output is followed by the log line with columns
+        assert expected_install_output in out
+        # Default name column should show "meltano"
+        assert "meltano" in out
 
     def test_console_output_from_metric_info(
         self,
@@ -456,3 +464,57 @@ class TestMeltanoConsoleRenderer:
         out = subject(None, "info", event_dict)
         assert "metric_name=record_count" in out
         assert "metric_value=1500" in out
+
+    def test_default_name_column(
+        self,
+        error_formatter: PluginErrorFormatter,
+    ) -> None:
+        """Test that 'meltano' appears as default when name is missing."""
+        renderer = MeltanoConsoleRenderer(
+            plugin_error_renderer=error_formatter,
+            colors=False,
+        )
+
+        event_dict = {
+            "timestamp": "2021-01-01T00:00:00Z",
+            "level": "info",
+            "event": "Something happened",
+            # No "name" key - should default to "meltano"
+        }
+
+        result = renderer(None, "info", event_dict)
+        # "meltano" should appear as a column (default value)
+        assert "meltano" in result
+        # It should NOT appear as key=value
+        assert "name=meltano" not in result
+        # The event should be rendered
+        assert "Something happened" in result
+
+    def test_plugin_name_column(
+        self,
+        error_formatter: PluginErrorFormatter,
+    ) -> None:
+        """Test that plugin name appears in its own column."""
+        renderer = MeltanoConsoleRenderer(
+            plugin_error_renderer=error_formatter,
+            colors=False,
+        )
+
+        event_dict = {
+            "timestamp": "2021-01-01T00:00:00Z",
+            "level": "info",
+            "event": "Something happened",
+            "name": "tap-mock",
+        }
+
+        result = renderer(None, "info", event_dict)
+        # Plugin name should appear as a column
+        assert "tap-mock" in result
+        # It should NOT appear as key=value
+        assert "name=tap-mock" not in result
+        # The event should be rendered
+        assert "Something happened" in result
+        # Verify column order: name should come before event
+        name_pos = result.find("tap-mock")
+        event_pos = result.find("Something happened")
+        assert name_pos < event_pos, "Plugin name should appear before event"

@@ -53,12 +53,12 @@ async def test_capture_subprocess_output() -> None:
     (
         pytest.param(
             LogFormat.colored,
-            "\x1b[2m2021-01-01T00:00:00Z\x1b[0m [\x1b[32m\x1b[1minfo     \x1b[0m] \x1b[1mtest                          \x1b[0m",  # noqa: E501
+            "\x1b[2m2021-01-01T00:00:00Z\x1b[0m [\x1b[32minfo     \x1b[0m] \x1b[36mmeltano     \x1b[0m \x1b[1mtest                          \x1b[0m",  # noqa: E501
             id="colored",
         ),
         pytest.param(
             LogFormat.uncolored,
-            "2021-01-01T00:00:00Z [info     ] test",
+            "2021-01-01T00:00:00Z [info     ] meltano      test",
             id="uncolored",
         ),
         pytest.param(
