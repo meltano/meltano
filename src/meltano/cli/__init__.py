@@ -114,6 +114,8 @@ def _run_cli() -> None:
             raise
         except MeltanoError as err:
             handle_meltano_error(err)
+        except CliError:
+            raise
         except Exception as err:
             raise CliError(f"{troubleshooting_message}\n{err}") from err  # noqa: EM102, TRY003
     except CliError as cli_error:
