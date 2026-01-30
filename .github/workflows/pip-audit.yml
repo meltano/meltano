@@ -1,0 +1,53 @@
+name: Dependency Audit
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - uv.lock
+      - pyproject.toml
+  pull_request:
+    paths:
+      - uv.lock
+      - pyproject.toml
+  schedule:
+    # Daily at 06:30 UTC
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    name: Audit Python Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v7.2.0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+
+      - name: Export dependencies from uv.lock
+        run: |
+          # Export all dependencies (including all extras and groups) to requirements format
+          uv export --all-extras --all-groups --no-hashes --no-header -o requirements-audit.txt
+
+      - name: Run pip-audit
+        uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
+        with:
+          inputs: requirements-audit.txt
+          # Use OSV for broader vulnerability coverage
+          vulnerability-service: osv
