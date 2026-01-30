@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.1.0 (2026-01-30)
+
+### ✨ New
+
+- [#9694](https://github.com/meltano/meltano/issues/9694) Remove stale tables used by long-removed UI/API
+- [#9759](https://github.com/meltano/meltano/issues/9759) Add plugin name or `meltano` as another column in the console-formatted output
+- [#9680](https://github.com/meltano/meltano/issues/9680) Auto-select a supported Python version if the plugin is not compatible with Meltano's own Python version
+
+### 🐛 Fixes
+
+- [#9779](https://github.com/meltano/meltano/issues/9779) Always display Slack community message for errors without self-service instructions
+- [#9775](https://github.com/meltano/meltano/issues/9775) Avoid displaying tracebacks when known CLI-level errors occur
+
+### ⚙️ Under the Hood
+
+- [#9723](https://github.com/meltano/meltano/issues/9723) Simplify state backend creation from settings
+- [#9726](https://github.com/meltano/meltano/issues/9726) Replace use of `check-jsonschema` with direct `jsonschema` calls
+
+### ⚡ Performance Improvements
+
+- [#9724](https://github.com/meltano/meltano/issues/9724) Revert to sync APIs for writing the tap catalog file following discovery
+
+### 📚 Documentation Improvements
+
+- [#9758](https://github.com/meltano/meltano/issues/9758) Sync plugin definition syntax with current options
+
+### 📦 Packaging changes
+
+- [#9780](https://github.com/meltano/meltano/issues/9780) Allow Rich 14.3.x
+- [#9762](https://github.com/meltano/meltano/issues/9762) Allow `packaging` 26.0
+- [#9756](https://github.com/meltano/meltano/issues/9756) Allow ruamel-yaml 0.19.x
+
 ## v4.0.9 (2026-01-19)
 
 ### 🐛 Fixes
