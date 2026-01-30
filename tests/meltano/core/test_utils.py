@@ -230,7 +230,12 @@ def test_unflatten() -> None:
         ),
     ),
 )
-def test_expand_env_vars(input_value, env, kwargs, expected_output) -> None:
+def test_expand_env_vars(
+    input_value: str,
+    env: dict[str, str | None],
+    kwargs: dict,
+    expected_output: str,
+) -> None:
     assert expand_env_vars(input_value, env, **kwargs) == expected_output
 
 

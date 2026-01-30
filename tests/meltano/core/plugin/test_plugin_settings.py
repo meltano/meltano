@@ -81,7 +81,10 @@ def custom_tap(project: Project):
 
 @pytest.fixture
 def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
-    return plugin_settings_service_factory(tap)
+    service: PluginSettingsService = plugin_settings_service_factory(tap)
+    service.project.dotenv.unlink(missing_ok=True)
+    service.project.refresh()
+    return service
 
 
 @pytest.fixture
@@ -620,6 +623,48 @@ class TestPluginSettingsService:
         assert not project.dotenv.exists()
 
     @pytest.mark.usefixtures("tap")
+    def test_store_dotenv_no_value(
+        self,
+        subject: PluginSettingsService,
+        project: Project,
+    ) -> None:
+        """Test dotenv handling of variables with no value.
+
+        Per python-dotenv docs, a variable with no value (e.g., `FOO` without `=`)
+        results in `dotenv_values` associating that variable with `None`.
+        This is different from `FOO=` which associates with empty string.
+        """
+        # Write a dotenv file with various value styles
+        project.dotenv.write_text(
+            "TAP_MOCK_TEST\n"  # No value - dotenv_values returns None
+            "TAP_MOCK_START_DATE=\n"  # Empty value - returns ""
+            "TAP_MOCK_BOOLEAN=true\n"  # Normal value
+        )
+        project.refresh()
+
+        # Verify dotenv_values behavior
+        dotenv_contents = dotenv.dotenv_values(project.dotenv)
+        assert dotenv_contents["TAP_MOCK_TEST"] is None
+        assert dotenv_contents["TAP_MOCK_START_DATE"] == ""
+        assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
+
+        # Verify how Meltano's settings service handles these values
+        # None values from dotenv are ignored - falls back to default
+        test_value, test_store = subject.get_with_source("test")
+        assert test_value == "mock"  # Default value from plugin definition
+        assert test_store == SettingValueStore.DEFAULT
+
+        # Empty string values are returned from dotenv
+        start_date_value, start_date_store = subject.get_with_source("start_date")
+        assert start_date_value == ""
+        assert start_date_store == SettingValueStore.DOTENV
+
+        # Normal values work as expected
+        boolean_value, boolean_store = subject.get_with_source("boolean")
+        assert boolean_value is True
+        assert boolean_store == SettingValueStore.DOTENV
+
+    @pytest.mark.usefixtures("tap")
     def test_env_var_expansion(
         self,
         session,
@@ -639,6 +684,12 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "A", "rock")
         dotenv.set_key(project.dotenv, "B", "paper")
         dotenv.set_key(project.dotenv, "C", "scissors")
+        # Append variables with no value and empty value to test dotenv edge cases
+        # NO_VALUE (no =) -> dotenv_values returns None
+        # EMPTY_VALUE= -> dotenv_values returns ""
+        with project.dotenv.open("a") as f:
+            f.write("NO_VALUE\n")
+            f.write("EMPTY_VALUE=\n")
         project.refresh()
 
         yml_config = {
@@ -651,6 +702,9 @@ class TestPluginSettingsService:
             "user_agent": "$MELTANO_USER_AGENT",
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
+            # Test dotenv edge cases: no value vs empty value
+            "no_value": "$NO_VALUE",
+            "empty_value": "$EMPTY_VALUE",
         }
         monkeypatch.setattr(subject.plugin, "config", yml_config)
 
@@ -675,6 +729,12 @@ class TestPluginSettingsService:
 
         # Env vars inside env var values do not get expanded
         assert config["test"] == "$FOO"
+
+        # Dotenv edge cases: no value vs empty value
+        # NO_VALUE (no =) in dotenv -> dotenv_values returns None
+        assert config["no_value"] is None
+        # EMPTY_VALUE= in dotenv -> dotenv_values returns ""
+        assert config["empty_value"] is None
 
         # Expansion can be disabled
         config = subject.as_dict(session=session, expand_env_vars=False)
