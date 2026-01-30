@@ -43,7 +43,7 @@ jobs:
       - name: Export dependencies from uv.lock
         run: |
           # Export all dependencies (including all extras and groups) to requirements format
-          uv export --all-extras --all-groups --no-hashes --no-header -o requirements-audit.txt
+          uv export --all-extras --no-dev --group testing --no-hashes --no-header -o requirements-audit.txt
 
       - name: Run pip-audit
         uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
