@@ -1,0 +1,25 @@
+# Grype configuration to reduce noise from vulnerabilities outside our control
+# https://github.com/anchore/grype#specifying-matches-to-ignore
+
+ignore:
+  # Ignore vulnerabilities with no fix available - we can't do anything about these
+  - fix-state: not-fixed
+  - fix-state: wont-fix
+  - fix-state: unknown
+
+  # Ignore OS-level packages from the base Debian image
+  # These are outside our control and should be addressed by updating the base image
+  - package:
+      type: deb
+
+  # Ignore binary packages (compiled libraries in base image)
+  - package:
+      type: binary
+
+  # Ignore apk packages (Alpine, though we use Debian)
+  - package:
+      type: apk
+
+  # Ignore rpm packages
+  - package:
+      type: rpm
