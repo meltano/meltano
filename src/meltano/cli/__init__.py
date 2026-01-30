@@ -117,9 +117,10 @@ def _run_cli() -> None:
         except CliError:
             raise
         except Exception as err:
-            raise CliError(f"{troubleshooting_message}\n{err}") from err  # noqa: EM102, TRY003
+            raise CliError(str(err)) from err
     except CliError as cli_error:
         cli_error.print()
+        logger.info(troubleshooting_message)
         sys.exit(cli_error.exit_code)
 
 
