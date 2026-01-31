@@ -39,7 +39,7 @@ root_path = Path(__file__).parent
 pyproject = nox.project.load_toml()
 python_versions = nox.project.python_versions(pyproject)
 
-main_python_version = "3.13"
+main_python_version = Path(".python-version").read_text().strip()
 
 UV_SYNC_COMMAND = (
     "uv",
