@@ -49,6 +49,16 @@ UV_SYNC_COMMAND = (
 )
 
 
+def _install_env(session: nox.Session) -> dict[str, str]:
+    env = {
+        "UV_PROJECT_ENVIRONMENT": session.virtualenv.location,
+    }
+    if isinstance(session.python, str):
+        env["UV_PYTHON"] = session.python
+
+    return env
+
+
 def _run_pytest(session: nox.Session) -> None:
     random_seed = randint(0, 2**32 - 1)  # noqa: S311
     args = session.posargs or ("tests/",)
@@ -106,7 +116,7 @@ def pytest_meltano(session: nox.Session) -> None:
         *UV_SYNC_COMMAND,
         "--group=testing",
         *(f"--extra={extra}" for extra in extras),
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+        env=_install_env(session),
     )
     _run_pytest(session)
 
@@ -123,7 +133,7 @@ def coverage(session: nox.Session) -> None:
     session.run_install(
         *UV_SYNC_COMMAND,
         "--group=coverage",
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+        env=_install_env(session),
     )
 
     if not session.posargs and any(Path().glob(".coverage.*")):
@@ -147,7 +157,7 @@ def pre_commit(session: nox.Session) -> None:
     session.run_install(
         *UV_SYNC_COMMAND,
         "--group=pre-commit",
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+        env=_install_env(session),
     )
     session.run("pre-commit", *args)
 
@@ -169,6 +179,6 @@ def mypy(session: nox.Session) -> None:
         "--extra=azure",
         "--extra=gcs",
         "--extra=s3",
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+        env=_install_env(session),
     )
     session.run("mypy", *session.posargs)
