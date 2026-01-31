@@ -34,7 +34,7 @@ jobs:
       matrix:
         include:
         - { integration_test: "meltano-basics", needs_postgres: false}
-        - { integration_test: "meltano-run", needs_postgres: true, python: "3.10"}
+        - { integration_test: "meltano-run", needs_postgres: true}
         - { integration_test: "meltano-objects", needs_postgres: false}
         - { integration_test: "meltano-migrations", needs_postgres: false}
         - { integration_test: "meltano-state-s3", needs_postgres: false}
