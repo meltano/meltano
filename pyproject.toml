@@ -171,13 +171,13 @@ addopts = [
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
-  "error",
-  "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
-  "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
-  "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
-  "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore::ResourceWarning",
-  "ignore:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning",  # https://github.com/meltano/meltano/issues/7066
+  'error',
+  # First-party warnings
+  'once:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning',  # https://github.com/meltano/meltano/issues/7066
+  # Third-party warnings
+  'once::pytest.PytestUnraisableExceptionWarning',
+  'once::ResourceWarning',
+  'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
 ]
 log_cli = true
 log_cli_format = "%(message)s"
