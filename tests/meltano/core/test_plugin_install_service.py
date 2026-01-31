@@ -155,6 +155,10 @@ class TestPluginInstallService:
         ]
 
     @pytest.mark.xfail(
+        sys.version_info[:2] == (3, 9),
+        reason="These plugins cannot be installed on Python 3.9",
+    )
+    @pytest.mark.xfail(
         platform.system() == "Windows"
         and sys.version_info >= (3, 13, 4)
         and sys.version_info < (3, 13, 5),
