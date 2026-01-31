@@ -20,9 +20,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-permissions:
-  contents: write  # Needed to upload artifacts to the release
-  id-token: write  # Needed for OIDC PyPI publishing
+permissions: {}
 
 jobs:
   build:
@@ -40,8 +38,6 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-      with:
-        version: ">=0.6.15"
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -78,10 +74,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      actions: read
-      contents: read
-      packages: write
-      security-events: write
+      actions: read # read the actions of the repo
+      contents: read # read the contents of the repo
+      packages: write # write the packages to the repo
+      security-events: write # create security reports for the repo write
     env:
       DEFAULT_PYTHON: "3.9"  # will be used in 'latest' images
 
@@ -98,30 +94,32 @@ jobs:
     steps:
     - name: Set the workflow inputs
       id: set-inputs
+      env:
+        REGISTRY: ${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}
       # This step makes it so that the same workflow inputs can be accessed
       # regardless of what event triggered it.
       run: |
-        echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
+        echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
     - name: Setup uv
       uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-      with:
-        version: ">=0.6"
 
     - name: Generate tags
       id: generate-tags
       run: >
         python scripts/generate_docker_tags.py
-        --git-sha ${{ github.sha }}
-        -v ${NEEDS_BUILD_OUTPUTS_VERSION}
-        -p ${{ matrix.python-version }}
-        -d ${{ env.DEFAULT_PYTHON }}
-        -r ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
+        --git-sha $GITHUB_SHA
+        --package-version ${NEEDS_BUILD_OUTPUTS_VERSION}
+        --python-version $PYTHON_VERSION
+        --default-python ${DEFAULT_PYTHON}
+        --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
         > tags
       env:
+        GITHUB_SHA: ${{ github.sha }}
         NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
+        PYTHON_VERSION: ${{ matrix.python-version }}
         STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Assemble image tags
@@ -139,13 +137,15 @@ jobs:
       run: |
         if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "ghcr.io" ]]; then
           echo "username=${GITHUB_ACTOR}" >> $GITHUB_OUTPUT
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+          echo "password=${GITHUB_TOKEN}" >> $GITHUB_OUTPUT
         fi
         if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "docker.io" ]]; then
           echo "username=meltano" >> $GITHUB_OUTPUT
-          echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
+          echo "password=${DOCKERHUB_TOKEN}" >> $GITHUB_OUTPUT
         fi
       env:
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version
@@ -168,6 +168,8 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build, build_docker]
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Needed for OIDC PyPI publishing
     environment:
       name: publishing
       url: https://pypi.org/project/${{ needs.build.outputs.name }}/${{ needs.build.outputs.version }}
@@ -183,15 +185,6 @@ jobs:
       with:
         name: Packages
         path: dist
-
-    - name: Upload wheel to release
-      uses: svenstaro/upload-release-action@6b7fa9f267e90b50a19fef07b3596790bb941741 # 2.11.3
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: dist/*.whl
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
 
     - name: Publish
       uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
