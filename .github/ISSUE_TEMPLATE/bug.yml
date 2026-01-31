@@ -19,7 +19,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "4.1.0"
+      placeholder: "4.1.1"
     validations:
       required: false
   - type: dropdown

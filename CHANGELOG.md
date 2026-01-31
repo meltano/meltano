@@ -1,7 +1,8 @@
-# CHANGELOG
+## v4.1.1 (2026-01-31)
 
-All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
+### 🐛 Fixes
+
+- [#9792](https://github.com/meltano/meltano/issues/9792) Require structlog 25.5.0+
 
 ## v4.1.0 (2026-01-30)
 
