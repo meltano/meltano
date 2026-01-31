@@ -645,7 +645,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
-            assert "`dbt run` failed" in result.output
+            assert "`dbt run` failed" in result.stderr
 
             matcher = EventMatcher(result.stderr)
             assert matcher.event_matches(
@@ -716,7 +716,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert "Extractor failed" in result.output
+            assert "Extractor failed" in result.stderr
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -807,7 +807,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert "Loader failed" in result.output
+            assert "Loader failed" in result.stderr
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -876,7 +876,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert "Loader failed" in result.output
+            assert "Loader failed" in result.stderr
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -952,7 +952,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert "Extractor and loader failed" in result.output
+            assert "Extractor and loader failed" in result.stderr
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -1033,7 +1033,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args)
 
-            assert "Output line length limit exceeded" in result.output
+            assert "Output line length limit exceeded" in result.stderr
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -1238,7 +1238,7 @@ class TestCliRunScratchpadOne:
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
 
-            assert "Mappers failed" in result.output
+            assert "Mappers failed" in result.stderr
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -1584,7 +1584,7 @@ class TestCliRunScratchpadOne:
 
         result = cli_runner.invoke(cli, args, catch_exceptions=True)
         assert result.exit_code == 2
-        assert "Invalid value for '--timeout'" in result.output
+        assert "Invalid value for '--timeout'" in result.stderr
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
