@@ -1,3 +1,9 @@
+#!/usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = ["nox"]
+# ///
+
 """Nox configuration.
 
 - Run `nox -l` to list the sessions Nox can run.
@@ -29,11 +35,6 @@ import nox
 
 nox.needs_version = ">=2025.2.9"
 nox.options.default_venv_backend = "uv"
-nox.options.sessions = [
-    "mypy",
-    "pre-commit",
-    "pytest",
-]
 
 root_path = Path(__file__).parent
 pyproject = nox.project.load_toml()
@@ -121,7 +122,7 @@ def pytest_meltano(session: nox.Session) -> None:
     _run_pytest(session)
 
 
-@nox.session(python=main_python_version)
+@nox.session(python=main_python_version, default=False)
 def coverage(session: nox.Session) -> None:
     """Combine and report previously generated coverage data.
 
@@ -182,3 +183,7 @@ def mypy(session: nox.Session) -> None:
         env=_install_env(session),
     )
     session.run("mypy", *session.posargs)
+
+
+if __name__ == "__main__":
+    nox.main()
