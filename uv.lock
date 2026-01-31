@@ -2084,7 +2084,7 @@ requires-dist = [
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
     { name = "tzlocal", specifier = "~=5.3" },
     { name = "urllib3", specifier = ">=1.26.20" },
-    { name = "uv", specifier = ">=0.1.24,!=0.8.7,<0.10" },
+    { name = "uv", specifier = ">=0.8.14,<0.10" },
     { name = "virtualenv", specifier = ">=20.26.6,<21" },
 ]
 provides-extras = ["azure", "gcs", "mssql", "postgres", "psycopg2", "s3"]
