@@ -1511,7 +1511,7 @@ requires-dist = [
     { name = "smart-open", specifier = ">=7.0.5,<8" },
     { name = "snowplow-tracker", specifier = ">=1.0.4,<2" },
     { name = "sqlalchemy", specifier = ">=2.0.35,<2.1" },
-    { name = "structlog", specifier = ">=25.1.0,<26" },
+    { name = "structlog", specifier = ">=25.5.0,<26" },
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
     { name = "tzlocal", specifier = "~=5.3" },
     { name = "urllib3", specifier = ">=1.26.20" },
