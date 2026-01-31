@@ -73,7 +73,7 @@ gcs = ["google-cloud-storage>=1.31.0"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
-s3 = ["boto3>=1.35,<1.41"]
+s3 = ["boto3>=1.35,<2"]
 
 [project.urls]
 Homepage = "https://meltano.com"
@@ -140,7 +140,7 @@ testing = [
   "time-machine>=2.15.0,<3",
 ]
 typing = [
-  "boto3-stubs[essential]>=1.35,<1.39",
+  "boto3-stubs[essential]>=1.35",
   "mypy>=1.16.0,<2",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
@@ -178,6 +178,7 @@ filterwarnings = [
   'once::pytest.PytestUnraisableExceptionWarning',
   'once::ResourceWarning',
   'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
+  'once:Boto3 will no longer support Python:boto3.exceptions.PythonDeprecationWarning',
 ]
 log_cli = true
 log_cli_format = "%(message)s"
