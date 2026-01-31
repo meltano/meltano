@@ -177,7 +177,9 @@ filterwarnings = [
   # Third-party warnings
   'once::pytest.PytestUnraisableExceptionWarning',
   'once::ResourceWarning',
-  'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
+  'once:You are using a non-supported Python version:FutureWarning',
+  'once:You are using a Python version .* past its end of life:FutureWarning',
+  'once:You are using a Python version .* which Google will stop supporting in new releases:FutureWarning',
   'once:Boto3 will no longer support Python:boto3.exceptions.PythonDeprecationWarning',
 ]
 log_cli = true
