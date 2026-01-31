@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/meltano/core/tracking/iglu-client-embedded/**'
   push:
-    branches: [main]
+    branches: [main, v3]
     paths:
       - 'src/meltano/core/tracking/iglu-client-embedded/**'
   workflow_dispatch:

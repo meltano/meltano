@@ -12,7 +12,7 @@ on:
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
   push:
-    branches: [main]
+    branches: [main, v3]
     paths:
       - src/**
       - tests/**
