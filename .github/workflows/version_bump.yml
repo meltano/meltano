@@ -24,6 +24,12 @@ on:
         - beta
         - rc
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   create_release_branch_pr:
     name: Create Release Pull Request
@@ -47,7 +53,7 @@ jobs:
 
     - uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
       with:
-        version: ">=0.6.15"
+        enable-cache: false
 
     - name: Bump version
       id: cz-bump
@@ -67,6 +73,7 @@ jobs:
 
     - name: Draft Release
       id: draft-release
+      if: ${{ github.event.inputs.prerelease == 'none' }}
       uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
       with:
         draft: true
