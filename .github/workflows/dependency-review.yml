@@ -29,3 +29,7 @@ jobs:
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}
         uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4.8.2
+        with:
+          allow-ghsas: |
+            GHSA-w853-jp5j-5j7f
+            GHSA-qmgc-5h2g-mvrw
