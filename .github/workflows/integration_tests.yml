@@ -27,6 +27,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  FORCE_COLOR: "1"
+
+permissions: {}
+
 jobs:
   validate:
     name: Integration Tests
@@ -57,13 +62,12 @@ jobs:
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       id: setup-python
       with:
-        python-version: ${{ matrix.python || '3.12' }}
+        python-version: ${{ matrix.python || '3.13' }}
         architecture: x64
 
     - name: Setup uv
       uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-      with:
-        version: ">=0.6.15"
+
 
     - name: Install Dependencies
       env:
@@ -86,5 +90,7 @@ jobs:
         postgres:13
 
     - name: Run integration tests
+      env:
+        INTEGRATION_TEST_NAME: ${{ matrix.integration_test }}
       run: |
-        uv run bash integration/validate.sh ${{ matrix.integration_test }}
+        uv run bash integration/validate.sh $INTEGRATION_TEST_NAME
