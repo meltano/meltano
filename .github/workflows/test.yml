@@ -11,6 +11,7 @@ on:
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
+      - .github/workflows/resources/docker-compose.postgres.yaml
   push:
     branches: [main, v3]
     paths:
@@ -22,6 +23,7 @@ on:
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
+      - .github/workflows/resources/docker-compose.postgres.yaml
   workflow_dispatch:
     inputs: {}
 
@@ -32,6 +34,8 @@ concurrency:
 env:
   FORCE_COLOR: "1"
   UV_PYTHON_DOWNLOADS: "never"
+
+permissions: {}
 
 jobs:
   tests:
@@ -116,8 +120,6 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-      with:
-        version: ">=0.6.15"
 
     - name: Install Nox
       env:
@@ -185,8 +187,6 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-      with:
-        version: ">=0.6.15"
 
     - name: Install Nox
       env:
@@ -225,8 +225,6 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
-      with:
-        version: ">=0.6.15"
 
     - name: Install Nox
       env:
