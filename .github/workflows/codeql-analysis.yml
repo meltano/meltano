@@ -8,7 +8,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - 'v*'
     paths:
       - .github/workflows/codeql-analysis.yml
       - '**.py'  # Any Python file
