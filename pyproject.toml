@@ -69,7 +69,7 @@ azure = [
   "azure-core>=1.32.0,<2",
   "azure-identity>=1.19.0,<2",
 ]
-gcs = ["google-cloud-storage>=1.31.0"]
+gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
