@@ -1492,7 +1492,7 @@ requires-dist = [
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
     { name = "dateparser", specifier = ">=1.2.1" },
     { name = "fasteners", specifier = ">=0.19,<0.21" },
-    { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=1.31.0" },
+    { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=3" },
     { name = "importlib-metadata", marker = "python_full_version < '3.12'", specifier = ">=5" },
     { name = "jinja2", specifier = ">=3.1.4,<4" },
     { name = "jsonschema", specifier = ">=4.23,<5" },

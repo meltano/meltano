@@ -67,7 +67,7 @@ azure = [
 containers = [
   "aiodocker>=0.24.0,<0.26",
 ]
-gcs = ["google-cloud-storage>=1.31.0"]
+gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
