@@ -69,7 +69,7 @@ jobs:
 
       fail-fast: false
 
-    name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }}) (${{ matrix.markers || 'not concurrent' }})"
+    name: ${{ matrix.id }}
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     timeout-minutes: 20
