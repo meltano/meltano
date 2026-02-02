@@ -8,7 +8,9 @@ on:
       - uv.lock
       - .github/workflows/benchmark.yml
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'v*'
     paths:
       - src/**
       - tests/benchmarks/**
