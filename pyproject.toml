@@ -176,6 +176,7 @@ filterwarnings = [
   'once:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning',  # https://github.com/meltano/meltano/issues/7066
   # Third-party warnings
   'once::pytest.PytestUnraisableExceptionWarning',
+  'once::pytest.PytestUnhandledThreadExceptionWarning',
   'once::ResourceWarning',
   'once:You are using a non-supported Python version:FutureWarning',
   'once:You are using a Python version .* past its end of life:FutureWarning',
