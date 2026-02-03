@@ -197,17 +197,20 @@ def default_config(
                 "level": logging.ERROR,
             },
             "urllib3": {
-                "level": logging.INFO,
-            },
-            "urllib3.connection": {
                 "level": logging.ERROR,
             },
             "asyncio": {
                 "level": logging.INFO,
             },
+            "alembic": {
+                "level": logging.WARNING,
+            },
             # Azure HTTP logs at info level are too noisy; see
             # https://github.com/meltano/meltano/issues/7723
             "azure.core.pipeline.policies.http_logging_policy": {
+                "level": logging.WARNING,
+            },
+            "smart_open": {
                 "level": logging.WARNING,
             },
         },

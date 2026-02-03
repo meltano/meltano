@@ -17,6 +17,8 @@ from meltano.core.job.job import (
 )
 
 if t.TYPE_CHECKING:
+    from types import FrameType
+
     from sqlalchemy.orm import Session
 
 
@@ -104,9 +106,18 @@ class TestJob:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
-        with pytest.raises(KeyboardInterrupt):
-            async with subject.run(session):
-                signal.raise_signal(signal.SIGINT)
+
+        # Install a signal handler that raises KeyboardInterrupt
+        def sigint_handler(signum: int, frame: FrameType) -> None:  # noqa: ARG001
+            raise KeyboardInterrupt
+
+        original_handler = signal.signal(signal.SIGINT, sigint_handler)
+        try:
+            with pytest.raises(KeyboardInterrupt):
+                async with subject.run(session):
+                    signal.raise_signal(signal.SIGINT)
+        finally:
+            signal.signal(signal.SIGINT, original_handler)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None

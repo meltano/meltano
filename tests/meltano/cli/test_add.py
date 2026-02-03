@@ -336,6 +336,9 @@ class TestCliAdd:
         with contextlib.suppress(PluginNotFoundError):
             project.plugins.remove_from_file(tap)
 
+        # Remove all lockfiles
+        shutil.rmtree(project.root_plugins_dir(), ignore_errors=True)
+
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 

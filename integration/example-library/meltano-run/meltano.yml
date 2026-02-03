@@ -13,26 +13,26 @@ plugins:
     pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
   loaders:
   - name: target-postgres
-    variant: transferwise
-    pip_url: >
-      git+https://github.com/transferwise/pipelinewise.git#subdirectory=singer-connectors/target-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-target-postgres
 environments:
 - name: dev
   config:
     plugins:
       extractors:
-        - name: tap-gitlab
-          config:
-            projects: meltano/meltano
-            start_date: '2022-04-25T00:00:00'
-          select:
-            - commits.*
-            - '!commits.stats.commits.stats*'
+      - name: tap-gitlab
+        config:
+          projects: meltano/meltano
+          start_date: '2022-04-25T00:00:00'
+        select:
+          - commits.*
+          - '!commits.stats.commits.stats*'
       loaders:
-        - name: target-postgres
-          config:
-            user: postgres
-            dbname: warehouse
-            default_target_schema: public
+      - name: target-postgres
+        config:
+          user: postgres
+          host: localhost
+          database: warehouse
+          default_target_schema: public
 - name: staging
 - name: prod

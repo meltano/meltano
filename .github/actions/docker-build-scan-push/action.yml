@@ -27,14 +27,14 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
     - name: Prepare the tags
       id: prepare-tags
@@ -46,7 +46,7 @@ runs:
         INPUTS_REGISTRY: ${{ inputs.registry }}
 
     - name: Download artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: Packages
         path: dist
@@ -90,7 +90,7 @@ runs:
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@16910ac423301c6d30554b83a7f71ac6ff4a51f3 # v6.4.0
+      uses: anchore/scan-action@8d2fce09422cd6037e577f4130e9b925e9a37175 # v7.3.1
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -98,7 +98,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+      uses: github/codeql-action/upload-sarif@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -118,7 +118,7 @@ runs:
         INPUTS_TOKEN: ${{ inputs.token }}
 
     - name: Login to the registry
-      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
       with:
         registry: ${{ inputs.registry }}
         username: ${{ inputs.username }}
