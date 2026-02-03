@@ -13,11 +13,11 @@
 .github/workflows/ @meltano/engineering
 
 # Docs (General)
-/docs/ @tayloramurphy @meltano/engineering @meltano/marketing
-/README.md @tayloramurphy @meltano/engineering @meltano/marketing
+/docs/ @meltano/engineering @meltano/marketing
+/README.md @meltano/engineering @meltano/marketing
 
 # Docs (Contributing)
-/CONTRIBUTING.md @tayloramurphy @meltano/engineering
+/CONTRIBUTING.md @meltano/engineering
 
 # Integration tests
 /docs/example-library/ @meltano/product @meltano/engineering
