@@ -72,7 +72,7 @@ def test_project_init_existing_meltano_yml(tmp_path: Path, pushd) -> None:
         ProjectInitServiceError,
         match=(
             r"A `meltano.yml` file already exists in the target directory. "
-            r"Use `--force` to overwrite it."
+            "Use `--force` to overwrite it."
         ),
     ):
         ProjectInitService(project_dir).init(activate=False)
