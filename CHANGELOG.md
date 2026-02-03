@@ -17,6 +17,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - Remove missing import handling for state backends now that they are loaded dynamically (#9479)
 - Get package version from distribution metadata (#9438)
 
+### ⚡ Performance Improvements
+
+- Revert to sync APIs for writing the tap catalog file following discovery (#9724)
+
 ### 📦 Packaging changes
 
 - Pin core `click` and `sqlalchemy` dependencies to their minor versions (#9449)
