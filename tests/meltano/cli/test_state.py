@@ -179,6 +179,46 @@ class TestCliState:
                     assert_cli_runner(result)
                     assert state_service.get_state(state_id) == state_payload
 
+    def test_set_from_string_file_mutually_exclusive(
+        self,
+        tmp_path: Path,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        """Test that mutually exclusive options are rejected."""
+        filepath = tmp_path / "file.json"
+        filepath.write_text("{}")
+
+        result = cli_runner.invoke(
+            cli,
+            [
+                "state",
+                "set",
+                "--force",
+                "test-state-id",
+                "--input-file",
+                filepath.as_posix(),
+                "{}",
+            ],
+        )
+        assert result.exit_code == 1
+        assert isinstance(result.exception, state.MutuallyExclusiveOptionsError)
+        assert "--input-file" in result.exception.options
+        assert "STATE" in result.exception.options
+
+        result = cli_runner.invoke(
+            cli,
+            [
+                "state",
+                "set",
+                "--force",
+                "test-state-id",
+            ],
+        )
+        assert result.exit_code == 1
+        assert isinstance(result.exception, state.MutuallyExclusiveOptionsError)
+        assert "--input-file" in result.exception.options
+        assert "STATE" in result.exception.options
+
     def test_set_invalid_json(
         self,
         state_service: StateService,
