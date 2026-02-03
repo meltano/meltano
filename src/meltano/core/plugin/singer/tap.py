@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-import inspect
+import asyncio.subprocess
 import json
 import logging
 import shutil
@@ -47,7 +47,7 @@ logger = structlog.stdlib.get_logger(__name__)
 
 async def _stream_redirect(
     stream: asyncio.StreamReader | None,
-    *file_like_objs,  # noqa: ANN002
+    *file_like_objs: t.IO,
     write_str: bool = False,
 ) -> None:
     """Redirect stream to a file like obj.
@@ -61,10 +61,7 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            if inspect.iscoroutinefunction(file_like_obj.write):
-                await file_like_obj.write(data.decode(encoding) if write_str else data)
-            else:
-                file_like_obj.write(data.decode(encoding) if write_str else data)
+            file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
 def _debug_logging_handler(
@@ -432,8 +429,8 @@ class SingerTap(SingerPlugin):
 
         # test for the result to be a valid catalog
         try:
-            async with await anyio.open_file(catalog_path) as catalog_file:
-                json.loads(await catalog_file.read())
+            with catalog_path.open() as catalog_file:
+                json.load(catalog_file)
         except Exception as err:
             catalog_path.unlink()
             msg = f"Catalog discovery failed: {err}"
@@ -468,9 +465,10 @@ class SingerTap(SingerPlugin):
                 f"Extractor '{self.name}' does not support catalog discovery "  # noqa: EM102
                 "(the `discover` capability is not advertised)",
             )
+        logger.info("Running catalog discovery")
         with StringIO("") as stderr_buff:
             try:
-                async with await anyio.open_file(catalog_path, mode="wb") as catalog:
+                with catalog_path.open(mode="wb") as catalog:
                     handle = await plugin_invoker.invoke_async(
                         "--discover",
                         stdout=asyncio.subprocess.PIPE,
@@ -596,8 +594,8 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
 
         try:
-            async with await anyio.open_file(catalog_path) as catalog_file:
-                catalog = json.loads(await catalog_file.read())
+            with catalog_path.open() as catalog_file:
+                catalog = json.load(catalog_file)
 
             if schema_rules:
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
@@ -606,8 +604,8 @@ class SingerTap(SingerPlugin):
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
-            async with await anyio.open_file(catalog_path, "w") as catalog_f:
-                await catalog_f.write(json.dumps(catalog, indent=2))
+            with catalog_path.open("w") as catalog_f:
+                catalog_f.write(json.dumps(catalog, indent=2))
 
             if cache_key := self.catalog_cache_key(plugin_invoker):
                 catalog_cache_key_path.write_text(cache_key)
