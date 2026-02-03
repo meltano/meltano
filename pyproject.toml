@@ -71,7 +71,7 @@ gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
-s3 = ["boto3>=1.35,<1.43"]
+s3 = ["boto3>=1.35,<2"]
 
 [project.urls]
 Homepage = "https://meltano.com"
