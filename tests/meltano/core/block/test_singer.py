@@ -197,7 +197,7 @@ class TestSingerBlocks:
 
             io_futures = [producer.proxy_stdout(), producer.proxy_stderr()]
 
-            done, _ = await asyncio.wait(
+            _done, _ = await asyncio.wait(
                 io_futures,
                 return_when=asyncio.FIRST_COMPLETED,
             )
