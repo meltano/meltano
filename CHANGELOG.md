@@ -1,3 +1,8 @@
+# CHANGELOG
+
+All notable changes to this project will be documented in this file.
+This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
+
 ## v4.1.2 (2026-02-03)
 
 ### 📦 Packaging changes
