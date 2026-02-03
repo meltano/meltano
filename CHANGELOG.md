@@ -1,7 +1,10 @@
-# CHANGELOG
+## v4.1.2 (2026-02-03)
 
-All notable changes to this project will be documented in this file.
-This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
+### 📦 Packaging changes
+
+- Require google-cloud-storage 3+
+- Require uv 0.8.14+
+- [#9799](https://github.com/meltano/meltano/issues/9799) Allow pip 26.0
 
 ## v4.1.1 (2026-01-31)
 
