@@ -120,6 +120,50 @@ def pytest_meltano(session: nox.Session) -> None:
     _run_pytest(session)
 
 
+@nox.session(
+    name="pytest-lowest-requirements",
+    tags=("test", "pytest"),
+    python=python_versions[0],
+)
+def pytest_lowest_requirements(session: nox.Session) -> None:
+    """Test with lowest requirements."""
+    backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
+    extras = ["azure", "gcs", "s3", "containers"]
+
+    if backend_db == "mssql":
+        extras.append("mssql")
+    elif backend_db == "postgresql":
+        extras.append("postgres")
+    elif backend_db == "postgresql_psycopg2":
+        extras.append("psycopg2")
+
+    _uv_sync(session, "--group=testing", *(f"--extra={extra}" for extra in extras))
+
+    tmpdir = Path(session.create_tmp())
+    tmpfile = tmpdir / "requirements.txt"
+    tmpfile.unlink(missing_ok=True)
+
+    env = {
+        "UV_PROJECT_ENVIRONMENT": session.virtualenv.location,
+        "UV_NO_CONFIG": "1",
+    }
+    session.run_install(
+        "uv",
+        "pip",
+        "compile",
+        "pyproject.toml",
+        f"--python={session.python}",
+        "--group=testing",
+        *(f"--extra={extra}" for extra in extras),
+        "--universal",
+        "--resolution=lowest-direct",
+        f"-o={tmpfile.as_posix()}",
+        env=env,
+    )
+    session.install("-r", f"{tmpdir}/requirements.txt", env=env)
+    _run_pytest(session)
+
+
 @nox.session(python=main_python_version, default=False)
 def coverage(session: nox.Session) -> None:
     """Combine and report previously generated coverage data.
