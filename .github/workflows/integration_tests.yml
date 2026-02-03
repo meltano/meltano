@@ -11,7 +11,9 @@ on:
       - .github/workflows/integration_tests.yml
       - .github/workflows/resources/constraints.txt
   push:
-    branches: [main, v3]
+    branches:
+      - main
+      - 'v*'
     paths:
       - src/**
       - integration/example-library/**
