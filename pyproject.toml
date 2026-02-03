@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.1.1"
+version = "4.1.2"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -38,7 +38,7 @@ dependencies = [
   "jinja2>=3.1.4,<4",
   "jsonschema>=4.23,<5",
   "packaging>=24.2,<27.0",
-  "pip~=25.1",
+  "pip>=25.1,<27.0",
   "platformdirs>=4.3.8",
   "psutil>=7.0.0,<8",
   "python-dotenv>=1.0.1,<2",
@@ -53,7 +53,7 @@ dependencies = [
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
-  "uv>=0.1.24,<0.10,!=0.8.7",
+  "uv>=0.8.14,<0.10",
   "virtualenv>=20.26.6,<21",
 ]
 
@@ -67,7 +67,7 @@ azure = [
 containers = [
   "aiodocker>=0.24.0,<0.26",
 ]
-gcs = ["google-cloud-storage>=1.31.0"]
+gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
@@ -252,7 +252,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.1.1"
+version = "4.1.2"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
