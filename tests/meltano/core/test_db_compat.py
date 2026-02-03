@@ -23,7 +23,7 @@ class TestDatabaseCompatibility:
                     match=(
                         r"Detected SQLite 3.25.0, but Meltano requires at least 3.25.1. "  # noqa: E501
                         "Upgrade your database to be compatible with Meltano or use a "
-                        r"different database."
+                        "different database."
                     ),
                 ),
                 id="sqlite-3.25.0",
