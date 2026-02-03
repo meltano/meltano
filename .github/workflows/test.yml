@@ -13,7 +13,9 @@ on:
       - .github/workflows/resources/docker-compose.mssql.yaml
       - .github/workflows/resources/docker-compose.postgres.yaml
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'v*'
     paths:
       - src/**
       - tests/**
