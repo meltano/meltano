@@ -13,7 +13,9 @@ on:
       - .github/workflows/resources/docker-compose.mssql.yaml
       - .github/workflows/resources/docker-compose.postgres.yaml
   push:
-    branches: [main, v3]
+    branches:
+      - main
+      - 'v*'
     paths:
       - src/**
       - tests/**
@@ -66,7 +68,7 @@ jobs:
         - { python-version: '3.14', os: windows-2025,  backend-db: sqlite, id: 'py314-windows-sqlite' }
       fail-fast: false
 
-    name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }}) (${{ matrix.markers || 'not concurrent' }})"
+    name: ${{ matrix.id }}
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     timeout-minutes: 20
@@ -122,6 +124,7 @@ jobs:
 
     - name: Run pytest
       env:
+        NOXSESSION: pytest
         SQLALCHEMY_WARN_20: 1
         COLUMNS: 160
         # Pytest
@@ -142,7 +145,7 @@ jobs:
         MSSQL_DB: pytest_warehouse
       shell: bash
       run: |
-        nox --verbose -t test -- -m "${PYTEST_MARKERS}"
+        nox --verbose -- -m "${PYTEST_MARKERS}"
 
     - name: Upload coverage data
       if: always()
