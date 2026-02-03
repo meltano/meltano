@@ -1883,7 +1883,7 @@ wheels = [
 
 [[package]]
 name = "meltano"
-version = "3.9.1"
+version = "3.9.2"
 source = { editable = "." }
 dependencies = [
     { name = "aiodocker", version = "0.24.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
