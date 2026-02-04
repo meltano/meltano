@@ -72,7 +72,7 @@ class SingerMapper(SingerPlugin):
                 **invoker.plugin_config_processed,
                 **expand_env_vars(
                     self._get_mapping_config(invoker.plugin.extra_config),
-                    expandable_env,
+                    expandable_env,  # ty: ignore[invalid-argument-type]
                 ),
             }
             await config_file.write(json_dumps(config_payload, indent=2))
