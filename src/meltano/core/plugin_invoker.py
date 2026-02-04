@@ -384,7 +384,7 @@ class PluginInvoker:
             expanded_active_env = (
                 expand_env_vars(
                     self.settings_service.project.environment.env,
-                    expanded_project_env,
+                    expanded_project_env,  # ty: ignore[invalid-argument-type]
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 )
                 if self.settings_service.project.environment
@@ -435,7 +435,7 @@ class PluginInvoker:
             )
             venv_dir = str(venv.bin_dir)
             env["VIRTUAL_ENV"] = str(venv.root)
-            env["PATH"] = os.pathsep.join([venv_dir, env["PATH"]])
+            env["PATH"] = os.pathsep.join([venv_dir, env["PATH"]])  # ty: ignore[no-matching-overload]
 
         return env
 
