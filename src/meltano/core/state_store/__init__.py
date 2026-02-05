@@ -115,12 +115,14 @@ def state_store_manager_from_project_settings(
     # Get backend-specific settings
     # AND top-level state_backend settings
     setting_defs = filter(
-        lambda setting_def: setting_def.name.startswith(
-            f"state_backend.{'gcs' if scheme == 'gs' else scheme}",
-        )
-        or (
-            setting_def.name.startswith("state_backend")
-            and len(setting_def.name.split(".")) == 2
+        lambda setting_def: (
+            setting_def.name.startswith(
+                f"state_backend.{'gcs' if scheme == 'gs' else scheme}",
+            )
+            or (
+                setting_def.name.startswith("state_backend")
+                and len(setting_def.name.split(".")) == 2
+            )
         ),
         settings_service.setting_definitions,
     )
