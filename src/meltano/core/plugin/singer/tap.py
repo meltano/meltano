@@ -485,11 +485,11 @@ class SingerTap(SingerPlugin):
                         raise failed_future.exception()  # type: ignore[misc]  # noqa: TRY301
                 exit_code = handle.returncode
             except Exception:
-                catalog_path.unlink()
+                catalog_path.unlink()  # noqa: ASYNC240
                 raise
 
             if exit_code != 0:
-                catalog_path.unlink()
+                catalog_path.unlink()  # noqa: ASYNC240
                 stderr_buff.seek(0)
                 raise PluginExecutionError(  # noqa: TRY003
                     "Catalog discovery failed: command "  # noqa: EM102

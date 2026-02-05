@@ -348,7 +348,7 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-required-version = ">=0.13"
+required-version = ">=0.15"
 
 [tool.ruff.lint]
 future-annotations = true

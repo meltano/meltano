@@ -71,9 +71,11 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             components joined by '/'
         """
         return reduce(
-            lambda comp1, comp2: f"{comp1}{comp2}"
-            if (comp1.endswith(self.delimiter) or comp2.startswith(self.delimiter))
-            else f"{comp1}{self.delimiter}{comp2}",
+            lambda comp1, comp2: (
+                f"{comp1}{comp2}"
+                if (comp1.endswith(self.delimiter) or comp2.startswith(self.delimiter))
+                else f"{comp1}{self.delimiter}{comp2}"
+            ),
             filter(None, components),
         )
 
