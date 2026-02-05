@@ -951,11 +951,13 @@ _sanitize_filename_transformations = (
     # Remove Remove illegal character combination `._` from front and back:
     lambda x: x.strip("._"),
     # Add a leading `_` if necessary to avoid conflict with reserved Windows filenames:
-    lambda x: f"_{x}"
-    if platform.system() == "Windows"
-    and x
-    and x.split(".")[0].upper() in _reserved_windows_filenames
-    else x,
+    lambda x: (
+        f"_{x}"
+        if platform.system() == "Windows"
+        and x
+        and x.split(".")[0].upper() in _reserved_windows_filenames
+        else x
+    ),
 )
 
 
