@@ -143,7 +143,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=1.16.0,<2",
-  "ty==0.0.14",
+  "ty==0.0.15",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -308,6 +308,9 @@ module = [
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
 ]
+
+[tool.ty.rules]
+unused-type-ignore-comment = "ignore"
 
 [tool.ty.src]
 include = [
