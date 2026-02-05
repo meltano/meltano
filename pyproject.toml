@@ -254,7 +254,6 @@ name = "cz_version_bump"
 version = "3.9.2"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
-changelog_merge_prerelease = true
 version_files = [
   "pyproject.toml:^version =",
   'docs/package.json:^  "version":',
