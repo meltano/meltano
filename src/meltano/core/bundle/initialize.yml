@@ -37,12 +37,12 @@ logging.yaml: |
       (): meltano.core.logging.console_log_formatter
       colors: true
       show_locals: false
-    
+
     # JSON formatted logs for production - machine readable
     json:
       (): meltano.core.logging.json_formatter
       callsite_parameters: true
-    
+
     # Plain text format - useful for simple output
     plain:
       (): meltano.core.logging.plain_formatter
@@ -77,13 +77,13 @@ logging.yaml: |
       level: INFO
       handlers: [console, file]
       propogate: no
-    
+
     # Plugin subprocess logging (taps, targets, etc.)
     meltano.core.plugin:
       level: INFO
       handlers: [console, file]
       propogate: no
-    
+
     # Debug logging for troubleshooting
     # Uncomment the following to enable debug logging:
     # meltano.core.runner:
