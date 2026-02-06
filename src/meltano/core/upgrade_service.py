@@ -169,38 +169,14 @@ class UpgradeService:
             raise UpgradeError(str(err)) from err
 
     def migrate_state(self, *, project: Project) -> None:
-        """Move cloud state files to deduplicated prefix paths.
+        """Run state-backend-specific migrations.
 
         Args:
             project: The Meltano project.
-
-        See: https://github.com/meltano/meltano/issues/7938
         """
-        from meltano.core.state_store.filesystem import CloudStateStoreManager
-
+        click.secho("Applying migrations to project state...", fg="blue")
         with StateService(project=project) as state_service:
-            manager = state_service.state_store_manager
-            if isinstance(manager, CloudStateStoreManager):
-                click.secho("Applying migrations to project state...", fg="blue")
-                for filepath in manager.list_all_files(with_prefix=False):
-                    parts = filepath.split(manager.delimiter)
-                    if (
-                        parts[-1] == "state.json"
-                        and filepath.count(manager.prefix.strip(manager.delimiter)) > 1
-                    ):
-                        duplicated_substr = manager.delimiter.join(
-                            [
-                                manager.prefix.strip(manager.delimiter),
-                                manager.prefix.strip(manager.delimiter),
-                            ],
-                        )
-                        new_path = filepath.replace(duplicated_substr, manager.prefix)
-                        new_path = new_path.replace(
-                            manager.delimiter * 2,
-                            manager.delimiter,
-                        )
-                        manager.copy_file(filepath, new_path)
-                        click.secho(f"Copied state from {filepath} to {new_path}")
+            state_service.state_store_manager.migrate()
 
     def upgrade(
         self,

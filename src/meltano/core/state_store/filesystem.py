@@ -611,6 +611,35 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         ...
 
     @override
+    def migrate(self) -> None:
+        """Migrate cloud state files to deduplicated prefix paths.
+
+        Fixes state files that were stored with a duplicated prefix path
+        component, e.g. ``prefix/prefix/state_id/state.json`` is copied
+        to ``prefix/state_id/state.json``.
+
+        See: https://github.com/meltano/meltano/issues/7938
+        """
+        stripped_prefix = self.prefix.strip(self.delimiter)
+        duplicated_substr = self.delimiter.join(
+            [stripped_prefix, stripped_prefix],
+        )
+        for filepath in self.list_all_files(with_prefix=False):
+            parts = filepath.split(self.delimiter)
+            if parts[-1] == "state.json" and filepath.count(stripped_prefix) > 1:
+                new_path = filepath.replace(duplicated_substr, self.prefix)
+                new_path = new_path.replace(
+                    self.delimiter * 2,
+                    self.delimiter,
+                )
+                self.copy_file(filepath, new_path)
+                logger.info(
+                    "Copied state to deduplicated path",
+                    src=filepath,
+                    dst=new_path,
+                )
+
+    @override
     def get_state_ids(self, pattern: str | None = None) -> list[str]:
         """Get list of state_ids stored in the backend.
 
