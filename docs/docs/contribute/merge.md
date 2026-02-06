@@ -54,6 +54,13 @@ Meltano makes use of ADR's (Architectural Decision Records) to record architectu
 In a nutshell, these are used to document architectural decisions and to provide a record of the decisions made by the team and contributors in regard to Meltano's architecture. These are held in [docs/adr](https://github.com/meltano/meltano/blob/main/docs/adr).
 To propose or add a new ADR, its simplest to create a new entry using [adr-tools](https://github.com/npryce/adr-tools), and then send a long a pull request for review.
 
+## AI-Assisted Contributions
+
+If your pull request was co-authored with an AI coding agent, please check the
+AI tooling box in the PR template and follow the
+[Agentic Coding guidelines](/contribute/agentic-coding) to make sure the
+contribution meets the project's quality bar.
+
 ## Integration Tests and The Example Library
 
 All new features should be covered via the [integration tests](https://docs.meltano.com/contribute/tests). In some cases
