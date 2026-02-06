@@ -208,7 +208,8 @@ def typing(session: nox.Session) -> None:
         session: Nox session.
     """
     _uv_sync(session, "--group=typing", "--all-extras")
-    session.run("ty", "check", *session.posargs)
+    output_format = "github" if os.getenv("GITHUB_ACTIONS") == "true" else "concise"
+    session.run("ty", "check", f"--output-format={output_format}", *session.posargs)
     session.run("mypy", *session.posargs)
 
 
