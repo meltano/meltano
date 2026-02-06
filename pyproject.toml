@@ -53,7 +53,7 @@ dependencies = [
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
-  "uv>=0.8.14,<0.10",
+  "uv>=0.8.14",
   "virtualenv>=20.26.6,<21",
 ]
 
