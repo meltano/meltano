@@ -118,11 +118,17 @@ class TestVenvService:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
+        # Pre-create a venv with a marker file to ensure `clean=True` clears it
+        venv_dir = subject.project.dirs.venvs("namespace", "name", make_dirs=True)
+        marker_file = venv_dir / "pre_existing_marker.txt"
+        marker_file.write_text("marker")
+
         await subject.install(["example"], clean=True)
         venv_dir = subject.project.dirs.venvs("namespace", "name")
 
-        # ensure the venv is created
+        # ensure the venv is created and previous contents have been cleared
         assert venv_dir.exists()
+        assert not marker_file.exists()
 
         # ensure that the binary is python3
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
