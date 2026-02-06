@@ -421,13 +421,13 @@ class Project:
         return self.root.joinpath(".env")
 
     @cached_property
-    def dotenv_env(self) -> dict[str, str | None]:
+    def dotenv_env(self) -> dict[str, str]:
         """Get values from this project's .env file.
 
         Returns:
-            values found in this project's .env file
+            Values found in this project's .env file, with None values filtered out.
         """
-        return dotenv_values(self.dotenv)
+        return {k: v for k, v in dotenv_values(self.dotenv).items() if v is not None}
 
     def activate_environment(self, name: str) -> None:
         """Activate a Meltano environment.
