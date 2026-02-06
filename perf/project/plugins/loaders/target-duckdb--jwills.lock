@@ -1,0 +1,136 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-duckdb",
+  "namespace": "target_duckdb",
+  "variant": "jwills",
+  "label": "DuckDB",
+  "docs": "https://hub.meltano.com/loaders/target-duckdb--jwills",
+  "repo": "https://github.com/jwills/target-duckdb",
+  "pip_url": "target-duckdb~=0.8",
+  "description": "DuckDB loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/duckdb.png",
+  "settings_group_validation": [
+    [
+      "default_target_schema",
+      "filepath"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "add_metadata_columns",
+      "kind": "boolean",
+      "value": false,
+      "label": "Add Metadata Columns",
+      "description": "Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in postgres etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix _SDC_. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the _SDC_DELETED_AT metadata column. Without the add_metadata_columns option the deleted rows from singer taps will not be recognisable in DuckDB."
+    },
+    {
+      "name": "batch_size_rows",
+      "kind": "integer",
+      "value": 100000,
+      "label": "Batch Size Rows",
+      "description": "Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into DuckDB."
+    },
+    {
+      "name": "data_flattening_max_level",
+      "kind": "integer",
+      "value": 0,
+      "label": "Data Flattening Max Level",
+      "description": "Object type RECORD items from taps can be transformed to flattened columns by creating columns automatically.\n\nWhen value is 0 (default) then flattening functionality is turned off.\n"
+    },
+    {
+      "name": "database",
+      "kind": "string",
+      "label": "Database name",
+      "description": "Alias of `dbname`."
+    },
+    {
+      "name": "dbname",
+      "kind": "string",
+      "label": "Database",
+      "description": "The database name to write to; this will be inferred from the path property if it is not specified."
+    },
+    {
+      "name": "default_target_schema",
+      "kind": "string",
+      "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
+      "label": "Default Target Schema",
+      "description": "Name of the schema where the tables will be created. If schema_mapping is not defined then every stream sent by the tap is loaded into this schema."
+    },
+    {
+      "name": "delimiter",
+      "kind": "string",
+      "value": ",",
+      "label": "Delimiter",
+      "description": "The delimiter to use for the CSV files that are used for record imports."
+    },
+    {
+      "name": "filepath",
+      "kind": "string",
+      "value": "${MELTANO_PROJECT_ROOT}/output/warehouse.duckdb",
+      "label": "File Path",
+      "description": "Alias of `path`.",
+      "placeholder": "/path/to/local/file.duckdb"
+    },
+    {
+      "name": "flush_all_streams",
+      "kind": "boolean",
+      "value": false,
+      "label": "Flush All Streams",
+      "description": "Flush and load every stream into DuckDB when one batch is full. Warning - This may trigger the COPY command to use files with low number of records."
+    },
+    {
+      "name": "hard_delete",
+      "kind": "boolean",
+      "value": false,
+      "label": "Hard Delete",
+      "description": "When hard_delete option is true then DELETE SQL commands will be performed in DuckDB to delete rows in tables. It's achieved by continuously checking the _SDC_DELETED_AT metadata column sent by the singer tap. Due to deleting rows requires metadata columns, hard_delete option automatically enables the add_metadata_columns option as well."
+    },
+    {
+      "name": "path",
+      "kind": "string",
+      "label": "Connection Path",
+      "description": "The path to use for the `duckdb.connect` call; either a local file or a MotherDuck connection uri.",
+      "placeholder": "/path/to/local/file.duckdb"
+    },
+    {
+      "name": "primary_key_required",
+      "kind": "boolean",
+      "value": true,
+      "label": "Primary Key Required",
+      "description": "Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined."
+    },
+    {
+      "name": "quotechar",
+      "kind": "string",
+      "value": "\"",
+      "label": "Quote Character",
+      "description": "The quote character to use for the CSV files that are used for record imports."
+    },
+    {
+      "name": "schema_mapping",
+      "kind": "object",
+      "label": "schema_mapping",
+      "description": "Useful if you want to load multiple streams from one tap to multiple DuckDB schemas.\n\nIf the tap sends the stream_id in <schema_name>-<table_name> format then this option overwrites the default_target_schema value.\n"
+    },
+    {
+      "name": "temp_dir",
+      "kind": "string",
+      "label": "Temporary Directory",
+      "description": "Directory of temporary CSV files with RECORD messages."
+    },
+    {
+      "name": "token",
+      "kind": "string",
+      "label": "Token",
+      "description": "For MotherDuck connections, the auth token to use.",
+      "sensitive": true
+    },
+    {
+      "name": "validate_records",
+      "kind": "boolean",
+      "value": false,
+      "label": "Validate Records",
+      "description": "Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by DuckDB. Enabling this option will detect invalid records earlier but could cause performance degradation."
+    }
+  ]
+}
