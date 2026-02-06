@@ -291,6 +291,16 @@ class Out:
         self.last_line = line
         line = line.rstrip()
 
+        # Handle encoding issues on Windows where the console may not support
+        # all Unicode characters (e.g., cp1252 encoding). Replace characters
+        # that cannot be encoded in the system's default encoding.
+        try:
+            line.encode(sys.stdout.encoding or "utf-8", errors="strict")
+        except UnicodeEncodeError:
+            line = line.encode(sys.stdout.encoding or "utf-8", errors="replace").decode(
+                sys.stdout.encoding or "utf-8", errors="replace"
+            )
+
         if not line:
             return
 
