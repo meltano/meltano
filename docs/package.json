@@ -8,6 +8,8 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",
+    "build:with-schema": "npm run generate-schema && docusaurus build",
+    "generate-schema": "python3 scripts/generate-schema-docs.py",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

@@ -1,0 +1,36 @@
+---
+title: Meltano YAML Schema
+description: JSON Schema reference for meltano.yml configuration file
+layout: doc
+sidebar_position: 3
+---
+
+# Meltano YAML Schema Reference
+
+This page provides a human-readable view of the JSON Schema for `meltano.yml` configuration files.
+
+The schema defines all valid properties and their types for Meltano project configuration.
+
+## View the Schema Documentation
+
+The generated schema documentation is available [here](/schema/index.html).
+
+## Schema File
+
+The source schema file is located at `src/meltano/schemas/meltano.schema.json` in the Meltano repository.
+
+## Using the Schema
+
+You can configure your IDE to use this schema for validation and autocomplete support when editing `meltano.yml` files. Most modern editors support JSON Schema validation for YAML files.
+
+### Visual Studio Code
+
+Add the following to your `.vscode/settings.json`:
+
+```json
+{
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/meltano/meltano/main/src/meltano/schemas/meltano.schema.json": "meltano.yml"
+  }
+}
+```
