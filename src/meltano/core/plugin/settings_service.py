@@ -76,7 +76,7 @@ class PluginSettingsService(SettingsService):
                 # expand state_id_suffix
                 self.project.environment.state_id_suffix = expand_env_vars(
                     self.project.environment.state_id_suffix,
-                    {  # ty: ignore[invalid-argument-type]
+                    {
                         **self.project.dotenv_env,
                         **self.env_override,
                     },

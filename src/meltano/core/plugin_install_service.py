@@ -467,7 +467,7 @@ class PluginInstallService:
                 os.environ,
                 if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
-            return {  # ty: ignore[invalid-return-type]
+            return {
                 "MELTANO__PYTHON_VERSION": (
                     f"{sys.version_info.major}.{sys.version_info.minor}"
                 ),
