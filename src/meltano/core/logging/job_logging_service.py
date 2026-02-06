@@ -52,7 +52,7 @@ class JobLoggingService:  # noqa: D101
         Returns:
             The logs directory for the given state ID.
         """
-        return self.project.job_logs_dir(state_id, *joinpaths, make_dirs=make_dirs)  # type: ignore[deprecated]
+        return self.project.dirs.job_logs(state_id, *joinpaths, make_dirs=make_dirs)
 
     def generate_log_name(
         self,
