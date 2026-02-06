@@ -305,18 +305,18 @@ class SingerTap(SingerPlugin):
         Returns:
             the state for the given job
         """
-        state_service = StateService(project=project, session=session)
-        try:
-            state = state_service.get_state(job_name)
-        except Exception as err:  # pragma: no cover
-            logger.error(  # noqa: TRY400
-                err.args[0],
-                state_backend=state_service.state_store_manager.label,
-            )
-            msg = "Failed to retrieve state"
-            raise PluginExecutionError(msg) from err
+        with StateService(project=project, session=session) as state_service:
+            try:
+                state = state_service.get_state(job_name)
+            except Exception as err:  # pragma: no cover
+                logger.error(  # noqa: TRY400
+                    err.args[0],
+                    state_backend=state_service.state_store_manager.label,
+                )
+                msg = "Failed to retrieve state"
+                raise PluginExecutionError(msg) from err
 
-        return state.get(SINGER_STATE_KEY)
+            return state.get(SINGER_STATE_KEY)
 
     @hook("before_invoke")
     async def discover_catalog_hook(

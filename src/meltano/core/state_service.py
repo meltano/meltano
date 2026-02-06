@@ -9,9 +9,15 @@ from __future__ import annotations
 
 import datetime
 import json
+import sys
 import typing as t
 
 import structlog
+
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
 
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import SINGER_STATE_KEY
@@ -22,6 +28,8 @@ from meltano.core.state_store import (
 )
 
 if t.TYPE_CHECKING:
+    from types import TracebackType
+
     from sqlalchemy.orm import Session
 
     from meltano.core.state_store.base import StateStoreManager
@@ -44,11 +52,33 @@ class StateService:
 
         Args:
             project: current meltano Project
-            session: the session to use, if using SYSTEMDB state backend
+            session: the session to use, if using SYSTEMDB state backend.
+                The caller is responsible for managing the session lifecycle;
+                closing the ``StateService`` only closes the state store
+                manager, not the session.
         """
         self.project = project or Project.find()
         self.session = session
         self._state_store_manager: StateStoreManager | None = None
+
+    def __enter__(self) -> Self:
+        """Enter the context manager."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
+        """Exit the context manager, closing the state store manager."""
+        self.close()
+
+    def close(self) -> None:
+        """Close the state store manager, if one was created."""
+        if self._state_store_manager is not None:
+            self._state_store_manager.close()
+            self._state_store_manager = None
 
     def list_state(self, state_id_pattern: str | None = None) -> dict:
         """List all state found in the db.
