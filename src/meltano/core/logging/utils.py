@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import enum
+import io
 import logging
 import os
 import sys
@@ -23,6 +24,30 @@ from meltano.core.utils import get_no_color_flag
 from .renderers import MeltanoConsoleRenderer
 
 logger = structlog.getLogger(__name__)
+
+
+def _get_utf8_stderr() -> io.TextIOWrapper:
+    """Get sys.stderr with UTF-8 encoding to handle non-ASCII characters.
+
+    On Windows, the default encoding may be cp1252 which cannot handle
+    all Unicode characters. This ensures logs containing non-ASCII chars
+    are handled correctly.
+
+    Returns:
+        A TextIOWrapper wrapping sys.stderr with UTF-8 encoding.
+    """
+    # If stderr is already a proper text stream with UTF-8, return it
+    if hasattr(sys.stderr, 'encoding') and sys.stderr.encoding == 'utf-8':
+        return sys.stderr
+
+    # Re-wrap stderr with UTF-8 encoding, handling errors gracefully
+    return io.TextIOWrapper(
+        sys.stderr.buffer,
+        encoding='utf-8',
+        errors='replace',
+        line_buffering=True,
+    )
+
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -187,7 +212,7 @@ def default_config(
                 "class": "logging.StreamHandler",
                 "level": numeric_level if log_level == "DISABLED" else log_level,
                 "formatter": log_format,
-                "stream": "ext://sys.stderr",
+                "stream": "ext://meltano.core.logging.utils._get_utf8_stderr()",
             },
         },
         "loggers": {
