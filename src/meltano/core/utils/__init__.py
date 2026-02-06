@@ -634,7 +634,10 @@ def expand_env_vars(
         if match["escape"]:
             return restored
         try:
-            val = str(env[var])
+            env_val = env[var]
+            # Handle None values from dotenv (e.g., ENV_VAR without a value)
+            # See: https://github.com/meltano/meltano/issues/9785
+            val = "" if env_val is None else str(env_val)
         except KeyError as ex:
             logger.debug(
                 f"Variable '${var}' is not set in the provided env dictionary.",  # noqa: G004

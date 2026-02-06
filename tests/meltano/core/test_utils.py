@@ -228,6 +228,13 @@ def test_unflatten() -> None:
             "MY_DB$TableName",
             id="escape",
         ),
+        pytest.param(
+            "prefix-$ENV_VAR-suffix",
+            {"ENV_VAR": None},
+            {},
+            "prefix--suffix",
+            id="none-value-from-dotenv",
+        ),
     ),
 )
 def test_expand_env_vars(input_value, env, kwargs, expected_output) -> None:
