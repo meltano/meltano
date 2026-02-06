@@ -481,7 +481,7 @@ def apply_scaffold(manifest: dict[str, t.Any], locations: Iterable[str]) -> None
 
     Args:
         manifest: The manifest dictionary to update in-place.
-        locations: The locations (as jq filters) which will be added to the the
+        locations: The locations (as jq filters) which will be added to the
             manifest as necessary.
     """
     _apply_scaffold(
