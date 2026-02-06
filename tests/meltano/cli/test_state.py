@@ -179,6 +179,7 @@ class TestCliState:
                     assert_cli_runner(result)
                     assert state_service.get_state(state_id) == state_payload
 
+    @pytest.mark.usefixtures("project")
     def test_set_from_string_file_mutually_exclusive(
         self,
         tmp_path: Path,
