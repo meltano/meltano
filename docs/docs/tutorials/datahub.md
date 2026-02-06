@@ -10,9 +10,9 @@ Meltano supports multiple [utilities](/concepts/plugins#utilities), one of them 
 
 This guide explains how to use the datahub utility either with a local running instance, or with a remotely running instance. It will explain how to setup the utility, configure datahub sources and how to run ingestions.
 
-We assume you have some familarity with DataHub and Meltano.
+We assume you have some familiarity with DataHub and Meltano.
 
-Have your [DataHub GMS](https://datahubproject.io/docs/what/gms/) url and and auth token ready for the setup. Or do the local setup described below.
+Have your [DataHub GMS](https://datahubproject.io/docs/what/gms/) url and auth token ready for the setup. Or do the local setup described below.
 
 ## High-level Overview
 
