@@ -2,11 +2,57 @@ from __future__ import annotations
 
 import json
 import platform
+import typing as t
+from unittest import mock
 
 import pytest
 
-from meltano.core.state_service import InvalidJobStateError
+from fixtures.state_backends import DummyStateStoreManager
+from meltano.core.state_service import InvalidJobStateError, StateService
 from meltano.core.utils import merge
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
+
+class TestStateServiceContextManager:
+    def test_context_manager_returns_self(self, project: Project) -> None:
+        service = StateService(project)
+        with service as svc:
+            assert svc is service
+
+    def test_exit_closes_manager(self, project: Project) -> None:
+        service = StateService(project)
+        dummy_manager = DummyStateStoreManager()
+        service._state_store_manager = dummy_manager
+
+        with mock.patch.object(dummy_manager, "close") as mock_close:
+            with service:
+                pass
+            mock_close.assert_called_once()
+
+    def test_close_noop_when_no_manager(self, project: Project) -> None:
+        service = StateService(project)
+        assert service._state_store_manager is None
+        service.close()  # Should not raise
+        assert service._state_store_manager is None
+
+    def test_close_resets_manager_to_none(self, project: Project) -> None:
+        service = StateService(project)
+        service._state_store_manager = DummyStateStoreManager()
+        service.close()
+        assert service._state_store_manager is None
+
+    def test_exception_propagated_and_close_called(self, project: Project) -> None:
+        service = StateService(project)
+        dummy_manager = DummyStateStoreManager()
+        service._state_store_manager = dummy_manager
+        msg = "boom"
+
+        with mock.patch.object(dummy_manager, "close") as mock_close:
+            with pytest.raises(RuntimeError, match=msg), service:
+                raise RuntimeError(msg)
+            mock_close.assert_called_once()
 
 
 class TestStateService:

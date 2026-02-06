@@ -18,6 +18,7 @@ from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
+    from types import TracebackType
 
 
 class UnsupportedStateBackendURIError(Exception):
@@ -123,7 +124,12 @@ class StateStoreManager(ABC):
         """Enter the context manager."""
         return self
 
-    def __exit__(self, *args: object) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         """Exit the context manager."""
         self.close()
 
