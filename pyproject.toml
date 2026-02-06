@@ -175,8 +175,8 @@ asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
   'error',
   # First-party warnings
-  '''ignore:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
-  'ignore::meltano.core._compat.MeltanoInternalDeprecationWarning',
+  '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
+  'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
   # Third-party warnings
   'once::pytest.PytestUnraisableExceptionWarning',
   'once::pytest.PytestUnhandledThreadExceptionWarning',
