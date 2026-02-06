@@ -45,6 +45,32 @@ else:
     from importlib_metadata import EntryPoint, EntryPoints
 
 
+class TestStateStoreManagerContextManager:
+    def test_context_manager(self) -> None:
+        manager = DummyStateStoreManager()
+        with manager as m:
+            assert m is manager
+
+    def test_close_called_on_exit(self) -> None:
+        manager = DummyStateStoreManager()
+        with mock.patch.object(manager, "close") as mock_close:
+            with manager:
+                pass
+            mock_close.assert_called_once()
+
+    def test_close_called_on_exception(self) -> None:
+        manager = DummyStateStoreManager()
+        msg = "test"
+        with mock.patch.object(manager, "close") as mock_close:
+            with pytest.raises(RuntimeError, match=msg), manager:
+                raise RuntimeError(msg)
+            mock_close.assert_called_once()
+
+    def test_close_is_noop_by_default(self) -> None:
+        manager = DummyStateStoreManager()
+        manager.close()  # Should not raise
+
+
 def test_unknown_state_backend_scheme(project: Project):
     project.settings.set(["state_backend", "uri"], "unknown://")
     with pytest.raises(

@@ -178,29 +178,29 @@ class UpgradeService:
         """
         from meltano.core.state_store.filesystem import CloudStateStoreManager
 
-        state_service = StateService(project=project)
-        manager = state_service.state_store_manager
-        if isinstance(manager, CloudStateStoreManager):
-            click.secho("Applying migrations to project state...", fg="blue")
-            for filepath in manager.list_all_files(with_prefix=False):
-                parts = filepath.split(manager.delimiter)
-                if (
-                    parts[-1] == "state.json"
-                    and filepath.count(manager.prefix.strip(manager.delimiter)) > 1
-                ):
-                    duplicated_substr = manager.delimiter.join(
-                        [
-                            manager.prefix.strip(manager.delimiter),
-                            manager.prefix.strip(manager.delimiter),
-                        ],
-                    )
-                    new_path = filepath.replace(duplicated_substr, manager.prefix)
-                    new_path = new_path.replace(
-                        manager.delimiter * 2,
-                        manager.delimiter,
-                    )
-                    manager.copy_file(filepath, new_path)
-                    click.secho(f"Copied state from {filepath} to {new_path}")
+        with StateService(project=project) as state_service:
+            manager = state_service.state_store_manager
+            if isinstance(manager, CloudStateStoreManager):
+                click.secho("Applying migrations to project state...", fg="blue")
+                for filepath in manager.list_all_files(with_prefix=False):
+                    parts = filepath.split(manager.delimiter)
+                    if (
+                        parts[-1] == "state.json"
+                        and filepath.count(manager.prefix.strip(manager.delimiter)) > 1
+                    ):
+                        duplicated_substr = manager.delimiter.join(
+                            [
+                                manager.prefix.strip(manager.delimiter),
+                                manager.prefix.strip(manager.delimiter),
+                            ],
+                        )
+                        new_path = filepath.replace(duplicated_substr, manager.prefix)
+                        new_path = new_path.replace(
+                            manager.delimiter * 2,
+                            manager.delimiter,
+                        )
+                        manager.copy_file(filepath, new_path)
+                        click.secho(f"Copied state from {filepath} to {new_path}")
 
     def upgrade(
         self,

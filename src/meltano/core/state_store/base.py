@@ -4,9 +4,15 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import sys
 import typing as t
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
+
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
 
 from meltano.core.utils import merge
 
@@ -111,6 +117,21 @@ class StateStoreManager(ABC):
 
         Args:
             kwargs: additional keyword arguments
+        """
+
+    def __enter__(self) -> Self:
+        """Enter the context manager."""
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        """Exit the context manager."""
+        self.close()
+
+    def close(self) -> None:  # noqa: B027
+        """Close any resources held by the state store manager.
+
+        Subclasses should override this to clean up backend-specific resources
+        (e.g., database connections, file handles).
         """
 
     @t.final
