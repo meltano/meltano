@@ -229,6 +229,13 @@ class StateStoreManager(ABC):
         """
         ...
 
+    def migrate(self) -> None:  # noqa: B027
+        """Migrate state from a previous version of the manager.
+
+        Subclasses should override this to perform any necessary migrations
+        on the state data (e.g., fixing path prefixes, schema changes).
+        """
+
     @abstractmethod
     @contextmanager
     def acquire_lock(

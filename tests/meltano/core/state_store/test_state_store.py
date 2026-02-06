@@ -489,3 +489,73 @@ class TestS3StateBackend:
                 == state
             )
             assert response["ContentType"] == "application/json"
+
+    def test_migrate_deduplicates_prefix(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+        duplicated_key = f"{prefix}/{prefix}/my-state-id/state.json"
+        correct_key = f"/{prefix}/my-state-id/state.json"
+        body = b'{"completed": {}, "partial": {}}'
+
+        with moto.mock_aws():
+            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+            monkeypatch.delenv("AWS_PROFILE", raising=False)
+            manager.client.create_bucket(Bucket=bucket)
+            manager.client.put_object(
+                Bucket=bucket,
+                Key=duplicated_key,
+                Body=body,
+            )
+
+            manager.migrate()
+
+            # The file should have been copied to the de-duplicated path
+            copied = manager.client.get_object(Bucket=bucket, Key=correct_key)
+            assert copied["Body"].read() == body
+
+    def test_migrate_ignores_clean_files(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+        clean_key = f"{prefix}/my-state-id/state.json"
+        body = b'{"completed": {}, "partial": {}}'
+
+        with moto.mock_aws():
+            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+            monkeypatch.delenv("AWS_PROFILE", raising=False)
+            manager.client.create_bucket(Bucket=bucket)
+            manager.client.put_object(
+                Bucket=bucket,
+                Key=clean_key,
+                Body=body,
+            )
+
+            manager.migrate()
+
+            # Only the original key should exist — no extra copies
+            objects = manager.client.list_objects_v2(Bucket=bucket)
+            keys = [obj["Key"] for obj in objects["Contents"]]
+            assert keys == [clean_key]
