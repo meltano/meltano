@@ -369,7 +369,7 @@ class SettingsService(metaclass=ABCMeta):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(  # type: ignore[type-var]
                 value,
-                env=expandable_env,  # ty: ignore[invalid-argument-type]
+                env=expandable_env,
                 if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167

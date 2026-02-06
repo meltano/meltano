@@ -491,7 +491,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             kwargs: Keyword arguments to pass to parent class.
         """
         super().__init__(*args, **kwargs)
-        self._env: dict[str, str | None] | None = None
+        self._env: dict[str, str] | None = None
 
     def ensure_supported(self, method: str = "get") -> None:
         """Ensure named method is supported.
@@ -509,7 +509,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             raise StoreNotSupportedError(ProjectReadonly())
 
     @property
-    def env(self) -> dict[str, str | None]:
+    def env(self) -> dict[str, str]:
         """Return values from the .env file.
 
         Returns:
