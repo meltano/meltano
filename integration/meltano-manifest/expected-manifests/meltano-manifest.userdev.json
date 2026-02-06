@@ -2765,7 +2765,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
         "name": "dbt-snowflake",
         "namespace": "dbt_snowflake",
-        "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.3.0",
+        "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.4.0",
         "plugin_type": "utilities",
         "repo": "https://github.com/dbt-labs/dbt-snowflake",
         "settings": [
