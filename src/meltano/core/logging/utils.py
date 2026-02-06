@@ -188,6 +188,7 @@ def default_config(
                 "level": numeric_level if log_level == "DISABLED" else log_level,
                 "formatter": log_format,
                 "stream": "ext://sys.stderr",
+                "encoding": "utf-8",
             },
         },
         "loggers": {
