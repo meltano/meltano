@@ -24,3 +24,69 @@ transform/.gitkeep: ""
 analyze/.gitkeep: ""
 notebook/.gitkeep: ""
 orchestrate/.gitkeep: ""
+logging.yaml: |
+  version: 1
+  disable_existing_loggers: false
+
+  # Meltano logging configuration
+  # For more details, see: https://docs.meltano.com/guide/logging
+
+  formatters:
+    # Colored console output for development - human readable with colors
+    colored:
+      (): meltano.core.logging.console_log_formatter
+      colors: true
+      show_locals: false
+    
+    # JSON formatted logs for production - machine readable
+    json:
+      (): meltano.core.logging.json_formatter
+      callsite_parameters: true
+    
+    # Plain text format - useful for simple output
+    plain:
+      (): meltano.core.logging.plain_formatter
+
+  handlers:
+    # Console handler for output to stdout/stderr
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: colored
+      stream: ext://sys.stderr
+
+    # File handler for persistent logs
+    file:
+      class: logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: json
+      filename: .meltano/logs/meltano.log
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+
+  # Root logger configuration
+  root:
+    level: INFO
+    handlers: [console, file]
+    propogate: yes
+
+  # Specific logger configurations
+  loggers:
+    # Meltano core logging
+    meltano:
+      level: INFO
+      handlers: [console, file]
+      propogate: no
+    
+    # Plugin subprocess logging (taps, targets, etc.)
+    meltano.core.plugin:
+      level: INFO
+      handlers: [console, file]
+      propogate: no
+    
+    # Debug logging for troubleshooting
+    # Uncomment the following to enable debug logging:
+    # meltano.core.runner:
+    #   level: DEBUG
+    #   handlers: [console, file]
+    #   propogate: no
