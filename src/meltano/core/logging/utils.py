@@ -37,14 +37,14 @@ def _get_utf8_stderr() -> io.TextIOWrapper:
         A TextIOWrapper wrapping sys.stderr with UTF-8 encoding.
     """
     # If stderr is already a proper text stream with UTF-8, return it
-    if hasattr(sys.stderr, 'encoding') and sys.stderr.encoding == 'utf-8':
+    if hasattr(sys.stderr, "encoding") and sys.stderr.encoding == "utf-8":
         return sys.stderr
 
     # Re-wrap stderr with UTF-8 encoding, handling errors gracefully
     return io.TextIOWrapper(
         sys.stderr.buffer,
-        encoding='utf-8',
-        errors='replace',
+        encoding="utf-8",
+        errors="replace",
         line_buffering=True,
     )
 
