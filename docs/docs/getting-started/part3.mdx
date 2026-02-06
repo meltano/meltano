@@ -117,7 +117,8 @@ dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath(
 ```yaml
   utilities:
   - name: dbt-postgres
-~=```
+    pip_url: dbt-core dbt-postgres meltano-dbt-ext~=0.4.0
+```
 :::
 
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
