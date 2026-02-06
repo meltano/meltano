@@ -60,7 +60,7 @@ class TestVenvService:
         return VenvService(project=project, namespace="namespace", name="name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService) -> None:
-        run_dir = project.run_dir("name")
+        run_dir = project.dirs.run("name")
 
         file = run_dir / "test.file.txt"
         file.touch()
@@ -98,7 +98,7 @@ class TestVenvService:
             namespace=plugin_type,
             name=plugin_name,
         )
-        venv_dir = project.venvs_dir(plugin_type, plugin_name, make_dirs=True)
+        venv_dir = project.dirs.venvs(plugin_type, plugin_name, make_dirs=True)
         # Don't allow writing to the venv dir
         venv_dir.chmod(0o555)
 
@@ -118,11 +118,17 @@ class TestVenvService:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
-        await subject.install(["example"], clean=True)
-        venv_dir = subject.project.venvs_dir("namespace", "name")
+        # Pre-create a venv with a marker file to ensure `clean=True` clears it
+        venv_dir = subject.project.dirs.venvs("namespace", "name", make_dirs=True)
+        marker_file = venv_dir / "pre_existing_marker.txt"
+        marker_file.write_text("marker")
 
-        # ensure the venv is created
+        await subject.install(["example"], clean=True)
+        venv_dir = subject.project.dirs.venvs("namespace", "name")
+
+        # ensure the venv is created and previous contents have been cleared
         assert venv_dir.exists()
+        assert not marker_file.exists()
 
         # ensure that the binary is python3
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
@@ -268,7 +274,7 @@ class TestVirtualEnv:
     )
     def test_cross_platform(self, system: str, lib_dir: str, project: Project) -> None:
         with mock.patch("platform.system", return_value=system):
-            subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
+            subject = VirtualEnv(project.dirs.venvs("pytest", "pytest"))
             assert subject.lib_dir == subject.root / lib_dir
 
     def test_unknown_platform(self, project: Project) -> None:
@@ -279,7 +285,7 @@ class TestVirtualEnv:
                 match=r"(?i)Platform 'commodore64'.*?not supported.",
             ),
         ):
-            VirtualEnv(project.venvs_dir("pytest", "pytest"))
+            VirtualEnv(project.dirs.venvs("pytest", "pytest"))
 
 
 class TestUvVenvService(TestVenvService):
