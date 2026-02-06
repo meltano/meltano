@@ -372,7 +372,7 @@ class VenvService:
         Returns:
             The path to the install log file.
         """
-        return self.project.logs_dir(
+        return self.project.dirs.logs(
             "pip",
             self.namespace,
             self.name,
@@ -430,19 +430,6 @@ class VenvService:
         except FileNotFoundError:
             logger.debug("No cached configuration files to remove")
 
-    def clean(self) -> None:
-        """Destroy the virtual environment, if it exists."""
-        try:
-            shutil.rmtree(self.venv.root)
-            logger.debug(
-                "Removed old virtual environment for '%s/%s'",
-                self.namespace,
-                self.name,
-            )
-        except FileNotFoundError:
-            # If the VirtualEnv has never been created before do nothing
-            logger.debug("No old virtual environment to remove")
-
     async def create_venv(
         self,
         *,
@@ -461,6 +448,7 @@ class VenvService:
             sys.executable,
             "-m",
             "virtualenv",
+            "--clear",
             f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
@@ -598,7 +586,6 @@ class VenvService:
             The process running `pip install` with the provided args.
         """
         if clean:
-            self.clean()
             await self.create()
             await self.upgrade_installer(env=env)
 
@@ -729,6 +716,7 @@ class UvVenvService(VenvService):
         return await exec_async(
             self.uv,
             "venv",
+            "--clear",
             f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
