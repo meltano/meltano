@@ -8,7 +8,7 @@ sidebar_position: 11
 
 Meltano supports multiple [utilities](/concepts/plugins#utilities), one of them is the [DataHub utility](https://hub.meltano.com/utilities/datahub). It provides an integration for the metadata platform called DataHub. You can find the reference at both the [utility-datahub level](https://github.com/z3z1ma/files-datahub/tree/main/bundle/utilities/datahub) as well as the [file-bundle-datahub level](https://github.com/z3z1ma/files-datahub).
 
-This guide explains how to use the datahub utility either with a local running instance, or with a remotely running instance. It will explain how to setup the utility, configure datahub sources and how to run ingestions.
+This guide explains how to use the datahub utility either with a local running instance, or with a remotely running instance. It will explain how to set up the utility, configure datahub sources and how to run ingestions.
 
 We assume you have some familiarity with DataHub and Meltano.
 
