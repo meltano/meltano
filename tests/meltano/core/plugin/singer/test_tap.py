@@ -24,7 +24,6 @@ from meltano.core.plugin.singer.catalog import (
     property_breadcrumb,
     select_metadata_rules,
 )
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 if t.TYPE_CHECKING:
@@ -34,6 +33,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin.singer.catalog import CatalogDict, MetadataRule, SchemaRule
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.project_add_service import ProjectAddService
 
