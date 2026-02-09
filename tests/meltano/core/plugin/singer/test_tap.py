@@ -992,7 +992,10 @@ class TestSingerTap:
         invoker.invoke_async = AsyncMock(return_value=process_mock)
         catalog_path = invoker.files["catalog"]
 
-        with pytest.raises(PluginExecutionError, match="returned 1"):
+        with pytest.raises(
+            PluginExecutionError,
+            match=r"returned 1 with stderr:\n stderr mock output",
+        ):
             await subject.run_discovery(invoker, catalog_path)
 
         assert not catalog_path.exists(), "Catalog should not be present."
@@ -1032,9 +1035,12 @@ class TestSingerTap:
             call_kwargs = invoker.invoke_async.call_args_list[0][1]
             assert call_kwargs.get("stderr") is subprocess.PIPE
             assert capture_mock.call_count == 1
-            capture_args = capture_mock.call_args[0]
-            assert len(capture_args) == 3
-            assert capture_args[0] is process_mock.stderr
+            assert capture_mock.call_args[0][0] is process_mock.stderr
+
+            process_mock.stderr = None
+            capture_mock.reset_mock()
+            await subject.run_discovery(invoker, catalog_path)
+            assert capture_mock.call_count == 0
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")

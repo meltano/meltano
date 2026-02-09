@@ -67,10 +67,10 @@ async def _stream_redirect(
             file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
-class _StringIOWriter:
-    """Adapter to use a StringIO as a SubprocessOutputWriter."""
+class _TextIOWriter:
+    """Adapter to use a text IO stream as a SubprocessOutputWriter."""
 
-    def __init__(self, buffer: StringIO) -> None:
+    def __init__(self, buffer: t.IO[str]) -> None:
         self._buffer = buffer
 
     def writeline(self, line: str) -> None:
@@ -468,7 +468,7 @@ class SingerTap(SingerPlugin):
                             plugin_invoker.stderr_logger.bind(type="discovery"),
                             log_parser=plugin_invoker.get_log_parser(),
                         )
-                        stderr_writer = _StringIOWriter(stderr_buff)
+                        stderr_writer = _TextIOWriter(stderr_buff)
                         future = capture_subprocess_output(
                             handle.stderr,
                             out,
