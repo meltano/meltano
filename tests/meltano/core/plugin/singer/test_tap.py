@@ -1019,59 +1019,22 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         with (
-            mock.patch.object(
-                PluginInvoker,
-                "stderr_logger",
-                new_callable=mock.PropertyMock,
-                return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=False)),
-            ),
             mock.patch(
                 "meltano.core.plugin.singer.tap._stream_redirect",
             ) as stream_mock,
-        ):
-            await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock.call_count == 2
-
-        with (
-            mock.patch.object(
-                PluginInvoker,
-                "stderr_logger",
-                new_callable=mock.PropertyMock,
-                return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
-            ),
-            mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect",
-            ) as stream_mock2,
-        ):
-            await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock2.call_count == 1
-
-        # ensure stderr is redirected to devnull if we don't need it
-        discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")  # noqa: TID251
-        original_level = discovery_logger.getEffectiveLevel()
-        discovery_logger.setLevel(logging.INFO)
-        with (
-            mock.patch.object(
-                PluginInvoker,
-                "stderr_logger",
-                new_callable=mock.PropertyMock,
-                return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
-            ),
-            mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect",
-            ) as stream_mock3,
             mock.patch(
                 "meltano.core.plugin.singer.tap.capture_subprocess_output",
-            ) as capture_subprocess_output_mock,
+            ) as capture_mock,
         ):
             await subject.run_discovery(invoker, catalog_path)
 
-            assert stream_mock3.call_count == 1
+            assert stream_mock.call_count == 1
             call_kwargs = invoker.invoke_async.call_args_list[0][1]
             assert call_kwargs.get("stderr") is subprocess.PIPE
-            assert capture_subprocess_output_mock.call_count == 1
-
-        discovery_logger.setLevel(original_level)
+            assert capture_mock.call_count == 1
+            capture_args = capture_mock.call_args[0]
+            assert len(capture_args) == 3
+            assert capture_args[0] is process_mock.stderr
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")
@@ -1122,13 +1085,7 @@ class TestSingerTap:
 
         assert sys.getdefaultencoding() == "utf-8"
 
-        with mock.patch.object(
-            PluginInvoker,
-            "stderr_logger",
-            new_callable=mock.PropertyMock,
-            return_value=mock.Mock(isEnabledFor=mock.Mock(return_value=True)),
-        ):
-            await subject.run_discovery(invoker, catalog_path)
+        await subject.run_discovery(invoker, catalog_path)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("use_test_log_config")
