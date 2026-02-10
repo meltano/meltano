@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import asyncio.subprocess
 import json
-import logging
 import shutil
 import sys
 import typing as t
@@ -66,6 +65,16 @@ async def _stream_redirect(
         data = await stream.readline()
         for file_like_obj in file_like_objs:
             file_like_obj.write(data.decode(encoding) if write_str else data)
+
+
+class _TextIOWriter:
+    """Adapter to use a text IO stream as a SubprocessOutputWriter."""
+
+    def __init__(self, buffer: t.IO[str]) -> None:
+        self._buffer = buffer
+
+    def writeline(self, line: str) -> None:
+        self._buffer.write(line)
 
 
 def config_metadata_rules(config: dict[str, t.Any]) -> list[MetadataRule]:
@@ -453,27 +462,19 @@ class SingerTap(SingerPlugin):
                         asyncio.ensure_future(_stream_redirect(handle.stdout, catalog)),
                         asyncio.ensure_future(handle.wait()),
                     ]
-                    if (
-                        plugin_invoker.stderr_logger.isEnabledFor(logging.DEBUG)
-                        and handle.stderr is not None
-                    ):
+                    if handle.stderr is not None:
                         out = OutputLogger("discovery.log").out(
                             self.name,
                             plugin_invoker.stderr_logger.bind(type="discovery"),
                             log_parser=plugin_invoker.get_log_parser(),
                         )
-                        future = capture_subprocess_output(handle.stderr, out)
-                        invoke_futures.append(asyncio.ensure_future(future))
-                    else:
-                        invoke_futures.append(
-                            asyncio.ensure_future(
-                                _stream_redirect(
-                                    handle.stderr,
-                                    stderr_buff,
-                                    write_str=True,
-                                ),
-                            ),
+                        stderr_writer = _TextIOWriter(stderr_buff)
+                        future = capture_subprocess_output(
+                            handle.stderr,
+                            out,
+                            stderr_writer,
                         )
+                        invoke_futures.append(asyncio.ensure_future(future))
                     done, _ = await asyncio.wait(
                         invoke_futures,
                         return_when=asyncio.ALL_COMPLETED,
