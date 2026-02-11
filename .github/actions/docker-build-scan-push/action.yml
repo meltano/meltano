@@ -68,7 +68,7 @@ runs:
         INPUTS_SLIM: ${{ inputs.slim }}
 
     - name: Build the image for all supported architectures
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@601a80b39c9405e50806ae38af30926f9d957c47 # v6.19.1
       with:
         context: .
         file: ${{ steps.dockerfile-path.outputs.path }}
@@ -85,7 +85,7 @@ runs:
         push: false
 
     - name: Load the amd64 image for scanning
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@601a80b39c9405e50806ae38af30926f9d957c47 # v6.19.1
       with:
         context: .
         file: ${{ steps.dockerfile-path.outputs.path }}
@@ -106,7 +106,7 @@ runs:
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@8d2fce09422cd6037e577f4130e9b925e9a37175 # v7.3.1
+      uses: anchore/scan-action@7037fa011853d5a11690026fb85feee79f4c946c # v7.3.2
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -114,7 +114,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
+      uses: github/codeql-action/upload-sarif@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4.32.2
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -142,7 +142,7 @@ runs:
 
     - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@601a80b39c9405e50806ae38af30926f9d957c47 # v6.19.1
       with:
         context: .
         file: ${{ steps.dockerfile-path.outputs.path }}
