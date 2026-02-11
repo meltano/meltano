@@ -11,7 +11,7 @@ from time import sleep
 from unittest import mock
 
 import pytest
-from snowplow_tracker import Emitter, SelfDescribing
+from snowplow_tracker import Emitter
 
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
@@ -22,6 +22,8 @@ from meltano.core.utils import hash_sha256, new_project_id
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+
+    from snowplow_tracker import SelfDescribing
 
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
@@ -400,8 +402,12 @@ class TestTracker:
             )
 
             tracker = Tracker(project)
+            assert tracker.snowplow_tracker is not None
             assert len(tracker.snowplow_tracker.emitters) == 1
-            tracker.snowplow_tracker.emitters[0].on_failure = mock.MagicMock()
+
+            emitter = tracker.snowplow_tracker.emitters[0]
+            assert isinstance(emitter, Emitter)
+            emitter.on_failure = mock.MagicMock()
 
             server_thread.start()
             tracker.track_command_event(CliEvent.started)
@@ -409,9 +415,7 @@ class TestTracker:
             server.shutdown()
             server_thread.join()
 
-            timeout_occurred = (
-                tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
-            )
+            timeout_occurred = emitter.on_failure.call_count == 1
             assert timeout_occurred is timeout_should_occur
 
     def test_project_context_send_anonymous_usage_stats_source(
@@ -453,16 +457,23 @@ class TestTracker:
 
         with pytest.warns(
             (UserWarning, UserWarning),
+            # UserWarning,
             match="Invalid Snowplow endpoint",
         ) as warnings:
             tracker = Tracker(project)
 
-        assert warnings[0].message.args[0] == "Invalid Snowplow endpoint: notvalid:8080"
-        assert (
-            warnings[1].message.args[0]
-            == "Invalid Snowplow endpoint: file://bad.scheme"
-        )
+        tracker_warnings = [
+            w.message.args[0]
+            for w in warnings
+            if isinstance(w.message, UserWarning)
+            and "Invalid Snowplow endpoint" in str(w.message)
+        ]
 
+        assert len(tracker_warnings) == 2
+        assert tracker_warnings[0] == "Invalid Snowplow endpoint: notvalid:8080"
+        assert tracker_warnings[1] == "Invalid Snowplow endpoint: file://bad.scheme"
+
+        assert tracker.snowplow_tracker is not None
         assert len(tracker.snowplow_tracker.emitters) == 2
 
         emitter = tracker.snowplow_tracker.emitters[0]

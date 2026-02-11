@@ -17,8 +17,8 @@ an explicit start_date from which you would like tap-gitlab to start importing d
 that the resulting jsonl files NOT actually include timestamps in their file names:
 
 ```shell
-meltano config tap-gitlab set start_date 2022-04-25T00:00:01Z
-meltano config target-jsonl set do_timestamp_file false
+meltano config set tap-gitlab start_date 2022-04-25T00:00:01Z
+meltano config set target-jsonl do_timestamp_file false
 ```
 
 ## Running a task

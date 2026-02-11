@@ -96,12 +96,12 @@ Options:
 
 ## Configure the target-postgres loader
 
-To configure the plugin, look at the options by running `meltano config target-postgres list`:
+To configure the plugin, look at the options by running `meltano config list target-postgres`:
 
 <Termy>
 
 ```console
-$ meltano config target-postgres list
+$ meltano config list target-postgres
 
 [...]
 host [env: TARGET_POSTGRES_HOST] current value: 'postgres' (from `meltano.yml`)
@@ -125,20 +125,20 @@ To learn more about loader 'target-postgres' and its settings, visit https://hub
 </Termy>
 
 <br />
-Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
+Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config set target-postgres ATTRIBUTE VALUE` command:
 
  <Termy>
 
 ```console
-$ meltano config target-postgres set user meltano
+$ meltano config set target-postgres user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
-$ meltano config target-postgres set password password
+$ meltano config set target-postgres password password
 &ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: (redacted)
-$ meltano config target-postgres set database postgres
+$ meltano config set target-postgres database postgres
 &ensp;&ensp;Loader 'target-postgres' setting 'database' was set in `meltano.yml`: 'postgres'
-$ meltano config target-postgres set add_record_metadata True
+$ meltano config set target-postgres add_record_metadata True
 &ensp;&ensp;Loader 'target-postgres' setting 'add_record_metadata' was set in `meltano.yml`: True
-$ meltano config target-postgres set host localhost
+$ meltano config set target-postgres host localhost
 &ensp;&ensp;Loader 'target-postgres' setting 'host' was set in `meltano.yml`: localhost
 ```
 
@@ -163,12 +163,12 @@ plugins:
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
 
-You can use `meltano config target-postgres` to check the configuration, including the default settings not visible in the project file.
+You can use `meltano config print target-postgres` to check the configuration, including the default settings not visible in the project file.
 
 <Termy>
 
 ```console
-$ meltano config target-postgres
+$ meltano config print target-postgres
 {
 &ensp;&ensp;&ensp;&ensp;"add_record_metadata": true,
 &ensp;&ensp;&ensp;&ensp;"database": "postgres",

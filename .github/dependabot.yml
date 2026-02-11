@@ -5,9 +5,6 @@ updates:
     directory: "/.github/workflows"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       default:
@@ -16,13 +13,12 @@ updates:
         - "patch"
     commit-message:
       prefix: "ci: "
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       actions:
@@ -30,14 +26,13 @@ updates:
           - "*"
     commit-message:
       prefix: "ci: "
+    cooldown:
+      default-days: 7
   - package-ecosystem: uv
     versioning-strategy: increase-if-necessary
     directory: "/"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
       development-dependencies:
@@ -50,29 +45,39 @@ updates:
     commit-message:
       prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
+    cooldown:
+      default-days: 7
+    allow:
+      - dependency-type: "all"
   - package-ecosystem: npm
     versioning-strategy: increase
     directory: "docs"
     schedule:
       interval: weekly
-      time: "12:00"
-      timezone: "Etc/UTC"
-      day: monday
     labels: [dependencies]
     groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/**"
       development-dependencies:
         dependency-type: development
+        exclude-patterns:
+          - "@docusaurus/**"
       runtime-dependencies:
         dependency-type: production
+        exclude-patterns:
+          - "@docusaurus/**"
         update-types:
         - "minor"
         - "patch"
     commit-message:
       prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
+    cooldown:
+      default-days: 7
   - package-ecosystem: "docker-compose"
     directory: "tests/fixtures/docker/"
     schedule:
-      interval: "monthly"
-      time: "12:00"
-      timezone: "Etc/UTC"
+      interval: monthly
+    cooldown:
+      default-days: 7

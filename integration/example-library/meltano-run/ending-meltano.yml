@@ -18,7 +18,8 @@ plugins:
   utilities:
   - name: dbt-postgres
     variant: dbt-labs
-    pip_url: dbt-core dbt-postgres meltano-dbt-ext~=0.3.0
+    pip_url: dbt-core dbt-postgres meltano-dbt-ext~=0.4.0
+    python: python3.13
 environments:
 - name: dev
   config:

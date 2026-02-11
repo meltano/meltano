@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import typing as t
-from contextlib import contextmanager
 from functools import cached_property
 
-from meltano.core.setting_definition import SettingDefinition, SettingKind
+import boto3
+
 from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
@@ -16,65 +16,6 @@ if t.TYPE_CHECKING:
     from collections.abc import Generator
 
     from mypy_boto3_s3 import S3Client
-
-BOTO_INSTALLED = True
-
-try:
-    import boto3
-except ImportError:
-    BOTO_INSTALLED = False
-
-
-class MissingBoto3Error(Exception):
-    """Raised when boto3 is required but not installed."""
-
-    def __init__(self) -> None:
-        """Initialize a MissingBoto3Error."""
-        super().__init__(
-            "boto3 required but not installed. Install meltano[s3] to use S3 as a state backend.",  # noqa: E501
-        )
-
-
-@contextmanager
-def requires_boto3() -> Generator[None, None, None]:
-    """Raise MissingBoto3Error if boto3 is required but missing in context.
-
-    Raises:
-        MissingBoto3Error: if boto3 is not installed.
-
-    Yields:
-        None
-    """
-    if not BOTO_INSTALLED:
-        raise MissingBoto3Error
-    yield
-
-
-AWS_ACCESS_KEY_ID = SettingDefinition(
-    name="state_backend.s3.aws_access_key_id",
-    label="AWS Access Key ID",
-    description="AWS Access Key ID",
-    kind=SettingKind.STRING,
-    sensitive=True,
-    env_specific=True,
-)
-
-AWS_SECRET_ACCESS_KEY = SettingDefinition(
-    name="state_backend.s3.aws_secret_access_key",
-    label="AWS Secret Access Key",
-    description="AWS Secret Access Key",
-    kind=SettingKind.STRING,
-    sensitive=True,
-    env_specific=True,
-)
-
-ENDPOINT_URL = SettingDefinition(
-    name="state_backend.s3.endpoint_url",
-    label="Endpoint URL",
-    description="URL for the AWS S3 or S3-compatible storage service",
-    kind=SettingKind.STRING,
-    env_specific=True,
-)
 
 
 class S3StateStoreManager(CloudStateStoreManager):
@@ -150,23 +91,22 @@ class S3StateStoreManager(CloudStateStoreManager):
             InvalidStateBackendConfigurationException: when configured AWS
                 settings are invalid.
         """
-        with requires_boto3():
-            if self.aws_secret_access_key and self.aws_access_key_id:
-                session = boto3.Session(
-                    aws_access_key_id=self.aws_access_key_id,
-                    aws_secret_access_key=self.aws_secret_access_key,
-                )
-                return session.client("s3", endpoint_url=self.endpoint_url)
-            if self.aws_secret_access_key:
-                raise InvalidStateBackendConfigurationException(
-                    "AWS secret access key configured, but not AWS access key ID.",  # noqa: EM101
-                )
-            if self.aws_access_key_id:
-                raise InvalidStateBackendConfigurationException(
-                    "AWS access key ID configured, but no AWS secret access key.",  # noqa: EM101
-                )
-            session = boto3.Session()
-            return session.client("s3")
+        if self.aws_secret_access_key and self.aws_access_key_id:
+            session = boto3.Session(
+                aws_access_key_id=self.aws_access_key_id,
+                aws_secret_access_key=self.aws_secret_access_key,
+            )
+            return session.client("s3", endpoint_url=self.endpoint_url)
+        if self.aws_secret_access_key:
+            raise InvalidStateBackendConfigurationException(  # noqa: TRY003
+                "AWS secret access key configured, but not AWS access key ID.",  # noqa: EM101
+            )
+        if self.aws_access_key_id:
+            raise InvalidStateBackendConfigurationException(  # noqa: TRY003
+                "AWS access key ID configured, but no AWS secret access key.",  # noqa: EM101
+            )
+        session = boto3.Session()
+        return session.client("s3")
 
     def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.

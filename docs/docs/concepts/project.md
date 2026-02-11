@@ -27,6 +27,8 @@ which contains your project configuration and tells Meltano that a particular di
 
 The only required property is `version`, which currently always holds the value `1`. You can find a formal JSON Schema for the specification on [SchemaStore.org](https://schemastore.org) or directly in the main repository [here](https://raw.githubusercontent.com/meltano/meltano/main/src/meltano/schemas/meltano.schema.json), which can be useful for code generation by many tools like [datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator) or [swagger-codegen](https://github.com/swagger-api/swagger-codegen).
 
+You can customize the YAML formatting of this file (indentation, spacing, etc.) using Meltano's [user YAML configuration](/guide/user-yaml-config).
+
 ### Configuration
 
 At the root of `meltano.yml`, and usually at the top of the file, you will find project-specific configuration.
@@ -354,7 +356,7 @@ used to [configure Meltano and its plugins](/guide/configuration#configuring-set
 Typically, this file is used to store configuration that is environment-specific or sensitive,
 and should not be stored in [`meltano.yml`](#meltano-yml-project-file) and checked into version control.
 
-[`meltano config <plugin> set`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
+[`meltano config set <plugin>`](/reference/command-line-interface#config) will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
 In a newly initialized project, this file will be included in [`.gitignore`](#gitignore) by default.
 
@@ -391,7 +393,7 @@ While you would usually not want to modify the system database directly, knowing
 Meltano's CLI utilizes the following tables:
 
 - `runs` table: One row for each [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config set <plugin>`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
 
 ### Support for other database types
 
@@ -400,7 +402,7 @@ Meltano is currently tested with the following databases as backends for state a
 | Database      | Supported Versions                      | Extra Requirement                                                                 | Example URL                                                     |
 | :------------ | :-------------------------------------- | :-------------------------------------------------------------------------------- | :-------------------------------------------------------------- |
 | SQLite        | Version `3.25.0` or higher is required. | None                                                                              | `sqlite:///$MELTANO_SYS_DIR_ROOT/meltano.db` (default)          |
-| PostgreSQL    | Version `13` or higher is required.     | [`postgres` or `psycopg2`](/guide/advanced-topics#installing-optional-components) | `postgresql+psycopg://<user>:<password>@<host>:<port>/<dbname>` |
+| PostgreSQL    | Version `13` or higher is required.     | [`postgres`](/guide/advanced-topics#installing-optional-components) .             | `postgresql+psycopg://<user>:<password>@<host>:<port>/<dbname>` |
 | MS SQL Server | Version `2019` or higher is required.   | [`mssql`](/guide/advanced-topics#installing-optional-components)                  | `mssql+pymssql://<user>:<password@<freetds_name>/?charset=utf8` |
 
 Support for other databases has been requested and is being tracked in the following issues:

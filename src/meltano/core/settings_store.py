@@ -13,25 +13,28 @@ from operator import eq
 
 import dotenv
 import sqlalchemy
+import sqlalchemy.orm
 import structlog
 
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.setting import Setting
-from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import Self  # noqa: ICN003
 else:
     from backports.strenum import StrEnum
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
     from sqlalchemy.orm import Session
 
-    from meltano.core.setting_definition import EnvVar
+    from meltano.core.plugin.settings_service import PluginSettingsService
+    from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_service import SettingsService
 
 
@@ -142,7 +145,7 @@ class SettingValueStore(StrEnum):
     AUTO = enum.auto()
 
     @classmethod
-    def readables(cls) -> list[SettingValueStore]:
+    def readables(cls: type[Self]) -> list[Self]:
         """Return list of readable SettingValueStore instances.
 
         Returns:
@@ -151,7 +154,7 @@ class SettingValueStore(StrEnum):
         return list(cls)
 
     @classmethod
-    def writables(cls) -> list[SettingValueStore]:
+    def writables(cls: type[Self]) -> list[Self]:
         """Return list of writable SettingValueStore instances.
 
         Returns:
@@ -160,7 +163,7 @@ class SettingValueStore(StrEnum):
         return [store for store in cls if store.writable]
 
     @property
-    def manager(self) -> type[SettingsStoreManager]:
+    def manager(self: Self) -> type[SettingsStoreManager]:
         """Return store manager for this store.
 
         Returns:
@@ -169,15 +172,15 @@ class SettingValueStore(StrEnum):
         # ordering here is not significant, other than being consistent with
         # the order of precedence.
         managers: dict[str, type[SettingsStoreManager]] = {
-            self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,  # type: ignore[dict-item]
-            self.ENV: EnvStoreManager,  # type: ignore[dict-item]
-            self.DOTENV: DotEnvStoreManager,  # type: ignore[dict-item]
-            self.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,  # type: ignore[dict-item]
-            self.MELTANO_YML: MeltanoYmlStoreManager,  # type: ignore[dict-item]
-            self.DB: DbStoreManager,  # type: ignore[dict-item]
-            self.INHERITED: InheritedStoreManager,  # type: ignore[dict-item]
-            self.DEFAULT: DefaultStoreManager,  # type: ignore[dict-item]
-            self.AUTO: AutoStoreManager,  # type: ignore[dict-item]
+            SettingValueStore.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
+            SettingValueStore.ENV: EnvStoreManager,
+            SettingValueStore.DOTENV: DotEnvStoreManager,
+            SettingValueStore.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,
+            SettingValueStore.MELTANO_YML: MeltanoYmlStoreManager,
+            SettingValueStore.DB: DbStoreManager,
+            SettingValueStore.INHERITED: InheritedStoreManager,
+            SettingValueStore.DEFAULT: DefaultStoreManager,
+            SettingValueStore.AUTO: AutoStoreManager,
         }
         return managers[self]
 
@@ -358,7 +361,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         try:
             value = self.settings_service.config_override[name]
             self.log(f"Read key '{name}' from config override: {value!r}")
-            return value, {}
+            return value, {}  # noqa: TRY300
         except KeyError:
             return None, {}
 
@@ -488,7 +491,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             kwargs: Keyword arguments to pass to parent class.
         """
         super().__init__(*args, **kwargs)
-        self._env: dict[str, str | None] | None = None
+        self._env: dict[str, str] | None = None
 
     def ensure_supported(self, method: str = "get") -> None:
         """Ensure named method is supported.
@@ -506,7 +509,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             raise StoreNotSupportedError(ProjectReadonly())
 
     @property
-    def env(self) -> dict[str, str | None]:
+    def env(self) -> dict[str, str]:
         """Return values from the .env file.
 
         Returns:
@@ -859,6 +862,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     """Configuration stored in an environment within `meltano.yml`."""
 
     label = "the active environment in `meltano.yml`"
+    settings_service: PluginSettingsService
 
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialise MeltanoEnvStoreManager instance.
@@ -877,8 +881,11 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         Returns:
             A dictionary of flattened configuration.
         """
+        # TODO: Remove this cast when we have a better way to get the settings service
+        # type or when we figure how the settings service type should be narrowed
+        # per-manager.
         if self._flat_config is None:
-            self._flat_config = flatten(self.settings_service.environment_config, "dot")  # type: ignore[attr-defined]
+            self._flat_config = flatten(self.settings_service.environment_config, "dot")
         return self._flat_config
 
     def ensure_supported(self, method: str = "get") -> None:
@@ -908,11 +915,11 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         Raises:
             StoreNotSupportedError: if the project is in read-only mode.
         """
-        config = deepcopy(self.settings_service.environment_config)  # type: ignore[attr-defined]
+        config = deepcopy(self.settings_service.environment_config)
         yield config
 
         try:
-            self.settings_service.update_meltano_environment_config(config)  # type: ignore[attr-defined]
+            self.settings_service.update_meltano_environment_config(config)
         except ProjectReadonly as err:
             raise StoreNotSupportedError(err) from err
 
@@ -954,7 +961,7 @@ class DbStoreManager(SettingsStoreManager):
     def session(self) -> Session:
         """Database session."""
         if not self._session:
-            raise StoreNotSupportedError("No database session provided")  # noqa: EM101
+            raise StoreNotSupportedError("No database session provided")  # noqa: EM101, TRY003
 
         return self._session
 
@@ -1001,7 +1008,7 @@ class DbStoreManager(SettingsStoreManager):
                 )
 
             self.log(f"Read key '{name}' from system database: {value!r}")
-            return value, {}
+            return value, {}  # noqa: TRY300
         except (sqlalchemy.orm.exc.NoResultFound, KeyError):
             return None, {}
 
@@ -1124,7 +1131,7 @@ class InheritedStoreManager(SettingsStoreManager):
             kwargs: Keyword arguments to pass to parent class.
         """
         super().__init__(settings_service, *args, **kwargs)
-        self._kwargs = {**kwargs, "expand_env_vars": False}
+        self._kwargs: dict[str, t.Any] = {**kwargs, "expand_env_vars": False}
         self.bulk = bulk
         self._config_with_metadata: dict | None = None
 
@@ -1149,7 +1156,7 @@ class InheritedStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if no setting_def is passed.
         """
         if not setting_def:
-            raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101
+            raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101, TRY003
 
         value, metadata = self.get_with_metadata(setting_def.name)
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:  # type: ignore[redundant-expr]
@@ -1254,7 +1261,10 @@ class AutoStoreManager(SettingsStoreManager):
         """
         super().__init__(*args, **kwargs)
         self.cache = cache
-        self._kwargs = {"settings_service": self.settings_service, **kwargs}
+        self._kwargs: dict[str, t.Any] = {
+            "settings_service": self.settings_service,
+            **kwargs,
+        }
         self._managers: dict[SettingValueStore, SettingsStoreManager] = {}
 
     def manager_for(self, store: SettingValueStore) -> SettingsStoreManager:
@@ -1309,7 +1319,7 @@ class AutoStoreManager(SettingsStoreManager):
         try:
             manager = self.manager_for(store)
             manager.ensure_supported(method)
-            return True
+            return True  # noqa: TRY300
         except StoreNotSupportedError:
             return False
 
@@ -1461,7 +1471,7 @@ class AutoStoreManager(SettingsStoreManager):
         store = self.auto_store(name, setting_def=setting_def)
         logger.debug(f"AutoStoreManager returned store '{store}'")  # noqa: G004
         if store is None:
-            raise StoreNotSupportedError("No storage method available")  # noqa: EM101
+            raise StoreNotSupportedError("No storage method available")  # noqa: EM101, TRY003
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)
@@ -1535,7 +1545,4 @@ class AutoStoreManager(SettingsStoreManager):
         Returns:
             A matching SettingDefinition, if found, else None.
         """
-        try:
-            return self.settings_service.find_setting(name)
-        except SettingMissingError:
-            return None
+        return self.settings_service.find_setting(name)

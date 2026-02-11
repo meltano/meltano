@@ -7,7 +7,10 @@ import pytest
 
 from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType, Variant
-from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
+from meltano.core.plugin.base import (
+    BasePlugin,
+    PluginRefNameContainsStateIdDelimiterError,
+)
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.project_plugins_service import PluginDefinitionNotFoundError
@@ -53,7 +56,7 @@ class TestProjectAddService:
         hub_request_counter: Counter,
     ) -> None:
         used_variant = variant or default_variant
-        lockfile_path = project.plugin_lock_path(
+        lockfile_path = project.dirs.plugin_lock_path(
             plugin_type,
             plugin_name,
             variant_name=used_variant,
@@ -67,6 +70,7 @@ class TestProjectAddService:
         # Variant and pip_url are repeated in
         # canonical representation for `meltano.yml`
         canonical = added.canonical()
+        assert isinstance(canonical, dict)
 
         if default_variant:
             assert added.variant == default_variant
@@ -133,17 +137,17 @@ class TestProjectAddService:
         assert isinstance(child.parent, SingerTap)
         assert child.parent.name == "tap-mock"
 
-        parent_path = subject.project.plugin_lock_path(
-            PluginType.EXTRACTORS,
-            "tap-mock",
+        parent_path = subject.project.dirs.plugin_lock_path(
+            plugin_type=PluginType.EXTRACTORS,
+            plugin_name="tap-mock",
             variant_name="meltano",
         )
         assert parent_path.stem == "tap-mock--meltano"
         assert parent_path.exists()
 
-        child_path = subject.project.plugin_lock_path(
-            child.type,
-            child.name,
+        child_path = subject.project.dirs.plugin_lock_path(
+            plugin_type=child.type,
+            plugin_name=child.name,
             variant_name=child.variant,
         )
         assert child_path.stem == "tap-mock-inherited-new--meltano"
@@ -156,11 +160,13 @@ class TestProjectAddService:
         )
         assert isinstance(grandchild.parent, ProjectPlugin)
         assert grandchild.parent.name == "tap-mock-inherited-new"
+
+        assert isinstance(grandchild.parent.parent, BasePlugin)
         assert grandchild.parent.parent.name == "tap-mock"
 
-        grandchild_path = subject.project.plugin_lock_path(
-            grandchild.type,
-            grandchild.name,
+        grandchild_path = subject.project.dirs.plugin_lock_path(
+            plugin_type=grandchild.type,
+            plugin_name=grandchild.name,
             variant_name=grandchild.variant,
         )
         assert grandchild_path.stem == "tap-mock-inherited-new-2--meltano"
@@ -183,7 +189,7 @@ class TestProjectAddService:
                 f"tap-mock{STATE_ID_COMPONENT_DELIMITER}",
             )
 
-    @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
+    @mock.patch("meltano.core.plugin_lock_service.PluginLockService.save")
     def test_add_update(
         self,
         lock_save: mock.MagicMock,
@@ -225,10 +231,13 @@ class TestProjectAddService:
         assert lock_save.call_count == 1
 
         assert updated in project.meltano["plugins"][target.type]
-        assert updated.canonical().items() >= updated_attrs.items()
+
+        plugin_dict = updated.canonical()
+        assert isinstance(plugin_dict, dict)
+        assert plugin_dict.items() >= updated_attrs.items()
         assert updated.config_with_extras
 
-    @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
+    @mock.patch("meltano.core.plugin_lock_service.PluginLockService.save")
     def test_add_update_custom(
         self,
         lock_save: mock.MagicMock,
@@ -270,5 +279,8 @@ class TestProjectAddService:
         assert lock_save.call_count == 0
 
         assert updated in project.meltano["plugins"][custom_plugin.type]
-        assert updated.canonical().items() >= updated_attrs.items()
+
+        plugin_dict = updated.canonical()
+        assert isinstance(plugin_dict, dict)
+        assert plugin_dict.items() >= updated_attrs.items()
         assert updated.config_with_extras

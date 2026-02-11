@@ -8,7 +8,7 @@ from copy import deepcopy
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginType
-from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import (
     DefinitionSource,
@@ -22,7 +22,7 @@ if t.TYPE_CHECKING:
 
 @pytest.fixture
 def modified_lockfile(project: Project):
-    lockfile_path = project.plugin_lock_path(
+    lockfile_path = project.dirs.plugin_lock_path(
         PluginType.EXTRACTORS,
         "tap-mock",
         variant_name="meltano",
@@ -46,7 +46,6 @@ class TestProjectPluginsService:
     @pytest.fixture(autouse=True)
     def setup(self, project: Project, tap) -> None:
         project.plugins.lock_service.save(tap, exists_ok=True)
-        project.plugins._prefer_source = DefinitionSource.ANY
 
     @pytest.mark.order(0)
     def test_plugins(self, project) -> None:
@@ -139,7 +138,10 @@ class TestProjectPluginsService:
         alternative_target,
     ) -> None:
         # The behavior being tested here assumes that no lockfiles exist.
-        shutil.rmtree(project.plugins.project.root_dir("plugins"), ignore_errors=True)
+        shutil.rmtree(
+            project.plugins.project.dirs.root_dir("plugins"),
+            ignore_errors=True,
+        )
         # name="tap-mock", variant="meltano"
         # Shadows base plugin with correct variant
         parent = project.plugins.get_parent(tap)
@@ -184,7 +186,7 @@ class TestProjectPluginsService:
         with pytest.raises(PluginDefinitionNotFoundError) as excinfo:
             assert project.plugins.get_parent(nonexistent_parent)
 
-        assert isinstance(excinfo.value.__cause__, PluginParentNotFoundError)
+        assert isinstance(excinfo.value.__cause__, PluginNotFoundError)
 
     def test_update_plugin(self, project: Project, tap) -> None:
         # update a tap with a random value

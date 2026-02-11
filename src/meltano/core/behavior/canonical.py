@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import copy
-import json
 import sys
 import typing as t
 from functools import lru_cache
@@ -17,8 +16,6 @@ else:
     from typing_extensions import Self
 
 if t.TYPE_CHECKING:
-    from os import PathLike
-
     from ruamel.yaml import Representer
 
 
@@ -171,9 +168,9 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
                 return as_commented_map
             return as_dict
 
-        if isinstance(target, (list, set, CommentedSet)):
+        if isinstance(target, list | set | CommentedSet):
             as_list = [cls._canonize(val) for val in target]
-            if isinstance(target, (CommentedSet, CommentedSeq)):
+            if isinstance(target, CommentedSet | CommentedSeq):
                 as_commented_seq = CommentedSeq(as_list)
                 target.copy_attributes(as_commented_seq)
                 return as_commented_seq
@@ -423,19 +420,6 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
             "tag:yaml.org,2002:map",
             cls.as_canonical(obj),
         )
-
-    @classmethod
-    def parse_json_file(cls, path: PathLike[str]) -> Self:
-        """Parse a plugin definition from a JSON file.
-
-        Args:
-            path: The path to the JSON file.
-
-        Returns:
-            A standalone plugin definition.
-        """
-        with open(path) as file:  # noqa: PTH123
-            return cls.parse(json.load(file))
 
 
 yaml.add_multi_representer(Canonical, Canonical.yaml)

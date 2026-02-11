@@ -1,14 +1,26 @@
 from __future__ import annotations
 
+import asyncio
 import platform
+import typing as t
+from contextlib import asynccontextmanager
+from unittest.mock import patch
 
 import dotenv
 import pytest
 
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.command import UndefinedEnvVarError
-from meltano.core.plugin_invoker import UnknownCommandError
+from meltano.core.plugin_invoker import (
+    ExecutableNotFoundError,
+    PluginInvoker,
+    UnknownCommandError,
+)
 from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 
 class TestPluginInvoker:
@@ -100,11 +112,12 @@ class TestPluginInvoker:
 
     @pytest.mark.asyncio
     async def test_unknown_command(self, plugin_invoker) -> None:
-        with pytest.raises(UnknownCommandError) as err:
+        with pytest.raises(UnknownCommandError) as exc_info:
             await plugin_invoker.invoke_async(command="foo")
 
-        assert err.value.command == "foo"
-        assert "supports the following commands" in str(err.value)
+        assert isinstance(exc_info.value, UnknownCommandError)
+        assert exc_info.value.command == "foo"
+        assert "supports the following commands" in str(exc_info.value)
 
     def test_expand_exec_args(self, plugin_invoker) -> None:
         exec_args = plugin_invoker.exec_args(
@@ -185,3 +198,160 @@ class TestPluginInvoker:
 
         assert "VIRTUAL_ENV" not in env
         assert "PYTHONPATH" not in env
+
+    @pytest.mark.asyncio
+    async def test_dump(
+        self,
+        plugin_invoker: PluginInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        files = {
+            "config": tmp_path / "config.json",
+            "catalog": tmp_path / "catalog.json",
+        }
+        files["config"].write_text('{"name": "test"}')
+        files["catalog"].write_text('{"streams": []}')
+        monkeypatch.setattr(PluginInvoker, "files", files)
+
+        result = await plugin_invoker.dump("config")
+        assert result == '{"name": "test"}'
+
+        with patch.object(PluginInvoker, "_invoke") as plugin_invoke:
+            result = await plugin_invoker.dump("catalog")
+            assert result == '{"streams": []}'
+            assert plugin_invoke.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_dump_error(
+        self,
+        plugin_invoker: PluginInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        files = {
+            "config": tmp_path / "config.json",
+            "catalog": tmp_path / "catalog.json",
+        }
+        files["config"].write_text('{"name": "test"}')
+        files["catalog"].write_text('{"streams": []}')
+        monkeypatch.setattr(PluginInvoker, "files", files)
+
+        @asynccontextmanager
+        async def mock_invoke(*args: t.Any, **kwargs: t.Any):  # noqa: ARG001
+            yield
+            raise FileNotFoundError(2, "No such file or directory", files["catalog"])
+
+        monkeypatch.setattr(PluginInvoker, "_invoke", mock_invoke)
+        with pytest.raises(FileNotFoundError) as exc_info:
+            await plugin_invoker.dump("catalog")
+
+        assert isinstance(exc_info.value, FileNotFoundError)
+        assert exc_info.value.filename == files["catalog"]
+
+        @asynccontextmanager
+        async def mock_invoke_executable_not_found(*args: t.Any, **kwargs: t.Any):  # noqa: ARG001
+            cause = FileNotFoundError(
+                2,
+                "No such file or directory",
+                plugin_invoker.exec_path(),
+            )
+            raise ExecutableNotFoundError(
+                plugin_invoker.plugin,
+                str(plugin_invoker.exec_path()),
+            ) from cause
+            yield
+
+        monkeypatch.setattr(PluginInvoker, "_invoke", mock_invoke_executable_not_found)
+        with pytest.raises(FileNotFoundError) as exc_info:
+            await plugin_invoker.dump("catalog")
+
+        assert isinstance(exc_info.value, FileNotFoundError)
+        assert exc_info.value.filename == plugin_invoker.exec_path()
+
+    @pytest.mark.asyncio
+    async def test_executable_not_found_error(
+        self,
+        plugin_invoker: PluginInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test that ExecutableNotFoundError is raised when executable is missing."""
+
+        # Mock asyncio.create_subprocess_exec to raise FileNotFoundError
+        # for the executable
+        async def mock_create_subprocess_exec(*args: t.Any, **kwargs: t.Any):  # noqa: ARG001
+            error = FileNotFoundError(
+                2, "No such file or directory", "/path/to/missing-executable"
+            )
+            raise error
+
+        monkeypatch.setattr(
+            asyncio,
+            "create_subprocess_exec",
+            mock_create_subprocess_exec,
+        )
+
+        # Mock exec_args to return our test executable path
+        monkeypatch.setattr(
+            plugin_invoker,
+            "exec_args",
+            lambda *args, **kwargs: ["/path/to/missing-executable", "arg1", "arg2"],  # noqa: ARG005
+        )
+
+        with pytest.raises(ExecutableNotFoundError) as exc_info:
+            await plugin_invoker.invoke_async()
+
+        # Verify the error message contains information about the executable
+        error_msg = str(exc_info.value)
+        assert "could not be found" in error_msg
+        assert plugin_invoker.plugin.name in error_msg
+
+    @pytest.mark.asyncio
+    async def test_plugin_file_access_error(
+        self,
+        plugin_invoker: PluginInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test that FileNotFoundError is raised when plugin can't access files."""
+
+        # Mock asyncio.create_subprocess_exec to raise FileNotFoundError for
+        # a different file
+        async def mock_create_subprocess_exec(*args: t.Any, **kwargs: t.Any):  # noqa: ARG001
+            error = FileNotFoundError(
+                2,
+                "No such file or directory",
+                "/project/data/missing-file",
+            )
+            raise error
+
+        monkeypatch.setattr(
+            asyncio,
+            "create_subprocess_exec",
+            mock_create_subprocess_exec,
+        )
+
+        # Mock exec_args to return a different executable path
+        monkeypatch.setattr(
+            plugin_invoker,
+            "exec_args",
+            lambda *args, **kwargs: ["/usr/bin/existing-executable", "arg1", "arg2"],  # noqa: ARG005
+        )
+
+        with pytest.raises(FileNotFoundError) as exc_info:
+            await plugin_invoker.invoke_async()
+
+        # Verify the error message indicates file access failure, not missing executable
+        assert isinstance(exc_info.value, FileNotFoundError)
+        assert exc_info.value.filename == "/project/data/missing-file"
+        error_msg = str(exc_info.value)
+        assert "/project/data/missing-file" in error_msg
+
+    def test_executable_not_found_error_class(self) -> None:
+        """Test ExecutableNotFoundError class directly."""
+        plugin = PluginRef(PluginType.EXTRACTORS, "test-tap")
+        error = ExecutableNotFoundError(plugin, "missing-executable")
+
+        error_msg = str(error)
+        assert "Executable 'missing-executable' could not be found" in error_msg
+        assert "Extractor 'test-tap'" in error_msg
+        assert "meltano install --plugin-type extractor test-tap" in error_msg

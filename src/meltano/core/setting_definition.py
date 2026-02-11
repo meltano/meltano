@@ -22,15 +22,47 @@ if sys.version_info >= (3, 11):
 else:
     from backports.strenum import StrEnum
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
     from ruamel.yaml import Node, Representer, ScalarNode
 
-VALUE_PROCESSORS = {
+
+class SettingValueJSONEncoder(json.JSONEncoder):
+    """JSON encoder for setting values."""
+
+    @override
+    def default(self, o: t.Any) -> t.Any:
+        """Return the JSON representation of the setting value.
+
+        Args:
+            o: The setting value to encode.
+        """
+        if isinstance(o, (date, datetime)):
+            return o.isoformat()
+        return super().default(o)
+
+
+def json_dumps(obj: t.Any, **kwargs: t.Any) -> str:  # noqa: ANN401
+    """Dump an object to a JSON string.
+
+    Args:
+        obj: The object to dump.
+        kwargs: Additional keyword arguments to pass to json.dumps.
+    """
+    kwargs.setdefault("cls", SettingValueJSONEncoder)
+    return json.dumps(obj, **kwargs)
+
+
+VALUE_PROCESSORS: dict[str, Callable[[t.Any], t.Any]] = {
     "nest_object": utils.nest_object,
     "upcase_string": lambda vlu: vlu.upper(),
-    "stringify": lambda vlu: vlu if isinstance(vlu, str) else json.dumps(vlu),
+    "stringify": lambda vlu: vlu if isinstance(vlu, str) else json_dumps(vlu),
     "parse_date": utils.parse_date,
 }
 
@@ -77,7 +109,8 @@ class EnvVar:
         return str(not utils.truthy(value)) if self.negated else value
 
 
-class SettingMissingError(Error):
+# TODO: No longer used, consider removing
+class SettingMissingError(Error):  # pragma: no cover
     """A setting is missing."""
 
     def __init__(self, name: str) -> None:
@@ -344,7 +377,7 @@ class SettingDefinition(NameEq, Canonical):
             kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
             kind = SettingKind.INTEGER
-        elif isinstance(value, (Decimal, float)):
+        elif isinstance(value, Decimal | float):
             kind = SettingKind.DECIMAL
         elif isinstance(value, dict):
             kind = SettingKind.OBJECT
@@ -477,7 +510,7 @@ class SettingDefinition(NameEq, Canonical):
         Raises:
             ValueError: If value is not of the expected type.
         """
-        value = value.isoformat() if isinstance(value, (date, datetime)) else value
+        value = value.isoformat() if isinstance(value, date | datetime) else value
 
         if isinstance(value, str):
             if self.kind == SettingKind.BOOLEAN:
@@ -548,4 +581,4 @@ class SettingDefinition(NameEq, Canonical):
         if not self.kind or self.kind in (SettingKind.STRING, SettingKind.DECIMAL):
             return str(value)
 
-        return json.dumps(value)
+        return json_dumps(value)

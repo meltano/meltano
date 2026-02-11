@@ -127,9 +127,9 @@ class Airflow(BasePlugin):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        stdout, stderr = await handle.communicate()
+        stdout, _stderr = await handle.communicate()
         if handle.returncode:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 "Command `airflow config generate` failed",  # noqa: EM101
                 process=handle,
             )
@@ -150,10 +150,10 @@ class Airflow(BasePlugin):
             stderr=subprocess.PIPE,
         )
 
-        stdout, stderr = await handle.communicate()
+        stdout, _stderr = await handle.communicate()
 
         if handle.returncode:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 "Command `airflow version` failed",  # noqa: EM101
                 process=handle,
             )
@@ -171,7 +171,7 @@ class Airflow(BasePlugin):
         exit_code = await handle.wait()
 
         if exit_code:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 (
                     "Airflow metadata database could not be initialized: "  # noqa: EM101
                     "`airflow initdb` failed"

@@ -93,7 +93,9 @@ capabilities:
 - state
 ```
 
-The full list of defined capabilities is below:
+The capabilities vary by plugin type. Below are the capabilities organized by type.
+
+### Extractor capabilities
 
 - [`catalog`](#catalog-capability)
 - [`properties`](#properties-capability)
@@ -101,6 +103,30 @@ The full list of defined capabilities is below:
 - [`state`](#state-capability)
 - [`about`](#about-capability)
 - [`stream-maps`](#stream-maps-capability)
+- [`activate-version`](#activate-version-capability)
+- [`batch`](#batch-capability)
+- [`test`](#test-capability)
+- [`log-based`](#log-based-capability)
+- [`schema-flattening`](#schema-flattening-capability)
+- [`structured-logging`](#structured-logging-capability)
+
+### Loader capabilities
+
+- [`about`](#about-capability)
+- [`stream-maps`](#stream-maps-capability)
+- [`activate-version`](#activate-version-capability)
+- [`batch`](#batch-capability)
+- [`soft-delete`](#soft-delete-capability)
+- [`hard-delete`](#hard-delete-capability)
+- [`datatype-failsafe`](#datatype-failsafe-capability)
+- [`schema-flattening`](#schema-flattening-capability)
+- [`structured-logging`](#structured-logging-capability)
+
+### Mapper capabilities
+
+- [`about`](#about-capability)
+- [`stream-maps`](#stream-maps-capability)
+- [`structured-logging`](#structured-logging-capability)
 
 ### `catalog` capability
 
@@ -132,12 +158,73 @@ Declares that the plugin supports a `--about` CLI argument and a paired `--forma
 
 For Singer connectors, declares the ability to perform inline transformations or 'mappings' within the stream. For more details, please see the [Singer SDK Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html) documentation.
 
+### `activate-version` capability
+
+Declares that the plugin supports the `ACTIVATE_VERSION` message type, which is used to indicate that all records for a stream have been sent and any records not seen should be soft-deleted.
+
+### `batch` capability
+
+Declares that the plugin supports batch processing of records, allowing for more efficient data transfer by grouping records together.
+
+### `test` capability
+
+Declares that the plugin supports a `--test` CLI argument for testing connectivity and configuration without performing a full sync.
+
+### `log-based` capability
+
+For extractors only. Declares that the plugin supports log-based replication (e.g., using database change data capture).
+
+### `schema-flattening` capability
+
+Declares that the plugin supports schema flattening, which can flatten nested objects into separate columns.
+
+### `structured-logging` capability
+
+Declares that the plugin outputs structured logs (typically JSON format) that can be parsed and processed by Meltano.
+
+### `soft-delete` capability
+
+For loaders only. Declares that the plugin supports soft deletion of records (marking records as deleted without physically removing them).
+
+### `hard-delete` capability
+
+For loaders only. Declares that the plugin supports hard deletion of records (physically removing records from the destination).
+
+### `datatype-failsafe` capability
+
+For loaders only. Declares that the plugin has failsafe handling for data type mismatches, allowing ingestion to continue even when encountering unexpected data types.
+
 ## `pip_url`
 
 A string with the plugin's [`pip install`](https://pip.pypa.io/en/stable/cli/pip_install/#options) argument. Can point to multiple packages and include any of the pip install options.
 
 ```yaml
 pip_url: apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.10.5/constraints-${MELTANO__PYTHON_VERSION}.txt
+```
+
+## `python`
+
+The Python version or path to use for this plugin. Can be specified as a version number (e.g., `3.11`), a path to an executable (e.g., `/usr/bin/python3.10`), or an executable name to find within `$PATH` (e.g., `python3.11`).
+
+If not specified, the Python executable that was used to run Meltano will be used (within a separate virtual environment).
+
+```yaml
+python: "3.11"
+```
+
+```yaml
+python: /usr/bin/python3.10
+```
+
+## `supported_python_versions`
+
+Optional. An array of Python versions that this plugin supports. This is used by Meltano to automatically select a compatible Python version when the plugin is not compatible with Meltano's own Python version.
+
+```yaml
+supported_python_versions:
+- "3.10"
+- "3.11"
+- "3.12"
 ```
 
 ## `maintenance_status`
@@ -180,7 +267,7 @@ Text to display before the settings in Meltano Hub, in Markdown format.
 settings_preamble: |
   Meltano [centralizes the configuration](https://docs.meltano.com/guide/configuration) of all of the plugins in your project, including Airflow's. This means that if the [Airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/howto/set-config.html) tells you to put something in `airflow.cfg`, you can use `meltano config`, `meltano.yml`, or environment variables instead, and get the benefits of Meltano features like [environments](https://docs.meltano.com/concepts/environments).
 
-  Any setting you can add to `airflow.cfg` can be added to `meltano.yml`, manually or using `meltano config`. For example, `[core] executor = SequentialExecutor` becomes `meltano config airflow set core executor SequentialExecutor` on the CLI, or `core.executor: SequentialExecutor` in `meltano.yml`. Config sections indicated by `[section]` in `airflow.cfg` become nested dictionaries in `meltano.yml`.
+  Any setting you can add to `airflow.cfg` can be added to `meltano.yml`, manually or using `meltano config`. For example, `[core] executor = SequentialExecutor` becomes `meltano config set airflow core executor SequentialExecutor` on the CLI, or `core.executor: SequentialExecutor` in `meltano.yml`. Config sections indicated by `[section]` in `airflow.cfg` become nested dictionaries in `meltano.yml`.
 ```
 
 ## `next_steps`
@@ -254,6 +341,30 @@ See the full in the [`requires` section](#requires) above.
 ### `requires.<plugin_type>[*].variant`
 
 See the full in the [`requires` section](#requires) above.
+
+## `requires_meltano`
+
+Optional. A version specifier for the Meltano version required by this plugin. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error when attempting to invoke the plugin.
+
+This field uses the same syntax as Python package version specifiers and supports complex version requirements.
+
+Examples:
+
+```yaml
+# Require Meltano 3.0 or higher
+requires_meltano: ">=3.0.0"
+
+# Require Meltano 3.x (3.0 or higher, but less than 4.0)
+requires_meltano: ">=3.0.0,<4.0.0"
+
+# Require exactly Meltano 3.5.0
+requires_meltano: "==3.5.0"
+
+# Require Meltano 3.6 or higher, but less than 3.8
+requires_meltano: ">=3.6.0,<3.8.0"
+```
+
+Note: This field should only be present in plugin lockfiles, not in `meltano.yml` for plugins from Meltano Hub. It is primarily used by the Hub to indicate compatibility requirements for specific plugin versions.
 
 ## `commands`
 
@@ -476,18 +587,23 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `decimal`, `date_iso8601`, `options`, `file`, `array`, and `object`.
+Optional. Use for a first-class input control. Default is `string`. Supported values are:
+
+- `string` - A text string (default)
+- `integer` - An integer number
+- `boolean` - A true/false value
+- `decimal` - A decimal number
+- `date_iso8601` - An ISO 8601 formatted date
+- `email` - An email address
+- `file` - A file path
+- `array` - An array of values
+- `object` - A nested object
+- `options` - A selection from predefined options (use with [`options`](#settingsoptions))
 
 ```yaml
 settings:
 - name: setting_name
   kind: integer
-```
-
-```yaml
-settings:
-- name: setting_name
-  env: SOME_API_KEY
 ```
 
 :::caution
@@ -543,6 +659,57 @@ settings:
   value: default_value
 ```
 
+### `settings[*].options`
+
+Optional. Use with `kind: options` to define the available choices for the setting. Each option has a `label` for display and a `value` for the actual configuration value.
+
+```yaml
+settings:
+- name: output_format
+  kind: options
+  label: Output Format
+  description: The format of the output file.
+  options:
+  - label: JSON
+    value: json
+  - label: CSV
+    value: csv
+  - label: Parquet
+    value: parquet
+```
+
+### `settings[*].value_processor`
+
+Optional. A pre-processor to apply to the setting value before it is used. Used primarily with `kind: object` to transform keys.
+
+Available processors:
+- `nest_object` - Convert a flat object with period-delimited keys to a nested object
+- `upcase_string` - Convert the setting value to uppercase
+
+```yaml
+settings:
+- name: config
+  kind: object
+  value_processor: nest_object
+```
+
+### `settings[*].value_post_processor`
+
+Optional. A post-processor to apply to the setting value after it is resolved.
+
+Available processors:
+- `nest_object` - Convert a flat object with period-delimited keys to a nested object
+- `upcase_string` - Convert the setting value to uppercase
+- `stringify` - Convert the JSON object to a string
+- `parse_date` - Parse the setting value as a date
+
+```yaml
+settings:
+- name: start_date
+  kind: date_iso8601
+  value_post_processor: parse_date
+```
+
 ## `env`
 
 Optional. Environment variables that will be used when [expanding environment variables in lower levels within your project's configuration](../guide/configuration#expansion-in-setting-values), and when running the plugin. These environment variables can make use of other environment variables from higher levels [as explained in the configuration guide](../guide/configuration#environment-variable-expansion).
@@ -551,4 +718,58 @@ Optional. Environment variables that will be used when [expanding environment va
 env:
   ENV_VAR_NAME: env var value
   PATH: "${PATH}:${MELTANO_PROJECT_ROOT}/bin"
+```
+
+## Plugin Type-Specific Attributes
+
+The following attributes are specific to certain plugin types.
+
+### Loader-specific attributes
+
+#### `dialect`
+
+For loaders only. The name of the dialect of the target database. This is used so that transformers in the same pipeline can determine the type of database to connect to.
+
+```yaml
+dialect: postgres
+```
+
+### Mapper-specific attributes
+
+#### `mappings`
+
+For mappers only. An array of named mapping configurations that can be invoked. Each mapping has a `name` and a `config` object.
+
+```yaml
+mappings:
+- name: hash-emails
+  config:
+    stream_maps:
+      users:
+        email: fake("email")
+- name: remove-pii
+  config:
+    stream_maps:
+      users:
+        __filter__: record["country"] == "US"
+```
+
+### Transform-specific attributes (dbt)
+
+#### `vars`
+
+For dbt transform plugins only. An object containing dbt model variables that will be passed to dbt.
+
+```yaml
+vars:
+  my_variable: my_value
+  another_variable: 123
+```
+
+#### `package_name`
+
+For dbt transform plugins only. The name of the dbt package's internal dbt project (the value of `name` in `dbt_project.yml`).
+
+```yaml
+package_name: my_dbt_project
 ```

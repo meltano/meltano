@@ -121,7 +121,7 @@ class MetadataRule(_CatalogRuleProtocol):
     tap_stream_id: str | list[str]
     breadcrumb: list[str]
     key: str
-    value: bool
+    value: bool | str
     negated: bool = False
 
     @classmethod

@@ -12,7 +12,6 @@ import click
 import structlog
 
 from meltano.cli.params import (
-    InstallPlugins,
     UUIDParamType,
     get_install_options,
     pass_project,
@@ -20,7 +19,7 @@ from meltano.cli.params import (
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core._state import StateStrategy
 from meltano.core.db import project_engine
-from meltano.core.elt_context import ELTContext, ELTContextBuilder
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -38,6 +37,8 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.cli.params import InstallPlugins
+    from meltano.core.elt_context import ELTContext
     from meltano.core.plugin.base import PluginDefinition
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -118,11 +119,9 @@ class ELOptions:
     )
     state_strategy = click.option(
         "--state-strategy",
-        # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and
-        # use click 8.2+ exclusively
-        type=click.Choice([strategy.value for strategy in StateStrategy]),
+        type=click.Choice(StateStrategy),
         help="Strategy to use for state updates.",
-        default=StateStrategy.AUTO.value,
+        default=StateStrategy.auto.value,
     )
     run_id = click.option(
         "--run-id",
@@ -317,7 +316,7 @@ async def _run_el_command(
     run_id: uuid.UUID | None,
 ) -> None:
     if platform.system() == "Windows":
-        raise CliError(
+        raise CliError(  # noqa: TRY003
             "ELT command not supported on Windows. Please use the run command "  # noqa: EM101
             "as documented here: "
             "https://docs.meltano.com/reference/command-line-interface#run",
@@ -384,7 +383,7 @@ async def _run_el_command(
             )
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
-        raise err
+        raise err  # noqa: TRY201
     finally:
         session.close()
 
@@ -444,9 +443,9 @@ async def dump_file(context_builder: ELTContextBuilder, dumpable: str) -> None:
 
         click.echo(content)
     except FileNotFoundError as err:
-        raise CliError(f"Could not find {dumpable} file for this pipeline") from err  # noqa: EM102
+        raise CliError(f"Could not find {dumpable} file for this pipeline") from err  # noqa: EM102, TRY003
     except Exception as err:
-        raise CliError(f"Could not dump {dumpable}: {err}") from err  # noqa: EM102
+        raise CliError(f"Could not dump {dumpable}: {err}") from err  # noqa: EM102, TRY003
 
 
 async def _run_job(
@@ -462,7 +461,7 @@ async def _run_job(
     fail_stale_jobs(session, job.job_name)
 
     if not force and (existing := JobFinder(job.job_name).latest_running(session)):
-        raise CliError(
+        raise CliError(  # noqa: TRY003
             f"Another '{job.job_name}' pipeline is already running which "  # noqa: EM102
             f"started at {existing.started_at}. To ignore this check use "
             "the '--force' option.",
@@ -541,7 +540,7 @@ async def _run_elt(
             else:
                 log.info("Transformation skipped.")
         except RunnerError as err:
-            raise CliError(
+            raise CliError(  # noqa: TRY003
                 f"ELT could not be completed: {err}.\nFor more detailed log "  # noqa: EM102
                 "messages re-run the command using 'meltano "
                 "--log-level=debug ...' CLI flag.\nNote that you can also "
@@ -614,11 +613,11 @@ async def _run_extract_load(
         with suppress(KeyError):
             code = err.exitcodes[PluginType.EXTRACTORS]
             message = extractor_log.last_line.rstrip() or "(see above)"
-            log.error("Extraction failed", code=code, message=message)
+            log.error("Extraction failed", code=code, message=message)  # noqa: TRY400
         with suppress(KeyError):
             code = err.exitcodes[PluginType.LOADERS]
             message = loader_log.last_line.rstrip() or "(see above)"
-            log.error("Loading failed", code=code, message=message)
+            log.error("Loading failed", code=code, message=message)  # noqa: TRY400
         raise
 
     log.info("Extract & load complete!")
@@ -652,23 +651,17 @@ async def _run_transform(
         with suppress(KeyError):
             code = err.exitcodes[PluginType.TRANSFORMERS]
             message = transformer_log.last_line.rstrip() or "(see above)"
-            log.error("Transformation failed", code=code, message=message)
+            log.error("Transformation failed", code=code, message=message)  # noqa: TRY400
         raise
 
     log.info("Transformation complete!")
 
 
 def _find_extractor(project: Project, extractor_name: str) -> PluginDefinition:
-    try:
-        return project.plugins.locked_definition_service.find_definition(
-            PluginType.EXTRACTORS,
-            extractor_name,
-        )
-    except PluginNotFoundError:
-        return project.hub_service.find_definition(
-            PluginType.EXTRACTORS,
-            extractor_name,
-        )
+    return project.plugins.locked_definition_service.find_definition(
+        PluginType.EXTRACTORS,
+        extractor_name,
+    )
 
 
 def _find_transform_for_extractor(
@@ -685,6 +678,6 @@ def _find_transform_for_extractor(
         # Check if the transform has been added to the project
         transform_plugin = project.plugins.get_plugin(transform_plugin_def)
 
-        return transform_plugin.name
+        return transform_plugin.name  # noqa: TRY300
     except PluginNotFoundError:
         return None

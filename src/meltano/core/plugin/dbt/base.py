@@ -10,13 +10,14 @@ import structlog
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_install_service import PluginInstaller, PluginInstallReason
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.transform_add_service import TransformAddService
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_install_service import PluginInstaller
     from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -82,13 +83,13 @@ async def install_dbt_plugin(
         logger.info(f"Adding dbt model to '{dbt_project_path}'...")  # noqa: G004
         transform_add_service.update_dbt_project(plugin)
     except PluginNotFoundError as ex:
-        raise PluginInstallError(
+        raise PluginInstallError(  # noqa: TRY003
             "Transformer 'dbt' is not installed. "  # noqa: EM101
             "Run `meltano add transformer dbt` to add it to your project.",
         ) from ex
     except FileNotFoundError as ex:
         relative_path = Path(ex.filename).relative_to(project.root)
-        raise PluginInstallError(
+        raise PluginInstallError(  # noqa: TRY003
             f"File '{relative_path}' could not be found. "  # noqa: EM102
             "Run `meltano add files files-dbt` to set up a dbt project.",
         ) from ex

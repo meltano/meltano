@@ -13,18 +13,13 @@ from structlog.stdlib import get_logger
 from urllib3 import Retry
 
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
-from meltano.core.plugin import (
-    BasePlugin,
-    PluginDefinition,
-    PluginRef,
-    PluginType,
-    Variant,
-)
+from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin import BasePlugin
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
@@ -237,7 +232,7 @@ class MeltanoHubService(PluginRepository):
         try:
             return self.session.send(prep, **settings)
         except requests.exceptions.ConnectionError as connection_err:
-            raise HubConnectionError("Could not reach Meltano Hub.") from connection_err  # noqa: EM101
+            raise HubConnectionError("Could not reach Meltano Hub.") from connection_err  # noqa: EM101, TRY003
 
     def find_definition(
         self,
@@ -282,6 +277,7 @@ class MeltanoHubService(PluginRepository):
                 variant_name,
             ) from variant_key_err
 
+        logger.info("Fetching plugin definition from Meltano Hub", url=url)
         response = self._get(url)
 
         try:

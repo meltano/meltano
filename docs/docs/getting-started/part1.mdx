@@ -94,7 +94,6 @@ Next steps:
 This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
 ```yml
-version: 1
 default_environment: dev
 project_id: <unique-GUID>
 environments:
@@ -200,7 +199,7 @@ The GitHub tap requires [configuration](/guide/configuration) before it can star
 1. The simplest way to configure a new plugin in Meltano is using the mode `interactive`:
 
 ```bash
-meltano config tap-github set --interactive
+meltano config set tap-github --interactive
 ```
 
 2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories (formatted like `["meltano/meltano"]`), start_date, and your auth_token.
@@ -210,7 +209,7 @@ meltano config tap-github set --interactive
 <Termy>
 
 ```console
-$ meltano config tap-github set --interactive
+$ meltano config set tap-github --interactive
 Configuring Extractor 'tap-github' Interactively
 [...]
 Settings
@@ -256,10 +255,10 @@ It will also add your secret auth token to the file `.env`:
 TAP_GITHUB_AUTH_TOKEN='ghp_XXX' # your token!
 ```
 
-3. Double check the config by running [`meltano config tap-github`](/reference/command-line-interface#config):
+3. Double check the config by running [`meltano config list tap-github`](/reference/command-line-interface#config):
 
 ```bash
-meltano config tap-github list
+meltano config list tap-github
 ```
 
 <br />
@@ -267,7 +266,7 @@ meltano config tap-github list
 <Termy>
 
 ```console
-$ meltano config tap-github list
+$ meltano config list tap-github
 2024-07-08T16:27:36.433823Z [info     ] The default environment 'dev' will be ignored for `meltano config`. To configure a specific environment, please use the option `--environment=<environment name>`.
 
 additional_auth_tokens [env: TAP_GITHUB_ADDITIONAL_AUTH_TOKENS] current value: None (default)
@@ -339,7 +338,6 @@ meltano select tap-github commits commit_timestamp
 This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml
-version: 1
 default_environment: dev
 environments:
 - name: dev

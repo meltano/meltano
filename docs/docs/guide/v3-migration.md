@@ -49,7 +49,7 @@ meltano install
 3. Generate all lock files for your project:
 
 ```bash
-meltano lock --all
+meltano lock
 ```
 
 4. (Optional) Remove the `ff.plugin_locks_required` feature flag after upgrading to Meltano v3, since it has no effect in Meltano v3.

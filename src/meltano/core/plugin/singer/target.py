@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.job import Job, Payload
+from meltano.core.job import Payload
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
@@ -20,6 +20,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.job import Job
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = get_logger(__name__)
@@ -68,7 +69,7 @@ class BookmarkWriter:
         new_state = {}
         try:
             new_state = json.loads(line)
-        except Exception:
+        except Exception:  # noqa: BLE001
             logger.warning(
                 "Received state is invalid, incremental state has not been updated",
             )
@@ -80,7 +81,7 @@ class BookmarkWriter:
 
         try:
             job.save(self.session)
-        except Exception as e:  # pragma: no cover
+        except Exception as e:  # pragma: no cover  # noqa: BLE001
             logger.warning("Failed to persist job to the system database: %s", e)
 
         try:
@@ -89,10 +90,10 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception:  # pragma: no cover
+        except Exception:  # pragma: no cover  # noqa: BLE001
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated: %s",
+                "incremental state has not been updated",
                 exc_info=True,
             )
         else:
@@ -108,6 +109,7 @@ class SingerTarget(SingerPlugin):
     __plugin_type__ = PluginType.LOADERS
 
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
+        *SingerPlugin.EXTRA_SETTINGS,
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 

@@ -23,18 +23,22 @@ inputs:
   python-version:
     description: 'The version of Python that will be installed on the image'
     required: true
+  slim:
+    description: 'Whether to build the slim variant of the image'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
     - name: Prepare the tags
       id: prepare-tags
@@ -46,16 +50,28 @@ runs:
         INPUTS_REGISTRY: ${{ inputs.registry }}
 
     - name: Download artifacts
-      uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: Packages
         path: dist
+
+    - name: Set Dockerfile path
+      id: dockerfile-path
+      shell: bash
+      run: |
+        if [[ "${INPUTS_SLIM}" == "true" ]]; then
+          echo "path=docker/meltano/Dockerfile.slim" >> $GITHUB_OUTPUT
+        else
+          echo "path=docker/meltano/Dockerfile" >> $GITHUB_OUTPUT
+        fi
+      env:
+        INPUTS_SLIM: ${{ inputs.slim }}
 
     - name: Build the image for all supported architectures
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
-        file: docker/meltano/Dockerfile
+        file: ${{ steps.dockerfile-path.outputs.path }}
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
@@ -72,7 +88,7 @@ runs:
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
-        file: docker/meltano/Dockerfile
+        file: ${{ steps.dockerfile-path.outputs.path }}
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
@@ -90,7 +106,7 @@ runs:
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e # v6.5.1
+      uses: anchore/scan-action@8d2fce09422cd6037e577f4130e9b925e9a37175 # v7.3.1
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -98,7 +114,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
+      uses: github/codeql-action/upload-sarif@b20883b0cd1f46c72ae0ba6d1090936928f9fa30 # v4.32.0
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -118,7 +134,7 @@ runs:
         INPUTS_TOKEN: ${{ inputs.token }}
 
     - name: Login to the registry
-      uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
       with:
         registry: ${{ inputs.registry }}
         username: ${{ inputs.username }}
@@ -129,7 +145,7 @@ runs:
       uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
       with:
         context: .
-        file: docker/meltano/Dockerfile
+        file: ${{ steps.dockerfile-path.outputs.path }}
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}

@@ -80,7 +80,7 @@ dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platfo
 <Termy>
 
 ```console
-$ meltano add utility dbt-postgres
+$ meltano add dbt-postgres
 2024-09-22T11:32:35.601357Z [info     ] Environment 'dev' is active
 Added utility 'dbt-postgres' to your Meltano project
 ...
@@ -117,7 +117,7 @@ dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath(
 ```yaml
   utilities:
   - name: dbt-postgres
-    pip_url: dbt-core dbt-postgres meltano-dbt-ext~=0.3.0
+    pip_url: dbt-core dbt-postgres meltano-dbt-ext~=0.4.0
 ```
 :::
 
@@ -130,17 +130,17 @@ Configure the dbt-postgres utility to use the same configuration as our target-p
 <Termy>
 
 ```console
-$ meltano config dbt-postgres set host localhost
+$ meltano config set dbt-postgres host localhost
 &ensp;&ensp;Utility 'dbt-postgres' setting 'host' was set in `meltano.yml`: 'localhost'
-$ meltano config dbt-postgres set port 5432
+$ meltano config set dbt-postgres port 5432
 &ensp;&ensp;Utility 'dbt-postgres' setting 'port' was set in `meltano.yml`: 5432
-$ meltano config dbt-postgres set user meltano
+$ meltano config set dbt-postgres user meltano
 &ensp;&ensp;Utility 'dbt-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
-$ meltano config dbt-postgres set password password
+$ meltano config set dbt-postgres password password
 &ensp;&ensp;Utility 'dbt-postgres' setting 'password' was set in `.env`: (redacted)
-$ meltano config dbt-postgres set dbname postgres
+$ meltano config set dbt-postgres dbname postgres
 &ensp;&ensp;Utility 'dbt-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
-$ meltano config dbt-postgres set schema analytics
+$ meltano config set dbt-postgres schema analytics
 &ensp;&ensp;Utility 'dbt-postgres' setting 'schema' was set in `meltano.yml`: 'analytics'
 ```
 
@@ -248,7 +248,6 @@ Extension executing `dbt run`...
 <p>If you encounter an error related to dbt not being to clean files outside of the project directory, you can add the following to your <code>meltano.yml</code> file:</p>
 
 ```yaml
-version: 1
 env:
   DBT_CLEAN_PROJECT_FILES_ONLY: "false"
 ```

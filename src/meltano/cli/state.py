@@ -96,7 +96,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             blocks = [match["tap"], match["target"]]
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service  # type: ignore[union-attr]
-        except Exception:
+        except Exception:  # noqa: BLE001
             logger.warning("No plugins found for provided state_id.")
     # If provided state_id does not match convention (i.e., run via "meltano el"),
     # use the standalone StateService in the CLI context.
@@ -119,7 +119,7 @@ def meltano_state(project: Project, ctx: click.Context) -> None:
     """  # noqa: D301
     _, sessionmaker = project_engine(project)
     session = sessionmaker(future=True)
-    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)
+    ctx.obj[STATE_SERVICE_KEY] = ctx.with_resource(StateService(project, session))
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
@@ -191,7 +191,7 @@ def move_state(
     dst_state_id: str,
 ) -> None:
     """Move state to another job ID, clearing the original."""
-    # Retrieve state for moveing
+    # Retrieve state for moving
     state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
@@ -264,6 +264,11 @@ def merge_state(
     type=click.Path(exists=True, path_type=Path),
     help="Set state from json file containing Singer state.",
 )
+@click.option(
+    "--no-validate",
+    is_flag=True,
+    help="Skip validation of state structure (not recommended).",
+)
 @click.argument("state-id")
 @click.argument("state", type=str, required=False)
 @pass_project(migrate=True)
@@ -272,13 +277,11 @@ def set_state(
     ctx: click.Context,
     project: Project,
     state_id: str,
-    state: str | None,
+    state: str,
     input_file: Path | None,
+    no_validate: bool,  # noqa: FBT001
 ) -> None:
     """Set state."""
-    state_service: StateService = (
-        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
     mutually_exclusive_options = {
         "--input-file": input_file,
         "STATE": state,
@@ -287,9 +290,29 @@ def set_state(
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     if input_file:
         with input_file.open() as state_f:
-            state_service.set_state(state_id, state_f.read())
-    elif state:
-        state_service.set_state(state_id, state)
+            state = state_f.read()
+
+    if no_validate:
+        logger.warning(
+            "Skipping state validation. Invalid state may cause issues in future runs.",
+        )
+
+    state_service: StateService = (
+        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+    try:
+        state_service.set_state(state_id, state, validate=not no_validate)
+    except json.JSONDecodeError as e:
+        msg = f"Invalid JSON provided: {e}"
+        raise click.ClickException(msg) from e
+    except InvalidJobStateError as e:
+        msg = (
+            f"Invalid state format: {e}. "
+            "State must be valid JSON with a top-level 'singer_state' key. "
+            "Use --no-validate to bypass this check."
+        )
+        raise click.ClickException(msg) from e
+
     logger.info(
         f"State for {state_id} was successfully set "  # noqa: G004
         f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
@@ -298,15 +321,77 @@ def set_state(
 
 @meltano_state.command(cls=InstrumentedCmd, name="get")
 @click.argument("state-id")
+@click.option(
+    "--format",
+    type=click.Choice(["json", "pretty"], case_sensitive=False),
+    default="json",
+    help=(
+        "Output format: 'json' for compact single-line (default, ready for "
+        "meltano state set), 'pretty' for human-readable indented format."
+    ),
+)
 @pass_project(migrate=True)
 @click.pass_context
-def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
+def get_state(ctx: click.Context, project: Project, state_id: str, format: str) -> None:  # noqa: A002
     """Get state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
     )
     retrieved_state = state_service.get_state(state_id)
-    click.echo(json.dumps(retrieved_state))
+    if format == "pretty":
+        click.echo(json.dumps(retrieved_state, indent=2))
+    else:
+        click.echo(json.dumps(retrieved_state, separators=(",", ":")))
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="edit")
+@prompt_for_confirmation(
+    prompt="This will overwrite the state's current value. Continue?",
+)
+@click.argument("state-id")
+@pass_project(migrate=True)
+@click.pass_context
+def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
+    """Edit state in your default text editor.
+
+    The state must be valid JSON with a top-level 'singer_state' key:
+    {
+        "singer_state": {
+            "bookmarks": {...}
+        }
+    }
+    """
+    state_service: StateService = (
+        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+    )
+
+    current_state = state_service.get_state(state_id)
+    if not current_state:
+        logger.info("No state found for %s. Creating new state.", state_id)
+        current_state = {}
+
+    initial_content = json.dumps(current_state, indent=2)
+    if edited_content := click.edit(initial_content, extension=".json"):
+        edited_content = edited_content.strip()
+    else:
+        logger.info("Edit cancelled - no changes made")
+        ctx.exit(0)
+
+    if not edited_content:
+        logger.info("Empty content provided - no changes made")
+        ctx.exit(0)
+
+    initial_json = json.loads(initial_content)
+    if json.loads(edited_content) == initial_json:
+        logger.info("No changes detected")
+        ctx.exit(0)
+
+    state_service.set_state(state_id, edited_content)
+    logger.info(
+        "State for %s was successfully updated at %s",
+        state_id,
+        dt.now(tz=tz.utc).strftime("%Y-%m-%d %H:%M:%S%z"),
+    )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")

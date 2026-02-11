@@ -9,16 +9,14 @@ from urllib.parse import urlparse
 import click
 import requests
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import PluginTypeArg, get_install_options, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
-    PluginTypeArg,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
     infer_plugin_type,
-    validate_plugin_type_args,
 )
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -28,6 +26,7 @@ from meltano.core.utils import run_async
 from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
+    from meltano.cli.params import InstallPlugins
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -143,7 +142,7 @@ async def add(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
+    plugin_names = plugin
 
     if as_name:
         # `add <type> <inherit-from> --as <name>``
@@ -157,7 +156,7 @@ async def add(
         PluginType.ORCHESTRATORS,
     }:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102
+        raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102, TRY003
 
     plugin_refs: list[PluginRef] = [
         PluginRef(
@@ -172,7 +171,7 @@ async def add(
     )
     if not dependencies_met:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(f"Failed to install plugin(s): {err}")  # noqa: EM102
+        raise CliError(f"Failed to install plugin(s): {err}")  # noqa: EM102, TRY003
 
     add_service = ProjectAddService(project)
 
@@ -219,7 +218,7 @@ async def add(
 
     if success is False:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError("Failed to install plugin(s)")  # noqa: EM101
+        raise CliError("Failed to install plugin(s)")  # noqa: EM101, TRY003
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)

@@ -745,7 +745,7 @@ class TestCliEltScratchpadOne:
         # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
         try:
-            raise asyncio.LimitOverrunError(
+            raise asyncio.LimitOverrunError(  # noqa: TRY003, TRY301
                 "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
@@ -753,7 +753,7 @@ class TestCliEltScratchpadOne:
             try:
                 # `ValueError` needs to be raised from inside the except block
                 # for `LimitOverrunError` so that `__context__` is set.
-                raise ValueError(str(err))
+                raise ValueError(str(err))  # noqa: TRY301
             except ValueError as wrapper_err:
                 tap_process.stdout.readline.side_effect = wrapper_err
 

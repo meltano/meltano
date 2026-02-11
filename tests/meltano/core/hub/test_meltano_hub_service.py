@@ -115,7 +115,7 @@ class TestMeltanoHubService:
     def test_server_error(self, project: Project) -> None:
         with pytest.raises(
             HubConnectionError,
-            match="Could not connect to Meltano Hub. 500 Server Error",
+            match=r"Could not connect to Meltano Hub. 500 Server Error",
         ) as exc_info:
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,

@@ -67,11 +67,11 @@ class ProjectInitService:
                 )
                 raise ProjectInitServiceError(msg) from ex
         except PermissionError as ex:
-            raise ProjectInitServiceError(
+            raise ProjectInitServiceError(  # noqa: TRY003
                 f"Permission denied to create '{self.project_directory}'.",  # noqa: EM102
             ) from ex
         except Exception as ex:
-            raise ProjectInitServiceError(
+            raise ProjectInitServiceError(  # noqa: TRY003
                 f"Could not create directory '{self.project_directory}'. {ex}",  # noqa: EM102
             ) from ex
 
@@ -101,7 +101,7 @@ class ProjectInitService:
         """
         # explicitly create the .meltano directory if it doesn't exist
         click.secho("Creating .meltano folder", fg="blue")
-        project.meltano_dir().mkdir(parents=True, exist_ok=True)
+        project.dirs.meltano().mkdir(parents=True, exist_ok=True)
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 

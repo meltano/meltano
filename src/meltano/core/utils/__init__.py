@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import functools
 import hashlib
+import importlib.metadata
 import math
 import os
 import platform
@@ -16,7 +17,6 @@ import typing as t
 import unicodedata
 import uuid
 from collections.abc import Mapping, Sequence
-from contextlib import suppress
 from copy import copy, deepcopy
 from datetime import date, datetime, time, timezone
 from enum import IntEnum
@@ -25,8 +25,8 @@ from operator import setitem
 from pathlib import Path
 
 import dateparser
-import flatten_dict
 import structlog
+from packaging.specifiers import SpecifierSet
 from requests.auth import HTTPBasicAuth
 
 from meltano.core.error import MeltanoError
@@ -104,6 +104,23 @@ class NotFound(Exception):
             super().__init__(f"{name} was not found.")
         else:
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
+
+
+class IncompatibleMeltanoVersionError(Exception):
+    """A component is incompatible with the Meltano version."""
+
+    def __init__(self, message: str, required_version: str, current_version: str):
+        """Initialize the error.
+
+        Args:
+            message: The error message.
+            required_version: The version required by the component.
+            current_version: The version of Meltano.
+        """
+        super().__init__(message)
+
+        self.required_version = required_version
+        self.current_version = current_version
 
 
 def run_async(func: Callable[..., Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
@@ -309,15 +326,27 @@ def to_env_var(*xs: str) -> str:
     return "_".join(re.sub(r"[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
-    """Flatten a dictionary with `dot` and `env_var` reducers.
+@t.overload
+def flatten(d: dict, reducer: t.Literal["dot"]) -> dict[str, t.Any]: ...
 
-    Wrapper around `flatten_dict.flatten`.
+
+@t.overload
+def flatten(d: dict, reducer: t.Literal["env_var"]) -> dict[str, str]: ...
+
+
+@t.overload
+def flatten(d: dict, reducer: t.Literal["tuple"]) -> dict[tuple[str, ...], str]: ...
+
+
+def flatten(
+    d: dict,
+    reducer: t.Literal["dot", "env_var", "tuple"] | Callable = "tuple",
+) -> dict[str, t.Any]:
+    """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Args:
         d: the dict to flatten
         reducer: the reducer to flatten with
-        **kwargs: additional kwargs to pass to flatten_dict.flatten
 
     Returns:
         the flattened dict
@@ -327,7 +356,63 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN0
     if reducer == "env_var":
         reducer = to_env_var
 
-    return flatten_dict.flatten(d, reducer, **kwargs)
+    def _flatten(obj: dict, parent_key: tuple = ()) -> dict:
+        """Recursively flatten a nested dictionary.
+
+        Args:
+            obj: the dictionary to flatten
+            parent_key: tuple of parent keys for nested recursion
+
+        Returns:
+            the flattened dictionary
+        """
+        items = []
+        for key, value in obj.items():
+            new_key = (*parent_key, key)
+            if isinstance(value, dict) and value:
+                items.extend(_flatten(value, new_key).items())
+            else:
+                items.append((new_key, value))
+        return dict(items)
+
+    flattened = _flatten(d)
+
+    # Apply the reducer to convert tuples to the desired key format
+    if reducer == "tuple":
+        return flattened
+    return {reducer(*key): value for key, value in flattened.items()}
+
+
+def unflatten(
+    d: dict,
+    splitter: t.Literal["tuple", "dot"] | Callable[[str], tuple[str, ...]] = "dot",
+) -> dict[str, t.Any]:
+    """Unflatten a dictionary with dot-separated keys into a nested dictionary.
+
+    Args:
+        d: the flattened dict to unflatten
+        splitter: the splitter to use for key separation. Can be "tuple", "dot",
+            or a callable that takes a key and returns a tuple of key parts.
+
+    Returns:
+        the nested dict
+    """
+    if splitter == "tuple":
+        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # noqa: E731
+    elif splitter == "dot":
+        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # noqa: E731
+
+    result = {}
+    for key, value in d.items():
+        key_parts = splitter(key)
+        current = result
+        for part in key_parts[:-1]:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        current[key_parts[-1]] = value
+
+    return result
 
 
 def compact(xs: Iterable) -> Iterable:
@@ -390,7 +475,19 @@ def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: Callable[..., Path]):  # noqa: ANN201, D103
+P = t.ParamSpec("P")
+
+
+def makedirs(func: Callable[P, Path]) -> Callable[P, Path]:
+    """Decorator to create directories for a given path.
+
+    Decorates a function that returns a path and creates the directories for the path
+    if the `make_dirs` keyword argument is True.
+
+    Args:
+        func: The function to decorate.
+    """
+
     @functools.wraps(func)
     def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
@@ -527,7 +624,7 @@ def expand_env_vars(
     """
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, Mapping, list)):
+    if not isinstance(raw_value, str | Mapping | list):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -568,7 +665,7 @@ def _expand_env_vars(
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, Mapping, list))
+            if isinstance(v, str | Mapping | list)
             else v
             for k, v in raw_value.items()
         }
@@ -577,7 +674,7 @@ def _expand_env_vars(
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, Mapping, list))
+            if isinstance(v, str | Mapping | list)
             else v
             for v in raw_value
         ]
@@ -635,7 +732,7 @@ def hash_sha256(value: str | bytes) -> str:
         ValueError: If we are blindly passed a value that is None.
     """
     if value is None:
-        raise ValueError("Cannot hash None.")  # noqa: EM101
+        raise ValueError("Cannot hash None.")  # noqa: EM101, TRY003
     if isinstance(value, str):
         value = value.encode()
     return hashlib.sha256(value).hexdigest()
@@ -701,7 +798,7 @@ def strtobool(val: str) -> bool:
     if val in {"n", "no", "f", "false", "off", "0"}:
         return False
 
-    raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
+    raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102, TRY003
 
 
 def get_boolean_env_var(env_var: str, *, default: bool = False) -> bool:
@@ -854,11 +951,13 @@ _sanitize_filename_transformations = (
     # Remove Remove illegal character combination `._` from front and back:
     lambda x: x.strip("._"),
     # Add a leading `_` if necessary to avoid conflict with reserved Windows filenames:
-    lambda x: f"_{x}"
-    if platform.system() == "Windows"
-    and x
-    and x.split(".")[0].upper() in _reserved_windows_filenames
-    else x,
+    lambda x: (
+        f"_{x}"
+        if platform.system() == "Windows"
+        and x
+        and x.split(".")[0].upper() in _reserved_windows_filenames
+        else x
+    ),
 )
 
 
@@ -900,6 +999,34 @@ def parse_date(date_string: str) -> str:
         return _parsed.isoformat()
 
     return date_string
+
+
+@functools.lru_cache
+def get_meltano_version() -> str:
+    """Get the version of Meltano.
+
+    Returns:
+        The version of Meltano.
+    """
+    return importlib.metadata.version("meltano")
+
+
+def check_meltano_compatibility(required: str | None) -> None:
+    """Check if the provided version is compatible with the current Meltano version.
+
+    Args:
+        required: The version required by the project.
+
+    Returns:
+        True if the provided version is compatible with the current Meltano version.
+    """
+    if not required:
+        return
+
+    current = get_meltano_version()
+    if not SpecifierSet(required).contains(current):
+        message = f"Project requires Meltano {required}, but {current} is installed"
+        raise IncompatibleMeltanoVersionError(message, required, current)
 
 
 def new_project_id() -> uuid.UUID:

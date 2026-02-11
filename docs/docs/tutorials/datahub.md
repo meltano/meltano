@@ -8,11 +8,11 @@ sidebar_position: 11
 
 Meltano supports multiple [utilities](/concepts/plugins#utilities), one of them is the [DataHub utility](https://hub.meltano.com/utilities/datahub). It provides an integration for the metadata platform called DataHub. You can find the reference at both the [utility-datahub level](https://github.com/z3z1ma/files-datahub/tree/main/bundle/utilities/datahub) as well as the [file-bundle-datahub level](https://github.com/z3z1ma/files-datahub).
 
-This guide explains how to use the datahub utility either with a local running instance, or with a remotely running instance. It will explain how to setup the utility, configure datahub sources and how to run ingestions.
+This guide explains how to use the datahub utility either with a local running instance, or with a remotely running instance. It will explain how to set up the utility, configure datahub sources and how to run ingestions.
 
-We assume you have some familarity with DataHub and Meltano.
+We assume you have some familiarity with DataHub and Meltano.
 
-Have your [DataHub GMS](https://datahubproject.io/docs/what/gms/) url and and auth token ready for the setup. Or do the local setup described below.
+Have your [DataHub GMS](https://datahubproject.io/docs/what/gms/) url and auth token ready for the setup. Or do the local setup described below.
 
 ## High-level Overview
 
@@ -78,8 +78,8 @@ Configuring the Utility by setting the GMS endpoint for the datahub CLI running 
       gms_host: http://localhost:8080
 ```
 
-or alternatively run the equal CLI command
-`meltano config datahub set gms_host http://localhost:8080`
+or alternatively run the equivalent CLI command
+`meltano config set datahub gms_host http://localhost:8080`
 
 . If you have MSA turned on, you will need an access token, and configure the `gms_auth` attribute as well:
 
@@ -95,7 +95,7 @@ or alternatively run the equal CLI command
 
 Alternatively, run
 
-`meltano config datahub set gms_auth myToken`
+`meltano config set datahub gms_auth myToken`
 
 ## Setting Recipes
 

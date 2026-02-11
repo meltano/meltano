@@ -91,7 +91,7 @@ class Superset(BasePlugin):
             custom_config_path = invoker.project.root.joinpath(custom_config_filename)
 
             if not custom_config_path.exists():
-                raise PluginExecutionError(
+                raise PluginExecutionError(  # noqa: TRY003
                     f"Could not find config file {custom_config_path}",  # noqa: EM102
                 )
 
@@ -138,7 +138,7 @@ class Superset(BasePlugin):
         exit_code = await handle.wait()
 
         if exit_code:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 (
                     "Superset metadata database could not be initialized: "  # noqa: EM101
                     "`superset db upgrade` failed"
@@ -171,7 +171,7 @@ class Superset(BasePlugin):
         exit_code = await handle.wait()
 
         if exit_code:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 (
                     "Superset default roles and permissions could not be "  # noqa: EM101
                     "created: `superset init` failed"

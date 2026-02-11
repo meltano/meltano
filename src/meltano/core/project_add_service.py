@@ -6,13 +6,12 @@ import enum
 import sys
 import typing as t
 
-from meltano.core.plugin import BasePlugin, PluginType, Variant
+import structlog
+
+from meltano.core.plugin import BasePlugin, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import (
-    AddedPluginFlags,
-    DefinitionSource,
-    PluginAlreadyAddedException,
-)
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.utils.python_compatibility import determine_plugin_python_version
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -20,7 +19,11 @@ else:
     from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin import PluginType
     from meltano.core.project import Project
+    from meltano.core.project_plugins_service import AddedPluginFlags
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginAddedReason(StrEnum):
@@ -56,7 +59,6 @@ class ProjectAddService:
         plugin_type: PluginType,
         plugin_name: str,
         *,
-        lock: bool = True,
         update: bool = False,
         **attrs: t.Any,
     ) -> tuple[ProjectPlugin, AddedPluginFlags]:
@@ -65,7 +67,6 @@ class ProjectAddService:
         Args:
             plugin_type: The type of the plugin to add.
             plugin_name: The name of the plugin to add.
-            lock: Whether to generate a lockfile for the plugin.
             update: Whether to update the plugin.
             attrs: Additional attributes to add to the plugin.
 
@@ -78,33 +79,44 @@ class ProjectAddService:
             **attrs,
             default_variant=Variant.DEFAULT_NAME,
         )
+        self.project.plugins.ensure_parent(plugin)
 
-        with self.project.plugins.use_preferred_source(DefinitionSource.ANY):
-            self.project.plugins.ensure_parent(plugin)
+        # If we are inheriting from a base plugin definition,
+        # repeat the variant and pip_url in meltano.yml
+        parent = plugin.parent
+        if isinstance(parent, BasePlugin):
+            plugin.variant = parent.variant
+            plugin.pip_url = parent.pip_url
 
-            # If we are inheriting from a base plugin definition,
-            # repeat the variant and pip_url in meltano.yml
-            parent = plugin.parent
-            if isinstance(parent, BasePlugin):
-                plugin.variant = parent.variant
-                plugin.pip_url = parent.pip_url
+            # Auto-configure Python version if current version is not supported
+            # Only auto-set if user didn't explicitly provide --python flag
+            if (
+                (attrs.get("python") is None)  # User didn't explicitly provide --python
+                and (python_version := determine_plugin_python_version(parent._variant))
+            ):
+                plugin.python = python_version
+                logger.warning(
+                    "The current Python version is not supported by this plugin. "
+                    "Automatically configured to use %s instead.",
+                    python_version,
+                    name=plugin.name,
+                )
 
-            plugin, flags = self.project.plugins.add_to_file_with_flags(
-                plugin,
-                update=update,
-            )
+        plugin, flags = self.project.plugins.add_to_file_with_flags(
+            plugin,
+            update=update,
+        )
 
-            if lock and not plugin.is_custom():
-                self.project.plugins.lock_service.save(plugin, exists_ok=True)
+        if not plugin.is_custom():
+            self.project.plugins.lock_service.save(plugin, exists_ok=True)
 
-            return plugin, flags
+        return plugin, flags
 
     def add(
         self,
         plugin_type: PluginType,
         plugin_name: str,
         *,
-        lock: bool = True,
         update: bool = False,
         **attrs: t.Any,
     ) -> ProjectPlugin:
@@ -123,7 +135,6 @@ class ProjectAddService:
         plugin, _flags = self.add_with_flags(
             plugin_type,
             plugin_name,
-            lock=lock,
             update=update,
             **attrs,
         )

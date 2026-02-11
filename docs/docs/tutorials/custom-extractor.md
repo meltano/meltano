@@ -30,11 +30,11 @@ These Singer taps and targets can be cumbersome to run manually so the easiest w
 
 The following steps will demonstrate how to implement a custom extractor to extract data from a JSON placeholder REST API to a JSONL file using Meltano and the Meltano SDK. You can check out the complete custom extractor code on this [GitHub repo](https://github.com/vicradon/tap-jsonplaceholder).
 
-There a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
+There are a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
 
-1. [Python3](https://www.python.org/downloads/) for running Python-based scripts
-3. [uv] for dependency management in your custom extractor
-4. [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) for installing the template repository
+1. [Python3](https://www.python.org/downloads/) for running Python-based scripts.
+2. [uv] for dependency management in your custom extractor. It's a fast and feature-rich Python package manager that simplifies the process of installing Python programs that need to be added to `PATH` (e.g., Meltano).
+3. [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) for installing the template repository.
 
 ## 1. Installing the Dependencies
 
@@ -44,15 +44,13 @@ You can install Python 3 from the [official website](https://www.python.org/down
 uv python install 3.13
 ```
 
-You can then run the command below to install Meltano and Cookiecutter.
+You can then run the following command to install Meltano and Cookiecutter.
 
 ```
 uv tool install meltano
 
 uv tool install cookiecutter
 ```
-
-Pipx is a wrapper around pip that simplifies the process of installing Python programs that need to be added to path (e.g., Meltano).
 
 You will use Cookiecutter to clone the Meltano SDK template repo for implementing a custom extractor.
 
@@ -64,54 +62,7 @@ Run the following command to create the project files from the cookiecutter temp
 cookiecutter https://github.com/meltano/sdk --directory="cookiecutter/tap-template"
 ```
 
-After running the above command, you will be prompted to configure your project.
-
-- Type `jsonplaceholder` as your source name.
-- Then input your first name and last name.
-- You can leave the `tap_id` and library name as the default suggested names.
-- If you are planning to distribute your project on PyPI and the `tap_id` is already in use, you can set a variant name. e.g. 'meltanolabs' or 'pipelinewise'.
-- For the stream type, you should select REST, and Custom or N/A for the auth method.
-- Finally, you can choose to add a CI/CD template or not. It doesn’t really matter in this case.
-
-```
-source_name [MySourceName]: jsonplaceholder
-
-admin_name [FirstName LastName]: <Your First Name, Your Last Name>
-
-tap_id [tap-jsonplaceholder]:
-
-library_name [tap_jsonplaceholder]:
-
-variant [None (Skip)]:
-
-Select stream_type:
-
-1 - REST
-
-2 - GraphQL
-
-3 - SQL
-
-4 - Other
-
-Choose from 1, 2, 3, 4 [1]: 1
-
-Select auth_method:
-
-1 - API Key
-2 - Bearer Token
-3 - Basic Auth
-4 - OAuth2
-5 - JWT
-6 - Custom or N/A
-Choose from 1, 2, 3, 4, 5, 6 [1]: 6
-
-Select include_cicd_sample_template:
-
-1 - GitHub
-2 - None (Skip)
-Choose from 1, 2 [1]:
-```
+After running the above command, you will be prompted to configure your project. For this tutorial, use `jsonplaceholder` as your source name and follow the rest of the prompts to complete the setup.
 
 The result of the above command is a new directory `tap-jsonplaceholder` that contains boilerplate code for developing your tap and also a `meltano.yml` file that you can use to test your custom extractor.
 
@@ -237,7 +188,7 @@ meltano add target-jsonl
 ```
 
 ```bash
-meltano add loader target-jsonl
+meltano add target-jsonl
 ```
 
 ```mdx-code-block
@@ -348,7 +299,7 @@ meltano add --custom tap-jsonplaceholder
 ```
 
 ```bash
-meltano add --custom extractor tap-jsonplaceholder
+meltano add --custom tap-jsonplaceholder
 ```
 
 ```mdx-code-block
@@ -407,7 +358,7 @@ meltano add --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```bash
-meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+meltano add --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```mdx-code-block
@@ -448,7 +399,7 @@ meltano add --update --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```bash
-meltano add --update --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+meltano add --update --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
 ```
 
 ```mdx-code-block
@@ -482,7 +433,7 @@ meltano add target-jsonl
 ```
 
 ```bash
-meltano add loader target-jsonl
+meltano add target-jsonl
 ```
 
 ```mdx-code-block
@@ -589,7 +540,7 @@ _**It is best practice not to store sensitive values directly in `meltano.yml`.*
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
 for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting is set to `sensitive: true` and then
-run [`meltano config <plugin> set password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
+run [`meltano config set <plugin> password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
 setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
 You may use any of the following to configure setting values (in order of precedence):
@@ -626,25 +577,22 @@ your tap directly to PyPI.
    - `--token=<token>` to publish using a PyPI API token
 
 
-### Test a `pip` install
+### Verify installation
 
 We recommend using [`uv`][uv] to avoid dependency conflicts:
 
 ```bash
-uv tool install tap-my-custom-source
-```
+uvx --from git+https://github.com/myusername/tap-my-custom-source.git tap-my-custom-source --help
 
-Or if you don't want to use pipx:
-
-```bash
-pip3 install tap-my-custom-source
+# Or from PyPI, if available
+uvx tap-my-custom-source --help
 ```
 
 If you have gotten this far... _**Congrats!** You are now a proud Singer tap developer!_
 
 ### Make it discoverable
 
-Once you have your tap published to PyPI, consider
+Once you have your tap published to PyPI or have tagged one or more GitHub releases, consider
 [making it discoverable](/contribute/plugins#making-a-custom-plugin-discoverable)
 for other users of Meltano.
 
@@ -652,10 +600,9 @@ for other users of Meltano.
 
 Once your repo is installable with pip, you can reference this in your `meltano.yml` file with three quick steps:
 
-1. Add a `pip_url` property to your `extractor` definition, for example `pip_url: tap-my-custom-source`.
-   - _Alternatively, you can also install the latest from your git repo directly using this syntax:
-     `pip_url: git+https://github.com/myusername/tap-my-custom-source@main`_
-2. Replace `/path/to/tap-my-custom-source.sh` with just the executable name: `tap-my-custom-source`.
+1. Create a GitHub release, e.g. v1.0.0.
+2. Add a `pip_url` property to your `extractor` definition, for example `pip_url: git+https://github.com/myusername/tap-my-custom-source@v1.0.0`.
+   _Alternatively, use `pip_url: tap-my-custom-source` if you've published your extractor to PyPI_.
 3. Rerun `meltano install` to use the version from pip in place of the local test version.
 
 ## References

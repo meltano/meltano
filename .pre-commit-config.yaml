@@ -1,16 +1,11 @@
 ci:
   autofix_commit_msg: |
-    [pre-commit.ci] auto fixes from pre-commit.ci hooks
+    chore: auto fixes from pre-commit.ci hooks
 
     for more information, see https://pre-commit.ci
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
-  autoupdate_schedule: weekly
-  skip:
-    - uv-lock
-    - check-github-issue-templates
-    - check-github-issue-config
-    - check-github-discussion-templates
+  autoupdate_schedule: monthly
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -29,9 +24,10 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: debug-statements
+      - id: no-commit-to-branch
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.33.3
+    rev: 0.36.1
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -40,25 +36,12 @@ repos:
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
-      - id: check-jsonschema
-        alias: check-github-issue-templates
-        name: validate GitHub issue templates
-        files: ^\.github/ISSUE_TEMPLATE/.*\.yml$
-        exclude: ^\.github/ISSUE_TEMPLATE/config\.yml$
-        args: ["--schemafile", "https://json.schemastore.org/github-issue-forms.json"]
-      - id: check-jsonschema
-        alias: check-github-issue-config
-        name: validate GitHub issue config
-        files: ^\.github/ISSUE_TEMPLATE/config\.yml$
-        args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
-      - id: check-jsonschema
-        alias: check-github-discussion-templates
-        name: validate GitHub discussion templates
-        files: ^.github/DISCUSSION_TEMPLATE/.*\.yml$
-        args: ["--schemafile", "https://json.schemastore.org/github-discussion.json"]
       - id: check-compose-spec
       - id: check-dependabot
       - id: check-github-actions
+      - id: check-github-issue-config
+      - id: check-github-issue-forms
+      - id: check-github-discussion
       - id: check-github-workflows
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -83,13 +66,13 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+    rev: v0.15.0
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.8.14
+    rev: 0.9.28
     hooks:
       - id: uv-lock

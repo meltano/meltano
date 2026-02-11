@@ -134,7 +134,7 @@ class ProjectFiles:
             InvalidIncludePathError: If the included path is not a valid file.
         """
         if not (file_path.is_file() and file_path.exists()):
-            raise InvalidIncludePathError(f"Included path '{file_path}' not found.")  # noqa: EM102
+            raise InvalidIncludePathError(f"Included path '{file_path}' not found.")  # noqa: EM102, TRY003
 
     def _resolve_include_paths(self, include_path_patterns: list[str]) -> list[Path]:
         """Return a list of paths from a list of glob pattern strings.
@@ -158,7 +158,7 @@ class ProjectFiles:
                     self._is_valid_include_path(path)
                 except InvalidIncludePathError as err:
                     logger.critical(f"Include path '{path}' is invalid: \n {err}")  # noqa: G004
-                    raise err
+                    raise err  # noqa: TRY201
                 include_paths.append(path)
             if self._meltano_file_path in include_paths:
                 include_paths.remove(self._meltano_file_path)
@@ -183,7 +183,7 @@ class ProjectFiles:
                 f'Plugin with path "{key_path_string}" already added in '  # noqa: G004
                 f"file {existing_key_file_path}.",
             )
-            raise Exception("Duplicate plugin name found.")  # noqa: EM101
+            raise Exception("Duplicate plugin name found.")  # noqa: EM101, TRY002, TRY003
 
         self._plugin_file_map[key] = str(include_path)
 
@@ -239,7 +239,7 @@ class ProjectFiles:
                 contents: CommentedMap = yaml.load(path)
             except YAMLError as exc:  # noqa: PERF203
                 logger.critical(f"Error while parsing YAML file: {path} \n {exc}")  # noqa: G004
-                raise exc
+                raise exc  # noqa: TRY201
             else:
                 self._raw_contents_map[str(path)] = contents
                 # TODO: validate dict schema
@@ -292,8 +292,13 @@ class ProjectFiles:
         # Make sure that the top-level keys are in the same order as the original files
         sorted_file_dicts = self._restore_file_key_order(file_dicts)
 
+        # Ensure meltano.yml is always present, even if empty
+        meltano_file_path = str(self._meltano_file_path)
+        if meltano_file_path not in sorted_file_dicts:
+            sorted_file_dicts[meltano_file_path] = CommentedMap()
+
         # Copy comments from the original config to the new config
-        config.copy_attributes(sorted_file_dicts[str(self._meltano_file_path)])
+        config.copy_attributes(sorted_file_dicts[meltano_file_path])
         self._copy_yaml_attributes(sorted_file_dicts)
         return sorted_file_dicts
 

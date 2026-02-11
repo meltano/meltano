@@ -48,7 +48,7 @@ class TestCliInit:
         for meltano_dir in meltano_dirs:
             assert meltano_dir.is_dir()
 
-        meltano_yml = project.root_dir("meltano.yml").read_text()
+        meltano_yml = project.dirs.root_dir("meltano.yml").read_text()
         assert "send_anonymous_usage_stats: false" in meltano_yml
         assert "project_id:" in meltano_yml
 

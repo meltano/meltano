@@ -77,13 +77,13 @@ meltano add --plugin-type utility airflow
 ```
 
 ```bash
-meltano add <type> <name>
+meltano add <name>
 
 # For example:
-meltano add extractor tap-gitlab
-meltano add loader target-postgres
-meltano add utility dbt-snowflake
-meltano add utility airflow
+meltano add tap-gitlab
+meltano add target-postgres
+meltano add dbt-snowflake
+meltano add airflow
 ```
 
 ```mdx-code-block
@@ -584,6 +584,10 @@ You can update a plugin in your project using the `--update` option. Updating a 
 - Update the plugin lock file (the same as [`meltano lock --update`](/reference/command-line-interface#lock) would)
 - Update the plugin entry in the `meltano.yml`, without overwriting any user-defined [config](/concepts/project#plugin-configuration) or [extras](/guide/configuration#plugin-extras)
 
+:::note
+Plugin lock files may include a `requires_meltano` field that specifies the minimum Meltano version required by that plugin. If your current Meltano version doesn't meet the plugin's requirements, Meltano will exit with an error when trying to invoke the plugin.
+:::
+
 
 ```bash
 meltano add --update <type> <name>
@@ -705,6 +709,97 @@ In a `Dockerfile`, this would look like:
 ARG PIP_INDEX_URL=<your_custom_pypi_url>
 RUN meltano install
 ```
+
+## Configuring _uv_ virtual environment options
+
+Starting with Meltano 3.8, the default virtual environment backend is [`uv`](/reference/settings#venvbackend), which creates virtual environments significantly faster than the traditional `virtualenv` backend.
+
+By default, `uv` creates lightweight virtual environments without bundling `pip`, `setuptools`, or `wheel` to optimize installation speed. However, some plugins or workflows may require these tools to be available within the virtual environment (e.g., notebooks that run `pip install` commands).
+
+### Using _uv_ environment variables
+
+You can configure `uv`'s virtual environment behavior using environment variables. These can be set in your project's [`.env` file](/concepts/project#env), in your shell environment, or in the top-level `env` key in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+
+```mdx-code-block
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
+```
+
+```yaml
+version: 1
+env:
+  UV_VENV_SEED: "1"
+  UV_EXCLUDE_NEWER: "2025-01-01T00:00:00Z"
+
+plugins:
+  extractors:
+    - name: tap-gitlab
+      # ...
+```
+
+```mdx-code-block
+  </TabItem>
+  <TabItem className="meltano-tab-content" value=".env" label=".env">
+```
+
+```bash
+UV_VENV_SEED=1
+UV_EXCLUDE_NEWER=2025-01-01T00:00:00Z
+```
+
+```mdx-code-block
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="shell" label="Shell">
+```
+
+```bash
+export UV_VENV_SEED=1
+export UV_EXCLUDE_NEWER=2025-01-01T00:00:00Z
+```
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
+
+#### `UV_VENV_SEED`
+
+The `UV_VENV_SEED` environment variable controls whether seed packages (`pip`, `setuptools`, and `wheel`) are installed into virtual environments created by `uv venv`.
+
+**When to use it:**
+- Your plugin or utility needs to run `pip install` commands within its virtual environment
+- You're using Jupyter notebooks that install dependencies dynamically
+- You need backwards compatibility with workflows that assume `pip` is available
+
+:::info
+Note that `setuptools` and `wheel` are excluded from Python 3.12+ environments by default, even when seeding is enabled.
+:::
+
+#### `UV_EXCLUDE_NEWER`
+
+The `UV_EXCLUDE_NEWER` environment variable limits package resolution to versions published before a specific date. This is useful for ensuring reproducible builds by preventing newer package versions from being considered during installation.
+
+**When to use it:**
+- You want to ensure consistent builds across different environments
+- You need to avoid issues caused by recently published package versions
+- You're troubleshooting dependency resolution problems
+
+:::info
+The date should be in ISO 8601 format (e.g., `2025-01-01T00:00:00Z`).
+:::
+
+:::tip Alternative approach
+If you only need `pip` available and don't want to enable full seeding, you can add `pip` to your plugin's `pip_url` configuration:
+
+```yaml
+plugins:
+  utilities:
+  - name: notebook
+    pip_url: jupyter pip
+```
+
+This installs `pip` as a dependency of the plugin without requiring `UV_VENV_SEED`.
+:::
 
 ## Removing a plugin from your project
 
@@ -851,13 +946,13 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
    meltano install target-postgres
    ```
 
-1. View the current configuration using [`meltano config <name> list`](/reference/command-line-interface#config) to see if it is still valid:
+1. View the current configuration using [`meltano config list <name>`](/reference/command-line-interface#config) to see if it is still valid:
 
    ```bash
-   meltano config <name> list
+   meltano config list <name>
 
    # For example:
-   meltano config target-postgres list
+   meltano config list target-postgres
    ```
 
    Because different variants often use different setting names,
@@ -892,13 +987,13 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
    you can unset the old setting and set the new one using [`meltano config`](/reference/command-line-interface#config):
 
    ```bash
-   meltano config <name> unset <old_setting>
-   meltano config <name> set <setting> <value>
+   meltano config unset <name> <old_setting>
+   meltano config set <name> <setting> <value>
 
    # For example:
-   meltano config target-postgres unset postgres_password
-   meltano config target-postgres set password my_password
+   meltano config unset target-postgres postgres_password
+   meltano config set target-postgres password my_password
    ```
 
-   Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
+   Keep doing this until `meltano config list <name>` shows a valid configuration for the new variant,
    without any of the old variant's settings remaining as [custom settings](/guide/configuration#custom-settings).

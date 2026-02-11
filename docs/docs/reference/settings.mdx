@@ -13,12 +13,14 @@ To quickly find the setting you're looking for, use the Table of Contents in the
 
 As described in the [Configuration guide](/guide/configuration#configuration-layers), Meltano will determine the values of these settings by first looking in [**the environment**](/guide/configuration#configuring-settings), then in your project's [**`.env` file**](/concepts/project#env), and finally in your [**`meltano.yml` project file**](/concepts/project#meltano-yml-project-file), falling back to a default value if nothing was found.
 
-You can use [`meltano config meltano list`](/reference/command-line-interface#config) to list all available settings with their names, [environment variables](/guide/configuration#configuring-settings), and current values.
+You can use [`meltano config list meltano`](/reference/command-line-interface#config) to list all available settings with their names, [environment variables](/guide/configuration#configuring-settings), and current values.
 
 Configuration that is _not_ environment-specific or sensitive should be stored in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) and checked into version
 control. Sensitive values like passwords and tokens are most appropriately stored in the environment or your project's [`.env` file](/concepts/project#env).
 
-[`meltano config meltano set <setting> <value>`](/reference/command-line-interface#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
+[`meltano config set meltano <setting> <value>`](/reference/command-line-interface#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
+
+You can customize how `meltano.yml` is formatted (indentation, spacing, etc.) using Meltano's [user YAML configuration](/guide/user-yaml-config).
 
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](../reference/command-line-interface#config).
 
@@ -26,7 +28,7 @@ If supported by the plugin type, its configuration can be tested using [`meltano
 
 For plugin settings, refer to the specific plugin's documentation
 ([extractors](https://hub.meltano.com/extractors/), [loaders](https://hub.meltano.com/loaders/)),
-or use [`meltano config <plugin> list`](/reference/command-line-interface#config)
+or use [`meltano config list <plugin>`](/reference/command-line-interface#config)
 to list all available settings with their names, environment variables, and current values.
 
 ### <a name="plugin-python"></a>`python`
@@ -70,7 +72,7 @@ The default environment to use when no environment is explicitly specified.
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set default_environment prod
+meltano config set meltano default_environment prod
 ```
 
   </TabItem>
@@ -140,7 +142,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set send_anonymous_usage_stats false
+meltano config set meltano send_anonymous_usage_stats false
 ```
 
   </TabItem>
@@ -224,7 +226,7 @@ Alternative way to disable tracking. When set to any truthy value, disables all 
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set disable_tracking true
+meltano config set meltano disable_tracking true
 ```
 
   </TabItem>
@@ -250,7 +252,7 @@ Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set project_id '<unique identifier>'
+meltano config set meltano project_id '<unique identifier>'
 ```
 
   </TabItem>
@@ -290,7 +292,7 @@ Some systems may come with an older version by default. You can run <code>sqlite
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
+meltano config set meltano database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 ```
 
   </TabItem>
@@ -316,7 +318,7 @@ meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<po
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set database_uri mssql+pymssql://<username>:<password>@<host>:<port>/<database>
+meltano config set meltano database_uri mssql+pymssql://<username>:<password>@<host>:<port>/<database>
 ```
 
   </TabItem>
@@ -439,7 +441,7 @@ Subsequent disconnections are handled by SQLALchemy
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set database_max_retries 3
+meltano config set meltano database_max_retries 3
 ```
 
   </TabItem>
@@ -468,7 +470,7 @@ Subsequent disconnections are handled by SQLALchemy
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set database_retry_timeout 5
+meltano config set meltano database_retry_timeout 5
 ```
 
   </TabItem>
@@ -490,7 +492,7 @@ Enable this setting to indicate that your Meltano project is deployed as read-on
 
 Specifically, this prevents [adding plugins](/reference/command-line-interface#add) or [pipeline schedules](/reference/command-line-interface#schedule) to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), as well as [modifying plugin configuration](/reference/command-line-interface#config) stored in [`meltano.yml`](/concepts/project#meltano-yml-project-file) or [`.env`](/concepts/project#env).
 
-Note that [`meltano config <plugin> set`](/reference/command-line-interface#config) can still be used to store configuration in the [system database](/concepts/project#system-database), but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
+Note that [`meltano config set <plugin>`](/reference/command-line-interface#config) can still be used to store configuration in the [system database](/concepts/project#system-database), but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 #### How to use
 
@@ -499,7 +501,7 @@ Note that [`meltano config <plugin> set`](/reference/command-line-interface#conf
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set project_readonly true
+meltano config set meltano project_readonly true
 ```
 
   </TabItem>
@@ -527,8 +529,8 @@ If provided, this setting overrides the [`hub_url`](#hub-url).
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set hub_api_root "https://mysite.com/my-plugins"
-meltano config meltano set hub_api_root false
+meltano config set meltano hub_api_root "https://mysite.com/my-plugins"
+meltano config set meltano hub_api_root false
 ```
 
   </TabItem>
@@ -557,7 +559,7 @@ The Hub is primarily used by [`meltano add`](/reference/command-line-interface#a
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set hub_url http://localhost:4000
+meltano config set meltano hub_url http://localhost:4000
 ```
 
   </TabItem>
@@ -588,8 +590,8 @@ No `Authorization` header is applied under the following conditions:
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set hub_url_auth "Bearer $ACCESS_TOKEN"
-meltano config meltano set hub_url_auth false
+meltano config set meltano hub_url_auth "Bearer $ACCESS_TOKEN"
+meltano config set meltano hub_url_auth false
 ```
 
   </TabItem>
@@ -625,8 +627,8 @@ Auto-install pertains to the following commands:
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set auto_install true
-meltano config meltano set auto_install false
+meltano config set meltano auto_install true
+meltano config set meltano auto_install false
 ```
 
   </TabItem>
@@ -661,7 +663,7 @@ The `disabled` option completely suppresses all logging output, which is useful 
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set cli log_level debug
+meltano config set meltano cli log_level debug
 ```
 
   </TabItem>
@@ -696,7 +698,7 @@ A shortcut for setting the format of the log output. Ignored if a local logging 
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set cli log_format json
+meltano config set meltano cli log_format json
 ```
 
   </TabItem>
@@ -730,9 +732,9 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set cli log_config /path/to/logging.yaml
+meltano config set meltano cli log_config /path/to/logging.yaml
 # or
-meltano config meltano set cli log_config /path/to/logging.yml
+meltano config set meltano cli log_config /path/to/logging.yml
 ```
 
   </TabItem>
@@ -836,7 +838,7 @@ With a default buffer size of 100MiB, the maximum message size would therefore b
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set elt.buffer_size 52428800 # 50MiB in bytes
+meltano config set meltano elt.buffer_size 52428800 # 50MiB in bytes
 ```
 
   </TabItem>
@@ -864,7 +866,7 @@ URI for the [state backend](/concepts/state_backends) where you'd like Meltano t
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.uri "s3://your_bucket/meltano/state"
+meltano config set meltano state_backend.uri "s3://your_bucket/meltano/state"
 ```
 
   </TabItem>
@@ -890,7 +892,7 @@ Number of seconds that a [lock for a state ID](/concepts/state_backends#locking)
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.lock_timeout_seconds 720
+meltano config set meltano state_backend.lock_timeout_seconds 720
 ```
 
   </TabItem>
@@ -916,7 +918,7 @@ Number of seconds that a Meltano should wait if trying to access or modify state
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.lock_retry_seconds 720
+meltano config set meltano state_backend.lock_retry_seconds 720
 ```
 
   </TabItem>
@@ -952,7 +954,7 @@ At least one of `state_backend.azure.storage_account_url` and `state_backend.azu
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.azure.storage_account_url "https://<myStorageAccountName>.blob.core.windows.net"
+meltano config set meltano state_backend.azure.storage_account_url "https://<myStorageAccountName>.blob.core.windows.net"
 ```
 
   </TabItem>
@@ -978,7 +980,7 @@ The [Azure connection string](https://learn.microsoft.com/en-us/azure/storage/co
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.azure.connection_string "DefaultEndpointsProtocol=https;AccountName=myAccountName;AccountKey=myAccountKey"
+meltano config set meltano state_backend.azure.connection_string "DefaultEndpointsProtocol=https;AccountName=myAccountName;AccountKey=myAccountKey"
 ```
 
   </TabItem>
@@ -1008,7 +1010,7 @@ The AWS access key ID to use when authenticating to S3.
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.s3.aws_access_key_id "someaccesskeyid"
+meltano config set meltano state_backend.s3.aws_access_key_id "someaccesskeyid"
 ```
 
   </TabItem>
@@ -1034,7 +1036,7 @@ The AWS secret access key to use when authenticating to S3.
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.s3.aws_secret_access_key "somesecretaccesskey"
+meltano config set meltano state_backend.s3.aws_secret_access_key "somesecretaccesskey"
 ```
 
   </TabItem>
@@ -1060,7 +1062,7 @@ The endpoint URL to use when connecting to S3. Only necessary if using S3-compat
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.s3.endpoint_url "https://play.min.io:9000"
+meltano config set meltano state_backend.s3.endpoint_url "https://play.min.io:9000"
 ```
 
   </TabItem>
@@ -1090,7 +1092,7 @@ JSON string containing the service account credentials for Google Cloud Storage.
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.gcs.application_credentials_json '{
+meltano config set meltano state_backend.gcs.application_credentials_json '{
   "type": "service_account",
   "project_id": "my-project",
   "private_key_id": "...",
@@ -1107,7 +1109,7 @@ meltano config meltano set state_backend.gcs.application_credentials_json '{
 Or set it from a file:
 
 ```bash
-meltano config meltano set state_backend.gcs.application_credentials_json --from-file service-account-key.json
+meltano config set meltano state_backend.gcs.application_credentials_json --from-file service-account-key.json
 ```
 
   </TabItem>
@@ -1135,7 +1137,7 @@ Path to the [credential file](https://cloud.google.com/docs/authentication/appli
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.gcs.application_credentials_path "path/to/creds.json"
+meltano config set meltano state_backend.gcs.application_credentials_path "path/to/creds.json"
 ```
 
   </TabItem>
@@ -1167,7 +1169,7 @@ Path to the [credential file](https://cloud.google.com/docs/authentication/appli
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set state_backend.gcs.application_credentials "path/to/creds.json"
+meltano config set meltano state_backend.gcs.application_credentials "path/to/creds.json"
 ```
 
   </TabItem>
@@ -1192,7 +1194,7 @@ export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set venv.backend virtualenv
+meltano config set meltano venv.backend virtualenv
 meltano install --clean
 ```
 
@@ -1236,7 +1238,7 @@ Whether to enable experimental features that are under development and may chang
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
-meltano config meltano set experimental true
+meltano config set meltano experimental true
 ```
 
   </TabItem>

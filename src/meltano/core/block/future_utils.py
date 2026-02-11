@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import asyncio
-from asyncio import Task
+import typing as t
 
 import structlog
 
 from meltano.core.runner import RunnerError
 from meltano.core.utils import human_size
+
+if t.TYPE_CHECKING:
+    from asyncio import Task
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -78,4 +81,4 @@ def handle_producer_line_length_limit_error(
         "To learn more, visit "
         "https://docs.meltano.com/reference/settings#eltbuffer_size",
     )
-    raise RunnerError("Output line length limit exceeded") from contextual_exception  # noqa: EM101
+    raise RunnerError("Output line length limit exceeded") from contextual_exception  # noqa: EM101, TRY003

@@ -19,6 +19,8 @@ if t.TYPE_CHECKING:
 
     from click.testing import CliRunner
 
+    from meltano.core.project import Project
+
 
 class TestCliUpgrade:
     @pytest.mark.usefixtures("project")
@@ -45,7 +47,7 @@ class TestCliUpgrade:
         )
         with monkeypatch.context() as m:
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(dist_path),
             )
             result = cli_runner.invoke(cli, ["upgrade"])
@@ -106,7 +108,7 @@ class TestCliUpgrade:
         # An editable should not be upgraded automatically
         with monkeypatch.context() as m:
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(dist_path),
             )
             result = cli_runner.invoke(cli, ["upgrade", "package"])
@@ -122,7 +124,7 @@ class TestCliUpgrade:
         # A Docker install should not be upgraded automatically
         with monkeypatch.context(), mock.patch("pathlib.Path.exists") as mock_exists:
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(tmp_path / "not-a-package"),
             )
             mock_exists.return_value = True
@@ -139,7 +141,7 @@ class TestCliUpgrade:
         # Meltano installed in a Nox test session should not be upgraded automatically
         with monkeypatch.context():
             m.setattr(
-                "meltano.core.upgrade_service.distribution",
+                "meltano.core._packaging.distribution",
                 lambda _: PathDistribution(tmp_path / "not-a-package"),
             )
             m.setenv("NOX_CURRENT_SESSION", "tests")
@@ -155,7 +157,7 @@ class TestCliUpgrade:
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")
     @pytest.mark.usefixtures("session")
-    def test_upgrade_files(self, project, cli_runner: CliRunner) -> None:
+    def test_upgrade_files(self, project: Project, cli_runner: CliRunner) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -166,12 +168,12 @@ class TestCliUpgrade:
 
         assert "Nothing to update" in result.stdout
 
-        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        result = cli_runner.invoke(cli, ["add", "--plugin-type=files", "airflow"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
 
         # Don't update file if unchanged
-        file_path = project.root_dir("orchestrate/dags/meltano.py")
+        file_path = project.dirs.root_dir("orchestrate/dags/meltano.py")
         file_content = file_path.read_text()
 
         result = cli_runner.invoke(cli, ["upgrade", "files"])
@@ -186,7 +188,7 @@ class TestCliUpgrade:
         file_path.write_text("Overwritten!")
 
         # The behavior being tested assumes that the file is not locked.
-        shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
+        shutil.rmtree(project.dirs.root_dir("plugins/files"), ignore_errors=True)
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
@@ -207,10 +209,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "set",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 "orchestrate/dags/meltano.py",
                 "false",
@@ -234,10 +235,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "unset",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 "orchestrate/dags/meltano.py",
             ],
@@ -251,16 +251,20 @@ class TestCliUpgrade:
         assert "Updated orchestrate/dags/meltano.py" in output
 
     @pytest.mark.usefixtures("session")
-    def test_upgrade_files_glob_path(self, project, cli_runner: CliRunner) -> None:
+    def test_upgrade_files_glob_path(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
-        result = cli_runner.invoke(cli, ["add", "files", "airflow"])
+        result = cli_runner.invoke(cli, ["add", "--plugin-type=files", "airflow"])
         assert_cli_runner(result)
 
-        file_path = project.root_dir("orchestrate/dags/meltano.py")
+        file_path = project.dirs.root_dir("orchestrate/dags/meltano.py")
         file_path.write_text("Overwritten!")
 
         # override airflow--meltano.lock update extra config
@@ -268,10 +272,9 @@ class TestCliUpgrade:
             cli,
             [
                 "config",
-                "--plugin-type",
-                "files",
-                "airflow",
                 "set",
+                "--plugin-type=files",
+                "airflow",
                 "_update",
                 json.dumps(
                     {

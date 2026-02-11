@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import json
 import typing as t
 
+import anyio
 import structlog
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.setting_definition import SettingDefinition, SettingKind
+from meltano.core.setting_definition import SettingDefinition, SettingKind, json_dumps
+from meltano.core.utils import expand_env_vars
 
 from . import PluginType, SingerPlugin
 
@@ -65,12 +66,16 @@ class SingerMapper(SingerPlugin):
         config_path = invoker.files["config"]
 
         config_payload: dict = {}
-        with config_path.open("w") as config_file:
+        expandable_env = {**invoker.project.dotenv_env, **invoker.project.settings.env}
+        async with await anyio.open_file(config_path, "w") as config_file:
             config_payload = {
                 **invoker.plugin_config_processed,
-                **self._get_mapping_config(invoker.plugin.extra_config),
+                **expand_env_vars(
+                    self._get_mapping_config(invoker.plugin.extra_config),
+                    expandable_env,
+                ),
             }
-            json.dump(config_payload, config_file, indent=2)
+            await config_file.write(json_dumps(config_payload, indent=2))
 
         logger.debug(
             "Created configuration",

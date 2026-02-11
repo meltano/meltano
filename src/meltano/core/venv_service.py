@@ -20,7 +20,7 @@ import structlog
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Generator, Iterable, Sequence
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -39,7 +39,7 @@ else:
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
+StdErrExtractor: t.TypeAlias = Callable[[Process], Awaitable[str | None]]
 
 
 @cache
@@ -89,6 +89,7 @@ class VirtualEnv:
     def __init__(
         self,
         root: Path,
+        *,
         python: str | None = None,
     ):
         """Initialize the `VirtualEnv` instance.
@@ -103,7 +104,7 @@ class VirtualEnv:
         """
         self._system = platform.system()
         if self._system not in self._SUPPORTED_PLATFORMS:
-            raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+            raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
         self.root = root.resolve()
         self.python_path = python or sys.executable
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
@@ -122,7 +123,7 @@ class VirtualEnv:
             return self.root / "lib"
         if self._system == "Windows":
             return self.root / "Lib"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
 
     @cached_property
     def bin_dir(self) -> Path:
@@ -138,7 +139,7 @@ class VirtualEnv:
             return self.root / "bin"
         if self._system == "Windows":
             return self.root / "Scripts"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
 
     @cached_property
     def site_packages_dir(self) -> Path:
@@ -158,7 +159,7 @@ class VirtualEnv:
             )
         if self._system == "Windows":
             return self.lib_dir / "site-packages"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102, TRY003
 
     @cached_property
     def python_version_tuple(self) -> tuple[int, int, int]:
@@ -184,6 +185,17 @@ class VirtualEnv:
             ),
         )
 
+    def get_fingerprint(self, pip_install_args: Sequence[str]) -> str:
+        """Compute the fingerprint of the virtual environment.
+
+        Args:
+            pip_install_args: The arguments being passed to `pip install`.
+
+        Returns:
+            The fingerprint of the virtual environment.
+        """
+        return fingerprint(pip_install_args, self.python_path)
+
     def read_fingerprint(self) -> str | None:
         """Get the fingerprint of the existing virtual environment.
 
@@ -201,9 +213,50 @@ class VirtualEnv:
         Args:
             pip_install_args: The arguments being passed to `pip install`.
         """
-        self.plugin_fingerprint_path.write_text(
-            fingerprint(pip_install_args, self.python_path)
+        self.plugin_fingerprint_path.write_text(self.get_fingerprint(pip_install_args))
+
+    def exec_path(self, executable: str) -> Path:
+        """Return the absolute path for the given executable in the virtual environment.
+
+        Args:
+            executable: The path to the executable relative to the venv bin directory.
+
+        Returns:
+            The venv bin directory joined to the provided executable.
+        """
+        absolute_executable = self.bin_dir / executable
+        if platform.system() != "Windows":
+            return absolute_executable
+
+        # On Windows, try using the '.exe' suffixed version if it exists. Use the
+        # regular executable path as a fallback (and for backwards compatibility).
+        absolute_executable_windows = absolute_executable.with_suffix(".exe")
+        return (
+            absolute_executable_windows
+            if absolute_executable_windows.exists()
+            else absolute_executable
         )
+
+    def requires_install(self, pip_install_args: Sequence[str]) -> bool:
+        """Determine whether a clean install is needed.
+
+        Args:
+            pip_install_args: The arguments being passed to `pip install`.
+
+        Returns:
+            Whether the virtual environment needs to be installed.
+        """
+
+        # A generator is used to perform the checks lazily
+        def checks() -> Generator[bool, None, None]:
+            # The Python installation used to create this venv no longer exists
+            yield not self.exec_path("python").exists()
+            # The fingerprint of the venv does not match the pip install args
+            existing_fingerprint = self.read_fingerprint()
+            yield existing_fingerprint is None
+            yield existing_fingerprint != self.get_fingerprint(pip_install_args)
+
+        return any(checks())
 
 
 async def _extract_stderr(_) -> None:
@@ -234,7 +287,7 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
     await run.wait()
 
     if run.returncode != 0:
-        raise AsyncSubprocessError(
+        raise AsyncSubprocessError(  # noqa: TRY003
             "Command failed",  # noqa: EM101
             process=run,
             stderr=await extract_stderr(run),
@@ -290,15 +343,9 @@ class VenvService:
         self.namespace = namespace
         self.name = name
         self.venv = VirtualEnv(
-            self.project.venvs_dir(namespace, name, make_dirs=False),
-            python or project.settings.get("python"),
+            self.project.dirs.venvs(namespace, name, make_dirs=False),
+            python=python or project.settings.get("python"),
         )
-        self.pip_log_path = self.project.logs_dir(
-            "pip",
-            self.namespace,
-            self.name,
-            "pip.log",
-        ).resolve()
 
     @classmethod
     def from_plugin(cls, project: Project, plugin: ProjectPlugin) -> Self:
@@ -317,6 +364,20 @@ class VenvService:
             namespace=plugin.type,
             name=plugin.plugin_dir_name,
         )
+
+    @property
+    def install_log_path(self) -> Path:
+        """Return the path to the install log file.
+
+        Returns:
+            The path to the install log file.
+        """
+        return self.project.dirs.logs(
+            "pip",
+            self.namespace,
+            self.name,
+            "install.log",
+        ).resolve()
 
     async def install(
         self,
@@ -354,23 +415,11 @@ class VenvService:
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
         """
-
-        # A generator is used to perform the checks lazily
-        def checks():  # noqa: ANN202
-            # The Python installation used to create this venv no longer exists
-            yield not self.exec_path("python").exists()
-            # The fingerprint of the venv does not match the pip install args
-            existing_fingerprint = self.venv.read_fingerprint()
-            yield existing_fingerprint is None
-            yield existing_fingerprint != fingerprint(
-                pip_install_args, self.venv.python_path
-            )
-
-        return any(checks())
+        return self.venv.requires_install(pip_install_args)
 
     def clean_run_files(self) -> None:
         """Destroy cached configuration files, if they exist."""
-        run_dir = self.project.run_dir(self.name, make_dirs=False)
+        run_dir = self.project.dirs.run(self.name, make_dirs=False)
 
         try:
             for path in run_dir.iterdir():
@@ -380,19 +429,6 @@ class VenvService:
                     path.unlink()
         except FileNotFoundError:
             logger.debug("No cached configuration files to remove")
-
-    def clean(self) -> None:
-        """Destroy the virtual environment, if it exists."""
-        try:
-            shutil.rmtree(self.venv.root)
-            logger.debug(
-                "Removed old virtual environment for '%s/%s'",
-                self.namespace,
-                self.name,
-            )
-        except FileNotFoundError:
-            # If the VirtualEnv has never been created before do nothing
-            logger.debug("No old virtual environment to remove")
 
     async def create_venv(
         self,
@@ -412,6 +448,7 @@ class VenvService:
             sys.executable,
             "-m",
             "virtualenv",
+            "--clear",
             f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
@@ -437,7 +474,7 @@ class VenvService:
         try:
             return await self.create_venv(extract_stderr=extract_stderr)
         except AsyncSubprocessError as err:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",  # noqa: EM102
                 process=err.process,
                 stderr=await err.stderr,
@@ -463,7 +500,7 @@ class VenvService:
         try:
             return await self._pip_install(("--upgrade", "pip"), env=env)
         except AsyncSubprocessError as err:
-            raise AsyncSubprocessError(
+            raise AsyncSubprocessError(  # noqa: TRY003
                 "Failed to upgrade pip to the latest version.",  # noqa: EM101
                 err.process,
             ) from err
@@ -477,18 +514,7 @@ class VenvService:
         Returns:
             The venv bin directory joined to the provided executable.
         """
-        absolute_executable = self.venv.bin_dir / executable
-        if platform.system() != "Windows":
-            return absolute_executable
-
-        # On Windows, try using the '.exe' suffixed version if it exists. Use the
-        # regular executable path as a fallback (and for backwards compatibility).
-        absolute_executable_windows = absolute_executable.with_suffix(".exe")
-        return (
-            absolute_executable_windows
-            if absolute_executable_windows.exists()
-            else absolute_executable
-        )
+        return self.venv.exec_path(executable)
 
     async def install_pip_args(
         self,
@@ -514,7 +540,7 @@ class VenvService:
             "pip",
             "install",
             "--log",
-            str(self.pip_log_path),
+            str(self.install_log_path),
             *pip_install_args,
             extract_stderr=extract_stderr,
             env=env,
@@ -539,28 +565,6 @@ class VenvService:
             extract_stderr=_extract_stderr,
         )
 
-    async def handle_installation_error(
-        self,
-        err: AsyncSubprocessError,
-    ) -> AsyncSubprocessError:
-        """Handle an error that occurred during installation.
-
-        Args:
-            err: The error that occurred during installation.
-
-        Returns:
-            The error that occurred during installation with additional context.
-        """
-        logger.info(
-            "Logged pip install output to %s",
-            self.pip_log_path,
-        )
-        return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'.",
-            err.process,
-            stderr=await err.stderr,
-        )
-
     async def _pip_install(
         self,
         pip_install_args: Sequence[str],
@@ -582,7 +586,6 @@ class VenvService:
             The process running `pip install` with the provided args.
         """
         if clean:
-            self.clean()
             await self.create()
             await self.upgrade_installer(env=env)
 
@@ -602,14 +605,11 @@ class VenvService:
 
             return (await proc.stdout.read()).decode("utf-8", errors="replace")
 
-        try:
-            return await self.install_pip_args(
-                pip_install_args,
-                extract_stderr=extract_stderr,
-                env=env,
-            )
-        except AsyncSubprocessError as err:
-            raise await self.handle_installation_error(err) from err
+        return await self.install_pip_args(
+            pip_install_args,
+            extract_stderr=extract_stderr,
+            env=env,
+        )
 
     async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
         """List the installed dependencies."""
@@ -699,53 +699,6 @@ class UvVenvService(VenvService):
         )
 
     @override
-    async def handle_installation_error(
-        self,
-        err: AsyncSubprocessError,
-    ) -> AsyncSubprocessError:
-        """Handle an error that occurred during installation.
-
-        Args:
-            err: The subprocess error that occurred during installation.
-
-        Returns:
-            The error that occurred during installation with additional context.
-        """
-        self.pip_log_path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            await self._write_error_log(err)
-        except OSError as log_err:
-            logger.debug(
-                "Failed to write installation error to log file %s: %s",
-                self.pip_log_path,
-                log_err,
-            )
-        else:
-            logger.info(
-                "Logged uv pip install output to %s",
-                self.pip_log_path,
-            )
-        return AsyncSubprocessError(
-            f"Failed to install plugin '{self.name}'.",
-            err.process,
-            stderr=await err.stderr,
-        )
-
-    async def _write_error_log(self, err: AsyncSubprocessError) -> None:
-        """Write error details to the log file."""
-        import anyio
-
-        stderr_content = await err.stderr
-
-        async with await anyio.open_file(
-            self.pip_log_path,
-            "a",
-            encoding="utf-8",
-        ) as log_file:
-            if stderr_content:
-                await log_file.write(stderr_content)
-
-    @override
     async def create_venv(
         self,
         *,
@@ -763,6 +716,7 @@ class UvVenvService(VenvService):
         return await exec_async(
             self.uv,
             "venv",
+            "--clear",
             f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,

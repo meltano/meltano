@@ -79,7 +79,7 @@ def compile_command(
     try:
         directory.mkdir(parents=True, exist_ok=True)
     except OSError as ex:
-        raise CliError(
+        raise CliError(  # noqa: TRY003
             f"Unable to create directory for Meltano manifests {directory}: {ex}",  # noqa: EM102
         ) from ex
 
@@ -111,7 +111,7 @@ def compile_command(
                     sort_keys=True,
                 )
         except OSError as ex:
-            raise CliError(
+            raise CliError(  # noqa: TRY003
                 f"Unable to write Meltano manifest {str(path)!r}: {ex}",  # noqa: EM102
             ) from ex
 

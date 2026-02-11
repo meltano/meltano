@@ -12,6 +12,7 @@ import click
 from meltano.cli.utils import AutoInstallBehavior, CliError
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationError
+from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import async_noop
@@ -41,10 +42,7 @@ def _install_plugins_fn(
     else:
         behavior = value
 
-    behavior = value or ctx.obj.get(
-        "auto_install_behaviour",
-        AutoInstallBehavior.install,
-    )
+    behavior = value or AutoInstallBehavior.install
     if behavior == AutoInstallBehavior.no_install:
         return async_noop
     if behavior == AutoInstallBehavior.only_install:
@@ -145,10 +143,11 @@ class pass_project:  # noqa: N801
 
             project = ctx.obj["project"]
             if not project:
-                raise CliError(
-                    f"`{ctx.command_path}` must be run inside a Meltano project.\n"  # noqa: EM102
-                    "Use `meltano init <project_directory>` to create one.",
+                msg = (
+                    f"`{ctx.command_path}` must be run inside a Meltano project.\n"
+                    "Use `meltano init <project_directory>` to create one."
                 )
+                raise click.UsageError(msg, ctx=ctx)
 
             # register the system database connection
             engine, _ = project_engine(project, default=True)
@@ -183,3 +182,20 @@ class UUIDParamType(click.ParamType):
             return uuid.UUID(value)
         except ValueError:
             self.fail(f"{value} is not a valid UUID.", param, ctx)
+
+
+class PluginTypeArg(click.Choice):
+    """A click parameter that converts a string to a PluginType."""
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
+        """Initialize the PluginTypeArg."""
+        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
+
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,  # noqa: ARG002
+        ctx: click.Context | None,  # noqa: ARG002
+    ) -> PluginType:
+        """Convert the value to a PluginType."""
+        return PluginType.from_cli_argument(value)

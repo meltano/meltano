@@ -42,6 +42,8 @@ def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
     log_level = root_logger.level
     try:
         runner = MeltanoCliRunner(snowplow=snowplow_optional)
+        # TODO: Remove this once support for Click<8.2 is dropped
+        runner.mix_stderr = False
         yield runner
     finally:
         root_logger.setLevel(log_level)

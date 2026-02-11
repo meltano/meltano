@@ -41,7 +41,7 @@ def ping(project: Project) -> None:
         # which is currently very small.
         project.hub_service.get_plugins_of_type(PluginType.ORCHESTRATORS)
     except Exception as ex:
-        raise click.ClickException(
+        raise click.ClickException(  # noqa: TRY003
             f"Failed to connect to the Hub at {project.hub_service.hub_api_url!r}",  # noqa: EM102
         ) from ex
     else:

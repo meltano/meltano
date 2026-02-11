@@ -62,7 +62,7 @@ class TestMeltanoInvoker:
             subject.invoke(["--version"])
 
             # Preferally, we use the symlink created by Project.activate
-            symlink_path = project.run_dir().joinpath("bin")
+            symlink_path = project.dirs.run().joinpath("bin")
             assert run_mock.call_args[0][0][0] == str(symlink_path)
 
             # If a different command is used...

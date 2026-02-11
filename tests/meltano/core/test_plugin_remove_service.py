@@ -204,7 +204,7 @@ class TestPluginRemoveService:
             "remove_from_file",
             side_effect=raise_permissionerror,
         ):
-            removed_plugins, total_plugins = subject.remove_plugins(plugins)
+            removed_plugins, _total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
 
@@ -219,7 +219,7 @@ class TestPluginRemoveService:
 
         with mock.patch("meltano.core.plugin_location_remove.shutil.rmtree") as rmtree:
             rmtree.side_effect = raise_permissionerror
-            removed_plugins, total_plugins = subject.remove_plugins(plugins)
+            removed_plugins, _total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
 

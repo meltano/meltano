@@ -217,7 +217,7 @@ Specifically, you will want to configure Airflow to:
     <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
   ```bash
-  meltano config airflow set core.sql_alchemy_conn postgresql://<username>:<password>@<host>:<port>/<database>
+  meltano config set airflow core.sql_alchemy_conn postgresql://<username>:<password>@<host>:<port>/<database>
   ```
 
     </TabItem>

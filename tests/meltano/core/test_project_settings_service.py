@@ -144,7 +144,16 @@ class TestProjectSettingsService:
     def test_warn_if_default_setting_is_used(self, subject, monkeypatch) -> None:
         # Assert that warnings are not raised in the following cases:
         with warnings.catch_warnings():
-            warnings.simplefilter("error")
+            warnings.filterwarnings(
+                "error",
+                "Unknown setting",
+                RuntimeWarning,
+            )
+            warnings.filterwarnings(
+                "ignore",
+                "The 'version' field in meltano.yml is deprecated.*",
+                DeprecationWarning,
+            )
 
             for ff in FeatureFlags:
                 subject.get(f"{FEATURE_FLAG_PREFIX}.{ff}")

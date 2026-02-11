@@ -9,26 +9,30 @@ import moto
 import pytest
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
-from azure.storage.blob._shared.authentication import (
-    SharedKeyCredentialPolicy,
-)
+from azure.storage.blob._shared.authentication import SharedKeyCredentialPolicy
 from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import NotFound
 from google.cloud.storage import Blob
 
 from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_store import (
     SYSTEMDB,
     DBStateStoreManager,
     MeltanoState,
     StateBackend,
+    StateBackendNotFoundError,
+    _settings_to_manager_kwargs,
     state_store_manager_from_project_settings,
 )
-from meltano.core.state_store.azure import AZStorageStateStoreManager
-from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
-from meltano.core.state_store.google import GCSStateStoreManager
-from meltano.core.state_store.s3 import S3StateStoreManager
+from meltano.core.state_store.azure.backend import AZStorageStateStoreManager
+from meltano.core.state_store.filesystem import (
+    InvalidStateBackendConfigurationException,
+    _LocalFilesystemStateStoreManager,
+)
+from meltano.core.state_store.google.backend import GCSStateStoreManager
+from meltano.core.state_store.s3.backend import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -41,9 +45,38 @@ else:
     from importlib_metadata import EntryPoint, EntryPoints
 
 
+class TestStateStoreManagerContextManager:
+    def test_context_manager(self) -> None:
+        manager = DummyStateStoreManager()
+        with manager as m:
+            assert m is manager
+
+    def test_close_called_on_exit(self) -> None:
+        manager = DummyStateStoreManager()
+        with mock.patch.object(manager, "close") as mock_close:
+            with manager:
+                pass
+            mock_close.assert_called_once()
+
+    def test_close_called_on_exception(self) -> None:
+        manager = DummyStateStoreManager()
+        msg = "test"
+        with mock.patch.object(manager, "close") as mock_close:
+            with pytest.raises(RuntimeError, match=msg), manager:
+                raise RuntimeError(msg)
+            mock_close.assert_called_once()
+
+    def test_close_is_noop_by_default(self) -> None:
+        manager = DummyStateStoreManager()
+        manager.close()  # Should not raise
+
+
 def test_unknown_state_backend_scheme(project: Project):
     project.settings.set(["state_backend", "uri"], "unknown://")
-    with pytest.raises(ValueError, match="No state backend found for scheme"):
+    with pytest.raises(
+        StateBackendNotFoundError,
+        match="No state backend found for scheme",
+    ):
         state_store_manager_from_project_settings(project.settings)
 
 
@@ -66,6 +99,71 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
 
         state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(state_store, DummyStateStoreManager)
+
+
+@pytest.mark.parametrize(
+    ("setting", "namespace", "expected"),
+    # NOTE: The "nested-setting" parametrized case below is currently xfail because
+    # `_settings_to_manager_kwargs` does *not* yet support materializing dotted
+    # setting names into nested dictionaries.
+    #
+    # Current contract:
+    # - Backends may rely on only the last path component (`parts[-1]`) being used
+    #   as the key in the kwargs dict, i.e. settings remain "flattened".
+    #
+    # If/when nested settings are supported, update `_settings_to_manager_kwargs`
+    # to materialize nested dicts and convert that xfail case into a passing test.
+    (
+        pytest.param(
+            SettingDefinition(name="state_backend.custom.username"),
+            "custom",
+            {"username": "test"},
+            id="simple-setting",
+        ),
+        pytest.param(
+            SettingDefinition(name="state_backend.other.username"),
+            "other",
+            {"username": "test"},
+            id="other-namespace",
+        ),
+        pytest.param(
+            SettingDefinition(name="state_backend.custom.has.nested.setting"),
+            "custom",
+            {"setting": "test"},
+            id="nested-tail",
+        ),
+        pytest.param(
+            SettingDefinition(name="state_backend.custom.has.nested.setting"),
+            "custom",
+            {"has": {"nested": {"setting": "test"}}},
+            id="nested-setting",
+            marks=pytest.mark.xfail(
+                reason=(
+                    "Nested settings are not yet supported; "
+                    "`_settings_to_manager_kwargs` only exposes the last path "
+                    "component as the key. See comment above for the intended contract."
+                ),
+                strict=True,
+            ),
+        ),
+    ),
+)
+def test_settings_to_manager_kwargs(
+    monkeypatch: pytest.MonkeyPatch,
+    project: Project,
+    setting: SettingDefinition,
+    namespace: str,
+    expected: dict[str, t.Any],
+) -> None:
+    project.settings.set(["state_backend", "uri"], "custom://")
+    monkeypatch.setattr(project.config_service.addon, "get_all", lambda: [setting])
+    project.settings.set(setting.name, "test")
+
+    kwargs = _settings_to_manager_kwargs(settings=project.settings, namespace=namespace)
+    assert kwargs.pop("uri") == "custom://"
+    assert kwargs.pop("lock_timeout_seconds") is not None
+    assert kwargs.pop("lock_retry_seconds") is not None
+    assert kwargs == expected
 
 
 class TestSystemDBStateBackend:
@@ -163,15 +261,22 @@ class TestGCSStateBackend:
     @pytest.fixture
     def manager(self, project: Project) -> GCSStateStoreManager:
         project.settings.set(["state_backend", "uri"], "gs://my-bucket")
+        project.settings.unset(["state_backend", "gcs", "application_credentials_json"])
+        project.settings.unset(["state_backend", "gcs", "application_credentials_path"])
         return state_store_manager_from_project_settings(project.settings)
 
     def test_manager_from_settings(self, project: Project) -> None:
         # GCS
         project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
+        project.settings.set(
+            ["state_backend", "gcs", "application_credentials_path"],
+            "path/to/credentials.json",
+        )
         gs_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(gs_state_store, GCSStateStoreManager)
         assert gs_state_store.bucket == "some_container"
         assert gs_state_store.prefix == "/some/path"
+        assert gs_state_store.application_credentials_path == "path/to/credentials.json"
 
     def test_delete_error(
         self,
@@ -181,10 +286,10 @@ class TestGCSStateBackend:
         file_path = "some/path"
 
         def _not_found(*args, **kwargs):  # noqa: ARG001
-            raise NotFound("No such object: ...")  # noqa: EM101
+            raise NotFound("No such object: ...")  # noqa: EM101, TRY003
 
         def _other_error(*args, **kwargs):  # noqa: ARG001
-            raise RuntimeError("Something went wrong")  # noqa: EM101
+            raise RuntimeError("Something went wrong")  # noqa: EM101, TRY003
 
         # Mock default credentials
         mock_credentials = AnonymousCredentials()
@@ -288,6 +393,38 @@ class TestS3StateBackend:
             s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
         )
 
+    def test_missing_aws_secret_access_key(
+        self,
+        aws_access_key_id: str,
+        prefix: str,
+        bucket: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=None,
+            lock_timeout_seconds=10,
+        )
+
+        with pytest.raises(InvalidStateBackendConfigurationException):
+            _ = manager.client
+
+    def test_missing_aws_access_key_id(
+        self,
+        aws_secret_access_key: str,
+        prefix: str,
+        bucket: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=None,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+        with pytest.raises(InvalidStateBackendConfigurationException):
+            _ = manager.client
+
     def test_get(
         self,
         project: Project,
@@ -352,3 +489,73 @@ class TestS3StateBackend:
                 == state
             )
             assert response["ContentType"] == "application/json"
+
+    def test_migrate_deduplicates_prefix(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+        duplicated_key = f"{prefix}/{prefix}/my-state-id/state.json"
+        correct_key = f"/{prefix}/my-state-id/state.json"
+        body = b'{"completed": {}, "partial": {}}'
+
+        with moto.mock_aws():
+            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+            monkeypatch.delenv("AWS_PROFILE", raising=False)
+            manager.client.create_bucket(Bucket=bucket)
+            manager.client.put_object(
+                Bucket=bucket,
+                Key=duplicated_key,
+                Body=body,
+            )
+
+            manager.migrate()
+
+            # The file should have been copied to the de-duplicated path
+            copied = manager.client.get_object(Bucket=bucket, Key=correct_key)
+            assert copied["Body"].read() == body
+
+    def test_migrate_ignores_clean_files(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+        clean_key = f"{prefix}/my-state-id/state.json"
+        body = b'{"completed": {}, "partial": {}}'
+
+        with moto.mock_aws():
+            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+            monkeypatch.delenv("AWS_PROFILE", raising=False)
+            manager.client.create_bucket(Bucket=bucket)
+            manager.client.put_object(
+                Bucket=bucket,
+                Key=clean_key,
+                Body=body,
+            )
+
+            manager.migrate()
+
+            # Only the original key should exist — no extra copies
+            objects = manager.client.list_objects_v2(Bucket=bucket)
+            keys = [obj["Key"] for obj in objects["Contents"]]
+            assert keys == [clean_key]

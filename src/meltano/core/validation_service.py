@@ -8,7 +8,7 @@ import typing as t
 from abc import ABCMeta, abstractmethod
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -21,6 +21,7 @@ else:
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
 
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
 EXIT_CODE_OK = 0
@@ -92,7 +93,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         try:
             self.tests_selection[name] = True
         except KeyError as exc:
-            raise KeyError(
+            raise KeyError(  # noqa: TRY003
                 f"Plugin {self.plugin_name} does not have a test named '{name}'",  # noqa: EM102
             ) from exc
 

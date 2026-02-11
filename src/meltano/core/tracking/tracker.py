@@ -33,7 +33,7 @@ from meltano.core.tracking.schemas import (
 from meltano.core.utils import format_exception, uuid7
 
 if t.TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Generator, Mapping
     from pathlib import Path
 
     from meltano.core.project import Project
@@ -288,7 +288,7 @@ class Tracker:  # - too many (public) methods
         """
         try:
             return tzlocal.get_localzone_name()
-        except Exception:
+        except Exception:  # noqa: BLE001
             return datetime.now().astimezone().tzname()
 
     def add_contexts(self, *extra_contexts) -> None:  # noqa: ANN002
@@ -300,7 +300,10 @@ class Tracker:  # - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(self, *extra_contexts) -> Tracker:  # noqa: ANN002
+    def with_contexts(
+        self,
+        *extra_contexts: SelfDescribingJson,
+    ) -> Generator[Tracker, None, None]:
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:
@@ -340,7 +343,7 @@ class Tracker:  # - too many (public) methods
                     context=self.contexts,
                 ),
             )
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             logger.debug(
                 "Failed to submit unstruct event to Snowplow, error",
                 err=format_exception(err),
@@ -413,12 +416,12 @@ class Tracker:  # - too many (public) methods
                     else tuple(
                         ctx
                         for ctx in self.contexts
-                        if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                        if isinstance(ctx, EnvironmentContext | ProjectContext)
                     ),
                 ),
             )
             self.snowplow_tracker.flush()
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             logger.debug(
                 (
                     "Failed to submit 'telemetry_state_change' unstruct event "
@@ -434,7 +437,7 @@ class Tracker:  # - too many (public) methods
         Returns:
             Path to 'analytics.json' file.
         """
-        return self.project.meltano_dir() / "analytics.json"
+        return self.project.dirs.meltano().joinpath("analytics.json")
 
     def load_saved_telemetry_settings(self) -> TelemetrySettings:
         """Get settings from the 'analytics.json' file.

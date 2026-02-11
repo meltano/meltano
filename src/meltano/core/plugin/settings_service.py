@@ -10,6 +10,7 @@ from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 
 if t.TYPE_CHECKING:
+    from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.project import Project
     from meltano.core.setting_definition import EnvVar, SettingDefinition
 
@@ -35,14 +36,13 @@ class PluginSettingsService(SettingsService):
         super().__init__(project, *args, **kwargs)
         self.plugin = plugin
 
+        self.environment_plugin_config: EnvironmentPluginConfig | None = None
         if self.project.environment:
             environment = self.project.environment
             self.environment_plugin_config = environment.get_plugin_config(
                 self.plugin.type,
                 self.plugin.name,
             )
-        else:
-            self.environment_plugin_config = None
 
         self.env_override = {
             # project level environment variables:
@@ -149,7 +149,7 @@ class PluginSettingsService(SettingsService):
             Namespace for setting value records in system database.
         """
         # "default" is included for legacy reasons
-        return ".".join((self.plugin.type, self.plugin.name, "default"))
+        return f"{self.plugin.type}.{self.plugin.name}.default"
 
     @property
     def setting_definitions(self) -> list[SettingDefinition]:
@@ -187,13 +187,13 @@ class PluginSettingsService(SettingsService):
             return self.environment_plugin_config.config_with_extras
         return {}
 
-    def update_meltano_yml_config(self, config_with_extras) -> None:  # noqa: ANN001
+    def update_meltano_yml_config(self, config: dict) -> None:
         """Update configuration in `meltano.yml`.
 
         Args:
-            config_with_extras: Configuration to update.
+            config: Configuration to update.
         """
-        self.plugin.config_with_extras = config_with_extras
+        self.plugin.config_with_extras = config
         self.project.plugins.update_plugin(self.plugin)
 
     def update_meltano_environment_config(
@@ -205,6 +205,7 @@ class PluginSettingsService(SettingsService):
         Args:
             config_with_extras: Configuration to update.
         """
+        assert self.environment_plugin_config is not None  # noqa: S101
         self.environment_plugin_config.config_with_extras = config_with_extras
         self.project.plugins.update_environment_plugin(self.environment_plugin_config)
 

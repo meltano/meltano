@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import json
+import logging
 import platform
 import typing as t
 from unittest import mock
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+import structlog
 
 from meltano.cli import cli
+from meltano.cli.invoke import _LogOutputHandler
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -29,7 +32,7 @@ def project_tap_mock(project_add_service):
 @pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
     @pytest.fixture
-    def mock_invoke(self, utility, plugin_invoker_factory):
+    def mock_invoke(self, utility: ProjectPlugin, plugin_invoker_factory):
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=0)
@@ -51,7 +54,7 @@ class TestCliInvoke:
             yield invoke_async
 
     @pytest.fixture
-    def mock_invoke_containers(self, utility, plugin_invoker_factory):
+    def mock_invoke_containers(self, utility: ProjectPlugin, plugin_invoker_factory):
         with (
             patch(
                 "meltano.core.plugin_invoker.invoker_factory",
@@ -69,7 +72,7 @@ class TestCliInvoke:
         ):
             yield invoke_async
 
-    def test_invoke(self, cli_runner, mock_invoke) -> None:
+    def test_invoke(self, cli_runner: CliRunner, mock_invoke: AsyncMock) -> None:
         res = cli_runner.invoke(cli, ["invoke", "utility-mock"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -78,7 +81,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert isinstance(kwargs, dict)
 
-    def test_invoke_args(self, cli_runner, mock_invoke) -> None:
+    def test_invoke_args(self, cli_runner: CliRunner, mock_invoke: AsyncMock) -> None:
         res = cli_runner.invoke(cli, ["invoke", "utility-mock", "--help"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -87,7 +90,9 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1] == "--help"
 
-    def test_invoke_command(self, cli_runner, mock_invoke) -> None:
+    def test_invoke_command(
+        self, cli_runner: CliRunner, mock_invoke: AsyncMock
+    ) -> None:
         res = cli_runner.invoke(
             cli,
             ["invoke", "utility-mock:cmd"],
@@ -103,9 +108,9 @@ class TestCliInvoke:
 
     def test_invoke_command_containerized(
         self,
-        project,
-        cli_runner,
-        mock_invoke_containers,
+        project: Project,
+        cli_runner: CliRunner,
+        mock_invoke_containers: AsyncMock,
     ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
@@ -164,7 +169,11 @@ class TestCliInvoke:
         volume_bindings = args[0]["HostConfig"]["Binds"]
         assert volume_bindings[0].startswith(str(project.root))
 
-    def test_invoke_command_args(self, cli_runner, mock_invoke) -> None:
+    def test_invoke_command_args(
+        self,
+        cli_runner: CliRunner,
+        mock_invoke: AsyncMock,
+    ) -> None:
         res = cli_runner.invoke(
             cli,
             ["invoke", "utility-mock:cmd"],
@@ -178,7 +187,9 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_exit_code(self, cli_runner, mock_invoke) -> None:
+    def test_invoke_exit_code(
+        self, cli_runner: CliRunner, mock_invoke: AsyncMock
+    ) -> None:
         mock_invoke.return_value.wait.return_value = 2
 
         basic = cli_runner.invoke(cli, ["invoke", "utility-mock"])
@@ -224,8 +235,8 @@ class TestCliInvoke:
 
     def test_invoke_dump_config(
         self,
-        cli_runner,
-        tap,
+        cli_runner: CliRunner,
+        tap: ProjectPlugin,
         plugin_settings_service_factory,
     ) -> None:
         settings_service = plugin_settings_service_factory(tap)
@@ -241,7 +252,7 @@ class TestCliInvoke:
                 process=True,
             )
 
-    def test_list_commands(self, cli_runner, mock_invoke) -> None:
+    def test_list_commands(self, cli_runner: CliRunner, mock_invoke: AsyncMock) -> None:
         res = cli_runner.invoke(cli, ["invoke", "--list-commands", "utility-mock"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -249,7 +260,12 @@ class TestCliInvoke:
         assert "utility-mock:cmd" in res.output
         assert "description of utility command" in res.output
 
-    def test_invoke_only_install(self, cli_runner, project: Project, utility) -> None:
+    def test_invoke_only_install(
+        self,
+        cli_runner: CliRunner,
+        project: Project,
+        utility: ProjectPlugin,
+    ) -> None:
         with (
             patch.object(
                 ProjectPluginsService,
@@ -268,3 +284,166 @@ class TestCliInvoke:
             reason=PluginInstallReason.INSTALL,
         )
         mock_invoke.assert_not_called()
+
+
+class TestLogOutputHandler:
+    """Tests for the _LogOutputHandler class."""
+
+    def test_writeline_with_singer_sdk_log(self, caplog: pytest.LogCaptureFixture):
+        """Test parsing Singer SDK structured logs."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        singer_log = json.dumps(
+            {
+                "level": "info",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": None,
+                "message": "Test message",
+                "extra": {"custom": "value"},
+            },
+        )
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(singer_log)
+
+        # Check that the log was parsed and the message was extracted
+        assert any("Test message" in record.message for record in caplog.records)
+
+    def test_writeline_with_unparseable_log(self, caplog: pytest.LogCaptureFixture):
+        """Test fallback for unparseable logs."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        plain_log = "This is a plain text log line"
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(plain_log)
+
+        # Check that the plain log was passed through
+        assert any(
+            "This is a plain text log line" in record.message
+            for record in caplog.records
+        )
+
+    def test_writeline_without_parser(self, caplog: pytest.LogCaptureFixture):
+        """Test that logs work without a parser configured."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser=None)
+
+        log_line = "Simple log message"
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(log_line)
+
+        # Check that the log was written
+        assert any("Simple log message" in record.message for record in caplog.records)
+
+    def test_writeline_empty_line(self, caplog: pytest.LogCaptureFixture):
+        """Test that empty lines are ignored."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser=None)
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline("")
+            handler.writeline("   ")
+
+        # No logs should be written for empty lines
+        assert len(caplog.records) == 0
+
+    def test_writeline_with_different_log_levels(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ):
+        """Test parsing logs with different severity levels."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        error_log = json.dumps(
+            {
+                "level": "error",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": None,
+                "message": "Error occurred",
+                "extra": {},
+            },
+        )
+        warning_log = json.dumps(
+            {
+                "level": "warning",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": None,
+                "message": "Warning message",
+                "extra": {},
+            },
+        )
+
+        with caplog.at_level(logging.WARNING):
+            handler.writeline(error_log)
+            handler.writeline(warning_log)
+
+        # Check that both error and warning were logged
+        error_record = next(
+            (record for record in caplog.records if "Error occurred" in record.message),
+            None,
+        )
+        assert error_record is not None
+        assert error_record.levelname == "ERROR"
+
+        warning_record = next(
+            (
+                record
+                for record in caplog.records
+                if "Warning message" in record.message
+            ),
+            None,
+        )
+        assert warning_record is not None
+        assert warning_record.levelname == "WARNING"
+
+    def test_writeline_preserves_extra_fields(self, caplog: pytest.LogCaptureFixture):
+        """Test that extra fields from parsed logs are preserved."""
+        logger = structlog.stdlib.get_logger("test")
+        handler = _LogOutputHandler(logger, log_parser="singer-sdk")
+
+        log_with_extras = json.dumps(
+            {
+                "level": "info",
+                "pid": 123,
+                "logger_name": "tap-test",
+                "ts": 1234567890.0,
+                "thread_name": "MainThread",
+                "app_name": "singer-sdk",
+                "stream_name": "users",
+                "message": "Processing stream",
+                "extra": {"record_count": 100},
+            },
+        )
+
+        with caplog.at_level(logging.INFO):
+            handler.writeline(log_with_extras)
+
+        # Verify the message was logged
+        record = next(
+            (
+                record
+                for record in caplog.records
+                if "Processing stream" in record.message
+            ),
+            None,
+        )
+        assert record is not None
+        assert "Processing stream" in record.message
+        assert "record_count" in str(record.msg)

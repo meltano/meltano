@@ -30,16 +30,13 @@ meltano add dbt-snowflake  # Automatically detected as utility
 
 # Explicit plugin type for disambiguation:
 # meltano add --plugin-type utility dbt-snowflake
-
-# Deprecated positional syntax:
-# meltano add utility dbt-snowflake
 ```
 
 After dbt is installed you can configure it using `config` CLI commands, [Meltano environments](/concepts/environments) or environment variables:
 
 ```bash
 # list available settings
-meltano config dbt-snowflake list
+meltano config list dbt-snowflake
 
 # configure the `dev` environment interactively
 meltano --environment=dev config dbt-snowflake set --interactive
@@ -141,10 +138,10 @@ meltano add transformer dbt
 After dbt is installed you can change the default configurations using environment variables or `config` CLI commands like the following:
 
 ```bash
-meltano config dbt set target <target>
+meltano config set dbt target <target>
 
 # For example:
-meltano config dbt set target postgres
+meltano config set dbt target postgres
 ```
 
 For more details, [pipeline environment variables](/guide/integration#pipeline-environment-variables) and [dbt transform settings](https://hub.meltano.com/transformers/dbt#settings).

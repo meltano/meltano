@@ -1,3 +1,9 @@
+#!/usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = ["nox"]
+# ///
+
 """Nox configuration.
 
 - Run `nox -l` to list the sessions Nox can run.
@@ -29,24 +35,31 @@ import nox
 
 nox.needs_version = ">=2025.2.9"
 nox.options.default_venv_backend = "uv"
-nox.options.sessions = [
-    "mypy",
-    "pre-commit",
-    "pytest",
-]
+nox.options.reuse_venv = "yes"
 
 root_path = Path(__file__).parent
 pyproject = nox.project.load_toml()
 python_versions = nox.project.python_versions(pyproject)
 
-main_python_version = "3.13"
+main_python_version = Path(".python-version").read_text().strip()
 
-UV_SYNC_COMMAND = (
-    "uv",
-    "sync",
-    "--locked",
-    "--no-dev",
-)
+
+def _uv_sync(session: nox.Session, *args: str) -> None:
+    env = {
+        "UV_PROJECT_ENVIRONMENT": session.virtualenv.location,
+        "UV_NO_CONFIG": "1",
+    }
+    session.run_install("uv", "--quiet", "pip", "uninstall", "uv", env=env)
+    session.run_install(
+        "uv",
+        "--quiet",
+        "sync",
+        "--locked",
+        "--no-dev",
+        f"--python={session.virtualenv.location}",
+        *args,
+        env=env,
+    )
 
 
 def _run_pytest(session: nox.Session) -> None:
@@ -60,6 +73,7 @@ def _run_pytest(session: nox.Session) -> None:
                     root_path / f".coverage.{random_seed:010}.{session.name}",
                 ),
                 "NOX_CURRENT_SESSION": "tests",
+                "UV_NO_CONFIG": "1",
             },
         )
 
@@ -98,20 +112,59 @@ def pytest_meltano(session: nox.Session) -> None:
     if backend_db == "mssql":
         extras.append("mssql")
     elif backend_db == "postgresql":
-        extras.append("psycopg2")
-    elif backend_db == "postgresql_psycopg3":
         extras.append("postgres")
+    elif backend_db == "postgresql_psycopg2":
+        extras.append("psycopg2")
 
-    session.run_install(
-        *UV_SYNC_COMMAND,
-        "--group=testing",
-        *(f"--extra={extra}" for extra in extras),
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
-    )
+    _uv_sync(session, "--group=testing", *(f"--extra={extra}" for extra in extras))
     _run_pytest(session)
 
 
-@nox.session(python=main_python_version)
+@nox.session(
+    name="pytest-lowest-requirements",
+    tags=("test", "pytest"),
+    python=python_versions[0],
+)
+def pytest_lowest_requirements(session: nox.Session) -> None:
+    """Test with lowest requirements."""
+    backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
+    extras = ["azure", "gcs", "s3", "containers"]
+
+    if backend_db == "mssql":
+        extras.append("mssql")
+    elif backend_db == "postgresql":
+        extras.append("postgres")
+    elif backend_db == "postgresql_psycopg2":
+        extras.append("psycopg2")
+
+    _uv_sync(session, "--group=testing", *(f"--extra={extra}" for extra in extras))
+
+    tmpdir = Path(session.create_tmp())
+    tmpfile = tmpdir / "requirements.txt"
+    tmpfile.unlink(missing_ok=True)
+
+    env = {
+        "UV_PROJECT_ENVIRONMENT": session.virtualenv.location,
+        "UV_NO_CONFIG": "1",
+    }
+    session.run_install(
+        "uv",
+        "pip",
+        "compile",
+        "pyproject.toml",
+        f"--python={session.python}",
+        "--group=testing",
+        *(f"--extra={extra}" for extra in extras),
+        "--universal",
+        "--resolution=lowest-direct",
+        f"-o={tmpfile.as_posix()}",
+        env=env,
+    )
+    session.install("-r", f"{tmpdir}/requirements.txt", env=env)
+    _run_pytest(session)
+
+
+@nox.session(python=main_python_version, default=False)
 def coverage(session: nox.Session) -> None:
     """Combine and report previously generated coverage data.
 
@@ -120,11 +173,7 @@ def coverage(session: nox.Session) -> None:
     """
     args = session.posargs or ("report",)
 
-    session.run_install(
-        *UV_SYNC_COMMAND,
-        "--group=coverage",
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
-    )
+    _uv_sync(session, "--group=coverage")
 
     if not session.posargs and any(Path().glob(".coverage.*")):
         session.run("coverage", "combine")
@@ -144,11 +193,7 @@ def pre_commit(session: nox.Session) -> None:
         session: Nox session.
     """
     args = session.posargs or ("run", "--all-files")
-    session.run_install(
-        *UV_SYNC_COMMAND,
-        "--group=pre-commit",
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
-    )
+    _uv_sync(session, "--group=pre-commit")
     session.run("pre-commit", *args)
 
 
@@ -156,20 +201,17 @@ def pre_commit(session: nox.Session) -> None:
     python=main_python_version,
     tags=("lint",),
 )
-def mypy(session: nox.Session) -> None:
-    """Run mypy type checking.
+def typing(session: nox.Session) -> None:
+    """Run mypy and ty type checking.
 
     Args:
         session: Nox session.
     """
-    session.run_install(
-        *UV_SYNC_COMMAND,
-        "--group=typing",
-        "--extra=mssql",
-        "--extra=azure",
-        "--extra=gcs",
-        "--extra=s3",
-        "--extra=containers",
-        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
-    )
+    _uv_sync(session, "--group=typing", "--all-extras")
+    output_format = "github" if os.getenv("GITHUB_ACTIONS") == "true" else "concise"
+    session.run("ty", "check", f"--output-format={output_format}", *session.posargs)
     session.run("mypy", *session.posargs)
+
+
+if __name__ == "__main__":
+    nox.main()

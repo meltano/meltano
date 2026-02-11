@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import json
 import typing as t
-from hashlib import sha256
+from dataclasses import dataclass
 
 from structlog.stdlib import get_logger
 
-from meltano.core.plugin.base import PluginRef, StandalonePlugin
+from meltano.core.plugin.base import PluginDefinition, StandalonePlugin
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable
     from pathlib import Path
 
+    from meltano.core.plugin.base import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 class LockfileAlreadyExistsError(Exception):
     """Raised when a plugin lockfile already exists."""
 
-    def __init__(self, message: str, path: Path, plugin: PluginRef):
+    def __init__(self, message: str, path: Path):
         """Create a new LockfileAlreadyExistsError.
 
         Args:
@@ -32,78 +32,15 @@ class LockfileAlreadyExistsError(Exception):
             plugin: The plugin that was locked.
         """
         self.path = path
-        self.plugin = plugin
         super().__init__(message)
 
 
-class PluginLock:
-    """Plugin lockfile."""
+@dataclass
+class VariantMetadata:
+    """Metadata for a variant."""
 
-    def __init__(self, project: Project, plugin: ProjectPlugin) -> None:
-        """Create a new PluginLock.
-
-        Args:
-            project: The project.
-            plugin: The plugin to lock.
-        """
-        self.project = project
-        self.definition = plugin.definition
-        self.variant = self.definition.find_variant(plugin.variant)
-
-        self.path = self.project.plugin_lock_path(
-            self.definition.type,
-            self.definition.name,
-            variant_name=self.variant.name,
-        )
-
-    def save(self) -> None:
-        """Save the plugin lockfile."""
-        locked_def = StandalonePlugin.from_variant(self.variant, self.definition)
-
-        with self.path.open("w") as lockfile:
-            json.dump(locked_def.canonical(), lockfile, indent=2)
-            lockfile.write("\n")
-
-    def load(
-        self,
-        *,
-        create: bool = False,
-        loader: Callable = lambda x: StandalonePlugin(**json.load(x)),
-    ) -> StandalonePlugin:
-        """Load the plugin lockfile.
-
-        Args:
-            create: Create the lockfile if it does not yet exist.
-            loader: Function to process the lock file. Defaults to constructing
-                a `StandalonePlugin` instance.
-
-        Raises:
-            FileNotFoundError: The lock file was not found at its expected path.
-
-        Returns:
-            The loaded plugin.
-        """
-
-        def _load():  # noqa: ANN202
-            with self.path.open() as lockfile:
-                return loader(lockfile)
-
-        try:
-            return _load()
-        except FileNotFoundError:
-            if create:
-                self.save()
-                return _load()
-            raise
-
-    @property
-    def sha256_checksum(self) -> str:
-        """Get the checksum of the lockfile.
-
-        Returns:
-            The checksum of the lockfile.
-        """
-        return sha256(self.path.read_bytes()).hexdigest()
+    is_default: bool | None = None
+    is_deprecated: bool | None = None
 
 
 class PluginLockService:
@@ -117,31 +54,197 @@ class PluginLockService:
         """
         self.project = project
 
-    def save(
+    def lock_path(
         self,
-        plugin: ProjectPlugin,
         *,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+    ) -> Path:
+        """Get the path to the plugin lockfile from a type, name, and variant."""
+        return self.project.dirs.plugin_lock_path(
+            plugin_type,
+            plugin_name,
+            variant_name=variant_name,
+        )
+
+    def plugin_lock_path(
+        self,
+        *,
+        plugin: ProjectPlugin,
+        variant_name: str | None = None,
+    ) -> Path:
+        """Get the path to the plugin lockfile from a plugin and variant."""
+        return self.lock_path(
+            plugin_type=plugin.type,
+            plugin_name=plugin.inherit_from or plugin.name,
+            variant_name=variant_name,
+        )
+
+    def save_definition(
+        self,
+        *,
+        definition: PluginDefinition,
+        variant_name: str | None = None,
         exists_ok: bool = False,
-    ) -> None:
+    ) -> Path:
         """Save the plugin lockfile.
 
         Args:
-            plugin: The plugin definition to save.
-            exists_ok: Whether raise an exception if the lockfile already exists.
+            definition: The plugin definition to save.
+            variant_name: The variant name to save.
+            exists_ok: Whether to raise an exception if the lockfile already exists.
+
+        Returns:
+            The path to the plugin lockfile.
 
         Raises:
             LockfileAlreadyExistsError: If the lockfile already exists and is not
                 flagged for overwriting.
         """
-        plugin_lock = PluginLock(self.project, plugin)
+        variant = definition.find_variant(variant_name)
+        path = self.lock_path(
+            plugin_type=definition.type,
+            plugin_name=definition.name,
+            variant_name=variant.name,
+        )
 
-        if plugin_lock.path.exists() and not exists_ok:
-            raise LockfileAlreadyExistsError(
-                f"Lockfile already exists: {plugin_lock.path}",  # noqa: EM102
-                plugin_lock.path,
-                plugin,
+        if path.exists() and not exists_ok:
+            msg = f"Lockfile already exists: {path}"
+            raise LockfileAlreadyExistsError(msg, path)
+
+        locked_def = StandalonePlugin.from_variant(variant, definition)
+
+        with path.open("w") as lockfile:
+            json.dump(locked_def.canonical(), lockfile, indent=2)
+            lockfile.write("\n")
+
+        logger.debug("Locked plugin definition", path=path)
+        return path
+
+    def _save_from_hub(
+        self,
+        *,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+        exists_ok: bool = False,
+    ) -> tuple[Path, VariantMetadata]:
+        """Save the plugin lockfile."""
+        definition = self.project.hub_service.find_definition(
+            plugin_type,
+            plugin_name,
+            variant_name=variant_name,
+        )
+        variant_metadata = VariantMetadata(
+            is_default=definition.is_default_variant,
+            is_deprecated=definition.find_variant(variant_name).deprecated,
+        )
+        path = self.save_definition(
+            variant_name=variant_name,
+            definition=definition,
+            exists_ok=exists_ok,
+        )
+        return path, variant_metadata
+
+    def _save_from_project_plugin(
+        self,
+        *,
+        plugin: ProjectPlugin,
+        exists_ok: bool = False,
+    ) -> Path:
+        """Save the plugin lockfile."""
+        return self.save_definition(
+            variant_name=plugin.variant,
+            definition=plugin.definition,
+            exists_ok=exists_ok,
+        )
+
+    def save(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        exists_ok: bool = False,
+        fetch_from_hub: bool = False,
+    ) -> Path:
+        """Save the plugin lockfile.
+
+        Args:
+            plugin: The plugin definition to save.
+            exists_ok: Whether raise an exception if the lockfile already exists.
+            fetch_from_hub: Whether to fetch the plugin definition from the Hub.
+
+        Returns:
+            The path to the plugin lockfile.
+
+        """
+        if fetch_from_hub:
+            path, _ = self._save_from_hub(
+                plugin_type=plugin.type,
+                plugin_name=plugin.inherit_from or plugin.name,
+                variant_name=plugin.variant,
+                exists_ok=exists_ok,
+            )
+            return path
+
+        return self._save_from_project_plugin(plugin=plugin, exists_ok=exists_ok)
+
+    def load_content(
+        self,
+        *,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+    ) -> tuple[dict[str, t.Any], VariantMetadata]:
+        """Load the content of the plugin lockfile."""
+        variant_metadata = VariantMetadata()
+        path = self.lock_path(
+            plugin_type=plugin_type,
+            plugin_name=plugin_name,
+            variant_name=variant_name,
+        )
+        if not path.exists():
+            path, variant_metadata = self._save_from_hub(
+                plugin_type=plugin_type,
+                plugin_name=plugin_name,
+                variant_name=variant_name,
+                exists_ok=True,
             )
 
-        plugin_lock.save()
+        with path.open() as lockfile:
+            return json.load(lockfile), variant_metadata
 
-        logger.debug("Locked plugin definition", path=plugin_lock.path)
+    def get_standalone_data(self, plugin: ProjectPlugin) -> dict[str, t.Any]:
+        """Get the standalone data for a plugin."""
+        path = self.lock_path(
+            plugin_type=plugin.type,
+            plugin_name=plugin.inherit_from or plugin.name,
+            variant_name=plugin.variant,
+        )
+        if path.exists():
+            with path.open() as lockfile:
+                return json.load(lockfile)
+
+        return StandalonePlugin.from_variant(
+            plugin.definition.find_variant(None),
+            plugin.definition,
+        ).canonical()
+
+    def load_definition(
+        self,
+        *,
+        plugin_type: PluginType,
+        plugin_name: str,
+        variant_name: str | None = None,
+    ) -> PluginDefinition:
+        """Load the plugin definition from the lockfile."""
+        content, variant_metadata = self.load_content(
+            plugin_type=plugin_type,
+            plugin_name=plugin_name,
+            variant_name=variant_name,
+        )
+        return PluginDefinition.from_standalone(
+            StandalonePlugin.parse(content),
+            is_default_variant=variant_metadata.is_default,
+            deprecated=variant_metadata.is_deprecated,
+        )

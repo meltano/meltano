@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import typing as t
-from collections import Counter, abc
+from collections import Counter
 from copy import deepcopy
 from http import HTTPStatus
 
@@ -13,8 +13,10 @@ import requests
 from requests.adapters import BaseAdapter
 
 from meltano.core.plugin.base import PluginType
+from meltano.core.user_config import _reset_user_config_service
 
 if t.TYPE_CHECKING:
+    from collections import abc
     from collections.abc import Callable
 
     from meltano.core.project import Project
@@ -35,17 +37,19 @@ if PYTEST_BACKEND == "sqlite":
     pytest_plugins.append("fixtures.db.sqlite")
 elif PYTEST_BACKEND == "postgresql":
     pytest_plugins.append("fixtures.db.postgresql")
-elif PYTEST_BACKEND == "postgresql_psycopg3":
-    pytest_plugins.append("fixtures.db.postgresql_psycopg3")
+elif PYTEST_BACKEND == "postgresql_psycopg2":
+    pytest_plugins.append("fixtures.db.postgresql_psycopg2")
 elif PYTEST_BACKEND == "mssql":
     pytest_plugins.append("fixtures.db.mssql")
 else:
-    raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")  # noqa: EM102
+    raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")  # noqa: EM102, TRY002, TRY003
 
 BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
 def pytest_runtest_setup(item) -> None:
+    _reset_user_config_service()
+
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database

@@ -119,7 +119,7 @@ class InvokerBase:
                 stderr=asyncio.subprocess.PIPE,
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start plugin: {err}") from err  # noqa: EM102
+            raise RunnerError(f"Cannot start plugin: {err}") from err  # noqa: EM102, TRY003
 
     async def stop(self, *, kill: bool = True) -> None:
         """Stop (kill) the underlying process and cancel output proxying.
@@ -127,12 +127,17 @@ class InvokerBase:
         Args:
             kill: whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
+        if self._process_handle is None:  # pragma: no cover
+            return
+
         with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
             else:
                 self.process_handle.terminate()
         await self.process_future
+
+        # Cancel any remaining output futures
         if self._stdout_future is not None:
             self._stdout_future.cancel()
         if self._stderr_future is not None:
@@ -214,7 +219,7 @@ class InvokerBase:
         if self._stdout_future is None:
             self.outputs.append(dst)
         else:
-            raise IOLinkError("IO capture already in flight")  # noqa: EM101
+            raise IOLinkError("IO capture already in flight")  # noqa: EM101, TRY003
 
     def stderr_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stderr_link to instruct block to link/write stderr content to dst.
@@ -228,7 +233,7 @@ class InvokerBase:
         if self._stderr_future is None:
             self.err_outputs.append(dst)
         else:
-            raise IOLinkError("IO capture already in flight")  # noqa: EM101
+            raise IOLinkError("IO capture already in flight")  # noqa: EM101, TRY003
 
     async def pre(self, context) -> None:  # noqa: ANN001
         """Pre triggers preparation of the underlying plugin.
@@ -334,7 +339,7 @@ class SingerBlock(InvokerBase, IOBlock):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err  # noqa: EM102
+            raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err  # noqa: EM102, TRY003
 
     async def stop(self, *, kill: bool = True) -> None:
         """Stop (kill) the underlying process and cancel output proxying.
@@ -342,12 +347,17 @@ class SingerBlock(InvokerBase, IOBlock):
         Args:
             kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
+        if self._process_handle is None:  # pragma: no cover
+            return
+
         with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
             else:
                 self.process_handle.terminate()
         await self.process_future
+
+        # Cancel any remaining output futures
         if self._stdout_future is not None:
             self._stdout_future.cancel()
         if self._stderr_future is not None:

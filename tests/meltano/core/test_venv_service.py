@@ -50,17 +50,17 @@ def test_fingerprint_with_python_path():
 class TestVenvService:
     cls = VenvService
 
-    def assert_pip_log_file(self, service: VenvService) -> None:
-        assert service.pip_log_path.exists()
-        assert service.pip_log_path.is_file()
-        assert service.pip_log_path.stat().st_size > 0
+    def assert_install_log_file(self, service: VenvService) -> None:
+        assert service.install_log_path.exists()
+        assert service.install_log_path.is_file()
+        assert service.install_log_path.stat().st_size > 0
 
     @pytest.fixture
     def subject(self, project):
         return VenvService(project=project, namespace="namespace", name="name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService) -> None:
-        run_dir = project.run_dir("name")
+        run_dir = project.dirs.run("name")
 
         file = run_dir / "test.file.txt"
         file.touch()
@@ -98,7 +98,7 @@ class TestVenvService:
             namespace=plugin_type,
             name=plugin_name,
         )
-        venv_dir = project.venvs_dir(plugin_type, plugin_name, make_dirs=True)
+        venv_dir = project.dirs.venvs(plugin_type, plugin_name, make_dirs=True)
         # Don't allow writing to the venv dir
         venv_dir.chmod(0o555)
 
@@ -118,11 +118,17 @@ class TestVenvService:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
-        await subject.install(["example"], clean=True)
-        venv_dir = subject.project.venvs_dir("namespace", "name")
+        # Pre-create a venv with a marker file to ensure `clean=True` clears it
+        venv_dir = subject.project.dirs.venvs("namespace", "name", make_dirs=True)
+        marker_file = venv_dir / "pre_existing_marker.txt"
+        marker_file.write_text("marker")
 
-        # ensure the venv is created
+        await subject.install(["example"], clean=True)
+        venv_dir = subject.project.dirs.venvs("namespace", "name")
+
+        # ensure the venv is created and previous contents have been cleared
         assert venv_dir.exists()
+        assert not marker_file.exists()
 
         # ensure that the binary is python3
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
@@ -150,7 +156,7 @@ class TestVenvService:
         assert fingerprint_content == expected_fingerprint
 
         # ensure that log file was created and is not empty
-        self.assert_pip_log_file(subject)
+        self.assert_install_log_file(subject)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -268,7 +274,7 @@ class TestVirtualEnv:
     )
     def test_cross_platform(self, system: str, lib_dir: str, project: Project) -> None:
         with mock.patch("platform.system", return_value=system):
-            subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
+            subject = VirtualEnv(project.dirs.venvs("pytest", "pytest"))
             assert subject.lib_dir == subject.root / lib_dir
 
     def test_unknown_platform(self, project: Project) -> None:
@@ -276,16 +282,16 @@ class TestVirtualEnv:
             mock.patch("platform.system", return_value="commodore64"),
             pytest.raises(
                 MeltanoError,
-                match="(?i)Platform 'commodore64'.*?not supported.",
+                match=r"(?i)Platform 'commodore64'.*?not supported.",
             ),
         ):
-            VirtualEnv(project.venvs_dir("pytest", "pytest"))
+            VirtualEnv(project.dirs.venvs("pytest", "pytest"))
 
 
 class TestUvVenvService(TestVenvService):
     cls = UvVenvService
 
-    def assert_pip_log_file(self, service: UvVenvService) -> None:
+    def assert_install_log_file(self, service: UvVenvService) -> None:
         pass
 
     @pytest.fixture
@@ -316,67 +322,7 @@ class TestUvVenvService(TestVenvService):
             ),
             pytest.raises(
                 AsyncSubprocessError,
-                match="Failed to install plugin 'name'",
+                match="Something went wrong",
             ),
         ):
             await subject.install(["cowsay"])
-
-    async def test_error_logging_creates_log_file(
-        self,
-        subject: UvVenvService,
-        tmp_path: Path,
-    ) -> None:
-        """Test that error handling creates log file with details."""
-        log_file_path = tmp_path / "pip.log"
-        with mock.patch.object(subject, "pip_log_path", log_file_path):
-            process = mock.Mock(spec=Process)
-            original_err = AsyncSubprocessError(
-                "Something went wrong",
-                process,
-                stderr="Some error",
-            )
-            result_err = await subject.handle_installation_error(original_err)
-
-            assert isinstance(result_err, AsyncSubprocessError)
-            assert "Failed to install plugin 'name'" in str(result_err)
-
-            assert log_file_path.exists()
-            assert "Some error" in log_file_path.read_text()
-
-    async def test_error_logging_empty_stderr(
-        self,
-        subject: UvVenvService,
-        tmp_path: Path,
-    ) -> None:
-        """Test error logging when stderr is empty."""
-        log_file_path = tmp_path / "pip.log"
-        with mock.patch.object(subject, "pip_log_path", log_file_path):
-            process = mock.Mock(spec=Process)
-            process.stderr = None
-            original_err = AsyncSubprocessError("Another error", process)
-
-            await subject.handle_installation_error(original_err)
-
-            assert log_file_path.exists()
-            assert log_file_path.read_text() == ""
-
-    async def test_error_logging_handles_write_failure(
-        self,
-        subject: UvVenvService,
-    ) -> None:
-        """Test that log write failures are handled gracefully."""
-        process = mock.Mock(spec=Process)
-        process.stderr = mock.AsyncMock(return_value="Some error")
-
-        # Mock the log writing to fail
-        with mock.patch.object(
-            subject,
-            "_write_error_log",
-            side_effect=OSError("Permission denied"),
-        ):
-            original_err = AsyncSubprocessError("Something went wrong", process)
-            result_err = await subject.handle_installation_error(original_err)
-
-            # Should still return the installation error, not the log error
-            assert isinstance(result_err, AsyncSubprocessError)
-            assert "Failed to install plugin 'name'" in str(result_err)

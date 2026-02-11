@@ -67,7 +67,6 @@ class TestMeltanoFile:
 
     def test_load_env(self) -> None:
         meltano_file = MeltanoFile(
-            version=1,
             env={
                 "FOO": 1,
                 "BAR": datetime.datetime(2025, 5, 20, tzinfo=datetime.timezone.utc),
@@ -79,3 +78,72 @@ class TestMeltanoFile:
         )
         assert meltano_file.env["FOO"] == "1"
         assert meltano_file.env["BAR"] == "2025-05-20 00:00:00+00:00"
+
+    def test_version_deprecation_warning(self) -> None:
+        """Test that version field triggers a deprecation warning."""
+        with pytest.warns(
+            DeprecationWarning,
+            match="The 'version' field in meltano.yml is deprecated",
+        ):
+            meltano_file = MeltanoFile(
+                version=1,
+                plugins={},
+                schedules=[],
+                environments=[],
+                jobs=[],
+            )
+
+        assert meltano_file.version == 1
+
+    def test_no_version_no_warning(self) -> None:
+        """Test that omitting version field does not trigger a warning."""
+        import warnings
+
+        # This should not raise any warning - treat all warnings as errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            meltano_file = MeltanoFile(
+                plugins={},
+                schedules=[],
+                environments=[],
+                jobs=[],
+            )
+            assert meltano_file.version == 1  # Uses default
+
+    def test_version_not_serialized_when_not_provided(self) -> None:
+        """Test that version field is not serialized when not explicitly provided."""
+        meltano_file = MeltanoFile(
+            plugins={},
+            schedules=[],
+            environments=[],
+            jobs=[],
+        )
+
+        # Convert to dict (simulates serialization)
+        serialized = dict(meltano_file)
+
+        # Version should not be in the serialized output
+        assert "version" not in serialized
+        # But the attribute should still be accessible
+        assert meltano_file.version == 1
+
+    def test_version_serialized_when_explicitly_provided(self) -> None:
+        """Test that version field is serialized when explicitly provided."""
+        with pytest.warns(
+            DeprecationWarning,
+            match="The 'version' field in meltano.yml is deprecated",
+        ):
+            meltano_file = MeltanoFile(
+                version=1,
+                plugins={},
+                schedules=[],
+                environments=[],
+                jobs=[],
+            )
+
+        # Convert to dict (simulates serialization)
+        serialized = dict(meltano_file)
+
+        # Version should be in the serialized output
+        assert "version" in serialized
+        assert serialized["version"] == 1

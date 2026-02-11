@@ -5,6 +5,9 @@ layout: doc
 sidebar_position: 1
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Meltano provides a command line interface (CLI) that makes it easy to manage your [project](/concepts/project), [plugins](/guide/plugin-management), and [EL(T) pipelines](/guide/integration).
 To quickly find the `meltano` subcommand you're looking for, use the Table of Contents in the sidebar.
 For a better understanding of command line documentation syntax, the [docopt](http://docopt.org/) standard is useful.
@@ -56,7 +59,7 @@ When adding a new plugin, it will:
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
 1. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
 1. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts))
-1. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
+1. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <name>`](#install), which will:
   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
   1. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
 5. If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the --force-install flag to `meltano add`.
@@ -100,16 +103,6 @@ meltano add --plugin-type extractor tap-gitlab
 meltano add --plugin-type loader target-postgres
 ```
 
-The original positional syntax is still supported but deprecated:
-
-```bash
-# Deprecated syntax (still works but will be removed in v4)
-meltano add <type> <name>
-
-# For example:
-meltano add extractor tap-gitlab  # Will show deprecation warning
-meltano add loader target-postgres
-```
 
 :::info Automatic Plugin Type Detection
 Meltano automatically detects plugin types based on naming conventions:
@@ -136,9 +129,6 @@ meltano add target-postgres --variant transferwise
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type loader target-postgres --variant transferwise
-
-# Deprecated positional syntax
-meltano add loader target-postgres --variant transferwise
 ```
 
 To add a [custom plugin](/concepts/plugins#custom-plugins) using a [custom plugin definition](/concepts/project#custom-plugin-definitions), use the `--custom` flag:
@@ -152,9 +142,6 @@ meltano add --custom tap-covid-19  # Automatically detected as extractor
 
 # With explicit type specification for disambiguation
 meltano add --custom --plugin-type extractor tap-covid-19
-
-# Deprecated positional syntax
-meltano add --custom extractor tap-covid-19
 
 # If you're using Docker, don't forget to mount the project directory,
 # and ensure that interactive mode is enabled so that Meltano can ask you
@@ -173,9 +160,6 @@ meltano add tap-ga--client-foo --inherit-from tap-google-analytics  # Automatica
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type extractor tap-ga--client-foo --inherit-from tap-google-analytics
-
-# Deprecated positional syntax
-meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
 
 To add a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file as a [custom plugin](/concepts/plugins#custom-plugins), use the `--from-ref` option referencing a URL or local path:
@@ -196,9 +180,6 @@ meltano add tap-shopify --from-ref tap-shopify--matatika.yml
 
 # With explicit type specification for disambiguation
 meltano add --plugin-type extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
-
-# Deprecated positional syntax
-meltano add extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
 
 # The plugin name specified in the command is superseded by the value in the
 # plugin definition file - using the same name is just a formality
@@ -221,10 +202,10 @@ This will update the plugin lock file and `meltano.yml` entry, without overwriti
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
 ```bash
-meltano add <type> <name> --no-install
+meltano add <name> --no-install
 
 # For example:
-meltano add extractor tap-shopify --no-install
+meltano add tap-shopify --no-install
 ```
 
 By default, plugins that use Python use the version of Python that was used to run Meltano. This behavior can be overridden using the `python` attribute, which can be set [for all plugins](/reference/settings#project-python), or on a [per-plugin basis](/reference/settings#plugin-python).
@@ -232,13 +213,13 @@ By default, plugins that use Python use the version of Python that was used to r
 When adding a new plugin, the Python version can be specified using the `--python` option:
 
 ```bash
-meltano add <type> <name> --python <Python version or path>
+meltano add <name> --python <Python version or path>
 ```
 
 For example, to add `tap-github` using Python 3.12 (assuming `python3.12` is installed and on your `$PATH`):
 
 ```bash
-meltano add extractor tap-github --python python3.12
+meltano add tap-github --python python3.12
 ```
 
 Then regardless of the Python version used when the plugin is installed, `tap-gitlab` and any plugin which inherits from it will use Python 3.12.
@@ -335,16 +316,34 @@ To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.js
 
 ## `config`
 
+:::warning Command Structure Changed
+
+The `meltano config` command structure changed in Meltano v4. The subcommand now comes _before_ the plugin name:
+
+- **New format**: `meltano config list <plugin>`, `meltano config set <plugin> <setting> <value>`
+- **Old format**: `meltano config <plugin> list`, `meltano config <plugin> set <setting> <value>`
+
+:::
+
+:::info Print Subcommand Required
+
+To view a plugin's configuration, you must now use the explicit `print` subcommand:
+
+- **New format**: `meltano config print <plugin>` or `meltano config print <plugin> --format=env`
+- **Old format**: `meltano config <plugin>` or `meltano config <plugin> --format=env`
+
+:::
+
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
 
-When no explicit `--store` is specified, `meltano config <plugin> set` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
+When no explicit `--store` is specified, `meltano config set <plugin>` will automatically store the value in the [most appropriate location](/guide/configuration#configuration-layers):
 
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
 - [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `sensitive: true` or `env_specific: true`);
 - [`meltano.yml`](/concepts/project#meltano-yml-project-file) otherwise.
 
-If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config test <plugin>`](/reference/command-line-interface#config).
 
 ### How to use
 
@@ -353,57 +352,86 @@ To manage the configuration of Meltano itself, specify `meltano` as the plugin n
 ```bash
 # List all settings for Meltano itself with their names,
 # environment variables, and current values
-meltano config meltano list
+meltano config list meltano
 
 # List all settings for the specified plugin with their names,
 # environment variables, and current values
-meltano config <plugin> list
+meltano config list <plugin>
 
 # View the plugin's current configuration.
-meltano config <plugin>
+meltano config print <plugin>
 
 # Sets the configuration's setting `<name>` to `<value>`.
-meltano config <plugin> set <name> <value>
+meltano config set <plugin> <name> <value>
 
 # Values are parsed as JSON, and interpreted as simple strings when invalid
-meltano config <plugin> set <name> <string>             # String with no meaning in JSON
-meltano config <plugin> set <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
-meltano config <plugin> set <name> <json>               # JSON that fits in a single word
-meltano config <plugin> set <name> '<json>'             # JSON in a string argument
-meltano config <plugin> set <name> '"<string>"'         # JSON string
-meltano config <plugin> set <name> <number>             # JSON number, e.g. 100 or 3.14
-meltano config <plugin> set <name> <true/false>         # Boolean True or False
-meltano config <plugin> set <name> '[<elem>, ...]'      # Array
-meltano config <plugin> set <name> '{"<key>": <value>, ...}' # JSON object
+meltano config set <plugin> <name> <string>             # String with no meaning in JSON
+meltano config set <plugin> <name> "<word> <word> ..."  # Multi-word string with no meaning in JSON
+meltano config set <plugin> <name> <json>               # JSON that fits in a single word
+meltano config set <plugin> <name> '<json>'             # JSON in a string argument
+meltano config set <plugin> <name> '"<string>"'         # JSON string
+meltano config set <plugin> <name> <number>             # JSON number, e.g. 100 or 3.14
+meltano config set <plugin> <name> <true/false>         # Boolean True or False
+meltano config set <plugin> <name> '[<elem>, ...]'      # Array
+meltano config set <plugin> <name> '{"<key>": <value>, ...}' # JSON object
 
 # Remove the configuration's setting `<name>`.
-meltano config <plugin> unset <name>
+meltano config unset <plugin> <name>
 
 # Clear the configuration (back to defaults).
-meltano config <plugin> reset
+meltano config reset <plugin>
 
 # Set, unset, or reset in a specific location
-meltano config <plugin> set --store=meltano_yml <name> <value> # set in `meltano.yml`
-meltano config <plugin> unset --store=dotenv <name> # unset in `.env`
-meltano config <plugin> reset --store=db # reset in system database
+meltano config set <plugin> --store=meltano_yml <name> <value> # set in `meltano.yml`
+meltano config unset <plugin> --store=dotenv <name> # unset in `.env`
+meltano config reset <plugin> --store=db # reset in system database
 
 # Test the plugin's current configuration, if supported.
-meltano config <plugin> test
-meltano config --no-install <plugin> test # prevent auto-install of plugin
+meltano config test <plugin>
+meltano config --no-install test <plugin> # prevent auto-install of plugin
+```
+
+#### Testing Plugin Configuration
+
+The `meltano config test` command validates a plugin's configuration by running a connectivity test. This is currently supported for:
+
+- **Extractors (taps)**: Validates configuration by invoking the extractor and checking if it can successfully emit at least one RECORD or BATCH message.
+- **Loaders (targets)**: Validates configuration by sending test Singer messages (SCHEMA, RECORD, STATE, and optionally ACTIVATE_VERSION) to the loader and verifying it can process them without errors.
+
+The test helps identify configuration or credential issues before setting up full data pipelines. For loaders with the `activate-version` capability, the test automatically includes an ACTIVATE_VERSION message in the test stream.
+
+:::warning Loader Testing Side Effects
+
+When testing a loader, **test data will be written to your target system**. The test creates a table/collection called `meltano_test_stream` with one test record. You may need to manually clean up this test data after the test completes.
+
+:::
+
+Example usage:
+
+```bash
+# Test an extractor configuration
+meltano config test tap-gitlab
+
+# Test a loader configuration
+meltano config test target-postgres
+
+# Test with a specific plugin type if names are ambiguous
+meltano config test --plugin-type=loader target-jsonl
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
 
 ```bash
-meltano config --plugin-type=<type> <plugin> ...
+meltano config list --plugin-type=<type> <plugin>
+meltano config set --plugin-type=<type> <plugin> <name> <value>
 ```
 
 When setting a config value that contains the character `$`, you can avoid expansion by
 escaping it with `\` or using single quotes:
 
 ```bash
-meltano config <plugin> set <name> "@\$a"
-meltano config <plugin> set <name> '@$a'
+meltano config set <plugin> <name> "@\$a"
+meltano config set <plugin> <name> '@$a'
 ```
 
 #### Sensitive values
@@ -413,7 +441,7 @@ By default, values for sensitive settings are redacted from the output of `melta
 # `--safe` is the effective default, whether the flag is present or not
 meltano config --safe <plugin>
 meltano config --safe <plugin> list
-meltano config <plugin> list
+meltano config list <plugin>
 
 meltano config --unsafe <plugin>
 meltano config --unsafe <plugin> list
@@ -426,10 +454,10 @@ meltano config --unsafe <plugin> set --interactive
 Nested properties can be set (and unset) by specifying a list of property names:
 
 ```bash
-meltano config <plugin> set <property> <subproperty> <value>
-meltano config <plugin> set <property> <deep> <nesting> <value>
+meltano config set <plugin> <property> <subproperty> <value>
+meltano config set <plugin> <property> <deep> <nesting> <value>
 
-meltano config <plugin> unset <property> <subproperty>
+meltano config unset <plugin> <property> <subproperty>
 ```
 
 This will result in the following configuration being passed on to the plugin:
@@ -445,11 +473,11 @@ This will result in the following configuration being passed on to the plugin:
 
 ##### Dot separator
 
-Note that `meltano config <plugin> list` always displays full config keys
+Note that `meltano config list <plugin>` always displays full config keys
 with nesting represented by the `.` separator, matching the internal flattened representation:
 
 ```bash
-meltano config <plugin> list
+meltano config list <plugin>
 # => <property>.<subproperty>
 # => <property>.<deep>.<nesting>
 ```
@@ -458,14 +486,14 @@ You can also set nested properties using the `.` separator, but specifying a lis
 since this will result in the nesting being reflected in the plugin's `config` object in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
 
 ```bash
-meltano config <plugin> set <property> <deep> <nesting> <value>
+meltano config set <plugin> <property> <deep> <nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>:
 #      <deep>:
 #        <nesting>: <value>
 
-meltano config <plugin> set <property>.<deep>.<nesting> <value>
+meltano config set <plugin> <property>.<deep>.<nesting> <value>
 # `meltano.yml`:
 #  config:
 #    <property>.<deep>.<nesting>: <value>
@@ -483,27 +511,27 @@ The `config` command can accept the `--environment` flag to target a specific [M
 
 In the context of `meltano config`, [plugin extras](/guide/configuration#plugin-extras) are distinguished from regular plugin-specific settings using an underscore (`_`) prefix, e.g. `_example_extra`. This also applies in the [environment variables](/guide/configuration#configuring-settings) that can be used to override them at runtime: since setting names for extras are prefixed with underscores (`_`), they get an extra underscore to separate them from the plugin name, e.g. `TAP_EXAMPLE__EXAMPLE_EXTRA`.
 
-By default, `meltano config <plugin>` and `meltano config <plugin> list` only take into account regular plugin settings.
+By default, `meltano config print <plugin>` and `meltano config list <plugin>` only take into account regular plugin settings.
 An `--extras` flag can be passed to view or list only extras instead.
 
-Be aware that `meltano config <plugin> reset` resets both regular settings _and_ extras.
+Be aware that `meltano config reset <plugin>` resets both regular settings _and_ extras.
 
 ```bash
 # List all extras for the specified plugin with their names,
 # environment variables, and current values
-meltano config <plugin> list --extras
+meltano config list <plugin> --extras
 
 # View the plugin's current extras
-meltano config --extras <plugin>
+meltano config print <plugin> --extras
 
 # Set value of extra `<extra>` to `<value>` through the `_<extra>` setting
-meltano config <plugin> set _<extra> <value>
+meltano config set <plugin> _<extra> <value>
 
 # Unset extra `<extra>`
-meltano config <plugin> unset _<extra>
+meltano config unset <plugin> _<extra>
 
 # Reset regular settings _and_ extras
-meltano config <plugin> reset
+meltano config reset <plugin>
 ```
 
 ### How to use: Interactive config
@@ -514,16 +542,16 @@ Interactive config supports the same options as the direct `set` command (i.e. `
 
 ```bash
 # Configure plugin interactively
-meltano config <plugin> set --interactive
+meltano config set <plugin> --interactive
 
 # Configure settings for specific environment interactively
-meltano --environment=prod config <plugin> set --interactive
+meltano --environment=prod config set <plugin> --interactive
 
 # Configure settings and extras interactively
-meltano config <plugin> set --interactive --extras
+meltano config set <plugin> --interactive --extras
 
 # Configure specific store interactively
-meltano config <plugin> set --interactive --store=dotenv
+meltano config set <plugin> --interactive --store=dotenv
 ```
 
 ### How to use: Read setting value from a file
@@ -535,10 +563,10 @@ The `--from-file` option can be used to read a configuration value from a file o
 
 ```bash
 # Set setting `<name>` to the contents of `./file.txt`.
-meltano config <plugin> set <name> --from-file ./file.txt
+meltano config set <plugin> <name> --from-file ./file.txt
 
 # Set setting `<name>` to the value returned by `uuidgen`.
-uuidgen | meltano config <plugin> set <name> --from-file -
+uuidgen | meltano config set <plugin> <name> --from-file -
 ```
 
 :::info
@@ -549,9 +577,9 @@ uuidgen | meltano config <plugin> set <name> --from-file -
 Values for sensitive settings (defined as `sensitive: true`) are redacted in the output of the following commands:
 
 ```bash
-meltano config <plugin> list
+meltano config list <plugin>
 meltano config set <name> <value>
-meltano config <plugin> set --interactive
+meltano config set <plugin> --interactive
 ```
 
 ## `docs`
@@ -848,25 +876,40 @@ The `init` command does not run relative to a [Meltano Environment](https://docs
 
 Installs dependencies of your project based on the **meltano.yml** file.
 
-You can install plugins by simply providing their names without specifying their type. Meltano will automatically detect the plugin type:
+The bare command will install all plugins:
 
 ```bash
-meltano install tap-github target-postgres
+meltano install
 ```
 
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-:::warning[Deprecated Syntax]
+<Tabs className="meltano-tabs" groupId="meltano-version">
+  <TabItem className="meltano-tab-content" value="v4" label="Meltano v4+" default>
 
-The following syntax forms are deprecated and will be removed in Meltano v4:
+```bash
+# Install specific plugins by name (automatically detects type)
+meltano install tap-github target-postgres
 
-| Deprecated Syntax | Use Instead |
-| --- | --- |
-| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
-| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
+# Install plugins by type
+meltano install --plugin-type=extractor tap-gitlab
+```
 
-:::
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="legacy" label="Legacy (pre-v4)">
+
+```bash
+# Using dash syntax
+meltano install - tap-github target-postgres
+
+# Using positional type argument
+meltano install extractor tap-gitlab
+meltano install <plugin_type> <plugin_name>
+```
+
+  </TabItem>
+</Tabs>
 
 To only install plugins for a particular schedule specify the `--schedule` argument.
 This can be useful in CI test workflows or for deployments that need to install plugins before every run.
@@ -892,13 +935,11 @@ meltano install
 # Install specific plugins (recommended - automatically detects type)
 meltano install tap-github target-postgres
 meltano install tap-gitlab
-meltano install - tap-gitlab target-postgres  # Deprecated syntax
 
 # Install plugins by type
 meltano install --plugin-type=extractor tap-gitlab
-meltano install extractors  # Deprecated syntax
+meltano install --plugin-type=extractors  # Install all extractors
 meltano install --plugin-type=extractor tap-gitlab tap-adwords
-meltano install extractors tap-gitlab tap-adwords  # Deprecated syntax
 
 # Install plugins for a specific schedule
 meltano install --schedule=<schedule_name>
@@ -1004,11 +1045,11 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 ### How to use
 
 ```bash
-# Lock all plugins
-meltano lock --all
+# Lock all plugins (default behavior)
+meltano lock
 
 # Lock all plugins of a certain type
-meltano lock --all --plugin-type=<type>
+meltano lock --plugin-type=<type>
 
 # Lock specific plugins
 meltano lock <name> <name_two>
@@ -1018,7 +1059,7 @@ meltano lock <name> <name_two> --plugin-type=<type>
 
 # Use --update in combination with any of the above to update the lock file
 # with the latest definition from MeltanoHub
-meltano lock --all --update
+meltano lock --update
 ```
 
 ### Using `lock` with Environments
@@ -1113,13 +1154,9 @@ Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from 
 ### How to Use
 
 ```bash
-# New syntax (recommended) - plugin type is automatically inferred
+# Plugin type is automatically inferred
 meltano remove <name>
 meltano remove <name> <name_two>
-
-# Deprecated syntax - will be removed in v4
-meltano remove <type> <name>
-meltano remove <type> <name> <name_two>
 ```
 
 ### Using `remove` with Environments
@@ -1129,13 +1166,9 @@ The `remove` command does not run relative to a [Meltano Environment](https://do
 ### Examples
 
 ```bash
-# New syntax - plugin type is automatically inferred
+# Plugin type is automatically inferred
 meltano remove tap-gitlab
 meltano remove target-postgres target-csv
-
-# Deprecated syntax - will be removed in v4
-meltano remove extractor tap-gitlab
-meltano remove loader target-postgres target-csv
 ```
 
 ## `run`
@@ -1168,6 +1201,7 @@ meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
 meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 meltano run --refresh-catalog tap-salesforce target-postgres
+meltano run --timeout 3600 tap-gitlab target-postgres
 ```
 
 #### Parameters
@@ -1176,14 +1210,15 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
   (implicitly enables --log-level=debug for 'console' named handlers).
-- `--no-state-update` will disable state saving for this invocation.
+- `--no-state-update` will disable state saving for this invocation. Can also be set via `MELTANO_RUN_NO_STATE_UPDATE` environment variable.
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
-- `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
-- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--state-id-suffix` defines a custom suffix to generate a state ID with for each EL pair. Can also be set via `MELTANO_RUN_STATE_ID_SUFFIX` environment variable.
+- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. Can also be set via `MELTANO_RUN_STATE_STRATEGY` environment variable. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
-- `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
-- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
+- `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano. Can also be set via `MELTANO_RUN_ID` environment variable.
+- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs. Can also be set via `MELTANO_RUN_REFRESH_CATALOG` environment variable.
+- `--timeout` will set a maximum duration (in seconds) for the pipeline run. After this time, the pipeline will be gracefully terminated. The `MELTANO_RUN_TIMEOUT` environment variable can be used to set this behavior. This is useful for preventing pipelines from running indefinitely and allows for preview runs or limiting resource usage.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
 Examples:
@@ -1206,6 +1241,27 @@ meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-s
 
 # run a pipeline, merging state with that of previous runs.
 meltano --environment=dev run --state-strategy=merge tap-gitlab target-postgres
+
+# run a pipeline with a timeout of 3600 seconds (1 hour)
+meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
+
+# run a pipeline with timeout set via environment variable
+MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with state-id-suffix set via environment variable
+MELTANO_RUN_STATE_ID_SUFFIX=pipeline-alias meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with state strategy set via environment variable
+MELTANO_RUN_STATE_STRATEGY=merge meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with no state update via environment variable
+MELTANO_RUN_NO_STATE_UPDATE=1 meltano --environment=dev run tap-gitlab target-postgres
+
+# run a pipeline with refresh catalog via environment variable
+MELTANO_RUN_REFRESH_CATALOG=1 meltano --environment=dev run tap-salesforce target-postgres
+
+# run a pipeline with run ID set via environment variable
+MELTANO_RUN_ID=550e8400-e29b-41d4-a716-446655440000 meltano --environment=dev run tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments
@@ -1618,6 +1674,59 @@ meltano state clear --force dev:tap-gitlab-to-target-jsonl
 
 Retrieve state for a given `state_id`.
 
+<Tabs className="meltano-tabs" groupId="meltano-version">
+  <TabItem className="meltano-tab-content" value="v4" label="Meltano v4+" default>
+
+:::info Output Format Change in v4
+
+In Meltano v4, the default output format for `meltano state get` changed from pretty-printed (indented) JSON to compact single-line JSON. This makes the output directly compatible with `meltano state set` without manual reformatting.
+
+- **Default behavior (v4+)**: Compact single-line JSON, ready to pipe or paste into `meltano state set`
+- **Legacy behavior (v3)**: Pretty-printed indented JSON for human readability
+
+To get the legacy pretty-printed format in v4, use `--format=pretty`.
+
+:::
+
+#### How to use
+
+```bash
+# Get state in compact format (default - ready for meltano state set)
+meltano state get <state_id>
+
+# Get state in pretty-printed format for human readability
+meltano state get <state_id> --format=pretty
+```
+
+#### Parameters
+
+- The `--format` option controls the output format:
+  - `json` (default): Compact single-line JSON, ready to use with `meltano state set`
+  - `pretty`: Human-readable indented JSON (legacy v3 behavior)
+
+#### Examples
+
+```bash
+# Get state in compact format (default)
+meltano state get dev:tap-gitlab-to-target-jsonl
+
+# Get state in pretty format
+meltano state get dev:tap-gitlab-to-target-jsonl --format=pretty
+
+# Round-trip example: copy state from one state ID to another
+meltano state get dev:tap-gitlab-to-target-jsonl | \
+  meltano state set --force prod:tap-gitlab-to-target-jsonl "$(cat)"
+
+# Save state to a file in compact format
+meltano state get dev:tap-gitlab-to-target-jsonl > state-backup.json
+
+# Restore state from a file
+meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file state-backup.json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="legacy" label="Legacy (pre-v4)">
+
 #### How to use
 
 ```bash
@@ -1630,6 +1739,17 @@ meltano state get <state_id>
 # Print the state that would be used in the next run of dev:tap-gitlab-to-target-jsonl
 meltano state get dev:tap-gitlab-to-target-jsonl
 ```
+
+:::note Legacy Behavior
+
+In Meltano v3 and earlier, `meltano state get` outputs pretty-printed (indented) JSON by default. To use this output with `meltano state set`, you needed to manually reformat it to compact JSON.
+
+In Meltano v4+, the default changed to compact single-line JSON that's directly compatible with `meltano state set`.
+
+:::
+
+  </TabItem>
+</Tabs>
 
 ### list
 
@@ -1751,28 +1871,44 @@ meltano state move original-tap-postgres-to-target-jsonl variant-tap-postgres-to
 
 Set state for a job.
 
+By default, `meltano state set` validates that the provided state is valid Singer state with a top-level `singer_state` key. This helps catch configuration errors before they cause unexpected full refreshes in future pipeline runs.
+
 #### How to use
 
 ```bash
 # Read state from a file
-# Meltano will prompt for confirmation.
+# Meltano will prompt for confirmation and validate the state format.
 meltano state set <state_id> --input-file <file>
 
 # Read state from a file, overriding confirmation prompt.
 meltano state set --force <state_id> --input-file <file>
 
 # Read state from a command-line argument
-# Meltano will prompt for confirmation.
+# Meltano will prompt for confirmation and validate the state format.
 meltano state set <state_id> <RAW STATE JSON>
 
 # Read state from a command-line argument, overriding confirmation prompt.
 meltano state set --force <state_id> <RAW STATE JSON>
+
+# Skip validation (not recommended)
+meltano state set --force --no-validate <state_id> <RAW STATE JSON>
 ```
 
 #### Parameters
 
 - The `--input-file` option specifies a file to read the state from.
 - The `--force` option will disable confirmation prompts. _Use with caution._
+- The `--no-validate` option will skip state format validation. _Use with caution._ This should only be used in edge cases where you need to set non-standard state. Invalid state may cause issues in future pipeline runs.
+
+:::warning Validation Behavior
+
+By default, `meltano state set` validates that:
+- The provided value is valid JSON
+- The JSON contains a top-level `singer_state` key
+
+If validation fails, you'll see a clear error message. You can bypass validation with `--no-validate`, but this is not recommended as invalid state may cause unexpected full refreshes in subsequent runs.
+
+:::
 
 #### Examples
 
@@ -1787,6 +1923,16 @@ meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"pro
 # These two lines have the same effect as the one line above.
 echo '{"singer_state": {"project_123456_issues": "2020-01-01"}}' > gitlab_state.json
 meltano state set --force dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.json
+
+# Example of validation error
+meltano state set --force dev:tap-gitlab-to-target-jsonl '{"invalid": "state"}'
+# Error: Invalid state format: singer_state not found in top level of provided state.
+# State must be valid JSON with a top-level 'singer_state' key.
+# Use --no-validate to bypass this check.
+
+# Bypass validation for edge cases (not recommended)
+meltano state set --force --no-validate dev:tap-gitlab-to-target-jsonl '{"custom": "format"}'
+# WARNING: Skipping state validation. Invalid state may cause issues in future runs.
 ```
 
 ### Using `state` with Environments
@@ -1834,10 +1980,14 @@ When called without arguments, this will:
 meltano upgrade
 meltano upgrade --skip-package # Skip upgrading the Meltano package
 
-meltano upgrade package # Only upgrade Meltano package
+meltano upgrade package # Only upgrade Meltano package (can run outside project directory)
 meltano upgrade files # Only update files managed by file bundles
 meltano upgrade database # Only apply migrations to system database
 ```
+
+### Project Directory Requirements
+
+The `upgrade` command and its subcommands require you to run them from within a Meltano project directory, with the exception of `meltano upgrade package`, which can be run from anywhere since it only upgrades the Meltano package itself.
 
 ### Using `upgrade` with Environments
 

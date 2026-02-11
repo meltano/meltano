@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import errno
-import importlib.metadata
 import os
 import sys
 import threading
@@ -12,12 +11,12 @@ from contextlib import contextmanager
 from functools import cached_property
 from pathlib import Path
 
-import fasteners  # type: ignore[import-untyped]
+import fasteners
 import structlog
 from dotenv import dotenv_values
 
 from meltano.core import yaml
-from meltano.core.behavior.versioned import Versioned
+from meltano.core._compat import MeltanoInternalDeprecationWarning, deprecated
 from meltano.core.config_service import ConfigService
 from meltano.core.environment import Environment
 from meltano.core.error import (
@@ -26,10 +25,16 @@ from meltano.core.error import (
     ProjectReadonly,
 )
 from meltano.core.hub import MeltanoHubService
+from meltano.core.project_dirs_service import ProjectDirsService
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.utils import makedirs, sanitize_filename, truthy
+from meltano.core.utils import (
+    check_meltano_compatibility,
+    get_meltano_version,
+    makedirs,
+    truthy,
+)
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
@@ -65,10 +70,9 @@ def walk_parent_directories() -> Generator[Path, None, None]:
         directory = parent_directory
 
 
-class Project(Versioned):
+class Project:
     """Represents a Meltano project."""
 
-    __version__ = 1
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
@@ -172,17 +176,26 @@ class Project(Versioned):
         return MeltanoHubService(self)
 
     @cached_property
-    def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
-        return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
+    def dirs(self) -> ProjectDirsService:
+        """Get the project directories service.
+
+        Returns:
+            A `ProjectDirsService` instance for this project.
+        """
+        return ProjectDirsService.from_project(self)
 
     @cached_property
+    def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
+        return fasteners.InterProcessLock(self.dirs.run().joinpath("meltano.yml.lock"))
+
+    @property
     def user_agent(self) -> str:
         """Get the user agent for this project.
 
         Returns:
             the user agent string for this project
         """
-        return f"Meltano/{importlib.metadata.version('meltano')}"
+        return f"Meltano/{get_meltano_version()}"
 
     @property
     def env(self) -> dict[str, str]:
@@ -212,7 +225,7 @@ class Project(Versioned):
         """
         import ctypes
 
-        project.ensure_compatible()
+        check_meltano_compatibility(project.meltano.requires_meltano)
 
         # create a symlink to our current binary
         try:
@@ -222,21 +235,21 @@ class Project(Versioned):
                 # Admin privileges are required to create symlinks on Windows
                 if ctypes.windll.shell32.IsUserAnAdmin():  # type: ignore[attr-defined]
                     if executable.is_file():
-                        project.run_dir().joinpath("bin").symlink_to(executable)
+                        project.dirs.run().joinpath("bin").symlink_to(executable)
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "  # noqa: G004
                             f"present in {Path(sys.executable).parent!s}",
                         )
                 else:
-                    logger.warning(
+                    logger.debug(
                         "Failed to create symlink to 'meltano.exe': "
                         "administrator privilege required",
                     )
             else:
                 executable = Path(sys.executable).parent / "meltano"
                 if executable.is_file():
-                    project.run_dir().joinpath("bin").symlink_to(executable)
+                    project.dirs.run().joinpath("bin").symlink_to(executable)
         except FileExistsError:
             pass
         except OSError as error:
@@ -368,6 +381,10 @@ class Project(Versioned):
 
         self.refresh()
 
+    @deprecated(
+        "Use `dirs.root_dir` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     def root_dir(self, *joinpaths: StrPath) -> Path:
         """Return the root directory of this project, optionally joined with path.
 
@@ -377,7 +394,7 @@ class Project(Versioned):
         Returns:
             project root joined with provided subdirs and/or file
         """
-        return self.root.joinpath(*joinpaths)
+        return self.dirs.root_dir(*joinpaths)
 
     @property
     def meltanofile(self) -> Path:
@@ -404,13 +421,13 @@ class Project(Versioned):
         return self.root.joinpath(".env")
 
     @cached_property
-    def dotenv_env(self) -> dict[str, str | None]:
+    def dotenv_env(self) -> dict[str, str]:
         """Get values from this project's .env file.
 
         Returns:
-            values found in this project's .env file
+            Values found in this project's .env file, with None values filtered out.
         """
-        return dotenv_values(self.dotenv)
+        return {k: v for k, v in dotenv_values(self.dotenv).items() if v is not None}
 
     def activate_environment(self, name: str) -> None:
         """Activate a Meltano environment.
@@ -447,8 +464,12 @@ class Project(Versioned):
         yield self.dotenv
         self.refresh()
 
+    @deprecated(
+        "Use `dirs.meltano` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
-    def meltano_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
+    def meltano_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
         """Path to the project `.meltano` directory.
 
         Args:
@@ -458,34 +479,12 @@ class Project(Versioned):
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
         """
-        return self.sys_dir_root.joinpath(*joinpaths)
+        return self.dirs.meltano(*joinpaths, make_dirs=make_dirs)
 
-    @makedirs
-    def analyze_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
-        """Path to the project `analyze` directory.
-
-        Args:
-            joinpaths: Paths to join to the `analyze` directory.
-            make_dirs: Whether to create the directory hierarchy if it doesn't exist.
-
-        Returns:
-            Resolved path to `analyze` dir optionally joined to given paths.
-        """
-        return self.root_dir("analyze", *joinpaths)
-
-    @makedirs
-    def extract_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
-        """Path to the project `extract` directory.
-
-        Args:
-            joinpaths: Paths to join to the `extract` directory.
-            make_dirs: Whether to create the directory hierarchy if it doesn't exist.
-
-        Returns:
-            Resolved path to `extract` dir optionally joined to given paths.
-        """
-        return self.root_dir("extract", *joinpaths)
-
+    @deprecated(
+        "Use `dirs.venvs` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def venvs_dir(self, *prefixes: StrPath, make_dirs: bool = True) -> Path:
         """Path to a `venv` directory in `.meltano`.
@@ -497,8 +496,12 @@ class Project(Versioned):
         Returns:
             Resolved path to `venv` dir optionally prepended with given prefixes.
         """
-        return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
+        return self.dirs.venvs(*prefixes, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.run` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def run_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
         """Path to the `run` directory in `.meltano`.
@@ -510,8 +513,12 @@ class Project(Versioned):
         Returns:
             Resolved path to `run` dir optionally joined to given paths.
         """
-        return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
+        return self.dirs.run(*joinpaths, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.logs` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def logs_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
         """Path to the `logs` directory in `.meltano`.
@@ -523,8 +530,12 @@ class Project(Versioned):
         Returns:
             Resolved path to `logs` dir optionally joined to given paths.
         """
-        return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
+        return self.dirs.logs(*joinpaths, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.job` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def job_dir(
         self,
@@ -542,13 +553,12 @@ class Project(Versioned):
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.run_dir(
-            "elt",
-            sanitize_filename(state_id),
-            *joinpaths,
-            make_dirs=make_dirs,
-        )
+        return self.dirs.job(state_id, *joinpaths, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.job_logs` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def job_logs_dir(
         self,
@@ -566,13 +576,12 @@ class Project(Versioned):
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.logs_dir(
-            "elt",
-            sanitize_filename(state_id),
-            *joinpaths,
-            make_dirs=make_dirs,
-        )
+        return self.dirs.job_logs(state_id, *joinpaths, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.plugin` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def plugin_dir(
         self,
@@ -590,15 +599,14 @@ class Project(Versioned):
         Returns:
             Resolved path to plugin installation dir optionally joined to given paths.
         """
-        return self.meltano_dir(
-            plugin.type,
-            plugin.plugin_dir_name,
-            *joinpaths,
-            make_dirs=make_dirs,
-        )
+        return self.dirs.plugin(plugin, *joinpaths, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.root_plugins` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
-    def root_plugins_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
+    def root_plugins_dir(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
         """Path to the project `plugins` directory.
 
         Args:
@@ -608,8 +616,12 @@ class Project(Versioned):
         Returns:
             Path to the project `plugins` directory.
         """
-        return self.root_dir("plugins", *joinpaths)
+        return self.dirs.root_plugins(*joinpaths, make_dirs=make_dirs)
 
+    @deprecated(
+        "Use `dirs.plugin_lock_path` instead.",
+        category=MeltanoInternalDeprecationWarning,
+    )
     @makedirs
     def plugin_lock_path(
         self,
@@ -630,14 +642,10 @@ class Project(Versioned):
         Returns:
             Path to the plugin lock file.
         """
-        filename = f"{plugin_name}"
-
-        if variant_name:
-            filename = f"{filename}--{variant_name}"
-
-        return self.root_plugins_dir(
+        return self.dirs.plugin_lock_path(
             plugin_type,
-            f"{filename}.lock",
+            plugin_name,
+            variant_name=variant_name,
             make_dirs=make_dirs,
         )
 
@@ -659,3 +667,11 @@ class Project(Versioned):
             Project hash.
         """
         return self.root.__hash__()
+
+    def __repr__(self) -> str:
+        """Project representation.
+
+        Returns:
+            Project representation.
+        """
+        return f"Project({self.root!r})"

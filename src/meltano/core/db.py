@@ -147,7 +147,7 @@ def connect(
             return engine.connect()
         except OperationalError:  # noqa: PERF203
             if attempt >= max_retries:
-                logger.error(
+                logger.error(  # noqa: TRY400
                     f"Could not connect to the database after {attempt} "  # noqa: G004
                     "attempts. Max retries exceeded.",
                 )
@@ -183,7 +183,7 @@ def init_hook(engine: Engine) -> None:
             try:
                 hook(conn)
             except Exception as ex:
-                raise Exception(f"Failed to initialize database: {ex!s}") from ex  # noqa: EM102
+                raise Exception(f"Failed to initialize database: {ex!s}") from ex  # noqa: EM102, TRY002, TRY003
 
 
 def ensure_schema_exists(

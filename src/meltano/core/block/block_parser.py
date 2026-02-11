@@ -12,8 +12,8 @@ import click
 from meltano.core._state import StateStrategy
 from meltano.core.block.blockset import BlockSet, BlockSetValidationError
 from meltano.core.block.extract_load import ELBContextBuilder, ExtractLoadBlocks
-from meltano.core.block.plugin_command import PluginCommandBlock, plugin_command_invoker
-from meltano.core.block.singer import CONSUMERS, SingerBlock
+from meltano.core.block.plugin_command import plugin_command_invoker
+from meltano.core.block.singer import CONSUMERS
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.task_sets_service import TaskSetsService
@@ -24,6 +24,8 @@ if t.TYPE_CHECKING:
 
     import structlog
 
+    from meltano.core.block.plugin_command import InvokerCommand
+    from meltano.core.block.singer import SingerBlock
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -46,7 +48,7 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
 
 def validate_block_sets(
     log: structlog.BoundLogger,
-    blocks: list[BlockSet | PluginCommandBlock],
+    blocks: list[InvokerCommand | ExtractLoadBlocks],
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
@@ -62,8 +64,8 @@ def validate_block_sets(
             log.debug("validating ExtractLoadBlock.", set_number=idx)
             try:
                 blk.validate_set()
-            except Exception as err:
-                log.error("Validation failed.", err=err)
+            except Exception as err:  # noqa: BLE001
+                log.error("Validation failed.", err=err)  # noqa: TRY400
                 return False
     return True
 
@@ -80,7 +82,7 @@ class BlockParser:  # noqa: D101
         no_state_update: bool | None = False,
         force: bool | None = False,
         state_id_suffix: str | None = None,
-        state_strategy: StateStrategy = StateStrategy.AUTO,
+        state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
     ):
         """Parse a meltano run command invocation into a list of blocks.
@@ -130,10 +132,10 @@ class BlockParser:  # noqa: D101
             try:
                 plugin = self.project.plugins.find_plugin(parsed_name)
             except PluginNotFoundError as e:
-                raise click.ClickException(f"Block {name} not found") from e  # noqa: EM102
+                raise click.ClickException(f"Block {name} not found") from e  # noqa: EM102, TRY003
 
             if plugin and task_sets_service.exists(name):
-                raise click.ClickException(
+                raise click.ClickException(  # noqa: TRY003
                     f"Ambiguous reference to '{name}' which matches a job "  # noqa: EM102
                     "name AND a plugin name.",
                 )
@@ -192,7 +194,7 @@ class BlockParser:  # noqa: D101
     def find_blocks(
         self,
         offset: int = 0,
-    ) -> Generator[BlockSet | PluginCommandBlock | ExtractLoadBlocks, None, None]:
+    ) -> Generator[ExtractLoadBlocks | InvokerCommand, None, None]:
         """Find all blocks in the invocation.
 
         Args:
@@ -226,7 +228,7 @@ class BlockParser:  # noqa: D101
                 )
                 cur += 1
             else:
-                raise BlockSetValidationError(
+                raise BlockSetValidationError(  # noqa: TRY003
                     "Unknown command type or bad block sequence at index "  # noqa: EM102
                     f"{cur + 1}, starting block '{plugin.name}'",
                 )
@@ -306,7 +308,7 @@ class BlockParser:  # noqa: D101
                         "Found unexpected mapper plugin name. ",
                         plugin_name=plugin.name,
                     )
-                    raise BlockSetValidationError(
+                    raise BlockSetValidationError(  # noqa: TRY003
                         f"Expected unique mappings name not the mapper plugin "  # noqa: EM102
                         f"name: {plugin.name}.",
                     )
@@ -323,7 +325,7 @@ class BlockParser:  # noqa: D101
                     plugin_type=plugin.type,
                     plugin_name=plugin.name,
                 )
-                raise BlockSetValidationError(
+                raise BlockSetValidationError(  # noqa: TRY003
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",  # noqa: EM102
                 )
-        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101
+        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101, TRY003

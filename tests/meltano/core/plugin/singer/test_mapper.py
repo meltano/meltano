@@ -33,6 +33,7 @@ class TestSingerMapper:
                                 "field_id": "author_email",
                                 "tap_stream_name": "commits",
                                 "type": "MASK-HIDDEN",
+                                "foo": "$ENV_FOO",
                             },
                         ],
                     },
@@ -45,6 +46,7 @@ class TestSingerMapper:
                                 "field_id": "given_name",
                                 "tap_stream_name": "users",
                                 "type": "lowercase",
+                                "foo": "$ENV_FOO",
                             },
                         ],
                     },
@@ -80,9 +82,11 @@ class TestSingerMapper:
         subject: ProjectPlugin,
         session: Session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
 
+        monkeypatch.setenv("ENV_FOO", "env_foo")
         async with invoker.prepared(session):
             config_path = invoker.files["config"]
 
@@ -95,6 +99,7 @@ class TestSingerMapper:
                         "field_id": "author_email",
                         "tap_stream_name": "commits",
                         "type": "MASK-HIDDEN",
+                        "foo": "env_foo",
                     },
                 ],
                 "parent_mapper_setting": "parent_mapper_setting_value",

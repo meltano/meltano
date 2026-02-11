@@ -6,6 +6,7 @@ import json
 import typing as t
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -32,7 +33,7 @@ class JobFactory:
         self,
         session: Session,
         *,
-        job_name: str = "tap-gitlab target-postgres",
+        job_name: str = "tap-gitlab-target-postgres",
         state: State = State.SUCCESS,
         run_id: str | None = None,
         log_content: str = "Test log content\nLine 2\nLine 3",
@@ -91,11 +92,11 @@ class TestLogsShow:
             result = cli_runner.invoke(cli, ["logs", "show", str(job.run_id)])
 
         assert result.exit_code == 0
-        assert "Latest log content" in result.output
-        assert "With multiple lines" in result.output
-        assert f"Job: {job.job_name}" in result.output
-        assert f"Run ID: {job.run_id}" in result.output
-        assert "State: SUCCESS" in result.output
+        assert "Latest log content" in result.stdout
+        assert "With multiple lines" in result.stdout
+        assert f"Job: {job.job_name}" in result.stdout
+        assert f"Run ID: {job.run_id}" in result.stdout
+        assert "State: SUCCESS" in result.stdout
 
     def test_show_specific_run(
         self,
@@ -119,8 +120,8 @@ class TestLogsShow:
             )
 
         assert result.exit_code == 0
-        assert "First run log" in result.output
-        assert "Second run log" not in result.output
+        assert "First run log" in result.stdout
+        assert "Second run log" not in result.stdout
 
     def test_list_runs(
         self,
@@ -143,14 +144,14 @@ class TestLogsShow:
             result = cli_runner.invoke(cli, ["logs", "list"])
 
         assert result.exit_code == 0
-        assert "Recent job runs" in result.output
-        assert str(job1.run_id) in result.output
-        assert str(job2.run_id) in result.output
-        assert str(job3.run_id) in result.output
-        assert str(job4.run_id) in result.output
-        assert result.output.count("✓") == 2  # Success marker
-        assert result.output.count("✗") == 1  # Fail marker
-        assert result.output.count("→") == 1  # Running marker
+        assert "Recent job runs" in result.stdout
+        assert str(job1.run_id) in result.stdout
+        assert str(job2.run_id) in result.stdout
+        assert str(job3.run_id) in result.stdout
+        assert str(job4.run_id) in result.stdout
+        assert result.stdout.count("✓") == 2  # Success marker
+        assert result.stdout.count("✗") == 1  # Fail marker
+        assert result.stdout.count("→") == 1  # Running marker
 
     def test_list_runs_json_format(
         self,
@@ -171,7 +172,7 @@ class TestLogsShow:
             )
 
         assert result.exit_code == 0
-        data = json.loads(result.output)
+        data = json.loads(result.stdout)
         assert "runs" in data
         assert len(data["runs"]) >= 1
         run_ids = [run["log_id"] for run in data["runs"]]
@@ -203,7 +204,7 @@ class TestLogsShow:
         first_idx = max(100 - tail + 1, 1)
         lines_present = [f"Line {i}" for i in range(first_idx, 100)]
         lines_not_present = [f"Line {i}" for i in range(1, first_idx)]
-        log_lines = result.output.splitlines()
+        log_lines = result.stdout.splitlines()
         assert all(line in log_lines for line in lines_present)
         assert all(line not in log_lines for line in lines_not_present)
 
@@ -214,7 +215,7 @@ class TestLogsShow:
     ):
         """Test error when no logs are found."""
         job = Job(
-            job_name="tap-gitlab target-postgres",
+            job_name="tap-gitlab-target-postgres",
             state=State.SUCCESS,
             started_at=datetime.now(timezone.utc),
         )
@@ -242,7 +243,7 @@ class TestLogsShow:
 
         # Should succeed but show no runs message
         assert result.exit_code == 0
-        assert "No job runs found." in result.output
+        assert "No job runs found." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_missing_run_id(self, cli_runner: MeltanoCliRunner):
@@ -279,9 +280,9 @@ class TestLogsShow:
             )
 
         assert result.exit_code == 0
-        assert "Log file is large" in result.output
-        assert "Do you want to display it anyway?" in result.output
-        assert "Log file path:" in result.output
+        assert "Log file is large" in result.stdout
+        assert "Do you want to display it anyway?" in result.stdout
+        assert "Log file path:" in result.stdout
 
         # Test accepting confirmation
         with mock.patch(
@@ -295,7 +296,7 @@ class TestLogsShow:
             )
 
         assert result.exit_code == 0
-        assert "Log file is large" in result.output
+        assert "Log file is large" in result.stdout
         # The large content would be displayed
 
     def test_json_format_with_log_display(
@@ -318,7 +319,7 @@ class TestLogsShow:
 
         assert result.exit_code == 0
         # Job info should be in JSON format
-        lines = result.output.strip().split("\n")
+        lines = result.stdout.strip().split("\n")
         json_end = next((i for i, line in enumerate(lines) if line == "}"), None)
         assert json_end is not None
         json_str = "\n".join(lines[: json_end + 1])
@@ -336,3 +337,24 @@ class TestLogsShow:
         # This would require mocking the legacy_logs_dir method
         # to return a valid path and creating logs there
         # Placeholder for legacy log test
+
+    def test_logs_directory(
+        self,
+        session: Session,
+        cli_runner: MeltanoCliRunner,
+        job_factory: JobFactory,
+    ):
+        """Test showing the logs directory."""
+        job = job_factory.create(
+            session,
+            state=State.SUCCESS,
+            log_content="Is this in the right directory?",
+        )
+        result = cli_runner.invoke(cli, ["logs", "dir"])
+        assert result.exit_code == 0
+
+        path = Path(result.stdout.strip())
+        assert path.parent.is_dir()
+
+        log_path = path / "elt" / job.job_name / str(job.run_id) / "elt.log"
+        assert log_path.read_text() == "Is this in the right directory?"

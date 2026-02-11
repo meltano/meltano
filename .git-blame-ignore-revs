@@ -30,3 +30,6 @@ dcdd9f09c105baf2f10d3214a730aa3f6c535726
 
 # feat(core): Support emitting logs with timestamps in local time
 4560c05ada3d3e462ceeeae728455c4943e0a5c5
+
+# chore: Ignore ty errors
+a9071fc99e484d189d675c9d4b70887586497ab6

@@ -12,7 +12,7 @@ from meltano.core.plugin.command import Command
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.utils import flatten, uniques_in
+from meltano.core.utils import check_meltano_compatibility, flatten, uniques_in
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -70,6 +70,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     variant: str | None
     executable: str
     python: str | None
+    definition: PluginDefinition
 
     config_files: dict[str, str]
 
@@ -88,6 +89,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         settings: list | None = None,
         commands: dict[str, Command] | None = None,
         requires: dict[PluginType, list[PluginRequirement]] | None = None,
+        requires_meltano: str | None = None,
         config: dict[str, t.Any] | None = None,
         default_variant: str = Variant.DEFAULT_NAME,
         env: dict[str, str] | None = None,
@@ -110,6 +112,8 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             settings: Settings.
             commands: Plugin commands.
             requires: Plugin requirements.
+            requires_meltano: A version specifier for the Meltano version required by
+                this plugin.
             config: Plugin configuration.
             default_variant: Default variant for this plugin.
             env: Environment variables to inject into plugins runtime context.
@@ -143,6 +147,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 settings_group_validation=settings_group_validation,
                 settings=settings,
                 requires=requires,
+                requires_meltano=requires_meltano,
                 **extras,
             )
 
@@ -169,6 +174,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.settings = list(map(SettingDefinition.parse, settings or []))
         self.commands = Command.parse_all(commands)
         self.requires = PluginRequirement.parse_all(requires)
+        self.requires_meltano = requires_meltano
         self.env = env or {}
 
         self._fallbacks.update(
@@ -181,6 +187,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 "executable",
                 "capabilities",
                 "settings_group_validation",
+                "requires_meltano",
             ],
         )
 
@@ -205,12 +212,6 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
         self.config = copy.deepcopy(config or {})
         self.extras = extras
-
-        if "profiles" in extras:
-            logger.warning(
-                "Plugin configuration profiles are no longer supported, ignoring "  # noqa: G004
-                f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
-            )
 
     def __repr__(self) -> str:
         """Return a string representation of the project plugin."""
@@ -498,3 +499,12 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.type is PluginType.MAPPERS and bool(
             self.extra_config.get("_mapping"),
         )
+
+    def ensure_compatible(self) -> None:
+        """Check if this plugin is compatible with the current Meltano version.
+
+        Raises:
+            IncompatibleMeltanoVersionError: If the plugin requires a different
+                Meltano version than the one currently installed.
+        """
+        check_meltano_compatibility(self.requires_meltano)

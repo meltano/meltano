@@ -10,6 +10,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.db import project_engine
+from meltano.core.error import MeltanoError
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
 from meltano.core.state_store.db import DBStateStoreManager
 
@@ -19,8 +20,6 @@ else:
     from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
-    from collections.abc import Mapping
-
     from sqlalchemy.orm import Session
 
     from meltano.core.project_settings_service import ProjectSettingsService
@@ -41,6 +40,26 @@ __all__ = [
 logger = get_logger(__name__)
 
 SYSTEMDB = "systemdb"
+SCHEME_TO_NAMESPACE = {
+    "gs": "gcs",
+}
+
+
+class StateBackendNotFoundError(MeltanoError):
+    """No state backend found for the given scheme."""
+
+    def __init__(self, scheme: str):
+        """Create a new NoStateBackendFoundError.
+
+        Args:
+            scheme: The scheme of the StateBackend.
+        """
+        self.scheme = scheme
+        super().__init__(
+            f"No state backend found for scheme '{scheme}', available backends are: "
+            f"{', '.join(StateBackend.backends())}",
+            instruction="Install the add-on that provides it",
+        )
 
 
 class StateBackend:
@@ -49,14 +68,6 @@ class StateBackend:
     addon: MeltanoAddon[type[StateStoreManager]] = MeltanoAddon(
         "meltano.state_backends",
     )
-
-    def __init__(self, scheme: str) -> None:
-        """Create a new StateBackend.
-
-        Args:
-            scheme: The scheme of the StateBackend.
-        """
-        self.scheme = scheme
 
     @classmethod
     def backends(cls) -> list[str]:
@@ -70,8 +81,8 @@ class StateBackend:
             *(ep.name for ep in cls.addon.installed),
         ]
 
-    @property
-    def manager(self) -> type[StateStoreManager]:
+    @classmethod
+    def get_manager_factory(cls, *, scheme: str) -> type[StateStoreManager]:
         """Get the StateStoreManager associated with this StateBackend.
 
         Returns:
@@ -81,11 +92,9 @@ class StateBackend:
             ValueError: If no state backend is found for the scheme.
         """
         try:
-            manager = self.addon.get(self.scheme)
+            manager = cls.addon.get(scheme)
         except KeyError:
-            msg = f"No state backend found for scheme '{self.scheme}'. "
-            msg += "Available backends: " + ", ".join(self.backends())
-            raise ValueError(msg) from None
+            raise StateBackendNotFoundError(scheme) from None
 
         logger.info("Using %s add-on state backend", manager.__name__)
         return manager
@@ -112,19 +121,35 @@ def state_store_manager_from_project_settings(
         )
 
     scheme = urlparse(state_backend_uri).scheme
-    # Get backend-specific settings
-    # AND top-level state_backend settings
-    setting_defs = filter(
-        lambda setting_def: setting_def.name.startswith(
-            f"state_backend.{'gcs' if scheme == 'gs' else scheme}",
+    manager_factory = StateBackend.get_manager_factory(scheme=scheme)
+    return manager_factory(
+        **_settings_to_manager_kwargs(
+            settings=settings_service,
+            namespace=SCHEME_TO_NAMESPACE.get(scheme, scheme),
         )
-        or (
-            setting_def.name.startswith("state_backend")
-            and len(setting_def.name.split(".")) == 2
-        ),
-        settings_service.setting_definitions,
     )
-    settings = (setting_def.name for setting_def in setting_defs)
-    backend = StateBackend(scheme).manager
-    kwargs = {name.split(".")[-1]: settings_service.get(name) for name in settings}
-    return backend(**kwargs)
+
+
+def _settings_to_manager_kwargs(
+    *,
+    settings: ProjectSettingsService,
+    namespace: str,
+) -> dict[str, t.Any]:
+    """Create a dictionary of keyword arguments for a state store manager from settings.
+
+    Args:
+        settings: the settings to use.
+        namespace: the setting namespace that corresponds to this manager.
+    """
+    kwargs = {}
+    for setting_def in settings.setting_definitions:
+        parts = setting_def.name.split(".")
+        if parts[0] != "state_backend" or len(parts) < 2:
+            continue
+
+        # e.g. "state_backend.s3.[aws_access_key_id]"
+        # or "state_backend.[lock_timeout_seconds]"
+        if len(parts) == 2 or (parts[1] == namespace):
+            kwargs[parts[-1]] = settings.get(setting_def.name)
+
+    return kwargs

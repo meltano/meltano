@@ -16,7 +16,7 @@ from meltano.cli.utils import (
     PartialInstrumentedCmd,
 )
 from meltano.core.block.block_parser import BlockParser, validate_block_sets
-from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
+from meltano.core.task_sets import InvalidTasksError, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
     JobAlreadyExistsError,
     JobNotFoundError,
@@ -26,6 +26,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.task_sets import TaskSets
     from meltano.core.tracking import Tracker
 
 logger = structlog.getLogger(__name__)
@@ -80,14 +81,14 @@ def _list_all_jobs(  # noqa: D417
                 {
                     "jobs": [
                         {"job_name": tset.name, "tasks": tset.tasks}
-                        for tset in task_sets_service.list()
+                        for tset in task_sets_service.list_task_sets()
                     ],
                 },
                 indent=2,
             ),
         )
     elif list_format == "text":
-        for task_set in task_sets_service.list():
+        for task_set in task_sets_service.list_task_sets():
             click.echo(f"{task_set.name}: {task_set.tasks}")
     tracker: Tracker = ctx.obj["tracker"]
     tracker.track_command_event(CliEvent.completed)
@@ -202,7 +203,7 @@ def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
         task_sets_service.add(task_sets)
     except JobAlreadyExistsError as serr:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError(f"Job '{task_sets.name}' already exists.") from serr  # noqa: EM102
+        raise CliError(f"Job '{task_sets.name}' already exists.") from serr  # noqa: EM102, TRY003
 
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 

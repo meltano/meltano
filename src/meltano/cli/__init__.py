@@ -36,6 +36,7 @@ from meltano.cli import (
 from meltano.cli import compile as compile_module
 from meltano.cli.cli import cli
 from meltano.cli.utils import CliError
+from meltano.core._compat import MeltanoInternalDeprecationWarning
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.logging import setup_logging
 
@@ -79,9 +80,9 @@ setup_logging()
 logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to \
+Need help fixing this problem? Visit https://melta.no/ for troubleshooting steps, or to \
 join our friendly Slack community.
-"""
+"""  # noqa: E501
 
 
 def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
@@ -93,7 +94,7 @@ def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
     Raises:
         CliError: always.
     """
-    raise CliError(str(error), exit_code=error.exit_code()) from error
+    raise CliError(str(error), exit_code=error.exit_code()) from None
 
 
 def _run_cli() -> None:
@@ -106,17 +107,20 @@ def _run_cli() -> None:
         try:
             cli(obj={"project": None})
         except ProjectReadonly as err:
-            raise CliError(
+            raise CliError(  # noqa: TRY003
                 f"The requested action could not be completed: {err}",  # noqa: EM102
             ) from err
         except KeyboardInterrupt:
             raise
         except MeltanoError as err:
             handle_meltano_error(err)
+        except CliError:
+            raise
         except Exception as err:
-            raise CliError(f"{troubleshooting_message}\n{err}") from err  # noqa: EM102
+            raise CliError(str(err)) from err
     except CliError as cli_error:
         cli_error.print()
+        logger.info(troubleshooting_message)
         sys.exit(cli_error.exit_code)
 
 
@@ -125,6 +129,7 @@ def main() -> None:
     # Mark the current process as executed via the CLI
     logging.captureWarnings(capture=True)
     warnings.filterwarnings("once", category=DeprecationWarning)
+    warnings.filterwarnings("ignore", category=MeltanoInternalDeprecationWarning)
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
     try:
         _run_cli()

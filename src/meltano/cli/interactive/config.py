@@ -21,17 +21,16 @@ from rich.text import Text
 
 from meltano.cli.interactive.utils import InteractionStatus
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.settings_service import (
-    REDACTED_VALUE,
-    SettingKind,
-    SettingsService,
-    SettingValueStore,
-)
+from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent
 
 if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     from meltano.core.project import Project
+    from meltano.core.settings_service import SettingsService
+    from meltano.core.tracking.tracker import Tracker
 
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
@@ -67,19 +66,29 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 class InteractiveConfig:
     """Manage Config interactively."""
 
-    def __init__(self, ctx, store, *, extras=False, max_width=None) -> None:  # noqa: ANN001
+    def __init__(
+        self,
+        *,
+        store: SettingValueStore,
+        project: Project,
+        settings: SettingsService,
+        safe: bool,
+        session: Session,
+        tracker: Tracker,
+        extras: bool = False,
+        max_width: int | None = None,
+    ) -> None:
         """Initialise InteractiveConfig instance."""
-        self.ctx = ctx
         self.store = store
         self.extras = extras
-        self.project: Project = self.ctx.obj["project"]
-        self.settings: SettingsService = self.ctx.obj["settings"]
-        self.session = self.ctx.obj["session"]
-        self.tracker = self.ctx.obj["tracker"]
+        self.project: Project = project
+        self.settings: SettingsService = settings
+        self.session: Session = session
+        self.tracker = tracker
         self.environment_service = EnvironmentService(self.project)
         self.max_width = max_width or 75
         self.console = Console()
-        self.safe: bool = ctx.obj["safe"]
+        self.safe: bool = safe
 
     @property
     def configurable_settings(self):  # noqa: ANN201
@@ -178,7 +187,7 @@ class InteractiveConfig:
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
-            label = f"inherited from '{self.settings.plugin.parent.name}'"
+            label = f"inherited from '{self.settings.plugin.parent.name}'"  # type: ignore[attr-defined]
         else:
             label = f"from {source.label}"
 
@@ -218,7 +227,7 @@ class InteractiveConfig:
         ]
 
         details.add_row(Text("Env(s)"), Text(f"{', '.join(env_keys)}"))
-        post = []
+        post: list[Group | Text] = []
         if setting_def.description:
             post.append(
                 Group(
@@ -320,8 +329,8 @@ class InteractiveConfig:
                     )
                     click.echo()
                     click.pause()
-                    return InteractionStatus.SKIP
-                except Exception as e:
+                    return InteractionStatus.SKIP  # noqa: TRY300
+                except Exception as e:  # noqa: BLE001
                     self.tracker.track_command_event(CliEvent.inflight)
                     click.secho(f"Failed to set value: {e}", fg="red")
 
@@ -395,7 +404,14 @@ class InteractiveConfig:
                     show_set_prompt=False,
                 )
 
-    def set_value(self, setting_name, value, store, *, interactive=False) -> None:  # noqa: ANN001
+    def set_value(
+        self,
+        setting_name: tuple[str, ...],
+        value: t.Any,  # noqa: ANN401
+        store: SettingValueStore,
+        *,
+        interactive: bool = False,
+    ) -> None:
         """Set value helper function."""
         settings = self.settings
         path = list(setting_name)

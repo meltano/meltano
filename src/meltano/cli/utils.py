@@ -6,15 +6,14 @@ import os
 import signal
 import sys
 import typing as t
-import warnings
 from contextlib import contextmanager
 from enum import Enum, auto
 
 import click
 import structlog
 from click_default_group import DefaultGroup
-from click_didyoumean import DYMGroup
 
+from meltano.cli._didyoumean import DYMGroup
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin.base import PluginDefinition, PluginType
@@ -22,11 +21,11 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
-    ProjectAddService,
 )
 from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+from meltano.core.version_check import VersionCheckService
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -37,11 +36,15 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
     from meltano.core.project_plugins_service import ProjectPluginsService
 
 setup_logging()
 
 logger = structlog.stdlib.get_logger(__name__)
+
+# Commands that should skip version check
+EXCLUDED_VERSION_CHECK_COMMANDS = {"version", "upgrade", "init"}
 
 
 class CliError(Exception):
@@ -77,14 +80,15 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    if flags == AddedPluginFlags.ADDED:
-        action, preposition = "Added", "to"
-    elif flags == AddedPluginFlags.UPDATED:
-        action, preposition = "Updated", "in"
-    elif flags == AddedPluginFlags.NOT_ADDED:
-        action, preposition = "Initialized", "in"
-    else:  # pragma: no cover
-        t.assert_never(flags)
+    match flags:
+        case AddedPluginFlags.ADDED:
+            action, preposition = "Added", "to"
+        case AddedPluginFlags.UPDATED:
+            action, preposition = "Updated", "in"
+        case AddedPluginFlags.NOT_ADDED:
+            action, preposition = "Initialized", "in"
+        case _:  # pragma: no cover
+            t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",
@@ -107,6 +111,9 @@ def print_added_plugin(
 
     if docs_url := plugin.docs:
         click.echo(f"Documentation:\t{docs_url}")
+
+    if plugin.python:
+        click.echo(f"Python Version:\t{plugin.python}")
 
 
 def _prompt_plugin_namespace(plugin_type, plugin_name):  # noqa: ANN001, ANN202
@@ -199,9 +206,9 @@ def _prompt_plugin_capabilities(plugin_type):  # noqa: ANN001, ANN202
         click.style("(capabilities)", fg="blue"),
         type=list,
         default=[],
-        value_proc=lambda value: [word.strip() for word in value.split(",")]
-        if value
-        else [],
+        value_proc=lambda value: (
+            [word.strip() for word in value.split(",")] if value else []
+        ),
     )
 
 
@@ -243,11 +250,11 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
             click.style("(settings)", fg="blue"),
             type=list,
             default=[],
-            value_proc=lambda value: [
-                setting.strip().partition(":") for setting in value.split(",")
-            ]
-            if value
-            else [],
+            value_proc=lambda value: (
+                [setting.strip().partition(":") for setting in value.split(",")]
+                if value
+                else []
+            ),
         )
         try:
             settings = [
@@ -266,12 +273,11 @@ def add_plugin(  # noqa: ANN201
     *,
     python: str | None = None,
     add_service: ProjectAddService,
-    variant=None,  # noqa: ANN001
-    inherit_from=None,  # noqa: ANN001
-    custom=False,  # noqa: ANN001
-    update=False,  # noqa: ANN001
-    lock=True,  # noqa: ANN001
-    plugin_yaml=None,  # noqa: ANN001
+    variant: str | None = None,
+    inherit_from: str | None = None,
+    custom: bool = False,
+    update: bool = False,
+    plugin_yaml: dict | None = None,
 ):
     """Add Plugin to given Project."""
     if custom:
@@ -306,6 +312,7 @@ def add_plugin(  # noqa: ANN201
 
         plugin_name = plugin_attrs.pop("name")
         variant = plugin_attrs.pop("variant", variant)
+        python = plugin_attrs.pop("python", python)
 
     try:
         plugin, flags = add_service.add_with_flags(
@@ -313,7 +320,6 @@ def add_plugin(  # noqa: ANN201
             plugin_name,
             variant=variant,
             inherit_from=inherit_from,
-            lock=lock,
             update=update,
             python=python,
             **plugin_attrs,
@@ -574,7 +580,28 @@ class InstrumentedGroup(InstrumentedGroupMixin, DYMGroup):
     """Click group with telemetry instrumentation."""
 
 
-class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class _BaseMeltanoCommand(click.Command):
+    """Base class for all Meltano commands."""
+
+    def _perform_version_check(self, ctx: click.Context) -> None:
+        """Perform version check if conditions are met."""
+        # Skip version check for certain commands
+        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
+            return
+
+        # Skip if project not available or version check disabled
+        project: Project | None = ctx.obj.get("project")
+        if project is None or not ctx.obj.get("version_check_enabled", False):
+            return
+
+        version_service = VersionCheckService(project)
+
+        if (result := version_service.check_version()) and result.is_outdated:
+            # Display version update message
+            logger.warning(version_service.format_update_message(result))
+
+
+class InstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command that automatically fires telemetry events when invoked.
 
     Both starting and ending events are fired. The ending event fired is
@@ -585,6 +612,10 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+
         if ctx.obj.get("tracker"):
             tracker = ctx.obj["tracker"]
             tracker.add_contexts(CliContext.from_click_context(ctx))
@@ -599,7 +630,7 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
             super().invoke(ctx)
 
 
-class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command with partial telemetry instrumentation.
 
     Only automatically fires a 'start' event.
@@ -609,6 +640,10 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
@@ -623,23 +658,6 @@ class AutoInstallBehavior(StrEnum):
     only_install = auto()
 
 
-class PluginTypeArg(click.Choice):
-    """A click parameter that converts a string to a PluginType."""
-
-    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
-        """Initialize the PluginTypeArg."""
-        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
-
-    def convert(
-        self,
-        value: str,
-        param: click.Parameter | None,  # noqa: ARG002
-        ctx: click.Context | None,  # noqa: ARG002
-    ) -> PluginType:
-        """Convert the value to a PluginType."""
-        return PluginType.from_cli_argument(value)
-
-
 def infer_plugin_type(plugin_name: str) -> PluginType:
     """Infer the plugin type from the plugin name."""
     if plugin_name.startswith("tap-"):
@@ -648,59 +666,3 @@ def infer_plugin_type(plugin_name: str) -> PluginType:
         return PluginType.LOADERS
 
     return PluginType.UTILITIES
-
-
-def validate_plugin_type_args(
-    plugin: tuple[str, ...],
-    plugin_type: PluginType | None,
-    ctx: click.Context,
-    *,
-    support_any: bool = False,
-) -> tuple[tuple[str, ...], PluginType | None]:
-    """Validate plugin type arguments and return processed values.
-
-    Raises click.UsageError if both positional plugin type and --plugin-type flag
-    are provided. Returns tuple of (plugin_names, plugin_type).
-
-    Args:
-        plugin: The plugin arguments tuple
-        plugin_type: The plugin type from --plugin-type flag
-        ctx: Click context
-        support_any: Whether to support the "-" (ANY) argument for install command
-    """
-    if not plugin:
-        return plugin, plugin_type
-
-    if plugin[0] in PluginType.cli_arguments():
-        if plugin_type is not None:
-            msg = "Use only --plugin-type to specify plugin type"
-            raise click.UsageError(msg, ctx=ctx)
-
-        plugin_names = plugin[1:]
-        plugin_type = PluginType.from_cli_argument(plugin[0])
-        warnings.warn(
-            "Passing the plugin type as the first positional argument is deprecated "
-            "and will be removed in Meltano v4. "
-            "Please use the --plugin-type option instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return plugin_names, plugin_type
-
-    if support_any and plugin[0] == "-":
-        if plugin_type is not None:
-            msg = "Use only --plugin-type to specify plugin type"
-            raise click.UsageError(msg, ctx=ctx)
-
-        plugin_names = plugin[1:]
-        plugin_type = None
-        warnings.warn(
-            'Using "-" to specify plugins of any type is '
-            "deprecated and will be removed in Meltano v4. "
-            "It is no longer necessary to use this argument.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return plugin_names, plugin_type
-
-    return plugin, plugin_type

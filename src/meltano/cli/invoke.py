@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
 import typing as t
 
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import (
+    PluginTypeArg,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
@@ -17,11 +22,10 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
-from meltano.core.plugin import PluginType
+from meltano.core.logging.utils import capture_subprocess_output
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
-    PluginInvoker,
     UnknownCommandError,
     invoker_factory,
 )
@@ -31,6 +35,9 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.cli.params import InstallPlugins
+    from meltano.core.plugin import PluginType
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -55,7 +62,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 )
 @click.option(
     "--plugin-type",
-    type=click.Choice(PluginType.cli_arguments()),
+    type=PluginTypeArg(),
     default=None,
 )
 @click.option(
@@ -85,7 +92,7 @@ async def invoke(
     project: Project,
     ctx: click.Context,
     *,
-    plugin_type: str,
+    plugin_type: PluginType | None,
     dump: str,
     list_commands: bool,
     plugin_name: str,
@@ -106,14 +113,12 @@ async def invoke(
     except ValueError:
         command_name = None
 
-    ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None
-
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     try:
         plugin = project.plugins.find_plugin(
             plugin_name,
-            plugin_type=ptype,
+            plugin_type=plugin_type,
             invokable=True,
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
@@ -146,13 +151,62 @@ async def invoke(
         )
     except Exception as invoke_err:
         tracker.track_command_event(CliEvent.failed)
-        raise invoke_err
+        raise invoke_err  # noqa: TRY201
 
     if exit_code == 0:
         tracker.track_command_event(CliEvent.completed)
     else:
         tracker.track_command_event(CliEvent.failed)
     sys.exit(exit_code)
+
+
+class _LogOutputHandler:
+    """Output handler for parsing plugin logs in invoke command."""
+
+    def __init__(self, logger, log_parser=None):  # noqa: ANN001, ANN204
+        """Initialize the log output handler.
+
+        Args:
+            logger: Structured logger to write parsed logs to.
+            log_parser: Name of the log parser to use for structured parsing.
+        """
+        self.logger = logger
+        self.log_parser = log_parser
+        from meltano.core.logging.parsers import get_parser_factory
+
+        self._parser_factory = get_parser_factory()
+
+    def writeline(self, line: str) -> None:
+        """Write a line using structured logging if possible.
+
+        Args:
+            line: Log line to write.
+        """
+        line = line.rstrip()
+        if not line:
+            return
+
+        # Try to parse the line if we have a parser configured
+        if self.log_parser and (
+            parsed_record := self._parser_factory.parse_line(
+                line,
+                self.log_parser,
+            )
+        ):
+            # Log with parsed level and structured data
+            extra = {**parsed_record.extra}
+            if parsed_record.logger_name:
+                extra["plugin_logger"] = parsed_record.logger_name
+
+            self.logger.log(
+                parsed_record.level,
+                parsed_record.message,
+                plugin_exception=parsed_record.exception,
+                **extra,
+            )
+        else:
+            # Fallback to simple logging
+            self.logger.info(line)
 
 
 async def _invoke(  # noqa: ANN202
@@ -188,14 +242,39 @@ async def _invoke(  # noqa: ANN202
                     *plugin_args,
                 )
             else:
-                handle = await invoker.invoke_async(*plugin_args, command=command_name)
+                # Capture stderr for log parsing
+                handle = await invoker.invoke_async(
+                    *plugin_args,
+                    command=command_name,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+
+                # Get the log parser for structured logging
+                log_parser = invoker.get_log_parser()
+
+                # Set up stderr logger with log parsing
+                stderr_logger = invoker.stderr_logger.bind(
+                    stdio="stderr",
+                    cmd_type="command",
+                )
+
+                # Create output handler for stderr
+                stderr_out = _LogOutputHandler(stderr_logger, log_parser=log_parser)
+
+                # Capture stderr output asynchronously
+                stderr_future = asyncio.create_task(
+                    capture_subprocess_output(handle.stderr, stderr_out),
+                )
+
                 with propagate_stop_signals(handle):
                     exit_code = await handle.wait()
+                    # Wait for stderr capture to complete
+                    await stderr_future
 
     except UnknownCommandError as err:
         raise click.BadArgumentUsage(str(err)) from err
     except AsyncSubprocessError as err:
-        logger.error(await err.stderr)
+        logger.error(await err.stderr)  # noqa: TRY400
         raise
     finally:
         session.close()
@@ -227,7 +306,7 @@ async def dump_file(invoker: PluginInvoker, file_id: str) -> None:
     try:
         content = await invoker.dump(file_id)
     except FileNotFoundError as err:
-        raise CliError(f"Could not find {file_id}") from err  # noqa: EM102
+        raise CliError(f"Could not find {file_id}") from err  # noqa: EM102, TRY003
     except Exception as err:
-        raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102
+        raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102, TRY003
     print(content)  # noqa: T201

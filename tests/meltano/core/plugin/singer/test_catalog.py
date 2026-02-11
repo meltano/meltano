@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import typing as t
+from copy import deepcopy
 
 import pytest
 
@@ -1319,7 +1320,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert len(stream_only_rules) == len(stream_star_rules) == 2
 
         # Both should create identical rules
-        for rule1, rule2 in zip(stream_only_rules, stream_star_rules):
+        for rule1, rule2 in zip(stream_only_rules, stream_star_rules, strict=False):
             assert rule1.tap_stream_id == rule2.tap_stream_id
             assert rule1.breadcrumb == rule2.breadcrumb
             assert rule1.key == rule2.key
@@ -1528,6 +1529,192 @@ class TestMetadataExecutor:
     @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
+
+    @pytest.mark.parametrize(
+        "catalog",
+        ("CATALOG", "JSON_SCHEMA"),
+        indirect=["catalog"],
+    )
+    def test_metadata_rules_order_matters(self, catalog) -> None:
+        """Test that metadata rules are applied in order and last matching rule wins.
+
+        This test documents the current behavior where metadata rules are processed
+        sequentially and later rules override earlier ones when they match the same
+        stream/property. This is based on the example from:
+        https://docs.meltano.com/guide/integration/#setting-metadata
+
+        In this test we verify that:
+        1. A wildcard rule ("*") applies to all streams
+        2. A more specific pattern ("*_full") overrides the wildcard when it matches
+        3. The order of rules in the list determines the final value
+        """
+        # First test: wildcard rule followed by specific pattern
+        # This mimics the example from the documentation where:
+        # - "*": replication-method: INCREMENTAL (applies to all)
+        # - "*_full": replication-method: FULL_TABLE (overrides for matching streams)
+        executor_wildcard_first = MetadataExecutor(
+            [
+                # First rule: all streams get INCREMENTAL
+                MetadataRule(
+                    "*",
+                    [],
+                    "replication-method",
+                    value="INCREMENTAL",
+                ),
+                # Second rule: streams ending in _full get FULL_TABLE (overrides)
+                MetadataRule(
+                    "*Name",  # Matches UniqueEntitiesName
+                    [],
+                    "replication-method",
+                    value="FULL_TABLE",
+                ),
+            ],
+        )
+
+        catalog_copy = deepcopy(catalog)
+        visit(catalog_copy, executor_wildcard_first)
+
+        stream_node = next(
+            s
+            for s in catalog_copy["streams"]
+            if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+        stream_metadata_node = next(
+            m for m in stream_node["metadata"] if len(m["breadcrumb"]) == 0
+        )
+
+        # The second rule (*Name -> FULL_TABLE) should win
+        assert stream_metadata_node["metadata"]["replication-method"] == "FULL_TABLE"
+
+        # Second test: reverse the order - specific pattern followed by wildcard
+        # This shows that order matters: the wildcard will override the specific pattern
+        executor_wildcard_last = MetadataExecutor(
+            [
+                # First rule: streams ending in Name get FULL_TABLE
+                MetadataRule(
+                    "*Name",
+                    [],
+                    "replication-method",
+                    value="FULL_TABLE",
+                ),
+                # Second rule: all streams get INCREMENTAL (overrides)
+                MetadataRule(
+                    "*",
+                    [],
+                    "replication-method",
+                    value="INCREMENTAL",
+                ),
+            ],
+        )
+
+        catalog_copy2 = deepcopy(catalog)
+        visit(catalog_copy2, executor_wildcard_last)
+
+        stream_node2 = next(
+            s
+            for s in catalog_copy2["streams"]
+            if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+        stream_metadata_node2 = next(
+            m for m in stream_node2["metadata"] if len(m["breadcrumb"]) == 0
+        )
+
+        # The second rule (* -> INCREMENTAL) should win
+        assert stream_metadata_node2["metadata"]["replication-method"] == "INCREMENTAL"
+
+    @pytest.mark.parametrize(
+        "catalog",
+        ("CATALOG", "JSON_SCHEMA"),
+        indirect=["catalog"],
+    )
+    def test_metadata_rules_order_matters_property_level(self, catalog) -> None:
+        """Test that metadata rules order matters at the property level too.
+
+        This test verifies that when multiple metadata rules match the same property,
+        the last matching rule wins. This is important for cases where users want to
+        set a default for all properties and then override specific ones.
+        """
+        # Apply rules: first mark all as available, then mark *_at as automatic
+        executor_general_then_specific = MetadataExecutor(
+            [
+                # First: all properties of UniqueEntitiesName are available
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "*"],
+                    "inclusion",
+                    value="available",
+                ),
+                # Second: *_at properties are automatic (should override)
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "*_at"],
+                    "inclusion",
+                    value="automatic",
+                ),
+            ],
+        )
+
+        catalog_copy = deepcopy(catalog)
+        visit(catalog_copy, executor_general_then_specific)
+
+        stream_node = next(
+            s
+            for s in catalog_copy["streams"]
+            if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+
+        # created_at should be automatic (second rule wins)
+        created_at_metadata = next(
+            m
+            for m in stream_node["metadata"]
+            if m["breadcrumb"] == ["properties", "created_at"]
+        )
+        assert created_at_metadata["metadata"]["inclusion"] == "automatic"
+
+        # code should be available (only first rule matches)
+        code_metadata = next(
+            m
+            for m in stream_node["metadata"]
+            if m["breadcrumb"] == ["properties", "code"]
+        )
+        assert code_metadata["metadata"]["inclusion"] == "available"
+
+        # Now reverse the order: specific pattern first, then general wildcard
+        executor_specific_then_general = MetadataExecutor(
+            [
+                # First: *_at properties are automatic
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "*_at"],
+                    "inclusion",
+                    value="automatic",
+                ),
+                # Second: all properties are available (should override everything)
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    ["properties", "*"],
+                    "inclusion",
+                    value="available",
+                ),
+            ],
+        )
+
+        catalog_copy2 = deepcopy(catalog)
+        visit(catalog_copy2, executor_specific_then_general)
+
+        stream_node2 = next(
+            s
+            for s in catalog_copy2["streams"]
+            if s["tap_stream_id"] == "UniqueEntitiesName"
+        )
+
+        # created_at should now be available (second rule overrides)
+        created_at_metadata2 = next(
+            m
+            for m in stream_node2["metadata"]
+            if m["breadcrumb"] == ["properties", "created_at"]
+        )
+        assert created_at_metadata2["metadata"]["inclusion"] == "available"
 
     @pytest.mark.parametrize(
         "catalog",

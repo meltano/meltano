@@ -13,15 +13,15 @@ from enum import Enum, IntEnum
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column  # noqa: TC002
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import (
     DateTimeUTC,
-    GUIDType,
+    GUIDType,  # noqa: TC001
     IntFlag,
-    IntPK,
+    IntPK,  # noqa: TC001
     JSONEncodedDict,
 )
 from meltano.core.utils import new_run_id
@@ -173,7 +173,7 @@ class Job(SystemModel):
         """
         return self.state is State.RUNNING
 
-    def valid_intil(self) -> datetime:
+    def valid_until(self) -> datetime:
         """Return the datetime when this job goes stale.
 
         Returns:
@@ -198,7 +198,7 @@ class Job(SystemModel):
         if not self.is_running():
             return False
 
-        return datetime.now(timezone.utc) > self.valid_intil()
+        return datetime.now(timezone.utc) > self.valid_until()
 
     def has_error(self) -> bool:
         """Return whether a job has failed.
@@ -411,7 +411,7 @@ class Job(SystemModel):
         if isinstance(err, SystemExit):
             return "The process was terminated"
 
-        if isinstance(err, (KeyboardInterrupt, asyncio.CancelledError)):
+        if isinstance(err, KeyboardInterrupt | asyncio.CancelledError):
             return "The process was interrupted"
 
         if str(err):

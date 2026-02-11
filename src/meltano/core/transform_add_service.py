@@ -49,7 +49,7 @@ class TransformAddService:
 
         git_repo = plugin.pip_url
         if not git_repo:
-            raise ValueError(f"Missing pip_url for transform plugin '{plugin.name}'")  # noqa: EM102
+            raise ValueError(f"Missing pip_url for transform plugin '{plugin.name}'")  # noqa: EM102, TRY003
 
         revision: str | None = None
         if len(git_repo.split("@")) == 2:

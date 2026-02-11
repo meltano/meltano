@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import asyncio.subprocess
 import enum
 import os
 import sys
@@ -32,6 +33,7 @@ if t.TYPE_CHECKING:
     from pathlib import Path
 
     from sqlalchemy.orm import Session
+    from structlog.stdlib import BoundLogger
 
     from meltano.core.block.extract_load import ELBContext
     from meltano.core.elt_context import ELTContext, PluginContext
@@ -98,7 +100,7 @@ class ExecutableNotFoundError(InvokerError):
             f"Executable '{executable}' could not be found. "
             f"{plugin_type_descriptor} '{plugin.name}' may not have "
             "been installed yet using "
-            f"`meltano install {plugin_type} {plugin.name}`, "
+            f"`meltano install --plugin-type {plugin_type} {plugin.name}`, "
             "or the executable name may be incorrect.",
         )
 
@@ -179,6 +181,7 @@ class PluginInvoker:
         self.project = project
         self.tracker = Tracker(project)
         self.plugin = plugin
+        self.plugin.ensure_compatible()
         self.context = context
         self.output_handlers = output_handlers
         self.venv_service: VenvService | None
@@ -195,8 +198,8 @@ class PluginInvoker:
 
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
-            config_dir or self.project.plugin_dir(plugin),
-            run_dir or self.project.run_dir(plugin.name),
+            config_dir or self.project.dirs.plugin(plugin),
+            run_dir or self.project.dirs.run(plugin.name),
         )
 
         self.settings_service = plugin_settings_service or PluginSettingsService(
@@ -424,7 +427,7 @@ class PluginInvoker:
         if self.venv_service:
             # Switch to plugin-specific venv
             venv = VirtualEnv(
-                self.project.venvs_dir(
+                self.project.dirs.venvs(
                     self.plugin.type,
                     self.plugin.name,
                     make_dirs=False,
@@ -485,10 +488,17 @@ class PluginInvoker:
             try:
                 yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
-                raise ExecutableNotFoundError(
-                    self.plugin,
-                    self.plugin.executable,
-                ) from err
+                # Check if the error is about the executable itself or a file it's
+                # trying to access
+                executable_path = popen_args[0] if popen_args else ""
+
+                if err.filename == executable_path:
+                    # The executable itself was not found
+                    raise ExecutableNotFoundError(
+                        self.plugin,
+                        self.plugin.executable,
+                    ) from err
+                raise
 
     async def invoke_async(
         self,
@@ -537,7 +547,7 @@ class PluginInvoker:
         command_config = self.find_command(plugin_command)
 
         if not command_config.container_spec:
-            raise ValueError("Command is missing a container spec")  # noqa: EM101
+            raise ValueError("Command is missing a container spec")  # noqa: EM101, TRY003
 
         spec = command_config.container_spec
         service = ContainerService()
@@ -587,3 +597,40 @@ class PluginInvoker:
             self.output_handlers[src].append(handler)
         else:
             self.output_handlers = {src: [handler]}
+
+    @property
+    def stdout_logger(self) -> BoundLogger:
+        """Get the logger for the plugin stdout.
+
+        Returns:
+            The logger for the plugin stdout.
+        """
+        return get_logger(
+            f"meltano.plugin.stdout.{self.plugin.type}.{self.plugin.name}",
+            stdio="stdout",
+        )
+
+    @property
+    def stderr_logger(self) -> BoundLogger:
+        """Get the logger for the plugin stderr.
+
+        Returns:
+            The logger for the plugin stderr.
+        """
+        return get_logger(
+            f"meltano.plugin.stderr.{self.plugin.type}.{self.plugin.name}",
+            stdio="stderr",
+        )
+
+    def get_log_parser(self) -> str | None:
+        """Get the log parser for the plugin.
+
+        Returns:
+            The log parser for the plugin.
+        """
+        if (
+            self.plugin.capabilities
+            and "structured-logging" in self.plugin.capabilities
+        ):
+            return self.plugin_config_extras.get("_log_parser")
+        return None

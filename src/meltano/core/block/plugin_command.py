@@ -13,7 +13,7 @@ from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.runner import RunnerError
 
 if t.TYPE_CHECKING:
@@ -21,6 +21,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.logging.utils import SubprocessOutputWriter
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
@@ -60,11 +61,11 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         self,
         name: str,
         log: SubprocessOutputWriter,
-        block_ctx: dict,
+        block_ctx: PluginContext,
         project: Project,
         plugin_invoker: PluginInvoker,
         command: str | None,
-        command_args: tuple[str],
+        command_args: str | None,
     ):
         """Configure and return a wrapped plugin invoker.
 
@@ -140,7 +141,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
             self.context.session.close()
         if exitcode := self.process_future.result():
             command = self.command or self.command_args[0]
-            raise RunnerError(
+            raise RunnerError(  # noqa: TRY003
                 f"`{self.name} {command}` failed with exit code: {exitcode}",  # noqa: EM102
             )
 
@@ -149,7 +150,7 @@ def plugin_command_invoker(
     plugin: ProjectPlugin,
     project: Project,
     command: str | None,
-    command_args: list[str] | None = None,
+    command_args: str | None = None,
     run_dir: Path | None = None,
 ) -> InvokerCommand:
     """Make an InvokerCommand from a plugin.
@@ -165,16 +166,10 @@ def plugin_command_invoker(
     Returns:
         InvokerCommand
     """
-    stderr_log = logger.bind(
-        stdio="stderr",
-        cmd_type="command",
-    )
-
     _, session_maker = project_engine(project)
     session = session_maker()
 
     output_logger = OutputLogger("run.log")
-    invoker_log = output_logger.out(plugin.name, stderr_log)
 
     ctx = PluginContext(
         plugin=plugin,
@@ -189,6 +184,12 @@ def plugin_command_invoker(
         run_dir=run_dir,
         plugin_settings_service=ctx.settings_service,
     )
+    invoker_log = output_logger.out(
+        plugin.name,
+        invoker.stderr_logger.bind(cmd_type="command"),
+        log_parser=invoker.get_log_parser(),
+    )
+
     return InvokerCommand(
         name=plugin.name,
         log=invoker_log,

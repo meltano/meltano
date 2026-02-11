@@ -1,16 +1,20 @@
 from __future__ import annotations  # noqa: D100
 
+import json
 import os
 import typing as t
 from contextlib import contextmanager
 
 import structlog
 
+from meltano.core.job import Job, State
 from meltano.core.utils import makedirs, slugify
 
 if t.TYPE_CHECKING:
     from pathlib import Path
     from uuid import UUID
+
+    from sqlalchemy.orm import Session
 
     from meltano.core._types import StrPath
     from meltano.core.project import Project
@@ -48,7 +52,7 @@ class JobLoggingService:  # noqa: D101
         Returns:
             The logs directory for the given state ID.
         """
-        return self.project.job_logs_dir(state_id, *joinpaths, make_dirs=make_dirs)
+        return self.project.dirs.job_logs(state_id, *joinpaths, make_dirs=make_dirs)
 
     def generate_log_name(
         self,
@@ -83,7 +87,7 @@ class JobLoggingService:  # noqa: D101
         except OSError:
             # Don't stop the Job running if you can not open the log file
             # for writing: just return /dev/null
-            logger.error(
+            logger.error(  # noqa: TRY400
                 f"Could open log file {log_file_name!r} for writing. "  # noqa: G004
                 "Using `/dev/null`",
             )
@@ -104,18 +108,18 @@ class JobLoggingService:  # noqa: D101
             latest_log = next(iter(self.get_all_logs(state_id)))
 
             if latest_log.stat().st_size > MAX_FILE_SIZE:
-                raise SizeThresholdJobLogException(
+                raise SizeThresholdJobLogException(  # noqa: TRY003
                     f"The log file size exceeds '{MAX_FILE_SIZE}'",  # noqa: EM102
                 )
 
             with latest_log.open() as f:
                 return f.read()
         except StopIteration:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Could not find any log for job with ID '{state_id}'",  # noqa: EM102
             ) from None
         except FileNotFoundError as ex:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",  # noqa: EM102
             ) from ex
 
@@ -125,11 +129,11 @@ class JobLoggingService:  # noqa: D101
             latest_log = next(iter(self.get_all_logs(state_id)))
             return str(latest_log.resolve())
         except StopIteration:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Could not find any log for job with ID '{state_id}'",  # noqa: EM102
             ) from None
         except FileNotFoundError as ex:
-            raise MissingJobLogException(
+            raise MissingJobLogException(  # noqa: TRY003
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",  # noqa: EM102
             ) from ex
 
@@ -158,7 +162,7 @@ class JobLoggingService:  # noqa: D101
             log_path.unlink()
 
     def legacy_logs_dir(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
-        job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)
+        job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)  # type: ignore[deprecated]
         return job_dir if job_dir.exists() else None
 
     def logs_dirs(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
@@ -170,3 +174,146 @@ class JobLoggingService:  # noqa: D101
             dirs.append(legacy_logs_dir)
 
         return dirs
+
+    def tail_file(self, file_path: Path, lines: int) -> list[str]:
+        """Read the last N lines from a file.
+
+        Args:
+            file_path: Path to the file to read.
+            lines: Number of lines to read from the end.
+
+        Returns:
+            List of the last N lines.
+        """
+        with file_path.open("rb") as f:
+            # Seek to end of file
+            f.seek(0, 2)
+            file_length = f.tell()
+
+            # Read file in reverse to find line breaks
+            lines_found: list[bytes] = []
+            block_size = 1024
+            blocks = []
+
+            while len(lines_found) < lines and file_length > 0:
+                # Calculate how much to read
+                block_size = min(block_size, file_length)
+
+                # Read block
+                f.seek(file_length - block_size)
+                blocks.append(f.read(block_size))
+
+                # Count lines in this block
+                all_content = b"".join(reversed(blocks))
+                lines_found = all_content.split(b"\n")
+
+                # Remove empty line at end if file ends with newline
+                lines_found = lines_found if lines_found[-1] else lines_found[:-1]
+
+                file_length -= block_size
+
+            # Return the last N lines, ensuring we get exactly N lines (or fewer if file is shorter)  # noqa: E501
+            result_lines = lines_found[-lines:] if lines_found else []
+            return [line.decode("utf-8", errors="replace") for line in result_lines]
+
+    def format_job_info(self, job: Job, format_type: str = "text") -> str:
+        """Format job information for display.
+
+        Args:
+            job: The job to format.
+            format_type: Output format type ('text' or 'json').
+
+        Returns:
+            Formatted job information.
+        """
+        if format_type == "json":
+            return json.dumps(
+                {
+                    "job_name": job.job_name,
+                    "run_id": str(job.run_id),
+                    "state": job.state.name,
+                    "started_at": job.started_at.isoformat(),
+                    "ended_at": job.ended_at.isoformat()
+                    if job.ended_at is not None
+                    else None,
+                    "trigger": job.trigger,
+                },
+                indent=2,
+            )
+        return (
+            f"Job: {job.job_name}\n"
+            f"Run ID: {job.run_id}\n"
+            f"State: {job.state.name}\n"
+            f"Started: {job.started_at}\n"
+            f"Ended: {job.ended_at or 'Running'}\n"
+            f"Trigger: {job.trigger or 'Manual'}"
+        )
+
+    def get_recent_jobs(self, session: Session, limit: int = 10) -> list[Job]:
+        """Get recent job runs, excluding STATE_EDIT operations.
+
+        Args:
+            session: Database session to use for the query.
+            limit: Maximum number of jobs to return.
+
+        Returns:
+            List of recent Job objects.
+        """
+        return (
+            session.query(Job)
+            .filter(
+                Job._state.in_(
+                    [State.SUCCESS.name, State.FAIL.name, State.RUNNING.name]
+                )
+            )
+            .order_by(Job.started_at.desc())
+            .limit(limit)
+            .all()
+        )
+
+    def find_job_by_run_id(self, session: Session, run_id: str) -> Job | None:
+        """Find a job by its run ID.
+
+        Args:
+            session: Database session to use for the query.
+            run_id: The run ID to search for.
+
+        Returns:
+            The Job object if found, None otherwise.
+        """
+        return session.query(Job).filter(Job.run_id == run_id).first()
+
+    def get_job_log_path(self, job: Job) -> Path:
+        """Get the log file path for a job.
+
+        Args:
+            job: The job to get the log path for.
+
+        Returns:
+            Path to the job's log file.
+        """
+        return self.generate_log_name(job.job_name, str(job.run_id))
+
+    def read_job_log(self, job: Job, tail_lines: int | None = None) -> tuple[str, bool]:
+        """Read the log content for a job.
+
+        Args:
+            job: The job to read the log for.
+            tail_lines: If provided, only read the last N lines.
+
+        Returns:
+            A tuple of (log_content, log_exists).
+            log_content is the log content (empty string if log doesn't exist).
+            log_exists is True if the log file exists.
+        """
+        log_file_path = self.get_job_log_path(job)
+
+        if not log_file_path.exists():
+            return "", False
+
+        if tail_lines:
+            lines = self.tail_file(log_file_path, tail_lines)
+            return "\n".join(lines), True
+
+        with log_file_path.open("r", encoding="utf-8", errors="replace") as f:
+            return f.read(), True

@@ -17,38 +17,31 @@ import time_machine
 
 from meltano.core.logging import formatters
 
-if sys.version_info < (3, 11):
-    from typing_extensions import TypeAlias
-else:
-    from typing import TypeAlias  # noqa: ICN003
-
 if t.TYPE_CHECKING:
     from pathlib import Path
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
-ExcInfo: TypeAlias = t.Union[
-    tuple[type[BaseException], BaseException, TracebackType],
-    tuple[None, None, None],
-]
+ExcInfo: t.TypeAlias = tuple[type[BaseException], BaseException, TracebackType]
+OptExcInfo: t.TypeAlias = ExcInfo | tuple[None, None, None]
 
 
 @pytest.fixture
-def exc_info() -> ExcInfo:
+def exc_info() -> OptExcInfo:
     """Fake a valid exc_info."""
     my_var = "my_value"  # noqa: F841
     try:
-        raise ValueError("Not a real error")  # noqa: EM101
+        raise ValueError("Not a real error")  # noqa: EM101, TRY003, TRY301
     except ValueError:
         return sys.exc_info()
 
 
 @pytest.fixture
-def deep_exc_info() -> ExcInfo:
+def deep_exc_info() -> OptExcInfo:
     """Create a deeper call stack for testing max_frames."""
 
     def level_5():
         local_var_5 = "level_5_value"  # noqa: F841
-        raise ValueError("Deep stack error")  # noqa: EM101
+        raise ValueError("Deep stack error")  # noqa: EM101, TRY003
 
     def level_4():
         local_var_4 = "level_4_value"  # noqa: F841
@@ -158,6 +151,25 @@ class TestLogFormatters:
         output_zero = formatter_zero.format(record_with_deep_exception)
         assert "frames hidden" not in output_zero
         assert output_zero.count("in level_") == 5
+
+    def test_console_log_formatter_include_keys(self, record) -> None:
+        record.foo = "bar"
+        record.baz = "qux"
+
+        formatter = formatters.console_log_formatter()
+        output = formatter.format(record)
+        assert "foo=bar" not in output
+        assert "baz=qux" not in output
+
+        formatter = formatters.console_log_formatter(include_keys=["foo"])
+        output = formatter.format(record)
+        assert "foo=bar" in output
+        assert "baz=qux" not in output
+
+        formatter = formatters.console_log_formatter(all_keys=True)
+        output = formatter.format(record)
+        assert "foo=bar" in output
+        assert "baz=qux" in output
 
     def test_key_value_formatter(self, record):
         formatter = formatters.key_value_formatter()

@@ -7,7 +7,9 @@
   "additionalProperties": false,
   "properties": {
     "version": {
-      "const": 1
+      "const": 1,
+      "deprecated": true,
+      "description": "DEPRECATED: The meltano.yml version field is deprecated and will be removed in a future release. Please remove it from your meltano.yml file. To specify Meltano version requirements, use 'requires_meltano' instead."
     },
     "annotations": {
       "$ref": "#/$defs/annotations"
@@ -24,6 +26,14 @@
     "project_id": {
       "type": "string",
       "description": "A globally unique project identifier. Defaults to a Meltano-generated unique GUID for each project."
+    },
+    "requires_meltano": {
+      "type": "string",
+      "description": "A version speficier for the Meltano version required by this project. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error.",
+      "examples": [
+        ">=3,<4",
+        ">=3.6,<3.7"
+      ]
     },
     "database_uri": {
       "type": "string",
@@ -536,6 +546,14 @@
           "requires": {
             "$ref": "#/$defs/requires"
           },
+          "requires_meltano": {
+            "type": "string",
+            "description": "A version specifier for the Meltano version required by this plugin. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error.",
+            "examples": [
+              ">=3,<4",
+              ">=3.6,<3.7"
+            ]
+          },
           "env": {
             "$ref": "#/$defs/env"
           }
@@ -591,6 +609,13 @@
             "type": "boolean",
             "description": "A boolean that determines if the catalog cache should be used or ignored.",
             "default": true
+          },
+          "log_parser": {
+            "type": "string",
+            "description": "The log parser to use for the extractor.",
+            "enum": [
+              "singer-sdk"
+            ]
           }
         }
       },
@@ -622,7 +647,8 @@
                     "batch",
                     "test",
                     "log-based",
-                    "schema-flattening"
+                    "schema-flattening",
+                    "structured-logging"
                   ]
                 }
               }
@@ -652,7 +678,8 @@
                     "soft-delete",
                     "hard-delete",
                     "datatype-failsafe",
-                    "schema-flattening"
+                    "schema-flattening",
+                    "structured-logging"
                   ]
                 }
               },
@@ -754,6 +781,22 @@
           },
           {
             "$ref": "#/$defs/plugins/mapper_specific"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "about",
+                    "stream-maps",
+                    "structured-logging"
+                  ]
+                }
+              }
+            }
           }
         ],
         "unevaluatedProperties": false

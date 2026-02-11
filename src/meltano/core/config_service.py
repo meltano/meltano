@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import typing as t
 from contextlib import contextmanager
 from functools import cached_property
@@ -15,6 +14,8 @@ from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.setting_definition import SettingDefinition
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.meltano_file import MeltanoFile
     from meltano.core.project import Project
 
@@ -58,7 +59,7 @@ class ConfigService:
         return self.project.meltano
 
     @contextmanager
-    def update_meltano_yml(self):  # noqa: ANN201
+    def update_meltano_yml(self) -> Generator[MeltanoFile, None, None]:
         """Update meltano.yml.
 
         This method is a context manager that will update meltano.yml with the
@@ -95,7 +96,7 @@ class ConfigService:
         """
         return self.current_meltano_yml.extras
 
-    def update_config(self, config) -> None:  # noqa: ANN001
+    def update_config(self, config: dict[str, t.Any]) -> None:
         """Update top-level Meltano configuration.
 
         Args:
@@ -104,12 +105,8 @@ class ConfigService:
         with self.update_meltano_yml() as meltano_yml:
             meltano_yml.extras = config
 
-    def make_meltano_secret_dir(self) -> None:
-        """Create the secret directory."""
-        os.makedirs(self.project.meltano_dir(), exist_ok=True)  # noqa: PTH103
-
     @property
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str | None]:
         """Return the top-level env vars from meltano.yml.
 
         Returns:

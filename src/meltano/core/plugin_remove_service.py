@@ -9,7 +9,6 @@ from meltano.core.plugin_location_remove import (
     InstallationRemoveManager,
     LockedDefinitionRemoveManager,
     MeltanoYmlRemoveManager,
-    PluginLocationRemoveManager,
 )
 from meltano.core.utils import noop
 
@@ -17,6 +16,7 @@ if t.TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_location_remove import PluginLocationRemoveManager
     from meltano.core.project import Project
 
 

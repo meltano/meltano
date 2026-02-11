@@ -78,22 +78,34 @@ class MyStateManager(StateStoreManager):
 
     def set(self, state: MeltanoState) -> None:
         # Implement the logic to store the state in your custom backend
+        ...
 
-    def get(self) -> MeltanoState | None:
+    def get(self, state_id: str) -> MeltanoState | None:
         # Implement the logic to retrieve the state from your custom backend
+        ...
 
-    def clear(self) -> None:
-        # Implement the logic to clear the state from your custom backend
+    def delete(self, state_id: str) -> None:
+        # Implement the logic to delete the state for a given state ID
+        ...
 
-    def get_state_ids(self) -> list[str]:
-        # Implement the logic to retrieve the list of state IDs from your custom backend
+    def get_state_ids(self, pattern: str | None = None) -> list[str]:
+        # Implement the logic to retrieve the list of state IDs from
+        # your custom backend, optionally filtered by a glob pattern
+        ...
 
     @contextmanager
     def acquire_lock(self, state_id: str, *, retry_seconds: int = 1):
-        # Implement the logic to acquire a lock for the given state ID
+        # Implement the logic to acquire a lock for the given state ID.
         # This method should be a context manager that acquires the lock
         # and releases it when the context exits.
         yield
+
+    def migrate(self) -> None:
+        # Optionally implement migration logic for your custom backend.
+        # This is called by `meltano upgrade` to perform any necessary
+        # data migrations (e.g., fixing path prefixes, schema changes).
+        # The default implementation is a no-op.
+        ...
 ```
 
 To let Meltano know about your custom state manager, you need to add the following configuration to your `pyproject.toml`:
