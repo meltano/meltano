@@ -197,6 +197,9 @@ Thanks go to these wonderful people ([emoji key](https://allcontributors.org/emo
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/iamlorax"><img src="https://avatars.githubusercontent.com/u/116229492?v=4?s=100" width="100px;" alt="iamlorax"/><br /><sub><b>iamlorax</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=iamlorax" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MarleTangible"><img src="https://avatars.githubusercontent.com/u/107574310?v=4?s=100" width="100px;" alt="MarleTangible"/><br /><sub><b>MarleTangible</b></sub></a><br /><a href="https://github.com/meltano/meltano/issues?q=author%3AMarleTangible" title="Bug reports">🐛</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.richardson.co.nz"><img src="https://avatars.githubusercontent.com/u/63807?v=4?s=100" width="100px;" alt="Samuel Richardson"/><br /><sub><b>Samuel Richardson</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=Rodeoclash" title="Documentation">📖</a></td>
+    </tr>
   </tbody>
 </table>
 
