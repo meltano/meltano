@@ -1426,6 +1426,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Rodeoclash",
+      "name": "Samuel Richardson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63807?v=4",
+      "profile": "http://www.richardson.co.nz",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
