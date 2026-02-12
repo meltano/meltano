@@ -1064,6 +1064,10 @@ def discovery():
                         "pip_url": "tap-mock",
                         "executable": "tap-mock",
                         "capabilities": ["discover", "catalog", "state"],
+                        "settings_group_validation": [
+                            ["test", "secure"],
+                            ["test", "auth.username", "auth.password"],
+                        ],
                         "settings": [
                             {"name": "test", "value": "mock"},
                             {"name": "start_date"},

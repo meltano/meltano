@@ -80,6 +80,15 @@ def _get_plugin(
     return plugin
 
 
+def _required_label(groups: list[int], num_groups: int) -> str:
+    """Format a required-setting label indicating which groups need it."""
+    if num_groups <= 1 or len(groups) == num_groups:
+        return "required"
+    group_str = ", ".join(map(str, groups))
+    plural = "s" if len(groups) > 1 else ""
+    return f"required by group{plural} {group_str}"
+
+
 @t.overload
 def _get_settings(
     *,
@@ -389,6 +398,23 @@ def list_settings(
         redacted=safe,
     )
 
+    validation_groups: list[list[str]] = (
+        plugin.settings_group_validation if plugin else []
+    ) or []
+    setting_groups: dict[str, list[int]] = {}
+    for i, group in enumerate(validation_groups, 1):
+        for setting_name in group:
+            setting_groups.setdefault(setting_name, []).append(i)
+    num_groups = len(validation_groups)
+    if num_groups > 1:
+        click.echo("Setting groups (one of the following combinations is required):")
+        for i, group in enumerate(validation_groups, 1):
+            click.echo(f"  Group {i}: {', '.join(sorted(group))}")
+        click.echo()
+    elif num_groups == 1:
+        click.echo(f"Required settings: {', '.join(sorted(validation_groups[0]))}")
+        click.echo()
+
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
@@ -416,6 +442,12 @@ def list_settings(
             printed_custom_heading = True
 
         click.secho(name, fg="blue", nl=False)
+        if name in setting_groups:
+            click.secho(
+                f" ({_required_label(setting_groups[name], num_groups)})",
+                fg="red",
+                nl=False,
+            )
 
         env_keys = [var.definition for var in settings.setting_env_vars(setting_def)]
         click.echo(f" [env: {', '.join(env_keys)}]", nl=False)

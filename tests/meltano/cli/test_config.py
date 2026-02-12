@@ -187,7 +187,8 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert (
-            f"secure [env: TAP_MOCK_SECURE] current value: {REDACTED_VALUE} (from the "
+            "secure (required by group 1) [env: TAP_MOCK_SECURE] current value: "
+            f"{REDACTED_VALUE} (from the "
             "TAP_MOCK_SECURE variable in `.env`)"
         ) in result.stdout
 
@@ -212,7 +213,9 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert (
-            f"secure [env: TAP_MOCK_INHERITED_SECURE] current value: {REDACTED_VALUE} "
+            "secure (required by group 1) "
+            "[env: TAP_MOCK_INHERITED_SECURE] current value: "
+            f"{REDACTED_VALUE} "
             f"(inherited from '{tap.name}')"
         ) in result.stdout
 
@@ -238,9 +241,42 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert (
-            f"secure [env: TAP_MOCK_SECURE] current value: '{value}' (from the "
-            "TAP_MOCK_SECURE variable in `.env`)"
+            f"secure (required by group 1) [env: TAP_MOCK_SECURE] "
+            f"current value: '{value}' "
+            "(from the TAP_MOCK_SECURE variable in `.env`)"
         ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_required_settings(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        assert "test (required) [env:" in result.stdout
+        assert "secure (required by group 1) [env:" in result.stdout
+        assert "auth.username (required by group 2) [env:" in result.stdout
+        assert "auth.password (required by group 2) [env:" in result.stdout
+
+        for name in ("port", "start_date"):
+            assert f"{name} (required" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_group_summary(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        assert (
+            "Setting groups (one of the following combinations is required):"
+        ) in result.stdout
+        assert "Group 1: secure, test" in result.stdout
+        assert "Group 2: auth.password, auth.username, test" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_meltano_no_required(self, cli_runner) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+        assert_cli_runner(result)
+
+        assert "(required)" not in result.stdout
+        assert "Setting groups" not in result.stdout
 
 
 class TestCliConfigSet:
