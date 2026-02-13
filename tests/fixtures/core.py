@@ -1067,6 +1067,7 @@ def discovery():
                         "settings_group_validation": [
                             ["test", "secure"],
                             ["test", "auth.username", "auth.password"],
+                            ["test", "secure", "port"],
                         ],
                         "settings": [
                             {"name": "test", "value": "mock"},
