@@ -26,11 +26,10 @@ def _get_sdk_logging(
     *,
     level: str,
     formatter: dict[str, t.Any],
-    disable_existing_loggers: bool = False,
 ) -> dict[str, t.Any]:
     return {
         "version": 1,
-        "disable_existing_loggers": disable_existing_loggers,
+        "disable_existing_loggers": False,
         "formatters": {
             "singer_formatter": formatter,
         },
@@ -147,23 +146,19 @@ class SingerPlugin(BasePlugin):
         log_parser = plugin_invoker.get_log_parser()
 
         # https://sdk.meltano.com/en/v0.49.1/implementation/logging.html
-        if log_parser == LOG_PARSER_SINGER_SDK:
-            # Structured logging configuration
-            formatter = {"()": "singer_sdk.logging.StructuredFormatter"}
-            disable_existing_loggers = True
-        else:
-            # Default logging configuration
-            formatter = {"format": "%(message)s"}
-            disable_existing_loggers = False
-
-        logging_config = _get_sdk_logging(
-            level=log_level,
-            formatter=formatter,
-            disable_existing_loggers=disable_existing_loggers,
+        formatter = (
+            {"()": "singer_sdk.logging.StructuredFormatter"}  # Structured logging
+            if log_parser == LOG_PARSER_SINGER_SDK
+            else {"format": "%(message)s"}  # Default logging configuration
         )
 
         async with await anyio.open_file(singer_sdk_logging, mode="w") as f:
-            await f.write(json.dumps(logging_config, indent=2))
+            await f.write(
+                json.dumps(
+                    _get_sdk_logging(level=log_level, formatter=formatter),
+                    indent=2,
+                )
+            )
 
         # https://github.com/transferwise/pipelinewise-singer-python/blob/da64a10cdbcad48ab373d4dab3d9e6dd6f58556b/singer/logger.py#L9C9-L9C26
         async with await anyio.open_file(pipelinewise_logging, mode="w") as f:
