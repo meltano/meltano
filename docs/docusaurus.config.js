@@ -202,7 +202,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Arch Data, Inc.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Matatika Limited.`,
       },
       prism: {
         theme: lightCodeTheme,

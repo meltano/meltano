@@ -68,7 +68,7 @@ export default function FooterCopyright({ copyright }) {
           />
         </a> */}
         <a
-          href="https://www.youtube.com/meltano"
+          href="https://www.youtube.com/@meltano"
           className="opacity-50"
           target="_blank" rel="noreferrer"
         >
