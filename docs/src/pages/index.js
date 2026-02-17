@@ -1,11 +1,7 @@
 import React from 'react';
-// eslint-disable-next-line no-unused-vars
-import clsx from 'clsx';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '../components/homepage/Features';
-// eslint-disable-next-line no-unused-vars
-import HomepageUseCases from '../components/homepage/UseCases';
 
 import styles from './index.module.scss';
 import HomepageFindOutMore from '../components/homepage/FindOutMore';
@@ -33,7 +29,6 @@ export default function Home() {
       <HomepageHeader />
       <main className="mb-10">
         <HomepageFeatures />
-        {/* <HomepageUseCases /> */}
         <HomepageFindOutMore />
       </main>
     </Layout>
