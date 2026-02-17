@@ -19,10 +19,12 @@ export default function FooterLayout({ style, links, logo, copyright }) {
             styles.background
           }
         >
-          <MeltanoLogo
-            title="Meltano"
-            className={'grow-0 me-32 mb-8 ' + styles.meltano}
-          />
+          <div>
+            <MeltanoLogo
+              title="Meltano"
+              className={'grow-0 me-32 mb-8 ' + styles.meltano}
+            />
+          </div>
           <div className="grow">{links}</div>
           <img
             src={FloatingIsland}
