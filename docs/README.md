@@ -1,6 +1,6 @@
 # Meltano Documentation
 
-![Meltano Logo](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
+![Meltano Logo](static/img/meltano.svg)
 
 ## Contribute to the Docs
 
