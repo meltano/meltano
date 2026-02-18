@@ -1090,6 +1090,11 @@ main {
   z-index: 1;
 }
 
+.meltano-gives-engineers .container {
+  padding: 0;
+  max-width: 1200px;
+}
+
 /* 
 Remove sticky scroll of architecture
 
@@ -1122,7 +1127,7 @@ Remove sticky scroll of architecture
   display: flex;
   justify-content: space-between;
   align-items: stretch;
-  max-width: 1160px;
+  max-width: 1200px;
   margin: 40px auto;
   padding: 0 30px;
 }
