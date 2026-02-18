@@ -1145,6 +1145,11 @@ Remove sticky scroll of architecture
   width: 32px;
 }
 
+.meltano-gives-table-item-label {
+  color: var(--ifm-heading-color);
+  display: inline-block;
+}
+
 @media all and (max-width: 768px) {
   .meltano-gives-table-head {
     display: none;
@@ -1213,7 +1218,11 @@ Remove sticky scroll of architecture
 
 .meltano-gives-terminal-image {
   width: 100%;
-  padding-bottom: 20%;
+  padding-bottom: 21%;
+  /* 
+  // separeate the image parts
+  filter: invert(1);
+  */
 }
 
 .meltano-gives-melty-image {
