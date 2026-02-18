@@ -1220,9 +1220,13 @@ Remove sticky scroll of architecture
   width: 100%;
   padding-bottom: 21%;
   /* 
-  // separeate the image parts
-  filter: invert(1);
+  // TODO separeate the image parts
   */
+  filter: invert(1);
+}
+
+[data-theme="dark"] .meltano-gives-terminal-image {
+  filter: invert(0);
 }
 
 .meltano-gives-melty-image {
