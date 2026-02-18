@@ -1,28 +1,17 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import { useState, useRef, useEffect } from 'react'
-import Path1 from '@site/static/img/engineers/path-1.svg'
-import Path2 from '@site/static/img/engineers/path-2.svg'
-import Path3 from '@site/static/img/engineers/path-3.svg'
-import Path4 from '@site/static/img/engineers/path-4.svg'
-import Path5 from '@site/static/img/engineers/path-5.svg'
-import Path6 from '@site/static/img/engineers/path-6.svg'
-import Path7 from '@site/static/img/engineers/path-7.svg'
-import Path8 from '@site/static/img/engineers/path-8.svg'
 import MeltyProgramming from '@site/static/img/engineers/melty-programming.webp'
-import MeltanoTerminal from '@site/static/img/engineers/meltano-terminal.svg'
-
-import styles from './engineers.module.scss';
 
 const Engineers = ({ data }) => {
   const paths = [
-    { svg: Path1, class: 'curved-path-1' },
-    { svg: Path2, class: 'curved-path-2' },
-    { svg: Path3, class: 'curved-path-3' },
-    { svg: Path4, class: 'curved-path-4' },
-    { svg: Path5, class: 'curved-path-5' },
-    { svg: Path6, class: 'curved-path-6' },
-    { svg: Path7, class: 'curved-path-7' },
-    { svg: Path8, class: 'curved-path-8' },
+    { svg: '/img/engineers/path-1.svg', class: 'curved-path-1' },
+    { svg: '/img/engineers/path-2.svg', class: 'curved-path-2' },
+    { svg: '/img/engineers/path-3.svg', class: 'curved-path-3' },
+    { svg: '/img/engineers/path-4.svg', class: 'curved-path-4' },
+    { svg: '/img/engineers/path-5.svg', class: 'curved-path-5' },
+    { svg: '/img/engineers/path-6.svg', class: 'curved-path-6' },
+    { svg: '/img/engineers/path-7.svg', class: 'curved-path-7' },
+    { svg: '/img/engineers/path-8.svg', class: 'curved-path-8' },
   ]
 
   const tableItems = data.engineersTable.map((path, index) => ({
@@ -61,20 +50,20 @@ const Engineers = ({ data }) => {
   return (
     <>
       <div
-        className={`${styles['meltano-gives-engineers']} section ${
-          isVisible ? styles['in-view'] : ''
+        className={`meltano-gives-engineers section ${
+          isVisible ? 'in-view' : ''
         }`}
       >
         <div className="container">
           <div className="heading">
-            <h2 class="my-6" dangerouslySetInnerHTML={{ __html: data.engineersTitle }} />
+            <h2 className="my-6" dangerouslySetInnerHTML={{ __html: data.engineersTitle }} />
             <p
               className="heading-description p2"
               dangerouslySetInnerHTML={{ __html: data.engineersText }}
             />
           </div>
 
-          <div className={styles['meltano-gives-table-head']}>
+          <div className='meltano-gives-table-head'>
             <h5 className="brackets brackets-left">
               {data.engineersHead.engineersHeadLeft}
             </h5>
@@ -82,62 +71,78 @@ const Engineers = ({ data }) => {
               {data.engineersHead.engineersHeadRight}
             </h5>
           </div>
-          <div className={styles['meltano-gives-table']}>
-            <div className={`${styles['meltano-gives-table-list']} ${styles['table-list-left']}`}>
+          <div className='meltano-gives-table'>
+            <div className="meltano-gives-table-list table-list-left">
               {firstTable.map(item => (
                 <div
                   key={item.index}
-                  className={`${styles['meltano-gives-table-item']} ${styles[`table-item-order-${item.line.class.substring(12)}`]}`}
+                  className={`meltano-gives-table-item table-item-order-${item.line.class.substring(
+                    12
+                  )}`}
                 >
-                  <div className={styles['meltano-gives-table-item-bubble']}>
+                  <div className="meltano-gives-table-item-bubble">
                     <item.engineersTableImage
-                      className={styles['meltano-gives-table-item-image']}
+                      className="meltano-gives-table-item-image"
                       alt={item.engineersTableText}
                     />
-                    <span className={styles['meltano-gives-table-item-label']}>
+                    <span className="meltano-gives-table-item-label">
                       {item.engineersTableText}
                     </span>
                   </div>
-                  <item.line.svg
-                    className={`${styles['meltano-gives-table-item-path']} ${styles[item.line.class]}`}
+                  <img
+                    className={`meltano-gives-table-item-path ${item.line.class}`}
+                    src={item.line.svg}
                     alt=""
+                    width="100%"
+                    height="auto"
                   />
                   <div
-                    className={`${styles['meltano-gives-table-item-path-dot']} ${styles[item.line.class]}`}
+                    className={`meltano-gives-table-item-path-dot ${item.line.class}`}
                   />
                 </div>
               ))}
             </div>
-            <div className={styles['meltano-gives-terminal']} ref={givesRef}>
-              <MeltanoTerminal
-                className={styles['meltano-gives-terminal-image']}
+            <div className="meltano-gives-terminal" ref={givesRef}>
+              <img
+                className="meltano-gives-terminal-image"
+                src='/img/engineers/meltano-terminal.svg'
+                alt=""
+                width="100%"
+                height="auto"
               />
               <img
-                className={styles['meltano-gives-melty-image']}
+                className="meltano-gives-melty-image"
                 ref={givesRef}
                 src={MeltyProgramming}
                 alt=""
+                width="100%"
+                height="auto"
               />
             </div>
-            <div className={`${styles['meltano-gives-table-list']} ${styles['table-list-right']}`}>
+            <div className="meltano-gives-table-list table-list-right">
               {secondTable.map(item => (
                 <div
                   key={item.index}
-                  className={`${styles['meltano-gives-table-item']} ${styles[`table-item-order-${item.line.class.substring(12)}`]}`}
+                  className={`meltano-gives-table-item table-item-order-${item.line.class.substring(
+                    12
+                  )}`}
                 >
-                  <item.line.svg
-                    className={`${styles['meltano-gives-table-item-path']} ${styles[item.line.class]}`}
+                  <img
+                    className={`meltano-gives-table-item-path ${item.line.class}`}
+                    src={item.line.svg}
                     alt=""
+                    width="100%"
+                    height="auto"
                   />
                   <div
-                    className={`${styles['meltano-gives-table-item-path-dot']} ${styles[item.line.class]}`}
+                    className={`meltano-gives-table-item-path-dot ${item.line.class}`}
                   />
-                  <div className={styles['meltano-gives-table-item-bubble']}>
+                  <div className="meltano-gives-table-item-bubble">
                     <item.engineersTableImage
-                      className={styles['meltano-gives-table-item-image']}
+                      className="meltano-gives-table-item-image"
                       alt={item.engineersTableText}
                     />
-                    <span className={styles['meltano-gives-table-item-label']}>
+                    <span className="meltano-gives-table-item-label">
                       {item.engineersTableText}
                     </span>
                   </div>
@@ -181,3 +186,4 @@ const Engineers = ({ data }) => {
 }
 
 export default Engineers
+
