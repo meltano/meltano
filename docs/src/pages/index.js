@@ -33,7 +33,7 @@ export default function Home() {
   const engineers = {
     engineersTitle: 'Meltano gives data engineers <br><em>control and visibility</em><br> of their pipelines',
     engineersText: 'No more black box. Let your creativity flow.',
-    engineersHead: { engineersHeadLeft: 'Sources', engineersHeadRight: 'Destinations' },
+    engineersHead: { engineersHeadLeft: 'Extractors', engineersHeadRight: 'Loaders' },
     engineersTable: [
       { engineersTableText: 'SaaS API', engineersTableImage: SaaS },
       { engineersTableText: 'Database', engineersTableImage: Database },
