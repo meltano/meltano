@@ -27,23 +27,23 @@ const Engineers = ({ data }) => {
   const givesRef = useRef(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const handleScroll = () => {
-        const scrollTop = window.scrollY
-        const elementHeight = givesRef.current.offsetHeight
+    const el = givesRef.current
+    if (!el) return
 
-        if (scrollTop > elementHeight) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
           setIsVisible(true)
+          observer.disconnect()
         }
-      }
+      },
+      { threshold: 0.1 }
+    )
 
-      handleScroll()
-      window.addEventListener('scroll', handleScroll)
+    observer.observe(el)
 
-      // Clean up the event listener on component unmount
-      return () => {
-        window.removeEventListener('scroll', handleScroll)
-      }
+    return () => {
+      observer.disconnect()
     }
   }, [])
 
@@ -112,7 +112,6 @@ const Engineers = ({ data }) => {
               />
               <img
                 className="meltano-gives-melty-image"
-                ref={givesRef}
                 src={MeltyProgramming}
                 alt=""
                 width="100%"
