@@ -11,7 +11,11 @@ from unittest import mock
 import pytest
 
 import meltano
-from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
+from meltano.core.meltano_invoker import (
+    MELTANO_COMMAND,
+    MELTANO_PATH_ENV,
+    MeltanoInvoker,
+)
 from meltano.core.tracking.contexts import environment_context
 
 if t.TYPE_CHECKING:
@@ -61,7 +65,7 @@ class TestMeltanoInvoker:
         with mock.patch("subprocess.run", return_value=process_mock) as run_mock:
             subject.invoke(["--version"])
 
-            # Preferally, we use the symlink created by Project.activate
+            # Prefer symlink created by Project.activate (when MELTANO_PATH not set)
             symlink_path = project.dirs.run().joinpath("bin")
             assert run_mock.call_args[0][0][0] == str(symlink_path)
 
@@ -86,3 +90,46 @@ class TestMeltanoInvoker:
 
             # ...we expect it to be in the PATH
             assert run_mock.call_args[0][0][0] == "nonexistent"
+
+    def test_meltano_path_env_set_for_children(
+        self,
+        subject: MeltanoInvoker,
+        project: Project,
+    ) -> None:
+        """Child processes receive MELTANO_PATH and PATH prefix (issue #6910)."""
+        env = subject._executable_env()
+        # When we can resolve the meltano executable, MELTANO_PATH is set
+        resolved = subject._meltano_executable_path()
+        if resolved is not None:
+            assert env.get(MELTANO_PATH_ENV) == resolved
+            # PATH is prefixed with the directory containing meltano
+            assert env["PATH"].startswith(str(Path(resolved).parent))
+        else:
+            assert MELTANO_PATH_ENV not in env
+
+    def test_meltano_path_env_takes_precedence(
+        self,
+        subject: MeltanoInvoker,
+        project: Project,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """When MELTANO_PATH is set in environment, it is used for resolution."""
+        custom_path = "/custom/path/to/meltano"
+        monkeypatch.setenv(MELTANO_PATH_ENV, custom_path)
+        # When MELTANO_PATH is set and the path exists, we use it (e.g. containers)
+        with mock.patch.object(Path, "exists", return_value=True):
+            assert subject._meltano_executable_path() == custom_path
+            env = subject._executable_env()
+            assert env[MELTANO_PATH_ENV] == custom_path
+            assert env["PATH"].startswith("/custom/path/to")
+
+    def test_meltano_path_env_ignored_when_path_missing(
+        self,
+        subject: MeltanoInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """When MELTANO_PATH is set but path does not exist, we fall back."""
+        monkeypatch.setenv(MELTANO_PATH_ENV, "/nonexistent/meltano")
+        # Should fall back to symlink or same-dir, not use the missing path
+        resolved = subject._meltano_executable_path()
+        assert resolved != "/nonexistent/meltano"

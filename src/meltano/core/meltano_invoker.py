@@ -18,6 +18,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 MELTANO_COMMAND = "meltano"
+MELTANO_PATH_ENV = "MELTANO_PATH"
 
 
 class MeltanoInvoker:
@@ -56,12 +57,34 @@ class MeltanoInvoker:
             env=self._executable_env(env),
         )
 
+    def _meltano_executable_path(self) -> str | None:
+        """Resolve the Meltano executable path for child processes.
+
+        Resolution order (see https://github.com/meltano/meltano/issues/6910):
+        1. MELTANO_PATH env var (containers / multi-version)
+        2. Symlink created by Project.activate
+        3. Same directory as sys.executable (e.g. venv bin/)
+        """
+        if path := os.environ.get(MELTANO_PATH_ENV):
+            if Path(path).exists():
+                return path
+        symlink = self.project.dirs.run().joinpath("bin")
+        if symlink.exists():
+            return str(symlink)
+        executable = Path(
+            os.path.dirname(sys.executable),  # noqa: PTH120
+            "meltano.exe" if platform.system() == "Windows" else MELTANO_COMMAND,
+        )
+        if executable.exists():
+            return str(executable)
+        return None
+
     def _executable_path(self, command):  # noqa: ANN001, ANN202
         if command == MELTANO_COMMAND:
-            # This symlink is created by Project.activate
-            executable_symlink = self.project.dirs.run().joinpath("bin")
-            if executable_symlink.exists():
-                return str(executable_symlink)
+            path = self._meltano_executable_path()
+            if path is not None:
+                return path
+            return MELTANO_COMMAND
 
         executable = Path(
             os.path.dirname(sys.executable),  # noqa: PTH120
@@ -74,7 +97,7 @@ class MeltanoInvoker:
     def _executable_env(self, env: Mapping[str, str] | None = None) -> dict[str, str]:
         if env is None:
             env = {}
-        return {
+        base = {
             # Include env that project settings are evaluated in
             **self.project.settings.env,
             # Include env for settings explicitly overridden using CLI flags
@@ -84,3 +107,11 @@ class MeltanoInvoker:
             # Include telemetry env vars
             **self.tracker.env,
         }
+        # Pass MELTANO_PATH and prefix PATH so child processes can find meltano
+        meltano_path = self._meltano_executable_path()
+        if meltano_path is not None:
+            base[MELTANO_PATH_ENV] = meltano_path
+            meltano_dir = str(Path(meltano_path).parent)
+            existing_path = base.get("PATH", os.environ.get("PATH", ""))
+            base["PATH"] = os.pathsep.join([meltano_dir, existing_path])
+        return base
