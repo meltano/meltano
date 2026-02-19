@@ -2,13 +2,13 @@ import React from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageEngineers from '../components/homepage/Engineers';
-import SaaS from '@site/static/img/engineers/1-saas-api.svg'
-import Database from '@site/static/img/engineers/2-database.svg'
-import File from '@site/static/img/engineers/3-file.svg'
-import TargetDatabase from '@site/static/img/engineers/5-database.svg'
-import TargetVectorDB from '@site/static/img/engineers/6-vector-db.svg'
-import TargetWarehouse from '@site/static/img/engineers/7-data-warehouse.svg'
-import TargetLake from '@site/static/img/engineers/8-data-lake.svg'
+import SaaS from '@site/static/img/engineers/1-saas-api.svg';
+import Database from '@site/static/img/engineers/2-database.svg';
+import File from '@site/static/img/engineers/3-file.svg';
+import TargetDatabase from '@site/static/img/engineers/5-database.svg';
+import TargetVectorDB from '@site/static/img/engineers/6-vector-db.svg';
+import TargetWarehouse from '@site/static/img/engineers/7-data-warehouse.svg';
+import TargetLake from '@site/static/img/engineers/8-data-lake.svg';
 import HomepageFeatures from '../components/homepage/Features';
 
 import styles from './index.module.scss';
@@ -50,7 +50,7 @@ export default function Home() {
       },
       { engineersTableText: 'Data Lake', engineersTableImage: TargetLake }
     ]
-  }
+  };
   return (
     <Layout
       title={siteConfig.title}
