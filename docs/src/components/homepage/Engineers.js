@@ -1,4 +1,5 @@
-/* eslint-disable jsx-a11y/mouse-events-have-key-events */
+import React from 'react'
+import PropTypes from 'prop-types'
 import { useState, useRef, useEffect } from 'react'
 import MeltyProgramming from '@site/static/img/engineers/melty-programming.webp'
 import styles from './engineers.module.scss';
@@ -179,6 +180,18 @@ const Engineers = ({ data }) => {
       </Modal> */}
     </>
   )
+}
+
+Engineers.propTypes = {
+  data: PropTypes.shape({
+    engineersTable: PropTypes.arrayOf(PropTypes.object).isRequired,
+    engineersTitle: PropTypes.string.isRequired,
+    engineersText: PropTypes.string.isRequired,
+    engineersHead: PropTypes.shape({
+      engineersHeadLeft: PropTypes.string.isRequired,
+      engineersHeadRight: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 }
 
 export default Engineers
