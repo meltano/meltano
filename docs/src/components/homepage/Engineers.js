@@ -1,7 +1,7 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { useState, useRef, useEffect } from 'react'
-import MeltyProgramming from '@site/static/img/engineers/melty-programming.webp'
+import React from 'react';
+import PropTypes from 'prop-types';
+import { useState, useRef, useEffect } from 'react';
+import MeltyProgramming from '@site/static/img/engineers/melty-programming.webp';
 import styles from './engineers.module.scss';
 
 const Engineers = ({ data }) => {
@@ -14,40 +14,40 @@ const Engineers = ({ data }) => {
     { svg: '/img/engineers/path-6.svg', class: 'curved-path-6' },
     { svg: '/img/engineers/path-7.svg', class: 'curved-path-7' },
     { svg: '/img/engineers/path-8.svg', class: 'curved-path-8' },
-  ]
+  ];
 
   const tableItems = data.engineersTable.map((path, index) => ({
     ...path,
     index: index,
     line: paths[index],
-  }))
+  }));
 
-  const firstTable = tableItems.slice(0, 4)
-  const secondTable = tableItems.slice(4)
+  const firstTable = tableItems.slice(0, 4);
+  const secondTable = tableItems.slice(4);
 
-  const [isVisible, setIsVisible] = useState(false)
-  const givesRef = useRef(null)
+  const [isVisible, setIsVisible] = useState(false);
+  const givesRef = useRef(null);
 
   useEffect(() => {
-    const el = givesRef.current
-    if (!el) return
+    const el = givesRef.current;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
+          setIsVisible(true);
+          observer.disconnect();
         }
       },
       { threshold: 0.1 }
-    )
+    );
 
-    observer.observe(el)
+    observer.observe(el);
 
     return () => {
-      observer.disconnect()
-    }
-  }, [])
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <>
@@ -179,8 +179,8 @@ const Engineers = ({ data }) => {
         </div>
       </Modal> */}
     </>
-  )
-}
+  );
+};
 
 Engineers.propTypes = {
   data: PropTypes.shape({
@@ -192,6 +192,6 @@ Engineers.propTypes = {
       engineersHeadRight: PropTypes.string.isRequired,
     }).isRequired,
   }).isRequired,
-}
+};
 
-export default Engineers
+export default Engineers;
