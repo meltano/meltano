@@ -41,10 +41,7 @@ def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
     root_logger = logging.getLogger()  # noqa: TID251
     log_level = root_logger.level
     try:
-        runner = MeltanoCliRunner(snowplow=snowplow_optional)
-        # TODO: Remove this once support for Click<8.2 is dropped
-        runner.mix_stderr = False
-        yield runner
+        yield MeltanoCliRunner(snowplow=snowplow_optional)
     finally:
         root_logger.setLevel(log_level)
 
