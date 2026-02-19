@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import { useState, useRef, useEffect } from 'react'
 import MeltyProgramming from '@site/static/img/engineers/melty-programming.webp'
+import styles from './engineers.module.scss';
 
 const Engineers = ({ data }) => {
   const paths = [
@@ -50,11 +51,11 @@ const Engineers = ({ data }) => {
   return (
     <>
       <div
-        className={`meltano-gives-engineers section ${
-          isVisible ? 'in-view' : ''
+        className={`${styles['meltano-gives-engineers']} section ${
+          isVisible ? styles['in-view'] : ''
         }`}
       >
-        <div className="container">
+        <div className={styles.container}>
           <div className="heading">
             <h2 className="my-6" dangerouslySetInnerHTML={{ __html: data.engineersTitle }} />
             <p
@@ -63,85 +64,81 @@ const Engineers = ({ data }) => {
             />
           </div>
 
-          <div className='meltano-gives-table-head'>
-            <h5 className="brackets brackets-left">
+          <div className={styles['meltano-gives-table-head']}>
+            <h5 className={`brackets ${styles['brackets-left']}`}>
               {data.engineersHead.engineersHeadLeft}
             </h5>
-            <h5 className="brackets-blue brackets-right">
+            <h5 className={`brackets-blue ${styles['brackets-right']}`}>
               {data.engineersHead.engineersHeadRight}
             </h5>
           </div>
-          <div className='meltano-gives-table'>
-            <div className="meltano-gives-table-list table-list-left">
+          <div className={styles['meltano-gives-table']}>
+            <div className={`${styles['meltano-gives-table-list']} ${styles['table-list-left']}`}>
               {firstTable.map(item => (
                 <div
                   key={item.index}
-                  className={`meltano-gives-table-item table-item-order-${item.line.class.substring(
-                    12
-                  )}`}
+                  className={`${styles['meltano-gives-table-item']} ${styles[`table-item-order-${item.line.class.substring(12)}`]}`}
                 >
-                  <div className="meltano-gives-table-item-bubble">
+                  <div className={styles['meltano-gives-table-item-bubble']}>
                     <item.engineersTableImage
-                      className="meltano-gives-table-item-image"
+                      className={styles['meltano-gives-table-item-image']}
                       alt={item.engineersTableText}
                     />
-                    <span className="meltano-gives-table-item-label">
+                    <span className={styles['meltano-gives-table-item-label']}>
                       {item.engineersTableText}
                     </span>
                   </div>
                   <img
-                    className={`meltano-gives-table-item-path ${item.line.class}`}
+                    className={`${styles['meltano-gives-table-item-path']} ${styles[item.line.class]}`}
                     src={item.line.svg}
                     alt=""
                     width="100%"
                     height="auto"
                   />
                   <div
-                    className={`meltano-gives-table-item-path-dot ${item.line.class}`}
+                    className={`${styles['meltano-gives-table-item-path-dot']} ${styles[item.line.class]}`}
                   />
                 </div>
               ))}
             </div>
-            <div className="meltano-gives-terminal" ref={givesRef}>
+            <div className={styles['meltano-gives-terminal']} ref={givesRef}>
               <img
-                className="meltano-gives-terminal-image"
+                className={styles['meltano-gives-terminal-image']}
                 src='/img/engineers/meltano-terminal.svg'
                 alt=""
                 width="100%"
                 height="auto"
               />
               <img
-                className="meltano-gives-melty-image"
+                className={styles['meltano-gives-melty-image']}
                 src={MeltyProgramming}
                 alt=""
                 width="100%"
                 height="auto"
               />
             </div>
-            <div className="meltano-gives-table-list table-list-right">
+            <div className={`${styles['meltano-gives-table-list']} ${styles['table-list-right']}`}>
               {secondTable.map(item => (
                 <div
                   key={item.index}
-                  className={`meltano-gives-table-item table-item-order-${item.line.class.substring(
-                    12
-                  )}`}
+                  className={`${styles['meltano-gives-table-item']} ${styles[`table-item-order-${item.line.class.substring(12)}`]}`}
                 >
                   <img
-                    className={`meltano-gives-table-item-path ${item.line.class}`}
+                    className={`${styles['meltano-gives-table-item-path']} ${styles[item.line.class]}`}
                     src={item.line.svg}
                     alt=""
                     width="100%"
                     height="auto"
                   />
                   <div
-                    className={`meltano-gives-table-item-path-dot ${item.line.class}`}
+                    className={`${styles['meltano-gives-table-item-path-dot']} ${styles[item.line.class]}`}
                   />
-                  <div className="meltano-gives-table-item-bubble">
+                  <div className={styles['meltano-gives-table-item-bubble']}>
                     <item.engineersTableImage
-                      className="meltano-gives-table-item-image"
+                      className={styles['meltano-gives-table-item-image']}
                       alt={item.engineersTableText}
                     />
-                    <span className="meltano-gives-table-item-label">
+                    <span className={styles['meltano-gives-table-item-label']}>
                       {item.engineersTableText}
                     </span>
                   </div>
@@ -185,4 +182,3 @@ const Engineers = ({ data }) => {
 }
 
 export default Engineers
-
