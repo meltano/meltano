@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import typing as t
 from contextlib import suppress
 
@@ -61,6 +62,34 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 
 {% if plugin_url %}To learn more about {{ plugin_name | safe }} and its settings, visit [link={{ plugin_url }}]{{ plugin_url }}[/link]{% endif %}
 """  # noqa: E501
+
+
+def _nested_settings_from_value(
+    value: str,
+) -> list[tuple[tuple[str, ...], t.Any]] | None:
+    """If value is a JSON object, return (path_suffix, leaf_value) pairs; else None.
+
+    When a user passes an object like '{"log_level": "debug"}', we expand it
+    so that each key can be set under the given setting path (e.g. cli.log_level).
+    """
+    try:
+        parsed = json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    if not isinstance(parsed, dict) or not parsed:
+        return None
+    result: list[tuple[tuple[str, ...], t.Any]] = []
+
+    def traverse(d: dict[str, t.Any], prefix: tuple[str, ...]) -> None:
+        for k, v in d.items():
+            path = (*prefix, k)
+            if isinstance(v, dict) and v:
+                traverse(v, path)
+            else:
+                result.append((path, v))
+
+    traverse(parsed, ())
+    return result
 
 
 class InteractiveConfig:
@@ -404,7 +433,7 @@ class InteractiveConfig:
                     show_set_prompt=False,
                 )
 
-    def set_value(
+    def _set_one_value(
         self,
         setting_name: tuple[str, ...],
         value: t.Any,  # noqa: ANN401
@@ -412,7 +441,7 @@ class InteractiveConfig:
         *,
         interactive: bool = False,
     ) -> None:
-        """Set value helper function."""
+        """Set a single setting path and report it."""
         settings = self.settings
         path = list(setting_name)
         try:
@@ -460,3 +489,36 @@ class InteractiveConfig:
             self.tracker.track_command_event(CliEvent.inflight)
         else:
             self.tracker.track_command_event(CliEvent.completed)
+
+    def set_value(
+        self,
+        setting_name: tuple[str, ...],
+        value: t.Any,  # noqa: ANN401
+        store: SettingValueStore,
+        *,
+        interactive: bool = False,
+    ) -> None:
+        """Set value helper function.
+
+        When the target setting is an OBJECT and the value is a JSON object string,
+        expands to set each nested key under the given path (e.g. cli + {"log_level": "debug"}
+        sets cli.log_level = "debug").
+        """
+        settings = self.settings
+        if not isinstance(value, str):
+            self._set_one_value(setting_name, value, store, interactive=interactive)
+            return
+        nested = _nested_settings_from_value(value)
+        if nested is None:
+            self._set_one_value(setting_name, value, store, interactive=interactive)
+            return
+        base_name = ".".join(setting_name)
+        target_setting = settings.find_setting(base_name)
+        # Expand when base is an OBJECT setting, or when base is unknown (e.g. "cli"
+        # for meltano, where only cli.log_level, cli.log_config, etc. exist).
+        if target_setting is not None and target_setting.kind != SettingKind.OBJECT:
+            self._set_one_value(setting_name, value, store, interactive=interactive)
+            return
+        for path_suffix, leaf_value in nested:
+            full_name = setting_name + path_suffix
+            self._set_one_value(full_name, leaf_value, store, interactive=interactive)

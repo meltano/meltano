@@ -137,6 +137,19 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
+    def test_config_set_with_json_object_expands_nested_paths(self, cli_runner) -> None:
+        """Setting a JSON object value sets each key under the given path (issue #8245)."""
+        result = cli_runner.invoke(
+            cli,
+            ["config", "set", "meltano", "cli", '{"log_level": "debug"}'],
+        )
+        assert_cli_runner(result)
+        assert "Meltano setting 'cli.log_level' was set in" in result.stdout
+        assert "'debug'" in result.stdout
+        # Restore default so other tests (e.g. test_config_meltano) see expected state
+        cli_runner.invoke(cli, ["config", "set", "meltano", "cli.log_level", "info"])
+
+    @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("message_type", ("RECORD", "BATCH"))
     def test_config_test(self, cli_runner, tap, message_type: str) -> None:
         mock_invoke = mock.Mock()
