@@ -79,11 +79,11 @@ export default function NavbarMobilePrimaryMenu() {
               className={styles.menuSocIcon}
             />
           </a> */}
-          <a href="https://www.youtube.com/meltano" className="opacity-50">
+          <a href="https://www.youtube.com/@meltano" className="opacity-50">
             <YoutubeLogo title="Youtube Logo" className={styles.menuSocIcon} />
           </a>
           <a
-            href="https://www.crunchbase.com/organization/meltano"
+            href="https://www.crunchbase.com/organization/matatika"
             className="opacity-50"
           >
             <CrunchbaseLogo
