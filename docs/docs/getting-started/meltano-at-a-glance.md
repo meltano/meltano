@@ -36,11 +36,11 @@ Welcome to your Open Source DataOps Infrastructure! With Meltano you can move yo
 - **Mature system**: Developed since [2018](https://handbook.meltano.com/timeline), runs in production at large companies like GitLab, and currently powers over a million pipeline runs monthly.
 - **First class ELT tooling built-in**: Extract data from any data source, load into any target, use inline maps to transform on data on the fly, and test the incoming data, all in one package.
 
-### The Quick Introduction
+<!-- ### The Quick Introduction
 
 Waiting to see how Meltano works within 90 secs? We got you covered:
 
-<iframe class="video" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 
 ## Core Workflow
 
@@ -53,19 +53,19 @@ Meltano helps you to create your end-to-end data stack within minutes. The core 
 
 Meltano allows you to do any combination of these steps inside your Meltano project, controlled by the Meltano CLI.
 
-### Extracting & Loading data
+<!-- ### Extracting & Loading data
 
 Here's a complete walk-through pulling data from AWS S3 and dumping it into a PostgreSQL database within 60 secs.
 
 <div class="language-bash highlighter-rouge">
     <iframe class="video" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div>
+</div> -->
 
-### Transforming data
+<!-- ### Transforming data
 
 Here's a complete walk-through extending the extract & load to include more CSVs and running a dbt-project over them to transform the data.
 
-<iframe class="video" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 
 ### Orchestrating workflows
 
@@ -77,11 +77,11 @@ meltano schedule add gitlab-to-postgres --extractor tap-gitlab --loader target-p
 
 to add the schedule. Meltano also provides commands to start an Airflow instance to execute on these schedules. You can find out more about it in the [Orchestrate Data Section](https://docs.meltano.com/guide/orchestration).
 
-### Adding Additional Steps
+<!-- ### Adding Additional Steps
 
 Need to add additional steps to your data pipeline? Here's a complete setup also pulling in Superset as visualization tool.
 
-<iframe class="video" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
 
 ### Getting Started Resources
 

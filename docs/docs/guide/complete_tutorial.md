@@ -13,11 +13,11 @@ import TabItem from '@theme/TabItem';
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
-:::tip
+<!-- :::tip
 
 <strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!
 
-:::
+::: -->
 
 ## Install Meltano
 
