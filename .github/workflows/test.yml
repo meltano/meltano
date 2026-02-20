@@ -92,16 +92,6 @@ jobs:
         check-latest: true
         allow-prereleases: true
 
-    - name: Set up Docker Buildx
-      if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
-
-    - name: Get Docker
-      if: always() && (matrix.backend-db == 'mssql')
-      uses: actions-hub/docker/cli@f5fdbfc3f9d2a9265ead8962c1314108a7b7ec5d # v1.0.3
-      env:
-        SKIP_LOGIN: true
-
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg2')
       run: >
@@ -113,6 +103,7 @@ jobs:
         docker compose -f .github/workflows/resources/docker-compose.mssql.yaml up -d --wait --quiet-pull
 
     - name: Check running containers
+      if: matrix.backend-db != 'sqlite'
       run: |
         docker ps -a
 
