@@ -202,7 +202,7 @@ class SingerTap(SingerPlugin):
         """Get the configuration files for this tap."""
         return {
             "config": f"tap.{self.instance_uuid}.config.json",
-            "catalog": "tap.properties.json",
+            "catalog": f"tap.{self.instance_uuid}.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
             "singer_sdk_logging": "tap.singer_sdk_logging.json",
