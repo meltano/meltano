@@ -68,14 +68,14 @@ export default function FooterCopyright({ copyright }) {
           />
         </a> */}
         <a
-          href="https://www.youtube.com/meltano"
+          href="https://www.youtube.com/@meltano"
           className="opacity-50"
           target="_blank" rel="noreferrer"
         >
           <YoutubeLogo title="Youtube Logo" className={styles.footerSocIcon} />
         </a>
         <a
-          href="https://www.crunchbase.com/organization/meltano"
+          href="https://www.crunchbase.com/organization/matatika"
           className="opacity-50"
           target="_blank" rel="noreferrer"
         >

@@ -136,6 +136,7 @@ h2 {
   font-weight: 700;
   font-size: 56px;
   line-height: 110%;
+  text-align: center;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -552,6 +553,21 @@ img {
 .brackets {
   position: relative;
   display: inline-block;
+}
+
+.brackets-blue {
+  position: relative;
+  display: block;
+}
+
+.brackets-blue:before {
+  content: '/';
+  color: #3a64fa;
+}
+
+.brackets-blue:after {
+  content: '/';
+  color: #3a64fa;
 }
 
 .brackets::before {
@@ -1054,6 +1070,15 @@ main {
 .video {
   aspect-ratio: 16 / 9;
   width: 100%;
+}
+
+.heading-description {
+  text-align: center;
+  margin-top: 18px;
+  margin-bottom: 60px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* termynal */

@@ -13,11 +13,11 @@ import TabItem from '@theme/TabItem';
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
-:::tip
+<!-- :::tip
 
 <strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!
 
-:::
+::: -->
 
 ## Install Meltano
 
@@ -36,31 +36,23 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
     cd meltano-projects
     ```
 
-1.  Install the [pipx](https://pypa.github.io/pipx/) package manager:
+1.  Install the [uv](https://docs.astral.sh/uv/) package manager:
 
     ```bash
-    #For Windows (PowerShell): New-Alias Python3 Python
-    python3 -m pip install --user pipx
-    python3 -m pipx ensurepath
-    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
-    source ~/.bashrc
+    # See https://docs.astral.sh/uv/getting-started/installation/ for Windows instructions
+    curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
-
-:::info
-
-<p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
-:::
 
 1.  Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
 
     ```bash
-    pipx install meltano
+    uv tool install meltano
     ```
 
-    If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
+    You can specify the Python version with the `--python` argument:
 
     ```bash
-    pipx install meltano --python <path to desired Python executable>
+    uv tool install --python <desired Python version> meltano
     ```
 
 1.  Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:

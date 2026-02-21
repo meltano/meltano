@@ -2,6 +2,7 @@
 title: Video Tutorials & Demos
 description: Learn advanced Meltano projects taught in an Office Hour or Demo Day session via YouTube.
 layout: doc
+sidebar_class_name: hidden
 ---
 Below is a list video tutorials & demos on specific Meltano-related topics. Most lessons are part of a longer YouTube video. If that is the case, the link below will guide you to the correct time period.
 
