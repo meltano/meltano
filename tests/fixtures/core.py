@@ -1064,6 +1064,14 @@ def discovery():
                         "pip_url": "tap-mock",
                         "executable": "tap-mock",
                         "capabilities": ["discover", "catalog", "state"],
+                        # 3 groups to cover: all-groups (test), some-groups
+                        # plural (secure in 1+3), single-group (port in 3,
+                        # auth.* in 2), and not-required (start_date).
+                        "settings_group_validation": [
+                            ["test", "secure"],
+                            ["test", "auth.username", "auth.password"],
+                            ["test", "secure", "port"],
+                        ],
                         "settings": [
                             {"name": "test", "value": "mock"},
                             {"name": "start_date"},

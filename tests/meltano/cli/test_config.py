@@ -12,6 +12,7 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.config import _required_label
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
@@ -187,7 +188,8 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert (
-            f"secure [env: TAP_MOCK_SECURE] current value: {REDACTED_VALUE} (from the "
+            "secure (required by groups 1, 3) [env: TAP_MOCK_SECURE] current value: "
+            f"{REDACTED_VALUE} (from the "
             "TAP_MOCK_SECURE variable in `.env`)"
         ) in result.stdout
 
@@ -212,7 +214,9 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert (
-            f"secure [env: TAP_MOCK_INHERITED_SECURE] current value: {REDACTED_VALUE} "
+            "secure (required by groups 1, 3) "
+            "[env: TAP_MOCK_INHERITED_SECURE] current value: "
+            f"{REDACTED_VALUE} "
             f"(inherited from '{tap.name}')"
         ) in result.stdout
 
@@ -238,9 +242,85 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert (
-            f"secure [env: TAP_MOCK_SECURE] current value: '{value}' (from the "
-            "TAP_MOCK_SECURE variable in `.env`)"
+            f"secure (required by groups 1, 3) [env: TAP_MOCK_SECURE] "
+            f"current value: '{value}' "
+            "(from the TAP_MOCK_SECURE variable in `.env`)"
         ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_required_settings(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        assert "test (required) [env:" in result.stdout
+        assert "secure (required by groups 1, 3) [env:" in result.stdout
+        assert "auth.username (required by group 2) [env:" in result.stdout
+        assert "auth.password (required by group 2) [env:" in result.stdout
+        assert "port (required by group 3) [env:" in result.stdout
+
+        assert "start_date (required" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_group_summary(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        assert (
+            "Setting groups (one of the following combinations is required):"
+        ) in result.stdout
+        assert "Group 1: secure, test" in result.stdout
+        assert "Group 2: auth.password, auth.username, test" in result.stdout
+        assert "Group 3: port, secure, test" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_meltano_no_required(self, cli_runner) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+        assert_cli_runner(result)
+
+        assert "(required)" not in result.stdout
+        assert "Setting groups" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_single_group(self, cli_runner, tap, project) -> None:
+        plugin = project.plugins.find_plugin(
+            tap.name,
+            plugin_type=tap.type,
+            configurable=True,
+        )
+        original = plugin.settings_group_validation
+        plugin.settings_group_validation = [["test", "secure"]]
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            assert_cli_runner(result)
+        finally:
+            plugin.settings_group_validation = original
+
+        assert "Required settings: secure, test" in result.stdout
+        assert "Setting groups" not in result.stdout
+        assert "test (required) [env:" in result.stdout
+        assert "secure (required) [env:" in result.stdout
+        assert "port (required" not in result.stdout
+
+
+class TestRequiredLabel:
+    @pytest.mark.parametrize(
+        ("groups", "num_groups", "expected"),
+        (
+            ([1], 1, "required"),
+            ([1, 2, 3], 3, "required"),
+            ([1], 3, "required by group 1"),
+            ([2], 3, "required by group 2"),
+            ([1, 3], 3, "required by groups 1, 3"),
+            ([1, 2], 3, "required by groups 1, 2"),
+        ),
+    )
+    def test_required_label(
+        self,
+        groups: list[int],
+        num_groups: int,
+        expected: str,
+    ) -> None:
+        assert _required_label(groups, num_groups) == expected
 
 
 class TestCliConfigSet:
