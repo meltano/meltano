@@ -213,7 +213,6 @@ class Project:
         }
 
     @classmethod
-    @fasteners.locked(lock="_activate_lock")
     def activate(cls, project: Project) -> None:
         """Activate the given Project.
 
@@ -225,43 +224,44 @@ class Project:
         """
         import ctypes
 
-        check_meltano_compatibility(project.meltano.requires_meltano)
+        with cls._activate_lock:
+            check_meltano_compatibility(project.meltano.requires_meltano)
 
-        # create a symlink to our current binary
-        try:
-            # check if running on Windows
-            if os.name == "nt":
-                executable = Path(sys.executable).parent / "meltano.exe"
-                # Admin privileges are required to create symlinks on Windows
-                if ctypes.windll.shell32.IsUserAnAdmin():  # type: ignore[attr-defined]
-                    if executable.is_file():
-                        project.dirs.run().joinpath("bin").symlink_to(executable)
+            # create a symlink to our current binary
+            try:
+                # check if running on Windows
+                if os.name == "nt":
+                    executable = Path(sys.executable).parent / "meltano.exe"
+                    # Admin privileges are required to create symlinks on Windows
+                    if ctypes.windll.shell32.IsUserAnAdmin():  # type: ignore[attr-defined]
+                        if executable.is_file():
+                            project.dirs.run().joinpath("bin").symlink_to(executable)
+                        else:
+                            logger.warning(
+                                "Could not create symlink: meltano.exe not "  # noqa: G004
+                                f"present in {Path(sys.executable).parent!s}",
+                            )
                     else:
-                        logger.warning(
-                            "Could not create symlink: meltano.exe not "  # noqa: G004
-                            f"present in {Path(sys.executable).parent!s}",
+                        logger.debug(
+                            "Failed to create symlink to 'meltano.exe': "
+                            "administrator privilege required",
                         )
                 else:
-                    logger.debug(
-                        "Failed to create symlink to 'meltano.exe': "
-                        "administrator privilege required",
+                    executable = Path(sys.executable).parent / "meltano"
+                    if executable.is_file():
+                        project.dirs.run().joinpath("bin").symlink_to(executable)
+            except FileExistsError:
+                pass
+            except OSError as error:
+                if error.errno == errno.EOPNOTSUPP:
+                    logger.warning(
+                        f"Could not create symlink: {error}\nPlease make sure "  # noqa: G004
+                        "that the underlying filesystem supports symlinks.",
                     )
-            else:
-                executable = Path(sys.executable).parent / "meltano"
-                if executable.is_file():
-                    project.dirs.run().joinpath("bin").symlink_to(executable)
-        except FileExistsError:
-            pass
-        except OSError as error:
-            if error.errno == errno.EOPNOTSUPP:
-                logger.warning(
-                    f"Could not create symlink: {error}\nPlease make sure "  # noqa: G004
-                    "that the underlying filesystem supports symlinks.",
-                )
-            else:
-                raise
+                else:
+                    raise
 
-        logger.debug("Activated project at %s", project.root)
+            logger.debug("Activated project at %s", project.root)
 
         # set the default project
         cls._default = project
@@ -281,7 +281,6 @@ class Project:
         return self.meltano.version
 
     @classmethod
-    @fasteners.locked(lock="_find_lock")
     def find(
         cls,
         project_root: Path | str | None = None,
@@ -307,31 +306,40 @@ class Project:
                 project, or the current working directory is not a Meltano
                 project or a subfolder of one.
         """
-        if cls._default:
-            return cls._default
+        with cls._find_lock:
+            if cls._default:
+                return cls._default
 
-        readonly = truthy(os.getenv(PROJECT_READONLY_ENV, "false"))
+            readonly = truthy(os.getenv(PROJECT_READONLY_ENV, "false"))
 
-        if project_root := project_root or os.getenv(PROJECT_ROOT_ENV):
-            project = Project(project_root, readonly=readonly, dotenv_file=dotenv_file)
-            if not project.meltanofile.exists():
-                raise ProjectNotFound(project)
-        else:
-            for directory in walk_parent_directories():
-                project = Project(directory, readonly=readonly, dotenv_file=dotenv_file)
-                if project.meltanofile.exists():
-                    break
-            if not project.meltanofile.exists():
-                raise ProjectNotFound(Project(Path.cwd()))
+            if project_root := project_root or os.getenv(PROJECT_ROOT_ENV):
+                project = Project(
+                    project_root,
+                    readonly=readonly,
+                    dotenv_file=dotenv_file,
+                )
+                if not project.meltanofile.exists():
+                    raise ProjectNotFound(project)
+            else:
+                for directory in walk_parent_directories():
+                    project = Project(
+                        directory,
+                        readonly=readonly,
+                        dotenv_file=dotenv_file,
+                    )
+                    if project.meltanofile.exists():
+                        break
+                if not project.meltanofile.exists():
+                    raise ProjectNotFound(Project(Path.cwd()))
 
-        readonly = project.settings.get("project_readonly")
-        if readonly != project.readonly:
-            project.refresh(readonly=readonly)
+            readonly = project.settings.get("project_readonly")
+            if readonly != project.readonly:
+                project.refresh(readonly=readonly)
 
-        if activate:
-            cls.activate(project)
+            if activate:
+                cls.activate(project)
 
-        return project
+            return project
 
     @property
     def meltano(self) -> MeltanoFileTypeHint:
