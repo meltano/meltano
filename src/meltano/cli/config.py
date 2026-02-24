@@ -6,6 +6,7 @@ import json
 import sys
 import tempfile
 import typing as t
+from collections import defaultdict
 from functools import wraps
 from pathlib import Path
 
@@ -401,10 +402,10 @@ def list_settings(
     validation_groups: list[list[str]] = (
         plugin.settings_group_validation if plugin else []
     ) or []
-    setting_groups: dict[str, list[int]] = {}
+    setting_groups: dict[str, list[int]] = defaultdict(list)
     for i, group in enumerate(validation_groups, 1):
         for setting_name in group:
-            setting_groups.setdefault(setting_name, []).append(i)
+            setting_groups[setting_name].append(i)
     num_groups = len(validation_groups)
     if num_groups > 1:
         click.echo("Setting groups (one of the following combinations is required):")
