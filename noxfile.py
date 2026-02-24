@@ -194,7 +194,7 @@ def pre_commit(session: nox.Session) -> None:
     """
     args = session.posargs or ("run", "--all-files")
     _uv_sync(session, "--group=pre-commit")
-    session.run("pre-commit", *args)
+    session.run("prek", *args)
 
 
 @nox.session(
