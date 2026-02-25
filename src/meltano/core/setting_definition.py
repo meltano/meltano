@@ -209,8 +209,11 @@ class SettingDefinition(NameEq, Canonical):
     aliases: list[str]
     env: str | None
     kind: SettingKind | None
+    description: str | None
+    label: str | None
     hidden: bool
     sensitive: bool
+    value: t.Any | None
     value_post_processor: str | Callable | None
     _custom: bool
 
