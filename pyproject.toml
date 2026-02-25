@@ -65,7 +65,7 @@ azure = [
   "azure-identity>=1.19.0,<2",
 ]
 containers = [
-  "aiodocker>=0.24.0,<0.26",
+  "aiodocker>=0.24.0,<0.27",
 ]
 gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
