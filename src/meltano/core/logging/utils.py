@@ -33,6 +33,7 @@ else:
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
+
 class SafeStreamHandler(logging.StreamHandler):
     """A StreamHandler that gracefully handles non-encodable characters.
 
