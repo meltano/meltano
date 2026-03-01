@@ -341,12 +341,21 @@ async def _run_el_command(
         state_strategy=state_strategy,
     )
 
-    job = Job(
-        job_name=state_id
-        or (
+    if not state_id:
+        state_id = (
             f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%S')}"
             f"--{extractor}--{loader}"
-        ),
+        )
+        logger.warning(
+            "No state ID provided. "
+            "Using an ephemeral state ID '%s'. "
+            "Incremental replication state will not be reused between runs. "
+            "To persist state across runs, pass `--state-id=<your_id>`.",
+            state_id,
+        )
+
+    job = Job(
+        job_name=state_id,
         run_id=run_id,
     )
     _, Session = project_engine(project)  # noqa: N806

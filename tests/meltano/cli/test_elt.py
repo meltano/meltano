@@ -874,6 +874,43 @@ class TestCliEltScratchpadOne:
                 result.exception,
             )
 
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
+    def test_elt_ephemeral_state_id_warning(
+        self,
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        command: str,
+    ) -> None:
+        args = [command, tap.name, target.name]
+
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            assert_log_lines(
+                result.stdout + result.stderr,
+                [
+                    LogEntry(
+                        None,
+                        None,
+                        "No state ID provided.",
+                        "warning",
+                    ),
+                ],
+            )
+
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_catalog(
         self,
