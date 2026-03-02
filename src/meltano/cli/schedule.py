@@ -117,7 +117,7 @@ class CronParam(click.ParamType):
         param: click.Parameter | None,
         ctx: click.Context | None,
     ) -> str:
-        """Validate and con interval."""
+        """Validate cron interval."""
         if value not in CRON_INTERVALS and not is_valid_cron(value):
             raise BadCronError(value)
 
