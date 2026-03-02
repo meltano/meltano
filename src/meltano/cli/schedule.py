@@ -29,6 +29,11 @@ from meltano.core.schedule_service import (
 )
 from meltano.core.task_sets_service import TaskSetsService
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
@@ -105,8 +110,14 @@ class CronParam(click.ParamType):
 
     name = "cron"
 
-    def convert(self, value: str, *_) -> str:
-        """Validate and con interval."""
+    @override
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,
+        ctx: click.Context | None,
+    ) -> str:
+        """Validate cron interval."""
         if value not in CRON_INTERVALS and not is_valid_cron(value):
             raise BadCronError(value)
 
