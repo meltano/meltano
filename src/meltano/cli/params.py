@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import functools
+import sys
 import typing as t
 import uuid
 from collections.abc import Callable, Coroutine
@@ -16,6 +17,11 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import async_noop
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -171,6 +177,7 @@ class UUIDParamType(click.ParamType):
 
     name = "uuid"
 
+    @override
     def convert(
         self,
         value: str,
@@ -191,11 +198,12 @@ class PluginTypeArg(click.Choice):
         """Initialize the PluginTypeArg."""
         super().__init__(PluginType.cli_arguments(), *args, **kwargs)
 
+    @override
     def convert(
         self,
         value: str,
-        param: click.Parameter | None,  # noqa: ARG002
-        ctx: click.Context | None,  # noqa: ARG002
+        param: click.Parameter | None,
+        ctx: click.Context | None,
     ) -> PluginType:
         """Convert the value to a PluginType."""
         return PluginType.from_cli_argument(value)
