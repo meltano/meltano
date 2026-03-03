@@ -270,7 +270,7 @@ enable_error_code = [
   "exhaustive-match",
   "deprecated",
 ]
-incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
+incremental = true
 files = [
   "src/meltano/",
 ]
