@@ -49,16 +49,20 @@ class SafeStreamHandler(logging.StreamHandler):
         except UnicodeEncodeError:
             # Re-encode the message with backslashreplace to avoid data loss
             # while still producing readable output.
-            msg = self.format(record)
-            stream = self.stream
-            stream.write(
-                msg.encode(
-                    stream.encoding or "utf-8",
-                    errors="backslashreplace",
-                ).decode(stream.encoding or "utf-8", errors="replace")
-                + self.terminator,
-            )
-            self.flush()
+            try:
+                msg = self.format(record)
+                stream = self.stream
+                encoding = getattr(stream, "encoding", "utf-8") or "utf-8"
+                stream.write(
+                    msg.encode(
+                        encoding,
+                        errors="backslashreplace",
+                    ).decode(encoding, errors="replace")
+                    + self.terminator,
+                )
+                self.flush()
+            except Exception:  # noqa: BLE001
+                self.handleError(record)
 
 
 LEVELS: dict[str, int] = {
