@@ -2,6 +2,7 @@ from __future__ import annotations  # noqa: D100
 
 import json
 import logging
+import sys
 import typing as t
 from textwrap import dedent
 
@@ -13,6 +14,11 @@ from meltano.core.constants import LOG_PARSER_SINGER_SDK
 from meltano.core.plugin import BasePlugin
 from meltano.core.setting_definition import SettingDefinition, json_dumps
 from meltano.core.utils import nest_object, uuid7
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -67,8 +73,9 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config: dict) -> dict:  # noqa: D102
-        non_null_config = {k: v for k, v in flat_config.items() if v is not None}
+    @override
+    def process_config(self, config: dict) -> dict:
+        non_null_config = {k: v for k, v in config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
         # options. We need to pop those redundant entries recursively.
