@@ -36,7 +36,7 @@ class TestLock:
         cli_runner: CliRunner,
         project: Project,
     ) -> None:
-        lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
+        lockfiles = list(project.dirs.root_plugins().glob("./*/*.lock"))
         assert len(lockfiles) == 2
 
         result = cli_runner.invoke(
@@ -110,7 +110,7 @@ class TestLock:
         cli_runner: CliRunner,
         project: Project,
     ) -> None:
-        lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
+        lockfiles = list(project.dirs.root_plugins().glob("./*/*.lock"))
         # 1 tap, 1 target
         assert len(lockfiles) == 2
 

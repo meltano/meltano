@@ -284,7 +284,7 @@ Location: `src/meltano/cli/` (32+ command files)
 
 **Deprecation Process**:
 - Use `@deprecated` decorator for legacy functionality
-- Issue `MeltanoInternalDeprecationWarning` warnings
+- Issue `MeltanoInternalDeprecationWarning` warnings for things that are only used internally in Meltano core, or by addons (i.e. state backends, etc.)
 - Document migration path in deprecation message
 - Controlled removal across versions
 

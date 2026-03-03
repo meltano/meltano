@@ -73,11 +73,11 @@ class TestPluginRemoveService:
 
     @pytest.fixture
     def install(self, subject: PluginRemoveService) -> Generator[None, None, None]:
-        tap_gitlab_installation = subject.project.meltano_dir().joinpath(
+        tap_gitlab_installation = subject.project.dirs.meltano().joinpath(
             "extractors",
             "tap-gitlab",
         )
-        target_csv_installation = subject.project.meltano_dir().joinpath(
+        target_csv_installation = subject.project.dirs.meltano().joinpath(
             "loaders",
             "target-csv",
         )
@@ -89,12 +89,12 @@ class TestPluginRemoveService:
 
     @pytest.fixture
     def lock(self, subject: PluginRemoveService) -> Generator[None, None, None]:
-        tap_gitlab_lockfile = subject.project.plugin_lock_path(
+        tap_gitlab_lockfile = subject.project.dirs.plugin_lock_path(
             "extractors",
             "tap-gitlab",
             variant_name="meltanolabs",
         )
-        target_csv_lockfile = subject.project.plugin_lock_path(
+        target_csv_lockfile = subject.project.dirs.plugin_lock_path(
             "loaders",
             "target-csv",
             variant_name="meltanolabs",
@@ -144,12 +144,12 @@ class TestPluginRemoveService:
                     meltano_yml[plugin.type, plugin.name]
 
             # check removed installation
-            path = subject.project.meltano_dir().joinpath(plugin.type, plugin.name)
+            path = subject.project.dirs.meltano().joinpath(plugin.type, plugin.name)
             assert not path.exists()
 
             # check removed lock files
             lock_file_paths = list(
-                subject.project.root_plugins_dir(plugin.type).glob(
+                subject.project.dirs.root_plugins(plugin.type).glob(
                     f"{plugin.name}*.lock",
                 ),
             )

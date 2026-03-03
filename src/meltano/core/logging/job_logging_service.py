@@ -162,7 +162,7 @@ class JobLoggingService:  # noqa: D101
             log_path.unlink()
 
     def legacy_logs_dir(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
-        job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)  # type: ignore[deprecated]
+        job_dir = self.project.dirs.run("elt").joinpath(slugify(state_id), *joinpaths)
         return job_dir if job_dir.exists() else None
 
     def logs_dirs(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102

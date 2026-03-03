@@ -296,21 +296,21 @@ class TestCli:
     def test_cwd_option(
         self,
         cli_runner,
-        test_cli_project,
+        test_cli_project: Project,
         tmp_path: Path,
     ) -> t.NoReturn:
         project = test_cli_project
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
-            assert Path.cwd() == project.root_dir()
+            assert Path.cwd() == project.dirs.root
 
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             assert_cli_runner(
                 cli_runner.invoke(cli, ("--cwd", str(tmp_path), "dragon")),
             )
             assert Path.cwd() == tmp_path
 
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             filepath = tmp_path / "file.txt"
             filepath.touch()
             with pytest.raises(click.BadParameter, match="is a file"):
@@ -319,7 +319,7 @@ class TestCli:
                     ("--cwd", str(filepath), "dragon"),
                 ).exception.__context__
 
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             dirpath = tmp_path / "subdir"
             with pytest.raises(click.BadParameter, match="does not exist"):
                 raise cli_runner.invoke(
@@ -327,7 +327,7 @@ class TestCli:
                     ("--cwd", str(dirpath), "dragon"),
                 ).exception.__context__
 
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             dirpath.mkdir()
             assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
             assert Path.cwd() == dirpath
@@ -339,7 +339,7 @@ class TestCli:
         tmp_path: Path,
     ):
         project = test_cli_project
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             dotenv_path = tmp_path / ".env"
             dotenv_path.write_text("MELTANO_DEFAULT_ENVIRONMENT=custom\n")
             result = cli_runner.invoke(
@@ -356,7 +356,7 @@ class TestCli:
             assert result.exit_code == 0
             assert "MELTANO_DEFAULT_ENVIRONMENT='custom'" in result.output
 
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             dotenv_path = project.root.joinpath("prod.env")
             dotenv_path.write_text("MELTANO_DEFAULT_ENVIRONMENT=custom\n")
             result = cli_runner.invoke(
@@ -652,7 +652,7 @@ class TestVersionCheck:
         """Test that version check integration works."""
         # This test verifies the version check is integrated into CLI commands.
         # The actual version check logic is thoroughly tested in test_version_check.py
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             result = cli_runner.invoke(cli, ["config", "list", "meltano"])
 
         # The command should execute successfully
@@ -669,7 +669,7 @@ class TestVersionCheck:
         project: Project,
     ) -> None:
         """Test that excluded commands work correctly."""
-        with cd(project.root_dir()):
+        with cd(project.dirs.root):
             # Test 'version' command works
             result = cli_runner.invoke(cli, ["--version"])
             assert result.exit_code == 0
@@ -693,7 +693,7 @@ class TestVersionCheck:
                 "meltano.core.version_check.editable_installation",
                 return_value=None,
             ),
-            cd(project.root_dir()),
+            cd(project.dirs.root),
         ):
             result = cli_runner.invoke(cli, ["config", "meltano", "list"])
 
@@ -711,7 +711,7 @@ class TestVersionCheck:
                 "meltano.core.version_check.editable_installation",
                 return_value=None,
             ),
-            cd(project.root_dir()),
+            cd(project.dirs.root),
         ):
             # Set the project setting to disable version check
             result = cli_runner.invoke(
@@ -741,7 +741,7 @@ class TestVersionCheck:
                     upgrade_command=None,
                 ),
             ),
-            cd(project.root_dir()),
+            cd(project.dirs.root),
         ):
             result = cli_runner.invoke(cli, ["config", "list", "meltano"])
 
