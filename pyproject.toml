@@ -54,7 +54,7 @@ dependencies = [
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
   "uv>=0.8.14",
-  "virtualenv>=20.26.6,<21",
+  "virtualenv>=20.26.6,<22",
 ]
 
 [project.optional-dependencies]
