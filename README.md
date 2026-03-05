@@ -1,8 +1,8 @@
 <div align="center">
   <picture align="center" with="600">
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/meltano/meltano/assets/5394188/59d36ec9-2e02-45ff-98ea-8b5b1f0fb34f">
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/meltano/meltano/assets/5394188/be586327-53b0-43e6-a93e-c7cc2577d9be">
-  <img alt="Meltano Logo" src="https://github.com/meltano/meltano/assets/5394188/be586327-53b0-43e6-a93e-c7cc2577d9be" width="600"/>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/dbeb107f-20ad-43d0-af9c-f51b97f95e04">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/d15ec5e3-65e9-4c5a-ab13-019c00d97d28">
+  <img alt="Meltano Logo" src="https://github.com/user-attachments/assets/d15ec5e3-65e9-4c5a-ab13-019c00d97d28" width="600"/>
   </picture>
 </div>
 
