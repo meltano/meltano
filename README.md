@@ -11,7 +11,7 @@
 
 <div align="center">
 <a href="https://meltano.com/demo">
-<img alt="Try codespaces" src="https://img.shields.io/static/v1?label=&message=Try live demo with Codespaces&color=02a5a5&style=for-the-badge&logo=github"/>
+<img alt="Try codespaces" src="https://img.shields.io/static/v1?label=&message=Try%20live%20demo%20with%20Codespaces&color=02a5a5&style=for-the-badge&logo=github"/>
 </a>
 </div>
 
