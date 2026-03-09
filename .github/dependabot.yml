@@ -1,6 +1,10 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
+  - package-ecosystem: pre-commit
+    directory: "/"
+    schedule:
+      interval: weekly
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
