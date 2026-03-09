@@ -54,7 +54,7 @@ dependencies = [
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
   "uv>=0.8.14",
-  "virtualenv>=20.26.6,<21",
+  "virtualenv>=20.26.6,<22",
 ]
 
 [project.optional-dependencies]
@@ -143,7 +143,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=1.16.0,<2",
-  "ty==0.0.18",
+  "ty==0.0.19",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -270,7 +270,7 @@ enable_error_code = [
   "exhaustive-match",
   "deprecated",
 ]
-incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
+incremental = true
 files = [
   "src/meltano/",
 ]
@@ -279,6 +279,7 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
@@ -324,20 +325,15 @@ exclude = [
   "src/meltano/core/behavior/name_eq.py",
   "src/meltano/core/block/extract_load.py",
   "src/meltano/core/block/plugin_command.py",
-  "src/meltano/core/environment_service.py",
   "src/meltano/core/job/job.py",
   "src/meltano/core/manifest/manifest.py",
   "src/meltano/core/plugin/airflow.py",
   "src/meltano/core/plugin/base.py",
-  "src/meltano/core/plugin/singer/base.py",
-  "src/meltano/core/plugin/singer/catalog.py",
   "src/meltano/core/plugin/meltano_file.py",
   "src/meltano/core/plugin/project_plugin.py",
   "src/meltano/core/project_plugins_service.py",
   "src/meltano/core/runner/dbt.py",
   "src/meltano/core/runner/singer.py",
-  "src/meltano/core/schedule.py",
-  "src/meltano/core/schedule_service.py",
   "src/meltano/core/settings_store.py",
   "src/meltano/core/sqlalchemy.py",
   "src/meltano/core/tracking/**",
@@ -346,7 +342,7 @@ exclude = [
 ]
 
 [build-system]
-requires = ["hatchling==1.28.0"]
+requires = ["hatchling==1.29.0"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
