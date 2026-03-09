@@ -22,6 +22,8 @@ from meltano.core.venv_service import VirtualEnv
 if t.TYPE_CHECKING:
     from pathlib import Path
 
+    from meltano.core.project import Project
+
 
 class TestPluginInvoker:
     @pytest.fixture
@@ -37,7 +39,13 @@ class TestPluginInvoker:
             yield subject
 
     @pytest.mark.asyncio
-    async def test_env(self, project, tap, session, plugin_invoker_factory) -> None:
+    async def test_env(
+        self,
+        project: Project,
+        tap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
         dotenv.set_key(project.dotenv, "TAP_MOCK_TEST", "from_dotenv")
@@ -65,7 +73,7 @@ class TestPluginInvoker:
         assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
 
         # Plugin execution environment
-        venv = VirtualEnv(project.venvs_dir(tap.type, tap.name))
+        venv = VirtualEnv(project.dirs.venvs(tap.type, tap.name))
         assert env["VIRTUAL_ENV"] == str(venv.root)
         assert env["PATH"].startswith(str(venv.bin_dir))
         assert "PYTHONPATH" not in env

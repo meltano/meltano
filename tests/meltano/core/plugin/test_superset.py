@@ -17,7 +17,10 @@ if t.TYPE_CHECKING:
     from pathlib import Path
     from types import ModuleType
 
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin.superset import SupersetInvoker
+    from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
 
 
 def load_module_from_path(name: str, path: Path) -> ModuleType:
@@ -41,7 +44,7 @@ def load_module_from_path(name: str, path: Path) -> ModuleType:
 
 class TestSuperset:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service: ProjectAddService) -> ProjectPlugin:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
@@ -51,8 +54,8 @@ class TestSuperset:
     )
     async def test_hooks(
         self,
-        subject,
-        project,
+        subject: ProjectPlugin,
+        project: Project,
         session,
         plugin_invoker_factory,
         monkeypatch,
@@ -61,7 +64,7 @@ class TestSuperset:
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
-        run_dir = project.run_dir("superset")
+        run_dir = project.dirs.run("superset")
         config_path = run_dir.joinpath("superset_config.py")
 
         handle_mock = mock.Mock()
@@ -77,7 +80,7 @@ class TestSuperset:
 
             # first time, it creates the `superset.db`
             if {"db", "upgrade"}.issubset(popen_args):
-                project.plugin_dir(subject, "superset.db").touch()
+                project.dirs.plugin(subject, "superset.db").touch()
             # second time, it inits
             elif "init" in popen_args:  # noqa: SIM114
                 return handle_mock
@@ -112,16 +115,14 @@ class TestSuperset:
                 assert commands[2][1] == "--version"
 
                 assert config_path.exists()
-                assert project.plugin_dir(subject, "superset.db").exists()
+                db_path = project.dirs.plugin(subject, "superset.db")
+                assert db_path.exists()
 
                 config_module = load_module_from_path("superset_config", config_path)
 
                 config_keys = dir(config_module)
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
-                assert (
-                    f"sqlite:///{project.plugin_dir(subject, 'superset.db')}"
-                    == config_module.SQLALCHEMY_DATABASE_URI
-                )
+                assert f"sqlite:///{db_path}" == config_module.SQLALCHEMY_DATABASE_URI
                 assert "SECRET_KEY" in config_keys
 
             # Test custom setting

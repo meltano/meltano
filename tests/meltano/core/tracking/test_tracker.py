@@ -30,7 +30,7 @@ if t.TYPE_CHECKING:
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:
-    with project.meltano_dir().joinpath("analytics.json").open() as analytics_json_file:
+    with (project.dirs.meltano() / "analytics.json").open() as analytics_json_file:
         return json.load(analytics_json_file)
 
 
@@ -47,7 +47,7 @@ def check_analytics_json(project: Project) -> None:
 
 @contextmanager
 def delete_analytics_json(project: Project) -> Generator[None, None, None]:
-    (project.meltano_dir() / "analytics.json").unlink(missing_ok=True)
+    (project.dirs.meltano() / "analytics.json").unlink(missing_ok=True)
     try:
         yield
     finally:
@@ -200,7 +200,7 @@ class TestTracker:
     ) -> None:
         with delete_analytics_json(project):
             # Use `delete_analytics_json` to ensure `analytics.json` is restored after
-            analytics_json_path = project.meltano_dir() / "analytics.json"
+            analytics_json_path = project.dirs.meltano() / "analytics.json"
             with analytics_json_path.open("w") as analytics_json_file:
                 analytics_json_file.write(analytics_json_content)
 

@@ -14,6 +14,7 @@ from meltano.core.plugin_invoker import asyncio
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.airflow import AirflowInvoker
+    from meltano.core.project import Project
 
 AIRFLOW_CONFIG = """
 
@@ -30,11 +31,11 @@ class TestAirflow:
     async def test_before_configure(
         self,
         subject,
-        project,
+        project: Project,
         session,
         plugin_invoker_factory,
     ) -> None:
-        run_dir = project.run_dir("airflow")
+        run_dir = project.dirs.run("airflow")
 
         handle_mock = mock.Mock()
         handle_mock.name = subject.name
@@ -69,7 +70,7 @@ class TestAirflow:
             elif {"db", "init"}.issubset(popen_args):
                 assert kwargs["env"]["AIRFLOW_HOME"] == str(run_dir)
 
-                project.plugin_dir(subject, "airflow.db").touch()
+                project.dirs.plugin(subject, "airflow.db").touch()
             else:
                 return original_exec(cmd, *popen_args, **kwargs)
             return handle_mock
@@ -99,7 +100,7 @@ class TestAirflow:
                 assert configure.call_count == 2
 
                 assert run_dir.joinpath("airflow.cfg").exists()
-                assert project.plugin_dir(subject, "airflow.db").exists()
+                assert project.dirs.plugin(subject, "airflow.db").exists()
 
                 airflow_cfg = ConfigParser()
                 with run_dir.joinpath("airflow.cfg").open() as cfg:
