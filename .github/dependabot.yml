@@ -5,6 +5,12 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      hooks:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore: "
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
