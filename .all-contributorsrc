@@ -1435,6 +1435,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "stbiadmin",
+      "name": "Justin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10222628?v=4",
+      "profile": "http://jusitintime.ai",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
