@@ -874,6 +874,79 @@ class TestCliEltScratchpadOne:
                 result.exception,
             )
 
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
+    def test_elt_ephemeral_state_id_warning(
+        self,
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        command: str,
+    ) -> None:
+        args = [command, tap.name, target.name]
+
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            output = result.stdout + result.stderr
+
+            assert_log_lines(
+                output,
+                [
+                    LogEntry(
+                        None,
+                        None,
+                        "No state ID provided.",
+                        "warning",
+                    ),
+                ],
+            )
+
+            assert "Using an ephemeral state ID" in output
+            assert "Incremental replication state will not be reused" in output
+            assert "--state-id" in output
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
+    def test_elt_explicit_state_id_no_warning(
+        self,
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        command: str,
+    ) -> None:
+        state_id = f"pytest_test_{command}_explicit"
+        args = [command, "--state-id", state_id, tap.name, target.name]
+
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+
+            result = cli_runner.invoke(cli, args)
+            assert_cli_runner(result)
+
+            output = result.stdout + result.stderr
+            assert "No state ID provided" not in output
+            assert "ephemeral state ID" not in output
+
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_catalog(
         self,
