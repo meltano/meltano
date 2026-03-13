@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import textwrap
 import typing as t
 from dataclasses import KW_ONLY, dataclass
 
@@ -44,6 +45,26 @@ class ProjectDirsService:
             project root joined with provided subdirs and/or file
         """
         return self.root.joinpath(*joinpaths)
+
+    @property
+    def cachedir_tag(self) -> Path:
+        """Path to CACHEDIR.TAG file."""
+        return self.sys_dir / "CACHEDIR.TAG"
+
+    def add_cachedir_tag(self) -> None:
+        """Generate a file indicating that this is not meant to be backed up.
+
+        See https://bford.info/cachedir/ for the spec.
+        """
+        cachedir_tag_file = self.cachedir_tag
+        if not cachedir_tag_file.exists():
+            cachedir_tag_text = textwrap.dedent("""
+                Signature: 8a477f597d28d172789f06886806bc55
+                # This file is a cache directory tag created by Meltano.
+                # For information about cache directory tags, see:
+                #   https://bford.info/cachedir/
+            """).strip()
+            cachedir_tag_file.write_text(cachedir_tag_text, encoding="utf-8")
 
     @makedirs
     def meltano(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
