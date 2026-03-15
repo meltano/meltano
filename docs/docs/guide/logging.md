@@ -292,10 +292,77 @@ logs:
 See https://docs.datadoghq.com/logs/log_collection/python/?tab=jsonlogformatter for further details.
 
 ## Google Cloud logging config
-
-For Google Cloud Logging (stackdriver) the default json log format is sufficient. That means when capturing `meltano run`,
+That means when capturing `meltano run`,
 `meltano invoke` and `meltano el` console output directly via something like CloudRun the built-in json format is
 sufficient:
+
+#For Google Cloud Logging (formerly Stackdriver), Meltano can output logs in JSON format,
+but Google Cloud does not automatically recognize them as structured logs.
+
+You may notice that Meltano logs show `"level": "info"` even when warnings or errors
+occur. This is expected behavior. Logs coming from plugins and subprocesses are
+normalized by Meltano, and their original Python log severity is not preserved.
+
+Because of this, when Meltano logs are sent directly to Google Cloud Logging,
+severity-based filtering and alerts may not work as expected unless the logs are
+explicitly transformed.
+##
+
+### Severity mapping with the Google Cloud Ops Agent
+
+To correctly parse Meltano logs and map severity levels in Google Cloud Logging,
+the Google Cloud Ops Agent must be configured to parse the JSON payload and
+explicitly map severity fields.
+
+
+
+#### Example configuration
+
+**`logging.yaml`**
+```yaml
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  json:
+    (): meltano.core.logging.json_formatter
+
+handlers:
+  file:
+    class: logging.FileHandler
+    level: DEBUG
+    filename: /tmp/meltano.log
+    formatter: json
+
+root:
+  level: DEBUG
+  handlers: [file]
+
+```yaml
+
+/etc/google-cloud-ops-agent/config.yaml
+
+logging:
+  receivers:
+    meltano:
+      type: files
+      include_paths:
+        - /tmp/meltano.log
+  processors:
+    json:
+      type: parse_json
+    map_severity:
+      type: modify_fields
+      fields:
+        severity:
+          move_from: jsonPayload.level
+  service:
+    pipelines:
+      meltano:
+        receivers: [meltano]
+        processors: [json, map_severity]
+
+
 
 ```yaml
 version: 1
