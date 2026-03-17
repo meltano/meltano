@@ -7,7 +7,7 @@ function ColumnLinkItem({ item }) {
     <li
       className="footer__item"
       // Developer provided the HTML, so assume it's safe.
-      // eslint-disable-next-line react/no-danger, react/prop-types
+      // eslint-disable-next-line react/prop-types
       dangerouslySetInnerHTML={{ __html: item.html }}
     />
   ) : (

@@ -7,7 +7,7 @@ import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import { useDocsVersionCandidates } from '@docusaurus/theme-common/internal';
 import { translate } from '@docusaurus/Translate';
 import { useLocation } from '@docusaurus/router';
-// eslint-disable-next-line no-unused-vars
+
 import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
 import DropdownNavbarItem from '@theme/NavbarItem/DropdownNavbarItem';
 const getVersionMainDoc = (version) =>

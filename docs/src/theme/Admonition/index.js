@@ -165,10 +165,10 @@ export default function Admonition(props) {
     icon: iconProp,
   } = processAdmonitionProps(props);
   const typeConfig = getAdmonitionConfig(type);
-  // eslint-disable-next-line no-unused-vars
+
   const titleLabel = title ?? typeConfig.label;
   const { iconComponent: IconComponent } = typeConfig;
-  // eslint-disable-next-line no-unused-vars
+
   const icon = iconProp ?? <IconComponent />;
   return (
     <div
