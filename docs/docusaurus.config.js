@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+
 // @ts-nocheck
 // Note: type annotations allow type checking and IDEs autocompletion
 

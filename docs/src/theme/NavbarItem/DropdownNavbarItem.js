@@ -30,7 +30,7 @@ function DropdownNavbarItemDesktop({
   position,
   // eslint-disable-next-line react/prop-types
   className,
-  // eslint-disable-next-line react/prop-types, no-unused-vars
+  // eslint-disable-next-line react/prop-types
   onClick,
   ...props
 }) {
@@ -97,7 +97,7 @@ function DropdownNavbarItemMobile({
   items,
   // eslint-disable-next-line react/prop-types
   className,
-  // eslint-disable-next-line react/prop-types, no-unused-vars
+  // eslint-disable-next-line react/prop-types
   position, // Need to destructure position from props so that it doesn't get passed on.
   // eslint-disable-next-line react/prop-types
   onClick,

@@ -8,7 +8,7 @@ export default function IconClose({
   color = 'currentColor',
   // eslint-disable-next-line react/prop-types
   strokeWidth = 2,
-  // eslint-disable-next-line react/prop-types, no-unused-vars
+  // eslint-disable-next-line react/prop-types
   className,
   ...restProps
 }) {

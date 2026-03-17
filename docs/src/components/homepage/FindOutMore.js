@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+
 import React from 'react';
 import styles from './findoutmore.module.scss';
 import Link from '@docusaurus/Link';

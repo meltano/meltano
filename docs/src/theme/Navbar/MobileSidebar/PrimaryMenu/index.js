@@ -9,9 +9,9 @@ import GithubLogo from '@site/static/img/footer/github.svg';
 import SlackLogo from '@site/static/img/footer/slack.svg';
 import TwitterLogo from '@site/static/img/footer/twitter.svg';
 import LinkedinLogo from '@site/static/img/footer/linkedin.svg';
-// eslint-disable-next-line no-unused-vars
+
 import FacebookLogo from '@site/static/img/footer/facebook.svg';
-// eslint-disable-next-line no-unused-vars
+
 import InstagramLogo from '@site/static/img/footer/instagram.svg';
 import YoutubeLogo from '@site/static/img/footer/youtube.svg';
 import CrunchbaseLogo from '@site/static/img/footer/crunchbase.svg';
