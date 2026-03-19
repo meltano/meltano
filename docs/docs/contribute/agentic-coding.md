@@ -30,8 +30,7 @@ common development workflows.
 
 ## Quality checklist
 
-Before opening a pull request, verify the following - whether the code was
-written by you, an agent, or both:
+Before opening a pull request, whether the code was written by you, an agent, or both, please verify the following:
 
 1. **Lint and format**
 
