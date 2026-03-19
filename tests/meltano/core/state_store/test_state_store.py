@@ -141,7 +141,7 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
                 reason=(
                     "Nested settings are not yet supported; "
                     "`_settings_to_manager_kwargs` only exposes the last path "
-                    "component as the key. See comment above for the intended contract."
+                    "component as the key."
                 ),
                 strict=True,
             ),
@@ -327,6 +327,11 @@ class TestGCSStateBackend:
 
 
 class TestS3StateBackend:
+    @pytest.fixture(autouse=True)
+    def clean_env(self, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+
     @pytest.fixture
     def bucket(self) -> str:
         return "some_bucket"
@@ -428,7 +433,6 @@ class TestS3StateBackend:
     def test_get(
         self,
         project: Project,
-        monkeypatch: pytest.MonkeyPatch,
         bucket: str,
         prefix: str,
         s3_uri: str,
@@ -442,8 +446,6 @@ class TestS3StateBackend:
         state = MeltanoState(state_id=state_id, completed_state={"key": "value"})
 
         with moto.mock_aws():
-            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-            monkeypatch.delenv("AWS_PROFILE", raising=False)
             s3_state_store.client.create_bucket(Bucket=bucket)
 
             state_key = f"{prefix}/{state_id}/state.json"
@@ -459,7 +461,6 @@ class TestS3StateBackend:
     def test_set(
         self,
         project: Project,
-        monkeypatch: pytest.MonkeyPatch,
         bucket: str,
         prefix: str,
         s3_uri: str,
@@ -473,8 +474,6 @@ class TestS3StateBackend:
         state = MeltanoState(state_id=state_id, completed_state={"key": "value"})
 
         with moto.mock_aws():
-            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-            monkeypatch.delenv("AWS_PROFILE", raising=False)
             s3_state_store.client.create_bucket(Bucket=bucket)
 
             s3_state_store.set(state)
@@ -492,7 +491,6 @@ class TestS3StateBackend:
 
     def test_migrate_deduplicates_prefix(
         self,
-        monkeypatch: pytest.MonkeyPatch,
         bucket: str,
         prefix: str,
         aws_access_key_id: str,
@@ -510,8 +508,6 @@ class TestS3StateBackend:
         body = b'{"completed": {}, "partial": {}}'
 
         with moto.mock_aws():
-            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-            monkeypatch.delenv("AWS_PROFILE", raising=False)
             manager.client.create_bucket(Bucket=bucket)
             manager.client.put_object(
                 Bucket=bucket,
@@ -527,7 +523,6 @@ class TestS3StateBackend:
 
     def test_migrate_ignores_clean_files(
         self,
-        monkeypatch: pytest.MonkeyPatch,
         bucket: str,
         prefix: str,
         aws_access_key_id: str,
@@ -544,8 +539,6 @@ class TestS3StateBackend:
         body = b'{"completed": {}, "partial": {}}'
 
         with moto.mock_aws():
-            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-            monkeypatch.delenv("AWS_PROFILE", raising=False)
             manager.client.create_bucket(Bucket=bucket)
             manager.client.put_object(
                 Bucket=bucket,
@@ -555,7 +548,7 @@ class TestS3StateBackend:
 
             manager.migrate()
 
-            # Only the original key should exist — no extra copies
+            # Only the original key should exist
             objects = manager.client.list_objects_v2(Bucket=bucket)
             keys = [obj["Key"] for obj in objects["Contents"]]
             assert keys == [clean_key]
