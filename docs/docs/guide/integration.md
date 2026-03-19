@@ -202,18 +202,6 @@ meltano config set tap-postgres _metadata '*_full' replication-method FULL_TABLE
               # highlight-end
 ```
 
-:::info
-
-  <p><strong>Order Matters When Declaring Metadata Rules</strong></p>
-  <p>When using the `metadata` extractor extra, the order of the metadata rules matters. The last rule that matches a stream or property will be used.</p>
-
-  <br/>
-  <p>In the example above, if a stream matches both rules, the `replication-method` will be set to `FULL_TABLE`.</p>
-
-  <br/>
-  <p>This might change in the future, when metadata rules are applied in increasing order of specificity. See <a href="https://github.com/meltano/meltano/issues/9629">the GitHub issue tracking this</a> for more details.</p>
-:::
-
 #### Overriding key properties and replication keys
 
 You can also use the `metadata` extra to override the `key-properties` (the columns that uniquely identify a record) and the `replication-key` (the column used as a bookmark for incremental replication) for a stream. Replace `some_stream_id` with the stream identifier from the extractor's discovered catalog. This is useful when the extractor's discovered catalog does not correctly identify these values, or when you need to change them for a specific use case.
@@ -238,6 +226,18 @@ meltano config set tap-postgres _metadata some_stream_id replication-key updated
                   - id
               # highlight-end
 ```
+
+:::info
+
+  <p><strong>Order Matters When Declaring Metadata Rules</strong></p>
+  <p>When using the `metadata` extractor extra, the order of the metadata rules matters. The last rule that matches a stream or property will be used.</p>
+
+  <br/>
+  <p>In the example above, if a stream matches both rules, the `replication-method` will be set to `FULL_TABLE`.</p>
+
+  <br/>
+  <p>This might change in the future, when metadata rules are applied in increasing order of specificity. See <a href="https://github.com/meltano/meltano/issues/9629">the GitHub issue tracking this</a> for more details.</p>
+:::
 
 See also the [Replication Key](#replication-key) section for more details on setting `replication-key` for incremental replication.
 
@@ -282,18 +282,7 @@ To learn more about how Key-based Incremental Replication works and its limitati
 
 Replication Keys are columns that database extractors use to identify new and updated data for replication.
 
-When you set a table to use Key-based Incremental Replication, you’ll also need to define a Replication Key for that table by setting the `replication-key` [stream metadata](#setting-metadata) key:
-
-```yaml title="meltano.yml"
-        extractors:
-          - name: tap-postgres
-            metadata:
-              # highlight-start
-              some_stream_id:
-                replication-method: INCREMENTAL
-                replication-key: updated_at
-              # highlight-end
-```
+When you set a table to use Key-based Incremental Replication, you’ll also need to define a Replication Key for that table by setting the `replication-key` [stream metadata](#setting-metadata) key. See the [Overriding key properties and replication keys](#overriding-key-properties-and-replication-keys) section for a complete example of configuring `replication-key` and `key-properties` via the `metadata` extra.
 
 To learn more about replication keys, refer to the [Stitch Docs](https://www.stitchdata.com/docs/replication/replication-keys), which by and large also apply to Singer taps used with Meltano.
 
