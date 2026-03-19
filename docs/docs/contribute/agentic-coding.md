@@ -59,7 +59,7 @@ accordingly.
 
 :::warning
 
-Not using the template might result in your pull request being closed without a review.
+Not using the template may result in your pull request being closed without a review.
 
 :::
 
