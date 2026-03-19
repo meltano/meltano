@@ -5,6 +5,7 @@ import platform
 import re
 import sys
 import typing as t
+from functools import partial
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -20,10 +21,41 @@ from meltano.core.plugin_install_service import (
     get_pip_install_args,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.venv_service import VenvBackend, VirtualEnvService
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
+
+class MockBackend(VenvBackend):
+    """Test backend that simulates venv creation without subprocess calls."""
+
+    @override
+    async def create_venv(self, **kwargs) -> None:
+        self.venv.bin_dir.mkdir(parents=True, exist_ok=True)
+        self.venv.exec_path("python").touch(exist_ok=True)
+
+    @override
+    async def upgrade_installer(self, *, env=None) -> None:
+        pass
+
+    @override
+    async def install_pip_args(self, args, **kwargs) -> None:
+        pass
+
+    @override
+    async def uninstall_package(self, package) -> None:
+        pass
+
+    @override
+    async def list_installed(self, *args) -> list:
+        return []
 
 
 class TestPluginInstallService:
@@ -213,7 +245,6 @@ class TestPluginInstallService:
             "python-json-logger",
         ]
 
-    @patch("meltano.core.venv_service.UvVenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install(
         self,
@@ -222,65 +253,70 @@ class TestPluginInstallService:
         inherited_tap,
         inherited_inherited_tap,
     ) -> None:
-        plugin = tap
-        inherited_plugin = inherited_tap
-        inherited_inherited_plugin = inherited_inherited_tap
+        with patch.object(
+            VirtualEnvService,
+            "from_plugin",
+            partial(VirtualEnvService.from_plugin, backend_class=MockBackend),
+        ):
+            plugin = tap
+            inherited_plugin = inherited_tap
+            inherited_inherited_plugin = inherited_inherited_tap
 
-        state = await subject.install_plugin_async(
-            plugin,
-            reason=PluginInstallReason.AUTO,
-        )
+            state = await subject.install_plugin_async(
+                plugin,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert not state.skipped, "Expected plugin with no venv to be installed"
+            assert not state.skipped, "Expected plugin with no venv to be installed"
 
-        state = await subject.install_plugin_async(
-            plugin,
-            reason=PluginInstallReason.AUTO,
-        )
+            state = await subject.install_plugin_async(
+                plugin,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert state.skipped, (
-            "Expected plugin with venv and matching fingerprint to not be installed"
-        )
+            assert state.skipped, (
+                "Expected plugin with venv and matching fingerprint to not be installed"
+            )
 
-        state = await subject.install_plugin_async(
-            inherited_plugin,
-            reason=PluginInstallReason.AUTO,
-        )
+            state = await subject.install_plugin_async(
+                inherited_plugin,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert state.skipped, (
-            "Expected plugin inheriting from another plugin with venv and matching"
-            " fingerprint to not be installed"
-        )
+            assert state.skipped, (
+                "Expected plugin inheriting from another plugin with venv and matching"
+                " fingerprint to not be installed"
+            )
 
-        state = await subject.install_plugin_async(
-            inherited_inherited_plugin,
-            reason=PluginInstallReason.AUTO,
-        )
+            state = await subject.install_plugin_async(
+                inherited_inherited_plugin,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert state.skipped, (
-            "Expected plugin inheriting from another inherited plugin with venv and"
-            " matching fingerprint to not be installed"
-        )
+            assert state.skipped, (
+                "Expected plugin inheriting from another inherited plugin with venv and"
+                " matching fingerprint to not be installed"
+            )
 
-        plugin.pip_url = "changed"
-        state = await subject.install_plugin_async(
-            plugin,
-            reason=PluginInstallReason.AUTO,
-        )
+            plugin.pip_url = "changed"
+            state = await subject.install_plugin_async(
+                plugin,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert not state.skipped, (
-            "Expected plugin with venv and non-matching fingerprint to be installed"
-        )
+            assert not state.skipped, (
+                "Expected plugin with venv and non-matching fingerprint to be installed"
+            )
 
-        plugin.pip_url = "$MISSING_ENV_VAR"
-        state = await subject.install_plugin_async(
-            plugin,
-            reason=PluginInstallReason.AUTO,
-        )
+            plugin.pip_url = "$MISSING_ENV_VAR"
+            state = await subject.install_plugin_async(
+                plugin,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert state.skipped, (
-            "Expected plugin with missing env var in pip URL to not be installed"
-        )
+            assert state.skipped, (
+                "Expected plugin with missing env var in pip URL to not be installed"
+            )
 
     @pytest.mark.usefixtures("reset_project_context")
     def test_plugin_installation_env(
@@ -305,7 +341,6 @@ class TestPluginInstallService:
             "EXTERNAL_VAR": "value",
         }
 
-    @patch("meltano.core.venv_service.UvVenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install_mapper_by_mapping(
         self,
@@ -313,26 +348,31 @@ class TestPluginInstallService:
         mapper,
         mapping,
     ) -> None:
-        state = await subject.install_plugin_async(
-            mapping,
-            reason=PluginInstallReason.AUTO,
-        )
+        with patch.object(
+            VirtualEnvService,
+            "from_plugin",
+            partial(VirtualEnvService.from_plugin, backend_class=MockBackend),
+        ):
+            state = await subject.install_plugin_async(
+                mapping,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert not state.skipped, "Expected mapper defining mapping to be installed"
+            assert not state.skipped, "Expected mapper defining mapping to be installed"
 
-        state = await subject.install_plugin_async(
-            mapper,
-            reason=PluginInstallReason.AUTO,
-        )
+            state = await subject.install_plugin_async(
+                mapper,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert state.skipped, "Expected mapper to not be installed"
+            assert state.skipped, "Expected mapper to not be installed"
 
-        state = await subject.install_plugin_async(
-            mapping,
-            reason=PluginInstallReason.AUTO,
-        )
+            state = await subject.install_plugin_async(
+                mapping,
+                reason=PluginInstallReason.AUTO,
+            )
 
-        assert state.skipped, "Expected mapper defining mapping to not be installed"
+            assert state.skipped, "Expected mapper defining mapping to not be installed"
 
     async def test_install_failed(
         self,
