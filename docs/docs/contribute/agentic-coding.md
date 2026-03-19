@@ -7,7 +7,7 @@ sidebar_class_name: hidden
 ---
 
 We welcome contributions that use AI coding agents. AI-assisted contributions are held to the same quality bar as any
-other pull request - the guidelines below help you get there.
+other pull request. The guidelines below help you get there.
 
 :::warning
 

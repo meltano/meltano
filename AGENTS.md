@@ -9,7 +9,7 @@ This file provides guidance to AI coding agents when working with code in this r
 **Package Manager**: `uv`
 **Task Runner**: `nox`
 **Testing**: `pytest` with support for multiple database backends
-**Linting & Formatteing**: `ruff`
+**Linting & Formatting**: `ruff`
 **Type Checking**: `mypy` + `ty`
 
 ## Development Commands
