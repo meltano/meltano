@@ -6,9 +6,14 @@ sidebar_position: 4
 sidebar_class_name: hidden
 ---
 
-We welcome contributions that use AI coding agents (Claude Code, Copilot, Cursor,
-and others). AI-assisted contributions are held to the same quality bar as any
-other pull request — the guidelines below help you get there.
+We welcome contributions that use AI coding agents. AI-assisted contributions are held to the same quality bar as any
+other pull request. The guidelines below help you get there.
+
+:::warning
+
+Please avoid wasting maintainers' time by submitting PRs you haven't personally reviewed, understood and tested. Any PR that appears to violate this guideline will be closed without a review.
+
+:::
 
 ## Setup
 
@@ -25,13 +30,12 @@ common development workflows.
 
 ## Quality checklist
 
-Before opening a pull request, verify the following — whether the code was
-written by you, an agent, or both:
+Before opening a pull request, whether the code was written by you, an agent, or both, please verify the following:
 
 1. **Lint and format**
 
    ```bash
-   ruff check --fix && ruff format
+   nox -s lint
    ```
 
 2. **Run the relevant tests**
@@ -40,15 +44,10 @@ written by you, an agent, or both:
    uv run pytest tests/path/to/test.py
    ```
 
-3. **Type-check changed files**
-
-   ```bash
-   uv run mypy src/meltano/path/to/file.py
-   ```
-
-4. **Review the diff yourself** — agents can introduce subtle issues such as
-   unused imports, overly broad exception handling, unnecessary refactors, or
-   hallucinated APIs. A human review of the final diff is always required.
+3. **Review the diff yourself** - agents can introduce subtle issues such as
+   overly broad exception handling, unnecessary refactors, hallucinated APIs,
+   or redundant comments. A human review of the final diff is always required
+   and a basic courtesy to the maintainers.
 
 ## Disclosure
 
@@ -56,6 +55,12 @@ If generative AI tooling was used to co-author your PR, check the corresponding
 box in the [pull request template](https://github.com/meltano/meltano/blob/main/.github/pull_request_template.md)
 and specify the tool name. This lets reviewers calibrate their review
 accordingly.
+
+:::warning
+
+Not using the template may result in your pull request being closed without a review.
+
+:::
 
 ## Tips for effective agent use
 
