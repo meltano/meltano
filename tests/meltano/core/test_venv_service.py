@@ -71,7 +71,7 @@ class TestVirtualEnv:
     )
     @pytest.mark.asyncio
     async def test_site_packages(self, tmp_path: Path) -> None:
-        proc = subprocess.CompletedProcess([], returncode=0, stdout="3 99 99")
+        proc = subprocess.CompletedProcess([], returncode=0, stdout=b"3 99 42")
         with mock.patch("subprocess.run", return_value=proc):
             subject = VirtualEnv(tmp_path / "venv", python="python3.9")
             assert subject.site_packages_dir.parts[-2:] == (
