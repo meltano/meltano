@@ -190,7 +190,7 @@ class PluginInvoker:
             self.venv = VirtualEnv(
                 self.project.dirs.venvs(
                     self.plugin.type,
-                    self.plugin.name,
+                    self.plugin.plugin_dir_name,
                     make_dirs=False,
                 ),
                 python=self.plugin.python,
