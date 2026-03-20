@@ -192,7 +192,8 @@ class PluginInvoker:
                     self.plugin.type,
                     self.plugin.name,
                     make_dirs=False,
-                )
+                ),
+                python=self.plugin.python,
             )
 
         else:
