@@ -46,6 +46,7 @@ main_python_version = Path(".python-version").read_text().strip()
 
 def _uv_sync(session: nox.Session, *args: str) -> None:
     env = {
+        "PYO3_USE_ABI3_FORWARD_COMPATIBILITY": "1",
         "UV_PROJECT_ENVIRONMENT": session.virtualenv.location,
         "UV_NO_CONFIG": "1",
     }

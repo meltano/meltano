@@ -182,6 +182,7 @@ filterwarnings = [
   'once::pytest.PytestUnhandledThreadExceptionWarning',
   'once::ResourceWarning',
   'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
+  "once:os.path.commonprefix\\(\\) is deprecated. Use os.path.commonpath\\(\\) for longest path prefix.:DeprecationWarning:pygments",  # https://github.com/pygments/pygments/issues/3039
 ]
 log_cli = true
 log_cli_format = "%(message)s"
