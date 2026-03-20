@@ -476,7 +476,7 @@ class VirtualEnvService:
         pip_install_args: Sequence[str],
         *,
         clean: bool = False,
-        force: bool = True,
+        force: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
