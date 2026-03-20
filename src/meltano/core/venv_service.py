@@ -165,7 +165,13 @@ class VirtualEnv:
         major, minor, micro = (
             int(x)
             for x in subprocess.run(
-                (self.python_path, "-c", "import sys; print(*sys.version_info[:3])"),
+                shlex.join(
+                    [
+                        self.python_path,
+                        "-c",
+                        "import sys; print(*sys.version_info[:3])",
+                    ],
+                ),
                 stdout=subprocess.PIPE,
                 check=True,
             ).stdout.split()
