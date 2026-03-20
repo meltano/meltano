@@ -111,7 +111,7 @@ class TestVirtualEnvService:
     def test_clean_run_files(
         self,
         project: Project,
-        subject: VirtualenvBackend,
+        subject: VirtualEnvService,
     ) -> None:
         run_dir = project.dirs.run("name")
 
