@@ -50,11 +50,11 @@ class MockBackend(VenvBackend):
         pass
 
     @override
-    async def uninstall_package(self, package) -> None:
+    async def uninstall_package(self, package) -> None:  # pragma: no cover
         pass
 
     @override
-    async def list_installed(self, *args) -> list:
+    async def list_installed(self, *args) -> list:  # pragma: no cover
         return []
 
 
