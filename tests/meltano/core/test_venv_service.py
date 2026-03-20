@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import platform
 import subprocess
+import sys
 import typing as t
 from asyncio.subprocess import Process
-from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -21,6 +21,8 @@ from meltano.core.venv_service import (
 )
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.project import Project
 
 
@@ -274,61 +276,35 @@ class TestVirtualEnvService:
         assert not subject.requires_clean_install(["example"])
 
 
-class TestVirtualenvBackend:
-    cls = VirtualenvBackend
+class TestVenvBackend:
+    @pytest.mark.parametrize("backend", ("virtualenv", "uv"))
+    async def test_python_setting(self, project: Project, backend: str) -> None:
+        cls = UvBackend if backend == "uv" else VirtualenvBackend
 
-    @pytest.fixture
-    def subject(self, venv: VirtualEnv, log_path: Path):
-        return VirtualenvBackend(log_path=log_path, venv=venv)
-
-    async def test_python_setting(self, project: Project) -> None:
         plugin_python = "test-python-executable-plugin-level"
         plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-mock",
             python=plugin_python,
         )
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == plugin_python
 
         # Setting the project-level `python` setting should have no effect at first
         # because the plugin-level setting takes precedence.
         project_python = "test-python-executable-project-level"
         project.settings.set("python", project_python)
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == plugin_python
 
         # The project-level setting should have an effect after the plugin-level
         # setting is unset
         plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
-        subject = self.cls.from_plugin(project, plugin)
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == project_python
 
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[-2] == f"--python={project_python}"
-
+        # After both the project-level and plugin-level are unset, the system Python
+        # should be used
         project.settings.unset("python")
-        subject = self.cls.from_plugin(project, plugin)
-
-        # After both the project-level and plugin-level are unset, it should be None
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert Path(exec_mock.call_args.args[-2].split("=")[1]).is_absolute()
-
-
-class TestUvBackend(TestVirtualenvBackend):
-    cls = UvBackend
-
-    @pytest.fixture
-    def subject(self, venv: VirtualEnv, log_path: Path):
-        return UvBackend(log_path=log_path, venv=venv)
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == sys.executable
