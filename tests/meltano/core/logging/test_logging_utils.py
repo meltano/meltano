@@ -12,6 +12,7 @@ import time_machine
 from meltano.core.logging.utils import (
     LEVELS,
     LogFormat,
+    SafeStreamHandler,
     capture_subprocess_output,
     default_config,
     parse_log_level,
@@ -197,3 +198,156 @@ def test_disabled_log_level():
     # When disabled, the numeric value should be used
     assert config["handlers"]["console"]["level"] == logging.CRITICAL + 1
     assert config["loggers"][""]["level"] == logging.CRITICAL + 1
+
+
+class TestSafeStreamHandler:
+    """Test cases for SafeStreamHandler."""
+
+    def test_normal_operation(self):
+        """Test that normal messages pass through unchanged."""
+        from io import StringIO
+
+        output = StringIO()
+        handler = SafeStreamHandler(output)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Normal ASCII message",
+            args=(),
+            exc_info=None,
+        )
+
+        handler.emit(record)
+        assert output.getvalue() == "Normal ASCII message\n"
+
+    def test_unicode_encode_error_handling(self):
+        """Test that UnicodeEncodeError is caught and handled with backslashreplace."""
+        from unittest.mock import Mock
+
+        # Create a mock stream that raises UnicodeEncodeError on write
+        mock_stream = Mock()
+        mock_stream.encoding = "ascii"
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            None,  # Second write succeeds
+        ]
+
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Message with unicode: 中文",
+            args=(),
+            exc_info=None,
+        )
+
+        # Should not raise an exception
+        handler.emit(record)
+
+        # Verify that write was called twice (first failed, second succeeded)
+        assert mock_stream.write.call_count == 2
+
+        # The second call should have the backslash-escaped string
+        second_call_args = mock_stream.write.call_args_list[1][0]
+        assert "\\u4e2d\\u6587" in second_call_args[0]  # Chinese characters escaped
+
+    def test_exception_in_fallback_calls_handle_error(self):
+        """Test that exceptions in the fallback encoding go to handleError."""
+        from unittest.mock import Mock
+
+        # Create a mock stream that always raises exceptions
+        mock_stream = Mock()
+        mock_stream.encoding = "ascii"
+        mock_stream.write.side_effect = Exception("Something went wrong")
+
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        # Mock handleError to track if it was called
+        handler.handleError = Mock()
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Any message",
+            args=(),
+            exc_info=None,
+        )
+
+        # Should not raise an exception
+        handler.emit(record)
+
+        # Verify handleError was called
+        handler.handleError.assert_called_once_with(record)
+
+    def test_stream_without_encoding_uses_utf8_fallback(self):
+        """Test that streams without encoding attribute default to utf-8."""
+        from unittest.mock import Mock
+
+        # Create a mock stream without encoding attribute
+        mock_stream = Mock()
+        del mock_stream.encoding  # Remove encoding attribute
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            None,  # Second write succeeds
+        ]
+
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Message with unicode: 中文",
+            args=(),
+            exc_info=None,
+        )
+
+        # Should not raise an exception and should handle encoding fallback
+        handler.emit(record)
+
+        # Verify that write was called twice
+        assert mock_stream.write.call_count == 2
+
+    def test_encoding_none_uses_utf8_fallback(self):
+        """Test that streams with None encoding default to utf-8."""
+        from unittest.mock import Mock
+
+        # Create a mock stream with None encoding
+        mock_stream = Mock()
+        mock_stream.encoding = None
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            None,  # Second write succeeds
+        ]
+
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Message with unicode: 中文",
+            args=(),
+            exc_info=None,
+        )
+
+        # Should not raise an exception and should handle encoding fallback
+        handler.emit(record)
+
+        # Verify that write was called twice
+        assert mock_stream.write.call_count == 2
