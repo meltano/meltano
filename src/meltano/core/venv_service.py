@@ -421,7 +421,7 @@ class VirtualEnvService:
 
     async def pip_install(
         self,
-        args: Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         clean: bool = False,
         force: bool = False,
@@ -430,7 +430,7 @@ class VirtualEnvService:
         """Install a package using `pip` in the proper virtual environment.
 
         Args:
-            args: The arguments to pass to `pip install`.
+            pip_install_args: The arguments to pass to `pip install`.
             clean: Whether the installation should be done in a clean venv.
             force: Whether to ignore the Python version required by plugins.
             env: Environment variables to pass to the subprocess.
@@ -445,10 +445,10 @@ class VirtualEnvService:
             await self.create()
             await self._backend.upgrade_installer(env=env)
 
-        pip_install_args_str = shlex.join(args)
+        pip_install_args_str = shlex.join(pip_install_args)
         log_msg_prefix = (
             f"Upgrading with args {pip_install_args_str!r} in existing"
-            if "--upgrade" in args
+            if "--upgrade" in pip_install_args
             else f"Installing with args {pip_install_args_str!r} into"
         )
         logger.debug(
@@ -465,7 +465,7 @@ class VirtualEnvService:
             return (await proc.stdout.read()).decode("utf-8", errors="replace")
 
         return await self._backend.install_pip_args(
-            args,
+            pip_install_args,
             extract_stderr=extract_stderr,
             force=force,
             env=env,
@@ -497,7 +497,12 @@ class VirtualEnvService:
 
         self.clean_run_files()
 
-        await self.pip_install(args=pip_install_args, clean=clean, env=env, force=force)
+        await self.pip_install(
+            pip_install_args=pip_install_args,
+            clean=clean,
+            env=env,
+            force=force,
+        )
         self.venv.write_fingerprint(pip_install_args)
 
 
@@ -550,7 +555,7 @@ class VenvBackend(abc.ABC):
     @abc.abstractmethod
     async def install_pip_args(
         self,
-        args: Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         force: bool = False,
@@ -559,14 +564,14 @@ class VenvBackend(abc.ABC):
         """Install requirements in the plugin's virtual environment.
 
         Args:
-            args: The arguments to pass to the installer.
+            pip_install_args: The arguments to pass to `pip install`.
             extract_stderr: Async function that is provided the completed failed
                 process, and returns its error string or `None`.
             force: Whether to ignore the Python version required by plugins.
             env: Environment variables to pass to the subprocess.
 
         Returns:
-            The process invoking the installing with the provided args.
+            The process running `pip install` with the provided args.
         """
 
     @abc.abstractmethod
@@ -613,7 +618,15 @@ class VirtualenvBackend(VenvBackend):
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
     ) -> Process:
-        """Create a new virtual environment."""
+        """Create a new virtual environment.
+
+        Args:
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+
+        Returns:
+            The Python process creating the virtual environment.
+        """
         return await exec_async(
             sys.executable,
             "-m",
@@ -646,14 +659,29 @@ class VirtualenvBackend(VenvBackend):
     @override
     async def install_pip_args(
         self,
-        args: Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         force: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> Process:
-        """Install into the virtualenv using `pip install` arguments."""
-        args = ("--ignore-requires-python", *args) if force else args
+        """Return the `pip install` arguments to use.
+
+        Args:
+            pip_install_args: The arguments to pass to `pip install`.
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+            force: Whether to ignore the Python version required by plugins.
+            env: Environment variables to pass to the subprocess.
+
+        Returns:
+            The process running `pip install` with the provided args.
+        """
+        pip_install_args = (
+            ("--ignore-requires-python", *pip_install_args)
+            if force
+            else pip_install_args
+        )
         return await exec_async(
             str(self.venv.exec_path("python")),
             "-m",
@@ -661,14 +689,21 @@ class VirtualenvBackend(VenvBackend):
             "install",
             "--log",
             str(self.log_path),
-            *args,
+            *pip_install_args,
             extract_stderr=extract_stderr,
             env=env,
         )
 
     @override
     async def uninstall_package(self, package: str) -> Process:
-        """Uninstall a single package."""
+        """Uninstall a single package.
+
+        Args:
+            package: The package name.
+
+        Returns:
+            The process running `pip uninstall` with the provided package.
+        """
         return await exec_async(
             str(self.venv.exec_path("python")),
             "-m",
@@ -698,7 +733,12 @@ class UvBackend(VenvBackend):
     """Manages virtual environments using `uv`."""
 
     def __init__(self, *args: t.Any, **kwargs: t.Any):
-        """Initialize the `UvBackend`."""
+        """Initialize the `UvBackend`.
+
+        Args:
+            args: Positional arguments for the VenvBackend.
+            kwargs: Keyword arguments for the VenvBackend.
+        """
         super().__init__(*args, **kwargs)
         self.uv = find_uv()
         logger.debug("Using uv executable at %s", self.uv)
@@ -709,31 +749,53 @@ class UvBackend(VenvBackend):
         *,
         env: dict[str, str | None] | None = None,
     ) -> Process | None:
-        """No-op for `uv` virtual environments."""
+        """No-op for `uv` virtual environments.
+
+        Args:
+            env: Environment variables to pass to the subprocess.
+        """
 
     @override
     async def install_pip_args(
         self,
-        args: Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         force: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> Process:
-        """Install into the virtualenv using `uv pip install` arguments."""
+        """Run `pip install` in the plugin's virtual environment.
+
+        Args:
+            pip_install_args: The arguments to pass to `pip install`.
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+            force: Whether to ignore the Python version required by plugins.
+            env: Environment variables to pass to the subprocess.
+
+        Returns:
+            The process running `pip install` with the provided args.
+        """
         return await exec_async(
             self.uv,
             "pip",
             "install",
             f"--python={self.venv.exec_path('python')}",
-            *args,
+            *pip_install_args,
             extract_stderr=extract_stderr,
             env=env,
         )
 
     @override
     async def uninstall_package(self, package: str) -> Process:
-        """Uninstall a single package using `uv`."""
+        """Uninstall a single package using `uv`.
+
+        Args:
+            package: The package name.
+
+        Returns:
+            The process running `pip uninstall` with the provided package.
+        """
         return await exec_async(
             self.uv,
             "pip",
@@ -748,7 +810,15 @@ class UvBackend(VenvBackend):
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
     ) -> Process:
-        """Create a new virtual environment using `uv`."""
+        """Create a new virtual environment using `uv`.
+
+        Args:
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+
+        Returns:
+            The Python process creating the virtual environment.
+        """
         return await exec_async(
             self.uv,
             "venv",
