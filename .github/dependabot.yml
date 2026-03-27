@@ -1,6 +1,16 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
+  - package-ecosystem: pre-commit
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      hooks:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore: "
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:

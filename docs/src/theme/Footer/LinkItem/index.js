@@ -2,7 +2,7 @@ import React from 'react';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import isInternalUrl from '@docusaurus/isInternalUrl';
-// eslint-disable-next-line no-unused-vars
+
 import IconExternalLink from '@theme/Icon/ExternalLink';
 // eslint-disable-next-line react/prop-types
 export default function FooterLinkItem({ item }) {

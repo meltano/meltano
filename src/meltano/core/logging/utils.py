@@ -77,6 +77,8 @@ DEFAULT_LEVEL = "info"
 FORMAT = (
     "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
 )
+_FRAMES_DEBUG = 100
+_FRAMES_DEFAULT = 2
 
 
 class LogFormat(StrEnum):
@@ -134,7 +136,7 @@ def default_config(
     # Convert log level to numeric value for disabled level
     numeric_level = parse_log_level(log_level.lower())
     log_level = log_level.upper()
-    max_frames = 100 if log_level == "DEBUG" else 2
+    max_frames = _FRAMES_DEBUG if log_level == "DEBUG" else _FRAMES_DEFAULT
     foreign_pre_chain = get_default_foreign_pre_chain()
 
     match log_format:

@@ -5,7 +5,7 @@ import { MDXProvider } from '@mdx-js/react';
 const progressLiteralStart = '---> 100%';
 const promptLiteralStart = '$ ';
 const customPromptLiteralStart = '# ';
-// eslint-disable-next-line no-unused-vars
+
 const codeThingy = '```';
 const waitStart = '<---';
 

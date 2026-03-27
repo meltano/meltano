@@ -498,6 +498,7 @@ class PluginInstaller(t.Protocol):
         *,
         project: Project,
         plugin: ProjectPlugin,
+        reason: PluginInstallReason,
         **kwargs,  # noqa: ANN003
     ) -> None:
         """Install the plugin.
@@ -505,6 +506,7 @@ class PluginInstaller(t.Protocol):
         Args:
             project: Meltano Project.
             plugin: `ProjectPlugin` to install.
+            reason: Install reason.
             kwargs: Additional arguments for the installation of the plugin.
         """
 

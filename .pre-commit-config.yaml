@@ -27,7 +27,7 @@ repos:
       - id: no-commit-to-branch
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.36.1
+    rev: 0.37.0
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -52,27 +52,29 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.55.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v10.0.3 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
-        args: ['--fix', '--config=docs/.eslintrc.json']
+        args: ['--fix', '--config=docs/eslint.config.js']
         additional_dependencies:
-          - "eslint@8.55.0" # Keep this in sync with the rev above!
-          - "eslint-config-prettier@8.8.0"
-          - "eslint-plugin-prettier@5.0.0"
-          - "eslint-plugin-react@7.33.0"
-          - "eslint-plugin-vue@9.15.1"
-          - "prettier@3.0.0"
+          - "eslint@10.1.0" # Keep this in sync with the rev above!
+
+          - "eslint-config-prettier@10.1.8"
+          - "eslint-plugin-prettier@5.5.5"
+          - "eslint-plugin-react@7.37.5"
+          - "eslint-plugin-vue@10.8.0"
+          - "prettier@3.8.1"
+          - "globals@17.4.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
+    rev: v0.15.7
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.9.28
+    rev: 0.10.12
     hooks:
       - id: uv-lock

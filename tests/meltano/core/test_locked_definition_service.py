@@ -32,7 +32,7 @@ class TestLockedDefinitionService:
             variant="meltano",
             foo="bar",
         )
-        path = subject.project.plugin_lock_path(
+        path = subject.project.dirs.plugin_lock_path(
             definition.plugin_type,
             definition.name,
             variant_name=definition.variant,

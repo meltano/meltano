@@ -123,7 +123,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
   ).current;
   const resultsFooterComponent = useMemo(
     () =>
-      // eslint-disable-next-line react/no-unstable-nested-components, react/display-name
+      // eslint-disable-next-line react/display-name
       (footerProps) =>
         <ResultsFooter {...footerProps} onClose={onClose} />,
     [onClose],

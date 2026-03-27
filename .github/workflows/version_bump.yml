@@ -51,13 +51,13 @@ jobs:
       with:
         python-version-file: .python-version
 
-    - uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
+    - uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
       with:
         enable-cache: false
 
     - name: Bump version
       id: cz-bump
-      uses: commitizen-tools/commitizen-action@2e8226b3e7e141ae28de9942957f267eb5d68fb6 # 0.27.0
+      uses: commitizen-tools/commitizen-action@338bbd841b75aaee6bf5340e1fa12f6ab58ff9ff # 0.27.1
       with:
         increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}

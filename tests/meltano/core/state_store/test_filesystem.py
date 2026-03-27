@@ -410,6 +410,11 @@ class TestAZStorageStateStoreManager:
 
 
 class TestS3StateStoreManager:
+    @pytest.fixture(autouse=True)
+    def clean_env(self, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+
     @contextmanager
     def stubber(self) -> Iterator[Stubber]:
         with patch(
@@ -471,13 +476,7 @@ class TestS3StateStoreManager:
     def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
 
-    def test_set_first_time(
-        self,
-        monkeypatch: pytest.MonkeyPatch,
-        faker: faker.Faker,
-    ) -> None:
-        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-        monkeypatch.delenv("AWS_PROFILE", raising=False)
+    def test_set_first_time(self, faker: faker.Faker) -> None:
         state_id = faker.pystr()
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
@@ -487,13 +486,7 @@ class TestS3StateStoreManager:
             store_manager.client.create_bucket(Bucket=store_manager.bucket)
             store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
 
-    def test_update_fail_object_in_glacier(
-        self,
-        monkeypatch: pytest.MonkeyPatch,
-        faker: faker.Faker,
-    ) -> None:
-        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-        monkeypatch.delenv("AWS_PROFILE", raising=False)
+    def test_update_fail_object_in_glacier(self, faker: faker.Faker) -> None:
         state_id = faker.pystr()
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
@@ -519,12 +512,7 @@ class TestS3StateStoreManager:
             assert isinstance(exc.__cause__, botocore.exceptions.ClientError)
             assert exc.__cause__.response["Error"]["Code"] == "InvalidObjectState"
 
-    def test_update_fail_bucket_does_not_exist(
-        self,
-        monkeypatch: pytest.MonkeyPatch,
-    ) -> None:
-        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
-        monkeypatch.delenv("AWS_PROFILE", raising=False)
+    def test_update_fail_bucket_does_not_exist(self) -> None:
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
                 uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
