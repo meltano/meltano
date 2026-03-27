@@ -50,7 +50,7 @@ jobs:
         python-version: 3.14.2
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
+      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
       with:
         python-version: ${{ steps.setup-python.outputs.python-version }}
 
@@ -59,7 +59,7 @@ jobs:
         uv sync --group testing
 
     - name: Run benchmarks
-      uses: CodSpeedHQ/action@281164b0f014a4e7badd2c02cecad9b595b70537 # v4.11.1
+      uses: CodSpeedHQ/action@1c8ae4843586d3ba879736b7f6b7b0c990757fab # v4.12.1
       with:
         mode: walltime
         run: uv run pytest tests/benchmarks/ --codspeed -p no:randomly
