@@ -45,13 +45,14 @@ class SafeStreamHandler(logging.StreamHandler):
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
-            super().emit(record)
+            msg = self.format(record)
+            stream = self.stream
+            stream.write(msg + self.terminator)
+            self.flush()
         except UnicodeEncodeError:
             # Re-encode the message with backslashreplace to avoid data loss
             # while still producing readable output.
             try:
-                msg = self.format(record)
-                stream = self.stream
                 encoding = getattr(stream, "encoding", "utf-8") or "utf-8"
                 stream.write(
                     msg.encode(
@@ -63,6 +64,10 @@ class SafeStreamHandler(logging.StreamHandler):
                 self.flush()
             except Exception:  # noqa: BLE001
                 self.handleError(record)
+        except RecursionError:
+            raise
+        except Exception:  # noqa: BLE001
+            self.handleError(record)
 
 
 LEVELS: dict[str, int] = {

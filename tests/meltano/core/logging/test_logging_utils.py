@@ -263,10 +263,14 @@ class TestSafeStreamHandler:
         """Test that exceptions in the fallback encoding go to handleError."""
         from unittest.mock import Mock
 
-        # Create a mock stream that always raises exceptions
+        # First write raises UnicodeEncodeError to enter the fallback path,
+        # then the fallback write itself raises an I/O error.
         mock_stream = Mock()
         mock_stream.encoding = "ascii"
-        mock_stream.write.side_effect = Exception("Something went wrong")
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            OSError("disk full"),
+        ]
 
         handler = SafeStreamHandler(mock_stream)
         handler.setFormatter(logging.Formatter("%(message)s"))
@@ -279,7 +283,7 @@ class TestSafeStreamHandler:
             level=logging.INFO,
             pathname="",
             lineno=0,
-            msg="Any message",
+            msg="Message with unicode: 中文",
             args=(),
             exc_info=None,
         )
@@ -287,7 +291,35 @@ class TestSafeStreamHandler:
         # Should not raise an exception
         handler.emit(record)
 
-        # Verify handleError was called
+        # Both writes should have been attempted
+        assert mock_stream.write.call_count == 2
+
+        # handleError should be called since the fallback also failed
+        handler.handleError.assert_called_once_with(record)
+
+    def test_non_unicode_exception_calls_handle_error(self):
+        """Test that non-UnicodeEncodeError exceptions go to handleError."""
+        from unittest.mock import Mock
+
+        mock_stream = Mock()
+        mock_stream.encoding = "utf-8"
+        mock_stream.write.side_effect = OSError("broken pipe")
+
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        handler.handleError = Mock()
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Any message",
+            args=(),
+            exc_info=None,
+        )
+
+        handler.emit(record)
         handler.handleError.assert_called_once_with(record)
 
     def test_stream_without_encoding_uses_utf8_fallback(self):
