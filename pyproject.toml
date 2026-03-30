@@ -144,7 +144,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=1.16.0,<2",
-  "ty==0.0.23",
+  "ty==0.0.24",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -183,7 +183,6 @@ filterwarnings = [
   'once::pytest.PytestUnhandledThreadExceptionWarning',
   'once::ResourceWarning',
   'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
-  "once:os.path.commonprefix\\(\\) is deprecated. Use os.path.commonpath\\(\\) for longest path prefix.:DeprecationWarning:pygments",  # https://github.com/pygments/pygments/issues/3039
 ]
 log_cli = true
 log_cli_format = "%(message)s"
