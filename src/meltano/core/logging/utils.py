@@ -44,6 +44,7 @@ class SafeStreamHandler(logging.StreamHandler):
     """
 
     def emit(self, record: logging.LogRecord) -> None:
+        """Emit a record, falling back to backslashreplace on encode errors."""
         try:
             msg = self.format(record)
             stream = self.stream
