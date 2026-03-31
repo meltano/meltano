@@ -245,7 +245,7 @@ class TestEnvVarResolution:
             meltanofile.update(meltanofile_updates)
 
         result = subprocess.run(
-            (
+            (  # noqa: S607
                 "meltano",
                 "invoke",
                 *(arg for key in expected_env_values for arg in ("--print-var", key)),
