@@ -303,7 +303,7 @@ class TestTracker:
 
     @pytest.mark.usefixtures("project")
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
-        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
+        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: S607
 
         event_summary = snowplow.all()
         assert event_summary["good"] > 0
