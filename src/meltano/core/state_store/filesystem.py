@@ -268,7 +268,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         self,
         state_id: str,
         *,
-        retry_seconds: int,
+        retry_seconds: float,
     ) -> Generator[None, None, None]:
         """Context manager for locking state_id during reads and writes.
 
