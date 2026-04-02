@@ -11,7 +11,11 @@ from structlog.stdlib import get_logger
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Payload
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.state_service import SINGER_STATE_KEY, StateService
+from meltano.core.state_service import (
+    SINGER_STATE_KEY,
+    StatePersistenceError,
+    StateService,
+)
 
 from . import PluginType, SingerPlugin
 
@@ -90,11 +94,9 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception as e:  # pragma: no cover
-            logger.error(
-                "Failed to persist incremental state to the configured backend: %s",
-                e,
-                exc_info=True,
+        except StatePersistenceError:  # pragma: no cover
+            logger.exception(
+                "Failed to persist incremental state to the configured backend",
             )
             raise
         else:

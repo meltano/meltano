@@ -9,7 +9,7 @@ from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer.target import BookmarkWriter
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.state_service import StateService
+from meltano.core.state_service import StatePersistenceError, StateService
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -85,13 +85,24 @@ class TestBookmarkWriter:
             payload_flag=Payload.STATE,
         )
 
-        def _raise_permission_error(*args, **kwargs):
-            raise PermissionError("403 AuthorizationPermissionMismatch")
+        def _raise_permission_error(
+            *_unused_args: object,
+            **_unused_kwargs: object,
+        ) -> None:
+            error_msg = "403 AuthorizationPermissionMismatch"
+            raise PermissionError(error_msg)
 
-        monkeypatch.setattr(state_service, "add_state", _raise_permission_error)
+        monkeypatch.setattr(
+            state_service.state_store_manager,
+            "update",
+            _raise_permission_error,
+        )
 
-        with pytest.raises(PermissionError, match="AuthorizationPermissionMismatch"):
+        with pytest.raises(StatePersistenceError) as err_info:
             writer.writeline('{"qux": "quux"}')
+
+        assert isinstance(err_info.value.__cause__, PermissionError)
+        assert "AuthorizationPermissionMismatch" in str(err_info.value.__cause__)
 
 
 class TestSingerTarget:
