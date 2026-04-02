@@ -90,7 +90,7 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception as e:  # pragma: no cover  # noqa: BLE001
+        except Exception as e:  # pragma: no cover
             logger.error(
                 "Failed to persist incremental state to the configured backend: %s",
                 e,
