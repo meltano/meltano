@@ -90,12 +90,13 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception:  # pragma: no cover  # noqa: BLE001
-            logger.warning(
-                "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated",
+        except Exception as e:  # pragma: no cover  # noqa: BLE001
+            logger.error(
+                "Failed to persist incremental state to the configured backend: %s",
+                e,
                 exc_info=True,
             )
+            raise
         else:
             logger.info(
                 f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: E501, G004

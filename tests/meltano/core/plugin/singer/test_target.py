@@ -68,6 +68,31 @@ class TestBookmarkWriter:
 
         assert state_service.get_state(job.job_name) == expected_state
 
+    @pytest.mark.asyncio
+    async def test_writeline_raises_on_state_backend_failure(
+        self,
+        session: Session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        state_service = StateService(session=session)
+        job = Job(job_name="pytest_test_runner", payload={"singer_state": {}})
+        job.save(session)
+
+        writer = BookmarkWriter(
+            job,
+            session,
+            state_service=state_service,
+            payload_flag=Payload.STATE,
+        )
+
+        def _raise_permission_error(*args, **kwargs):
+            raise PermissionError("403 AuthorizationPermissionMismatch")
+
+        monkeypatch.setattr(state_service, "add_state", _raise_permission_error)
+
+        with pytest.raises(PermissionError, match="AuthorizationPermissionMismatch"):
+            writer.writeline('{"qux": "quux"}')
+
 
 class TestSingerTarget:
     @pytest.fixture
