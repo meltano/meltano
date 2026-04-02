@@ -359,7 +359,9 @@ class TestSafeStreamHandler:
 
         mock_stream = Mock()
         mock_stream.encoding = "utf-8"
-        mock_stream.write.side_effect = RecursionError("maximum recursion depth exceeded")
+        mock_stream.write.side_effect = RecursionError(
+            "maximum recursion depth exceeded"
+        )
 
         handler = SafeStreamHandler(mock_stream)
         handler.setFormatter(logging.Formatter("%(message)s"))
