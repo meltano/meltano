@@ -353,6 +353,30 @@ class TestSafeStreamHandler:
         # Verify that write was called twice
         assert mock_stream.write.call_count == 2
 
+    def test_recursion_error_is_reraised(self):
+        """Test that RecursionError is not swallowed."""
+        from unittest.mock import Mock
+
+        mock_stream = Mock()
+        mock_stream.encoding = "utf-8"
+        mock_stream.write.side_effect = RecursionError("maximum recursion depth exceeded")
+
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+
+        record = logging.LogRecord(
+            name="test_logger",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="Any message",
+            args=(),
+            exc_info=None,
+        )
+
+        with pytest.raises(RecursionError):
+            handler.emit(record)
+
     def test_encoding_none_uses_utf8_fallback(self):
         """Test that streams with None encoding default to utf-8."""
         from unittest.mock import Mock
