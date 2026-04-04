@@ -324,12 +324,17 @@ class TestCliConfig:
         assert result.stdout.index("\nport") < result.stdout.index("\nsecure")
         assert result.stdout.index("\nsecure") < result.stdout.index("\ntest")
 
-        # Alphabetical within Optional
-        assert result.stdout.index("\naliased") < result.stdout.index("\nboolean")
-        assert result.stdout.index("\nboolean") < result.stdout.index("\nhidden")
-        assert result.stdout.index("\nstacked_env_var") < result.stdout.index(
-            "\nstart_date"
-        )
+        # Alphabetical within Optional: extract setting names and verify sorted
+        lines = result.stdout.split("\n")
+        optional_idx = next(i for i, line in enumerate(lines) if line == "Optional:")
+        optional_names = []
+        for line in lines[optional_idx + 1 :]:
+            if not line or line.endswith(":"):
+                break
+            if not line.startswith("\t"):
+                optional_names.append(line.split(" ")[0])
+        assert optional_names == sorted(optional_names)
+        assert len(optional_names) > 0
 
     @pytest.mark.usefixtures("project")
     def test_config_list_configured_section(
@@ -366,6 +371,33 @@ class TestCliConfig:
                 store=SettingValueStore.DOTENV,
                 session=session,
             )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_extras_sorted(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
+        assert_cli_runner(result)
+
+        # Default sections should not appear in --extras mode
+        assert "Required:" not in result.stdout
+        assert "Configured:" not in result.stdout
+        assert "Optional:" not in result.stdout
+
+        # Non-extra settings should not appear
+        assert "\ntest " not in result.stdout
+        assert "\nport " not in result.stdout
+
+        # Extra settings should appear and be sorted
+        assert "_select" in result.stdout
+
+        # Extract setting names and verify sorted
+        lines = result.stdout.strip().split("\n")
+        setting_names = [
+            line.split(" ")[0]
+            for line in lines
+            if line and not line.startswith("\t") and line[0] == "_"
+        ]
+        assert setting_names == sorted(setting_names)
+        assert len(setting_names) > 0
 
     @pytest.mark.usefixtures("project")
     def test_config_list_sections_no_validation_groups(self, cli_runner) -> None:
