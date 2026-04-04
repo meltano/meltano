@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import typing as t
+import warnings
 from signal import SIGTERM
 from unittest import mock
 from unittest.mock import AsyncMock
@@ -300,6 +301,207 @@ class TestCliConfig:
         assert "test (required) [env:" in result.stdout
         assert "secure (required) [env:" in result.stdout
         assert "port (required" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_sorted_sections(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        # Section headers appear
+        assert "Required:" in result.stdout
+        assert "Optional:" in result.stdout
+
+        # Configured section does not appear (no non-required settings configured)
+        assert "\nConfigured:\n" not in result.stdout
+
+        # Section order: Required before Optional
+        assert result.stdout.index("Required:") < result.stdout.index("Optional:")
+
+        # Alphabetical within Required
+        assert result.stdout.index("\nauth.password") < result.stdout.index(
+            "\nauth.username"
+        )
+        assert result.stdout.index("\nauth.username") < result.stdout.index("\nport")
+        assert result.stdout.index("\nport") < result.stdout.index("\nsecure")
+        assert result.stdout.index("\nsecure") < result.stdout.index("\ntest")
+
+        # Alphabetical within Optional: extract setting names and verify sorted
+        lines = result.stdout.split("\n")
+        optional_idx = next(i for i, line in enumerate(lines) if line == "Optional:")
+        optional_names = []
+        for line in lines[optional_idx + 1 :]:
+            if not line or line.endswith(":"):
+                break
+            if not line.startswith("\t"):
+                optional_names.append(line.split(" ")[0])
+        assert optional_names == sorted(optional_names)
+        assert len(optional_names) > 0
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_configured_section(
+        self,
+        cli_runner,
+        tap,
+        session,
+        plugin_settings_service_factory,
+    ) -> None:
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set(
+            "start_date",
+            "2023-01-01",
+            store=SettingValueStore.DOTENV,
+            session=session,
+        )
+
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            assert_cli_runner(result)
+
+            assert "Configured:" in result.stdout
+            assert result.stdout.index("Required:") < result.stdout.index("Configured:")
+            assert result.stdout.index("Configured:") < result.stdout.index("Optional:")
+
+            # start_date is in Configured, not Optional
+            configured_pos = result.stdout.index("Configured:")
+            optional_pos = result.stdout.index("Optional:")
+            start_date_pos = result.stdout.index("\nstart_date")
+            assert configured_pos < start_date_pos < optional_pos
+        finally:
+            plugin_settings_service.unset(
+                "start_date",
+                store=SettingValueStore.DOTENV,
+                session=session,
+            )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_extras_sorted(
+        self,
+        cli_runner,
+        tap,
+        session,
+        plugin_settings_service_factory,
+    ) -> None:
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+            plugin_settings_service.set(
+                "_my_custom_extra",
+                "test_value",
+                store=SettingValueStore.MELTANO_YML,
+                session=session,
+            )
+
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
+            assert_cli_runner(result)
+
+            # Default sections should not appear in --extras mode
+            assert "Required:" not in result.stdout
+            assert "Configured:" not in result.stdout
+            assert "Optional:" not in result.stdout
+
+            # Non-extra settings should not appear
+            assert "\ntest " not in result.stdout
+            assert "\nport " not in result.stdout
+
+            # Extra settings should appear and be sorted
+            assert "_select" in result.stdout
+
+            # Custom extras get their own header
+            assert "Custom:" in result.stdout
+
+            # Extract non-custom extra names (before Custom: header) and verify sorted
+            lines = result.stdout.strip().split("\n")
+            setting_names = [
+                line.split(" ")[0]
+                for line in lines
+                if line
+                and not line.startswith("\t")
+                and line[0] == "_"
+                and line.split(" ")[0] != "_my_custom_extra"
+            ]
+            assert setting_names == sorted(setting_names)
+            assert len(setting_names) > 0
+
+            # Custom extra appears after Custom: header
+            custom_pos = result.stdout.index("Custom:")
+            custom_extra_pos = result.stdout.index("_my_custom_extra")
+            assert custom_pos < custom_extra_pos
+        finally:
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+                plugin_settings_service.unset(
+                    "_my_custom_extra",
+                    store=SettingValueStore.MELTANO_YML,
+                    session=session,
+                )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_custom_settings(
+        self,
+        cli_runner,
+        tap,
+        session,
+        plugin_settings_service_factory,
+    ) -> None:
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+            plugin_settings_service.set(
+                "my_custom_setting",
+                "custom_value",
+                store=SettingValueStore.MELTANO_YML,
+                session=session,
+            )
+            plugin_settings_service.set(
+                "_my_custom_extra",
+                "extra_value",
+                store=SettingValueStore.MELTANO_YML,
+                session=session,
+            )
+
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            assert_cli_runner(result)
+
+            assert "Custom, possibly unsupported by the plugin:" in result.stdout
+            custom_pos = result.stdout.index(
+                "Custom, possibly unsupported by the plugin:"
+            )
+            setting_pos = result.stdout.index("my_custom_setting")
+            assert custom_pos < setting_pos
+
+            assert (
+                "Custom extras, plugin-specific options handled by Meltano:"
+                in result.stdout
+            )
+            extras_pos = result.stdout.index(
+                "Custom extras, plugin-specific options handled by Meltano:"
+            )
+            extra_setting_pos = result.stdout.index("_my_custom_extra")
+            assert extras_pos < extra_setting_pos
+        finally:
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
+                plugin_settings_service.unset(
+                    "my_custom_setting",
+                    store=SettingValueStore.MELTANO_YML,
+                    session=session,
+                )
+                plugin_settings_service.unset(
+                    "_my_custom_extra",
+                    store=SettingValueStore.MELTANO_YML,
+                    session=session,
+                )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_sections_no_validation_groups(self, cli_runner) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+        assert_cli_runner(result)
+
+        assert "Required:" not in result.stdout
+        assert "Optional:" in result.stdout
+        assert "send_anonymous_usage_stats" in result.stdout
 
 
 class TestRequiredLabel:
