@@ -301,6 +301,81 @@ class TestCliConfig:
         assert "secure (required) [env:" in result.stdout
         assert "port (required" not in result.stdout
 
+    @pytest.mark.usefixtures("project")
+    def test_config_list_sorted_sections(self, cli_runner, tap) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        # Section headers appear
+        assert "Required:" in result.stdout
+        assert "Optional:" in result.stdout
+
+        # Configured section does not appear (no non-required settings configured)
+        assert "\nConfigured:\n" not in result.stdout
+
+        # Section order: Required before Optional
+        assert result.stdout.index("Required:") < result.stdout.index("Optional:")
+
+        # Alphabetical within Required
+        assert result.stdout.index("\nauth.password") < result.stdout.index(
+            "\nauth.username"
+        )
+        assert result.stdout.index("\nauth.username") < result.stdout.index("\nport")
+        assert result.stdout.index("\nport") < result.stdout.index("\nsecure")
+        assert result.stdout.index("\nsecure") < result.stdout.index("\ntest")
+
+        # Alphabetical within Optional
+        assert result.stdout.index("\naliased") < result.stdout.index("\nboolean")
+        assert result.stdout.index("\nboolean") < result.stdout.index("\nhidden")
+        assert result.stdout.index("\nstacked_env_var") < result.stdout.index(
+            "\nstart_date"
+        )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_configured_section(
+        self,
+        cli_runner,
+        tap,
+        session,
+        plugin_settings_service_factory,
+    ) -> None:
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set(
+            "start_date",
+            "2023-01-01",
+            store=SettingValueStore.DOTENV,
+            session=session,
+        )
+
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            assert_cli_runner(result)
+
+            assert "Configured:" in result.stdout
+            assert result.stdout.index("Required:") < result.stdout.index("Configured:")
+            assert result.stdout.index("Configured:") < result.stdout.index("Optional:")
+
+            # start_date is in Configured, not Optional
+            configured_pos = result.stdout.index("Configured:")
+            optional_pos = result.stdout.index("Optional:")
+            start_date_pos = result.stdout.index("\nstart_date")
+            assert configured_pos < start_date_pos < optional_pos
+        finally:
+            plugin_settings_service.unset(
+                "start_date",
+                store=SettingValueStore.DOTENV,
+                session=session,
+            )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_sections_no_validation_groups(self, cli_runner) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+        assert_cli_runner(result)
+
+        assert "Required:" not in result.stdout
+        assert "Optional:" in result.stdout
+        assert "send_anonymous_usage_stats" in result.stdout
+
 
 class TestRequiredLabel:
     @pytest.mark.parametrize(
