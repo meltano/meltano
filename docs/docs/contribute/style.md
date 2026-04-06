@@ -84,6 +84,7 @@ Javascript `import`s are sorted using the following pattern:
 The first rule is used to separate both blocks.</strong></p>
 :::
 
+<!--spellchecker:off-->
 ```js
 import lodash from 'lodash'                  // 1: third-party, 2: default, 3: [l]odash
 import Vue from 'vue'                        // 1: third-party, 2: default, 3: [v]ue
@@ -97,6 +98,7 @@ import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]ti
 ¶
 ¶  // 2 blank lines to split the imports from the code
 ```
+<!--spellchecker:on-->
 
 Python imports are sorted automatically using [Ruff](https://docs.astral.sh/ruff/). This is executed as part of the `pre-commit` hooks.
 

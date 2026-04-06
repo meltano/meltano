@@ -41,7 +41,7 @@ Before installing the utility, take a look at the [DataHub modules](https://data
 
 For this example we choose:
 
-- s3, becasuse we have CSV files hosted in AWS S3
+- s3, because we have CSV files hosted in AWS S3
 - postgres, because we have data inside a PostgreSQL database
 - and dbt, because we use a dbt transformer to build models.
 
@@ -67,7 +67,7 @@ Alternatively, you can use this part of the YAML and run
 
 ## Configure the Meltano Utility
 
-Configuring the Utility by setting the GMS endpoint for the datahub CLI running inside the Meltano project. If [DataHubs metadata service authentification](https://datahubproject.io/docs/authentication/introducing-metadata-service-authentication/) is turned off, you just need to configure the gms_host attribute:
+Configuring the Utility by setting the GMS endpoint for the datahub CLI running inside the Meltano project. If [DataHubs metadata service authentication](https://datahubproject.io/docs/authentication/introducing-metadata-service-authentication/) is turned off, you just need to configure the gms_host attribute:
 
 ```
  utilities:

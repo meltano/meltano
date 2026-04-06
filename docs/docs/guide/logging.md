@@ -130,11 +130,11 @@ loggers:
   somespecific.module.logger: # if you want debug logs for a specific named logger or module
     level: DEBUG
     handlers: [console]
-    propogate: no
+    propagate: no
   urllib3: # for example hide all urllib3 debug logs
     level: WARNING
     handlers: [console, meltano_log]
-    propogate: no
+    propagate: no
 ```
 
 For a detailed explanation of the above of the file format, see the [python logging documentation](https://docs.python.org/3/library/logging.config.html#configuration-file-format).
@@ -498,7 +498,7 @@ Log parsing adds minimal overhead:
 
 - Parsing performance: ~381K logs/second
 - Memory usage: Minimal additional allocation
-- Fallback behavior: Preserves original performance for unparseable logs
+- Fallback behavior: Preserves original performance for unparsable logs
 
 #### Debug Log Parsing
 

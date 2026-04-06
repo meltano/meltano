@@ -7,7 +7,7 @@ sidebar_class_name: hidden
 Below is a list video tutorials & demos on specific Meltano-related topics. Most lessons are part of a longer YouTube video. If that is the case, the link below will guide you to the correct time period.
 
 
-- **[DemoDay - Combining Meltano & Lightdash](https://youtu.be/NZZyBnEOGOI?list=PLO0YrxtDbWAuLRElrtwFI5PwlAEMUi0AD&t=937)** - Using Meltano as EL and T tool together with Lightdash, a leightweight BI tool that integrates well with dbt.
+- **[DemoDay - Combining Meltano & Lightdash](https://youtu.be/NZZyBnEOGOI?list=PLO0YrxtDbWAuLRElrtwFI5PwlAEMUi0AD&t=937)** - Using Meltano as EL and T tool together with Lightdash, a lightweight BI tool that integrates well with dbt.
 - **[DemoDay - Meltano Mappers](https://www.youtube.com/watch?v=41RGHQ49U_M&t=99s)** - An introduction to mappers and in particular to both, the two default mappers transferwise and meltano-map-transformer.
 - **[Tap a thon - tap-trello](https://youtu.be/41RGHQ49U_M?t=704)** - Intro to the tap for trello.
 - **[DemoDay - Meltano Slack Notifications](https://youtu.be/41RGHQ49U_M?t=1151)** - How to get job notifications from Meltano into Slack.

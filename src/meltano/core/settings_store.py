@@ -195,7 +195,7 @@ class SettingValueStore(StrEnum):
 
     @property
     def writable(self) -> bool:
-        """Return if this store is writeable.
+        """Return if this store is writable.
 
         Returns:
             True if store is writable.

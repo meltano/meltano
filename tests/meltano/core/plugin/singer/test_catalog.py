@@ -751,7 +751,7 @@ class TestCatalogRule:
 
         # Stream ID patterns don't match
         assert not rule.match("tap_stream")
-        assert not rule.match("othe")
+        assert not rule.match("not-a-match")
 
     def test_match_negated(self) -> None:
         rule = CatalogRule("tap_stream_id", negated=True)
@@ -786,7 +786,7 @@ class TestCatalogRule:
 
         # Stream ID pattern doesn't match, so the rule does
         assert rule.match("tap_stream")
-        assert rule.match("othe")
+        assert rule.match("not-a-match")
 
         # Stream ID pattern matches, so the rule doesn't
         assert not rule.match("tap_stream_id")
