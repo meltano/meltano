@@ -381,6 +381,26 @@ class TestCliConfig:
         session,
         plugin_settings_service_factory,
     ) -> None:
+        # Without custom extras: no Custom: header, just sorted built-in extras
+        result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
+        assert_cli_runner(result)
+
+        assert "Required:" not in result.stdout
+        assert "Configured:" not in result.stdout
+        assert "Optional:" not in result.stdout
+        assert "Custom:" not in result.stdout
+        assert "_select" in result.stdout
+
+        lines = result.stdout.strip().split("\n")
+        setting_names = [
+            line.split(" ")[0]
+            for line in lines
+            if line and not line.startswith("\t") and line[0] == "_"
+        ]
+        assert setting_names == sorted(setting_names)
+        assert len(setting_names) > 0
+
+        # With a custom extra: Custom: header appears
         plugin_settings_service = plugin_settings_service_factory(tap)
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)
@@ -395,35 +415,8 @@ class TestCliConfig:
             result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
             assert_cli_runner(result)
 
-            # Default sections should not appear in --extras mode
-            assert "Required:" not in result.stdout
-            assert "Configured:" not in result.stdout
-            assert "Optional:" not in result.stdout
-
-            # Non-extra settings should not appear
-            assert "\ntest " not in result.stdout
-            assert "\nport " not in result.stdout
-
-            # Extra settings should appear and be sorted
-            assert "_select" in result.stdout
-
-            # Custom extras get their own header
             assert "Custom:" in result.stdout
 
-            # Extract non-custom extra names (before Custom: header) and verify sorted
-            lines = result.stdout.strip().split("\n")
-            setting_names = [
-                line.split(" ")[0]
-                for line in lines
-                if line
-                and not line.startswith("\t")
-                and line[0] == "_"
-                and line.split(" ")[0] != "_my_custom_extra"
-            ]
-            assert setting_names == sorted(setting_names)
-            assert len(setting_names) > 0
-
-            # Custom extra appears after Custom: header
             custom_pos = result.stdout.index("Custom:")
             custom_extra_pos = result.stdout.index("_my_custom_extra")
             assert custom_pos < custom_extra_pos
@@ -493,6 +486,50 @@ class TestCliConfig:
                     store=SettingValueStore.MELTANO_YML,
                     session=session,
                 )
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_all_required_no_optional(
+        self, cli_runner, tap, project
+    ) -> None:
+        plugin = project.plugins.find_plugin(
+            tap.name,
+            plugin_type=tap.type,
+            configurable=True,
+        )
+        all_settings = [
+            "test",
+            "start_date",
+            "secure",
+            "port",
+            "list",
+            "object",
+            "hidden",
+            "boolean",
+            "auth.username",
+            "auth.password",
+            "aliased",
+            "stacked_env_var",
+        ]
+        original = plugin.settings_group_validation
+        plugin.settings_group_validation = [all_settings]
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            assert_cli_runner(result)
+        finally:
+            plugin.settings_group_validation = original
+
+        assert "Required:" in result.stdout
+        assert "Optional:" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_extras_no_extras_available(self, cli_runner) -> None:
+        result = cli_runner.invoke(cli, ["config", "list", "--extras", "meltano"])
+        assert_cli_runner(result)
+
+        # meltano has no extras, so output should be empty (no sections)
+        assert "Required:" not in result.stdout
+        assert "Optional:" not in result.stdout
+        assert "Custom:" not in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_sections_no_validation_groups(self, cli_runner) -> None:

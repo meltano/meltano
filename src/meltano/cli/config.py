@@ -486,8 +486,6 @@ def list_settings(
         source = config_metadata["source"]
 
         if extras:
-            if not setting_def.is_extra:
-                continue
             if setting_def.is_custom:
                 _custom.append((name, config_metadata))
             else:
