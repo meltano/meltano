@@ -92,65 +92,6 @@ def _required_label(groups: list[int], num_groups: int) -> str:
     return f"required by group{plural} {group_str}"
 
 
-def _print_setting(
-    name: str,
-    config_metadata: dict[str, t.Any],
-    *,
-    settings: PluginSettingsService | ProjectSettingsService,
-    setting_groups: dict[str, list[int]],
-    num_groups: int,
-    safe: bool,
-) -> None:
-    """Print a single setting with its metadata."""
-    value = config_metadata["value"]
-    source = config_metadata["source"]
-    setting_def: SettingDefinition = config_metadata["setting"]
-
-    click.secho(name, fg="blue", nl=False)
-    if name in setting_groups:
-        click.secho(
-            f" ({_required_label(setting_groups[name], num_groups)})",
-            fg="red",
-            nl=False,
-        )
-
-    env_keys = [var.definition for var in settings.setting_env_vars(setting_def)]
-    click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
-
-    if source is not SettingValueStore.DEFAULT:
-        default_value = setting_def.value
-        if default_value is not None:
-            click.echo(f" (default: {default_value!r})", nl=False)
-
-    if source is SettingValueStore.DEFAULT:
-        label = "default"
-    elif source is SettingValueStore.INHERITED:
-        label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]  # ty:ignore[unresolved-attribute]
-    else:
-        label = f"{get_label(config_metadata, source)}"
-
-    redacted_with_value = safe and setting_def.is_redacted and value is not None
-
-    current_value = click.style(
-        value if redacted_with_value else f"{value!r}",
-        fg="yellow" if redacted_with_value else "green",
-    )
-
-    click.echo(f" current value: {current_value}", nl=False)
-
-    unexpanded_value = config_metadata.get("unexpanded_value")
-    if not unexpanded_value or unexpanded_value == value:
-        click.echo(f" ({label})")
-    else:
-        click.echo(f" ({label}: {unexpanded_value!r})")
-
-    if setting_def.description:
-        click.echo("\t", nl=False)
-        if setting_def.label:
-            click.echo(f"{setting_def.label}: ", nl=False)
-        click.echo(f"{setting_def.description}")
-
-
 @t.overload
 def _get_settings(
     *,
@@ -508,28 +449,23 @@ def list_settings(
         bucket.sort(key=lambda item: item[0])
 
     # Build ordered section list
-    sections: list[tuple[str | None, _SettingBucket]] = []
     if extras:
-        if _optional:
-            sections.append((None, _optional))
-        if _custom:
-            sections.append(("Custom:", _custom))
+        _section_defs: list[tuple[str | None, _SettingBucket]] = [
+            (None, _optional),
+            ("Custom:", _custom),
+        ]
     else:
-        if _required:
-            sections.append(("Required:", _required))
-        if _configured:
-            sections.append(("Configured:", _configured))
-        if _optional:
-            sections.append(("Optional:", _optional))
-        if _custom:
-            sections.append(("Custom, possibly unsupported by the plugin:", _custom))
-        if _custom_extras:
-            sections.append(
-                (
-                    "Custom extras, plugin-specific options handled by Meltano:",
-                    _custom_extras,
-                )
-            )
+        _section_defs = [
+            ("Required:", _required),
+            ("Configured:", _configured),
+            ("Optional:", _optional),
+            ("Custom, possibly unsupported by the plugin:", _custom),
+            (
+                "Custom extras, plugin-specific options handled by Meltano:",
+                _custom_extras,
+            ),
+        ]
+    sections = [(h, b) for h, b in _section_defs if b]
 
     for i, (header, bucket) in enumerate(sections):
         if i > 0:
@@ -537,14 +473,55 @@ def list_settings(
         if header:
             click.echo(header)
         for name, config_metadata in bucket:
-            _print_setting(
-                name,
-                config_metadata,
-                settings=settings,
-                setting_groups=setting_groups,
-                num_groups=num_groups,
-                safe=safe,
+            value = config_metadata["value"]
+            source = config_metadata["source"]
+            setting_def = config_metadata["setting"]
+
+            click.secho(name, fg="blue", nl=False)
+            if name in setting_groups:
+                click.secho(
+                    f" ({_required_label(setting_groups[name], num_groups)})",
+                    fg="red",
+                    nl=False,
+                )
+
+            env_keys = [
+                var.definition for var in settings.setting_env_vars(setting_def)
+            ]
+            click.echo(f" [env: {', '.join(env_keys)}]", nl=False)
+
+            if source is not SettingValueStore.DEFAULT:
+                default_value = setting_def.value
+                if default_value is not None:
+                    click.echo(f" (default: {default_value!r})", nl=False)
+
+            if source is SettingValueStore.DEFAULT:
+                label = "default"
+            elif source is SettingValueStore.INHERITED:
+                label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]  # ty:ignore[unresolved-attribute]
+            else:
+                label = f"{get_label(config_metadata, source)}"
+
+            redacted_with_value = safe and setting_def.is_redacted and value is not None
+
+            current_value = click.style(
+                value if redacted_with_value else f"{value!r}",
+                fg="yellow" if redacted_with_value else "green",
             )
+
+            click.echo(f" current value: {current_value}", nl=False)
+
+            unexpanded_value = config_metadata.get("unexpanded_value")
+            if not unexpanded_value or unexpanded_value == value:
+                click.echo(f" ({label})")
+            else:
+                click.echo(f" ({label}: {unexpanded_value!r})")
+
+            if setting_def.description:
+                click.echo("\t", nl=False)
+                if setting_def.label:
+                    click.echo(f"{setting_def.label}: ", nl=False)
+                click.echo(f"{setting_def.description}")
 
     if docs_url := settings.docs_url:
         click.echo()
