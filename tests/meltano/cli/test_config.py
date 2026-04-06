@@ -328,12 +328,11 @@ class TestCliConfig:
         # Alphabetical within Optional: extract setting names and verify sorted
         lines = result.stdout.split("\n")
         optional_idx = next(i for i, line in enumerate(lines) if line == "Optional:")
-        optional_names = []
-        for line in lines[optional_idx + 1 :]:
-            if not line or line.endswith(":"):
-                break
-            if not line.startswith("\t"):
-                optional_names.append(line.split(" ")[0])
+        optional_names = [
+            line.split(" ")[0]
+            for line in lines[optional_idx + 1 :]
+            if line and not line.startswith("\t") and not line.endswith(":")
+        ]
         assert optional_names == sorted(optional_names)
         assert len(optional_names) > 0
 
