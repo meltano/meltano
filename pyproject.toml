@@ -168,8 +168,6 @@ include = ["src/meltano"]
 addopts = [
   "--doctest-modules",
   "-ra",
-  "--strict-config",
-  "--strict-markers",
 ]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
@@ -199,10 +197,10 @@ markers = [
   "slow: slow test",
 ]
 minversion = "9"
+strict = true
 testpaths = [
   "tests/",
 ]
-xfail_strict = true
 
 [tool.coverage.run]
 branch = true
