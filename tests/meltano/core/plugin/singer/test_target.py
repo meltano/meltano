@@ -9,7 +9,7 @@ from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer.target import BookmarkWriter
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.state_service import StateService
+from meltano.core.state_service import StatePersistenceError, StateService
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -67,6 +67,42 @@ class TestBookmarkWriter:
         writer.writeline(state_line)
 
         assert state_service.get_state(job.job_name) == expected_state
+
+    @pytest.mark.asyncio
+    async def test_writeline_raises_on_state_backend_failure(
+        self,
+        session: Session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        state_service = StateService(session=session)
+        job = Job(job_name="pytest_test_runner", payload={"singer_state": {}})
+        job.save(session)
+
+        writer = BookmarkWriter(
+            job,
+            session,
+            state_service=state_service,
+            payload_flag=Payload.STATE,
+        )
+
+        def _raise_permission_error(
+            *_unused_args: object,
+            **_unused_kwargs: object,
+        ) -> None:
+            error_msg = "403 AuthorizationPermissionMismatch"
+            raise PermissionError(error_msg)
+
+        monkeypatch.setattr(
+            state_service.state_store_manager,
+            "update",
+            _raise_permission_error,
+        )
+
+        with pytest.raises(StatePersistenceError) as err_info:
+            writer.writeline('{"qux": "quux"}')
+
+        assert isinstance(err_info.value.__cause__, PermissionError)
+        assert "AuthorizationPermissionMismatch" in str(err_info.value.__cause__)
 
 
 class TestSingerTarget:
