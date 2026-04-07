@@ -278,6 +278,7 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+strict = false
 warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true

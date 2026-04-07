@@ -17,7 +17,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin import PluginType
-    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin.base import PluginRef
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -68,7 +68,7 @@ def lock(
     if plugin_type is not None:
         plugins = [plugin for plugin in plugins if plugin.type == plugin_type]
 
-    tracked_plugins: list[tuple[ProjectPlugin, str | None]] = []
+    tracked_plugins: list[tuple[PluginRef, str | None]] = []
 
     if not plugins:
         tracker.track_command_event(CliEvent.aborted)
