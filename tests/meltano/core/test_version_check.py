@@ -166,11 +166,20 @@ class TestVersionCheckService:
         responses.add(responses.GET, PYPI_URL, status=HTTPStatus.INTERNAL_SERVER_ERROR)
         assert version_service.check_version() is None
 
+    @responses.activate
     def test_check_version_invalid_version(
         self,
         version_service: VersionCheckService,
     ) -> None:
         """Test version check when current version is invalid."""
+        pypi_response = {
+            "info": {
+                "version": "3.9.0",
+                "name": "meltano",
+            }
+        }
+        responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
+
         with mock.patch(
             "meltano.core.version_check.importlib.metadata.version",
             return_value="invalid",
@@ -302,7 +311,8 @@ class TestVersionCheckService:
 
         assert result1 is not None
         assert result1.latest_version == "3.9.0"
-        assert len(responses.calls) == 1
+        calls_after_first = len(responses.calls)
+        assert calls_after_first == 1
 
         # Second check - should use cache
         with mock.patch(
@@ -313,4 +323,4 @@ class TestVersionCheckService:
 
         assert result2 is not None
         assert result2.latest_version == "3.9.0"
-        assert len(responses.calls) == 1  # No additional API call
+        assert len(responses.calls) == calls_after_first  # No additional API call
