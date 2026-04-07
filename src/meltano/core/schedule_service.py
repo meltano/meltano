@@ -293,7 +293,7 @@ class ScheduleService:
         """Run a scheduled elt task or named job.
 
         Args:
-            schedule: The schedule whos elt task or named job to run.
+            schedule: The schedule whose elt task or named job to run.
             args: The arguments to pass to the elt task or named job.
             env: The environment to run the elt task or named job in.
             kwargs: The keyword arguments to pass to the elt task or named job.

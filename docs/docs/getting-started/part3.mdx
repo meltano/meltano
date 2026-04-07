@@ -230,8 +230,8 @@ Extension executing `dbt run`...
 20:45:15
 20:45:15  Concurrency: 2 threads (target='dev')
 20:45:15
-20:45:15  1 of 1 START sql table model analytics.auhtors ................................. [RUN]
-20:45:15  1 of 1 OK created sql table model analytics.auhtors ............................ [SELECT 1 in 0.14s]
+20:45:15  1 of 1 START sql table model analytics.authors ................................. [RUN]
+20:45:15  1 of 1 OK created sql table model analytics.authors ............................ [SELECT 1 in 0.14s]
 20:45:15
 20:45:15  Finished running 1 table model in 0 hours 0 minutes and 0.31 seconds (0.31s).
 20:45:15
@@ -263,7 +263,7 @@ To check that everything works together as a pipeline, we clean out once more an
 docker exec meltano_postgres psql -d postgres -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
 ```
 
-Run the final pipeline alltogether using the parameter `--full-refresh` to ignore the stored state:
+Run the final pipeline altogether using the parameter `--full-refresh` to ignore the stored state:
 
 <Termy>
 

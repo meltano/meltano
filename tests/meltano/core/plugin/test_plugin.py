@@ -646,7 +646,7 @@ class TestPluginType:
             assert plugin_type.singular is not None
             assert plugin_type.verb is not None
 
-    def test_specfic_properties(self) -> None:
+    def test_specific_properties(self) -> None:
         assert PluginType.FILES.descriptor == "file bundle"
         assert PluginType.TRANSFORMS.verb == "transform"
         assert PluginType.UTILITIES.verb == "utilize"

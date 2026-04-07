@@ -30,7 +30,9 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
 
     check(("Yes", "TRUE", "1", "true", "y", "on", "t"), expected=True)
     check(("No", "FALSE", "0", "false", "n", "off", "f"), expected=False)
+    # spellchecker:off  # noqa: ERA001
     check(("trew", "Fallse", "nah", "si", "okay", "01"), expected=None)
+    # spellchecker:on  # noqa: ERA001
 
 
 def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
