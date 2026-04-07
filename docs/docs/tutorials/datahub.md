@@ -67,7 +67,7 @@ Alternatively, you can use this part of the YAML and run
 
 ## Configure the Meltano Utility
 
-Configuring the Utility by setting the GMS endpoint for the datahub CLI running inside the Meltano project. If [DataHubs metadata service authentication](https://datahubproject.io/docs/authentication/introducing-metadata-service-authentication/) is turned off, you just need to configure the gms_host attribute:
+Configuring the Utility by setting the GMS endpoint for the datahub CLI running inside the Meltano project. If [DataHub's metadata service authentication](https://datahubproject.io/docs/authentication/introducing-metadata-service-authentication/) is turned off, you just need to configure the gms_host attribute:
 
 ```
  utilities:

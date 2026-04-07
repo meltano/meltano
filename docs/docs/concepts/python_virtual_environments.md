@@ -11,7 +11,7 @@ Python Virtual Environments, also known as a venv, are a way to allow a
 Python application access to specific versions of the libraries it needs to run properly. In the Singer ecosystem
 you may need to install multiple Taps and Targets, which all have different dependencies.
 
-If any of those dependencies are were in conflict with each other you would have a difficult development experience without Virtual Environments.
+If any of those dependencies were in conflict with each other you would have a difficult development experience without Virtual Environments.
 
 Python has a great technical write up at [Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html).
 
