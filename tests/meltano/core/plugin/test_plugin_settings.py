@@ -120,7 +120,7 @@ class TestPluginSettingsService:
             SettingValueStore.INHERITED,
         )
 
-        # overriden by an Setting db value when set
+        # overridden by a Setting db value when set
         subject.set(
             "test",
             "THIS_IS_FROM_DB",
@@ -133,7 +133,7 @@ class TestPluginSettingsService:
             SettingValueStore.DB,
         )
 
-        # overriden via the `meltano.yml` configuration
+        # overridden via the `meltano.yml` configuration
         test_value = 42
         subject.set(
             "test",
@@ -150,7 +150,7 @@ class TestPluginSettingsService:
         # revert back to the original
         subject.reset(store=SettingValueStore.MELTANO_YML)
 
-        # overriden via ENV
+        # overridden via ENV
         monkeypatch.setenv(env_var(subject, "test"), "N33DC0F33")
 
         assert subject.get_with_source("test", session=session) == (

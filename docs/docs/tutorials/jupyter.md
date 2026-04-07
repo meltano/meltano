@@ -75,7 +75,7 @@ plugins:
 
 ```
 
-### 3. _Optional: Expore database connection variables into the environment_
+### 3. _Optional: Expose database connection variables into the environment_
 
 To connect to datasources across different plugins it is useful to expose the connection details using environment variables. Meltano is able to do so in the meltano.yml. Here is an example configuration using plain text connection details:
 
@@ -148,7 +148,7 @@ If you want to use papermill, the easiest option is to use [plugin inheritance](
         description: Start lab server, on any ip range for Mac users inside docker.
 ```
 
-You will need to adapt the "args" to your notebook path, output path and parameters. The example notebook here has one cell with a defined parameter "price_1" which we are able to override from the outside. For details, refer to the (pleasently short) [documentation from papermill](https://papermill.readthedocs.io/en/latest/usage-parameterize.html), it's a simple process.
+You will need to adapt the "args" to your notebook path, output path and parameters. The example notebook here has one cell with a defined parameter "price_1" which we are able to override from the outside. For details, refer to the (pleasantly short) [documentation from papermill](https://papermill.readthedocs.io/en/latest/usage-parameterize.html), it's a simple process.
 
 ### 5. Execute & schedule your notebooks
 

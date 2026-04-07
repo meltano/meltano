@@ -508,7 +508,7 @@ class SingerTap(SingerPlugin):
 
         Args:
             plugin_invoker: the plugin invoker running
-            exec_args: the argumnets to pass to the tap
+            exec_args: the arguments to pass to the tap
 
         Returns:
             None
@@ -529,7 +529,7 @@ class SingerTap(SingerPlugin):
 
         Args:
             plugin_invoker: the plugin invoker running
-            exec_args: the argumnets to pass to the tap
+            exec_args: the arguments to pass to the tap
 
         Returns:
             None

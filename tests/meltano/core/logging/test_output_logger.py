@@ -381,24 +381,24 @@ class TestOutputLogger:
         assert entry["retry_count"] == 3
         assert entry["error_code"] == "CONNECTION_ERROR"
 
-    def test_writeline_with_parser_fallback_to_unparseable(
+    def test_writeline_with_parser_fallback_to_unparsable(
         self,
         subject: OutputLogger,
         log_output: LogCapture,
     ) -> None:
-        """Test writeline falls back to regular logging for unparseable lines."""
+        """Test writeline falls back to regular logging for unparsable lines."""
         out = subject.out("test_fallback", log_parser="singer-sdk")
 
         # Non-JSON line that can't be parsed
-        unparseable_line = "2023-12-20 10:00:00 | INFO | Some regular log message"
+        unparsable_line = "2023-12-20 10:00:00 | INFO | Some regular log message"
 
-        out.writeline(unparseable_line)
+        out.writeline(unparsable_line)
 
         # Should fallback to regular logging at INFO level
         assert len(log_output.entries) == 1
         entry = log_output.entries[0]
 
-        assert entry["event"] == unparseable_line
+        assert entry["event"] == unparsable_line
         assert entry["log_level"] == "info"  # Default write_level
         assert entry["name"] == "test_fallback"
         # Should not have any structured fields from failed parsing
@@ -471,7 +471,7 @@ class TestOutputLogger:
         subject: OutputLogger,
         log_output: LogCapture,
     ) -> None:
-        """Test writeline with custom write_level for unparseable lines."""
+        """Test writeline with custom write_level for unparsable lines."""
         # Set custom write_level to WARNING
         out = subject.out(
             "test_custom_level",
@@ -480,14 +480,14 @@ class TestOutputLogger:
         )
 
         # Use a line that won't parse as Singer SDK
-        unparseable_line = "This won't parse as JSON"
-        out.writeline(unparseable_line)
+        unparsable_line = "This won't parse as JSON"
+        out.writeline(unparsable_line)
 
         # Should use the custom write_level for fallback
         assert len(log_output.entries) == 1
         entry = log_output.entries[0]
 
-        assert entry["event"] == unparseable_line
+        assert entry["event"] == unparsable_line
         # Note: structlog may normalize log levels differently than expected
         # Let's check what we actually get and adjust accordingly
         assert entry["log_level"] in ["warning", "info"]  # Allow both for now
@@ -569,21 +569,21 @@ class TestOutputLogger:
         subject: OutputLogger,
         log_output: LogCapture,
     ) -> None:
-        """Test writeline with a parser that doesn't exist and unparseable content."""
-        out = subject.out("test_unparseable", log_parser="nonexistent-parser")
+        """Test writeline with a parser that doesn't exist and unparsable content."""
+        out = subject.out("test_unparsable", log_parser="nonexistent-parser")
 
         # Content that won't be parsed by any default parser
-        unparseable_line = "2023-12-20 | Regular log format that won't parse"
+        unparsable_line = "2023-12-20 | Regular log format that won't parse"
 
-        out.writeline(unparseable_line)
+        out.writeline(unparsable_line)
 
         # Should fallback to regular logging since no parser can handle this
         assert len(log_output.entries) == 1
         entry = log_output.entries[0]
 
-        assert entry["event"] == unparseable_line
+        assert entry["event"] == unparsable_line
         assert entry["log_level"] == "info"
-        assert entry["name"] == "test_unparseable"
+        assert entry["name"] == "test_unparsable"
         # Should not have structured fields since parsing failed everywhere
         assert "plugin_logger" not in entry
 
