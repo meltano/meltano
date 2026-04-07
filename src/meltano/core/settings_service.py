@@ -420,7 +420,7 @@ class SettingsService(metaclass=ABCMeta):
                     metadata["uncast_value"] = value
                     value = cast_value
 
-            # we don't want to leak secure informations
+            # we don't want to leak secure information
             # so we redact all `passwords`
             if redacted and value and setting_def.is_redacted:
                 metadata["redacted"] = True

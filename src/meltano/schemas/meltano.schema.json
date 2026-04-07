@@ -29,7 +29,7 @@
     },
     "requires_meltano": {
       "type": "string",
-      "description": "A version speficier for the Meltano version required by this project. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error.",
+      "description": "A version specifier for the Meltano version required by this project. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error.",
       "examples": [
         ">=3,<4",
         ">=3.6,<3.7"

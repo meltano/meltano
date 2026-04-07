@@ -245,7 +245,7 @@ meltano invoke dbt:run --models tap_gitlab.*
 
 Again, this runs all dbt models in the `/transform/models/tap_gitlab/` directory.
 
-The downside of running directly vs in a pipeline is that Meltano can't infer anything about how dbt should run so more settings might need to be explictly set by the user. This includes target dialet `DBT_TARGET`, target schema `DBT_TARGET_SCHEMA`, and models `DBT_MODELS`.
+The downside of running directly vs in a pipeline is that Meltano can't infer anything about how dbt should run so more settings might need to be explicitly set by the user. This includes target dialect `DBT_TARGET`, target schema `DBT_TARGET_SCHEMA`, and models `DBT_MODELS`.
 
 See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other dbt commands.
 

@@ -257,7 +257,7 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
     ) -> None:
-        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stderr.at_eof.side_effect = (True,)
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
             side_effect=(
@@ -266,7 +266,7 @@ class TestExtractLoadBlocks:
             ),
         )
 
-        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stderr.at_eof.side_effect = (True,)
         mapper_process.stdout.at_eof.side_effect = (False, False, True)
         mapper_process.stdout.readline = AsyncMock(
             side_effect=(
@@ -343,7 +343,7 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
     ) -> None:
-        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stderr.at_eof.side_effect = (True,)
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
             side_effect=(
@@ -352,7 +352,7 @@ class TestExtractLoadBlocks:
             ),
         )
 
-        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stderr.at_eof.side_effect = (True,)
         mapper_process.stdout.at_eof.side_effect = (False, False, True)
         mapper_process.stdout.readline = AsyncMock(
             side_effect=(
@@ -421,7 +421,7 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
     ) -> None:
-        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stderr.at_eof.side_effect = (True,)
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
             side_effect=(
@@ -517,7 +517,7 @@ class TestExtractLoadBlocks:
         elb_context,
         project,
     ) -> None:
-        tap_process.sterr.at_eof.side_effect = True
+        tap_process.stderr.at_eof.side_effect = (True,)
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
             side_effect=(
@@ -526,7 +526,7 @@ class TestExtractLoadBlocks:
             ),
         )
 
-        mapper_process.sterr.at_eof.side_effect = True
+        mapper_process.stderr.at_eof.side_effect = (True,)
         mapper_process.stdout.at_eof.side_effect = (False, False, True)
         mapper_process.stdout.readline = AsyncMock(
             side_effect=(

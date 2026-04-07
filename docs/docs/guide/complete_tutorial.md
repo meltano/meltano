@@ -1002,7 +1002,7 @@ schedules:
 
 :::info
 
-  <p>The <code>name</code> setting in schedules acts as the <code>state_id</code> so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. <code>gitlab-to-postgres</code> or <code>gitlab-to-postgres-prod</code> if you have multiple environemnts).</p>
+  <p>The <code>name</code> setting in schedules acts as the <code>state_id</code> so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. <code>gitlab-to-postgres</code> or <code>gitlab-to-postgres-prod</code> if you have multiple environments).</p>
 :::
 
 1. Optionally, verify that the schedule was created successfully using [`meltano schedule list`](/reference/command-line-interface#schedule):

@@ -628,7 +628,7 @@ typically points at a [PyPI](https://pypi.org/) package or Git repository withou
 to ensure that you always get the latest and (presumably) greatest.
 
 This makes sense when a plugin is installed for the first time, but can lead to unwelcome surprises down the line,
-as your pipeline may break when a new version of the package is released that introduces a bug or changes its behavior in a backward-incompatible or otherwise undesireable way.
+as your pipeline may break when a new version of the package is released that introduces a bug or changes its behavior in a backward-incompatible or otherwise undesirable way.
 
 To ensure that [`meltano install`](/reference/command-line-interface#install) always installs the same version that was used when you originally got the pipeline working,
 you can modify the plugin definition in your [`meltano.yml` project file](/concepts/project#plugins) to include a version identifier in the `pip_url`.

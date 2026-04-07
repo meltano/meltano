@@ -899,7 +899,7 @@ class TestCliAdd:
             "some required properties",
         ),
     )
-    def test_add_from_ref_invalid_definiton(
+    def test_add_from_ref_invalid_definition(
         self,
         definition,
         invalid_reason,

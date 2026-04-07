@@ -11,7 +11,7 @@ Python Virtual Environments, also known as a venv, are a way to allow a
 Python application access to specific versions of the libraries it needs to run properly. In the Singer ecosystem
 you may need to install multiple Taps and Targets, which all have different dependencies.
 
-If any of those dependecies are were in conflict with each other you would have a difficult development experience without Virtual Envrionments.
+If any of those dependencies were in conflict with each other you would have a difficult development experience without Virtual Environments.
 
 Python has a great technical write up at [Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html).
 
@@ -27,7 +27,7 @@ we recommend using pipx to install Meltano which manages the creation of venvs f
 See our [Installation Guide](/getting-started/installation) for more details.
 
 However, if you ever need to customize or build your own production pipeline (or do anything else) you may need to understand
-how to install Meltano in an isolated way so that you don't have a conflict with dependecies within your own Operating System
+how to install Meltano in an isolated way so that you don't have a conflict with dependencies within your own Operating System
 or other Python applications running on the same machine.
 
 ## How do I use Virtual Environments?

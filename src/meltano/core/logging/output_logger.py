@@ -317,7 +317,7 @@ class Out:
             )
             return
 
-        # Fallback to original behavior for unparseable lines
+        # Fallback to original behavior for unparsable lines
         self.logger.log(self.write_level, line, name=self.name)
 
     async def _read_from_fd(self, read_fd) -> None:  # noqa: ANN001

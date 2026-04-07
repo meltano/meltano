@@ -295,7 +295,7 @@ class Manifest:
         # Merge env vars derived from project settings:
         self.env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
 
-        # Ensure the environment-level plugin config is mergable:
+        # Ensure the environment-level plugin config is mergeable:
         environment = next(iter(manifest["environments"]))
         environment_plugins = environment.setdefault("config", {}).setdefault(
             "plugins",

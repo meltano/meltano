@@ -200,6 +200,7 @@ Thanks go to these wonderful people ([emoji key](https://allcontributors.org/emo
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://www.richardson.co.nz"><img src="https://avatars.githubusercontent.com/u/63807?v=4?s=100" width="100px;" alt="Samuel Richardson"/><br /><sub><b>Samuel Richardson</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=Rodeoclash" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://jusitintime.ai"><img src="https://avatars.githubusercontent.com/u/10222628?v=4?s=100" width="100px;" alt="Justin"/><br /><sub><b>Justin</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=stbiadmin" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/awohletz-pm"><img src="https://avatars.githubusercontent.com/u/205805864?v=4?s=100" width="100px;" alt="Alex Wohletz"/><br /><sub><b>Alex Wohletz</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=awohletz-pm" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

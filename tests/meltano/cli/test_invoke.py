@@ -314,8 +314,8 @@ class TestLogOutputHandler:
         # Check that the log was parsed and the message was extracted
         assert any("Test message" in record.message for record in caplog.records)
 
-    def test_writeline_with_unparseable_log(self, caplog: pytest.LogCaptureFixture):
-        """Test fallback for unparseable logs."""
+    def test_writeline_with_unparsable_log(self, caplog: pytest.LogCaptureFixture):
+        """Test fallback for unparsable logs."""
         logger = structlog.stdlib.get_logger("test")
         handler = _LogOutputHandler(logger, log_parser="singer-sdk")
 

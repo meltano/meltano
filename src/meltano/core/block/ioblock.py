@@ -83,7 +83,7 @@ class IOBlock(metaclass=ABCMeta):
     async def start(self) -> None:
         """Start the block.
 
-        Whatever that might entail (spwaning a process, spinning up a async
+        Whatever that might entail (spawning a process, spinning up a async
         task that will handle transforms, etc).
 
         Raises:

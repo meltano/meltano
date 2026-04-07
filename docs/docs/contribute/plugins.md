@@ -31,7 +31,7 @@ please add it to your Meltano project as a [custom plugin](/concepts/plugins#cus
 or [file an issue](https://github.com/meltano/meltano/issues/new) so that the Meltano core team can assist you.
 
 As a plugin's primary maintainer, you do not have to spend a lot of time improving the plugin yourself.
-In fact, attracting more users and getting the community involved is likely to recude your personal maintenance burden,
+In fact, attracting more users and getting the community involved is likely to reduce your personal maintenance burden,
 since you'll receive contributions with bug fixes and new features that you will only be expected to review, not build yourself.
 
 ## Plugin Development

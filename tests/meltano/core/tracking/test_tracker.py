@@ -89,17 +89,17 @@ class TestTracker:
 
     def test_update_analytics_json(self, project: Project) -> None:
         tracker = Tracker(project)
-        inital_send_anonymous_usage_stats = tracker.send_anonymous_usage_stats
+        initial_send_anonymous_usage_stats = tracker.send_anonymous_usage_stats
 
-        # Check the inital value of `send_anonymous_usage_stats`
+        # Check the initial value of `send_anonymous_usage_stats`
         analytics_json_pre = load_analytics_json(project)
         assert (
-            inital_send_anonymous_usage_stats
+            initial_send_anonymous_usage_stats
             == analytics_json_pre["send_anonymous_usage_stats"]
         )
 
         # Flip the value of `send_anonymous_usage_stats`
-        tracker.send_anonymous_usage_stats = not inital_send_anonymous_usage_stats
+        tracker.send_anonymous_usage_stats = not initial_send_anonymous_usage_stats
         tracker.telemetry_state_change_check(
             TelemetrySettings(
                 analytics_json_pre["client_id"],
@@ -111,7 +111,7 @@ class TestTracker:
         # Ensure `send_anonymous_usage_stats` has been flipped on disk
         analytics_json_post = load_analytics_json(project)
         assert (
-            inital_send_anonymous_usage_stats
+            initial_send_anonymous_usage_stats
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
@@ -303,7 +303,7 @@ class TestTracker:
 
     @pytest.mark.usefixtures("project")
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
-        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
+        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: S607
 
         event_summary = snowplow.all()
         assert event_summary["good"] > 0
@@ -331,7 +331,7 @@ class TestTracker:
         class MockSnowplowTracker:
             def track(self, event: SelfDescribing) -> None:
                 # Can't put asserts in here because this method is executed
-                # withing a try-except block that catches all exceptions.
+                # within a try-except block that catches all exceptions.
                 nonlocal passed
                 expected_contexts = [EnvironmentContext, ProjectContext]
                 if send_anonymous_usage_stats:

@@ -22,7 +22,7 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --docusaurus-announcement-bar-height: 60px !important;
   --ifm-heading-color: var(--ifm-color-primary);
-  --ligth-button-text-color: var(--meltano-black);
+  --light-button-text-color: var(--meltano-black);
   --ifm-link-hover-color: var(--meltano-black);
   --ifm-footer-background-color: var(--meltano-white);
   --ifm-footer-background: linear-gradient(136deg, #EAE5FC 0%, rgba(234, 229, 252, 0.00) 100%);
@@ -74,7 +74,7 @@
   --background-color: var(--meltano-black);
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.2);
   --ifm-heading-color: var(--meltano-white);
-  --ligth-button-text-color: var(--meltano-white);
+  --light-button-text-color: var(--meltano-white);
   --ifm-link-hover-color: var(--meltano-white);
   --ifm-footer-background-color: var(--meltano-black);
   --ifm-footer-background: var(--meltano-black);
@@ -1064,7 +1064,7 @@ main {
 }
 
 .toc-book-icon path {
-  stroke: var(--ligth-button-text-color)
+  stroke: var(--light-button-text-color)
 }
 
 .video {
