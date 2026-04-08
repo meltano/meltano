@@ -1212,6 +1212,10 @@
             "name": {
               "type": "string"
             },
+            "inherit_from": {
+              "type": "string",
+              "description": "An existing plugin to inherit from."
+            },
             "config": {
               "type": "object"
             },
