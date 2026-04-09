@@ -114,7 +114,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         if not self.tests_selection:
             return {}
 
-        results = {}  # type: ignore[var-annotated]
+        results = {}
         async with self.invoker.prepared(session):
             for name, selected in self.tests_selection.items():
                 if selected:
@@ -147,7 +147,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         }
 
     @abstractmethod
-    async def run_test(self, name: str) -> t.NoReturn:
+    async def run_test(self, name: str) -> t.Any:  # noqa: ANN401
         """Run a test command.
 
         Args:

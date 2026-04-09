@@ -252,7 +252,7 @@ class BlockParser:  # noqa: D101
 
         builder = (
             ELBContextBuilder(self.project)
-            .with_force(force=self._force)  # type: ignore[arg-type]
+            .with_force(force=self._force)  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
             .with_full_refresh(full_refresh=self._full_refresh)
             .with_refresh_catalog(refresh_catalog=self._refresh_catalog)
             .with_no_state_update(no_state_update=self._no_state_update)

@@ -47,7 +47,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         self.aws_secret_access_key = aws_secret_access_key or self.parsed.password
 
         # TODO: Make this type-safe. Maybe use https://github.com/fsspec/universal_pathlib?
-        self.bucket: str = bucket or self.parsed.hostname  # type: ignore[assignment]
+        self.bucket: str = bucket or self.parsed.hostname  # type: ignore[assignment]  # ty:ignore[invalid-assignment]
         self.prefix = prefix or self.parsed.path
         self.endpoint_url = endpoint_url
 

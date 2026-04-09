@@ -79,7 +79,7 @@ class SelectService:  # noqa: D101
         # TODO: revisit the visit_with decorator when mypy has better support
         # for class decorators
         # https://github.com/python/mypy/issues/3135
-        list_all.visit(catalog)  # type: ignore[attr-defined]
+        list_all.visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
         return list_all
 

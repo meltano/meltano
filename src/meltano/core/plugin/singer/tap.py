@@ -289,7 +289,7 @@ class SingerTap(SingerPlugin):
         # the `state.json` is stored in a state backend
         if state := self.get_singer_state(
             project=elt_context.project,
-            session=elt_context.session,  # type: ignore[arg-type]
+            session=elt_context.session,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
             job_name=elt_context.job.job_name,
         ):
             with state_path.open("w") as state_file:
@@ -483,7 +483,7 @@ class SingerTap(SingerPlugin):
                         future for future in done if future.exception() is not None
                     ]:
                         failed_future = failed.pop()
-                        raise failed_future.exception()  # type: ignore[misc]  # noqa: TRY301
+                        raise failed_future.exception()  # type: ignore[misc]  # noqa: TRY301  # ty:ignore[invalid-raise]
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()  # noqa: ASYNC240
@@ -574,11 +574,11 @@ class SingerTap(SingerPlugin):
                 catalog = json.load(catalog_file)
 
             if schema_rules:
-                SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
+                SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
             if metadata_rules:
                 self.warn_property_not_found(metadata_rules, catalog)
-                MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
+                MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
             with catalog_path.open("w") as catalog_f:
                 catalog_f.write(json_dumps(catalog, indent=2))

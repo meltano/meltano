@@ -485,7 +485,7 @@ class ELTContextBuilder:
                 env_override=env,
                 config_override=config,
             ),
-            session=self._session,  # type: ignore[arg-type]
+            session=self._session,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
         )
 
     def context(self) -> ELTContext:
