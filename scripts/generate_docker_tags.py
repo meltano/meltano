@@ -33,6 +33,16 @@ def main() -> None:
         action="store_true",
         help="Generate tags for slim images",
     )
+    parser.add_argument(
+        "--latest-version",
+        default=None,
+        help=(
+            "The current latest published version. When provided and the registry is "
+            "not 'ghcr.io', 'latest' tags are only generated if --package-version >= "
+            "--latest-version. This prevents backport releases from overwriting the "
+            "'latest' tag with an older version."
+        ),
+    )
     args = parser.parse_args()
 
     is_default_python = args.default_python == args.python_version
@@ -42,6 +52,15 @@ def main() -> None:
     # Add suffix for slim images
     slim = args.slim or os.getenv("DOCKER_TAGS_SLIM") == "1"
     suffix = "-slim" if slim else ""
+
+    # For non-ghcr.io registries, only apply 'latest' if this version is >=
+    # the current latest published version. This prevents backport releases
+    # (e.g. v3.9.2 published after v4.1.2) from overwriting 'latest'.
+    is_overall_latest = (
+        args.latest_version is None
+        or args.registry == "ghcr.io"
+        or version >= Version(args.latest_version)
+    )
 
     # To save space, only publish the `latest` tag for each
     # images to the GitHub registry
@@ -66,8 +85,8 @@ def main() -> None:
                 )
 
     # ghcr.io: publish `latest` for ALL versions
-    # docker.io: only publish `latest` for final releases
-    if not version.is_prerelease or args.registry == "ghcr.io":
+    # docker.io: only publish `latest` for final releases that are the overall latest
+    if (not version.is_prerelease or args.registry == "ghcr.io") and is_overall_latest:
         tags.append(f"latest-python{args.python_version}{suffix}")
 
         if is_default_python:
