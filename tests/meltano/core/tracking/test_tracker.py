@@ -317,8 +317,14 @@ class TestTracker:
             elapsed += poll_interval
             event_summary = snowplow.all()
 
-        assert event_summary["good"] > 0
-        assert event_summary["bad"] == 0
+        assert event_summary["good"] > 0, (
+            f"Expected at least one good event within {deadline}s "
+            f"(elapsed={elapsed}s), got: {event_summary}"
+        )
+        assert event_summary["bad"] == 0, (
+            f"Expected zero bad events within {deadline}s "
+            f"(elapsed={elapsed}s), got: {event_summary}"
+        )
 
         exit_event = next(
             x["event"]
