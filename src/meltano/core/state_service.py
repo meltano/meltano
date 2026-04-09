@@ -172,7 +172,7 @@ class StateService:
         state_to_add_to = self._get_or_create_job(job)
         state_to_add_to.payload = new_state_dict
         state_to_add_to.payload_flags = payload_flags
-        state_to_add_to.save(self.session)  # type: ignore[arg-type]
+        state_to_add_to.save(self.session)  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
         logger.debug(
             "Added to state %s state payload %s",
             state_to_add_to.job_name,

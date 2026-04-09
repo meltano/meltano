@@ -55,7 +55,7 @@ def write_sep_line(title: str, sepchar: str, **kwargs) -> None:  # noqa: ANN003
 class CommandLineRunner(ValidationsRunner):
     """Validator that runs in the CLI."""
 
-    async def run_test(self, name: str) -> int:  # type: ignore[override]
+    async def run_test(self, name: str) -> int:
         """Run a test command.
 
         Args:

@@ -63,7 +63,7 @@ class ProjectSettingsService(SettingsService):
             **self.env_override,
         }
 
-        self.config_override = {  # type: ignore[misc]
+        self.config_override = {  # type: ignore[misc]  # ty:ignore[invalid-attribute-access]
             **self.__class__.config_override,
             **self.config_override,
         }

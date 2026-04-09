@@ -98,7 +98,7 @@ class InvokerBase:
         return self.invoker.plugin.name
 
     @property
-    def consumer(self) -> bool: ...  # type: ignore[empty-body]  # noqa: D102
+    def consumer(self) -> bool: ...  # type: ignore[empty-body]  # noqa: D102  # ty:ignore[empty-body]
 
     async def start(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Invoke the process asynchronously.
