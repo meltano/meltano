@@ -222,7 +222,7 @@ class SettingsService(metaclass=ABCMeta):
         """
         if source_manager:
             # TODO: Ensure only a bulk-enabled manager can be used here
-            source_manager.bulk = True  # type: ignore[attr-defined]
+            source_manager.bulk = True  # type: ignore[attr-defined]  # ty:ignore[invalid-assignment]
         else:
             source_manager = source.manager(self, bulk=True, **kwargs)
 
@@ -370,7 +370,7 @@ class SettingsService(metaclass=ABCMeta):
             expanded_value = do_expand_env_vars(  # type: ignore[type-var]
                 value,
                 env=expandable_env,
-                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]
+                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
             if value and not expanded_value:  # The whole string was missing env vars

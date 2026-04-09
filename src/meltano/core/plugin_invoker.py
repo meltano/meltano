@@ -225,7 +225,7 @@ class PluginInvoker:
         Returns:
             The set of plugin capabilities.
         """
-        return frozenset(self.plugin.capabilities)  # type: ignore[arg-type]
+        return frozenset(self.plugin.capabilities)  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
 
     @property
     def files(self) -> dict[str, Path]:
@@ -578,7 +578,7 @@ class PluginInvoker:
             return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:  # . Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__ from None  # type: ignore[misc]
+            raise err.__cause__ from None  # type: ignore[misc]  # ty:ignore[invalid-raise]
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter) -> None:
         """Append an output handler for a given stdio stream.
