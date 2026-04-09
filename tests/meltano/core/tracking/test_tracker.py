@@ -305,7 +305,18 @@ class TestTracker:
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: S607
 
+        # Snowplow Micro may not have processed events yet even after the
+        # subprocess exits (it returns HTTP 200 before committing to storage),
+        # so poll with a timeout to avoid a race condition.
+        deadline = 10.0
+        poll_interval = 0.1
+        elapsed = 0.0
         event_summary = snowplow.all()
+        while event_summary["good"] == 0 and elapsed < deadline:
+            sleep(poll_interval)
+            elapsed += poll_interval
+            event_summary = snowplow.all()
+
         assert event_summary["good"] > 0
         assert event_summary["bad"] == 0
 
