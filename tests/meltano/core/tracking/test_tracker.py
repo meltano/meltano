@@ -312,7 +312,7 @@ class TestTracker:
         poll_interval = 0.1
         elapsed = 0.0
         event_summary = snowplow.all()
-        while event_summary["good"] == 0 and elapsed < deadline:
+        while event_summary["good"] == 0 and elapsed < deadline:  # pragma: no branch
             sleep(poll_interval)
             elapsed += poll_interval
             event_summary = snowplow.all()
