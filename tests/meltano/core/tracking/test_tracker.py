@@ -7,7 +7,7 @@ import uuid
 from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
-from time import sleep
+from time import monotonic, sleep
 from unittest import mock
 
 import pytest
@@ -310,12 +310,15 @@ class TestTracker:
         # so poll with a timeout to avoid a race condition.
         deadline = 10.0
         poll_interval = 0.1
-        elapsed = 0.0
+        start = monotonic()
         event_summary = snowplow.all()
-        while event_summary["good"] == 0 and elapsed < deadline:  # pragma: no branch
+        while (  # pragma: no cover
+            event_summary["good"] == 0 and monotonic() - start < deadline
+        ):
             sleep(poll_interval)
-            elapsed += poll_interval
             event_summary = snowplow.all()
+
+        elapsed = monotonic() - start
 
         assert event_summary["good"] > 0, (
             f"Expected at least one good event within {deadline}s "
