@@ -117,7 +117,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        latest=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 100 --json tagName --jq '.[].tagName | ltrimstr("v")' | sort -V | tail -1)
+        latest=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName | ltrimstr("v")' | sort -V | tail -1)
         echo "version=$latest" >> $GITHUB_OUTPUT
 
     - name: Generate tags
