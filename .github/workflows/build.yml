@@ -127,7 +127,7 @@ jobs:
         if [[ -n "$LATEST_VERSION" ]]; then
           extra_args+=(--latest-version "$LATEST_VERSION")
         fi
-        python scripts/generate_docker_tags.py \
+        ./scripts/generate_docker_tags.py \
           --git-sha "$GITHUB_SHA" \
           --package-version "$NEEDS_BUILD_OUTPUTS_VERSION" \
           --python-version "$PYTHON_VERSION" \

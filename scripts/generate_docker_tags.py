@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = [
+#   "packaging>=26",
+# ]
+# ///
 
 """Script to generate docker tags for Meltano images.
 
