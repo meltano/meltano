@@ -261,7 +261,7 @@ class Project:
             else:
                 raise
 
-        project.dirs.add_cachedir_tag()
+        project.dirs.ensure_system_files()
         logger.debug("Activated project at %s", project.root)
 
         # set the default project

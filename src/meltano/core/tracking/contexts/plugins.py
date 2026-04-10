@@ -18,12 +18,13 @@ if t.TYPE_CHECKING:
     from collections.abc import Sequence
 
     from meltano.core.elt_context import ELTContext
+    from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
-def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
+def _from_plugin(plugin: PluginRef, cmd: str | None) -> dict:
     if not plugin or not safe_hasattr(plugin, "info"):
         # Don't try to snag any info for this plugin, we're somehow badly
         # malformed (unittest?), or where passed None. This event will be
@@ -53,7 +54,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
 class PluginsTrackingContext(SelfDescribingJson):
     """Tracking context for the Meltano plugins."""
 
-    def __init__(self, plugins: list[tuple[ProjectPlugin, str | None]]):
+    def __init__(self, plugins: list[tuple[PluginRef, str | None]]):
         """Initialize a meltano tracking plugin context.
 
         Args:

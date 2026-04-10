@@ -20,6 +20,7 @@ else:
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin import PluginType
+    from meltano.core.plugin.base import PluginRef
     from meltano.core.project import Project
     from meltano.core.project_plugins_service import AddedPluginFlags
 
@@ -142,7 +143,7 @@ class ProjectAddService:
 
     def add_required(
         self,
-        plugin: ProjectPlugin,
+        plugin: PluginRef,
         *,
         lock: bool = True,
     ) -> list[ProjectPlugin]:

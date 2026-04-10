@@ -3,6 +3,7 @@ from __future__ import annotations
 import platform
 import re
 import typing as t
+import warnings
 from datetime import datetime, timezone
 
 import dotenv
@@ -684,7 +685,6 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(3)
     @pytest.mark.usefixtures("tap")
-    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_nested_keys(self, session, subject, project) -> None:
         def set_config(path, value) -> None:
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
@@ -700,50 +700,53 @@ class TestPluginSettingsService:
         def final_config():
             return subject.as_dict(session=session)
 
-        set_config("metadata.stream.replication-key", "created_at")
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
 
-        assert yml_config()["metadata.stream.replication-key"] == "created_at"
-        assert final_config()["metadata.stream.replication-key"] == "created_at"
+            set_config("metadata.stream.replication-key", "created_at")
 
-        set_config(["metadata", "stream", "replication-key"], "created_at")
+            assert yml_config()["metadata.stream.replication-key"] == "created_at"
+            assert final_config()["metadata.stream.replication-key"] == "created_at"
 
-        yml = yml_config()
-        assert "metadata.stream.replication-key" not in yml
-        assert yml["metadata"]["stream"]["replication-key"] == "created_at"
-        assert final_config()["metadata.stream.replication-key"] == "created_at"
+            set_config(["metadata", "stream", "replication-key"], "created_at")
 
-        set_config(["metadata", "stream", "replication-method"], "INCREMENTAL")
+            yml = yml_config()
+            assert "metadata.stream.replication-key" not in yml
+            assert yml["metadata"]["stream"]["replication-key"] == "created_at"
+            assert final_config()["metadata.stream.replication-key"] == "created_at"
 
-        yml = yml_config()
-        assert "metadata.stream.replication-key" not in yml
-        assert "metadata.stream.replication-method" not in yml
-        assert yml["metadata"]["stream"]["replication-key"] == "created_at"
-        assert yml["metadata"]["stream"]["replication-method"] == "INCREMENTAL"
-        final = final_config()
-        assert final["metadata.stream.replication-key"] == "created_at"
-        assert final["metadata.stream.replication-method"] == "INCREMENTAL"
+            set_config(["metadata", "stream", "replication-method"], "INCREMENTAL")
 
-        set_config(["metadata.stream.replication-key"], "created_at")
-        unset_config(["metadata.stream.replication-method"])
+            yml = yml_config()
+            assert "metadata.stream.replication-key" not in yml
+            assert "metadata.stream.replication-method" not in yml
+            assert yml["metadata"]["stream"]["replication-key"] == "created_at"
+            assert yml["metadata"]["stream"]["replication-method"] == "INCREMENTAL"
+            final = final_config()
+            assert final["metadata.stream.replication-key"] == "created_at"
+            assert final["metadata.stream.replication-method"] == "INCREMENTAL"
 
-        yml = yml_config()
-        assert "metadata" not in yml
-        assert yml["metadata.stream.replication-key"] == "created_at"
-        assert final_config()["metadata.stream.replication-key"] == "created_at"
+            set_config(["metadata.stream.replication-key"], "created_at")
+            unset_config(["metadata.stream.replication-method"])
 
-        set_config(["metadata", "stream.replication-key"], "created_at")
+            yml = yml_config()
+            assert "metadata" not in yml
+            assert yml["metadata.stream.replication-key"] == "created_at"
+            assert final_config()["metadata.stream.replication-key"] == "created_at"
 
-        yml = yml_config()
-        assert "metadata.stream.replication-key" not in yml
-        assert yml["metadata"]["stream.replication-key"] == "created_at"
-        assert final_config()["metadata.stream.replication-key"] == "created_at"
+            set_config(["metadata", "stream.replication-key"], "created_at")
 
-        unset_config(["metadata", "stream.replication-key"])
+            yml = yml_config()
+            assert "metadata.stream.replication-key" not in yml
+            assert yml["metadata"]["stream.replication-key"] == "created_at"
+            assert final_config()["metadata.stream.replication-key"] == "created_at"
 
-        yml = yml_config()
-        assert "metadata.stream.replication-key" not in yml
-        assert "metadata" not in yml
-        assert "metadata.stream.replication-key" not in final_config()
+            unset_config(["metadata", "stream.replication-key"])
+
+            yml = yml_config()
+            assert "metadata.stream.replication-key" not in yml
+            assert "metadata" not in yml
+            assert "metadata.stream.replication-key" not in final_config()
 
     @pytest.mark.usefixtures("tap")
     @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
