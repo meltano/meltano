@@ -73,7 +73,7 @@ class ProjectDirsService:
         try:
             cachedir_tag_file.write_text(cachedir_tag_text, encoding="utf-8")
         except OSError:  # pragma: no cover
-            logger.debug("Failed to write %s", cachedir_tag_file)
+            logger.debug("Failed to write %s", cachedir_tag_file, exc_info=True)
 
     def _ensure_gitignore(self) -> None:
         """Generate a .gitignore inside .meltano."""
@@ -84,7 +84,7 @@ class ProjectDirsService:
         try:
             gitignore.write_text("*\n", encoding="utf-8")
         except OSError:  # pragma: no cover
-            logger.debug("Failed to write %s", gitignore)
+            logger.debug("Failed to write %s", gitignore, exc_info=True)
 
     @makedirs
     def meltano(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
