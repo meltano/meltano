@@ -684,7 +684,6 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(3)
     @pytest.mark.usefixtures("tap")
-    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_nested_keys(self, session, subject, project) -> None:
         def set_config(path, value) -> None:
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
