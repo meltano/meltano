@@ -7,7 +7,7 @@ import uuid
 from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
-from time import sleep
+from time import monotonic, sleep
 from unittest import mock
 
 import pytest
@@ -305,9 +305,29 @@ class TestTracker:
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: S607
 
+        # Snowplow Micro may not have processed events yet even after the
+        # subprocess exits (it returns HTTP 200 before committing to storage),
+        # so poll with a timeout to avoid a race condition.
+        deadline = 10.0
+        poll_interval = 0.1
+        start = monotonic()
         event_summary = snowplow.all()
-        assert event_summary["good"] > 0
-        assert event_summary["bad"] == 0
+        while (  # pragma: no cover
+            event_summary["good"] == 0 and monotonic() - start < deadline
+        ):
+            sleep(poll_interval)
+            event_summary = snowplow.all()
+
+        elapsed = monotonic() - start
+
+        assert event_summary["good"] > 0, (
+            f"Expected at least one good event within {deadline}s "
+            f"(elapsed={elapsed}s), got: {event_summary}"
+        )
+        assert event_summary["bad"] == 0, (
+            f"Expected zero bad events within {deadline}s "
+            f"(elapsed={elapsed}s), got: {event_summary}"
+        )
 
         exit_event = next(
             x["event"]
