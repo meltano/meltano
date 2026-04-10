@@ -121,14 +121,18 @@ runs:
 
     - name: Provide a link to results
       shell: bash
-      continue-on-error: true
       run: |
         echo "View scan results at:"
         echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}+tool:Grype"
-        sleep 10 # Give GitHub some time to process the uploaded report
-        NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${INPUTS_TOKEN}" \
-            "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${GITHUB_REF}" \
-            | jq length)"
+        # Retry up to 6 times (60s total) for GitHub to finish processing the uploaded SARIF report
+        for i in {1..6}; do
+          sleep 10
+          NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${INPUTS_TOKEN}" \
+              "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${GITHUB_REF}" \
+              | jq length)"
+          [[ "$NUM_ISSUES" =~ ^[0-9]+$ ]] && break
+          echo "Attempt $i: could not get a numeric response, retrying..."
+        done
         [ "$NUM_ISSUES" = '0' ] # Error if there are any alerts that are neither fixed nor dismissed
       env:
         INPUTS_TOKEN: ${{ inputs.token }}
