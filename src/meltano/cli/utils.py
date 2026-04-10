@@ -648,6 +648,41 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
+        
+    def format_options(self, ctx, formatter):
+        params = self.get_params(ctx)
+
+        groups = {
+            "Run options": [],
+            "State options": [],
+            "Installation options": [],
+            "Global options": [],
+        }
+
+        for param in params:
+            record = param.get_help_record(ctx)
+            if not record:
+                continue
+
+            name = param.name
+
+            if name in {"dry_run", "full_refresh", "refresh_catalog", "run_id", "timeout"}:
+                groups["Run options"].append(record)
+
+            elif name in {"no_state_update", "force", "state_id_suffix", "merge_state", "state_strategy"}:
+                groups["State options"].append(record)
+
+            elif name == "install_plugins":
+                groups["Installation options"].append(record)
+
+            else:
+                groups["Global options"].append(record)
+
+        for group_name, records in groups.items():
+            if records:
+                formatter.write_heading(group_name)
+                formatter.write_dl(records)
+                formatter.write_paragraph()
 
 
 class AutoInstallBehavior(StrEnum):
