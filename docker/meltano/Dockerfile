@@ -21,7 +21,8 @@ RUN mkdir "${WORKDIR}" && \
       tdsodbc \
       unixodbc \
       unixodbc-dev && \
-    pip install --no-cache-dir uv && \
+    python -m pip install --no-cache-dir --upgrade pip && \
+    python -m pip install --no-cache-dir uv && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 WORKDIR "${WORKDIR}"
