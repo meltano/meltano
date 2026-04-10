@@ -28,7 +28,7 @@
   "homepage": "https://meltano.com",
   "dependencies": {
     "@docusaurus/core": "3.1.0",
-    "@docusaurus/plugin-google-gtag": "3.1.0",
+    "@docusaurus/plugin-google-gtag": "3.9.2",
     "@docusaurus/preset-classic": "3.1.0",
     "@mdx-js/react": "^3.1.1",
     "clsx": "^2.1.1",
@@ -37,7 +37,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.1.0",
+    "@docusaurus/module-type-aliases": "3.9.2",
     "docusaurus-plugin-sass": "^0.2.6",
     "eslint": "^9.39.2",
     "eslint-config-wesbos": "^4.3.2",
