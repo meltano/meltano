@@ -648,7 +648,7 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
-        
+
     def format_options(self, ctx, formatter):
         params = self.get_params(ctx)
 
@@ -666,10 +666,22 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
 
             name = param.name
 
-            if name in {"dry_run", "full_refresh", "refresh_catalog", "run_id", "timeout"}:
+            if name in {
+                "dry_run",
+                "full_refresh",
+                "refresh_catalog",
+                "run_id",
+                "timeout",
+            }:
                 groups["Run options"].append(record)
 
-            elif name in {"no_state_update", "force", "state_id_suffix", "merge_state", "state_strategy"}:
+            elif name in {
+                "no_state_update",
+                "force",
+                "state_id_suffix",
+                "merge_state",
+                "state_strategy",
+            }:
                 groups["State options"].append(record)
 
             elif name == "install_plugins":
