@@ -499,7 +499,13 @@ class SettingsService(metaclass=ABCMeta):
 
         setting_def = self.find_setting(name)
         if setting_def is None:
-            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning, stacklevel=2)
+            root_name, _, _ = name.partition(".")
+            if root_name == name or self.find_setting(root_name) is None:
+                warnings.warn(
+                    f"Unknown setting {name!r}",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
 
         metadata: dict[str, t.Any] = {
             "name": name,
