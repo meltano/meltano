@@ -12,7 +12,36 @@ class TestProjectDirsService:
         sys_dir = tmp_path_factory.mktemp(".meltano")
         return ProjectDirsService(root=root, sys_dir=sys_dir)
 
-    def test_add_cachedir_tag(self, subject: ProjectDirsService) -> None:
-        assert not subject.cachedir_tag.exists()
-        subject.add_cachedir_tag()
-        assert subject.cachedir_tag.exists()
+    def test_ensure_cachedir_tag(
+        self,
+        subject: ProjectDirsService,
+        subtests: pytest.Subtests,
+    ) -> None:
+        path = subject.sys_dir / "CACHEDIR.TAG"
+
+        with subtests.test("creates file"):
+            assert not path.exists()
+            subject._ensure_cachedir_tag()
+            assert path.read_text().startswith("Signature:")
+
+        with subtests.test("preserves existing file"):
+            path.write_text("Old content")
+            subject._ensure_cachedir_tag()
+            assert path.read_text() == "Old content"
+
+    def test_ensure_gitignore(
+        self,
+        subject: ProjectDirsService,
+        subtests: pytest.Subtests,
+    ) -> None:
+        path = subject.sys_dir / ".gitignore"
+
+        with subtests.test("creates file"):
+            assert not path.exists()
+            subject._ensure_gitignore()
+            assert path.read_text() == "*\n"
+
+        with subtests.test("preserves existing file"):
+            path.write_text("Old content")
+            subject._ensure_gitignore()
+            assert path.read_text() == "Old content"
