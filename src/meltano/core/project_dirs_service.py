@@ -7,6 +7,7 @@ import typing as t
 from dataclasses import KW_ONLY, dataclass
 
 import platformdirs
+from structlog.stdlib import get_logger
 
 from meltano.core.utils import makedirs, sanitize_filename
 
@@ -16,6 +17,8 @@ if t.TYPE_CHECKING:
     from meltano.core._types import StrPath
     from meltano.core.plugin.base import PluginRef
     from meltano.core.project import Project
+
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -46,25 +49,42 @@ class ProjectDirsService:
         """
         return self.root.joinpath(*joinpaths)
 
-    @property
-    def cachedir_tag(self) -> Path:
-        """Path to CACHEDIR.TAG file."""
-        return self.sys_dir / "CACHEDIR.TAG"
+    def ensure_system_files(self) -> None:
+        """Ensure standard files .meltano."""
+        self._ensure_gitignore()
+        self._ensure_cachedir_tag()
 
-    def add_cachedir_tag(self) -> None:
+    def _ensure_cachedir_tag(self) -> None:
         """Generate a file indicating that this is not meant to be backed up.
 
         See https://bford.info/cachedir/ for the spec.
         """
-        cachedir_tag_file = self.cachedir_tag
-        if not cachedir_tag_file.exists():
-            cachedir_tag_text = textwrap.dedent("""
-                Signature: 8a477f597d28d172789f06886806bc55
-                # This file is a cache directory tag created by Meltano.
-                # For information about cache directory tags, see:
-                #   https://bford.info/cachedir/
-            """).strip()
+        cachedir_tag_file = self.sys_dir / "CACHEDIR.TAG"
+        if cachedir_tag_file.exists():
+            return
+
+        cachedir_tag_text = textwrap.dedent("""
+            Signature: 8a477f597d28d172789f06886806bc55
+            # This file is a cache directory tag created by Meltano.
+            # For information about cache directory tags, see:
+            #   https://bford.info/cachedir/
+        """).strip()
+
+        try:
             cachedir_tag_file.write_text(cachedir_tag_text, encoding="utf-8")
+        except OSError:  # pragma: no cover
+            logger.debug("Failed to write %s", cachedir_tag_file)
+
+    def _ensure_gitignore(self) -> None:
+        """Generate a .gitignore inside .meltano."""
+        gitignore = self.sys_dir / ".gitignore"
+        if gitignore.exists():
+            return
+
+        try:
+            gitignore.write_text("*\n", encoding="utf-8")
+        except OSError:  # pragma: no cover
+            logger.debug("Failed to write %s", gitignore)
 
     @makedirs
     def meltano(self, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ARG002
