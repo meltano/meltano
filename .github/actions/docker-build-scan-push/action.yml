@@ -123,7 +123,7 @@ runs:
       shell: bash
       run: |
         echo "View scan results at:"
-        echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}+tool:Grype"
+        echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}+tool:Grype+is:open"
         # Retry up to 6 times (60s total) for GitHub to finish processing the uploaded SARIF report
         for i in {1..6}; do
           sleep 10
