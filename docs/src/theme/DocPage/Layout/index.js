@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDocsSidebar } from '@docusaurus/theme-common/internal';
+import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
 import Layout from '@theme/Layout';
 import BackToTopButton from '@theme/BackToTopButton';
 import DocPageLayoutSidebar from '@theme/DocPage/Layout/Sidebar';
