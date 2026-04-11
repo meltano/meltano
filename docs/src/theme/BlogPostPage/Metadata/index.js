@@ -1,6 +1,6 @@
 import React from 'react';
 import {PageMetadata} from '@docusaurus/theme-common';
-import {useBlogPost} from '@docusaurus/theme-common/internal';
+import {useBlogPost} from '@docusaurus/plugin-content-blog/client';
 export default function BlogPostPageMetadata() {
   const {assets, metadata} = useBlogPost();
   const {title, description, date, tags, authors, frontMatter} = metadata;

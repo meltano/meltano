@@ -1,7 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import { useBaseUrlUtils } from '@docusaurus/useBaseUrl';
-import { useBlogPost } from '@docusaurus/theme-common/internal';
+import { useDateTimeFormat } from '@docusaurus/theme-common/internal';
+import { useBlogPost } from '@docusaurus/plugin-content-blog/client';
 import styles from './styles.module.css';
 
 // eslint-disable-next-line react/prop-types
@@ -9,9 +10,11 @@ export default function BlogPostItemContainer({ children, className }) {
   const { frontMatter, assets, metadata } = useBlogPost();
   const { withBaseUrl } = useBaseUrlUtils();
   const image = assets.image ?? frontMatter.image;
-  const regex = /\b\d{1,2},\s/;
-  const date = metadata.formattedDate.replace(regex, '');
-  const dateArray = date.split(' ');
+  const monthFormat = useDateTimeFormat({ month: 'long', timeZone: 'UTC' });
+  const yearFormat = useDateTimeFormat({ year: 'numeric', timeZone: 'UTC' });
+  const dateObj = new Date(metadata.date);
+  const month = monthFormat.format(dateObj);
+  const year = yearFormat.format(dateObj);
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -21,8 +24,8 @@ export default function BlogPostItemContainer({ children, className }) {
           styles.date
         )}
       >
-        <span className={styles.month}>{dateArray[0]}</span>
-        <span className={styles.year}>{dateArray[1]}</span>
+        <span className={styles.month}>{month}</span>
+        <span className={styles.year}>{year}</span>
       </div>
       <article
         className={className}
