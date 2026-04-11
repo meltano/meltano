@@ -4,7 +4,7 @@ import {
   useActiveDocContext,
 } from '@docusaurus/plugin-content-docs/client';
 import { useDocsPreferredVersion } from '@docusaurus/theme-common';
-import { useDocsVersionCandidates } from '@docusaurus/theme-common/internal';
+import { useDocsVersionCandidates } from '@docusaurus/plugin-content-docs/client';
 import { translate } from '@docusaurus/Translate';
 import { useLocation } from '@docusaurus/router';
 

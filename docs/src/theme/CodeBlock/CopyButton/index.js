@@ -1,7 +1,5 @@
 import React, {useCallback, useState, useRef, useEffect} from 'react';
 import clsx from 'clsx';
-// @ts-expect-error: TODO, we need to make theme-classic have type: module
-import copy from 'copy-text-to-clipboard';
 import {translate} from '@docusaurus/Translate';
 import IconCopy from '@theme/Icon/Copy';
 import IconSuccess from '@theme/Icon/Success';
@@ -11,11 +9,12 @@ export default function CopyButton({code, className}) {
   const [isCopied, setIsCopied] = useState(false);
   const copyTimeout = useRef(undefined);
   const handleCopyCode = useCallback(() => {
-    copy(code);
-    setIsCopied(true);
-    copyTimeout.current = window.setTimeout(() => {
-      setIsCopied(false);
-    }, 1000);
+    navigator.clipboard.writeText(code).then(() => {
+      setIsCopied(true);
+      copyTimeout.current = window.setTimeout(() => {
+        setIsCopied(false);
+      }, 1000);
+    });
   }, [code]);
   useEffect(() => () => window.clearTimeout(copyTimeout.current), []);
   return (
