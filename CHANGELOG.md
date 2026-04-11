@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.2.0 (2026-04-10)
+
+### ✨ New
+
+- [#9948](https://github.com/meltano/meltano/issues/9948) Create `.gitignore` automatically in the `.meltano` directory
+- [#9946](https://github.com/meltano/meltano/issues/9946) Avoid setting a global `UV_NO_CACHE=1` in the Docker image
+- [#9901](https://github.com/meltano/meltano/issues/9901) Add `CACHEDIR.TAG` file automatically to `.meltano` directory
+- [#9849](https://github.com/meltano/meltano/issues/9849) Show required setting indicators in `meltano config list` -- _**Thanks @mahangu!**_
+- [#9843](https://github.com/meltano/meltano/issues/9843) Print stderr from extractor's discover call at default log level -- _**Thanks @mahangu!**_
+- [#9822](https://github.com/meltano/meltano/issues/9822) Added `StateStoreManager.migrate()` interface which state backend implementations can override to provide a state migration mechanism
+- [#9819](https://github.com/meltano/meltano/issues/9819) Make `StateStoreManager` a context manager with a default no-op `.close()` method
+
+### 🐛 Fixes
+
+- [#9949](https://github.com/meltano/meltano/issues/9949) Avoid emitting an `Unknown setting ...` warning when setting a nested "extra" setting like `_metadata.*.replication-method`
+- [#9922](https://github.com/meltano/meltano/issues/9922) Do not swallow state backend persistence errors in BookmarkWriter -- _**Thanks @awohletz-pm!**_
+- [#9921](https://github.com/meltano/meltano/issues/9921) Update the type annotation of `retry_seconds` in the state backend `acquire_lock` method to allow `float` values
+- [#9877](https://github.com/meltano/meltano/issues/9877) Add warning when using ephemeral state ID in el/elt commands -- _**Thanks @stbiadmin!**_
+- [#9858](https://github.com/meltano/meltano/issues/9858) Do not disable existing loggers when passing logging configuration to SDK-based plugins
+- [#9825](https://github.com/meltano/meltano/issues/9825) Drop `None` values coming from `.env` -- _**Thanks @RamiNoodle733!**_
+- [#9804](https://github.com/meltano/meltano/issues/9804) Make `meltano state set --input-file ...` work with click 8.1
+
+### ⚙️ Under the Hood
+
+- [#9936](https://github.com/meltano/meltano/issues/9936) Updated some plugin-related types
+- [#9909](https://github.com/meltano/meltano/issues/9909) Centralize virtualenv management into a new `VirtualEnvService` and delegate to `VenvBackend` implementations
+- Move logging frame number to constants `_FRAMES_DEBUG` and `_FRAMES_DEFAULT`
+- [#9883](https://github.com/meltano/meltano/issues/9883) Use `ProjectDirsService` in all remaining places
+- [#9880](https://github.com/meltano/meltano/issues/9880) Ensure custom `click.ParamType` implementations correctly override their parent methods
+- [#9879](https://github.com/meltano/meltano/issues/9879) Added `reason` keyword argument to `PluginInstaller` callable protocol
+- [#9870](https://github.com/meltano/meltano/issues/9870) Add more type-annotations for `SettingDefinition` attributes
+- [#9841](https://github.com/meltano/meltano/issues/9841) Use `Project.dirs` API in more places
+- [#9840](https://github.com/meltano/meltano/issues/9840) Use the `--clear` flag of virtualenv and uv to recreate the venv instead of removing it preemptively
+- [#9817](https://github.com/meltano/meltano/issues/9817) Bump Ruff to 0.15 and update code to the 2026 style guide
+
+### 📚 Documentation Improvements
+
+- [#9939](https://github.com/meltano/meltano/issues/9939) Fixed some broken links in the `environments` page
+- [#9906](https://github.com/meltano/meltano/issues/9906) Added examples for overriding key-properties and replication-key in metadata -- _**Thanks @alexchenai!**_
+- [#9908](https://github.com/meltano/meltano/issues/9908) Update our AI guidelines
+- Hide video links since they are no longer available
+- [#9868](https://github.com/meltano/meltano/issues/9868) Use uv in the "complete tutorial"
+- [#9860](https://github.com/meltano/meltano/issues/9860) Add architecture diagram to docs home page
+- [#9855](https://github.com/meltano/meltano/issues/9855) Fix broken image link.
+- [#9856](https://github.com/meltano/meltano/issues/9856) Fix copyright and images in footer
+- [#9468](https://github.com/meltano/meltano/issues/9468) Updated `production.md` to reflect it is not possible to set Airflow's `core.executor` configuration value with `meltano config set` -- _**Thanks @Rodeoclash!**_
+- [#9839](https://github.com/meltano/meltano/issues/9839) Add a section about AI coding agents to the contribution guide
+- [#9833](https://github.com/meltano/meltano/issues/9833) Fix typo 'the the' -> 'the' in manifest.py docstring -- _**Thanks @RamiNoodle733!**_
+- [#9827](https://github.com/meltano/meltano/issues/9827) Fix typos in DataHub tutorial documentation -- _**Thanks @RamiNoodle733!**_
+
+### 📦 Packaging changes
+
+- [#9887](https://github.com/meltano/meltano/issues/9887) Allow virtualenv 21
+- [#9854](https://github.com/meltano/meltano/issues/9854) Require click 8.2.0+
+- [#9823](https://github.com/meltano/meltano/issues/9823) Remove upper constraint for uv dependency
+- [#9806](https://github.com/meltano/meltano/issues/9806) Bump upper constraint for boto3 in the S3 state backend extension
+
 ## v4.1.2 (2026-02-03)
 
 ### 📦 Packaging changes

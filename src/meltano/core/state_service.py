@@ -41,6 +41,10 @@ class InvalidJobStateError(Exception):
     """Invalid job state is parsed."""
 
 
+class StatePersistenceError(Exception):
+    """Failed to persist state to the configured state backend."""
+
+
 class StateService:
     """Meltano Service used to manage job state.
 
@@ -168,7 +172,7 @@ class StateService:
         state_to_add_to = self._get_or_create_job(job)
         state_to_add_to.payload = new_state_dict
         state_to_add_to.payload_flags = payload_flags
-        state_to_add_to.save(self.session)  # type: ignore[arg-type]
+        state_to_add_to.save(self.session)  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
         logger.debug(
             "Added to state %s state payload %s",
             state_to_add_to.job_name,
@@ -183,7 +187,11 @@ class StateService:
             partial_state=partial_state,
             completed_state=completed_state,
         )
-        self.state_store_manager.update(job_state)
+        try:
+            self.state_store_manager.update(job_state)
+        except Exception as err:
+            msg = "Failed to persist state to the configured state backend"
+            raise StatePersistenceError(msg) from err
 
     def get_state(self, state_id: str) -> dict:
         """Get state for the given state_id.

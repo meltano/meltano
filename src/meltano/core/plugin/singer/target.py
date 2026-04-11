@@ -11,7 +11,11 @@ from structlog.stdlib import get_logger
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Payload
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.state_service import SINGER_STATE_KEY, StateService
+from meltano.core.state_service import (
+    SINGER_STATE_KEY,
+    StatePersistenceError,
+    StateService,
+)
 
 from . import PluginType, SingerPlugin
 
@@ -90,12 +94,11 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception:  # pragma: no cover  # noqa: BLE001
-            logger.warning(
-                "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated",
-                exc_info=True,
+        except StatePersistenceError:  # pragma: no cover
+            logger.exception(
+                "Failed to persist incremental state to the configured backend",
             )
+            raise
         else:
             logger.info(
                 f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: E501, G004

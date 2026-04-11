@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import TOCItems from '@theme/TOCItems';
-import { useDoc } from '@docusaurus/theme-common/internal';
+import { useDoc } from '@docusaurus/plugin-content-docs/client';
 import styles from './styles.module.css';
 import EditThisPage from '../EditThisPage';
 // Using a custom className

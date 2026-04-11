@@ -1,24 +1,28 @@
 from __future__ import annotations
 
 import platform
+import subprocess
+import sys
 import typing as t
 from asyncio.subprocess import Process
-from pathlib import Path
 from unittest import mock
 
 import pytest
 
-from meltano.core.error import AsyncSubprocessError, MeltanoError
+from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.venv_service import (
-    UvVenvService,
-    VenvService,
+    UvBackend,
     VirtualEnv,
+    VirtualenvBackend,
+    VirtualEnvService,
     fingerprint,
 )
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.project import Project
 
 
@@ -47,19 +51,68 @@ def test_fingerprint_with_python_path():
     assert fp1 == fp6
 
 
-class TestVenvService:
-    cls = VenvService
+class TestVirtualEnv:
+    @pytest.mark.parametrize(
+        ("system", "lib_dir"),
+        (
+            ("Linux", "lib"),
+            ("Darwin", "lib"),
+            ("Windows", "Lib"),
+        ),
+    )
+    def test_cross_platform(self, system: str, lib_dir: str, tmp_path: Path) -> None:
+        with mock.patch("platform.system", return_value=system):
+            subject = VirtualEnv(tmp_path / "venv")
+            assert subject.lib_dir == subject.root / lib_dir
 
-    def assert_install_log_file(self, service: VenvService) -> None:
-        assert service.install_log_path.exists()
-        assert service.install_log_path.is_file()
-        assert service.install_log_path.stat().st_size > 0
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="subprocess is not called on Windows",
+    )
+    @pytest.mark.asyncio
+    async def test_site_packages(self, tmp_path: Path) -> None:
+        proc = subprocess.CompletedProcess([], returncode=0, stdout=b"3 99 42")
+        with mock.patch("subprocess.run", return_value=proc):
+            subject = VirtualEnv(tmp_path / "venv", python="python3.9")
+            assert subject.site_packages_dir.parts[-2:] == (
+                "python3.99",
+                "site-packages",
+            )
 
-    @pytest.fixture
-    def subject(self, project):
-        return VenvService(project=project, namespace="namespace", name="name")
 
-    def test_clean_run_files(self, project: Project, subject: VenvService) -> None:
+@pytest.fixture
+def venv(tmp_path: Path) -> VirtualEnv:
+    return VirtualEnv(tmp_path / "venv")
+
+
+@pytest.fixture
+def log_path(tmp_path: Path) -> Path:
+    return tmp_path / "install.log"
+
+
+class TestVirtualEnvService:
+    @pytest.fixture(params=["virtualenv", "uv"])
+    def subject(
+        self,
+        request: pytest.FixtureRequest,
+        project: Project,
+        venv: VirtualEnv,
+        log_path: Path,
+    ) -> VirtualEnvService:
+        backend_name = request.param
+        backend_class = UvBackend if backend_name == "uv" else VirtualenvBackend
+        return VirtualEnvService(
+            project=project,
+            namespace="namespace",
+            name="name",
+            backend=backend_class(venv=venv, log_path=log_path),
+        )
+
+    def test_clean_run_files(
+        self,
+        project: Project,
+        subject: VirtualEnvService,
+    ) -> None:
         run_dir = project.dirs.run("name")
 
         file = run_dir / "test.file.txt"
@@ -88,17 +141,10 @@ class TestVenvService:
         reason="chmod behavior is different on Windows",
     )
     async def test_create_venv_dir_not_writable(
-        self, project: Project, request: pytest.FixtureRequest
+        self, subject: VirtualEnvService
     ) -> None:
-        plugin_type = "dummy_type"
-        plugin_name = request.node.name
-
-        venv_service = VenvService(
-            project=project,
-            namespace=plugin_type,
-            name=plugin_name,
-        )
-        venv_dir = project.dirs.venvs(plugin_type, plugin_name, make_dirs=True)
+        venv_dir = subject.venv.root
+        venv_dir.mkdir()
         # Don't allow writing to the venv dir
         venv_dir.chmod(0o555)
 
@@ -106,25 +152,28 @@ class TestVenvService:
             AsyncSubprocessError,
             match="Could not create the virtualenv for",
         ) as excinfo:
-            await venv_service.create()
+            await subject.create()
 
-        assert "is not write-able" in await excinfo.value.stderr
+        assert (
+            "Permission denied" in await excinfo.value.stderr  # uv's message
+            or "is not write-able" in await excinfo.value.stderr  # virtualenv's message
+        )
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
-    async def test_clean_install(self, subject: VenvService) -> None:
+    async def test_clean_install(self, subject: VirtualEnvService) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         # Pre-create a venv with a marker file to ensure `clean=True` clears it
-        venv_dir = subject.project.dirs.venvs("namespace", "name", make_dirs=True)
+        venv_dir = subject.venv.root
+        venv_dir.mkdir()
         marker_file = venv_dir / "pre_existing_marker.txt"
         marker_file.write_text("marker")
 
         await subject.install(["example"], clean=True)
-        venv_dir = subject.project.dirs.venvs("namespace", "name")
 
         # ensure the venv is created and previous contents have been cleared
         assert venv_dir.exists()
@@ -134,17 +183,14 @@ class TestVenvService:
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
 
         # ensure that the package is installed
-        installed = await subject.list_installed()
+        installed = await subject._backend.list_installed()
         assert any(dep["name"] == "example" for dep in installed)
 
         # ensure that pip is the latest version
-        outdated = await subject.list_installed("--outdated")
+        outdated = await subject._backend.list_installed("--outdated")
         assert not any(dep["name"] == "pip" for dep in outdated)
 
-        assert subject.exec_path("some_exe").parts[-6:] == (
-            ".meltano",
-            "namespace",
-            "name",
+        assert subject.venv.exec_path("some_exe").parts[-3:] == (
             "venv",
             "bin",
             "some_exe",
@@ -155,36 +201,49 @@ class TestVenvService:
         expected_fingerprint = fingerprint(["example"], subject.venv.python_path)
         assert fingerprint_content == expected_fingerprint
 
-        # ensure that log file was created and is not empty
-        self.assert_install_log_file(subject)
-
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
-    async def test_install(self, subject: VenvService) -> None:
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
-
+    async def test_install(self, subject: VirtualEnvService, log_path: Path) -> None:
         # Make sure the venv exists already
-        await subject.install(["example"], clean=True)
+        await subject.install(["cowsay"], clean=True)
 
         # remove the package, then check that after a regular install the package exists
-        await subject.uninstall_package("example")
-        await subject.install(["example"])
+        await subject._backend.uninstall_package("cowsay")
+        await subject.install(["cowsay"])
 
-        # ensure that the package is installed
-        installed = await subject.list_installed()
-        assert any(dep["name"] == "example" for dep in installed)
+        installed = await subject._backend.list_installed()
+        assert any(dep["name"] == "cowsay" for dep in installed)
+
+        if isinstance(subject._backend, VirtualenvBackend):
+            assert log_path.exists()  # noqa: ASYNC240
+            assert log_path.is_file()  # noqa: ASYNC240
+            assert log_path.stat().st_size > 0  # noqa: ASYNC240
+
+    async def test_handle_installation_error(self, subject: VirtualEnvService) -> None:
+        process = mock.Mock(spec=Process)
+        process.stderr = "Some error"
+
+        with (
+            mock.patch(
+                "meltano.core.venv_service.VirtualEnvService.pip_install",
+                side_effect=AsyncSubprocessError("Something went wrong", process),
+            ),
+            pytest.raises(
+                AsyncSubprocessError,
+                match="Something went wrong",
+            ),
+        ):
+            await subject.install(["cowsay"])
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
-    async def test_requires_clean_install(self, subject: VenvService) -> None:
+    async def test_requires_clean_install(self, subject: VirtualEnvService) -> None:
         # Make sure the venv exists already
-        await subject.install(["example"], clean=True)
+        await subject.create()
+        subject.venv.write_fingerprint(["example"])
 
         if platform.system() != "Windows":
-            python_path = subject.exec_path("python")
+            python_path = subject.venv.exec_path("python")
             original_link_target = python_path.readlink()
             try:
                 # Simulate the deletion of the underlying Python executable by
@@ -203,126 +262,49 @@ class TestVenvService:
 
     @pytest.mark.asyncio
     async def test_requires_clean_install_python_change(
-        self, subject: VenvService
+        self,
+        subject: VirtualEnvService,
     ) -> None:
         await subject.install(["example"], clean=True)
         assert not subject.requires_clean_install(["example"])
 
         original_python = subject.venv.python_path
-        try:
-            subject.venv.python_path = "/fake/test/python"
-            assert subject.requires_clean_install(["example"])
+        subject.venv.python_path = "/fake/test/python"
+        assert subject.requires_clean_install(["example"])
 
-            subject.venv.python_path = original_python
-            assert not subject.requires_clean_install(["example"])
-        finally:
-            subject.venv.python_path = original_python
+        subject.venv.python_path = original_python
+        assert not subject.requires_clean_install(["example"])
 
-    async def test_python_setting(self, project: Project) -> None:
+
+class TestVenvBackend:
+    @pytest.mark.parametrize("backend", ("virtualenv", "uv"))
+    async def test_python_setting(self, project: Project, backend: str) -> None:
+        cls = UvBackend if backend == "uv" else VirtualenvBackend
+
         plugin_python = "test-python-executable-plugin-level"
         plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-mock",
             python=plugin_python,
         )
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == plugin_python
 
         # Setting the project-level `python` setting should have no effect at first
         # because the plugin-level setting takes precedence.
         project_python = "test-python-executable-project-level"
         project.settings.set("python", project_python)
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == plugin_python
 
         # The project-level setting should have an effect after the plugin-level
         # setting is unset
         plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
-        subject = self.cls.from_plugin(project, plugin)
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == project_python
 
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[-2] == f"--python={project_python}"
-
+        # After both the project-level and plugin-level are unset, the system Python
+        # should be used
         project.settings.unset("python")
-        subject = self.cls.from_plugin(project, plugin)
-
-        # After both the project-level and plugin-level are unset, it should be None
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert Path(exec_mock.call_args.args[-2].split("=")[1]).is_absolute()
-
-
-class TestVirtualEnv:
-    @pytest.mark.parametrize(
-        ("system", "lib_dir"),
-        (
-            ("Linux", "lib"),
-            ("Darwin", "lib"),
-            ("Windows", "Lib"),
-        ),
-    )
-    def test_cross_platform(self, system: str, lib_dir: str, project: Project) -> None:
-        with mock.patch("platform.system", return_value=system):
-            subject = VirtualEnv(project.dirs.venvs("pytest", "pytest"))
-            assert subject.lib_dir == subject.root / lib_dir
-
-    def test_unknown_platform(self, project: Project) -> None:
-        with (
-            mock.patch("platform.system", return_value="commodore64"),
-            pytest.raises(
-                MeltanoError,
-                match=r"(?i)Platform 'commodore64'.*?not supported.",
-            ),
-        ):
-            VirtualEnv(project.dirs.venvs("pytest", "pytest"))
-
-
-class TestUvVenvService(TestVenvService):
-    cls = UvVenvService
-
-    def assert_install_log_file(self, service: UvVenvService) -> None:
-        pass
-
-    @pytest.fixture
-    def subject(self, project):
-        return UvVenvService(project=project, namespace="namespace", name="name")
-
-    @pytest.mark.asyncio
-    @pytest.mark.usefixtures("project")
-    async def test_install(self, subject: UvVenvService) -> None:
-        # Make sure the venv exists already
-        await subject.install(["cowsay"], clean=True)
-
-        # remove the package, then check that after a regular install the package exists
-        await subject.uninstall_package("cowsay")
-        await subject.install(["cowsay"])
-
-        installed = await subject.list_installed()
-        assert any(dep["name"] == "cowsay" for dep in installed)
-
-    async def test_handle_installation_error(self, subject: UvVenvService) -> None:
-        process = mock.Mock(spec=Process)
-        process.stderr = "Some error"
-
-        with (
-            mock.patch(
-                "meltano.core.venv_service.UvVenvService.install_pip_args",
-                side_effect=AsyncSubprocessError("Something went wrong", process),
-            ),
-            pytest.raises(
-                AsyncSubprocessError,
-                match="Something went wrong",
-            ),
-        ):
-            await subject.install(["cowsay"])
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == sys.executable

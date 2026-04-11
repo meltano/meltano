@@ -108,12 +108,12 @@ Response: {A run}
 # meltano run equivalent (custom google style verb: run)
 POST meltano/core/v2/envs/prod/jobs:run
 {"command": "tap mapper target dbt:run", "args"...}
-Reponse: {The run, with run_id , and "inprogress" status field}
+Response: {The run, with run_id , and "inprogress" status field}
 
 # meltano state set equivalent
 PUT meltano/core/v2/envs/stage/jobs/tap-gh-to-target-sql/state
 {new state message}
-Reponse: {"The new state after update"}
+Response: {"The new state after update"}
 
 # meltano state copy equivalent (custom verb: copy)
 POST meltano/core/v2/envs/stage/jobs/tap-gh-to-target-sql/state/copy
@@ -121,6 +121,6 @@ POST meltano/core/v2/envs/stage/jobs/tap-gh-to-target-sql/state/copy
 Response: {"ref to the dest")
 ```
 
-### Guidelines for FastAPI pydantic models and auto generated documention
+### Guidelines for FastAPI pydantic models and auto generated documentation
 
 TBD

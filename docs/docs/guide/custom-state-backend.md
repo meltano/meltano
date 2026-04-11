@@ -94,7 +94,7 @@ class MyStateManager(StateStoreManager):
         ...
 
     @contextmanager
-    def acquire_lock(self, state_id: str, *, retry_seconds: int = 1):
+    def acquire_lock(self, state_id: str, *, retry_seconds: float = 1.0):
         # Implement the logic to acquire a lock for the given state ID.
         # This method should be a context manager that acquires the lock
         # and releases it when the context exits.

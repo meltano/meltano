@@ -25,7 +25,7 @@ class MigrationError(Exception):
     """Generic class for migration errors."""
 
 
-class MigrationUneededException(Exception):
+class MigrationUnneededException(Exception):
     """No migrations are needed."""
 
 
@@ -64,13 +64,13 @@ class MigrationService:
             target_revision: The desired target revision.
 
         Raises:
-            MigrationUneededException: If no migration is needed.
+            MigrationUnneededException: If no migration is needed.
         """
         current_head = context.get_current_revision()
 
         for rev in script.iterate_revisions(current_head, "base"):
             if rev.revision == target_revision:
-                raise MigrationUneededException
+                raise MigrationUnneededException
 
     def upgrade(self, *, silent: bool = False) -> None:
         """Upgrade to the latest revision.
@@ -118,7 +118,7 @@ class MigrationService:
             except FileNotFoundError as ex:
                 err_msg = "Cannot upgrade the system database, revision lock not found."
                 raise MigrationError(err_msg) from ex
-            except MigrationUneededException:
+            except MigrationUnneededException:
                 if not silent:
                     click.secho("System database up-to-date.")
             except Exception as ex:

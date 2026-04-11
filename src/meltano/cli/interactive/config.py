@@ -187,7 +187,7 @@ class InteractiveConfig:
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
-            label = f"inherited from '{self.settings.plugin.parent.name}'"  # type: ignore[attr-defined]
+            label = f"inherited from '{self.settings.plugin.parent.name}'"  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
         else:
             label = f"from {source.label}"
 

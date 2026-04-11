@@ -107,7 +107,7 @@ jobs:
         docker ps -a
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Install Nox
       env:
@@ -177,7 +177,7 @@ jobs:
         merge-multiple: true
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Install Nox
       env:
@@ -199,7 +199,7 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+      uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
 
   typing:
     name: "Static type checking"
@@ -217,7 +217,7 @@ jobs:
         python-version-file: .python-version
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Install Nox
       env:

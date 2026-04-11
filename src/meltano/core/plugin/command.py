@@ -100,7 +100,7 @@ class Command(Canonical):
         # if there are only args, flatten the object
         # to the short form
         if "args" in canonical and len(canonical) == 1:
-            return canonical["args"]  # type: ignore[call-overload]
+            return canonical["args"]  # type: ignore[call-overload]  # ty:ignore[invalid-argument-type]
 
         return canonical
 

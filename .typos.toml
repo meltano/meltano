@@ -1,0 +1,27 @@
+[default]
+extend-ignore-re = [
+    "(?s)(#|//|<!--)\\s*spellchecker:off.*?\\n\\s*(#|//|<!--)\\s*spellchecker:on"
+]
+
+[default.extend-identifiers]
+Automattic = "Automattic"  # https://automattic.com/
+
+# Pesonal names
+Ines = "Ines"  # i.e. https://github.com/ines
+Ethe = "Ethe"  # a silly name we use in an inline data mapping example
+ethe = "ethe"  # a silly name we use in an inline data mapping example
+
+# Legacy
+StaleJobFailer = "StaleJobFailer"
+HDA = "HDA"  # Hyper Dimensional Aggregates
+
+[default.extend-words]
+failer = "failer"
+invokable = "invokable"
+writables = "writables"
+
+[files]
+extend-exclude = [
+    "integration/meltano-manifest/expected-manifests/*.json",
+    "**/mdsh",
+]

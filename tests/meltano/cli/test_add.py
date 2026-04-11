@@ -4,6 +4,7 @@ import contextlib
 import os
 import platform
 import shutil
+import sys
 import typing as t
 from unittest import mock
 
@@ -20,6 +21,12 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.utils.python_compatibility import get_current_python_version
+from meltano.core.venv_service import VenvBackend, VirtualEnvService
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
@@ -28,12 +35,36 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
+
 plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
 plugin_ref_with_python = plugins_dir / "extractors" / "tap-custom" / "has_python.yml"
 fails_on_windows = pytest.mark.xfail(
     platform.system() == "Windows",
     reason="Fails on Windows: https://github.com/meltano/meltano/issues/3444",
 )
+
+
+class MockBackend(VenvBackend):
+    @override
+    async def create_venv(self, **kwargs) -> None:
+        self.venv.bin_dir.mkdir(parents=True, exist_ok=True)
+        self.venv.exec_path("python").touch(exist_ok=True)
+
+    @override
+    async def upgrade_installer(self, *, env=None) -> None:
+        pass
+
+    @override
+    async def install_pip_args(self, args, **kwargs) -> None:
+        pass
+
+    @override
+    async def uninstall_package(self, package) -> None:  # pragma: no cover
+        pass
+
+    @override
+    async def list_installed(self, *args) -> list:  # pragma: no cover
+        return []
 
 
 class TestCliAdd:
@@ -868,7 +899,7 @@ class TestCliAdd:
             "some required properties",
         ),
     )
-    def test_add_from_ref_invalid_definiton(
+    def test_add_from_ref_invalid_definition(
         self,
         definition,
         invalid_reason,
@@ -887,12 +918,16 @@ class TestCliAdd:
         assert res.exception.reason == invalid_reason
 
     def test_add_with_python_version(self, cli_runner: CliRunner) -> None:
-        with (
-            mock.patch("meltano.core.venv_service.exec_async") as exec_mock,
-            mock.patch("meltano.core.venv_service.UvVenvService.install_pip_args"),
-            mock.patch("meltano.core.venv_service.VirtualEnv.write_fingerprint"),
-        ):
-            python = "python3.X"
+        venv_service: VirtualEnvService = None
+        _orig = VirtualEnvService.from_plugin
+
+        def mock_from_plugin(project, plugin):
+            nonlocal venv_service
+            venv_service = _orig(project, plugin, backend_class=MockBackend)
+            return venv_service
+
+        python = "python3.X"
+        with mock.patch.object(VirtualEnvService, "from_plugin", mock_from_plugin):
             assert_cli_runner(
                 cli_runner.invoke(
                     cli,
@@ -905,7 +940,7 @@ class TestCliAdd:
                     ),
                 ),
             )
-            assert exec_mock.call_args.args[-2] == f"--python={python}"
+        assert venv_service.venv.python_path == python
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:

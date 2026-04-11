@@ -261,7 +261,7 @@ class Project:
             else:
                 raise
 
-        project.dirs.add_cachedir_tag()
+        project.dirs.ensure_system_files()
         logger.debug("Activated project at %s", project.root)
 
         # set the default project
@@ -375,7 +375,7 @@ class Project:
             meltano_config = MeltanoFile.parse(self.project_files.load())
             yield meltano_config
             try:
-                self.project_files.update(meltano_config.canonical())  # type: ignore[arg-type]
+                self.project_files.update(meltano_config.canonical())  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
             except Exception as err:  # pragma: no cover
                 logger.critical("Could not update meltano.yml: %s", err)
                 raise

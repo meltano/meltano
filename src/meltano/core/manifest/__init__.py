@@ -23,9 +23,9 @@ to reference any other file to fully describe the Meltano project.
 Plugin lockfiles are merged into manifest files during compilation time.
 
 Because the manifest file aims to be a single source of truth for project data,
-and aims to enable significant simplication of `meltano.core`, few existing
+and aims to enable significant simplification of `meltano.core`, few existing
 `meltano.core` services are used for the compilation of the manifest file. In
-the future, it should be the case that no `meltano.core` serivces are used for
+the future, it should be the case that no `meltano.core` services are used for
 the compilation of the manifest files.
 
 Related: https://github.com/meltano/meltano/issues/7270

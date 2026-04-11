@@ -267,7 +267,7 @@ def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
         parsed_pattern = SelectPattern.parse(pattern)
 
         rule = exclude_rule if parsed_pattern.negated else include_rule
-        rule.tap_stream_id.append(parsed_pattern.stream_pattern)  # type: ignore[union-attr]
+        rule.tap_stream_id.append(parsed_pattern.stream_pattern)  # type: ignore[union-attr]  # ty:ignore[unresolved-attribute]
 
     rules = []
     if include_rule.tap_stream_id:
@@ -498,7 +498,7 @@ class MetadataExecutor(CatalogExecutor):
 
     def ensure_metadata(self, breadcrumb: list[str]) -> None:
         """Handle missing metadata entries."""
-        metadata_list: list[dict] = self._stream["metadata"]  # type: ignore[index]
+        metadata_list: list[dict] = self._stream["metadata"]  # type: ignore[index]  # ty:ignore[not-subscriptable]
         match = next(
             (
                 metadata
@@ -555,7 +555,7 @@ class MetadataExecutor(CatalogExecutor):
     @override
     def metadata_node(self, node: Node, path: str) -> None:
         """Process metadata node."""
-        tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]
+        tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]  # ty:ignore[not-subscriptable]
         breadcrumb = node["breadcrumb"]
 
         logger.debug(
@@ -634,7 +634,7 @@ class SchemaExecutor(CatalogExecutor):
 
     def ensure_property(self, breadcrumb: list[str]) -> None:
         """Create nodes for the breadcrumb and schema extra that matches."""
-        next_node: dict[str, t.Any] = self._stream[SCHEMA_KEY]  # type: ignore[index]
+        next_node: dict[str, t.Any] = self._stream[SCHEMA_KEY]  # type: ignore[index]  # ty:ignore[not-subscriptable]
 
         for idx, key in enumerate(breadcrumb):
             # If the key contains shell-style wildcards,
@@ -672,7 +672,7 @@ class SchemaExecutor(CatalogExecutor):
     @override
     def property_node(self, node: Node, path: str) -> None:
         """Process property schema node."""
-        tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]
+        tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]  # ty:ignore[not-subscriptable]
 
         breadcrumb_idx = path.index(PROPERTIES_KEY)
         breadcrumb = path[breadcrumb_idx:].split(PROP_DELIMITER)

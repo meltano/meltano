@@ -461,7 +461,7 @@ def list_settings(
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
-            label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]
+            label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]  # ty:ignore[unresolved-attribute]
         else:
             label = f"{get_label(config_metadata, source)}"
 
@@ -600,7 +600,7 @@ def set_(
         ctx.exit()
 
     if from_file is not None:
-        setting_name += (value,)  # type: ignore[operator]
+        setting_name += (value,)  # type: ignore[operator]  # ty:ignore[invalid-assignment]
         value = from_file.read().strip()
 
     interaction.set_value(setting_name=setting_name, value=value, store=store)

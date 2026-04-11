@@ -299,7 +299,7 @@ Meltano setting 'state_backend.s3.aws_secret_access_key' was set in `.env`: '(re
 Now we can set the state in the new backend using the state file we just wrote:
 
 ```shell
-$ meltano state set dev:tap-github-to-target-jsonl --input-file dev:tap-github-to-taget-jsonl.json
+$ meltano state set dev:tap-github-to-target-jsonl --input-file dev:tap-github-to-target-jsonl.json
 ```
 
 Meltano will prompt you to confirm:

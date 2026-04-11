@@ -11,7 +11,7 @@ grep "Block run completed" $LOG_FILE
 grep "\[info     \] dbt-postgres .* Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=1" $LOG_FILE
 
 # we could also run psql statements
-# check for the existance of files
+# check for the existence of files
 # etc
 source "$(git rev-parse --show-toplevel)/integration/commons.sh"
 cd "${TEST_DOCS_DIR}"

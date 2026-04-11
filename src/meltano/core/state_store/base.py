@@ -242,7 +242,7 @@ class StateStoreManager(ABC):
         self,
         state_id: str,
         *,
-        retry_seconds: int,
+        retry_seconds: float,
     ) -> Generator[None, None, None]:
         """Acquire a naive lock for the given job's state.
 

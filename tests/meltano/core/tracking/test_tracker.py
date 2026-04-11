@@ -7,7 +7,7 @@ import uuid
 from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
-from time import sleep
+from time import monotonic, sleep
 from unittest import mock
 
 import pytest
@@ -89,17 +89,17 @@ class TestTracker:
 
     def test_update_analytics_json(self, project: Project) -> None:
         tracker = Tracker(project)
-        inital_send_anonymous_usage_stats = tracker.send_anonymous_usage_stats
+        initial_send_anonymous_usage_stats = tracker.send_anonymous_usage_stats
 
-        # Check the inital value of `send_anonymous_usage_stats`
+        # Check the initial value of `send_anonymous_usage_stats`
         analytics_json_pre = load_analytics_json(project)
         assert (
-            inital_send_anonymous_usage_stats
+            initial_send_anonymous_usage_stats
             == analytics_json_pre["send_anonymous_usage_stats"]
         )
 
         # Flip the value of `send_anonymous_usage_stats`
-        tracker.send_anonymous_usage_stats = not inital_send_anonymous_usage_stats
+        tracker.send_anonymous_usage_stats = not initial_send_anonymous_usage_stats
         tracker.telemetry_state_change_check(
             TelemetrySettings(
                 analytics_json_pre["client_id"],
@@ -111,7 +111,7 @@ class TestTracker:
         # Ensure `send_anonymous_usage_stats` has been flipped on disk
         analytics_json_post = load_analytics_json(project)
         assert (
-            inital_send_anonymous_usage_stats
+            initial_send_anonymous_usage_stats
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
@@ -305,9 +305,29 @@ class TestTracker:
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: S607
 
+        # Snowplow Micro may not have processed events yet even after the
+        # subprocess exits (it returns HTTP 200 before committing to storage),
+        # so poll with a timeout to avoid a race condition.
+        deadline = 10.0
+        poll_interval = 0.1
+        start = monotonic()
         event_summary = snowplow.all()
-        assert event_summary["good"] > 0
-        assert event_summary["bad"] == 0
+        while (  # pragma: no cover
+            event_summary["good"] == 0 and monotonic() - start < deadline
+        ):
+            sleep(poll_interval)
+            event_summary = snowplow.all()
+
+        elapsed = monotonic() - start
+
+        assert event_summary["good"] > 0, (
+            f"Expected at least one good event within {deadline}s "
+            f"(elapsed={elapsed}s), got: {event_summary}"
+        )
+        assert event_summary["bad"] == 0, (
+            f"Expected zero bad events within {deadline}s "
+            f"(elapsed={elapsed}s), got: {event_summary}"
+        )
 
         exit_event = next(
             x["event"]
@@ -331,7 +351,7 @@ class TestTracker:
         class MockSnowplowTracker:
             def track(self, event: SelfDescribing) -> None:
                 # Can't put asserts in here because this method is executed
-                # withing a try-except block that catches all exceptions.
+                # within a try-except block that catches all exceptions.
                 nonlocal passed
                 expected_contexts = [EnvironmentContext, ProjectContext]
                 if send_anonymous_usage_stats:

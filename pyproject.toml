@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.1.2"
+version = "4.2.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -144,7 +144,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy~=1.20.0",
-  "ty==0.0.24",
+  "ty==0.0.28",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -168,8 +168,6 @@ include = ["src/meltano"]
 addopts = [
   "--doctest-modules",
   "-ra",
-  "--strict-config",
-  "--strict-markers",
 ]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
@@ -199,10 +197,10 @@ markers = [
   "slow: slow test",
 ]
 minversion = "9"
+strict = true
 testpaths = [
   "tests/",
 ]
-xfail_strict = true
 
 [tool.coverage.run]
 branch = true
@@ -253,7 +251,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.1.2"
+version = "4.2.0"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
@@ -280,6 +278,7 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+strict = false
 warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true

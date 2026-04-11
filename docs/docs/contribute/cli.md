@@ -234,7 +234,7 @@ help out). Which often looks like:
 meltano elt <tap_name> <target_name>
 ```
 
-In the context of something like a more conversational guide or other online docs this does help indicate that we expect the user to supply this input. However, our current use in help output is often ambigous when it comes to indicating whether this is a required item or optional item. So moving forward if you use this form in CLI help out you should still follow the documented conventions for indicating whether something is required:
+In the context of something like a more conversational guide or other online docs this does help indicate that we expect the user to supply this input. However, our current use in help output is often ambiguous when it comes to indicating whether this is a required item or optional item. So moving forward if you use this form in CLI help out you should still follow the documented conventions for indicating whether something is required:
 
 ```
 # TAP and TARGET are upper case since they are required inputs

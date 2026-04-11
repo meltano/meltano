@@ -19,7 +19,7 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, uuid7
-from meltano.core.venv_service import VenvService, VirtualEnv
+from meltano.core.venv_service import VirtualEnv
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -184,17 +184,20 @@ class PluginInvoker:
         self.plugin.ensure_compatible()
         self.context = context
         self.output_handlers = output_handlers
-        self.venv_service: VenvService | None
+        self.venv: VirtualEnv | None
 
         if plugin.pip_url:
-            self.venv_service = VenvService(
-                project=project,
+            self.venv = VirtualEnv(
+                self.project.dirs.venvs(
+                    self.plugin.type,
+                    self.plugin.plugin_dir_name,
+                    make_dirs=False,
+                ),
                 python=self.plugin.python,
-                name=plugin.plugin_dir_name,
-                namespace=plugin.type,
             )
+
         else:
-            self.venv_service = None
+            self.venv = None
 
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
@@ -222,7 +225,7 @@ class PluginInvoker:
         Returns:
             The set of plugin capabilities.
         """
-        return frozenset(self.plugin.capabilities)  # type: ignore[arg-type]
+        return frozenset(self.plugin.capabilities)  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
 
     @property
     def files(self) -> dict[str, Path]:
@@ -299,7 +302,7 @@ class PluginInvoker:
             Full path to the executable.
         """
         executable = executable or self.plugin.executable
-        if not self.venv_service:
+        if not self.venv:
             if "/" not in executable.replace("\\", "/"):
                 # Expect executable on path
                 return executable
@@ -308,7 +311,7 @@ class PluginInvoker:
             return self.project.root.joinpath(executable)
 
         # Return executable within venv
-        return self.venv_service.exec_path(executable)
+        return self.venv.exec_path(executable)
 
     def exec_args(
         self,
@@ -424,17 +427,10 @@ class PluginInvoker:
         # Ensure Meltano venv is not inherited
         env.pop("VIRTUAL_ENV", None)
         env.pop("PYTHONPATH", None)
-        if self.venv_service:
+        if self.venv:
             # Switch to plugin-specific venv
-            venv = VirtualEnv(
-                self.project.dirs.venvs(
-                    self.plugin.type,
-                    self.plugin.name,
-                    make_dirs=False,
-                ),
-            )
-            venv_dir = str(venv.bin_dir)
-            env["VIRTUAL_ENV"] = str(venv.root)
+            venv_dir = str(self.venv.bin_dir)
+            env["VIRTUAL_ENV"] = str(self.venv.root)
             env["PATH"] = os.pathsep.join([venv_dir, env["PATH"]])
 
         return env
@@ -582,7 +578,7 @@ class PluginInvoker:
             return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:  # . Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__ from None  # type: ignore[misc]
+            raise err.__cause__ from None  # type: ignore[misc]  # ty:ignore[invalid-raise]
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter) -> None:
         """Append an output handler for a given stdio stream.

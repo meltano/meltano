@@ -27,7 +27,6 @@ from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
     from meltano.cli.params import InstallPlugins
-    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -175,7 +174,7 @@ async def add(
 
     add_service = ProjectAddService(project)
 
-    plugins: list[ProjectPlugin] = []
+    plugins: list[PluginRef] = []
     for ref in plugin_refs:
         try:
             plugins.append(
@@ -224,7 +223,7 @@ async def add(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _print_plugins(plugins: list[ProjectPlugin]) -> None:
+def _print_plugins(plugins: list[PluginRef]) -> None:
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo

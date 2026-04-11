@@ -52,7 +52,7 @@ class PluginLocationRemoveManager(ABC):
 
     @property
     def plugin_removed(self) -> bool:
-        """Wether or not the plugin was successfully removed.
+        """Whether or not the plugin was successfully removed.
 
         Returns:
             True if the plugin was successfully removed, False otherwise.
@@ -61,7 +61,7 @@ class PluginLocationRemoveManager(ABC):
 
     @property
     def plugin_not_found(self) -> bool:
-        """Wether or not the plugin was not found to remove.
+        """Whether or not the plugin was not found to remove.
 
         Returns:
             True if the plugin was not found, False otherwise.
@@ -70,7 +70,7 @@ class PluginLocationRemoveManager(ABC):
 
     @property
     def plugin_error(self) -> bool:
-        """Wether or not an error was encountered the plugin removal process.
+        """Whether or not an error was encountered the plugin removal process.
 
         Returns:
             True if an error was encountered, False otherwise.

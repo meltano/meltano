@@ -222,7 +222,7 @@ class SettingsService(metaclass=ABCMeta):
         """
         if source_manager:
             # TODO: Ensure only a bulk-enabled manager can be used here
-            source_manager.bulk = True  # type: ignore[attr-defined]
+            source_manager.bulk = True  # type: ignore[attr-defined]  # ty:ignore[invalid-assignment]
         else:
             source_manager = source.manager(self, bulk=True, **kwargs)
 
@@ -370,7 +370,7 @@ class SettingsService(metaclass=ABCMeta):
             expanded_value = do_expand_env_vars(  # type: ignore[type-var]
                 value,
                 env=expandable_env,
-                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]
+                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
             if value and not expanded_value:  # The whole string was missing env vars
@@ -420,7 +420,7 @@ class SettingsService(metaclass=ABCMeta):
                     metadata["uncast_value"] = value
                     value = cast_value
 
-            # we don't want to leak secure informations
+            # we don't want to leak secure information
             # so we redact all `passwords`
             if redacted and value and setting_def.is_redacted:
                 metadata["redacted"] = True
@@ -499,7 +499,13 @@ class SettingsService(metaclass=ABCMeta):
 
         setting_def = self.find_setting(name)
         if setting_def is None:
-            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning, stacklevel=2)
+            root_name, _, _ = name.partition(".")
+            if root_name == name or self.find_setting(root_name) is None:
+                warnings.warn(
+                    f"Unknown setting {name!r}",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
 
         metadata: dict[str, t.Any] = {
             "name": name,
