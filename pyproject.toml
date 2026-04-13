@@ -262,8 +262,14 @@ version_files = [
 
 [tool.mypy]
 check_untyped_defs = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
+enable_error_code = [
+  "ignore-without-code",
+  "redundant-expr",
+  "truthy-bool",
+  "exhaustive-match",
+  "deprecated",
+]
+incremental = true
 files = [
   "src/meltano/",
 ]
@@ -272,6 +278,8 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+strict = false
+warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
@@ -313,6 +321,7 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
+required-version = ">=0.15"
 
 [tool.ruff.lint]
 ignore = [

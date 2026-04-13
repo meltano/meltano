@@ -31,10 +31,10 @@ runs:
       with:
         persist-credentials: false
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+      uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
 
     - name: Prepare the tags
       id: prepare-tags
@@ -46,13 +46,13 @@ runs:
         INPUTS_REGISTRY: ${{ inputs.registry }}
 
     - name: Download artifacts
-      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         name: Packages
         path: dist
 
     - name: Build the image for all supported architectures
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
       with:
         context: .
         file: docker/meltano/Dockerfile
@@ -69,7 +69,7 @@ runs:
         push: false
 
     - name: Load the amd64 image for scanning
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
       with:
         context: .
         file: docker/meltano/Dockerfile
@@ -90,7 +90,7 @@ runs:
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@8d2fce09422cd6037e577f4130e9b925e9a37175 # v7.3.1
+      uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -98,7 +98,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@6bc82e05fd0ea64601dd4b465378bbcf57de0314 # v4.32.1
+      uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -118,7 +118,7 @@ runs:
         INPUTS_TOKEN: ${{ inputs.token }}
 
     - name: Login to the registry
-      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+      uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
       with:
         registry: ${{ inputs.registry }}
         username: ${{ inputs.username }}
@@ -126,7 +126,7 @@ runs:
 
     - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+      uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
       with:
         context: .
         file: docker/meltano/Dockerfile

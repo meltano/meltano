@@ -6,7 +6,7 @@
   "label": "dbt Snowflake",
   "docs": "https://hub.meltano.com/utilities/dbt-snowflake--dbt-labs",
   "repo": "https://github.com/dbt-labs/dbt-snowflake",
-  "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.3.0",
+  "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.4.0",
   "executable": "dbt_invoker",
   "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
   "settings": [

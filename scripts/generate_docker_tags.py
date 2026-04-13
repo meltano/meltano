@@ -1,4 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+
+# /// script
+# dependencies = [
+#   "packaging>=26",
+# ]
+# ///
 
 """Script to generate docker tags for Meltano images.
 
@@ -27,11 +33,30 @@ def main() -> None:
     parser.add_argument("-p", "--python-version", required=True)
     parser.add_argument("-d", "--default-python", required=True)
     parser.add_argument("--git-sha")
+    parser.add_argument(
+        "--latest-version",
+        default=None,
+        help=(
+            "The current latest published version. When provided and the registry is "
+            "not 'ghcr.io', 'latest' tags are only generated if --package-version >= "
+            "--latest-version. This prevents backport releases from overwriting the "
+            "'latest' tag with an older version."
+        ),
+    )
     args = parser.parse_args()
 
     is_default_python = args.default_python == args.python_version
     version = Version(args.package_version)
     tags = []
+
+    # For non-ghcr.io registries, only apply 'latest' if this version is >=
+    # the current latest published version. This prevents backport releases
+    # (e.g. v3.9.2 published after v4.1.2) from overwriting 'latest'.
+    is_overall_latest = (
+        args.latest_version is None
+        or args.registry == "ghcr.io"
+        or version >= Version(args.latest_version)
+    )
 
     # To save space, only publish the `latest` tag for each
     # images to the GitHub registry
@@ -56,8 +81,8 @@ def main() -> None:
                 )
 
     # ghcr.io: publish `latest` for ALL versions
-    # docker.io: only publish `latest` for final releases
-    if not version.is_prerelease or args.registry == "ghcr.io":
+    # docker.io: only publish `latest` for final releases that are the overall latest
+    if (not version.is_prerelease or args.registry == "ghcr.io") and is_overall_latest:
         tags.append(f"latest-python{args.python_version}")
 
         if is_default_python:

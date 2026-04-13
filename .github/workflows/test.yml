@@ -89,16 +89,6 @@ jobs:
         check-latest: true
         allow-prereleases: true
 
-    - name: Set up Docker Buildx
-      if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
-
-    - name: Get Docker
-      if: always() && (matrix.backend-db == 'mssql')
-      uses: actions-hub/docker/cli@f5fdbfc3f9d2a9265ead8962c1314108a7b7ec5d # v1.0.3
-      env:
-        SKIP_LOGIN: true
-
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg2')
       run: >
@@ -110,11 +100,12 @@ jobs:
         docker compose -f .github/workflows/resources/docker-compose.mssql.yaml up -d --wait --quiet-pull
 
     - name: Check running containers
+      if: matrix.backend-db != 'sqlite'
       run: |
         docker ps -a
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Install Nox
       env:
@@ -149,7 +140,7 @@ jobs:
 
     - name: Upload coverage data
       if: always()
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         include-hidden-files: true
         name: coverage-data-${{ matrix.id }}
@@ -157,7 +148,7 @@ jobs:
 
     - name: Upload test logs
       if: always()
-      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: test-logs-${{ matrix.id }}
         path: pytest.log
@@ -174,15 +165,17 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      with:
+        python-version-file: .python-version
 
     - name: Download coverage data
-      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         pattern: coverage-data-*
         merge-multiple: true
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Install Nox
       env:
@@ -204,7 +197,7 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+      uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
 
   mypy:
     name: "Static type checking"
@@ -218,9 +211,11 @@ jobs:
 
     - name: Setup Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      with:
+        python-version-file: .python-version
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Install Nox
       env:
