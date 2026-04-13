@@ -2,6 +2,8 @@ name: Build
 
 on:
   push:
+    branches-ignore:
+    - 'gh-readonly-queue/**'
     paths:
     - .github/actions/docker-build-scan-push/action.yml
     - .github/workflows/build.yml
@@ -37,12 +39,12 @@ jobs:
         persist-credentials: false
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       with:
-        python-version: 3.x
+        python-version-file: .python-version
 
     - name: Check version
       if: github.event_name == 'release' && github.event.action == 'published'
@@ -66,7 +68,7 @@ jobs:
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      uses: hynek/build-and-inspect-python-package@efb823f52190ad02594531168b7a2d5790e66516 # v2.14.0
+      uses: hynek/build-and-inspect-python-package@fe0a0fb1925ca263d076ca4f2c13e93a6e92a33e # v2.17.0
       id: baipp
 
   build_docker:
@@ -104,23 +106,38 @@ jobs:
       with:
         persist-credentials: false
     - name: Setup uv
-      uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+      uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+
+    - name: Get latest published release version
+      id: get-latest-version
+      if: github.event_name == 'release' && github.event.action == 'published'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        latest=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName | ltrimstr("v")' | sort -V | tail -1)
+        echo "version=$latest" >> $GITHUB_OUTPUT
 
     - name: Generate tags
       id: generate-tags
-      run: >
-        python scripts/generate_docker_tags.py
-        --git-sha $GITHUB_SHA
-        --package-version ${NEEDS_BUILD_OUTPUTS_VERSION}
-        --python-version $PYTHON_VERSION
-        --default-python ${DEFAULT_PYTHON}
-        --registry ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
-        > tags
+      run: |
+        extra_args=()
+        if [[ -n "$LATEST_VERSION" ]]; then
+          extra_args+=(--latest-version "$LATEST_VERSION")
+        fi
+        ./scripts/generate_docker_tags.py \
+          --git-sha "$GITHUB_SHA" \
+          --package-version "$NEEDS_BUILD_OUTPUTS_VERSION" \
+          --python-version "$PYTHON_VERSION" \
+          --default-python "$DEFAULT_PYTHON" \
+          --registry "$STEPS_SET_INPUTS_OUTPUTS_REGISTRY" \
+          "${extra_args[@]}" \
+          > tags
       env:
         GITHUB_SHA: ${{ github.sha }}
         NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
         PYTHON_VERSION: ${{ matrix.python-version }}
         STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
+        LATEST_VERSION: ${{ steps.get-latest-version.outputs.version }}
 
     - name: Assemble image tags
       id: assemble-tags
@@ -181,10 +198,10 @@ jobs:
         persist-credentials: false
 
     - name: Download artifacts
-      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         name: Packages
         path: dist
 
     - name: Publish
-      uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+      uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0

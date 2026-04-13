@@ -287,8 +287,8 @@ class ELTSchedule(Schedule):
             NotImplementedError: If the schedule is a job.
         """
         return [
-            t.cast("str", self.extractor),
-            t.cast("str", self.loader),
+            self.extractor,
+            self.loader,
             f"--transform={self.transform}",
             f"--state-id={self.name}",
         ]

@@ -165,7 +165,7 @@ class Manifest:
             schema_instance_file.write(json.dumps(instance_data).encode())
             schema_instance_file.flush()
             proc = subprocess.run(
-                (
+                (  # noqa: S607
                     "check-jsonschema",
                     "--color",
                     "never" if get_no_color_flag() else "always",

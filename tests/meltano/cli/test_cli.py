@@ -324,7 +324,7 @@ class TestCli:
         assert (
             "must be run inside a Meltano project"
             in subprocess.run(
-                ("meltano", *command_args),
+                ("meltano", *command_args),  # noqa: S607
                 text=True,
                 stderr=subprocess.PIPE,
                 cwd=tmp_path,
