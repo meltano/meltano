@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.9.3 (2026-04-13)
+
+### 📦 Packaging changes
+
+- [#9960](https://github.com/meltano/meltano/issues/9960) Remove upper constraint for uv dependency (#9823)
+
 ## v3.9.2 (2026-02-03)
 
 ### 🐛 Fixes
