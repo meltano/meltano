@@ -8,7 +8,6 @@ import sys
 import typing as t
 from contextlib import contextmanager
 from enum import Enum, auto
-from typing import Dict, List, Tuple
 
 import click
 import structlog
@@ -655,7 +654,7 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             return super().format_options(ctx, formatter)
         params = self.get_params(ctx)
 
-        groups : Dict[str, List[Tuple[str, str]]] = {
+        groups: dict[str, list[tuple[str, str]]] = {
             "Run options": [],
             "State options": [],
             "Installation options": [],
