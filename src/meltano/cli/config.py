@@ -388,8 +388,9 @@ def list_settings(
     )
     settings = _get_settings(project=project, plugin=plugin)
 
-    # If `--extras` is not specified (`False`), we still want to load both
-    # regular and extra settings, since we show custom extras.
+    # `config_with_metadata(extras=True)` returns only extras; `extras=None`
+    # returns both regular and extras. When `--extras` is not specified we
+    # still need both, since custom extras appear in the default listing.
     load_extras = True if extras else None
 
     full_config = settings.config_with_metadata(
