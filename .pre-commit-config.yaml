@@ -58,28 +58,28 @@ repos:
         files: \.[jt]sx?$
         args: ['--fix', '--config=docs/eslint.config.js']
         additional_dependencies:
-          - "eslint@10.2.0" # Keep this in sync with the rev above!
+          - "eslint@10.2.1" # Keep this in sync with the rev above!
 
           - "eslint-config-prettier@10.1.8"
           - "eslint-plugin-prettier@5.5.5"
           - "eslint-plugin-react@7.37.5"
           - "eslint-plugin-vue@10.8.0"
-          - "prettier@3.8.2"
-          - "globals@17.4.0"
+          - "prettier@3.8.3"
+          - "globals@17.5.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.10
+    rev: v0.15.11
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.6
+    rev: 0.11.7
     hooks:
       - id: uv-lock
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.45.0
+    rev: v1.45.1
     hooks:
       - id: typos
