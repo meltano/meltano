@@ -463,6 +463,28 @@ class TestCliConfigSet:
             assert_cli_runner(result)
             mock_configure_all.assert_called_once()
 
+    @pytest.mark.usefixtures("project")
+    def test_config_test_invalid_shows_hint(self, cli_runner, tap) -> None:
+        mock_invoke = mock.Mock()
+        mock_invoke.stderr.at_eof.return_value = True
+        mock_invoke.stdout.at_eof.side_effect = (True,)
+        mock_invoke.wait = AsyncMock(return_value=1)
+        mock_invoke.returncode = 1
+
+        with mock.patch(
+            "meltano.core.plugin_invoker.PluginInvoker.invoke_async",
+            return_value=mock_invoke,
+        ):
+            result = cli_runner.invoke(cli, ["config", "test", tap.name])
+
+        assert result.exit_code == 1
+        assert "Plugin configuration is invalid" in str(result.exception)
+        assert "Plugin did not emit any output" in str(result.exception)
+        assert (
+            "Hint: Check plugin settings in meltano.yml or environment variables."
+            in str(result.exception)
+        )
+
 
 class TestCliConfigUnset:
     @pytest.mark.usefixtures("project")
