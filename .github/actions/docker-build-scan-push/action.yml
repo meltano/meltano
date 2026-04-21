@@ -139,6 +139,19 @@ runs:
           [[ "$NUM_ISSUES" =~ ^[0-9]+$ ]] && break
           echo "Attempt $i: could not get a numeric response from GitHub API, retrying..."
         done
+
+        # GitHub re-opens dismissed alerts when a new SARIF is uploaded (e.g. on job retry).
+        # Fetch dismissed alerts and subtract any whose rule IDs overlap with the open set.
+        if [[ "$NUM_ISSUES" -gt 0 ]]; then
+          DISMISSED="$(curl --fail-with-body --no-progress-meter -H "Authorization: token ${INPUTS_TOKEN}" \
+              "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=dismissed&ref=${GITHUB_REF}")"
+          if DISMISSED_RULES="$(jq -r '[.[].rule.id]' <<<"$DISMISSED")"; then
+            NUM_ISSUES="$(jq --argjson dismissed "$DISMISSED_RULES" \
+              '[.[] | select(.rule.id as $r | ($dismissed | index($r)) == null)] | length' \
+              <<<"$RESPONSE")"
+          fi
+        fi
+
         [ "$NUM_ISSUES" = '0' ] # Error if there are any alerts that are neither fixed nor dismissed
       env:
         INPUTS_TOKEN: ${{ inputs.token }}
