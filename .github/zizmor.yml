@@ -1,0 +1,4 @@
+rules:
+  superfluous-actions:
+    ignore:
+      - version_bump.yml
