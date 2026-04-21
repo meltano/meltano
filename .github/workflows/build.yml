@@ -116,7 +116,7 @@ jobs:
       if: github.event_name == 'release' && github.event.action == 'published'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
+      run: |  # zizmor: ignore[template-injection]
         latest=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName | ltrimstr("v")' | sort -V | tail -1)
         echo "version=$latest" >> $GITHUB_OUTPUT
 
