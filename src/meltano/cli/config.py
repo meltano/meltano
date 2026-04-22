@@ -501,7 +501,7 @@ def list_settings(
             elif source is SettingValueStore.INHERITED:
                 label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]  # ty:ignore[unresolved-attribute]
             else:
-                label = f"{get_label(config_metadata, source)}"
+                label = get_label(config_metadata, source)
 
             redacted_with_value = safe and setting_def.is_redacted and value is not None
 
