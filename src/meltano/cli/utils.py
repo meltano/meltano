@@ -12,6 +12,7 @@ from enum import Enum, auto
 import click
 import structlog
 from click_default_group import DefaultGroup
+from typing_extensions import override
 
 from meltano.cli._didyoumean import DYMGroup
 from meltano.core.error import MeltanoConfigurationError
@@ -649,7 +650,13 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
 
-    def format_options(self, ctx, formatter):
+    @override
+    def format_options(
+        self,
+        ctx: click.Context,
+        formatter: click.HelpFormatter
+    )-> None:
+        """Format CLI options into grouped sections for the run command."""
         if ctx.command.name != "run":
             return super().format_options(ctx, formatter)
         params = self.get_params(ctx)
