@@ -122,9 +122,7 @@ def test_no_unexpected_options_in_global_group(runner):
     }
 
     # Allowed global options (expand if needed)
-    expected_global_options = {
-        "--help", "--database-uri"
-    }
+    expected_global_options = {"--help", "--database-uri"}
 
     # Fail if any unexpected option appears in global group
     unexpected = global_options - expected_global_options
