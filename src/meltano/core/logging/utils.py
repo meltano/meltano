@@ -45,9 +45,9 @@ class SafeStreamHandler(logging.StreamHandler):
 
     def emit(self, record: logging.LogRecord) -> None:
         """Emit a record, falling back to backslashreplace on encode errors."""
+        stream = self.stream
         try:
             msg = self.format(record)
-            stream = self.stream
             stream.write(msg + self.terminator)
             self.flush()
         except UnicodeEncodeError:
@@ -56,11 +56,10 @@ class SafeStreamHandler(logging.StreamHandler):
             try:
                 encoding = getattr(stream, "encoding", "utf-8") or "utf-8"
                 stream.write(
-                    msg.encode(
-                        encoding,
-                        errors="backslashreplace",
-                    ).decode(encoding, errors="replace")
-                    + self.terminator,
+                    self.format(record)
+                    .encode(encoding, errors="backslashreplace")
+                    .decode(encoding, errors="replace")
+                    + self.terminator
                 )
                 self.flush()
             except Exception:  # noqa: BLE001
