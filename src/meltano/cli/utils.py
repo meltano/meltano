@@ -12,6 +12,7 @@ from enum import Enum, auto
 import click
 import structlog
 from click_default_group import DefaultGroup
+from typing_extensions import override
 
 from meltano.cli._didyoumean import DYMGroup
 from meltano.core.error import MeltanoConfigurationError
@@ -648,6 +649,52 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
+
+    @override
+    def format_options(
+        self,
+        ctx: click.Context,
+        formatter: click.HelpFormatter,
+    ) -> None:
+        """Format CLI options into grouped sections for the run command."""
+        if ctx.command.name != "run":
+            super().format_options(ctx, formatter)
+            return
+
+        opt_to_group: dict[str | None, str] = {
+            # Run options
+            "dry_run": "Run options",
+            "full_refresh": "Run options",
+            "refresh_catalog": "Run options",
+            "run_id": "Run options",
+            "timeout": "Run options",
+            # State options
+            "no_state_update": "State options",
+            "force": "State options",
+            "state_id_suffix": "State options",
+            "merge_state": "State options",
+            "state_strategy": "State options",
+            # Installation options
+            "install_plugins": "Installation options",
+        }
+        groups: dict[str, list[tuple[str, str]]] = {
+            "Run options": [],
+            "State options": [],
+            "Installation options": [],
+            "Global options": [],
+        }
+
+        for param in self.get_params(ctx):
+            record = param.get_help_record(ctx)
+            if not record:
+                continue
+
+            groups[opt_to_group.get(param.name, "Global options")].append(record)
+
+        for group_name, records in groups.items():
+            if records:  # pragma: no branch
+                with formatter.section(group_name):
+                    formatter.write_dl(records)
 
 
 class AutoInstallBehavior(StrEnum):

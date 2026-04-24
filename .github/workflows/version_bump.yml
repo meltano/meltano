@@ -74,7 +74,7 @@ jobs:
     - name: Draft Release
       id: draft-release
       if: ${{ github.event.inputs.prerelease == 'none' }}
-      uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
+      uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
       with:
         draft: true
         body_path: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}
@@ -84,7 +84,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+      uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
       id: create-pull-request
       with:
         # https://github.com/peter-evans/create-pull-request

@@ -225,7 +225,7 @@ class PluginInvoker:
         Returns:
             The set of plugin capabilities.
         """
-        return frozenset(self.plugin.capabilities)  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
+        return frozenset(self.plugin.capabilities)
 
     @property
     def files(self) -> dict[str, Path]:

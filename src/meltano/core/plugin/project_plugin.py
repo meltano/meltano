@@ -71,6 +71,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     executable: str
     python: str | None
     definition: PluginDefinition
+    capabilities: list[str]
 
     config_files: dict[str, str]
 
