@@ -652,13 +652,31 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
 
     @override
     def format_options(
-        self, ctx: click.Context, formatter: click.HelpFormatter
+        self,
+        ctx: click.Context,
+        formatter: click.HelpFormatter,
     ) -> None:
         """Format CLI options into grouped sections for the run command."""
         if ctx.command.name != "run":
-            return super().format_options(ctx, formatter)
-        params = self.get_params(ctx)
+            super().format_options(ctx, formatter)
+            return
 
+        opt_to_group: dict[str | None, str] = {
+            # Run options
+            "dry_run": "Run options",
+            "full_refresh": "Run options",
+            "refresh_catalog": "Run options",
+            "run_id": "Run options",
+            "timeout": "Run options",
+            # State options
+            "no_state_update": "State options",
+            "force": "State options",
+            "state_id_suffix": "State options",
+            "merge_state": "State options",
+            "state_strategy": "State options",
+            # Installation options
+            "install_plugins": "Installation options",
+        }
         groups: dict[str, list[tuple[str, str]]] = {
             "Run options": [],
             "State options": [],
@@ -666,42 +684,17 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             "Global options": [],
         }
 
-        for param in params:
+        for param in self.get_params(ctx):
             record = param.get_help_record(ctx)
             if not record:
                 continue
 
-            name = param.name
-
-            if name in {
-                "dry_run",
-                "full_refresh",
-                "refresh_catalog",
-                "run_id",
-                "timeout",
-            }:
-                groups["Run options"].append(record)
-
-            elif name in {
-                "no_state_update",
-                "force",
-                "state_id_suffix",
-                "merge_state",
-                "state_strategy",
-            }:
-                groups["State options"].append(record)
-
-            elif name == "install_plugins":
-                groups["Installation options"].append(record)
-
-            else:
-                groups["Global options"].append(record)
+            groups[opt_to_group.get(param.name, "Global options")].append(record)
 
         for group_name, records in groups.items():
-            if records:
-                formatter.write_heading(group_name)
-                formatter.write_dl(records)
-                formatter.write_paragraph()
+            if records:  # pragma: no branch
+                with formatter.section(group_name):
+                    formatter.write_dl(records)
 
 
 class AutoInstallBehavior(StrEnum):
