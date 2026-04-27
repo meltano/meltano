@@ -399,7 +399,15 @@ class PipPackageManager(PackageManager):
 
     @override
     async def list_installed(self, *args: str, python: str) -> list[dict[str, t.Any]]:
-        proc = await exec_async(python, "-m", "pip", "list", "--format=json", *args)
+        proc = await exec_async(
+            python,
+            "-m",
+            "pip",
+            "--no-color",
+            "list",
+            "--format=json",
+            *args,
+        )
         stdout, _ = await proc.communicate()
 
         # pip may include warnings before the JSON output
