@@ -107,7 +107,11 @@ def _print_setting(
     setting_def: SettingDefinition = config_metadata["setting"]
 
     click.secho(name, fg="blue", nl=False)
-    if name in setting_groups:
+    # With a single validation group, the `Required:` section header and the
+    # `Required settings:` summary already convey what `(required)` would.
+    # Skip the per-setting label there; keep it for multi-group plugins where
+    # `(required by group N)` carries unique information.
+    if name in setting_groups and num_groups > 1:
         click.secho(
             f" ({_required_label(setting_groups[name], num_groups)})",
             fg="red",
@@ -466,12 +470,12 @@ def list_settings(
         for setting_name in group:
             setting_groups[setting_name].append(i)
     num_groups = len(validation_groups)
-    if num_groups > 1:
+    if not extras and num_groups > 1:
         click.echo("Setting groups (one of the following combinations is required):")
         for i, group in enumerate(validation_groups, 1):
             click.echo(f"  Group {i}: {', '.join(sorted(group))}")
         click.echo()
-    elif num_groups == 1:
+    elif not extras and num_groups == 1:
         click.echo(f"Required settings: {', '.join(sorted(validation_groups[0]))}")
         click.echo()
 

@@ -319,8 +319,11 @@ class TestCliConfig:
 
         assert "Required settings: secure, test" in result.stdout
         assert "Setting groups" not in result.stdout
-        assert "test (required) [env:" in result.stdout
-        assert "secure (required) [env:" in result.stdout
+        # Single validation group: section header + summary make the per-setting
+        # `(required)` redundant, so it should not appear.
+        assert "(required)" not in result.stdout
+        assert "test [env:" in result.stdout
+        assert "secure [env:" in result.stdout
         assert "port (required" not in result.stdout
 
     @pytest.mark.usefixtures("project")
@@ -378,8 +381,14 @@ class TestCliConfig:
         result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
         assert_cli_runner(result)
 
+        assert "Setting groups" not in result.stdout
+        assert "Required settings:" not in result.stdout
         assert "Required:" not in result.stdout
+        assert "Configured:" not in result.stdout
+        assert "Optional:" not in result.stdout
         assert "Custom:" not in result.stdout
+        assert "\ntest " not in result.stdout
+        assert "\nport " not in result.stdout
         assert "_select" in result.stdout
 
         lines = result.stdout.strip().split("\n")
