@@ -64,9 +64,9 @@ class SafeStreamHandler(logging.StreamHandler):
                 self.flush()
             except Exception:  # noqa: BLE001
                 self.handleError(record)
-        except RecursionError:
+        except RecursionError:  # pragma: no cover
             raise
-        except Exception:  # noqa: BLE001
+        except Exception:  # noqa: BLE001  # pragma: no cover
             self.handleError(record)
 
 
