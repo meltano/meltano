@@ -35,6 +35,12 @@ if t.TYPE_CHECKING:
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
 
+_sigint_received: bool = False
+
+
+def _was_sigint_received() -> bool:
+    return _sigint_received
+
 
 class InconsistentStateError(Error):
     """Occur upon a wrong operation for the current state."""
@@ -395,17 +401,32 @@ class Job(SystemModel):
         self,
         session: Session,  # noqa: ARG002
     ) -> AsyncGenerator[None, None]:
+        global _sigint_received
+        _sigint_received = False
+
         loop = asyncio.get_running_loop()
         task = asyncio.current_task()
         sigterm_received = False
 
-        def handler() -> None:
+        def sigterm_handler() -> None:
             nonlocal sigterm_received
             sigterm_received = True
             if task is not None:
-                task.cancel()
+                task.cancel("SIGTERM")
 
-        loop.add_signal_handler(signal.SIGTERM, handler)
+        original_sigint = signal.getsignal(signal.SIGINT)
+
+        def sigint_wrapper(sig: int, frame: t.Any) -> None:  # noqa: ANN401
+            global _sigint_received
+            _sigint_received = True
+            if callable(original_sigint):
+                t.cast("t.Callable[[int, t.Any], None]", original_sigint)(sig, frame)
+
+        with suppress(
+            NotImplementedError
+        ):  # Windows: loop.add_signal_handler is unavailable
+            loop.add_signal_handler(signal.SIGTERM, sigterm_handler)
+        signal.signal(signal.SIGINT, sigint_wrapper)
         try:
             yield
         except asyncio.CancelledError:
@@ -413,7 +434,9 @@ class Job(SystemModel):
                 raise SystemExit(143) from None
             raise
         finally:
-            loop.remove_signal_handler(signal.SIGTERM)
+            with suppress(NotImplementedError):  # Windows
+                loop.remove_signal_handler(signal.SIGTERM)
+            signal.signal(signal.SIGINT, original_sigint)
 
     def _error_message(self, err: BaseException) -> str:
         if isinstance(err, SystemExit):

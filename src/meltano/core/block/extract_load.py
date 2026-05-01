@@ -628,8 +628,9 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 await block.pre(self.context)
                 await block.start()
             yield
-        except asyncio.CancelledError:
-            await asyncio.shield(self.terminate(graceful=True))
+        except asyncio.CancelledError as e:
+            if e.args == ("SIGTERM",):
+                await asyncio.shield(self.terminate(graceful=True))
             raise
         finally:
             await self._cleanup()
