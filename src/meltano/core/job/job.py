@@ -6,7 +6,7 @@ import asyncio
 import os
 import signal
 import typing as t
-from contextlib import asynccontextmanager, contextmanager, suppress
+from contextlib import asynccontextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntEnum
 
@@ -27,7 +27,7 @@ from meltano.core.sqlalchemy import (
 from meltano.core.utils import new_run_id
 
 if t.TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Generator
+    from collections.abc import AsyncGenerator
 
     from sqlalchemy.orm import Session
 
@@ -278,9 +278,8 @@ class Job(SystemModel):
             self.start()
             self.save(session)
 
-            with self._handling_sigterm(session):
-                async with self._heartbeating(session):
-                    yield
+            async with self._handling_sigterm(session), self._heartbeating(session):
+                yield
 
             self.success()
             self.save(session)
@@ -391,21 +390,30 @@ class Job(SystemModel):
             with suppress(asyncio.CancelledError):
                 await heartbeat_future
 
-    @contextmanager
-    def _handling_sigterm(
+    @asynccontextmanager
+    async def _handling_sigterm(
         self,
         session: Session,  # noqa: ARG002
-    ) -> Generator[None, None, None]:
-        def handler(*_) -> t.NoReturn:
-            sigterm_status = 143
-            raise SystemExit(sigterm_status)
+    ) -> AsyncGenerator[None, None]:
+        loop = asyncio.get_running_loop()
+        task = asyncio.current_task()
+        sigterm_received = False
 
-        original_termination_handler = signal.signal(signal.SIGTERM, handler)
+        def handler() -> None:
+            nonlocal sigterm_received
+            sigterm_received = True
+            if task is not None:
+                task.cancel()
 
+        loop.add_signal_handler(signal.SIGTERM, handler)
         try:
             yield
+        except asyncio.CancelledError:
+            if sigterm_received:
+                raise SystemExit(143) from None
+            raise
         finally:
-            signal.signal(signal.SIGTERM, original_termination_handler)
+            loop.remove_signal_handler(signal.SIGTERM)
 
     def _error_message(self, err: BaseException) -> str:
         if isinstance(err, SystemExit):
