@@ -19,6 +19,7 @@ from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.block.extract_load import ExtractLoadBlocks
 from meltano.core.block.plugin_command import InvokerCommand
+from meltano.core.job.job import _was_sigint_received
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -308,16 +309,19 @@ async def _run_blocks(
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             ctx.exit(1)
-        except asyncio.CancelledError:
-            # Handle graceful termination on timeout
-            logger.info(
-                "Attempting graceful termination of current block",
-                block_type=current_block.__class__.__name__,
-            )
-            if isinstance(current_block, ExtractLoadBlocks):
-                await current_block.terminate(graceful=True)
-            else:
-                await current_block.stop(kill=False)
+        except asyncio.CancelledError as e:
+            # Only attempt graceful termination for timeout or plain cancellation.
+            # SIGTERM is handled in _start_blocks. SIGINT is skipped because the
+            # subprocess already received SIGINT from the terminal process group.
+            if not _was_sigint_received() and e.args != ("SIGTERM",):
+                logger.info(
+                    "Attempting graceful termination of current block",
+                    block_type=current_block.__class__.__name__,
+                )
+                if isinstance(current_block, ExtractLoadBlocks):
+                    await current_block.terminate(graceful=True)
+                else:
+                    await current_block.stop(kill=False)
             raise
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions
