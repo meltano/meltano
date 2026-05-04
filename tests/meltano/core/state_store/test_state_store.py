@@ -398,6 +398,34 @@ class TestS3StateBackend:
             s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
         )
 
+    @pytest.mark.parametrize(
+        "endpoint_url",
+        (
+            None,
+            "https://s3.amazonaws.com",
+            "https://s3.us-west-004.backblazeb2.com",
+            "http://minio.local:9000",
+        ),
+        ids=("default-aws", "aws-explicit", "b2", "self-hosted"),
+    )
+    def test_user_agent_extra_always_set_to_meltano(
+        self,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+        prefix: str,
+        bucket: str,
+        endpoint_url: str | None,
+    ) -> None:
+        manager = S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            endpoint_url=endpoint_url,
+            lock_timeout_seconds=10,
+        )
+
+        assert "meltano" in manager.client.meta.config.user_agent_extra
+
     def test_missing_aws_secret_access_key(
         self,
         aws_access_key_id: str,
