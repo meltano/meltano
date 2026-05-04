@@ -20,14 +20,14 @@ const FindOutMoreList = [
       target: '_blank',
     },
   },
-  {
-    title: <>Subscribe to our Newsletter</>,
-    Svg: require('@site/static/img/homepage/subscribe.svg').default,
-    link: {
-      url: 'https://meltano.com/lp/meltastic-newsletter/',
-      target: '_blank',
-    },
-  },
+  // {
+  //   title: <>Subscribe to our Newsletter</>,
+  //   Svg: require('@site/static/img/homepage/subscribe.svg').default,
+  //   link: {
+  //     url: 'https://meltano.com/lp/meltastic-newsletter/',
+  //     target: '_blank',
+  //   },
+  // },
 ];
 
 // eslint-disable-next-line react/prop-types
