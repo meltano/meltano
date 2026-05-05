@@ -303,8 +303,14 @@ def fingerprint(pip_install_args: Iterable[str], interpreter: str | None = None)
     return hashlib.sha256(" ".join(components).encode()).hexdigest()
 
 
+@dataclass(slots=True, frozen=True)
 class PackageManager(abc.ABC):
     """Standalone package manager tool, independent of any virtual environment."""
+
+    _: KW_ONLY
+
+    log_path: Path | None = None
+    """Optional path to write install logs."""
 
     @abc.abstractmethod
     async def install(
@@ -312,7 +318,6 @@ class PackageManager(abc.ABC):
         args: Sequence[str],
         *,
         python: str,
-        log_path: Path | None = None,
         extract_stderr: StdErrExtractor = _extract_stderr,
         force: bool = False,
         env: dict[str, str | None] | None = None,
@@ -356,6 +361,7 @@ class PackageManager(abc.ABC):
         """
 
 
+@dataclass(slots=True, frozen=True)
 class PipPackageManager(PackageManager):
     """Package manager using ``pip``."""
 
@@ -365,15 +371,13 @@ class PipPackageManager(PackageManager):
         args: Sequence[str],
         *,
         python: str,
-        log_path: Path | None = None,
         extract_stderr: StdErrExtractor = _extract_stderr,
         force: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> Process:
         install_args = ("--ignore-requires-python", *args) if force else args
         cmd: tuple[str, ...] = (python, "-m", "pip", "install")
-        if log_path is not None:
-            cmd = (*cmd, "--log", str(log_path))
+        cmd = (*cmd, "--log", str(self.log_path)) if self.log_path else cmd
         return await exec_async(
             *cmd,
             *install_args,
@@ -395,21 +399,27 @@ class PipPackageManager(PackageManager):
 
     @override
     async def list_installed(self, *args: str, python: str) -> list[dict[str, t.Any]]:
-        proc = await exec_async(python, "-m", "pip", "list", "--format=json", *args)
+        proc = await exec_async(
+            python,
+            "-m",
+            "pip",
+            "--no-color",
+            "list",
+            "--format=json",
+            *args,
+        )
         stdout, _ = await proc.communicate()
-        return json.loads(stdout)
+
+        # pip may include warnings before the JSON output
+        return json.loads(stdout.splitlines()[-1])
 
 
+@dataclass(slots=True, frozen=True)
 class UvPackageManager(PackageManager):
     """Package manager using ``uv pip``."""
 
-    def __init__(self, uv: str) -> None:
-        """Initialize the ``UvPackageManager``.
-
-        Args:
-            uv: Path to the ``uv`` executable.
-        """
-        self.uv = uv
+    uv: str
+    """Path to the `uv` executable."""
 
     @override
     async def install(
@@ -417,7 +427,6 @@ class UvPackageManager(PackageManager):
         args: Sequence[str],
         *,
         python: str,
-        log_path: Path | None = None,
         extract_stderr: StdErrExtractor = _extract_stderr,
         force: bool = False,  # uv has no --ignore-requires-python equivalent
         env: dict[str, str | None] | None = None,
@@ -769,7 +778,7 @@ class VirtualenvBackend(VenvBackend):
     @cached_property
     def package_manager(self) -> PipPackageManager:
         """The pip-based package manager for this virtual environment."""
-        return PipPackageManager()
+        return PipPackageManager(log_path=self.log_path)
 
     @override
     async def create_venv(
@@ -839,7 +848,6 @@ class VirtualenvBackend(VenvBackend):
         return await self.package_manager.install(
             pip_install_args,
             python=str(self.venv.exec_path("python")),
-            log_path=self.log_path,
             extract_stderr=extract_stderr,
             force=force,
             env=env,
