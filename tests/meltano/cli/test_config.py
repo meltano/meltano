@@ -15,6 +15,7 @@ import pytest
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.cli.config import _required_label
+from meltano.cli.utils import CliError
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
@@ -177,6 +178,40 @@ class TestCliConfig:
             assert_cli_runner(result)
 
             assert "Plugin configuration is valid" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    @pytest.mark.parametrize("plugin_output", ("", "Password is missing!"))
+    def test_config_test_invalid_shows_hint(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        plugin_output: str,
+    ) -> None:
+        mock_invoke = mock.Mock()
+        mock_invoke.stderr.at_eof.return_value = True
+        mock_invoke.stdout.at_eof.side_effect = (False, True)
+        mock_invoke.wait = AsyncMock(return_value=1)
+        mock_invoke.returncode = 1
+        payload = plugin_output.encode()
+        mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
+
+        with mock.patch(
+            "meltano.core.plugin_invoker.PluginInvoker.invoke_async",
+            return_value=mock_invoke,
+        ):
+            result = cli_runner.invoke(cli, ["config", "test", tap.name])
+
+        assert result.exit_code == 1
+
+        exception = result.exception
+        assert isinstance(exception, CliError)
+        message = exception.args[0]
+        assert "Plugin configuration is invalid" in message
+
+        expected_content = plugin_output or "Plugin did not emit any output"
+        assert expected_content in message
+
+        assert f"meltano config list {tap.name}" in message
 
     @pytest.mark.usefixtures("project")
     def test_config_meltano_test(self, cli_runner) -> None:
@@ -631,25 +666,6 @@ class TestCliConfigSet:
             result = cli_runner.invoke(cli, ["config", "set"], input=f"{tap.name}\n")
             assert_cli_runner(result)
             mock_configure_all.assert_called_once()
-
-    @pytest.mark.usefixtures("project")
-    def test_config_test_invalid_shows_hint(self, cli_runner, tap) -> None:
-        mock_invoke = mock.Mock()
-        mock_invoke.stderr.at_eof.return_value = True
-        mock_invoke.stdout.at_eof.side_effect = (True,)
-        mock_invoke.wait = AsyncMock(return_value=1)
-        mock_invoke.returncode = 1
-
-        with mock.patch(
-            "meltano.core.plugin_invoker.PluginInvoker.invoke_async",
-            return_value=mock_invoke,
-        ):
-            result = cli_runner.invoke(cli, ["config", "test", tap.name])
-
-        assert result.exit_code == 1
-        assert "Plugin configuration is invalid" in str(result.exception)
-        assert "Plugin did not emit any output" in str(result.exception)
-        assert f"meltano config list {tap.name}" in str(result.exception)
 
 
 class TestCliConfigUnset:
