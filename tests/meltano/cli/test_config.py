@@ -649,10 +649,7 @@ class TestCliConfigSet:
         assert result.exit_code == 1
         assert "Plugin configuration is invalid" in str(result.exception)
         assert "Plugin did not emit any output" in str(result.exception)
-        assert (
-            "Hint: Check plugin settings in meltano.yml or environment variables."
-            in str(result.exception)
-        )
+        assert f"meltano config list {tap.name}" in str(result.exception)
 
 
 class TestCliConfigUnset:
