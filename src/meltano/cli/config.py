@@ -730,6 +730,7 @@ async def test(
                 (
                     "Plugin configuration is invalid",
                     detail or "Plugin did not emit any output",
+                    f"Run 'meltano config list {plugin_name}' to review the plugin settings.",  # noqa: E501
                 ),
             ),
         )
