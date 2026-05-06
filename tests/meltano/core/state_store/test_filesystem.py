@@ -471,7 +471,11 @@ class TestS3StateStoreManager:
         with patch("boto3.Session.client") as mock_client:
             _ = subject.client
             _ = subject.client
-            mock_client.assert_called_once_with("s3", endpoint_url=subject.endpoint_url)
+            mock_client.assert_called_once()
+            args, kwargs = mock_client.call_args
+            assert args == ("s3",)
+            assert kwargs["endpoint_url"] == subject.endpoint_url
+            assert "meltano" in kwargs["config"].user_agent_extra
 
     def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
