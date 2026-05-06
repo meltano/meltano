@@ -92,20 +92,14 @@ class S3StateStoreManager(CloudStateStoreManager):
             InvalidStateBackendConfigurationException: when configured AWS
                 settings are invalid.
         """
-        extra_kwargs: dict[str, t.Any] = {
-            "config": Config(user_agent_extra="meltano"),
-        }
+        config = Config(user_agent_extra="meltano")
 
         if self.aws_secret_access_key and self.aws_access_key_id:
             session = boto3.Session(
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key,
             )
-            return session.client(
-                "s3",
-                endpoint_url=self.endpoint_url,
-                **extra_kwargs,
-            )
+            return session.client("s3", endpoint_url=self.endpoint_url, config=config)
         if self.aws_secret_access_key:
             raise InvalidStateBackendConfigurationException(  # noqa: TRY003
                 "AWS secret access key configured, but not AWS access key ID.",  # noqa: EM101
@@ -115,7 +109,7 @@ class S3StateStoreManager(CloudStateStoreManager):
                 "AWS access key ID configured, but no AWS secret access key.",  # noqa: EM101
             )
         session = boto3.Session()
-        return session.client("s3", **extra_kwargs)
+        return session.client("s3", config=config)
 
     def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
