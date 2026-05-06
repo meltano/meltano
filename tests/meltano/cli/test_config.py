@@ -329,7 +329,8 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_list_meltano_no_required(self, cli_runner) -> None:
-        result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+        # With --all, optional settings at defaults are shown.
+        result = cli_runner.invoke(cli, ["config", "list", "--all", "meltano"])
         assert_cli_runner(result)
 
         assert "(required)" not in result.stdout
@@ -347,7 +348,9 @@ class TestCliConfig:
         original = plugin.settings_group_validation
         plugin.settings_group_validation = [["test", "secure"]]
         try:
-            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            # Use --all so the (now default-hidden) optional settings still show
+            # this test exercises rendering of single-group required settings.
+            result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
             assert_cli_runner(result)
         finally:
             plugin.settings_group_validation = original
@@ -363,7 +366,8 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_list_sorted_sections(self, cli_runner, tap) -> None:
-        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        # --all is needed to render the Optional section with default values.
+        result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
         assert_cli_runner(result)
 
         assert "Required:" in result.stdout
@@ -396,7 +400,7 @@ class TestCliConfig:
         with _set_setting(
             pss, "start_date", "2023-01-01", SettingValueStore.DOTENV, session
         ):
-            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
             assert_cli_runner(result)
 
             assert "Configured:" in result.stdout
@@ -412,8 +416,10 @@ class TestCliConfig:
     def test_config_list_extras_sorted(
         self, cli_runner, tap, session, plugin_settings_service_factory
     ) -> None:
-        # Without custom extras: sorted, no section headers
-        result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
+        # `--all --extras`: full extras listing remains un-headered & sorted.
+        result = cli_runner.invoke(
+            cli, ["config", "list", "--all", "--extras", tap.name]
+        )
         assert_cli_runner(result)
 
         assert "Setting groups" not in result.stdout
@@ -435,12 +441,14 @@ class TestCliConfig:
         assert setting_names == sorted(setting_names)
         assert len(setting_names) > 0
 
-        # With custom extra: Custom: header appears
+        # With custom extra and `--all`: Custom: header appears.
         pss = plugin_settings_service_factory(tap)
         with _set_setting(
             pss, "_my_custom_extra", "v", SettingValueStore.MELTANO_YML, session
         ):
-            result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
+            result = cli_runner.invoke(
+                cli, ["config", "list", "--all", "--extras", tap.name]
+            )
             assert_cli_runner(result)
 
             assert "Custom:" in result.stdout
@@ -504,6 +512,77 @@ class TestCliConfig:
 
         assert "Required:" in result.stdout
         assert "Optional:" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_default_hides_optional(self, cli_runner, tap) -> None:
+        """Default `meltano config list` hides optional settings at defaults."""
+        result = cli_runner.invoke(cli, ["config", "list", tap.name])
+        assert_cli_runner(result)
+
+        # Required settings still shown
+        assert "Required:" in result.stdout
+        # Optional section is hidden
+        assert "Optional:" not in result.stdout
+        # The hidden-count summary is shown, mentioning --all
+        assert "hidden" in result.stdout
+        assert "--all" in result.stdout
+        # `start_date` is an optional non-required setting at default — hidden
+        assert "\nstart_date" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_all_shows_optional(self, cli_runner, tap) -> None:
+        """`--all` restores the full listing including Optional."""
+        result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
+        assert_cli_runner(result)
+
+        assert "Required:" in result.stdout
+        assert "Optional:" in result.stdout
+        # No hidden-count summary when --all is used
+        assert "hidden. Use --all" not in result.stdout
+        assert "\nstart_date" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_substring(self, cli_runner, tap) -> None:
+        """`--filter` performs case-insensitive substring matching on names."""
+        result = cli_runner.invoke(
+            cli, ["config", "list", "--filter", "AUTH", tap.name]
+        )
+        assert_cli_runner(result)
+
+        # Auth-prefixed required settings appear (case-insensitive)
+        assert "auth.username" in result.stdout
+        assert "auth.password" in result.stdout
+        # Other settings do not
+        assert "\nport " not in result.stdout
+        assert "\nstart_date" not in result.stdout
+        # Validation-groups summary is suppressed when filtering
+        assert "Setting groups" not in result.stdout
+        # Hidden-count summary is suppressed when filtering
+        assert "hidden. Use --all" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_searches_all(self, cli_runner, tap) -> None:
+        """`--filter` finds optional-at-default settings that the default hides."""
+        # `start_date` is at default (not in `Configured:`). Without --filter
+        # and without --all, it would be hidden.
+        result = cli_runner.invoke(
+            cli, ["config", "list", "--filter", "start_date", tap.name]
+        )
+        assert_cli_runner(result)
+
+        assert "start_date" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_no_match(self, cli_runner, tap) -> None:
+        """`--filter` with no matches prints a clear notice."""
+        result = cli_runner.invoke(
+            cli,
+            ["config", "list", "--filter", "definitely-does-not-exist", tap.name],
+        )
+        assert_cli_runner(result)
+
+        assert "No settings match" in result.stdout
+        assert "definitely-does-not-exist" in result.stdout
 
 
 class TestRequiredLabel:

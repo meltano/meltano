@@ -417,13 +417,32 @@ def print_config(
     cls=PartialInstrumentedCmd,
     name="list",
     short_help=(
-        "List all settings for the specified plugin with their names, "
+        "List settings for the specified plugin with their names, "
         "environment variables, and current values."
     ),
 )
 @click.argument("plugin_name")
 @click.option("--plugin-type", type=PluginTypeArg())
 @click.option("--extras", is_flag=True, help="List only plugin extras.")
+@click.option(
+    "--all",
+    "show_all",
+    is_flag=True,
+    help=(
+        "Show all settings, including optional settings at their default values. "
+        "By default only required, configured, and custom settings are shown."
+    ),
+)
+@click.option(
+    "--filter",
+    "filter_pattern",
+    metavar="SUBSTRING",
+    help=(
+        "Show only settings whose name contains the given substring "
+        "(case-insensitive). Searches all settings, including those at default "
+        "values."
+    ),
+)
 @pass_project(migrate=True)
 @click.pass_context
 def list_settings(
@@ -433,8 +452,10 @@ def list_settings(
     plugin_name: str,
     plugin_type: PluginType | None,
     extras: bool,
+    show_all: bool,
+    filter_pattern: str | None,
 ) -> None:
-    """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
+    """List settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
 
@@ -470,12 +491,15 @@ def list_settings(
         for setting_name in group:
             setting_groups[setting_name].append(i)
     num_groups = len(validation_groups)
-    if not extras and num_groups > 1:
+    # The validation groups summary orients users on what `Required:` means.
+    # Skip it when filtering, since the filter gives a narrow view that the
+    # full summary would distract from.
+    if filter_pattern is None and not extras and num_groups > 1:
         click.echo("Setting groups (one of the following combinations is required):")
         for i, group in enumerate(validation_groups, 1):
             click.echo(f"  Group {i}: {', '.join(sorted(group))}")
         click.echo()
-    elif not extras and num_groups == 1:
+    elif filter_pattern is None and not extras and num_groups == 1:
         click.echo(f"Required settings: {', '.join(sorted(validation_groups[0]))}")
         click.echo()
 
@@ -493,6 +517,8 @@ def list_settings(
         if extras:
             if setting_def.is_custom:
                 _custom.append((name, config_metadata))
+            elif source is not SettingValueStore.DEFAULT:
+                _configured.append((name, config_metadata))
             else:
                 _optional.append((name, config_metadata))
         elif setting_def.is_extra:
@@ -512,12 +538,40 @@ def list_settings(
     for bucket in (_required, _configured, _optional, _custom, _custom_extras):
         bucket.sort(key=lambda item: item[0])
 
+    # Apply --filter (case-insensitive name substring match across all buckets).
+    # When filtering, the user is searching, so optional-at-defaults are not
+    # hidden — the filter result IS the narrowed view.
+    hidden_optional_count = 0
+    if filter_pattern is not None:
+        needle = filter_pattern.lower()
+
+        def _matches(item: tuple[str, dict[str, t.Any]]) -> bool:
+            return needle in item[0].lower()
+
+        _required = [item for item in _required if _matches(item)]
+        _configured = [item for item in _configured if _matches(item)]
+        _optional = [item for item in _optional if _matches(item)]
+        _custom = [item for item in _custom if _matches(item)]
+        _custom_extras = [item for item in _custom_extras if _matches(item)]
+    elif not show_all:
+        # Default behavior: hide optional settings at default values, surface
+        # the count so users know the option exists.
+        hidden_optional_count = len(_optional)
+        _optional = []
+
     # Build ordered section list
     if extras:
         _section_defs: list[tuple[str | None, _SettingBucket]] = [
-            (None, _optional),
+            ("Configured:", _configured),
+            ("Optional:", _optional),
             ("Custom:", _custom),
         ]
+        # Preserve the historical un-headered listing when there's nothing to
+        # disambiguate (no Configured section, no Custom section).
+        if not _configured and not _custom:
+            _section_defs = [(None, _optional)]
+        elif not _configured:
+            _section_defs = [(None, _optional), ("Custom:", _custom)]
     else:
         _section_defs = [
             ("Required:", _required),
@@ -545,6 +599,18 @@ def list_settings(
                 num_groups=num_groups,
                 safe=safe,
             )
+
+    if filter_pattern is not None and not sections:
+        click.echo(f"No settings match filter {filter_pattern!r}.")
+
+    if hidden_optional_count > 0:
+        if sections:
+            click.echo()
+        plural = "s" if hidden_optional_count != 1 else ""
+        click.echo(
+            f"{hidden_optional_count} optional setting{plural} at default values "
+            f"hidden. Use --all to show all settings."
+        )
 
     if docs_url := settings.docs_url:
         click.echo()
