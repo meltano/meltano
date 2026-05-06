@@ -430,18 +430,15 @@ def print_config(
     is_flag=True,
     help=(
         "Show all settings, including optional settings at their default values. "
-        "By default only required, configured, and custom settings are shown."
+        "By default only required, configured, and custom settings are shown. "
+        "Has no effect when combined with --filter."
     ),
 )
 @click.option(
     "--filter",
     "filter_pattern",
     metavar="SUBSTRING",
-    help=(
-        "Show only settings whose name contains the given substring "
-        "(case-insensitive). Searches all settings, including those at default "
-        "values."
-    ),
+    help="Show only settings whose name contains SUBSTRING (case-insensitive).",
 )
 @pass_project(migrate=True)
 @click.pass_context
@@ -482,6 +479,11 @@ def list_settings(
         extras=load_extras,
         redacted=safe,
     )
+
+    # An empty `--filter` value would match every setting (`"" in name`), which
+    # silently turns the flag into a no-op. Treat it as not set instead.
+    if filter_pattern is not None and not filter_pattern.strip():
+        filter_pattern = None
 
     validation_groups: list[list[str]] = (
         plugin.settings_group_validation if plugin else []
@@ -535,29 +537,23 @@ def list_settings(
         else:
             _optional.append((name, config_metadata))
 
-    for bucket in (_required, _configured, _optional, _custom, _custom_extras):
+    buckets = [_required, _configured, _optional, _custom, _custom_extras]
+    for bucket in buckets:
         bucket.sort(key=lambda item: item[0])
 
-    # Apply --filter (case-insensitive name substring match across all buckets).
-    # When filtering, the user is searching, so optional-at-defaults are not
-    # hidden — the filter result IS the narrowed view.
-    hidden_optional_count = 0
+    # When filtering, the user is searching — optional-at-defaults are not
+    # hidden, the filter result IS the narrowed view.
     if filter_pattern is not None:
         needle = filter_pattern.lower()
-
-        def _matches(item: tuple[str, dict[str, t.Any]]) -> bool:
-            return needle in item[0].lower()
-
-        _required = [item for item in _required if _matches(item)]
-        _configured = [item for item in _configured if _matches(item)]
-        _optional = [item for item in _optional if _matches(item)]
-        _custom = [item for item in _custom if _matches(item)]
-        _custom_extras = [item for item in _custom_extras if _matches(item)]
+        _required, _configured, _optional, _custom, _custom_extras = (
+            [item for item in bucket if needle in item[0].lower()] for bucket in buckets
+        )
+        hidden_optional_count = 0
     elif not show_all:
-        # Default behavior: hide optional settings at default values, surface
-        # the count so users know the option exists.
         hidden_optional_count = len(_optional)
         _optional = []
+    else:
+        hidden_optional_count = 0
 
     # Build ordered section list
     if extras:
@@ -566,12 +562,11 @@ def list_settings(
             ("Optional:", _optional),
             ("Custom:", _custom),
         ]
-        # Preserve the historical un-headered listing when there's nothing to
-        # disambiguate (no Configured section, no Custom section).
-        if not _configured and not _custom:
-            _section_defs = [(None, _optional)]
-        elif not _configured:
-            _section_defs = [(None, _optional), ("Custom:", _custom)]
+        # Preserve the historical un-headered listing when there's only an
+        # Optional bucket — adding a `Optional:` header in that case would be a
+        # gratuitous output change for `--all --extras` callers.
+        if not _configured:
+            _section_defs[1] = (None, _optional)
     else:
         _section_defs = [
             ("Required:", _required),
@@ -601,15 +596,15 @@ def list_settings(
             )
 
     if filter_pattern is not None and not sections:
-        click.echo(f"No settings match filter {filter_pattern!r}.")
+        click.echo(f"No settings match {filter_pattern!r}.")
 
     if hidden_optional_count > 0:
         if sections:
             click.echo()
         plural = "s" if hidden_optional_count != 1 else ""
         click.echo(
-            f"{hidden_optional_count} optional setting{plural} at default values "
-            f"hidden. Use --all to show all settings."
+            f"{hidden_optional_count} optional setting{plural} at defaults "
+            f"are hidden. Use --all to show all settings."
         )
 
     if docs_url := settings.docs_url:

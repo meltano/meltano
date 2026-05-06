@@ -523,11 +523,59 @@ class TestCliConfig:
         assert "Required:" in result.stdout
         # Optional section is hidden
         assert "Optional:" not in result.stdout
-        # The hidden-count summary is shown, mentioning --all
-        assert "hidden" in result.stdout
-        assert "--all" in result.stdout
         # `start_date` is an optional non-required setting at default — hidden
         assert "\nstart_date" not in result.stdout
+
+        # Hidden-count summary appears with the exact expected wording.
+        # Compute count by diffing against `--all`.
+        all_result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
+        assert_cli_runner(all_result)
+        all_lines = all_result.stdout.split("\n")
+        optional_idx = next(
+            i for i, line in enumerate(all_lines) if line == "Optional:"
+        )
+        remaining = all_lines[optional_idx + 1 :]
+        end_idx = remaining.index("") if "" in remaining else len(remaining)
+        expected_count = sum(
+            1 for line in remaining[:end_idx] if line and not line.startswith("\t")
+        )
+        assert (
+            f"{expected_count} optional settings at defaults are hidden. "
+            "Use --all to show all settings."
+        ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_hidden_count_singular(self, cli_runner, tap, project) -> None:
+        """Hidden-count summary uses singular form when exactly one is hidden."""
+        plugin = project.plugins.find_plugin(
+            tap.name, plugin_type=tap.type, configurable=True
+        )
+        # All settings except one go into the required group. Only one
+        # setting (`start_date`) remains optional and at its default value.
+        original = plugin.settings_group_validation
+        all_names = [
+            "test",
+            "secure",
+            "port",
+            "list",
+            "object",
+            "hidden",
+            "boolean",
+            "auth.username",
+            "auth.password",
+            "aliased",
+            "stacked_env_var",
+        ]
+        plugin.settings_group_validation = [all_names]
+        try:
+            result = cli_runner.invoke(cli, ["config", "list", tap.name])
+            assert_cli_runner(result)
+        finally:
+            plugin.settings_group_validation = original
+
+        assert (
+            "1 optional setting at defaults are hidden. Use --all to show all settings."
+        ) in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_all_shows_optional(self, cli_runner, tap) -> None:
@@ -538,8 +586,17 @@ class TestCliConfig:
         assert "Required:" in result.stdout
         assert "Optional:" in result.stdout
         # No hidden-count summary when --all is used
-        assert "hidden. Use --all" not in result.stdout
+        assert "are hidden. Use --all" not in result.stdout
         assert "\nstart_date" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_meltano_default_hides_all(self, cli_runner) -> None:
+        """Meltano itself has no required settings; default hides them all."""
+        result = cli_runner.invoke(cli, ["config", "list", "meltano"])
+        assert_cli_runner(result)
+
+        assert "Optional:" not in result.stdout
+        assert "are hidden. Use --all to show all settings." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_substring(self, cli_runner, tap) -> None:
@@ -552,13 +609,15 @@ class TestCliConfig:
         # Auth-prefixed required settings appear (case-insensitive)
         assert "auth.username" in result.stdout
         assert "auth.password" in result.stdout
+        # The `Required:` section header still renders, scoping the matches.
+        assert "Required:" in result.stdout
         # Other settings do not
         assert "\nport " not in result.stdout
         assert "\nstart_date" not in result.stdout
         # Validation-groups summary is suppressed when filtering
         assert "Setting groups" not in result.stdout
         # Hidden-count summary is suppressed when filtering
-        assert "hidden. Use --all" not in result.stdout
+        assert "are hidden. Use --all" not in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_searches_all(self, cli_runner, tap) -> None:
@@ -571,6 +630,74 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert "start_date" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_only_configured(
+        self, cli_runner, tap, session, plugin_settings_service_factory
+    ) -> None:
+        """`--filter` matching a configured setting renders Configured: only."""
+        pss = plugin_settings_service_factory(tap)
+        with _set_setting(
+            pss, "start_date", "2023-01-01", SettingValueStore.DOTENV, session
+        ):
+            result = cli_runner.invoke(
+                cli, ["config", "list", "--filter", "start_date", tap.name]
+            )
+            assert_cli_runner(result)
+
+            assert "Configured:" in result.stdout
+            assert "start_date" in result.stdout
+            assert "Required:" not in result.stdout
+            assert "Optional:" not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_literal_substring(self, cli_runner, tap) -> None:
+        """`--filter` treats its pattern as a literal substring (no regex)."""
+        # `auth.` (with the literal dot) should match both auth.username and
+        # auth.password but nothing else.
+        result = cli_runner.invoke(
+            cli, ["config", "list", "--filter", "auth.", tap.name]
+        )
+        assert_cli_runner(result)
+
+        assert "auth.username" in result.stdout
+        assert "auth.password" in result.stdout
+        assert "\nport " not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_empty_string_treated_as_unset(
+        self, cli_runner, tap
+    ) -> None:
+        """`--filter ""` is treated as no filter (default subset behavior)."""
+        result = cli_runner.invoke(cli, ["config", "list", "--filter", "", tap.name])
+        assert_cli_runner(result)
+
+        # Default subset behavior: Optional hidden, hidden-count summary shown.
+        assert "Optional:" not in result.stdout
+        assert "are hidden. Use --all to show all settings." in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_with_extras(self, cli_runner, tap) -> None:
+        """`--filter` composes with `--extras`, narrowing the extras listing."""
+        result = cli_runner.invoke(
+            cli, ["config", "list", "--extras", "--filter", "_select", tap.name]
+        )
+        assert_cli_runner(result)
+
+        assert "_select" in result.stdout
+        # No regular (non-extra) settings should appear.
+        assert "\nport " not in result.stdout
+        assert "\ntest " not in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_extras_default_hides_optional(self, cli_runner, tap) -> None:
+        """`--extras` alone hides default-valued non-custom extras."""
+        result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
+        assert_cli_runner(result)
+
+        # `_select` is at default; without --all it should be hidden.
+        assert "_select" not in result.stdout
+        assert "are hidden. Use --all to show all settings." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_no_match(self, cli_runner, tap) -> None:
