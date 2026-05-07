@@ -12,6 +12,7 @@ import time_machine
 from meltano.core.logging.utils import (
     LEVELS,
     LogFormat,
+    SafeStreamHandler,
     capture_subprocess_output,
     default_config,
     parse_log_level,
@@ -197,3 +198,105 @@ def test_disabled_log_level():
     # When disabled, the numeric value should be used
     assert config["handlers"]["console"]["level"] == logging.CRITICAL + 1
     assert config["loggers"][""]["level"] == logging.CRITICAL + 1
+
+
+class TestSafeStreamHandler:
+    def test_normal_operation(self):
+        from io import StringIO
+
+        output = StringIO()
+        handler = SafeStreamHandler(output)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        record = logging.LogRecord(
+            "",
+            logging.INFO,
+            "",
+            0,
+            "Normal ASCII message",
+            (),
+            None,
+        )
+        handler.emit(record)
+        assert output.getvalue() == "Normal ASCII message\n"
+
+    def test_unicode_encode_error_falls_back_to_backslashreplace(self):
+        from unittest.mock import Mock
+
+        mock_stream = Mock()
+        mock_stream.encoding = "ascii"
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            None,
+        ]
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        record = logging.LogRecord(
+            "",
+            logging.INFO,
+            "",
+            0,
+            "Message with unicode: 中文",
+            (),
+            None,
+        )
+
+        handler.emit(record)
+
+        assert mock_stream.write.call_count == 2
+        second_write = mock_stream.write.call_args_list[1][0][0]
+        assert "\\u4e2d\\u6587" in second_write
+
+    @pytest.mark.parametrize("encoding", (None, "missing"))
+    def test_missing_or_none_encoding_defaults_to_utf8(self, encoding):
+        from unittest.mock import Mock
+
+        mock_stream = Mock()
+        if encoding == "missing":
+            del mock_stream.encoding
+        else:
+            mock_stream.encoding = None
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            None,
+        ]
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        record = logging.LogRecord(
+            "",
+            logging.INFO,
+            "",
+            0,
+            "Message with unicode: 中文",
+            (),
+            None,
+        )
+
+        handler.emit(record)
+
+        assert mock_stream.write.call_count == 2
+
+    def test_fallback_failure_calls_handle_error(self):
+        from unittest.mock import Mock
+
+        mock_stream = Mock()
+        mock_stream.encoding = "ascii"
+        mock_stream.write.side_effect = [
+            UnicodeEncodeError("ascii", "test 中文", 5, 6, "ordinal not in range(128)"),
+            OSError("disk full"),
+        ]
+        handler = SafeStreamHandler(mock_stream)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        handler.handleError = Mock()
+        record = logging.LogRecord(
+            "",
+            logging.INFO,
+            "",
+            0,
+            "Message with unicode: 中文",
+            (),
+            None,
+        )
+
+        handler.emit(record)
+
+        handler.handleError.assert_called_once_with(record)
