@@ -480,10 +480,12 @@ def list_settings(
         redacted=safe,
     )
 
-    # An empty `--filter` value would match every setting (`"" in name`), which
-    # silently turns the flag into a no-op. Treat it as not set instead.
-    if filter_pattern is not None and not filter_pattern.strip():
-        filter_pattern = None
+    # Normalize `--filter`: strip surrounding whitespace and treat empty/
+    # whitespace-only values as not set. An empty pattern would match every
+    # setting (`"" in name`), and a stray trailing space would silently fail
+    # to match (e.g. `--filter "ssl "` would not match `"ssl"`).
+    if filter_pattern is not None:
+        filter_pattern = filter_pattern.strip() or None
 
     validation_groups: list[list[str]] = (
         plugin.settings_group_validation if plugin else []
@@ -601,10 +603,9 @@ def list_settings(
     if hidden_optional_count > 0:
         if sections:
             click.echo()
-        plural = "s" if hidden_optional_count != 1 else ""
         click.echo(
-            f"{hidden_optional_count} optional setting{plural} at defaults "
-            f"are hidden. Use --all to show all settings."
+            f"Hiding {hidden_optional_count} optional settings with default "
+            f"values. Use --all to show all."
         )
 
     if docs_url := settings.docs_url:

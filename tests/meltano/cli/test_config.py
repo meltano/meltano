@@ -540,13 +540,13 @@ class TestCliConfig:
             1 for line in remaining[:end_idx] if line and not line.startswith("\t")
         )
         assert (
-            f"{expected_count} optional settings at defaults are hidden. "
-            "Use --all to show all settings."
+            f"Hiding {expected_count} optional settings with default values. "
+            "Use --all to show all."
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_hidden_count_singular(self, cli_runner, tap, project) -> None:
-        """Hidden-count summary uses singular form when exactly one is hidden."""
+    def test_config_list_hidden_count_one(self, cli_runner, tap, project) -> None:
+        """Hidden-count summary reports the count when exactly one is hidden."""
         plugin = project.plugins.find_plugin(
             tap.name, plugin_type=tap.type, configurable=True
         )
@@ -574,7 +574,8 @@ class TestCliConfig:
             plugin.settings_group_validation = original
 
         assert (
-            "1 optional setting at defaults are hidden. Use --all to show all settings."
+            "Hiding 1 optional settings with default values. "
+            "Use --all to show all."
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
@@ -586,7 +587,7 @@ class TestCliConfig:
         assert "Required:" in result.stdout
         assert "Optional:" in result.stdout
         # No hidden-count summary when --all is used
-        assert "are hidden. Use --all" not in result.stdout
+        assert "Use --all to show all" not in result.stdout
         assert "\nstart_date" in result.stdout
 
     @pytest.mark.usefixtures("project")
@@ -596,7 +597,7 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert "Optional:" not in result.stdout
-        assert "are hidden. Use --all to show all settings." in result.stdout
+        assert "Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_substring(self, cli_runner, tap) -> None:
@@ -617,7 +618,7 @@ class TestCliConfig:
         # Validation-groups summary is suppressed when filtering
         assert "Setting groups" not in result.stdout
         # Hidden-count summary is suppressed when filtering
-        assert "are hidden. Use --all" not in result.stdout
+        assert "Use --all to show all" not in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_searches_all(self, cli_runner, tap) -> None:
@@ -674,7 +675,7 @@ class TestCliConfig:
 
         # Default subset behavior: Optional hidden, hidden-count summary shown.
         assert "Optional:" not in result.stdout
-        assert "are hidden. Use --all to show all settings." in result.stdout
+        assert "Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_with_extras(self, cli_runner, tap) -> None:
@@ -697,7 +698,7 @@ class TestCliConfig:
 
         # `_select` is at default; without --all it should be hidden.
         assert "_select" not in result.stdout
-        assert "are hidden. Use --all to show all settings." in result.stdout
+        assert "Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_no_match(self, cli_runner, tap) -> None:
