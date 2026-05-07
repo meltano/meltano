@@ -203,6 +203,7 @@ Thanks go to these wonderful people ([emoji key](https://allcontributors.org/emo
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/awohletz-pm"><img src="https://avatars.githubusercontent.com/u/205805864?v=4?s=100" width="100px;" alt="Alex Wohletz"/><br /><sub><b>Alex Wohletz</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=awohletz-pm" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://avinashyerra.netlify.app/"><img src="https://avatars.githubusercontent.com/u/101195675?v=4?s=100" width="100px;" alt="Yerra SRJ Avinash"/><br /><sub><b>Yerra SRJ Avinash</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=AvinashYerra" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://goanpeca.co"><img src="https://avatars.githubusercontent.com/u/3627835?v=4?s=100" width="100px;" alt="Gonzalo Peña-Castellanos"/><br /><sub><b>Gonzalo Peña-Castellanos</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=goanpeca" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/toroleapinc"><img src="https://avatars.githubusercontent.com/u/88481784?v=4?s=100" width="100px;" alt="edvatar"/><br /><sub><b>edvatar</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=toroleapinc" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
