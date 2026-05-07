@@ -14,7 +14,7 @@ for Meltano projects running in ephemeral environments or in circumstances where
 
 - [System Database](#default-system-database)
 - [Local Filesystem](#local-file-system)
-- [Amazon AWS S3](#aws-s3)
+- [Amazon AWS S3](#aws-s3) (and S3-compatible providers)
 - [Azure Blob Storage](#azure-blob-storage)
 - [Google Cloud Storage](#google-cloud-storage)
 - [Snowflake (External)](#snowflake-external)
@@ -35,7 +35,7 @@ No extra work is needed to use the default system database or local filesystem a
 
 To use a cloud storage backend, install Meltano using one of the following [extras](https://peps.python.org/pep-0508/#extras):
 
-- `meltano[s3]` to use the AWS S3 state backend.
+- `meltano[s3]` to use the AWS S3 state backend (also covers any S3-compatible provider, e.g. Backblaze B2).
 - `meltano[azure]` to use the Azure Blob Storage state backend.
 - `meltano[gcs]` to use the Google Cloud Storage state backend.
 
@@ -148,6 +148,26 @@ The `AWS_IGNORE_CONFIGURED_ENDPOINT_URLS` environment variable won't have any ef
 :::
 
 For reference, read the [AWS documentation on service-specific endpoints](https://docs.aws.amazon.com/sdkref/latest/guide/feature-ss-endpoints.html).
+
+#### Using S3-compatible providers
+
+Meltano's `s3` state backend works against any S3-compatible storage service that boto3 can talk to. In addition to the required `state_backend.uri` (set to `s3://<bucket>/<prefix>`), configure:
+
+- `state_backend.s3.endpoint_url`: the S3-compatible endpoint URL for your provider and region.
+- The provider's S3 access key ID and secret access key, set on `state_backend.s3.aws_access_key_id` / `state_backend.s3.aws_secret_access_key` (or the corresponding `AWS_*` environment variables).
+
+##### Backblaze B2 example
+
+[Backblaze B2](https://www.backblaze.com/cloud-storage) exposes an [S3-compatible API](https://www.backblaze.com/docs/cloud-storage-s3-compatible-api). To store state in a B2 bucket, create a bucket-scoped [Application Key](https://www.backblaze.com/docs/cloud-storage-application-keys) and use the resulting `keyID` / `applicationKey` as the S3 access key ID and secret access key. The endpoint URL follows the pattern `https://s3.<region>.backblazeb2.com` (visible on the Bucket detail page in the Backblaze console).
+
+```yaml
+state_backend:
+  uri: s3://my-b2-bucket/state
+  s3:
+    aws_access_key_id: <B2 Application Key ID>
+    aws_secret_access_key: <B2 Application Key>
+    endpoint_url: https://s3.<region>.backblazeb2.com
+```
 
 ### Google Cloud Storage
 

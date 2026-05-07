@@ -110,6 +110,7 @@ def compile_command(
                     indent=indent if indent > 0 else None,
                     sort_keys=True,
                 )
+                manifest_file.write("\n")
         except OSError as ex:
             raise CliError(  # noqa: TRY003
                 f"Unable to write Meltano manifest {str(path)!r}: {ex}",  # noqa: EM102
