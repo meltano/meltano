@@ -574,8 +574,7 @@ class TestCliConfig:
             plugin.settings_group_validation = original
 
         assert (
-            "Hiding 1 optional settings with default values. "
-            "Use --all to show all."
+            "Hiding 1 optional settings with default values. Use --all to show all."
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
