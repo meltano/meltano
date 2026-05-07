@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import typing as t
 from pathlib import Path
 
@@ -111,7 +110,7 @@ def compile_command(
                     indent=indent if indent > 0 else None,
                     sort_keys=True,
                 )
-                manifest_file.write(os.linesep)
+                manifest_file.write("\n")
         except OSError as ex:
             raise CliError(  # noqa: TRY003
                 f"Unable to write Meltano manifest {str(path)!r}: {ex}",  # noqa: EM102
