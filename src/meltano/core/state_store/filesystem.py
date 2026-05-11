@@ -36,6 +36,8 @@ if t.TYPE_CHECKING:
 
 logger = structlog.stdlib.get_logger(__name__)
 
+_STATE_FILENAME = "state.json"
+
 
 class InvalidStateBackendConfigurationException(Exception):
     """State backend configuration is invalid."""
@@ -195,7 +197,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Returns:
             the path to the file/blob storing complete state for the given state_id.
         """
-        return self.get_path(state_id, filename="state.json")
+        return self.get_path(state_id, filename=_STATE_FILENAME)
 
     def get_state_dir(self, state_id: str) -> str:
         """Get the path to the state directory for the given state_id.
@@ -363,7 +365,9 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
 class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
-    label: str = "Local Filesystem"
+    @property
+    def label(self) -> str:
+        return "Local Filesystem"  # pragma: no cover
 
     @override
     def __init__(self, **kwargs: t.Any) -> None:
@@ -389,8 +393,8 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return isinstance(err, FileNotFoundError)
 
-    @override
     @property
+    @override
     def client(self) -> None:
         """Get a client for performing fs operations.
 
@@ -399,8 +403,8 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         return None
 
-    @override
     @property
+    @override
     def state_dir(self) -> str:
         """Get the path that state should be stored at.
 
@@ -447,9 +451,9 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
             for state_file in glob.glob(
                 os.path.join(
                     self.state_dir,
-                    os.path.join(pattern, "state.json")
+                    os.path.join(pattern, _STATE_FILENAME)
                     if pattern
-                    else os.path.join("*", "state.json"),
+                    else os.path.join("*", _STATE_FILENAME),
                 ),
             )
         ]
@@ -486,8 +490,11 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
 class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
     """State backend for local Windows filesystem."""
 
-    label: str = "Local Windows Filesystem"
     delimiter = "\\"
+
+    @property
+    def label(self) -> str:
+        return "Local Windows Filesystem"  # pragma: no cover
 
     @override
     def __init__(self, **kwargs: t.Any) -> None:
@@ -534,7 +541,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
         for state_file in glob.glob(
             os.path.join(
                 self.state_dir,
-                os.path.join("*", "state.json"),
+                os.path.join("*", _STATE_FILENAME),
             ),
         ):
             state_id = b64decode(
@@ -566,8 +573,8 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         super().__init__(**kwargs)
         self.prefix = prefix or self.parsed.path
 
-    @override
     @property
+    @override
     def state_dir(self) -> str:
         """Get the prefix that state should be stored at.
 
@@ -626,7 +633,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         )
         for filepath in self.list_all_files(with_prefix=False):
             parts = filepath.split(self.delimiter)
-            if parts[-1] == "state.json" and filepath.count(stripped_prefix) > 1:
+            if parts[-1] == _STATE_FILENAME and filepath.count(stripped_prefix) > 1:
                 new_path = filepath.replace(duplicated_substr, self.prefix)
                 new_path = new_path.replace(
                     self.delimiter * 2,
@@ -649,16 +656,15 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             List of state_ids
         """
-        if pattern:
-            pattern_re = re.compile(pattern.replace("*", ".*"))
+        pattern_re = re.compile(pattern.replace("*", ".*")) if pattern else None
         state_ids = set()
         for filepath in self.list_all_files():
             if "/" not in filepath:
                 continue
 
             (state_id, filename) = filepath.split("/")[-2:]
-            if filename == "state.json" and (
-                (not pattern) or pattern_re.match(state_id)
+            if filename == _STATE_FILENAME and (
+                (not pattern_re) or pattern_re.match(state_id)
             ):
                 state_ids.add(state_id)
         return list(state_ids)
