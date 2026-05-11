@@ -116,11 +116,14 @@ class TestMeltanoHubService:
         with pytest.raises(
             HubConnectionError,
             match=r"Internal Server Error",
-        ):
+        ) as exc_info:
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,
                 "this-returns-500",
             )
+
+        assert isinstance(exc_info.value, HubConnectionError)
+        assert str(exc_info.value) == "Internal Server Error."
 
     def test_request_headers(self, project: Project) -> None:
         with mock.patch("click.get_current_context") as get_context:
