@@ -266,7 +266,7 @@ class MeltanoHubService(PluginRepository):
         logger.info("Fetching plugin definition from Meltano Hub", url=url)
         response = self._get(url)
 
-        if HTTPStatus.INTERNAL_SERVER_ERROR <= response.status_code < 600:
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
             raise HubConnectionError(response.reason)
 
         return PluginDefinition(
