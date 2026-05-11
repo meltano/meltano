@@ -13,6 +13,7 @@ from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
+from meltano.core._compat import override
 from meltano.core.hub.client import (
     HubConnectionError,
     HubPluginTypeNotFoundError,
@@ -151,9 +152,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
+            @override
             def send(
                 self,
                 request,  # noqa: ARG002
+                *args,  # noqa: ARG002
                 **kwargs,
             ):
                 nonlocal send_kwargs
@@ -176,9 +179,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
+            @override
             def send(
                 self,
                 request,  # noqa: ARG002
+                *args,  # noqa: ARG002
                 **kwargs,
             ):
                 nonlocal send_kwargs
