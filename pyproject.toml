@@ -151,7 +151,6 @@ typing = [
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
   "types-pyyaml>=6.0.12.20240917,<7",
-  "types-requests>=2.31.0,<3",
 ]
 
 [tool.hatch.build.targets.sdist]

@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import sys
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if sys.version_info >= (3, 13):
     from warnings import deprecated
 else:
@@ -11,6 +16,7 @@ else:
 
 __all__ = [
     "deprecated",
+    "override",
 ]
 
 
