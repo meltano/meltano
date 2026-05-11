@@ -1,16 +1,23 @@
 from __future__ import annotations
 
 import typing as t
+from http import HTTPStatus
 from unittest import mock
 
 import click
 import pytest
+import requests
+import requests.exceptions
 from requests import Response
 from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
-from meltano.core.hub.client import HubConnectionError, HubPluginVariantNotFoundError
+from meltano.core.hub.client import (
+    HubConnectionError,
+    HubPluginTypeNotFoundError,
+    HubPluginVariantNotFoundError,
+)
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 
@@ -189,3 +196,40 @@ class TestMeltanoHubService:
         monkeypatch.setenv("HTTPS_PROXY", "https://www.example.com:3128/")
         hub._get(mock_url)
         assert send_kwargs["proxies"] == {"https": "https://www.example.com:3128/"}
+
+    def test_connection_error(self, project: Project) -> None:
+        with (
+            mock.patch.object(
+                project.hub_service.session,
+                "send",
+                side_effect=requests.exceptions.ConnectionError,
+            ),
+            pytest.raises(HubConnectionError) as exc_info,
+        ):
+            project.hub_service._get(project.hub_service.hub_api_url)
+
+        assert str(exc_info.value) == "Could not connect to Meltano Hub."
+        assert isinstance(exc_info.value.__cause__, requests.exceptions.ConnectionError)
+
+    def test_plugin_type_not_found_error(self, project: Project) -> None:
+        mock_response = Response()
+        mock_response.status_code = HTTPStatus.NOT_FOUND
+
+        with (
+            mock.patch.object(project.hub_service, "_get", return_value=mock_response),
+            pytest.raises(HubPluginTypeNotFoundError) as exc_info,
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+        assert "is not supported in Meltano Hub" in str(exc_info.value)
+
+    def test_server_error_on_index(self, project: Project) -> None:
+        mock_response = Response()
+        mock_response.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+        mock_response.reason = "Internal Server Error"
+
+        with (
+            mock.patch.object(project.hub_service, "_get", return_value=mock_response),
+            pytest.raises(HubConnectionError, match="Internal Server Error"),
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
