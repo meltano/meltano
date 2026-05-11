@@ -117,7 +117,13 @@ def pytest_meltano(session: nox.Session) -> None:
     elif backend_db == "postgresql_psycopg2":
         extras.append("psycopg2")
 
-    _uv_sync(session, "--group=testing", *(f"--extra={extra}" for extra in extras))
+    sync_args = ["--group=testing"]
+
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        sync_args.append("--group=ci")
+
+    sync_args.extend(f"--extra={extra}" for extra in extras)
+    _uv_sync(session, *sync_args)
     _run_pytest(session)
 
 
