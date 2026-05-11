@@ -254,7 +254,7 @@ class Manifest:
             for k, v in env.items()
         }
 
-    def env_aware_merge_mappings(
+    def env_aware_merge_mappings(  # noqa: RET503
         self,
         data: MutableMapping[str, t.Any],
         key: str,
@@ -268,10 +268,12 @@ class Manifest:
             key: The key for the dictionary being merged into.
             value: The value being merged into the dictionary.
             _: Merge strategies - unused argument.
+
+        Returns:
+            `NotImplemented` if the key is not "env"; `None` otherwise.
         """
         if key != "env":
-            return
-
+            return NotImplemented
         data[key] = self.sanitize_env_vars(
             {
                 **expand_env_vars(
