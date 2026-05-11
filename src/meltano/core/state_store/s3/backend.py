@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from functools import cached_property
 
@@ -12,6 +13,11 @@ from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
 )
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
@@ -53,6 +59,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         self.endpoint_url = endpoint_url
 
     @staticmethod
+    @override
     def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
@@ -67,6 +74,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         )
 
     @property
+    @override
     def extra_transport_params(self) -> dict[str, t.Any]:
         """Extra transport params for ``smart_open.open``.
 
@@ -82,6 +90,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         }
 
     @cached_property
+    @override
     def client(self) -> S3Client:
         """Get an authenticated boto3.Client.
 
@@ -111,6 +120,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         session = boto3.Session()
         return session.client("s3", config=config)
 
+    @override
     def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
