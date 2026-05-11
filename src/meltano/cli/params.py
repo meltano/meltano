@@ -206,4 +206,7 @@ class PluginTypeArg(click.Choice):
         ctx: click.Context | None,
     ) -> PluginType:
         """Convert the value to a PluginType."""
-        return PluginType.from_cli_argument(value)
+        try:
+            return PluginType.from_cli_argument(value)
+        except ValueError as exc:
+            self.fail(str(exc), param, ctx)
