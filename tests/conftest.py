@@ -185,8 +185,7 @@ class MockAdapter(BaseAdapter):
         response.request = request
         response.url = request.url
 
-        response_500 = self.RETURN_500.get(endpoint)
-        if response_500:
+        if response_500 := self.RETURN_500.get(endpoint):
             response.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
             response.reason = "Internal Server Error"
             response._content = json.dumps(response_500).encode()

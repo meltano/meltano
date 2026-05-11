@@ -12,6 +12,7 @@ from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry
 
+from meltano.core.error import MeltanoError
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -25,7 +26,7 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-class HubPluginTypeNotFoundError(Exception):
+class HubPluginTypeNotFoundError(MeltanoError):
     """Raised when a Hub plugin type is not found."""
 
     def __init__(self, plugin_type: PluginType):
@@ -35,33 +36,25 @@ class HubPluginTypeNotFoundError(Exception):
             plugin_type: The type of the plugin.
         """
         self.plugin_type = plugin_type
-
-    def __str__(self) -> str:
-        """Return a string representation of the error.
-
-        Returns:
-            The string representation of the error.
-        """
-        return (
+        super().__init__(
             f"{self.plugin_type.descriptor.capitalize()} is not supported in "
             f"Meltano Hub. Available plugin types: {PluginType.plurals()}"
         )
 
 
-class HubConnectionError(Exception):
+class HubConnectionError(MeltanoError):
     """Raised when a Hub connection error occurs."""
 
-    def __init__(self, reason: str):
+    def __init__(self, reason: str | None = None):
         """Create a new HubConnectionError.
 
         Args:
             reason: The reason for the error.
         """
-        message = f"Could not connect to Meltano Hub. {reason}"
-        super().__init__(message)
+        super().__init__(reason or "Could not connect to Meltano Hub")
 
 
-class HubPluginVariantNotFoundError(Exception):
+class HubPluginVariantNotFoundError(MeltanoError):
     """Raised when a Hub plugin variant is not found."""
 
     def __init__(
@@ -80,14 +73,7 @@ class HubPluginVariantNotFoundError(Exception):
         self.plugin_type = plugin_type
         self.plugin = plugin
         self.variant_name = variant_name
-
-    def __str__(self) -> str:
-        """Return a string representation of the error.
-
-        Returns:
-            The string representation of the error.
-        """
-        return (
+        super().__init__(
             f"{self.plugin_type.descriptor.capitalize()} '{self.plugin.name}' "
             f"variant '{self.variant_name}' is not known to Meltano. "
             f"Variants: {self.plugin.variant_labels}"
@@ -204,7 +190,7 @@ class MeltanoHubService(PluginRepository):
         """
         request = requests.Request(method, url)
         if click_context := click.get_current_context(silent=True):
-            request.headers["X-Meltano-Command"] = click_context.command_path
+            request.headers["X-Meltano-Command"] = click_context.command_path  # type: ignore[index] # ty:ignore[invalid-assignment]
 
         return self.session.prepare_request(request)
 
@@ -222,7 +208,7 @@ class MeltanoHubService(PluginRepository):
         """
         prep = self._build_request("GET", url)
         settings = self.session.merge_environment_settings(
-            prep.url,
+            prep.url,  # type: ignore[arg-type] # ty:ignore[invalid-argument-type]
             {},
             None,
             None,
@@ -232,7 +218,7 @@ class MeltanoHubService(PluginRepository):
         try:
             return self.session.send(prep, **settings)
         except requests.exceptions.ConnectionError as connection_err:
-            raise HubConnectionError("Could not reach Meltano Hub.") from connection_err  # noqa: EM101, TRY003
+            raise HubConnectionError from connection_err
 
     def find_definition(
         self,
@@ -280,15 +266,8 @@ class MeltanoHubService(PluginRepository):
         logger.info("Fetching plugin definition from Meltano Hub", url=url)
         response = self._get(url)
 
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as http_err:
-            logger.exception(
-                "Can not retrieve plugin",
-                status_code=http_err.response.status_code,
-                error=http_err,
-            )
-            raise HubConnectionError(str(http_err)) from http_err
+        if HTTPStatus.INTERNAL_SERVER_ERROR <= response.status_code < 600:
+            raise HubConnectionError(response.reason)
 
         return PluginDefinition(
             **response.json(),
@@ -342,17 +321,15 @@ class MeltanoHubService(PluginRepository):
         url = self.plugin_type_endpoint(plugin_type)
         response = self._get(url)
 
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as err:
-            logger.exception(
-                "Can not retrieve plugin type",
-                status_code=err.response.status_code,
-                error=err,
-            )
-            if err.response.status_code < HTTPStatus.TOO_MANY_REQUESTS:
-                raise HubPluginTypeNotFoundError(plugin_type) from err
-            raise HubConnectionError(err.response.reason) from err
+        if (
+            HTTPStatus.BAD_REQUEST
+            <= response.status_code
+            < HTTPStatus.TOO_MANY_REQUESTS
+        ):
+            raise HubPluginTypeNotFoundError(plugin_type)
+
+        if HTTPStatus.INTERNAL_SERVER_ERROR <= response.status_code < 600:
+            raise HubConnectionError(response.reason)
 
         plugins: dict[str, dict[str, t.Any]] = response.json()
         return {

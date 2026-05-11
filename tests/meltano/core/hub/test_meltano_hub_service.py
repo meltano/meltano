@@ -5,7 +5,7 @@ from unittest import mock
 
 import click
 import pytest
-from requests import HTTPError, Response
+from requests import Response
 from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
@@ -115,21 +115,12 @@ class TestMeltanoHubService:
     def test_server_error(self, project: Project) -> None:
         with pytest.raises(
             HubConnectionError,
-            match=r"Could not connect to Meltano Hub. 500 Server Error",
-        ) as exc_info:
+            match=r"Internal Server Error",
+        ):
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,
                 "this-returns-500",
             )
-
-        assert isinstance(exc_info.value.__cause__, HTTPError)
-        assert isinstance(exc_info.value.__cause__.response, Response)
-        assert exc_info.value.__cause__.response.status_code == 500
-        assert exc_info.value.__cause__.response.json() == {"error": "Server error"}
-        assert exc_info.value.__cause__.response.url == (
-            "https://hub.meltano.com/meltano/api/v1/plugins/extractors"
-            "/this-returns-500--original"
-        )
 
     def test_request_headers(self, project: Project) -> None:
         with mock.patch("click.get_current_context") as get_context:
