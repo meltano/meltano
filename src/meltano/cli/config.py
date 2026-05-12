@@ -496,14 +496,16 @@ def list_settings(
             setting_groups[setting_name].append(i)
     num_groups = len(validation_groups)
     # The validation groups summary orients users on what `Required:` means.
-    # Skip it when filtering, since the filter gives a narrow view that the
-    # full summary would distract from.
-    if filter_pattern is None and not extras and num_groups > 1:
+    # Always emit it for non-extras listings (including filter mode): without
+    # it, `--filter` matches that fall in a single validation group would be
+    # framed under `Required:` as if they were the full required set, which
+    # is misleading for plugins with alternative validation groups.
+    if not extras and num_groups > 1:
         click.echo("Setting groups (one of the following combinations is required):")
         for i, group in enumerate(validation_groups, 1):
             click.echo(f"  Group {i}: {', '.join(sorted(group))}")
         click.echo()
-    elif filter_pattern is None and not extras and num_groups == 1:
+    elif not extras and num_groups == 1:
         click.echo(f"Required settings: {', '.join(sorted(validation_groups[0]))}")
         click.echo()
 

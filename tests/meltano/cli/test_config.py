@@ -614,8 +614,9 @@ class TestCliConfig:
         # Other settings do not
         assert "\nport " not in result.stdout
         assert "\nstart_date" not in result.stdout
-        # Validation-groups summary is suppressed when filtering
-        assert "Setting groups" not in result.stdout
+        # Validation-groups summary is preserved so the `Required:` framing
+        # is not misleading for plugins with alternative validation groups.
+        assert "Setting groups" in result.stdout
         # Hidden-count summary is suppressed when filtering
         assert "Use --all to show all" not in result.stdout
 
