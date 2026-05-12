@@ -145,7 +145,7 @@ typing = [
   "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
-  "mypy~=1.20.0",
+  "mypy~=2.1.0",
   "ty==0.0.33",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
