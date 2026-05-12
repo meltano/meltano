@@ -703,9 +703,7 @@ class TestCliConfig:
     def test_config_list_extras_configured_section(
         self, cli_runner, tap, session, plugin_settings_service_factory
     ) -> None:
-        """`--all --extras` with a configured (non-default) extra renders
-        the `Configured:` header above it.
-        """
+        """`--all --extras` shows `Configured:` above non-default extras."""
         pss = plugin_settings_service_factory(tap)
         with _set_setting(
             pss, "_select", ["*.*"], SettingValueStore.MELTANO_YML, session
