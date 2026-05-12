@@ -540,7 +540,7 @@ class TestCliConfig:
             1 for line in remaining[:end_idx] if line and not line.startswith("\t")
         )
         assert (
-            f"Hiding {expected_count} optional settings with default values. "
+            f"Optional settings with default values: {expected_count} hidden. "
             "Use --all to show all."
         ) in result.stdout
 
@@ -574,7 +574,8 @@ class TestCliConfig:
             plugin.settings_group_validation = original
 
         assert (
-            "Hiding 1 optional settings with default values. Use --all to show all."
+            "Optional settings with default values: 1 hidden. "
+            "Use --all to show all."
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
@@ -698,6 +699,24 @@ class TestCliConfig:
         # `_select` is at default; without --all it should be hidden.
         assert "_select" not in result.stdout
         assert "Use --all to show all." in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_extras_configured_section(
+        self, cli_runner, tap, session, plugin_settings_service_factory
+    ) -> None:
+        """`--all --extras` with a configured (non-default) extra renders
+        the `Configured:` header above it."""
+        pss = plugin_settings_service_factory(tap)
+        with _set_setting(
+            pss, "_select", ["*.*"], SettingValueStore.MELTANO_YML, session
+        ):
+            result = cli_runner.invoke(
+                cli, ["config", "list", "--all", "--extras", tap.name]
+            )
+            assert_cli_runner(result)
+
+            assert "Configured:" in result.stdout
+            assert result.stdout.index("Configured:") < result.stdout.index("_select")
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_no_match(self, cli_runner, tap) -> None:

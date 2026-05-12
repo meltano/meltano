@@ -604,8 +604,8 @@ def list_settings(
         if sections:
             click.echo()
         click.echo(
-            f"Hiding {hidden_optional_count} optional settings with default "
-            f"values. Use --all to show all."
+            f"Optional settings with default values: {hidden_optional_count} "
+            f"hidden. Use --all to show all."
         )
 
     if docs_url := settings.docs_url:
