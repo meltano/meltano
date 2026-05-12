@@ -574,8 +574,7 @@ class TestCliConfig:
             plugin.settings_group_validation = original
 
         assert (
-            "Optional settings with default values: 1 hidden. "
-            "Use --all to show all."
+            "Optional settings with default values: 1 hidden. Use --all to show all."
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
@@ -705,7 +704,8 @@ class TestCliConfig:
         self, cli_runner, tap, session, plugin_settings_service_factory
     ) -> None:
         """`--all --extras` with a configured (non-default) extra renders
-        the `Configured:` header above it."""
+        the `Configured:` header above it.
+        """
         pss = plugin_settings_service_factory(tap)
         with _set_setting(
             pss, "_select", ["*.*"], SettingValueStore.MELTANO_YML, session
