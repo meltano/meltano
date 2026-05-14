@@ -63,8 +63,10 @@ class TestMigrationService:
     @pytest.fixture
     def engine(self) -> Generator[Engine, None, None]:
         engine = create_engine("sqlite:///:memory:")
-        yield engine
-        engine.dispose()
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     def test_upgrade(self, engine: Engine, tmp_path: Path) -> None:
         lock_path = tmp_path / "db.lock"

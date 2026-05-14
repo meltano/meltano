@@ -16,8 +16,10 @@ class TestSQLAlchemyModels:
     @pytest.fixture
     def engine(self) -> Generator[sa.Engine, None, None]:
         engine = sa.create_engine("sqlite:///:memory:")
-        yield engine
-        engine.dispose()
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture
     def table(self, engine: sa.Engine) -> sa.Table:
