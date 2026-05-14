@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import platform
@@ -18,6 +19,8 @@ from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from click.testing import CliRunner
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -31,6 +34,24 @@ def project_tap_mock(project_add_service):
 
 @pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
+    @pytest.fixture(scope="class", autouse=True)
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
+        """Manage the event loop for tests that call asyncio.run() via @run_async.
+
+        Each CLI invocation calls asyncio.run() which replaces and then nulls
+        the current event loop, stranding any loop pytest-asyncio may have
+        created at class scope. This fixture owns the loop lifecycle so teardown
+        is always explicit regardless of what asyncio.run() does.
+        """
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            yield loop
+        finally:
+            if not loop.is_closed():
+                loop.close()
+            asyncio.set_event_loop(None)
+
     @pytest.fixture
     def mock_invoke(self, utility: ProjectPlugin, plugin_invoker_factory):
         process_mock = Mock()
@@ -288,6 +309,23 @@ class TestCliInvoke:
 
 class TestLogOutputHandler:
     """Tests for the _LogOutputHandler class."""
+
+    @pytest.fixture(scope="class", autouse=True)
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
+        """Ensure any event loop pytest-asyncio creates is properly closed.
+
+        The tests here are purely synchronous, but
+        asyncio_default_fixture_loop_scope='class' can still create a loop that
+        goes unclosed without an explicit override.
+        """
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            yield loop
+        finally:
+            if not loop.is_closed():
+                loop.close()
+            asyncio.set_event_loop(None)
 
     def test_writeline_with_singer_sdk_log(self, caplog: pytest.LogCaptureFixture):
         """Test parsing Singer SDK structured logs."""
