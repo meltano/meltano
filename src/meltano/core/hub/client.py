@@ -190,7 +190,7 @@ class MeltanoHubService(PluginRepository):
         """
         request = requests.Request(method, url)
         if click_context := click.get_current_context(silent=True):
-            request.headers["X-Meltano-Command"] = click_context.command_path
+            request.headers["X-Meltano-Command"] = click_context.command_path  # type: ignore[index] # ty:ignore[invalid-assignment]
 
         return self.session.prepare_request(request)
 
