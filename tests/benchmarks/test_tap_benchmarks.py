@@ -20,6 +20,8 @@ import pytest
 from meltano.core.plugin_invoker import PluginInvoker
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin.singer import SingerTap
     from meltano.core.project_add_service import ProjectAddService
@@ -82,6 +84,25 @@ class MockStderr:
 class TestTapBenchmarks:
     """Benchmarks for SingerTap catalog operations."""
 
+    @pytest.fixture
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
+        """Provide a single event loop for all iterations of a benchmark.
+
+        Using asyncio.run() inside benchmark.pedantic() creates and tears down
+        an event loop on every iteration, which interferes with pytest-asyncio's
+        loop management and leaves unclosed loops. A single reusable loop avoids
+        this.
+        """
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            yield loop
+        finally:
+            loop.run_until_complete(loop.shutdown_asyncgens())
+            loop.run_until_complete(loop.shutdown_default_executor())
+            loop.close()
+            asyncio.set_event_loop(None)
+
     @pytest.fixture(scope="class")
     def tap_plugin(self, project_add_service: ProjectAddService) -> SingerTap:
         """Create tap plugin once per test class."""
@@ -103,6 +124,7 @@ class TestTapBenchmarks:
     @pytest.mark.benchmark
     def test_discover_catalog(
         self,
+        event_loop: asyncio.AbstractEventLoop,
         session,
         tap_plugin: SingerTap,
         catalog_lines: list[bytes],
@@ -141,7 +163,7 @@ class TestTapBenchmarks:
 
         # Use pedantic mode with warmup for more stable async benchmarks
         benchmark.pedantic(
-            lambda: asyncio.run(run_discovery()),
+            lambda: event_loop.run_until_complete(run_discovery()),
             rounds=10,
             warmup_rounds=5,
         )
@@ -149,6 +171,7 @@ class TestTapBenchmarks:
     @pytest.mark.benchmark
     def test_apply_catalog_rules(
         self,
+        event_loop: asyncio.AbstractEventLoop,
         session,
         tap_plugin: SingerTap,
         catalog: dict,
@@ -170,7 +193,7 @@ class TestTapBenchmarks:
 
         # Use pedantic mode with warmup for more stable async benchmarks
         benchmark.pedantic(
-            lambda: asyncio.run(apply_rules()),
+            lambda: event_loop.run_until_complete(apply_rules()),
             rounds=10,
             warmup_rounds=5,
         )
