@@ -244,6 +244,22 @@ class TestExtractLoadBlocks:
         target.wait = AsyncMock(return_value=0)
         return target
 
+    @pytest.mark.usefixtures("log_level_debug")
+    def test_log_level_debug_affects_invoker_logger(
+        self,
+        tap,
+        tap_config_dir,
+        plugin_invoker_factory,
+    ) -> None:
+        """log_level_debug must enable DEBUG on the logger _link_io checks.
+
+        If the fixture stops covering the right logger namespace or the logger
+        name constructed by get_logger changes, this test fails immediately
+        rather than silently omitting the stdout link in test_link_io.
+        """
+        invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
+        assert invoker.get_logger("stdout", "stdlib").isEnabledFor(logging.DEBUG)
+
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "subject", "log", "log_level_debug")
     async def test_link_io(
