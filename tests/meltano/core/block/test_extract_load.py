@@ -171,13 +171,16 @@ class TestELBContextBuilder:
 class TestExtractLoadBlocks:
     @pytest.fixture
     def log_level_debug(self):
-        root_logger = logging.getLogger()  # noqa: TID251
-        log_level = root_logger.level
+        # Set the intermediate logger rather than root: pytest's catching_logs
+        # overrides root to log_level (INFO) during the test call, which would
+        # suppress DEBUG even after setting root to DEBUG in fixture setup.
+        logger = logging.getLogger("meltano.plugin.stdout")  # noqa: TID251
+        orig = logger.level
+        logger.setLevel(logging.DEBUG)
         try:
-            root_logger.setLevel(logging.DEBUG)
             yield
         finally:
-            root_logger.setLevel(log_level)
+            logger.setLevel(orig)
 
     @pytest.fixture
     def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
