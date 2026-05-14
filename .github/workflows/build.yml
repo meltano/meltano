@@ -42,6 +42,10 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |  # zizmor: ignore[template-injection]
         tag=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName' | sort -V | tail -1)
+        if [[ -z "$tag" ]]; then
+          echo "::error::No stable releases found; cannot determine tag for re-roll"
+          exit 1
+        fi
         echo "tag=$tag" >> $GITHUB_OUTPUT
 
     - name: Check out the repository
@@ -111,10 +115,19 @@ jobs:
         - true
 
     steps:
+    - name: Set registry
+      id: set-registry
+      run: |
+        if [[ "${{ github.event_name }}" == "release" && "${{ github.event.action }}" == "published" ]] || [[ "${{ github.event_name }}" == "schedule" ]]; then
+          echo "registry=docker.io" >> "$GITHUB_OUTPUT"
+        else
+          echo "registry=ghcr.io" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Set the workflow inputs
       id: set-inputs
       env:
-        REGISTRY: ${{ (github.event_name == 'release' && github.event.action == 'published' || github.event_name == 'schedule') && 'docker.io' || 'ghcr.io' }}
+        REGISTRY: ${{ steps.set-registry.outputs.registry }}
       # This step makes it so that the same workflow inputs can be accessed
       # regardless of what event triggered it.
       run: |
@@ -129,7 +142,7 @@ jobs:
 
     - name: Get latest published release version
       id: get-latest-version
-      if: (github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'schedule'
+      if: steps.set-registry.outputs.registry == 'docker.io'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |  # zizmor: ignore[template-injection]
