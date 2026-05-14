@@ -40,7 +40,11 @@ class SafeStreamHandler(logging.StreamHandler):
     On Windows, the default console encoding (e.g. cp1252) may not support
     all Unicode characters, causing UnicodeEncodeError when logging plugin
     output containing non-ASCII text. This handler falls back to
-    'backslashreplace' error handling to avoid crashing.
+    'backslashreplace' error handling — unencodable characters are escaped
+    rather than raising an error and dropping the log entry.
+
+    This handler is not used by default. See the Meltano logging guide for
+    instructions on opting in via a custom ``logging.yaml`` config.
     """
 
     def emit(self, record: logging.LogRecord) -> None:
@@ -223,7 +227,7 @@ def default_config(
         },
         "handlers": {
             "console": {
-                "class": "meltano.core.logging.utils.SafeStreamHandler",
+                "class": "logging.StreamHandler",
                 "level": numeric_level if log_level == "DISABLED" else log_level,
                 "formatter": log_format,
                 "stream": "ext://sys.stderr",

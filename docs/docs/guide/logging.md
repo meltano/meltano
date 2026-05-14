@@ -139,6 +139,38 @@ loggers:
 
 For a detailed explanation of the above of the file format, see the [python logging documentation](https://docs.python.org/3/library/logging.config.html#configuration-file-format).
 
+## Handling non-Unicode characters in plugin logs
+
+On Windows, the default console encoding (e.g. `cp1252`) cannot represent all Unicode characters. When a plugin emits log lines containing non-ASCII text — for example, a tap that surfaces Cyrillic or CJK characters — the standard `logging.StreamHandler` raises a `UnicodeEncodeError` and drops the log entry entirely.
+
+Meltano ships a `SafeStreamHandler` that catches these errors and falls back to `backslashreplace` encoding, so unencodable characters are escaped (e.g. `сам`) instead of causing a crash or silent data loss.
+
+This handler is **not used by default**. To opt in, reference it by its fully-qualified class name in a custom `logging.yaml` and point Meltano at that file via `cli.log_config` (or the `--log-config` CLI option / `MELTANO_CLI_LOG_CONFIG` environment variable):
+
+```yaml
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  structured_colored:
+    (): meltano.core.logging.console_log_formatter
+    colors: true
+
+handlers:
+  console:
+    class: meltano.core.logging.utils.SafeStreamHandler
+    level: INFO
+    formatter: structured_colored
+    stream: "ext://sys.stderr"
+
+root:
+  level: INFO
+  propagate: yes
+  handlers: [console]
+```
+
+The only change relative to a standard config is replacing `class: logging.StreamHandler` with `class: meltano.core.logging.utils.SafeStreamHandler`. All other handler options (formatters, levels, streams) work identically.
+
 ## Local development config example
 
 While working with Meltano locally it's sometimes nice to have more terse logging on the console, but still have DEBUG
