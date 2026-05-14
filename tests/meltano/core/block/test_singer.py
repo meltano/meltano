@@ -89,7 +89,6 @@ class TestSingerBlocks:
         invoker.cleanup = AsyncMock()
         return invoker
 
-    @pytest.mark.asyncio
     async def test_singer_block_start(
         self,
         elt_context,
@@ -137,7 +136,6 @@ class TestSingerBlocks:
             == asyncio.subprocess.PIPE
         )
 
-    @pytest.mark.asyncio
     async def test_singer_block_stop(
         self,
         elt_context,
@@ -167,7 +165,6 @@ class TestSingerBlocks:
         assert block.process_handle.terminate.called
         assert block.invoker.cleanup.called
 
-    @pytest.mark.asyncio
     async def test_singer_block_io(
         self,
         elt_context,
@@ -213,7 +210,6 @@ class TestSingerBlocks:
 
             assert cap_logs == expected_lines
 
-    @pytest.mark.asyncio
     async def test_singer_block_close_stdin(
         self,
         elt_context,
