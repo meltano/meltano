@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import asyncio.subprocess
 import enum
+import logging
 import os
 import sys
 import typing as t
@@ -594,6 +595,32 @@ class PluginInvoker:
         else:
             self.output_handlers = {src: [handler]}
 
+    @t.overload
+    def get_logger(
+        self,
+        io: t.Literal["stderr", "stdout"],
+        kind: t.Literal["structlog"],
+    ) -> BoundLogger: ...
+
+    @t.overload
+    def get_logger(
+        self,
+        io: t.Literal["stderr", "stdout"],
+        kind: t.Literal["stdlib"],
+    ) -> logging.Logger: ...
+
+    def get_logger(
+        self,
+        io: t.Literal["stderr", "stdout"],
+        kind: t.Literal["structlog", "stdlib"],
+    ) -> BoundLogger | logging.Logger:
+        """Get a logger for this plugin."""
+        name = f"meltano.plugin.{io}.{self.plugin.type}.{self.plugin.name}"
+        if kind == "structlog":
+            return get_logger(name, stdio=io)
+
+        return logging.getLogger(name)  # noqa: TID251
+
     @property
     def stdout_logger(self) -> BoundLogger:
         """Get the logger for the plugin stdout.
@@ -601,10 +628,7 @@ class PluginInvoker:
         Returns:
             The logger for the plugin stdout.
         """
-        return get_logger(
-            f"meltano.plugin.stdout.{self.plugin.type}.{self.plugin.name}",
-            stdio="stdout",
-        )
+        return self.get_logger("stdout", "structlog")
 
     @property
     def stderr_logger(self) -> BoundLogger:
@@ -613,10 +637,7 @@ class PluginInvoker:
         Returns:
             The logger for the plugin stderr.
         """
-        return get_logger(
-            f"meltano.plugin.stderr.{self.plugin.type}.{self.plugin.name}",
-            stdio="stderr",
-        )
+        return self.get_logger("stderr", "structlog")
 
     def get_log_parser(self) -> str | None:
         """Get the log parser for the plugin.

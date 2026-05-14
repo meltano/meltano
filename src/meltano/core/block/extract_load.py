@@ -654,7 +654,8 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             }
             stdout_logger = block.invoker.stdout_logger.bind(**context)
             stderr_logger = block.invoker.stderr_logger.bind(**context)
-            if stdout_logger.isEnabledFor(logging.DEBUG):
+
+            if block.invoker.get_logger("stdout", "stdlib").isEnabledFor(logging.DEBUG):
                 block.stdout_link(
                     self.output_logger.out(
                         block.string_id,
