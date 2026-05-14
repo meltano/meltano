@@ -28,15 +28,27 @@ jobs:
   build:
     name: Wheel and SDist
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       name: ${{ steps.baipp.outputs.package_name }}
       version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
+    - name: Get latest release tag (re-roll)
+      id: get-release-tag
+      if: github.event_name == 'schedule'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |  # zizmor: ignore[template-injection]
+        tag=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName' | sort -V | tail -1)
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+
     - name: Check out the repository
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
+        ref: ${{ steps.get-release-tag.outputs.tag || github.sha }}
 
     - name: Setup uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
@@ -65,7 +77,7 @@ jobs:
         uv run scripts/alembic_freeze.py
 
     - name: Release Marker
-      if: github.event_name == 'release' && github.event.action == 'published'
+      if: (github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'schedule'
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
       run: touch src/meltano/core/tracking/.release_marker
 
@@ -102,7 +114,7 @@ jobs:
     - name: Set the workflow inputs
       id: set-inputs
       env:
-        REGISTRY: ${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}
+        REGISTRY: ${{ (github.event_name == 'release' && github.event.action == 'published' || github.event_name == 'schedule') && 'docker.io' || 'ghcr.io' }}
       # This step makes it so that the same workflow inputs can be accessed
       # regardless of what event triggered it.
       run: |
@@ -117,7 +129,7 @@ jobs:
 
     - name: Get latest published release version
       id: get-latest-version
-      if: github.event_name == 'release' && github.event.action == 'published'
+      if: (github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'schedule'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |  # zizmor: ignore[template-injection]
@@ -180,7 +192,8 @@ jobs:
         # - The trigger is a push to the main branch
         # - The trigger is a workflow dispatch
         # - The trigger is a release and the action is 'published'
-        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' )}}
+        # - The trigger is a weekly schedule (re-roll latest release with updated base image)
+        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' ) || github.event_name == 'schedule' }}
         token: ${{ secrets.GITHUB_TOKEN }}
         tags: ${{ env.IMAGE_TAGS }}
         registry: ${{ steps.set-inputs.outputs.registry }}
