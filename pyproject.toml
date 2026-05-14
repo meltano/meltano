@@ -178,9 +178,6 @@ filterwarnings = [
   '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
   'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
   # Third-party warnings
-  'once::pytest.PytestUnraisableExceptionWarning',
-  'once::pytest.PytestUnhandledThreadExceptionWarning',
-  'once::ResourceWarning',
   'once:You are using a Python version .* which Google will stop supporting in new releases of google.api_core once it reaches its end of life:FutureWarning',
 ]
 log_level = "INFO"
