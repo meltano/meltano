@@ -143,7 +143,7 @@ For a detailed explanation of the above of the file format, see the [python logg
 
 On Windows, the default console encoding (e.g. `cp1252`) cannot represent all Unicode characters. When a plugin emits log lines containing non-ASCII text — for example, a tap that surfaces Cyrillic or CJK characters — the standard `logging.StreamHandler` raises a `UnicodeEncodeError` and drops the log entry entirely.
 
-Meltano ships a `SafeStreamHandler` that catches these errors and falls back to `backslashreplace` encoding, so unencodable characters are escaped (e.g. `сам`) instead of causing a crash or silent data loss.
+Meltano ships a `SafeStreamHandler` that catches these errors and falls back to `backslashreplace` encoding, so unencodable characters are escaped instead of causing a crash or silent data loss. For example, the Cyrillic word `сам` would be written as `\u0441\u0430\u043c`.
 
 This handler is **not used by default**. To opt in, reference it by its fully-qualified class name in a custom `logging.yaml` and point Meltano at that file via `cli.log_config` (or the `--log-config` CLI option / `MELTANO_CLI_LOG_CONFIG` environment variable):
 
