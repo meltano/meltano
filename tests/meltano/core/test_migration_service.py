@@ -10,7 +10,10 @@ from sqlalchemy import create_engine
 from meltano.core.migration_service import MigrationError, MigrationService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
     from pathlib import Path
+
+    from sqlalchemy import Engine
 
 MIGRATION_TEMPLATE = """
 revision = {revision}
@@ -57,8 +60,13 @@ def _generate_migrations(
 
 
 class TestMigrationService:
-    def test_upgrade(self, tmp_path: Path) -> None:
+    @pytest.fixture
+    def engine(self) -> Generator[Engine, None, None]:
         engine = create_engine("sqlite:///:memory:")
+        yield engine
+        engine.dispose()
+
+    def test_upgrade(self, engine: Engine, tmp_path: Path) -> None:
         lock_path = tmp_path / "db.lock"
 
         migrations = _generate_migrations(tmp_path)
@@ -71,8 +79,7 @@ class TestMigrationService:
         )
         migration_service.upgrade()
 
-    def test_upgrade_without_lock(self, tmp_path: Path) -> None:
-        engine = create_engine("sqlite:///:memory:")
+    def test_upgrade_without_lock(self, engine: Engine, tmp_path: Path) -> None:
         lock_path = tmp_path / "db.lock"
 
         migration_service = MigrationService(
@@ -86,8 +93,7 @@ class TestMigrationService:
         ):
             migration_service.upgrade()
 
-    def test_upgrade_error(self, tmp_path: Path) -> None:
-        engine = create_engine("sqlite:///:memory:")
+    def test_upgrade_error(self, engine: Engine, tmp_path: Path) -> None:
         lock_path = tmp_path / "db.lock"
 
         migrations = _generate_migrations(tmp_path)
