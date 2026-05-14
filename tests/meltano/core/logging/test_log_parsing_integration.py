@@ -18,7 +18,7 @@ class TestLogParsingIntegration:
     def project(self, tmp_path):
         """Create a test project."""
         meltano_yml = tmp_path / "meltano.yml"
-        meltano_yml.write_text("version: 1\ndefault_environment: dev\n")
+        meltano_yml.write_text("default_environment: dev\n")
         return Project(tmp_path)
 
     def create_invoker(self, project, plugin, log_parser_config=None):
