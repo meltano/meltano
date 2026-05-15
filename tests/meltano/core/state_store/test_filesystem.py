@@ -323,7 +323,7 @@ class TestLocalFilesystemStateStoreManager:
         self, subject: _LocalFilesystemStateStoreManager
     ) -> None:
         for i in range(3):
-            subject.set(
+            subject.update(
                 MeltanoState(
                     state_id=f"job-{i}",
                     completed_state={"singer_state": {"v": i}},
@@ -338,8 +338,12 @@ class TestLocalFilesystemStateStoreManager:
         self, subject: _LocalFilesystemStateStoreManager
     ) -> None:
         for sid in ("tap-a-to-target-x", "tap-b-to-target-x", "other"):
-            subject.set(
-                MeltanoState(state_id=sid, completed_state={}, partial_state={})
+            subject.update(
+                MeltanoState(
+                    state_id=sid,
+                    completed_state={},
+                    partial_state={},
+                )
             )
         result = list(subject.get_all(pattern="tap-*"))
         assert {s.state_id for s in result} == {
