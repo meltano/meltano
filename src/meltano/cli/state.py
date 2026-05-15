@@ -400,8 +400,8 @@ def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
 def export_state_cmd(ctx: click.Context, pattern: str | None) -> None:
     """Export all state to JSON on stdout.
 
-    Output is a JSON array where each entry has 'state_id', 'completed', and 'partial'
-    keys, suitable for piping into 'meltano state import'.
+    Output is a JSON object mapping each state_id to its completed and partial state,
+    suitable for piping into 'meltano state import'.
     """
     state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
     states = state_service.export_state(pattern)
@@ -423,6 +423,9 @@ def state_import_cmd(ctx: click.Context, input_file: t.IO[str]) -> None:
     except json.JSONDecodeError as e:
         msg = f"Invalid JSON: {e}"
         raise click.ClickException(msg) from e
+    if not isinstance(data, dict):
+        msg = f"expected a JSON object, got {type(data).__name__}"
+        raise click.BadParameter(msg, param_hint="'INPUT_FILE'")
     count = state_service.import_state(data)
     logger.info("Successfully imported %d state(s).", count)
 
