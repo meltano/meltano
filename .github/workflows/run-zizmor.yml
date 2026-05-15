@@ -28,19 +28,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-
       - name: Run zizmor 🌈
-        run: >
-          uvx zizmor
-          --min-severity=informational
-          --persona=pedantic
-          --format=sarif
-          .github > results.sarif
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4.35.4
+        uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
         with:
-          sarif_file: results.sarif
-          category: zizmor
+          persona: pedantic
