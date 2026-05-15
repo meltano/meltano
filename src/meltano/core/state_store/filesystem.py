@@ -437,14 +437,13 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
     @override
-    def set(self, state: MeltanoState) -> None:
-        """Set state for the given state_id, creating its directory if needed.
-
-        Args:
-            state: the state to set
-        """
-        self.create_state_id_dir_if_not_exists(state.state_id)
-        super().set(state)
+    def set_all(self, states: Iterable[MeltanoState]) -> int:
+        count = 0
+        for state in states:
+            self.create_state_id_dir_if_not_exists(state.state_id)
+            self.set(state)
+            count += 1
+        return count
 
     @override
     def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
