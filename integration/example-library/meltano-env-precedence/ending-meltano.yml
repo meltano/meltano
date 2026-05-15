@@ -1,4 +1,3 @@
-version: 1
 project_id: faa14098-8fdc-4336-850e-96db154b7990
 send_anonymous_usage_stats: false
 env:

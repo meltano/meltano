@@ -1,4 +1,3 @@
-version: 1
 env:
   DBT_CLEAN_PROJECT_FILES_ONLY: 'false'
 venv:
