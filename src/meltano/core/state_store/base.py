@@ -206,6 +206,35 @@ class StateStoreManager(ABC):
         """
         ...
 
+    def get_all(self, pattern: str | None = None) -> Iterable[MeltanoState]:
+        """Yield all states, optionally filtered by pattern.
+
+        Override for bulk-retrieval efficiency.
+
+        Args:
+            pattern: glob-style pattern to filter by
+        """
+        for state_id in self.get_state_ids(pattern):
+            if state := self.get(state_id):
+                yield state
+
+    def set_all(self, states: Iterable[MeltanoState]) -> int:
+        """Set multiple states, returning the count written.
+
+        Override for bulk-write efficiency.
+
+        Args:
+            states: iterable of MeltanoState objects to persist
+
+        Returns:
+            The number of set states.
+        """
+        count = 0
+        for state in states:
+            self.set(state)
+            count += 1
+        return count
+
     def clear_all(self) -> int:
         """Clear all states.
 

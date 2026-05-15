@@ -394,6 +394,39 @@ def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
     )
 
 
+@meltano_state.command(cls=InstrumentedCmd, name="export")
+@click.option("--pattern", type=str, help="Filter state IDs by pattern.")
+@click.pass_context
+def export_state_cmd(ctx: click.Context, pattern: str | None) -> None:
+    """Export all state to JSON on stdout.
+
+    Output is a JSON array where each entry has 'state_id', 'completed', and 'partial'
+    keys, suitable for piping into 'meltano state import'.
+    """
+    state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
+    states = state_service.export_state(pattern)
+    click.echo(json.dumps(states, separators=(",", ":")))
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="import")
+@click.argument("input-file", type=click.File("r"), default="-")
+@click.pass_context
+def state_import_cmd(ctx: click.Context, input_file: t.IO[str]) -> None:
+    """Import state from a JSON file (or stdin when no file is given).
+
+    Reads the format produced by 'meltano state export' and overwrites any existing
+    state for each state ID present in the input.
+    """
+    state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
+    try:
+        data = json.load(input_file)
+    except json.JSONDecodeError as e:
+        msg = f"Invalid JSON: {e}"
+        raise click.ClickException(msg) from e
+    count = state_service.import_state(data)
+    logger.info("Successfully imported %d state(s).", count)
+
+
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
 @prompt_for_confirmation(prompt="This will clear state for the job(s). Continue?")
 @click.argument("state-id", required=False)

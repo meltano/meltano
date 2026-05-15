@@ -897,3 +897,118 @@ class TestCliState:
 
         current_state = state_service.get_state(state_id)
         assert current_state == original_state
+
+    def test_export(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(cli, ["state", "export"])
+        assert_cli_runner(result)
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+        assert set(data) == set(state_ids)
+        assert all("completed" in val and "partial" in val for val in data.values())
+
+    def test_export_pattern(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        first_id = state_ids[0]
+        env = first_id.split(":")[0]
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli, ["state", "export", "--pattern", f"{env}:*"]
+            )
+        assert_cli_runner(result)
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+        assert len(data) == len(state_ids)
+        assert all(state_id.startswith(f"{env}:") for state_id in data)
+
+    def test_import_from_file(
+        self,
+        tmp_path: Path,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        original_merged = {sid: state_service.get_state(sid) for sid in state_ids}
+        export_data = state_service.export_state()
+        filepath = tmp_path / "states.json"
+        filepath.write_text(json.dumps(export_data))
+
+        state_service.clear_all_states()
+        assert not state_service.list_state()
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(cli, ["state", "import", str(filepath)])
+        assert_cli_runner(result)
+
+        assert all(
+            state_service.get_state(state_id) == original_merged[state_id]
+            for state_id in state_ids
+        )
+
+    def test_import_from_stdin(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        original_merged = {sid: state_service.get_state(sid) for sid in state_ids}
+        export_data = state_service.export_state()
+
+        state_service.clear_all_states()
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(
+                cli,
+                ["state", "import"],
+                input=json.dumps(export_data),
+            )
+        assert_cli_runner(result)
+
+        assert all(
+            state_service.get_state(state_id) == original_merged[state_id]
+            for state_id in state_ids
+        )
+
+    def test_import_invalid_json(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(cli, ["state", "import"], input="{ invalid json")
+        assert result.exit_code == 1
+        assert "Invalid JSON" in result.stderr
+
+    def test_export_import_roundtrip(
+        self,
+        state_service: StateService,
+        state_ids: list[str],
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        original_merged = {sid: state_service.get_state(sid) for sid in state_ids}
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            export_result = cli_runner.invoke(cli, ["state", "export"])
+            assert_cli_runner(export_result)
+
+            state_service.clear_all_states()
+            assert not state_service.list_state()
+
+            import_result = cli_runner.invoke(
+                cli, ["state", "import"], input=export_result.stdout
+            )
+            assert_cli_runner(import_result)
+
+        assert all(
+            state_service.get_state(state_id) == original_merged[state_id]
+            for state_id in state_ids
+        )
