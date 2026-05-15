@@ -101,6 +101,22 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
         assert isinstance(state_store, DummyStateStoreManager)
 
 
+def test_set_fallback() -> None:
+    manager = DummyStateStoreManager()
+    states = [
+        MeltanoState(
+            state_id=f"dev:tap-a-to-target-{i}",
+            completed_state={"singer_state": {"bookmark": i}},
+            partial_state={},
+        )
+        for i in range(3)
+    ]
+    with mock.patch.object(manager, "set") as mock_set:
+        count = manager.set_all(states)
+    assert count == 3
+    assert mock_set.call_count == 3
+
+
 @pytest.mark.parametrize(
     ("setting", "namespace", "expected"),
     # NOTE: The "nested-setting" parametrized case below is currently xfail because
