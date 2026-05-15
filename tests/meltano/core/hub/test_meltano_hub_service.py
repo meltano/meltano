@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import typing as t
 from http import HTTPStatus
 from unittest import mock
@@ -13,7 +14,6 @@ from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
-from meltano.core._compat import override
 from meltano.core.hub.client import (
     HubConnectionError,
     HubPluginTypeNotFoundError,
@@ -21,6 +21,11 @@ from meltano.core.hub.client import (
 )
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections import Counter
@@ -155,8 +160,8 @@ class TestMeltanoHubService:
             @override
             def send(
                 self,
-                request,  # noqa: ARG002
-                *args,  # noqa: ARG002
+                request,
+                *args,
                 **kwargs,
             ):
                 nonlocal send_kwargs
@@ -182,8 +187,8 @@ class TestMeltanoHubService:
             @override
             def send(
                 self,
-                request,  # noqa: ARG002
-                *args,  # noqa: ARG002
+                request,
+                *args,
                 **kwargs,
             ):
                 nonlocal send_kwargs
