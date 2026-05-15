@@ -650,3 +650,121 @@ class TestS3StateBackend:
             objects = manager.client.list_objects_v2(Bucket=bucket)
             keys = [obj["Key"] for obj in objects["Contents"]]
             assert keys == [clean_key]
+
+    @pytest.fixture
+    def s3_manager(
+        self,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> S3StateStoreManager:
+        return S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+    def test_get_all_returns_all_states(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        state_ids = ["job-a", "job-b", "job-c"]
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            for sid in state_ids:
+                s3_manager.client.put_object(
+                    Bucket=bucket,
+                    Key=f"{prefix}/{sid}/state.json",
+                    Body=b'{"completed":{"singer_state":{"bookmarks":{}}},"partial":{}}',
+                    ContentType="application/json",
+                )
+            results = list(s3_manager.get_all())
+        assert {s.state_id for s in results} == set(state_ids)
+
+    def test_get_all_with_pattern(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            for sid in ("tap-a-to-target-x", "tap-b-to-target-x", "other"):
+                s3_manager.client.put_object(
+                    Bucket=bucket,
+                    Key=f"{prefix}/{sid}/state.json",
+                    Body=b'{"completed":{},"partial":{}}',
+                    ContentType="application/json",
+                )
+            results = list(s3_manager.get_all(pattern="tap-*"))
+        assert {s.state_id for s in results} == {
+            "tap-a-to-target-x",
+            "tap-b-to-target-x",
+        }
+
+    def test_get_all_empty_bucket(
+        self,
+        bucket: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            results = list(s3_manager.get_all())
+        assert results == []
+
+    def test_set_all_writes_states(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        states = [
+            MeltanoState(
+                state_id=f"job-{i}",
+                completed_state={"singer_state": {"bookmarks": {}}},
+                partial_state={},
+            )
+            for i in range(4)
+        ]
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            count = s3_manager.set_all(iter(states))
+            assert count == 4
+            listed = s3_manager.client.list_objects_v2(Bucket=bucket, Prefix=prefix)
+            keys = {obj["Key"] for obj in listed.get("Contents", [])}
+            for state in states:
+                assert f"{prefix}/{state.state_id}/state.json" in keys
+
+    def test_set_all_content_type_is_json(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        state = MeltanoState(
+            state_id="my-job",
+            completed_state={"singer_state": {}},
+            partial_state={},
+        )
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            s3_manager.set_all([state])
+            response = s3_manager.client.get_object(
+                Bucket=bucket,
+                Key=f"{prefix}/{state.state_id}/state.json",
+            )
+            assert response["ContentType"] == "application/json"
+
+    def test_set_all_empty_iterable(
+        self,
+        bucket: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            count = s3_manager.set_all([])
+        assert count == 0

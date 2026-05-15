@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import typing as t
 from functools import cached_property
@@ -9,7 +10,9 @@ from functools import cached_property
 import boto3
 from botocore.config import Config
 
+from meltano.core.state_store.base import MeltanoState
 from meltano.core.state_store.filesystem import (
+    _STATE_FILENAME,
     CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
 )
@@ -20,7 +23,7 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Generator, Iterable, Iterator
 
     from mypy_boto3_s3 import S3Client
 
@@ -119,6 +122,52 @@ class S3StateStoreManager(CloudStateStoreManager):
             )
         session = boto3.Session()
         return session.client("s3", config=config)
+
+    @override
+    def get_all(self, pattern: str | None = None) -> Iterator[MeltanoState]:
+        """Yield all states using a single paginated listing.
+
+        Uses a paginator to handle buckets with more than 1000 objects, then
+        fetches each ``state.json`` directly via ``GetObject`` — avoiding the
+        double-iteration of ``get_state_ids`` + ``get``.
+
+        Args:
+            pattern: glob-style pattern to filter state IDs by
+        """
+        pattern_re = re.compile(pattern.replace("*", ".*")) if pattern else None
+        paginator = self.client.get_paginator("list_objects_v2")
+        for page in paginator.paginate(Bucket=self.bucket, Prefix=self.state_dir):
+            for obj in page.get("Contents", []):
+                key: str = obj["Key"]
+                parts = key.split("/")
+                if len(parts) < 2 or parts[-1] != _STATE_FILENAME:
+                    continue
+                state_id = parts[-2]
+                if pattern_re and not pattern_re.match(state_id):
+                    continue
+                response = self.client.get_object(Bucket=self.bucket, Key=key)
+                yield MeltanoState.from_json(state_id, response["Body"].read().decode())
+
+    @override
+    def set_all(self, states: Iterable[MeltanoState]) -> int:
+        """Write multiple states via direct ``PutObject`` calls.
+
+        Bypasses ``smart_open``'s multipart-upload setup, which is wasteful
+        for the small JSON payloads that state files typically contain.
+
+        Args:
+            states: iterable of MeltanoState objects to persist
+        """
+        count = 0
+        for state in states:
+            self.client.put_object(
+                Bucket=self.bucket,
+                Key=self.get_state_path(state.state_id),
+                Body=state.json().encode(),
+                ContentType="application/json",
+            )
+            count += 1
+        return count
 
     @override
     def delete_file(self, file_path: str) -> None:
