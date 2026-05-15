@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
 import typing as t
 from collections import Counter
 from copy import deepcopy
@@ -58,6 +59,16 @@ def pytest_runtest_setup(item) -> None:
     # both as SYSTEM and WAREHOUSE.
     if backend_marker and backend_marker.args[0] != PYTEST_BACKEND:
         pytest.skip()
+
+
+def pytest_configure(config: pytest.Config):
+    if sys.version_info < (3, 11):
+        config.addinivalue_line(
+            "filterwarnings",
+            r"ignore:You are using a Python version \(3\.10\.\d+\) which Google will "
+            "stop supporting in new releases of google.api_core once it reaches its "
+            "end of life:FutureWarning",
+        )
 
 
 @pytest.fixture(scope="session")
