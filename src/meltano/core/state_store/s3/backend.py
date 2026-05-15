@@ -194,8 +194,10 @@ class S3StateStoreManager(CloudStateStoreManager):
         if with_prefix:
             kwargs["Prefix"] = self.prefix
 
-        for state_obj in self.client.list_objects_v2(**kwargs).get("Contents", []):
-            yield state_obj["Key"]
+        paginator = self.client.get_paginator("list_objects_v2")
+        for page in paginator.paginate(**kwargs):
+            for state_obj in page.get("Contents", []):
+                yield state_obj["Key"]
 
     def copy_file(self, src: str, dst: str) -> None:
         """Copy a file from one path to another.
