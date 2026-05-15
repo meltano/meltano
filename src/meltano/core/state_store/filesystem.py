@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import fnmatch
 import glob
 import os
 import platform
@@ -545,7 +546,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
             List of state_ids
         """
         state_ids = set()
-        pattern_re = re.compile(pattern.replace("*", ".*")) if pattern else None
+        pattern_re = re.compile(fnmatch.translate(pattern)) if pattern else None
 
         for state_file in glob.glob(
             os.path.join(
@@ -665,7 +666,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             List of state_ids
         """
-        pattern_re = re.compile(pattern.replace("*", ".*")) if pattern else None
+        pattern_re = re.compile(fnmatch.translate(pattern)) if pattern else None
         state_ids = set()
         for filepath in self.list_all_files():
             if "/" not in filepath:
