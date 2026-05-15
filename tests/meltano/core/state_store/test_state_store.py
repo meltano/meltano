@@ -173,6 +173,76 @@ class TestSystemDBStateBackend:
         db_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(db_state_store, DBStateStoreManager)
 
+    @pytest.fixture
+    def db_store(self, session) -> DBStateStoreManager:
+        return DBStateStoreManager(session=session)
+
+    @pytest.fixture
+    def populated_db_store(self, db_store: DBStateStoreManager) -> DBStateStoreManager:
+        states = [
+            MeltanoState(
+                state_id=f"dev:tap-a-to-target-{i}",
+                completed_state={"singer_state": {"bookmark": i}},
+                partial_state={},
+            )
+            for i in range(3)
+        ]
+        for s in states:
+            db_store.set(s)
+        return db_store
+
+    def test_get_all_returns_all_states(
+        self, populated_db_store: DBStateStoreManager
+    ) -> None:
+        result = list(populated_db_store.get_all())
+        assert len(result) == 3
+        assert {s.state_id for s in result} == {
+            "dev:tap-a-to-target-0",
+            "dev:tap-a-to-target-1",
+            "dev:tap-a-to-target-2",
+        }
+
+    def test_get_all_with_pattern(
+        self, populated_db_store: DBStateStoreManager
+    ) -> None:
+        result = list(populated_db_store.get_all("dev:tap-a-to-target-1"))
+        assert len(result) == 1
+        assert result[0].state_id == "dev:tap-a-to-target-1"
+
+    def test_get_all_empty(self, db_store: DBStateStoreManager) -> None:
+        assert list(db_store.get_all()) == []
+
+    def test_set_all_inserts_states(self, db_store: DBStateStoreManager) -> None:
+        states = [
+            MeltanoState(
+                state_id=f"dev:tap-b-to-target-{i}",
+                completed_state={"singer_state": {"v": i}},
+                partial_state={},
+            )
+            for i in range(4)
+        ]
+        count = db_store.set_all(iter(states))
+        assert count == 4
+        assert len(list(db_store.get_all())) == 4
+
+    def test_set_all_overwrites_existing(
+        self, populated_db_store: DBStateStoreManager
+    ) -> None:
+        new_states = [
+            MeltanoState(
+                state_id="dev:tap-a-to-target-0",
+                completed_state={"singer_state": {"bookmark": 99}},
+                partial_state={},
+            ),
+        ]
+        populated_db_store.set_all(iter(new_states))
+        result = populated_db_store.get("dev:tap-a-to-target-0")
+        assert result is not None
+        assert result.completed_state == {"singer_state": {"bookmark": 99}}
+
+    def test_set_all_empty_iterable(self, db_store: DBStateStoreManager) -> None:
+        assert db_store.set_all(iter([])) == 0
+
 
 class TestLocalFilesystemStateBackend:
     @pytest.fixture

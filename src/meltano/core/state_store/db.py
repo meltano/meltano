@@ -18,7 +18,7 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterator
+    from collections.abc import Generator, Iterable, Iterator
 
     from sqlalchemy.orm import Session
 
@@ -111,6 +111,53 @@ class DBStateStoreManager(StateStoreManager):
         count = self.session.query(JobState).delete()
         self.session.commit()
         return count
+
+    @override
+    def get_all(self, pattern: str | None = None) -> Iterator[MeltanoState]:
+        """Yield all states in a single query, optionally filtered by pattern.
+
+        Args:
+            pattern: glob-style pattern to filter by
+        """
+        query = self.session.query(JobState)
+        if pattern:
+            query = query.filter(JobState.state_id.like(pattern.replace("*", "%")))
+        return (
+            MeltanoState(
+                state_id=js.state_id,
+                partial_state=js.partial_state,
+                completed_state=js.completed_state,
+            )
+            for js in query.all()
+        )
+
+    @override
+    def set_all(self, states: Iterable[MeltanoState]) -> int:
+        """Replace multiple states in bulk using a single transaction.
+
+        Deletes any existing rows for the given state IDs, then inserts the
+        new ones — all in one commit.
+
+        Args:
+            states: iterable of MeltanoState objects to persist
+        """
+        state_list = list(states)
+        if not state_list:
+            return 0
+        state_ids = [s.state_id for s in state_list]
+        self.session.query(JobState).filter(
+            JobState.state_id.in_(state_ids),
+        ).delete(synchronize_session=False)
+        for state in state_list:
+            self.session.add(
+                JobState(
+                    state_id=state.state_id,
+                    partial_state=state.partial_state,
+                    completed_state=state.completed_state,
+                ),
+            )
+        self.session.commit()
+        return len(state_list)
 
     @override
     def get_state_ids(self, pattern: str | None = None) -> Iterator[str]:
