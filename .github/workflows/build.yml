@@ -118,11 +118,14 @@ jobs:
     - name: Set registry
       id: set-registry
       run: |
-        if [[ "${{ github.event_name }}" == "release" && "${{ github.event.action }}" == "published" ]] || [[ "${{ github.event_name }}" == "schedule" ]]; then
+        if [[ "${GITHUB_EVENT_NAME}" == "release" && "${GITHUB_EVENT_ACTION}" == "published" ]] || [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
           echo "registry=docker.io" >> "$GITHUB_OUTPUT"
         else
           echo "registry=ghcr.io" >> "$GITHUB_OUTPUT"
         fi
+      env:
+        GITHUB_EVENT_ACTION: ${{ github.event.action }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
 
     - name: Set the workflow inputs
       id: set-inputs
