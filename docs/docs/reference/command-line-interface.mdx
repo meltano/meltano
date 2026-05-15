@@ -1935,6 +1935,63 @@ meltano state set --force --no-validate dev:tap-gitlab-to-target-jsonl '{"custom
 # WARNING: Skipping state validation. Invalid state may cause issues in future runs.
 ```
 
+### export
+
+Export all state to stdout as a JSON object, suitable for backup or migration to another state backend.
+
+The output maps each state ID to its `completed` and `partial` state, preserving the internal split so that a round-trip export → import is lossless.
+
+#### How to use
+
+```bash
+# Write all state to a file
+meltano state export > states.json
+
+# Pipe directly into another backend
+meltano --env-file src.env state export | meltano --env-file dst.env state import
+```
+
+#### Examples
+
+```bash
+# Migrate state from an S3 backend to Snowflake
+meltano --env-file s3.env state export > states.json
+meltano --env-file snowflake.env state import states.json
+
+# Quick backup before making changes
+meltano state export > backup.json
+```
+
+### import
+
+Import state from a JSON file (or stdin when no file is given), overwriting any existing state for each state ID present in the input.
+
+The expected format is the JSON object produced by `meltano state export`.
+
+#### How to use
+
+```bash
+# Read from a file
+meltano state import <file>
+
+# Read from stdin (e.g. piped from export)
+meltano state export | meltano state import
+```
+
+#### Parameters
+
+- `FILE` — path to a JSON file in the format produced by `meltano state export`. When omitted, state is read from stdin.
+
+#### Examples
+
+```bash
+# Restore from a backup
+meltano state import backup.json
+
+# Migrate state between backends
+meltano --env-file s3.env state export | meltano --env-file snowflake.env state import
+```
+
 ### Using `state` with Environments
 
 The `state` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
