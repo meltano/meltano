@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import fnmatch
 import glob
 import os
 import platform
@@ -437,6 +438,15 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
     @override
+    def set_all(self, states: Iterable[MeltanoState]) -> int:
+        count = 0
+        for state in states:
+            self.create_state_id_dir_if_not_exists(state.state_id)
+            self.set(state)
+            count += 1
+        return count
+
+    @override
     def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
 
@@ -536,7 +546,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
             List of state_ids
         """
         state_ids = set()
-        pattern_re = re.compile(pattern.replace("*", ".*")) if pattern else None
+        pattern_re = re.compile(fnmatch.translate(pattern)) if pattern else None
 
         for state_file in glob.glob(
             os.path.join(
@@ -656,7 +666,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             List of state_ids
         """
-        pattern_re = re.compile(pattern.replace("*", ".*")) if pattern else None
+        pattern_re = re.compile(fnmatch.translate(pattern)) if pattern else None
         state_ids = set()
         for filepath in self.list_all_files():
             if "/" not in filepath:

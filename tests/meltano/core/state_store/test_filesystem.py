@@ -318,6 +318,67 @@ class TestLocalFilesystemStateStoreManager:
         assert subject.clear_all() == initial_count
         assert len(list(Path(state_path).iterdir())) == 0
 
+    @pytest.mark.usefixtures("state_path")
+    def test_get_all_yields_all_states(
+        self, subject: _LocalFilesystemStateStoreManager
+    ) -> None:
+        for i in range(3):
+            subject.update(
+                MeltanoState(
+                    state_id=f"job-{i}",
+                    completed_state={"singer_state": {"v": i}},
+                    partial_state={},
+                )
+            )
+        result = list(subject.get_all())
+        assert {s.state_id for s in result} == {"job-0", "job-1", "job-2"}
+
+    @pytest.mark.usefixtures("state_path")
+    def test_get_all_with_pattern(
+        self, subject: _LocalFilesystemStateStoreManager
+    ) -> None:
+        for sid in ("tap-a-to-target-x", "tap-b-to-target-x", "other"):
+            subject.update(
+                MeltanoState(
+                    state_id=sid,
+                    completed_state={},
+                    partial_state={},
+                )
+            )
+        result = list(subject.get_all(pattern="tap-*"))
+        assert {s.state_id for s in result} == {
+            "tap-a-to-target-x",
+            "tap-b-to-target-x",
+        }
+
+    @pytest.mark.usefixtures("state_path")
+    def test_get_all_empty_store(
+        self, subject: _LocalFilesystemStateStoreManager
+    ) -> None:
+        assert list(subject.get_all()) == []
+
+    @pytest.mark.usefixtures("state_path")
+    def test_set_all_writes_states(
+        self, subject: _LocalFilesystemStateStoreManager
+    ) -> None:
+        states = [
+            MeltanoState(
+                state_id=f"job-{i}",
+                completed_state={"singer_state": {"v": i}},
+                partial_state={},
+            )
+            for i in range(3)
+        ]
+        count = subject.set_all(iter(states))
+        assert count == 3
+        assert all(subject.get(f"job-{i}") is not None for i in range(3))
+
+    @pytest.mark.usefixtures("state_path")
+    def test_set_all_empty_iterable(
+        self, subject: _LocalFilesystemStateStoreManager
+    ) -> None:
+        assert subject.set_all([]) == 0
+
 
 class TestAZStorageStateStoreManager:
     @pytest.fixture
@@ -662,14 +723,14 @@ class TestS3StateStoreManager:
             stubber.add_response(
                 "list_objects_v2",
                 response,
-                expected_params={"Bucket": subject.bucket, "Prefix": "/state"},
+                expected_params={"Bucket": subject.bucket, "Prefix": "state"},
             )
             assert set(subject.get_state_ids()) == {"state_id_1", "state_id_2"}
 
             stubber.add_response(
                 "list_objects_v2",
                 response,
-                expected_params={"Bucket": subject.bucket, "Prefix": "/state"},
+                expected_params={"Bucket": subject.bucket, "Prefix": "state"},
             )
             assert set(subject.get_state_ids(pattern="dev*")) == set()
 

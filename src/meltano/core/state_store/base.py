@@ -72,15 +72,17 @@ class MeltanoState:
         """
         return cls.from_json(state_id=state_id, json_str=file_obj.read())
 
+    def to_dict(self) -> dict[str, t.Any]:
+        """Convert the state object to a dictionary."""
+        return {"completed": self.completed_state, "partial": self.partial_state}
+
     def json(self) -> str:
         """Get the json representation of this MeltanoState.
 
         Returns:
             json representation of this MeltanoState
         """
-        return json.dumps(
-            {"completed": self.completed_state, "partial": self.partial_state},
-        )
+        return json.dumps(self.to_dict())
 
     def json_merged(self) -> str:
         """Return the json representation of partial state merged onto complete state.
@@ -205,6 +207,35 @@ class StateStoreManager(ABC):
             state_id: the state_id to clear state for
         """
         ...
+
+    def get_all(self, pattern: str | None = None) -> Iterable[MeltanoState]:
+        """Yield all states, optionally filtered by pattern.
+
+        Override for bulk-retrieval efficiency.
+
+        Args:
+            pattern: glob-style pattern to filter by
+        """
+        for state_id in self.get_state_ids(pattern):
+            if state := self.get(state_id):  # pragma: no branch
+                yield state
+
+    def set_all(self, states: Iterable[MeltanoState]) -> int:
+        """Set multiple states, returning the count written.
+
+        Override for bulk-write efficiency.
+
+        Args:
+            states: iterable of MeltanoState objects to persist
+
+        Returns:
+            The number of set states.
+        """
+        count = 0
+        for state in states:
+            self.set(state)
+            count += 1
+        return count
 
     def clear_all(self) -> int:
         """Clear all states.

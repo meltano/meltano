@@ -101,6 +101,22 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
         assert isinstance(state_store, DummyStateStoreManager)
 
 
+def test_set_fallback() -> None:
+    manager = DummyStateStoreManager()
+    states = [
+        MeltanoState(
+            state_id=f"dev:tap-a-to-target-{i}",
+            completed_state={"singer_state": {"bookmark": i}},
+            partial_state={},
+        )
+        for i in range(3)
+    ]
+    with mock.patch.object(manager, "set") as mock_set:
+        count = manager.set_all(states)
+    assert count == 3
+    assert mock_set.call_count == 3
+
+
 @pytest.mark.parametrize(
     ("setting", "namespace", "expected"),
     # NOTE: The "nested-setting" parametrized case below is currently xfail because
@@ -172,6 +188,76 @@ class TestSystemDBStateBackend:
         project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
         db_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(db_state_store, DBStateStoreManager)
+
+    @pytest.fixture
+    def db_store(self, session) -> DBStateStoreManager:
+        return DBStateStoreManager(session=session)
+
+    @pytest.fixture
+    def populated_db_store(self, db_store: DBStateStoreManager) -> DBStateStoreManager:
+        states = [
+            MeltanoState(
+                state_id=f"dev:tap-a-to-target-{i}",
+                completed_state={"singer_state": {"bookmark": i}},
+                partial_state={},
+            )
+            for i in range(3)
+        ]
+        for s in states:
+            db_store.set(s)
+        return db_store
+
+    def test_get_all_returns_all_states(
+        self, populated_db_store: DBStateStoreManager
+    ) -> None:
+        result = list(populated_db_store.get_all())
+        assert len(result) == 3
+        assert {s.state_id for s in result} == {
+            "dev:tap-a-to-target-0",
+            "dev:tap-a-to-target-1",
+            "dev:tap-a-to-target-2",
+        }
+
+    def test_get_all_with_pattern(
+        self, populated_db_store: DBStateStoreManager
+    ) -> None:
+        result = list(populated_db_store.get_all("dev:tap-a-to-target-1"))
+        assert len(result) == 1
+        assert result[0].state_id == "dev:tap-a-to-target-1"
+
+    def test_get_all_empty(self, db_store: DBStateStoreManager) -> None:
+        assert list(db_store.get_all()) == []
+
+    def test_set_all_inserts_states(self, db_store: DBStateStoreManager) -> None:
+        states = [
+            MeltanoState(
+                state_id=f"dev:tap-b-to-target-{i}",
+                completed_state={"singer_state": {"v": i}},
+                partial_state={},
+            )
+            for i in range(4)
+        ]
+        count = db_store.set_all(iter(states))
+        assert count == 4
+        assert len(list(db_store.get_all())) == 4
+
+    def test_set_all_overwrites_existing(
+        self, populated_db_store: DBStateStoreManager
+    ) -> None:
+        new_states = [
+            MeltanoState(
+                state_id="dev:tap-a-to-target-0",
+                completed_state={"singer_state": {"bookmark": 99}},
+                partial_state={},
+            ),
+        ]
+        populated_db_store.set_all(iter(new_states))
+        result = populated_db_store.get("dev:tap-a-to-target-0")
+        assert result is not None
+        assert result.completed_state == {"singer_state": {"bookmark": 99}}
+
+    def test_set_all_empty_iterable(self, db_store: DBStateStoreManager) -> None:
+        assert db_store.set_all(iter([])) == 0
 
 
 class TestLocalFilesystemStateBackend:
@@ -580,3 +666,120 @@ class TestS3StateBackend:
             objects = manager.client.list_objects_v2(Bucket=bucket)
             keys = [obj["Key"] for obj in objects["Contents"]]
             assert keys == [clean_key]
+
+    @pytest.fixture
+    def s3_manager(
+        self,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> S3StateStoreManager:
+        return S3StateStoreManager(
+            uri=f"s3://{bucket}/{prefix}",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            lock_timeout_seconds=10,
+        )
+
+    def test_get_all_returns_all_states(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        state_ids = ["job-a", "job-b", "job-c"]
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            for sid in state_ids:
+                s3_manager.client.put_object(
+                    Bucket=bucket,
+                    Key=f"{prefix}/{sid}/state.json",
+                    Body=b'{"completed":{"singer_state":{"bookmarks":{}}},"partial":{}}',
+                    ContentType="application/json",
+                )
+            results = list(s3_manager.get_all())
+        assert {s.state_id for s in results} == set(state_ids)
+
+    def test_get_all_with_pattern(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            for sid in ("tap-a-to-target-x", "tap-b-to-target-x", "other"):
+                s3_manager.client.put_object(
+                    Bucket=bucket,
+                    Key=f"{prefix}/{sid}/state.json",
+                    Body=b'{"completed":{},"partial":{}}',
+                    ContentType="application/json",
+                )
+            results = list(s3_manager.get_all(pattern="tap-*"))
+        assert {s.state_id for s in results} == {
+            "tap-a-to-target-x",
+            "tap-b-to-target-x",
+        }
+
+    def test_get_all_empty_bucket(
+        self,
+        bucket: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            results = list(s3_manager.get_all())
+        assert results == []
+
+    def test_set_all_writes_states(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        states = [
+            MeltanoState(
+                state_id=f"job-{i}",
+                completed_state={"singer_state": {"bookmarks": {}}},
+                partial_state={},
+            )
+            for i in range(4)
+        ]
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            count = s3_manager.set_all(iter(states))
+            assert count == 4
+            listed = s3_manager.client.list_objects_v2(Bucket=bucket, Prefix=prefix)
+            keys = {obj["Key"] for obj in listed.get("Contents", [])}
+            assert all(f"{prefix}/{s.state_id}/state.json" in keys for s in states)
+
+    def test_set_all_content_type_is_json(
+        self,
+        bucket: str,
+        prefix: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        state = MeltanoState(
+            state_id="my-job",
+            completed_state={"singer_state": {}},
+            partial_state={},
+        )
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            s3_manager.set_all([state])
+            response = s3_manager.client.get_object(
+                Bucket=bucket,
+                Key=f"{prefix}/{state.state_id}/state.json",
+            )
+            assert response["ContentType"] == "application/json"
+
+    def test_set_all_empty_iterable(
+        self,
+        bucket: str,
+        s3_manager: S3StateStoreManager,
+    ) -> None:
+        with moto.mock_aws():
+            s3_manager.client.create_bucket(Bucket=bucket)
+            count = s3_manager.set_all([])
+        assert count == 0
