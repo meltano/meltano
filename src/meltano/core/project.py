@@ -119,6 +119,7 @@ class Project:
             "root": self.root,
             "environment": self.environment,
             "readonly": self.readonly,
+            "dotenv_file": self.dotenv_file,
             **kwargs,
         }
         cls = type(self)

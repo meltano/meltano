@@ -139,6 +139,13 @@ class TestProject:
         assert contents.startswith("# Please don't delete me :)\n")
         assert "a_new_key: New Key" in contents
 
+    def test_refresh_preserves_dotenv_file(self, project: Project, tmp_path) -> None:
+        env_file = tmp_path / "custom.env"
+        env_file.write_text("SOME_VAR=value\n")
+        project.dotenv_file = env_file
+        project.refresh()
+        assert project.dotenv_file == env_file
+
 
 class TestIncompatibleProject:
     @pytest.fixture
