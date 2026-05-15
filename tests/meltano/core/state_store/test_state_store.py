@@ -14,7 +14,7 @@ from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import NotFound
 from google.cloud.storage import Blob
 
-from fixtures.state_backends import DummyStateStoreManager
+from fixtures.state_backends import DummyStateStoreManager, InMemoryStateStoreManager
 from meltano.core.error import MeltanoError
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_store import (
@@ -69,6 +69,95 @@ class TestStateStoreManagerContextManager:
     def test_close_is_noop_by_default(self) -> None:
         manager = DummyStateStoreManager()
         manager.close()  # Should not raise
+
+
+class TestStateStoreManagerFallbacks:
+    """Tests for the default get_all / set_all code paths in StateStoreManager.
+
+    Uses InMemoryStateStoreManager, which does NOT override get_all or set_all,
+    so every test here exercises the base-class fallback implementations.
+    """
+
+    @pytest.fixture
+    def manager(self) -> InMemoryStateStoreManager:
+        return InMemoryStateStoreManager()
+
+    @pytest.fixture
+    def populated_manager(
+        self, manager: InMemoryStateStoreManager
+    ) -> InMemoryStateStoreManager:
+        for i in range(3):
+            manager.set(
+                MeltanoState(
+                    state_id=f"job-{i}",
+                    completed_state={"singer_state": {"v": i}},
+                    partial_state={},
+                )
+            )
+        return manager
+
+    def test_get_all_yields_all_states(
+        self, populated_manager: InMemoryStateStoreManager
+    ) -> None:
+        result = list(populated_manager.get_all())
+        assert {s.state_id for s in result} == {"job-0", "job-1", "job-2"}
+
+    def test_get_all_passes_pattern_to_get_state_ids(
+        self, populated_manager: InMemoryStateStoreManager
+    ) -> None:
+        with mock.patch.object(
+            populated_manager,
+            "get_state_ids",
+            wraps=populated_manager.get_state_ids,
+        ) as mock_ids:
+            list(populated_manager.get_all(pattern="job-*"))
+        mock_ids.assert_called_once_with("job-*")
+
+    def test_get_all_skips_states_where_get_returns_none(
+        self, manager: InMemoryStateStoreManager
+    ) -> None:
+        manager.set(MeltanoState(state_id="real", completed_state={}, partial_state={}))
+        original_get = manager.get
+
+        def _get(state_id: str) -> MeltanoState | None:
+            return None if state_id == "ghost" else original_get(state_id)
+
+        with (
+            mock.patch.object(manager, "get_state_ids", return_value=["real", "ghost"]),
+            mock.patch.object(manager, "get", side_effect=_get),
+        ):
+            result = list(manager.get_all())
+        assert len(result) == 1
+        assert result[0].state_id == "real"
+
+    def test_get_all_empty_store(self, manager: InMemoryStateStoreManager) -> None:
+        assert list(manager.get_all()) == []
+
+    def test_set_all_writes_each_state(
+        self, manager: InMemoryStateStoreManager
+    ) -> None:
+        states = [
+            MeltanoState(
+                state_id=f"job-{i}",
+                completed_state={"singer_state": {"v": i}},
+                partial_state={},
+            )
+            for i in range(3)
+        ]
+        count = manager.set_all(iter(states))
+        assert count == 3
+        for i in range(3):
+            assert manager.get(f"job-{i}") is not None
+
+    def test_set_all_returns_count(self, manager: InMemoryStateStoreManager) -> None:
+        states = [
+            MeltanoState(state_id=f"x-{i}", completed_state={}, partial_state={})
+            for i in range(5)
+        ]
+        assert manager.set_all(states) == 5
+
+    def test_set_all_empty_iterable(self, manager: InMemoryStateStoreManager) -> None:
+        assert manager.set_all([]) == 0
 
 
 def test_unknown_state_backend_scheme(project: Project):
