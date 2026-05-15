@@ -736,8 +736,7 @@ class TestS3StateBackend:
             assert count == 4
             listed = s3_manager.client.list_objects_v2(Bucket=bucket, Prefix=prefix)
             keys = {obj["Key"] for obj in listed.get("Contents", [])}
-            for state in states:
-                assert f"{prefix}/{state.state_id}/state.json" in keys
+            assert all(f"{prefix}/{s.state_id}/state.json" in keys for s in states)
 
     def test_set_all_content_type_is_json(
         self,
