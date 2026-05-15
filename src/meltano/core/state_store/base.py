@@ -217,7 +217,7 @@ class StateStoreManager(ABC):
             pattern: glob-style pattern to filter by
         """
         for state_id in self.get_state_ids(pattern):
-            if state := self.get(state_id):
+            if state := self.get(state_id):  # pragma: no branch
                 yield state
 
     def set_all(self, states: Iterable[MeltanoState]) -> int:
