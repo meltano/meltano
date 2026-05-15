@@ -114,21 +114,26 @@ class DBStateStoreManager(StateStoreManager):
 
     @override
     def get_all(self, pattern: str | None = None) -> Iterator[MeltanoState]:
-        """Yield all states in a single query, optionally filtered by pattern.
+        """Yield all states in a memory-efficient way, optionally filtered by pattern.
 
         Args:
-            pattern: glob-style pattern to filter by
+            pattern: glob-style pattern to filter by.
         """
         query = self.session.query(JobState)
         if pattern:
-            query = query.filter(JobState.state_id.like(pattern.replace("*", "%")))
+            like_pattern = pattern.replace("*", "%")
+            query = query.filter(JobState.state_id.like(like_pattern))
+
+        # Use yield_per so rows are fetched in bounded batches instead of all at once.
+        query = query.yield_per(1000)
+
         return (
             MeltanoState(
                 state_id=js.state_id,
                 partial_state=js.partial_state,
                 completed_state=js.completed_state,
             )
-            for js in query.all()
+            for js in query
         )
 
     @override
