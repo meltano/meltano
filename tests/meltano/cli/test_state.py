@@ -918,6 +918,12 @@ class TestCliState:
         state_ids: list[str],
         cli_runner: MeltanoCliRunner,
     ) -> None:
+        # Add a state with a different env prefix so the pattern actually filters
+        staging_id = "staging:tap-extra-to-target-extra"
+        state_service.import_state(
+            {staging_id: {"completed": {"singer_state": {}}, "partial": {}}}
+        )
+
         first_id = state_ids[0]
         env = first_id.split(":")[0]
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
@@ -927,8 +933,8 @@ class TestCliState:
         assert_cli_runner(result)
         data = json.loads(result.stdout)
         assert isinstance(data, dict)
-        assert len(data) == len(state_ids)
-        assert all(state_id.startswith(f"{env}:") for state_id in data)
+        assert set(data) == set(state_ids)
+        assert staging_id not in data
 
     def test_import_from_file(
         self,
@@ -988,6 +994,18 @@ class TestCliState:
         assert result.exit_code == 1
         assert "Invalid JSON" in result.stderr
 
+    @pytest.mark.parametrize("invalid_input", ("[]", "123"), ids=["array", "number"])
+    def test_import_structurally_invalid_json_wrong_type(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+        invalid_input: str,
+    ) -> None:
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(cli, ["state", "import"], input=invalid_input)
+        assert result.exit_code != 0
+        assert "expected a JSON object" in result.stderr
+
     def test_export_import_roundtrip(
         self,
         state_service: StateService,
@@ -1012,3 +1030,23 @@ class TestCliState:
             state_service.get_state(state_id) == original_merged[state_id]
             for state_id in state_ids
         )
+
+    def test_export_import_roundtrip_preserves_split_state(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        original_export = state_service.export_state()
+
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            export_result = cli_runner.invoke(cli, ["state", "export"])
+            assert_cli_runner(export_result)
+
+            state_service.clear_all_states()
+
+            import_result = cli_runner.invoke(
+                cli, ["state", "import"], input=export_result.stdout
+            )
+            assert_cli_runner(import_result)
+
+        assert state_service.export_state() == original_export
