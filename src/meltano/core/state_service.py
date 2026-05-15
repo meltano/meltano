@@ -275,7 +275,7 @@ class StateService:
             A dict mapping each state_id to ``{"completed": ..., "partial": ...}``.
         """
         return {
-            s.state_id: json.loads(s.json())
+            s.state_id: s.to_dict()
             for s in self.state_store_manager.get_all(state_id_pattern)
         }
 

@@ -72,15 +72,17 @@ class MeltanoState:
         """
         return cls.from_json(state_id=state_id, json_str=file_obj.read())
 
+    def to_dict(self) -> dict[str, t.Any]:
+        """Convert the state object to a dictionary."""
+        return {"completed": self.completed_state, "partial": self.partial_state}
+
     def json(self) -> str:
         """Get the json representation of this MeltanoState.
 
         Returns:
             json representation of this MeltanoState
         """
-        return json.dumps(
-            {"completed": self.completed_state, "partial": self.partial_state},
-        )
+        return json.dumps(self.to_dict())
 
     def json_merged(self) -> str:
         """Return the json representation of partial state merged onto complete state.
