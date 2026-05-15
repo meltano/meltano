@@ -662,14 +662,14 @@ class TestS3StateStoreManager:
             stubber.add_response(
                 "list_objects_v2",
                 response,
-                expected_params={"Bucket": subject.bucket, "Prefix": "/state"},
+                expected_params={"Bucket": subject.bucket, "Prefix": "state"},
             )
             assert set(subject.get_state_ids()) == {"state_id_1", "state_id_2"}
 
             stubber.add_response(
                 "list_objects_v2",
                 response,
-                expected_params={"Bucket": subject.bucket, "Prefix": "/state"},
+                expected_params={"Bucket": subject.bucket, "Prefix": "state"},
             )
             assert set(subject.get_state_ids(pattern="dev*")) == set()
 
