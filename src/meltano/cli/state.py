@@ -395,16 +395,15 @@ def edit_state(ctx: click.Context, project: Project, state_id: str) -> None:
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="export")
-@click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-def export_state_cmd(ctx: click.Context, pattern: str | None) -> None:
+def export_state_cmd(ctx: click.Context) -> None:
     """Export all state to JSON on stdout.
 
     Output is a JSON object mapping each state_id to its completed and partial state,
     suitable for piping into 'meltano state import'.
     """
     state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
-    states = state_service.export_state(pattern)
+    states = state_service.export_state()
     click.echo(json.dumps(states, separators=(",", ":")))
 
 

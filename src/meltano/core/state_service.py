@@ -262,22 +262,13 @@ class StateService:
         """
         self.set_state(state_id_dst, json.dumps(self.get_state(state_id_src)))
 
-    def export_state(
-        self,
-        state_id_pattern: str | None = None,
-    ) -> dict[str, dict[str, t.Any]]:
+    def export_state(self) -> dict[str, dict[str, t.Any]]:
         """Export all states as a mapping preserving the completed/partial split.
-
-        Args:
-            state_id_pattern: An optional glob-style pattern of state_ids to export
 
         Returns:
             A dict mapping each state_id to ``{"completed": ..., "partial": ...}``.
         """
-        return {
-            s.state_id: s.to_dict()
-            for s in self.state_store_manager.get_all(state_id_pattern)
-        }
+        return {s.state_id: s.to_dict() for s in self.state_store_manager.get_all()}
 
     def import_state(self, states: dict[str, dict[str, t.Any]]) -> int:
         """Import states from a mapping, overwriting any existing state.

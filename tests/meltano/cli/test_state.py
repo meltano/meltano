@@ -912,30 +912,6 @@ class TestCliState:
         assert set(data) == set(state_ids)
         assert all("completed" in val and "partial" in val for val in data.values())
 
-    def test_export_pattern(
-        self,
-        state_service: StateService,
-        state_ids: list[str],
-        cli_runner: MeltanoCliRunner,
-    ) -> None:
-        # Add a state with a different env prefix so the pattern actually filters
-        staging_id = "staging:tap-extra-to-target-extra"
-        state_service.import_state(
-            {staging_id: {"completed": {"singer_state": {}}, "partial": {}}}
-        )
-
-        first_id = state_ids[0]
-        env = first_id.split(":")[0]
-        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            result = cli_runner.invoke(
-                cli, ["state", "export", "--pattern", f"{env}:*"]
-            )
-        assert_cli_runner(result)
-        data = json.loads(result.stdout)
-        assert isinstance(data, dict)
-        assert set(data) == set(state_ids)
-        assert staging_id not in data
-
     def test_import_from_file(
         self,
         tmp_path: Path,
