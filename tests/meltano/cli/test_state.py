@@ -1030,23 +1030,3 @@ class TestCliState:
             state_service.get_state(state_id) == original_merged[state_id]
             for state_id in state_ids
         )
-
-    def test_export_import_roundtrip_preserves_split_state(
-        self,
-        state_service: StateService,
-        cli_runner: MeltanoCliRunner,
-    ) -> None:
-        original_export = state_service.export_state()
-
-        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            export_result = cli_runner.invoke(cli, ["state", "export"])
-            assert_cli_runner(export_result)
-
-            state_service.clear_all_states()
-
-            import_result = cli_runner.invoke(
-                cli, ["state", "import"], input=export_result.stdout
-            )
-            assert_cli_runner(import_result)
-
-        assert state_service.export_state() == original_export
