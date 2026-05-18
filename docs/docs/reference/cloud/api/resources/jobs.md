@@ -55,8 +55,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{page.components}}/view-all-running-or-completed-jobs-for-a-workspace.md %}

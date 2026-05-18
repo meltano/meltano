@@ -67,8 +67,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/view-all-supported-dataplugins.md %}

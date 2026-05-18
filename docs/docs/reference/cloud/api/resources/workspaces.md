@@ -44,8 +44,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [Set a workspace as default](profiles#set-a-workspace-as-default)

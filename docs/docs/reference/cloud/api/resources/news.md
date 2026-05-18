@@ -10,8 +10,6 @@ News is a collection of [notifications](notifications) resulting from all config
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [View all tags in the news for a workspace](tags#view-all-tags-in-the-news-for-a-workspace)

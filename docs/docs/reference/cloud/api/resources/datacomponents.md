@@ -76,8 +76,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/view-all-datacomponents-in-a-workspace.md %}

@@ -37,8 +37,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{page.components}}/view-all-subscriptions.md %}

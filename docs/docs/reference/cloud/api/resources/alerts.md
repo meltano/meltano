@@ -10,8 +10,6 @@ Alerts can be created by users on [datasets](datasets). These alerts can then be
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/initialise-an-alert-on-a-dataset.md %}

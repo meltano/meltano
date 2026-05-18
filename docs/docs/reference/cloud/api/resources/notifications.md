@@ -43,8 +43,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [Create or update a dataset message](datasets#create-or-update-a-dataset-message)

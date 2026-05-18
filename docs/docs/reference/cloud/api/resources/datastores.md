@@ -33,8 +33,6 @@ Path | Type | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/view-all-datastores-in-a-workspace.md %}

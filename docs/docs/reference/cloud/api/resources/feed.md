@@ -16,8 +16,6 @@ User and member interactions that affect a dataset's score:
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [View all datasets in a workspace](datasets#view-all-datasets-in-a-workspace)

@@ -24,8 +24,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{page.components}}/view-all-members-of-a-workspace.md %}

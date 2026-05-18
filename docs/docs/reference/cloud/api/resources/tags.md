@@ -24,8 +24,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [Search for datasets in a workspace by tag name](search#search-for-datasets-in-a-workspace-by-tag-name)

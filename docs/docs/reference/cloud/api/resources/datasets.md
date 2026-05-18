@@ -50,8 +50,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [View all comments on a dataset](comments#view-all-comments-on-a-dataset)

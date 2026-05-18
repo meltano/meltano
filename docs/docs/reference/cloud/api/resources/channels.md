@@ -29,8 +29,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [Subscribe to a channel](subscriptions#subscribe-to-a-channel)

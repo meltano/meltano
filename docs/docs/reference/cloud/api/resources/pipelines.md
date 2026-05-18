@@ -66,8 +66,6 @@ Value | Description
 
 #### Requests
 
-- TOC
-
 #### See Also
 
 - [View all running or completed jobs for a pipeline](jobs#view-all-running-or-completed-jobs-for-a-pipeline)

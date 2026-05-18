@@ -31,8 +31,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/view-all-comments-on-a-dataset.md %}

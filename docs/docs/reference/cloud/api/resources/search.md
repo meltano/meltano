@@ -12,8 +12,6 @@ See [here]({{site.baseurl}}/api/links#search) for more information on constructi
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/search-for-datasets-in-a-workspace-by-free-text.md %}

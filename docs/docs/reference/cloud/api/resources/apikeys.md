@@ -27,8 +27,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{page.components}}/view-all-api-keys.md %}

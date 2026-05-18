@@ -12,8 +12,6 @@ This can be done manually or via a GitHub Webhook which you can see how to set u
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{ page.components }}/deploy-workspace.md %}

@@ -28,8 +28,6 @@ Path | JSON Type | Format | Description
 
 #### Requests
 
-- TOC
-
 ---
 
 <!-- {% include {{page.components}}/view-a-resource-in-a-workspace.md %}
