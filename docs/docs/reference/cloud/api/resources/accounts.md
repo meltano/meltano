@@ -8,15 +8,11 @@ nav_order: 1
 components: request-md-components/accounts
 ---
 
-# {{page.title}}
-
 Accounts are passive entities that store quota information for resources consumed by associated [profiles](profiles). An account is created for a user when they first sign up.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Account
 

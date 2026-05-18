@@ -8,15 +8,11 @@ nav_order: 3
 components: request-md-components/invitations
 ---
 
-# {{page.title}}
-
 Invitations allow access to private workspaces. When an invitation is created, an email containing an access link to the workspace will be sent to the recipient. Invitations can be sent to email addresses under the allowed domains configured for a workspace.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Invitation
 
@@ -30,16 +26,13 @@ Path | JSON Type | Format | Description
 `creator` | `object` | [`Member`](members#member) | The invitation creator
 `workspace` | `object` | [`Workspace`](workspaces#workspace) | The invitation target workspace
 
-{% include snippets/api/invitations/view-all-invitations-to-a-workspace/response-body.md %}
+<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/response-body.md %} -->
 
 ## Formats
-{: .no_toc}
 
 ### Invitation Status
-{: .d-inline-block }
 
 `string`
-{: .float-right .mt-5 }
 
 Value | Description
 ----- | -----------
@@ -52,14 +45,13 @@ Value | Description
 #### Requests
 
 - TOC
-{: toc }
 
 ---
 
-{% include {{ page.components }}/view-all-sent-invitations.md %}
+<!-- {% include {{ page.components }}/view-all-sent-invitations.md %}
 {% include {{ page.components }}/view-all-received-invitations.md %}
 {% include {{ page.components }}/view-all-invitations-to-a-workspace.md %}
 {% include {{ page.components }}/create-an-invitation-to-a-workspace.md %}
 {% include {{ page.components }}/accept-an-invitation.md %}
 {% include {{ page.components }}/delete-an-invitation-to-a-workspace.md %}
-{% include {{ page.components }}/withdraw-an-invitation-to-a-workspace.md %}
+{% include {{ page.components }}/withdraw-an-invitation-to-a-workspace.md %} -->

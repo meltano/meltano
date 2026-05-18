@@ -8,15 +8,11 @@ nav_order: 5
 components: request-md-components/datasets
 ---
 
-# {{page.title}}
-
-Datasets are modules of data that can be published to workspaces. Datasets are visualised in the Matatika app following the [Chart.js](https://www.chartjs.org/){:target="_blank"} specifications.
-{: .fs-5 }
+Datasets are modules of data that can be published to workspaces. Datasets are visualised in the Matatika app following the [Chart.js](https://www.chartjs.org/) specifications.
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Dataset
 
@@ -41,7 +37,7 @@ Path | JSON Type | Format | Description
 `created` | `string` | ISO 8601 timestamp | The instant the dataset was create
 `score` | `number` | Decimal | The dataset score used to determine its position in the workspace [Feed](feed)
 
-{% include snippets/api/datasets/view-a-dataset/response-body.md %}
+<!-- {% include snippets/api/datasets/view-a-dataset/response-body.md %} -->
 
 ### Dataset Message
 
@@ -52,14 +48,13 @@ Path | JSON Type | Format | Description
 `message` | `string` | | The dataset message content
 `datasetId` | `string` | Version 4 UUID | The message subject dataset ID
 
-{% include snippets/api/datasets/create-or-update-a-dataset-message/response-body.md %}
+<!-- {% include snippets/api/datasets/create-or-update-a-dataset-message/response-body.md %} -->
 
 ---
 
 #### Requests
 
 - TOC
-{: toc }
 
 #### See Also
 
@@ -71,7 +66,7 @@ Path | JSON Type | Format | Description
 
 ---
 
-{% include {{ page.components }}/view-all-datasets-in-a-workspace.md %}
+<!-- {% include {{ page.components }}/view-all-datasets-in-a-workspace.md %}
 {% include {{ page.components }}/view-datasets-in-a-workspace-liked-by-profile.md %}
 {% include {{ page.components }}/view-datasets-by-channel.md %}
 {% include {{ page.components }}/view-a-dataset.md %}
@@ -84,7 +79,7 @@ Path | JSON Type | Format | Description
 {% include {{ page.components }}/remove-a-like-from-a-dataset.md %}
 {% include {{ page.components }}/initialise-a-new-dataset-message.md %}
 {% include {{ page.components }}/create-or-update-a-dataset-message.md %}
-{% include {{ page.components }}/delete-a-dataset.md %}
+{% include {{ page.components }}/delete-a-dataset.md %} -->
 
 ---
 

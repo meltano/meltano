@@ -8,15 +8,11 @@ nav_order: 2
 components: request-md-components/workspaces
 ---
 
-# {{page.title}}
-
 Workspaces allow users to operate within isolated instances of the Matatika service. This is useful for separating profiles based on the data they require access to.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Workspace
 
@@ -30,20 +26,17 @@ Path | JSON Type | Format | Description
 `domains` | `string[]` | Array of domain hosts | The workspace allowed domains
 `repositoryUrl` | `string` | URL | The workspace repository URL
 `pipelinesImage` | `string` | Container image name path | The path name of an image to run pipelines from
-`imageUrl` | `string` | Image [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs){:target="_blank"} | The workspace image data URL
+`imageUrl` | `string` | Image [data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs) | The workspace image data URL
 `status` | `string` | [Workspace Status](#workspace-status) | The workspace status
 `defaultWorkspace` | `bool` | | Whether or not the workspace is set as the default the authenticated user
 
-{% include snippets/api/workspaces/view-a-workspace/response-body.md %}
+<!-- {% include snippets/api/workspaces/view-a-workspace/response-body.md %} -->
 
 ## Formats
-{: .no_toc}
 
 ### Workspace Status
-{: .d-inline-block }
 
 `string`
-{: .float-right .mt-5 }
 
 Value | Description
 ----- | -----------
@@ -56,7 +49,6 @@ Value | Description
 #### Requests
 
 - TOC
-{: toc}
 
 #### See Also
 
@@ -78,9 +70,9 @@ Value | Description
 
 ---
 
-{% include {{page.components}}/view-all-workspaces.md %}
+<!-- {% include {{page.components}}/view-all-workspaces.md %}
 {% include {{page.components}}/view-a-workspace.md %}
 {% include {{page.components}}/initialise-a-workspace.md %}
 {% include {{page.components}}/create-a-workspace.md %}
 {% include {{page.components}}/update-a-workspace.md %}
-{% include {{page.components}}/delete-a-workspace.md %}
+{% include {{page.components}}/delete-a-workspace.md %} -->

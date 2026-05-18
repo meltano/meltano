@@ -8,15 +8,11 @@ nav_order: 11
 components: request-md-components/datacomponents
 ---
 
-# {{page.title}}
-
 Datacomponents hold configuration for [dataplugins](dataplugins), and are the building blocks for constructing [pipelines](pipelines). One dataplugin may be referenced by many datacomponents, each with a different set of `properties` for the dataplugin [`settings`](dataplugins#setting). One pipeline may reference multiple datacomponents.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Datacomponent
 
@@ -27,9 +23,9 @@ Path | JSON Type | Format | Description
 `lastModified` | `string` | ISO 8601 timestamp | When the datacomponent was last modified
 `name` | `string` | | The datacomponent name
 `dataPlugin` | `string` | | Create / update with [dataplugin](dataplugins#dataplugin) `fullyQualifiedName`
-`properties` | `object` | [`Properties`](#properties) | The datacomponent properties, defined by the [dataplugin](dataplugins) [`settings`](dataplugins#setting)<br>Properties are key-value pairs, where keys reference setting `name`s
+`properties` | `object` | [`Properties`](#properties) | The datacomponent properties, defined by the [dataplugin](dataplugins) [`settings`](dataplugins#setting)<br/>Properties are key-value pairs, where keys reference setting `name`s
 
-{% include snippets/api/datacomponents/view-a-datacomponent/response-body.md %}
+<!-- {% include snippets/api/datacomponents/view-a-datacomponent/response-body.md %} -->
 
 #### Extractor Datacomponent
 Datacomponents that are backed by [dataplugins](dataplugins) of `type` `EXTRACTOR` expose the following additional configuration:
@@ -38,7 +34,7 @@ Path | JSON Type | Format | Description
 ---- | --------- | ------ | -----------
 `streams` | `object[]` | Array of [Stream](#stream)s | The available streams (populated after [verifying a pipeline](pipelines#verify-a-pipeline) that references this datacomponent)
 
-{% include snippets/api/jobs/view-an-extractor-datacomponent/response-body.md %}
+<!-- {% include snippets/api/jobs/view-an-extractor-datacomponent/response-body.md %} -->
 
 ### Properties
 
@@ -71,14 +67,12 @@ Path | JSON Type | Format | Description
 `selected` | `string` | [Entity Selection](#entity-selection) | The field entity selection type
 
 ## Formats
-{: .no_toc}
 
 ### Entity Selection
-{: .d-inline-block }
 
 Value | Description
 ----- | -----------
-`AUTOMATIC` | The entity is automatically selected by the underlying [extractor](https://docs.meltano.com/concepts/plugins#extractors){:target="_blank"} and will always be synced
+`AUTOMATIC` | The entity is automatically selected by the underlying [extractor](https://docs.meltano.com/concepts/plugins#extractors) and will always be synced
 `SELECTED` | The entity is selected and will be synced
 `EXCLUDED` | The entity is excluded and will not be synced
 
@@ -87,13 +81,12 @@ Value | Description
 #### Requests
 
 - TOC
-{: toc }
 
 ---
 
-{% include {{ page.components }}/view-all-datacomponents-in-a-workspace.md %}
+<!-- {% include {{ page.components }}/view-all-datacomponents-in-a-workspace.md %}
 {% include {{ page.components }}/view-a-datacomponent.md %}
 {% include {{ page.components }}/initialise-a-new-datacomponent-in-a-workspace.md %}
 {% include {{ page.components }}/create-or-update-a-datacomponent-in-a-workspace.md %}
 {% include {{ page.components }}/update-a-datacomponent.md %}
-{% include {{ page.components }}/delete-a-datacomponent.md %}
+{% include {{ page.components }}/delete-a-datacomponent.md %} -->

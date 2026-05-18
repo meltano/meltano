@@ -8,10 +8,7 @@ nav_order: 9
 components: request-md-components/feed
 ---
 
-# {{page.title}}
-
 The feed returns the most relevant datasets for the authenticated user profile. [Member](members) interactions with datasets are scored, determining their position within the feed.
-{: .fs-5 }
 
 User and member interactions that affect a dataset's score:
 - Creating or modifying a dataset
@@ -24,7 +21,6 @@ User and member interactions that affect a dataset's score:
 #### Requests
 
 - TOC
-{: toc }
 
 #### See Also
 
@@ -32,4 +28,4 @@ User and member interactions that affect a dataset's score:
 
 ---
 
-{% include {{ page.components }}/view-the-feed-of-a-workspace.md %}
+<!-- {% include {{ page.components }}/view-the-feed-of-a-workspace.md %} -->

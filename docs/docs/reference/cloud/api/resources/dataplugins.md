@@ -8,15 +8,11 @@ nav_order: 11
 components: request-md-components/dataplugins
 ---
 
-# {{page.title}}
-
 Dataplugins simply define a source of data from a given repository. Matatika provides a number of pre-configured platform-wide dataplugins out-the-box, as well as the ability to create custom dataplugins through the API. From these, [pipeline](pipelines) jobs can be run to inject data into a workspace.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Dataplugin
 
@@ -28,7 +24,7 @@ Path | JSON Type | Format | Description
 `repositoryUrl` | `string` | URL | The dataplugin repository URL
 `settings` | `object[]` | Array of [`Setting`](#setting)s | The dataplugin settings
 
-{% include snippets/api/dataplugins/view-a-dataplugin/response-body.md %}
+<!-- {% include snippets/api/dataplugins/view-a-dataplugin/response-body.md %} -->
 
 ### Setting
 
@@ -53,13 +49,10 @@ Path | JSON Type | Format | Description
 `provider` | `string` | | The OAuth provider
 
 ## Formats
-{: .no_toc}
 
 ### Setting Kind
-{: .d-inline-block }
 
 `string`
-{: .float-right .mt-5 }
 
 Value | Description
 ----- | -----------
@@ -79,11 +72,10 @@ Value | Description
 #### Requests
 
 - TOC
-{: toc }
 
 ---
 
-{% include {{ page.components }}/view-all-supported-dataplugins.md %}
+<!-- {% include {{ page.components }}/view-all-supported-dataplugins.md %}
 {% include {{ page.components }}/view-the-matatika-discovery-yml.md %}
 {% include {{ page.components }}/view-all-workspace-dataplugins.md %}
 {% include {{ page.components }}/view-a-workspace-discovery-yml.md %}
@@ -92,4 +84,4 @@ Value | Description
 {% include {{ page.components }}/publish-dataplugins-from-a-discovery-yml.md %}
 {% include {{ page.components }}/create-a-dataplugin.md %}
 {% include {{ page.components }}/update-a-dataplugin.md %}
-{% include {{ page.components }}/delete-a-dataplugin.md %}
+{% include {{ page.components }}/delete-a-dataplugin.md %} -->

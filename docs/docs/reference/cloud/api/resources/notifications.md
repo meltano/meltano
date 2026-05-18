@@ -8,15 +8,11 @@ nav_order: 16
 components: request-md-components/notifications
 ---
 
-# {{page.title}}
-
 Notifications are alerts triggered by certain events pertaining to a resource. To receive notifications for a specific resource, a user must have a [subscription](subscriptions) to the resource.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Notification
 
@@ -29,16 +25,13 @@ Path | JSON Type | Format | Description
 `type` | `string` | [Notification Type](#notification-type) | The type of notification
 `resolved` | `bool` | | Whether or not the notification has been read
 
-{% include snippets/api/notifications/view-a-notification/response-body.md %}
+<!-- {% include snippets/api/notifications/view-a-notification/response-body.md %} -->
 
 ## Formats
-{: .no_toc}
 
 ### Notification Type
-{: .d-inline-block }
 
 `string`
-{: .float-right .mt-5 }
 
 Value | Description
 ----- | -----------
@@ -55,7 +48,6 @@ Value | Description
 #### Requests
 
 - TOC
-{: toc }
 
 #### See Also
 
@@ -63,9 +55,9 @@ Value | Description
 
 ---
 
-{% include {{page.components}}/view-all-notifications.md %}
+<!-- {% include {{page.components}}/view-all-notifications.md %}
 {% include {{page.components}}/view-all-notifications-for-a-workspace.md %}
 {% include {{page.components}}/view-a-notification.md %}
 {% include {{page.components}}/refresh-notifications.md %}
-{% include {{page.components}}/delete-a-notification.md %}
+{% include {{page.components}}/delete-a-notification.md %} -->
 

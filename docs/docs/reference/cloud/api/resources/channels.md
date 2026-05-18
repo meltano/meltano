@@ -8,15 +8,11 @@ nav_order: 6
 components: request-md-components/channels
 ---
 
-# {{page.title}}
-
 Channels enable datasets to be categorised or grouped together. A single workspace can have multiple channels.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc }
 
 ### Channel
 
@@ -31,14 +27,13 @@ Path | JSON Type | Format | Description
 `description` | `string` | | The channel description
 `picture` | `string` | URL | The channel picture metadata
 
-{% include snippets/api/channels/view-a-channel/response-body.md %}
+<!-- {% include snippets/api/channels/view-a-channel/response-body.md %} -->
 
 ---
 
 #### Requests
 
 - TOC
-{: toc}
 
 #### See Also
 
@@ -46,7 +41,7 @@ Path | JSON Type | Format | Description
 
 ---
 
-{% include request-md-components/channels/initialise-a-channel.md %}
+<!-- {% include request-md-components/channels/initialise-a-channel.md %}
 {% include request-md-components/channels/view-a-channel.md %}
 {% include request-md-components/channels/view-a-channel-in-a-workspace.md %}
 {% include request-md-components/channels/view-all-channels-in-a-workspace.md %}
@@ -56,4 +51,4 @@ Path | JSON Type | Format | Description
 {% include request-md-components/channels/add-dataset-to-list-channel.md %}
 {% include request-md-components/channels/remove-dataset-from-list-channel.md %}
 {% include request-md-components/channels/add-workspace-scope-to-a-channel.md %}
-{% include request-md-components/channels/withdraw-workspace-scope-from-a-channel.md %}
+{% include request-md-components/channels/withdraw-workspace-scope-from-a-channel.md %} -->

@@ -8,15 +8,11 @@ nav_order: 14
 components: request-md-components/jobs
 ---
 
-# {{page.title}}
-
 A job is an arbitrary task with some stored state, pertaining to the governing [workspace](workspaces). Typically, jobs are orchestrated by [pipeline](pipelines) operations, but can also represent tasks for the user to complete.
-{: .fs-5 }
 
 ---
 
 ## Objects
-{: .no_toc}
 
 ### Job
 
@@ -30,16 +26,13 @@ Path | JSON Type | Format | Description
 `startTime` | `string` | ISO 8601 timestamp | The instant at which the job run started
 `endTime` | `string` | ISO 8601 timestamp | The instant at which the job run ended
 
-{% include snippets/api/jobs/view-a-job/response-body.md %}
+<!-- {% include snippets/api/jobs/view-a-job/response-body.md %} -->
 
 ## Formats
-{: .no_toc}
 
 ### Job Status
-{: .d-inline-block }
 
 `string`
-{: .float-right .mt-5 }
 
 Value | Description
 ----- | -----------
@@ -50,10 +43,8 @@ Value | Description
 `STOPPED` | The job timed out or was manually stopped
 
 ### Job Type
-{: .d-inline-block }
 
 `string`
-{: .float-right .mt-5 }
 
 Value | Description
 ----- | -----------
@@ -69,14 +60,13 @@ Value | Description
 #### Requests
 
 - TOC
-{: toc }
 
 ---
 
-{% include {{page.components}}/view-all-running-or-completed-jobs-for-a-workspace.md %}
+<!-- {% include {{page.components}}/view-all-running-or-completed-jobs-for-a-workspace.md %}
 {% include {{page.components}}/view-all-running-or-completed-jobs-for-a-pipeline.md %}
 {% include {{page.components}}/view-a-job.md %}
 {% include {{page.components}}/view-the-logs-of-a-job.md %}
 {% include {{page.components}}/create-a-job-from-a-pipeline.md %}
 {% include {{page.components}}/stop-a-job.md %}
-{% include {{page.components}}/delete-a-job.md %}
+{% include {{page.components}}/delete-a-job.md %} -->
