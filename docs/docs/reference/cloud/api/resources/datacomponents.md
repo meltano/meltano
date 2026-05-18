@@ -53,7 +53,7 @@ Path | JSON Type | Format | Description
 ---- | --------- | ------ | -----------
 `name` | `string` | | The stream name
 `selected` | `string` | [Entity Selection](#entity-selection) | The stream entity selection type
-`fields` | `object[]` | Array of [Field](#fields)s | The available stream fields
+`fields` | `object[]` | Array of [Field](#field)s | The available stream fields
 
 ### Field
 
