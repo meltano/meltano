@@ -54,7 +54,9 @@ Path | JSON Type | Format | Description
 
 ### View all datasets in a workspace
 
-GET `/api/workspaces/{workspace-id}/datasets`
+:::info
+**GET** `/api/workspaces/{workspace-id}/datasets`
+:::
 
 Returns all datasets in the workspace `{workspace-id}`.
 
@@ -86,7 +88,9 @@ Returns all datasets in the workspace `{workspace-id}`.
 ---
 ### View all liked datasets in a workspace
 
-GET `/api/workspaces/{workspace-id}/liked`
+:::info
+**GET** `/api/workspaces/{workspace-id}/liked`
+:::
 
 Returns all datasets in the workspace `{workspace-id}` liked by the authenticated profile.
 
@@ -118,7 +122,9 @@ Returns all datasets in the workspace `{workspace-id}` liked by the authenticate
 ---
 ### View datasets by channel
 
-GET `/api/channels/{channel-id}/datasets`
+:::info
+**GET** `/api/channels/{channel-id}/datasets`
+:::
 
 Returns datasets by the channel `{channel-id}`.
 
@@ -150,7 +156,9 @@ Returns datasets by the channel `{channel-id}`.
 ---
 ### View a dataset
 
-GET `/api/datasets/{dataset-id}`
+:::info
+**GET** `/api/datasets/{dataset-id}`
+:::
 
 Returns the dataset `{dataset-id}`.
 
@@ -181,7 +189,9 @@ Returns the dataset `{dataset-id}`.
 ---
 ### View a dataset in a workspace
 
-GET `/api/workspaces/{workspace-id}/datasets/{dataset-id-or-alias}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/datasets/{dataset-id-or-alias}`
+:::
 
 Returns the dataset `{dataset-id-or-alias}` in the workspace `{workspace-id}`.
 
@@ -214,7 +224,9 @@ Returns the dataset `{dataset-id-or-alias}` in the workspace `{workspace-id}`.
 ---
 ### View the data of a dataset
 
-GET `/api/datasets/{dataset-id}/data`
+:::info
+**GET** `/api/datasets/{dataset-id}/data`
+:::
 
 Returns the data of the dataset `{dataset-id}`.
 
@@ -256,7 +268,9 @@ Defaults to `application/json` (given `Accept */*` or no `Accept` header).
 ---
 ### Publish a dataset to a workspace
 
-POST `/api/workspaces/{workspace-id}/datasets`
+:::info
+**POST** `/api/workspaces/{workspace-id}/datasets`
+:::
 
 Publishes a dataset to the workspace `{workspace-id}`.
 
@@ -293,7 +307,9 @@ Making the request with an existing `id` or `alias` will result in the respectiv
 ---
 ### Edit a dataset
 
-PATCH `/api/datasets/{dataset-id}`
+:::info
+**PATCH** `/api/datasets/{dataset-id}`
+:::
 
 Edits the dataset `{dataset-id}`.
 
@@ -330,7 +346,9 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 ---
 ### Record a view of a dataset
 
-PUT `/api/datasets/{dataset-id}/view`
+:::info
+**PUT** `/api/datasets/{dataset-id}/view`
+:::
 
 "Adds a view to the dataset `{dataset-id}`.
 
@@ -361,7 +379,9 @@ No response body provided.
 ---
 ### Record a like of a dataset
 
-PUT `/api/datasets/{dataset-id}/like`
+:::info
+**PUT** `/api/datasets/{dataset-id}/like`
+:::
 
 Records a like of the dataset `{dataset-id}` from the authenticated user profile.
 
@@ -392,7 +412,9 @@ No response body provided.
 ---
 ### Remove a like from a dataset
 
-DELETE `/api/datasets/{dataset-id}/like`
+:::info
+**DELETE** `/api/datasets/{dataset-id}/like`
+:::
 
 Removes a like of the dataset `{dataset-id}` from the authenticated user profile.
 
@@ -423,7 +445,9 @@ No response body provided.
 ---
 ### Initialise a new dataset message
 
-POST `/api/datasets/{dataset-id}/messages`
+:::info
+**POST** `/api/datasets/{dataset-id}/messages`
+:::
 
 Initialises a new dataset message for the dataset `{dataset-id}`
 
@@ -454,7 +478,9 @@ Initialises a new dataset message for the dataset `{dataset-id}`
 ---
 ### Create or update a dataset message
 
-PUT `/api/datasets/{dataset-id}/messages/{message-id}`
+:::info
+**PUT** `/api/datasets/{dataset-id}/messages/{message-id}`
+:::
 
 Creates or updates the dataset message `{message-id}` for the dataset `{dataset-id}`. This appears as [`DATASET_MESSAGE`](notifications#notification-type) [notification](notifications) for the recipient.
 
@@ -489,7 +515,9 @@ Creates or updates the dataset message `{message-id}` for the dataset `{dataset-
 ---
 ### Delete a dataset
 
-DELETE `/api/datasets/{dataset-id}`
+:::info
+**DELETE** `/api/datasets/{dataset-id}`
+:::
 
 Deletes the dataset `{dataset-id}`.
 

@@ -33,7 +33,9 @@ Path | JSON Type | Format | Description
 
 ### Initialise a channel
 
-POST `/api/channels/{channel-id}`
+:::info
+**POST** `/api/channels/{channel-id}`
+:::
 
 Initialise a channel.
 
@@ -61,7 +63,9 @@ Initialise a channel.
 ---
 ### View a channel
 
-GET `/api/channels/{channel-id}`
+:::info
+**GET** `/api/channels/{channel-id}`
+:::
 
 Returns the channel `{channel-id}`.
 
@@ -92,7 +96,9 @@ Returns the channel `{channel-id}`.
 ---
 ### View a channel in a workspace
 
-GET `/api/workspaces/{workspace-id}/channels/{channel-id}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/channels/{channel-id}`
+:::
 
 Returns a channel in the workspace `{workspace-id}`.
 
@@ -124,7 +130,9 @@ Returns a channel in the workspace `{workspace-id}`.
 ---
 ### View all channels in a workspace
 
-GET `/api/workspaces/{workspace-id}/channels/{channel-id}?type={type}&source={source}&containsDataset={datasetId}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/channels/{channel-id}?type={type}&source={source}&containsDataset={datasetId}`
+:::
 
 Returns all channels in the workspace `{workspace-id}`.
 
@@ -165,7 +173,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### Create or Update a channel in a workspace
 
-PUT `/api/workspaces/{workspace-id}/channels/{channel-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/channels/{channel-id}`
+:::
 
 Creates or Updates a channel in the workspace `{workspace-id}`.
 
@@ -199,7 +209,9 @@ This endpoint takes a `{channel-id}` (UUID) and based on the supplied value and 
 ---
 ### Delete a channel
 
-DELETE `/api/channels/{channel-id}`
+:::info
+**DELETE** `/api/channels/{channel-id}`
+:::
 
 Delete a channel.
 
@@ -229,7 +241,9 @@ No response body provided.
 ---
 ### View all channels in your workspace news
 
-GET `/api/channels/{channel-id}`
+:::info
+**GET** `/api/channels/{channel-id}`
+:::
 
 Returns all channels in your news for the workspace.
 
@@ -257,7 +271,9 @@ Returns all channels in your news for the workspace.
 ---
 ### Add a dataset to a list channel
 
-PUT `/api/channels/{channel-id}/datasets/{dataset-id}`
+:::info
+**PUT** `/api/channels/{channel-id}/datasets/{dataset-id}`
+:::
 
 Adds a dataset to a channel with type list.
 
@@ -284,7 +300,9 @@ No response body provided.
 ---
 ### Remove a dataset from a list channel
 
-DELETE `/api/channels/{channel-id}/datasets/{dataset-id}`
+:::info
+**DELETE** `/api/channels/{channel-id}/datasets/{dataset-id}`
+:::
 
 Removes a dataset from a channel with type list.
 
@@ -311,7 +329,9 @@ No response body provided.
 ---
 ### Add workspace scope to a channel
 
-PUT `/api/channels/{channel-id}/scope/workspace`
+:::info
+**PUT** `/api/channels/{channel-id}/scope/workspace`
+:::
 
 Add workspace scope to a channel.
 
@@ -339,7 +359,9 @@ Add workspace scope to a channel.
 ---
 ### Withdraw workspace scope from a channel
 
-PUT `/api/channels/{channel-id}/scope/profile`
+:::info
+**PUT** `/api/channels/{channel-id}/scope/profile`
+:::
 
 Withdraw workspace scope from a channel.
 

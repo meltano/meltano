@@ -28,7 +28,9 @@ Path | JSON Type | Format | Description
 
 ### View all tags in a workspace
 
-GET `/api/workspaces/{workspace-id}/tags`
+:::info
+**GET** `/api/workspaces/{workspace-id}/tags`
+:::
 
 Returns all tags in the workspace `{workspace-id}`.
 
@@ -60,7 +62,9 @@ Returns all tags in the workspace `{workspace-id}`.
 ---
 ### View all tags in the news for a workspace
 
-GET `/api/workspaces/{workspace-id}/news/tags`
+:::info
+**GET** `/api/workspaces/{workspace-id}/news/tags`
+:::
 
 Returns all tags in the news for the workspace `{workspace-id}`.
 
@@ -75,7 +79,9 @@ Returns all tags in the news for the workspace `{workspace-id}`.
 ---
 ### View a tag in a workspace
 
-GET `/api/workspaces/{workspace-id}/tags/{tag-id}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/tags/{tag-id}`
+:::
 
 Returns the tag `{tag-id}` in the workspace `{workspace-id}`.
 

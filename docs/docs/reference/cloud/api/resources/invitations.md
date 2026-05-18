@@ -44,7 +44,9 @@ Value | Description
 
 ### View all sent invitations
 
-GET `/api/invitations`
+:::info
+**GET** `/api/invitations`
+:::
 
 Returns all invitations sent by the authenticated user profile.
 
@@ -72,7 +74,9 @@ Returns all invitations sent by the authenticated user profile.
 ---
 ### View all received invitations
 
-GET `/api/invitations?email={user-email}`
+:::info
+**GET** `/api/invitations?email={user-email}`
+:::
 
 Returns all invitations received by the authenticated user profile.
 
@@ -100,7 +104,9 @@ Returns all invitations received by the authenticated user profile.
 ---
 ### View all invitations to a workspace
 
-GET `/api/workspaces/{workspace-id}/invitations`
+:::info
+**GET** `/api/workspaces/{workspace-id}/invitations`
+:::
 
 *As a workspace owner...*
 
@@ -138,7 +144,9 @@ Returns all active invitations to the workspace `{workspace-id}` sent by the aut
 ---
 ### Create an invitation to a workspace
 
-POST `/api/workspaces/{workspace-id}/invitations`
+:::info
+**POST** `/api/workspaces/{workspace-id}/invitations`
+:::
 
 Creates an invitation to the workspace `{workspace-id}`.
 
@@ -174,7 +182,9 @@ No response body provided.
 ---
 ### Accept an invitation
 
-PATCH `/api/invitations/{invitation-id}`
+:::info
+**PATCH** `/api/invitations/{invitation-id}`
+:::
 
 Accepts the invitation `{invitation-id}`.
 
@@ -207,7 +217,9 @@ Accepts the invitation `{invitation-id}`.
 ---
 ### Delete an invitation
 
-DELETE `/api/invitations/{invitation-id}`
+:::info
+**DELETE** `/api/invitations/{invitation-id}`
+:::
 
 Deletes a pending or revoked invitation `{invitation-id}`.
 
@@ -239,7 +251,9 @@ No response body provided.
 ---
 ### Withdraw an invitation
 
-PUT `/api/invitations/{invitation-id}/revoked`
+:::info
+**PUT** `/api/invitations/{invitation-id}/revoked`
+:::
 
 Withdraws the pending or accepted invitation `{invitation-id}`.
 

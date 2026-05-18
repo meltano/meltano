@@ -11,7 +11,9 @@ News is a collection of [notifications](notifications) resulting from all config
 
 ### View the news for a workspace
 
-GET `/api/workspaces/{workspace-id}/news?before={before}&since={since}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/news?before={before}&since={since}`
+:::
 
 Returns the news for the workspace `{workspace-id}`.
 

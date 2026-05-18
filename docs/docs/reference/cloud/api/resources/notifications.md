@@ -47,7 +47,9 @@ Value | Description
 
 ### View all notifications
 
-GET `/api/notifications?all={all}&before={before}&since={since}`
+:::info
+**GET** `/api/notifications?all={all}&before={before}&since={since}`
+:::
 
 Returns all notifications for the authenticated user profile.
 
@@ -83,7 +85,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### View all notifications for a workspace
 
-GET `/api/workspaces/{workspaceId}/notifications?all={all}&before={before}&since={since}`
+:::info
+**GET** `/api/workspaces/{workspaceId}/notifications?all={all}&before={before}&since={since}`
+:::
 
 Returns all notifications for the workspace `{workspace-id}`.
 
@@ -122,7 +126,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### View a notification
 
-GET `/api/notifications/{notification-id}`
+:::info
+**GET** `/api/notifications/{notification-id}`
+:::
 
 Returns the notification `{notification-id}`.
 
@@ -153,7 +159,9 @@ Returns the notification `{notification-id}`.
 ---
 ### Refresh notifications
 
-PUT `/api/notifications?since={since}&markAsResolved={markAsResolved}`
+:::info
+**PUT** `/api/notifications?since={since}&markAsResolved={markAsResolved}`
+:::
 
 Returns new notifications for the authenticated user profile, optionally marking existing notifications as resolved up to the moment the request was made or the supplied `since` parameter.
 
@@ -188,7 +196,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### Delete a notification
 
-DELETE `/api/notifications/{notification-id}`
+:::info
+**DELETE** `/api/notifications/{notification-id}`
+:::
 
 Deletes the notification `{notification-id}`.
 

@@ -80,7 +80,9 @@ Value | Description
 
 ### View all datacomponents in a workspace
 
-GET `/api/workspaces/{workspace-id}/datacomponents`
+:::info
+**GET** `/api/workspaces/{workspace-id}/datacomponents`
+:::
 
 Returns all datacomponents in the workspace `{workspace-id}`.
 
@@ -111,7 +113,9 @@ Returns all datacomponents in the workspace `{workspace-id}`.
 ---
 ### View a datacomponent
 
-GET `/api/datacomponents/{datacomponent-id}`
+:::info
+**GET** `/api/datacomponents/{datacomponent-id}`
+:::
 
 Returns the datacomponent `{datacomponent-id}`.
 
@@ -142,7 +146,9 @@ Returns the datacomponent `{datacomponent-id}`.
 ---
 ### Initialise a new datacomponent in a workspace
 
-POST `/api/workspaces/{workspace-id}/datacomponents`
+:::info
+**POST** `/api/workspaces/{workspace-id}/datacomponents`
+:::
 
 Initialises a new datacomponent in the workspace `{workspace-id}`.
 
@@ -170,7 +176,9 @@ Initialises a new datacomponent in the workspace `{workspace-id}`.
 ---
 ### Create or update a datacomponent in a workspace
 
-PUT `/api/workspaces/{workspace-id}/datacomponents/{datacomponent-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/datacomponents/{datacomponent-id}`
+:::
 
 Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{workspace-id}`.
 
@@ -202,7 +210,9 @@ Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{wor
 ---
 ### Update a datacomponent
 
-PUT `/api/datacomponents/{datacomponent-id}`
+:::info
+**PUT** `/api/datacomponents/{datacomponent-id}`
+:::
 
 Updates the datacomponent `{datacomponent-id}`.
 
@@ -237,7 +247,9 @@ Updates the datacomponent `{datacomponent-id}`.
 ---
 ### Delete a datacomponent
 
-DELETE `/api/datacomponents/{datacomponent-id}`
+:::info
+**DELETE** `/api/datacomponents/{datacomponent-id}`
+:::
 
 Deletes the datacomponent `{datacomponent-id}`.
 

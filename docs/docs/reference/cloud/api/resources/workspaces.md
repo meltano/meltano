@@ -48,7 +48,9 @@ Value | Description
 
 ### View all workspaces
 
-GET `/api/workspaces`
+:::info
+**GET** `/api/workspaces`
+:::
 
 Returns all workspaces the authenticated user profile is an owner or member of.
 
@@ -76,7 +78,9 @@ Returns all workspaces the authenticated user profile is an owner or member of.
 ---
 ### View a workspace
 
-GET `/api/workspaces/{workspace-id}`
+:::info
+**GET** `/api/workspaces/{workspace-id}`
+:::
 
 Returns the workspace `{workspace-id}`.
 
@@ -108,7 +112,9 @@ Returns the workspace `{workspace-id}`.
 ---
 ### Initialise a workspace
 
-POST `/api/workspaces`
+:::info
+**POST** `/api/workspaces`
+:::
 
 Initialises a new workspace.
 
@@ -136,7 +142,9 @@ Initialises a new workspace.
 ---
 ### Create a workspace
 
-PUT `/api/workspaces/{workspace-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}`
+:::
 
 Creates the workspace `{workspace-id}`.
 
@@ -173,7 +181,9 @@ Creates the workspace `{workspace-id}`.
 ---
 ### Update a workspace
 
-PUT `/api/workspaces/{workspace-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}`
+:::
 
 Updates the workspace `{workspace-id}`.
 
@@ -210,7 +220,9 @@ Updates the workspace `{workspace-id}`.
 ---
 ### Delete a workspace
 
-DELETE `/api/workspaces/{workspace-id}`
+:::info
+**DELETE** `/api/workspaces/{workspace-id}`
+:::
 
 Deletes the workspace `{workspace-id}`.
 

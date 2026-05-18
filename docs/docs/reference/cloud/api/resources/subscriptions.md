@@ -41,7 +41,9 @@ Value | Description
 
 ### View all subscriptions
 
-GET `/api/subscriptions`
+:::info
+**GET** `/api/subscriptions`
+:::
 
 Returns all subscriptions for the authenticated user profile.
 
@@ -69,7 +71,9 @@ Returns all subscriptions for the authenticated user profile.
 ---
 ### View all member subscriptions to a workspace
 
-GET `/api/workspaces/{workspace-id}/members/subscriptions`
+:::info
+**GET** `/api/workspaces/{workspace-id}/members/subscriptions`
+:::
 
 Returns all member subscriptions to the workspace `{workspace-id}`.
 
@@ -100,7 +104,9 @@ Returns all member subscriptions to the workspace `{workspace-id}`.
 ---
 ### View a subscription
 
-GET `/api/subscriptions/{subscription-id}`
+:::info
+**GET** `/api/subscriptions/{subscription-id}`
+:::
 
 Returns the subscription `{subscription-id}`.
 
@@ -131,7 +137,9 @@ Returns the subscription `{subscription-id}`.
 ---
 ### Subscribe to a workspace
 
-POST `/api/workspaces/{workspace-id}/subscriptions`
+:::info
+**POST** `/api/workspaces/{workspace-id}/subscriptions`
+:::
 
 Subscribes the authenticated user profile to the workspace `{workspace-id}`.
 
@@ -170,7 +178,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### Subscribe to a channel
 
-POST `/api/channels/{channel-id}/subscriptions`
+:::info
+**POST** `/api/channels/{channel-id}/subscriptions`
+:::
 
 Subscribes the authenticated user profile to the channel `{channel-id}`.
 
@@ -209,7 +219,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### Subscribe to a dataset
 
-POST `/api/datasets/{dataset-id}/subscriptions`
+:::info
+**POST** `/api/datasets/{dataset-id}/subscriptions`
+:::
 
 Subscribes the authenticated user profile to the dataset `{dataset-id}`.
 
@@ -248,7 +260,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### Subscribe to a pipeline
 
-POST `/api/pipelines/{pipeline-id}/subscriptions`
+:::info
+**POST** `/api/pipelines/{pipeline-id}/subscriptions`
+:::
 
 Subscribes the authenticated user profile to the pipeline `{pipeline-id}`.
 
@@ -287,7 +301,9 @@ Parameter | Required | Format | Default Value | Description
 ---
 ### Update a subscription
 
-PUT `/api/subscriptions/{subscription-id}`
+:::info
+**PUT** `/api/subscriptions/{subscription-id}`
+:::
 
 Updates the subscription `{subscription-id}`.
 
@@ -326,7 +342,9 @@ Path | JSON Type | Format | Description
 ---
 ### Remove a subscription
 
-DELETE `/api/subscriptions/{subscription-id}`
+:::info
+**DELETE** `/api/subscriptions/{subscription-id}`
+:::
 
 Removes the subscription `{subscription-id}`.
 

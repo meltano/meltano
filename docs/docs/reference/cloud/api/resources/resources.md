@@ -28,7 +28,9 @@ Path | JSON Type | Format | Description
 
 ### View a resource in a workspace
 
-GET `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::
 
 Returns the resource `{resource-path}` in the workspace `{workspace-id}`.
 
@@ -54,7 +56,9 @@ Returns the resource `{resource-path}` in the workspace `{workspace-id}`.
 
 ### View the content of a resource in a workspace
 
-GET `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::
 
 Returns the content of the resource `{resource-path}` in the workspace `{workspace-id}`.
 
@@ -80,7 +84,9 @@ The resource content.
 
 ### View all resources in a workspace
 
-GET `/api/workspaces/{workspace-id}/resources`
+:::info
+**GET** `/api/workspaces/{workspace-id}/resources`
+:::
 
 Returns all resources in the workspace `{workspace-id}`.
 
@@ -105,7 +111,9 @@ Returns all resources in the workspace `{workspace-id}`.
 
 ### Publish multiple resources to a workspace
 
-POST `/api/workspaces/{workspace-id}/resources`
+:::info
+**POST** `/api/workspaces/{workspace-id}/resources`
+:::
 
 Publishes multiple resources to the workspace `{workspace-id}`.
 
@@ -129,7 +137,9 @@ Publishes multiple resources to the workspace `{workspace-id}`.
 
 ### Create or update a resource in a workspace
 
-PUT `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::
 
 Creates or updates the resource `{resource-path}` in the workspace `{workspace-id}`.
 
@@ -159,7 +169,9 @@ Creates or updates the resource `{resource-path}` in the workspace `{workspace-i
 
 ### Delete a resource in a workspace
 
-DELETE `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::info
+**DELETE** `/api/workspaces/{workspace-id}/resources/{resource-path}`
+:::
 
 Deletes the resource `{resource-path}` in the workspace `{workspace-id}`.
 

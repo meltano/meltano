@@ -28,7 +28,9 @@ Path | JSON Type | Format | Description
 
 ### View all members of a workspace
 
-GET `/api/workspaces/{workspace-id}/members`
+:::info
+**GET** `/api/workspaces/{workspace-id}/members`
+:::
 
 Returns all members of the workspace `{workspace-id}`.
 
@@ -60,7 +62,9 @@ Returns all members of the workspace `{workspace-id}`.
 ---
 ### View a member of a workspace
 
-GET `/api/workspaces/{workspace-id}/members/{member-id}`
+:::info
+**GET** `/api/workspaces/{workspace-id}/members/{member-id}`
+:::
 
 Returns the member `{member-id}` of the workspace `{workspace-id}`.
 

@@ -59,7 +59,9 @@ Value | Description
 
 ### View all running or completed jobs for a workspace
 
-GET `/api/workspaces/{workspace-id}/jobs`
+:::info
+**GET** `/api/workspaces/{workspace-id}/jobs`
+:::
 
 Returns all running or completed jobs for the workspace `{workspace-id}`.
 
@@ -91,7 +93,9 @@ Returns all running or completed jobs for the workspace `{workspace-id}`.
 ---
 ### View all running or completed jobs for a pipeline
 
-GET `/api/pipelines/{pipeline-id}/jobs`
+:::info
+**GET** `/api/pipelines/{pipeline-id}/jobs`
+:::
 
 Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 
@@ -123,7 +127,9 @@ Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 ---
 ### View a job
 
-GET `/api/jobs/{job-id}`
+:::info
+**GET** `/api/jobs/{job-id}`
+:::
 
 Returns the job `{job-id}`.
 
@@ -155,7 +161,9 @@ Returns the job `{job-id}`.
 ---
 ### View the logs of a job
 
-GET `/api/jobs/{job-id}/logs?sequence={sequence}`
+:::info
+**GET** `/api/jobs/{job-id}/logs?sequence={sequence}`
+:::
 
 Returns the logs of the job `{job-id}`.
 
@@ -201,7 +209,9 @@ Media Type(s) | Description
 ---
 ### Create a job from a pipeline
 
-POST `/api/pipelines/{pipeline-id}/jobs`
+:::info
+**POST** `/api/pipelines/{pipeline-id}/jobs`
+:::
 
 Creates a new job from the pipeline `{pipeline-id}`.
 
@@ -233,7 +243,9 @@ Creates a new job from the pipeline `{pipeline-id}`.
 ---
 ### Stop a job
 
-PUT `/api/jobs/{job-id}/stopped`
+:::info
+**PUT** `/api/jobs/{job-id}/stopped`
+:::
 
 Stops the execution of the job `{job-id}`.
 
@@ -266,7 +278,9 @@ Job stop acceptance message.
 ---
 ### Delete a job
 
-DELETE `/api/jobs/{job-id}`
+:::info
+**DELETE** `/api/jobs/{job-id}`
+:::
 
 Deletes and stops the execution of the job `{job-id}`.
 

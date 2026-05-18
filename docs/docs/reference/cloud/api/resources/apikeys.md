@@ -31,7 +31,9 @@ Path | JSON Type | Format | Description
 
 ### View all API keys
 
-GET `/api/apikeys`
+:::info
+**GET** `/api/apikeys`
+:::
 
 Returns all API keys owned by the authenticated user profile.
 
@@ -64,7 +66,9 @@ Returns all API keys owned by the authenticated user profile.
 ---
 ### View an API key
 
-GET `/api/apikeys/{apikey-id}`
+:::info
+**GET** `/api/apikeys/{apikey-id}`
+:::
 
 Returns the API key `{apikey-id}`.
 
@@ -97,7 +101,9 @@ Returns the API key `{apikey-id}`.
 ---
 ### Initialise an API key
 
-POST `/api/apikeys`
+:::info
+**POST** `/api/apikeys`
+:::
 
 Initialises a new API key.
 
@@ -129,7 +135,9 @@ Initialises a new API key.
 ---
 ### Create an API key
 
-PUT `/api/apikeys/{apikey-id}`
+:::info
+**PUT** `/api/apikeys/{apikey-id}`
+:::
 
 Creates the API key `{apikey-id}`.
 
@@ -165,7 +173,9 @@ Creates the API key `{apikey-id}`.
 ---
 ### Update an API key
 
-PUT `/api/apikeys/{apikey-id}`
+:::info
+**PUT** `/api/apikeys/{apikey-id}`
+:::
 
 Updates the API key `{apikey-id}`.
 
@@ -201,7 +211,9 @@ Updates the API key `{apikey-id}`.
 ---
 ### Delete an API key
 
-DELETE `/api/apikeys/{apikey-id}`
+:::info
+**DELETE** `/api/apikeys/{apikey-id}`
+:::
 
 Deletes the API key `{apikey-id}`.
 

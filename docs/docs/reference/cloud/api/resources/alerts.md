@@ -14,7 +14,9 @@ Alerts can be created by users on [datasets](datasets). These alerts can then be
 
 ### Initialise an alert on a dataset
 
-POST `/datasets/{dataset-id}/alerts`
+:::info
+**POST** `/datasets/{dataset-id}/alerts`
+:::
 
 Initialises a new alert on a dataset.
 
@@ -46,7 +48,9 @@ Initialises a new alert on a dataset.
 
 ### Create an alert on a dataset
 
-PUT `/datasets/{dataset-id}/alerts/{alert-id}`
+:::info
+**PUT** `/datasets/{dataset-id}/alerts/{alert-id}`
+:::
 
 Create a new alert on a dataset.
 
@@ -78,7 +82,9 @@ Create a new alert on a dataset.
 
 ### View alerts on a dataset
 
-GET `/datasets/{dataset-id}/alerts`
+:::info
+**GET** `/datasets/{dataset-id}/alerts`
+:::
 
 View alerts on a dataset.
 
@@ -110,7 +116,9 @@ View alerts on a dataset.
 
 ### View an alert
 
-GET `/alerts/{alert-id}`
+:::info
+**GET** `/alerts/{alert-id}`
+:::
 
 View an alert.
 

@@ -70,7 +70,9 @@ Value | Description
 
 ### View all pipelines in a workspace
 
-GET `/api/workspaces/{workspace-id}/pipelines`
+:::info
+**GET** `/api/workspaces/{workspace-id}/pipelines`
+:::
 
 Returns all configured pipelines in the workspace `{workspace-id}`.
 
@@ -102,7 +104,9 @@ Returns all configured pipelines in the workspace `{workspace-id}`.
 ---
 ### View a pipeline
 
-GET `/api/pipelines/{pipeline-id}`
+:::info
+**GET** `/api/pipelines/{pipeline-id}`
+:::
 
 Returns the pipeline `{pipeline-id}`.
 
@@ -134,7 +138,9 @@ Returns the pipeline `{pipeline-id}`.
 ---
 ### Initialise a pipeline in a workspace
 
-POST `/api/workspaces/{workspace-id}/pipelines`
+:::info
+**POST** `/api/workspaces/{workspace-id}/pipelines`
+:::
 
 Initialises a new pipeline in the workspace `{workspace-id}`.
 
@@ -166,7 +172,9 @@ Initialises a new pipeline in the workspace `{workspace-id}`.
 ---
 ### Create or update a pipeline in a workspace
 
-PUT `/api/workspaces/{workspace-id}/pipelines/{pipeline-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/pipelines/{pipeline-id}`
+:::
 
 Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}`.
 
@@ -202,7 +210,9 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 ---
 ### Create or update a pipeline as a draft
 
-PUT `/api/workspaces/{workspace-id}/pipelines/{pipeline-id}/draft`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/pipelines/{pipeline-id}/draft`
+:::
 
 Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}` as a draft.
 
@@ -238,7 +248,9 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 ---
 ### Validate a pipeline configuration in a workspace
 
-POST `/api/workspaces/{workspace-id}/pipelines/validation`
+:::info
+**POST** `/api/workspaces/{workspace-id}/pipelines/validation`
+:::
 
 Validates a pipeline configuration in the workspace `{workspace-id}`.
 
@@ -278,7 +290,9 @@ No response body provided.
 ---
 ### Verify a pipeline
 
-POST `/api/pipelines/{pipeline-id}/verification`
+:::info
+**POST** `/api/pipelines/{pipeline-id}/verification`
+:::
 
 Verifies the configuration of the pipeline `{pipeline-id}`.
 
@@ -310,7 +324,9 @@ Verifies the configuration of the pipeline `{pipeline-id}`.
 ---
 ### Delete a pipeline
 
-DELETE `/api/pipelines/{pipeline-id}`
+:::info
+**DELETE** `/api/pipelines/{pipeline-id}`
+:::
 
 Deletes the pipeline `{pipeline-id}`.
 
@@ -341,7 +357,9 @@ No response body provided.
 ---
 ### View pipeline metrics
 
-GET `/api/pipelines/{pipeline-id}/metrics`
+:::info
+**GET** `/api/pipelines/{pipeline-id}/metrics`
+:::
 
 Returns the pipeline metrics for each job of `{pipeline-id}`.
 

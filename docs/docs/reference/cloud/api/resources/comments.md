@@ -35,7 +35,9 @@ Path | JSON Type | Format | Description
 
 ### View all comments on a dataset
 
-GET `/api/datasets/{dataset-id}/comments`
+:::info
+**GET** `/api/datasets/{dataset-id}/comments`
+:::
 
 Returns all comments on the dataset `{dataset-id}`.
 
@@ -67,7 +69,9 @@ Returns all comments on the dataset `{dataset-id}`.
 ---
 ### View a comment
 
-GET `/api/comments/{comment-id}`
+:::info
+**GET** `/api/comments/{comment-id}`
+:::
 
 Returns the comment `{comment-id}`.
 
@@ -99,7 +103,9 @@ Returns the comment `{comment-id}`.
 ---
 ### View the edit history of a comment
 
-GET `/api/comments/{comment-id}/history`
+:::info
+**GET** `/api/comments/{comment-id}/history`
+:::
 
 Returns the edit history of the comment `{comment-id}`.
 
@@ -130,7 +136,9 @@ Returns the edit history of the comment `{comment-id}`.
 ---
 ### View all replies to a comment
 
-GET `/api/comments/{comment-id}`
+:::info
+**GET** `/api/comments/{comment-id}`
+:::
 
 Returns all replies to the comment `{comment-id}`.
 
@@ -162,7 +170,9 @@ Returns all replies to the comment `{comment-id}`.
 ---
 ### Initialise a comment on a dataset
 
-POST `/api/datasets/{dataset-id}/comments`
+:::info
+**POST** `/api/datasets/{dataset-id}/comments`
+:::
 
 Initialises a new comment on the dataset `{dataset-id}`.
 
@@ -194,7 +204,9 @@ Initialises a new comment on the dataset `{dataset-id}`.
 ---
 ### Initialise a reply to a comment
 
-POST `/api/comments/{comment-id}`
+:::info
+**POST** `/api/comments/{comment-id}`
+:::
 
 Initialises a new reply comment to the comment `{comment-id}`.
 
@@ -226,7 +238,9 @@ Initialises a new reply comment to the comment `{comment-id}`.
 ---
 ### Create a comment
 
-PUT `/api/comments/{comment-id}`
+:::info
+**PUT** `/api/comments/{comment-id}`
+:::
 
 Creates the comment `{comment-id}`.
 
@@ -263,7 +277,9 @@ Creates the comment `{comment-id}`.
 ---
 ### Update a comment
 
-PUT `/api/comments/{comment-id}`
+:::info
+**PUT** `/api/comments/{comment-id}`
+:::
 
 Updates the comment `{comment-id}`.
 
@@ -299,7 +315,9 @@ Updates the comment `{comment-id}`.
 ---
 ### Record a like of a comment
 
-PUT `/api/comments/{comment-id}/like`
+:::info
+**PUT** `/api/comments/{comment-id}/like`
+:::
 
 Records a like of the comment `{comment-id}` from the authenticated user profile.
 
@@ -330,7 +348,9 @@ No response body provided.
 ---
 ### Remove a like from a comment
 
-DELETE `/api/comments/{comment-id}/like`
+:::info
+**DELETE** `/api/comments/{comment-id}/like`
+:::
 
 Removes a like of the comment `{comment-id}` from the authenticated user profile.
 
@@ -361,7 +381,9 @@ No response body provided.
 ---
 ### Delete a comment
 
-DELETE `/api/comments/{comment-id}`
+:::info
+**DELETE** `/api/comments/{comment-id}`
+:::
 
 Deletes the comment `{comment-id}`.
 

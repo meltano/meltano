@@ -20,7 +20,9 @@ User and member interactions that affect a dataset's score:
 
 ### View the feed of a workspace
 
-GET `/api/workspaces/{workspace-id}/feed`
+:::info
+**GET** `/api/workspaces/{workspace-id}/feed`
+:::
 
 Returns the feed of the workspace `{workspace-id}`.
 

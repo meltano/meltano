@@ -31,7 +31,9 @@ Path | JSON Type | Format | Description
 
 ### View all profiles
 
-GET `/api/profiles`
+:::info
+**GET** `/api/profiles`
+:::
 
 Returns all profiles under the authenticated user account.
 
@@ -59,7 +61,9 @@ Returns all profiles under the authenticated user account.
 ---
 ### View a profile
 
-GET `/api/profiles/{profile-id}`
+:::info
+**GET** `/api/profiles/{profile-id}`
+:::
 
 Returns the profile `{profile-id}`.
 
@@ -91,7 +95,9 @@ Returns the profile `{profile-id}`.
 ---
 ### Create or update profile
 
-PUT `/api/profiles/{profile-id}`
+:::info
+**PUT** `/api/profiles/{profile-id}`
+:::
 
 Creates or updates the user profile.
 
@@ -128,7 +134,9 @@ Creates or updates the user profile.
 ---
 ### Set a workspace as default
 
-PATCH `/api/profiles/{profile-id}`
+:::info
+**PATCH** `/api/profiles/{profile-id}`
+:::
 
 Sets a default workspace for the profile `{profile-id}`.
 

@@ -37,7 +37,9 @@ Path | Type | Description
 
 ### View all datastores in a workspace
 
-GET `/api/workspaces/{workspace-id}/datastores`
+:::info
+**GET** `/api/workspaces/{workspace-id}/datastores`
+:::
 
 Returns the datastores in the workspace `{workspace-id}`.
 
@@ -68,7 +70,9 @@ Returns the datastores in the workspace `{workspace-id}`.
 ---
 ### View a datastore
 
-GET `/api/datastores/{datastore-id}`
+:::info
+**GET** `/api/datastores/{datastore-id}`
+:::
 
 Returns the datastore `{datastore-id}`.
 
@@ -99,7 +103,9 @@ Returns the datastore `{datastore-id}`.
 ---
 ### Set a datastore as the workspace default
 
-PUT `/api/datastores/{datastore-id}/default`
+:::info
+**PUT** `/api/datastores/{datastore-id}/default`
+:::
 
 Sets the datastore `{datastore-id}` as the workspace default.
 
@@ -129,7 +135,9 @@ No response body provided.
 ---
 ### Initialise a new datastore in a workspace
 
-POST `/api/workspaces/{workspace-id}/datastores`
+:::info
+**POST** `/api/workspaces/{workspace-id}/datastores`
+:::
 
 Initialises a new datastore in the workspace `{workspace-id}`.
 
@@ -160,7 +168,9 @@ Initialises a new datastore in the workspace `{workspace-id}`.
 ---
 ### Create or update a datastore in a workspace
 
-PUT `/api/workspaces/{workspace-id}/datastores/{datastore-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/datastores/{datastore-id}`
+:::
 
 Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-id}`.
 
@@ -195,7 +205,9 @@ Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-i
 ---
 ### Delete a datastore
 
-DELETE `/api/datastores/{datastore-id}`
+:::info
+**DELETE** `/api/datastores/{datastore-id}`
+:::
 
 Deletes the datastore `{datastore-id}`.
 

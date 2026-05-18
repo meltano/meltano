@@ -28,7 +28,9 @@ Path | JSON Type | Format | Description
 
 ### View all administrators of a workspace
 
-GET `/api/workspaces/{workspace-id}/administrators`
+:::info
+**GET** `/api/workspaces/{workspace-id}/administrators`
+:::
 
 Returns all administrators of the workspace `{workspace-id}`.
 
@@ -59,7 +61,9 @@ Returns all administrators of the workspace `{workspace-id}`.
 ---
 ### Add an administrator to a workspace
 
-PUT `/api/workspaces/{workspace-id}/administrators/{profile-id}`
+:::info
+**PUT** `/api/workspaces/{workspace-id}/administrators/{profile-id}`
+:::
 
 Adds the profile `{profile-id}` as an administrator to the workspace `{workspace-id}`.
 
@@ -91,7 +95,9 @@ Adds the profile `{profile-id}` as an administrator to the workspace `{workspace
 ---
 ### Withdraw an administrator from a workspace
 
-DELETE `/api/workspaces/{workspace-id}/administrators/{profile-id}`
+:::info
+**DELETE** `/api/workspaces/{workspace-id}/administrators/{profile-id}`
+:::
 
 Withdraws the profile `{profile-id}` as an administrator from the workspace `{workspace-id}`.
 

@@ -16,7 +16,9 @@ This can be done manually or via a GitHub Webhook which you can see how to set u
 
 ### Deploy your workspace repository
 
-POST `/api/workspaces/{workspaces-id}/deployments`
+:::info
+**POST** `/api/workspaces/{workspaces-id}/deployments`
+:::
 
 Deploys the workspace `{workspace-id}`.
 
@@ -45,7 +47,9 @@ Deploys the workspace `{workspace-id}`.
 
 ### GitHub webhook workspace deployment
 
-POST `/api/workspaces/{workspaces-id}/deployments/github-webhook`
+:::info
+**POST** `/api/workspaces/{workspaces-id}/deployments/github-webhook`
+:::
 
 Receives `POST` requests from GitHub and starts a workspace deploy job.
 

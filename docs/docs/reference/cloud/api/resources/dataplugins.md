@@ -71,7 +71,9 @@ Value | Description
 
 ### View all supported dataplugins
 
-GET `/api/dataplugins`
+:::info
+**GET** `/api/dataplugins`
+:::
 
 Returns all dataplugins supported by Matatika.
 
@@ -99,7 +101,9 @@ Returns all dataplugins supported by Matatika.
 ---
 ### View the Matatika `discovery.yml`
 
-GET `/api/discovery.yml`
+:::info
+**GET** `/api/discovery.yml`
+:::
 
 Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins supported by Matatika.
 
@@ -127,7 +131,9 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 ---
 ### View all workspace dataplugins
 
-GET `/api/workspaces/{workspace-id}/dataplugins`
+:::info
+**GET** `/api/workspaces/{workspace-id}/dataplugins`
+:::
 
 Returns all dataplugins available to the workspace `{workspace-id}`.
 
@@ -158,7 +164,9 @@ Returns all dataplugins available to the workspace `{workspace-id}`.
 ---
 ### View a workspace `discovery.yml`
 
-GET `/api/workspaces/{workspace-id}/discovery.yml`
+:::info
+**GET** `/api/workspaces/{workspace-id}/discovery.yml`
+:::
 
 Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins available to the workspace `{workspace-id}`.
 
@@ -189,7 +197,9 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 ---
 ### View a dataplugin
 
-GET `/api/dataplugins/{dataplugin-id}`
+:::info
+**GET** `/api/dataplugins/{dataplugin-id}`
+:::
 
 Returns the dataplugin `{dataplugin-id}`.
 
@@ -220,7 +230,9 @@ Returns the dataplugin `{dataplugin-id}`.
 ---
 ### Initialise a new dataplugin
 
-POST `/api/dataplugins`
+:::info
+**POST** `/api/dataplugins`
+:::
 
 Initialises a new dataplugin.
 
@@ -248,7 +260,9 @@ Initialises a new dataplugin.
 ---
 ### Publish dataplugins from a `discovery.yml`
 
-POST `/api/workspaces/{workspace-id}/discovery.yml`
+:::info
+**POST** `/api/workspaces/{workspace-id}/discovery.yml`
+:::
 
 Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
 
@@ -284,7 +298,9 @@ Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/
 ---
 ### Create a dataplugin
 
-PUT `/api/dataplugins/{dataplugin-id}`
+:::info
+**PUT** `/api/dataplugins/{dataplugin-id}`
+:::
 
 Creates the dataplugin `{dataplugin-id}`.
 
@@ -316,7 +332,9 @@ Creates the dataplugin `{dataplugin-id}`.
 ---
 ### Update a dataplugin
 
-PUT `/api/dataplugins/{dataplugin-id}`
+:::info
+**PUT** `/api/dataplugins/{dataplugin-id}`
+:::
 
 Updates the dataplugin `{dataplugin-id}`.
 
@@ -357,7 +375,9 @@ Path | JSON Type | Format | Description | Constraints
 ---
 ### Delete a dataplugin
 
-DELETE `/api/dataplugins/{dataplugin-id}`
+:::info
+**DELETE** `/api/dataplugins/{dataplugin-id}`
+:::
 
 Deletes the dataplugin `{dataplugin-id}`.
 
