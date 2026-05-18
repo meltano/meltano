@@ -6,10 +6,7 @@ parent: API
 nav_order: 8
 ---
 
-# {{page.title}}
-
 The Matatika API uses link relations to communicate the capabilities of our resources.  Where you see a link with one of the following relations, you can expect our API to act accordingly provided nothing has changed in the meantime.
-{: .fs-5 }
 
 ---
 
@@ -36,7 +33,7 @@ Resource | Item relation | Collection relation
 [Notification](resources/notifications) | `notification` | `notifications`
 [API Key](resources/apikeys) | `apikey` | `apikeys`
 
-A link relation formed entirely from an item or collection relation will accept a <span>GET</span>{:.label .label-GET} request and return the respective resource. Expect `200 OK` to indicate the resource was successfully returned.
+A link relation formed entirely from an item or collection relation will accept a <span>GET</span> request and return the respective resource. Expect `200 OK` to indicate the resource was successfully returned.
 
 ---
 
@@ -86,46 +83,46 @@ Actions are phrases that define the behaviour of a HTTP transaction. A link rela
 ```
 
 ### `latest`
-Make a <span>GET</span>{:.label .label-GET} request to this link to return the latest resource. Expect `200 OK` to indicate the resource was successfully returned.
+Make a <span>GET</span> request to this link to return the latest resource. Expect `200 OK` to indicate the resource was successfully returned.
 
 ### `search`
-Make a <span>GET</span>{:.label .label-GET} request to this link to a return a [filtered view](#searching-and-filtering) of the current respective resource. Expect `200 OK` to indicate the resource was successfully returned.
+Make a <span>GET</span> request to this link to a return a [filtered view](#searching-and-filtering) of the current respective resource. Expect `200 OK` to indicate the resource was successfully returned.
 
 ### `self`
-Make a  <span>GET</span>{:.label .label-GET} request to this link to return the current respective resource. Expect `200 OK` to indicate the resource was successfully returned.
+Make a  <span>GET</span> request to this link to return the current respective resource. Expect `200 OK` to indicate the resource was successfully returned.
 
 ### `new`
-Make a <span>POST</span>{:.label .label-POST} request to this link to initialise a new resource. Expect `200 OK` to indicate the resource was successfully initialised.
+Make a <span>POST</span> request to this link to initialise a new resource. Expect `200 OK` to indicate the resource was successfully initialised.
 
 ### `publish`
-Make a <span>POST</span>{:.label .label-POST} request to this link to publish data into a resource. Expect `201 Created` or `200 OK` to indicate the resource was successfully published.
+Make a <span>POST</span> request to this link to publish data into a resource. Expect `201 Created` or `200 OK` to indicate the resource was successfully published.
 
 ### `validate`
-Make a <span>POST</span>{:.label .label-POST} request to this link to validate a resource. Expect `200 OK` to indicate the resource was successfully validated.
+Make a <span>POST</span> request to this link to validate a resource. Expect `200 OK` to indicate the resource was successfully validated.
 
 ### `verify`
-Make a <span>POST</span>{:.label .label-POST} request to this link to verify a resource. Expect `200 OK` to indicate the resource was successfully verified.
+Make a <span>POST</span> request to this link to verify a resource. Expect `200 OK` to indicate the resource was successfully verified.
 
 ### `add`
-Make a <span>PUT</span>{:.label .label-PUT} request to this link to add a new resource. Expect `200 OK` to indicate the resource was successfully added.
+Make a <span>PUT</span> request to this link to add a new resource. Expect `200 OK` to indicate the resource was successfully added.
 
 ### `create`
-Make a <span>PUT</span>{:.label .label-PUT} request to this link to create a new resource. Expect `201 Created` or `202 Accepted` to indicate the resource was successfully created.
+Make a <span>PUT</span> request to this link to create a new resource. Expect `201 Created` or `202 Accepted` to indicate the resource was successfully created.
 
 ### `draft`
-Make a <span>PUT</span>{:.label .label-PUT} request to this link to create or update a draft resource. Expect `200 OK` or `201 Created` to indicate the resource was successfully drafted.
+Make a <span>PUT</span> request to this link to create or update a draft resource. Expect `200 OK` or `201 Created` to indicate the resource was successfully drafted.
 
 ### `make-default`
-Make a <span>PUT</span>{:.label .label-PUT} request to this link to set a particular resource within a collection as default. Expect `200 OK` to indicate the resource was successfully set as default.
+Make a <span>PUT</span> request to this link to set a particular resource within a collection as default. Expect `200 OK` to indicate the resource was successfully set as default.
 
 ### `update`
-Make a <span>PUT</span>{:.label .label-PUT} request to this link to update a resource. Expect `200 OK` to indicate the resource was successfully updated.
+Make a <span>PUT</span> request to this link to update a resource. Expect `200 OK` to indicate the resource was successfully updated.
 
 ### `withdraw` 
-Make a <span>PUT</span>{:.label .label-PUT} request to this link to withdraw a resource. Expect `200 OK` to indicate the resource was successfully withdrawn.
+Make a <span>PUT</span> request to this link to withdraw a resource. Expect `200 OK` to indicate the resource was successfully withdrawn.
 
 ### `edit`
-Make a <span>PATCH</span>{:.label .label-PATCH} request to this link to edit a resource. Expect `200 OK` to indicate the resource was successfully edited.
+Make a <span>PATCH</span> request to this link to edit a resource. Expect `200 OK` to indicate the resource was successfully edited.
 
 ### `delete`
-Make a <span>DELETE</span>{:.label .label-DELETE} request to this link to delete a resource. Expect `204 No Content` to indicate the resource was successfully deleted.
+Make a <span>DELETE</span> request to this link to delete a resource. Expect `204 No Content` to indicate the resource was successfully deleted.

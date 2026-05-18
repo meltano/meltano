@@ -6,10 +6,7 @@ parent: API
 nav_order: 2
 ---
 
-# {{page.title}}
-
 The Matatika API returns standard HTTP status codes and returns an error structure explaining all failing fields.  We use a standard templated error response across different scenarios so you can expect consistency in our error responses.
-{: .fs-5 }
 
 ---
 

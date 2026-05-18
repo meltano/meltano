@@ -6,16 +6,11 @@ parent: API
 nav_order: 1
 ---
 
-# {{page.title}}
-
----
-
 We automatically maintain a fully-tested Postman collection for the Matatika API, which contains all the requests documented for each [resource](resources) type.
 
 Simply import the following collection URL into Postman to begin sending requests:
 
-`{{site.matatika.links.www}}/docs/matatika.json`{: #postman-collection-url .fs-5 }
-{: .text-center }
+`{{site.matatika.links.www}}/docs/matatika.json`
 
 ---
 
@@ -32,8 +27,6 @@ The following steps outline how to set-up authorisation in Postman for the Matat
 
 ## Collection Variables
 
-{% raw %}
 When running any request within the collection for the first time, the collection pre-request script will automatically attempt to populate the `{{profile-id}}` and `{{workspace-id}}` collection variables based on the provided token.
-{% endraw %}
 
 These variables can be manually created, set, and deleted when editing the collection, if required.
