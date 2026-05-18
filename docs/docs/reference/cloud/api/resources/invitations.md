@@ -1,10 +1,6 @@
 ---
 title: Invitations
 description: Matatika Invitations resource reference documentation
-permalink: /api/resources/invitations
-parent: Resources
-grand_parent: API
-nav_order: 3
 components: request-md-components/invitations
 ---
 

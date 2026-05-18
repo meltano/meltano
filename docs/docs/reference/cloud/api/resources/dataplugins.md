@@ -1,10 +1,6 @@
 ---
 title: Dataplugins
 description: Matatika Dataplugins resource reference documentation
-permalink: /api/resources/dataplugins
-parent: Resources
-grand_parent: API
-nav_order: 11
 components: request-md-components/dataplugins
 ---
 

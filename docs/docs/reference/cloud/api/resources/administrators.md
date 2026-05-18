@@ -1,10 +1,6 @@
 ---
 title: Administrators
 description: Matatika Administrators resource reference documentation
-permalink: api/resources/administrators
-parent: Resources
-grand_parent: API
-nav_order: 4
 components: request-md-components/administrators
 ---
 

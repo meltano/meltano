@@ -1,10 +1,6 @@
 ---
 title: Subscriptions
 description: Matatika Subscriptions resource reference documentation
-permalink: /api/resources/subscriptions
-parent: Resources
-grand_parent: API
-nav_order: 15
 components: request-md-components/subscriptions
 ---
 

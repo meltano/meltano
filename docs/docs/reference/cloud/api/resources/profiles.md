@@ -1,10 +1,6 @@
 ---
 title: Profiles
 description: Matatika Profiles resource reference documentation
-permalink: /api/resources/profiles
-parent: Resources
-grand_parent: API
-nav_order: 1
 components: request-md-components/profiles
 ---
 

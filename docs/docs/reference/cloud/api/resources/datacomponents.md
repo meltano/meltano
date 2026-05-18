@@ -1,10 +1,6 @@
 ---
 title: Datacomponents
 description: Matatika Datacomponents resource reference documentation
-permalink: /api/resources/datacomponents
-parent: Resources
-grand_parent: API
-nav_order: 11
 components: request-md-components/datacomponents
 ---
 

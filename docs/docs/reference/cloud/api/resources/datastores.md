@@ -1,10 +1,6 @@
 ---
 title: Datastores
 description: Matatika Datastores resource reference documentation
-permalink: /api/resources/datastores
-parent: Resources
-grand_parent: API
-nav_order: 12
 components: request-md-components/datastores
 ---
 

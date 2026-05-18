@@ -1,10 +1,6 @@
 ---
 title: Datasets
 description: Matatika Datasets resource reference documentation
-permalink: /api/resources/datasets
-parent: Resources
-grand_parent: API
-nav_order: 5
 components: request-md-components/datasets
 ---
 

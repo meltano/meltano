@@ -1,10 +1,6 @@
 ---
 title: Comments
 description: Matatika Comments resource reference documentation
-permalink: /api/resources/comments
-parent: Resources
-grand_parent: API
-nav_order: 7
 components: request-md-components/comments
 ---
 

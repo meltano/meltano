@@ -1,10 +1,6 @@
 ---
 title: Accounts
 description: Matatika Accounts resource reference documentation
-permalink: /api/resources/accounts
-parent: Resources
-grand_parent: API
-nav_order: 1
 components: request-md-components/accounts
 ---
 

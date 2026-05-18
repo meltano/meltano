@@ -1,10 +1,6 @@
 ---
 title: Pipelines
 description: Matatika Pipelines resource reference documentation
-permalink: /api/resources/pipelines
-parent: Resources
-grand_parent: API
-nav_order: 13
 components: request-md-components/pipelines
 ---
 

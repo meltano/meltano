@@ -1,10 +1,6 @@
 ---
 title: Deployments
 description: Matatika Deployments resource reference documentation
-permalink: /api/resources/deployments
-parent: Resources
-grand_parent: API
-nav_order: 19
 components: request-md-components/deployments
 ---
 

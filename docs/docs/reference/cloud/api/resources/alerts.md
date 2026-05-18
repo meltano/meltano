@@ -1,10 +1,6 @@
 ---
 title: Alerts
 description: Matatika Alerts resource reference documentation
-permalink: /api/resources/alerts
-parent: Resources
-grand_parent: API
-nav_order: 20
 components: request-md-components/alerts
 ---
 

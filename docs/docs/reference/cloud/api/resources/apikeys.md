@@ -1,10 +1,6 @@
 ---
 title: API Keys
 description: Matatika API Keys resource reference documentation
-permalink: /api/resources/apikeys
-parent: Resources
-grand_parent: API
-nav_order: 18
 components: request-md-components/apikeys
 ---
 

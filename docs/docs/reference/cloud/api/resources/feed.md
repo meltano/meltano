@@ -1,10 +1,6 @@
 ---
 title: Feed
 description: Matatika Feed resource reference documentation
-permalink: /api/resources/feed
-parent: Resources
-grand_parent: API
-nav_order: 9
 components: request-md-components/feed
 ---
 

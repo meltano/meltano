@@ -1,10 +1,6 @@
 ---
 title: Members
 description: Matatika Members resource reference documentation
-permalink: api/resources/members
-parent: Resources
-grand_parent: API
-nav_order: 4
 components: request-md-components/members
 ---
 

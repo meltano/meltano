@@ -1,10 +1,6 @@
 ---
 title: Resources
 description: Matatika resources resource reference documentation
-permalink: /api/resources/resources
-parent: Resources
-grand_parent: API
-nav_order: 21
 components: request-md-components/resources
 snippets: snippets/api/resources
 ---

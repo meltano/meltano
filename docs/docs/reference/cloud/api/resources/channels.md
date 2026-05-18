@@ -1,10 +1,6 @@
 ---
 title: Channels
 description: Matatika Channels resource reference documentation
-permalink: /api/resources/channels
-parent: Resources
-grand_parent: API
-nav_order: 6
 components: request-md-components/channels
 ---
 

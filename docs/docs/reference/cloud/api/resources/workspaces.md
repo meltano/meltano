@@ -1,10 +1,6 @@
 ---
 title: Workspaces
 description: Matatika Workspaces resource reference documentation
-permalink: /api/resources/workspaces
-parent: Resources
-grand_parent: API
-nav_order: 2
 components: request-md-components/workspaces
 ---
 
