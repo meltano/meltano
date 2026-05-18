@@ -3,6 +3,9 @@ title: Subscriptions
 description: Matatika Subscriptions resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Subscriptions are a declaration of interest in a particular resource, allowing a user to receive [notifications](notifications) when certain events occur. The events that trigger [notifications](notifications) are controlled by the [type of subscription](#subscription-type).
 
 ---
@@ -44,13 +47,18 @@ Returns all subscriptions for the authenticated user profile.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/view-all-subscriptions/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/view-all-subscriptions/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -70,13 +78,18 @@ Returns all member subscriptions to the workspace `{workspace-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -96,13 +109,18 @@ Returns the subscription `{subscription-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/view-a-subscription/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/view-a-subscription/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -130,13 +148,18 @@ Parameter | Required | Format | Default Value | Description
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to workspace events, in order to enable workspace-wide notifications for all [members](members) by default (applicable for the workspace owner only)
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -164,13 +187,18 @@ Parameter | Required | Format | Default Value | Description
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to channel events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -198,13 +226,18 @@ Parameter | Required | Format | Default Value | Description
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to dataset events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -232,13 +265,18 @@ Parameter | Required | Format | Default Value | Description
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to pipeline events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -266,13 +304,18 @@ Path | JSON Type | Format | Description
 <!-- {% include snippets/api/subscriptions/update-a-subscription/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/update-a-subscription/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/update-a-subscription/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -292,13 +335,18 @@ Removes the subscription `{subscription-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/subscriptions/remove-a-subscription/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/subscriptions/remove-a-subscription/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`

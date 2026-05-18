@@ -3,6 +3,9 @@ title: Workspaces
 description: Matatika Workspaces resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Workspaces allow users to operate within isolated instances of the Matatika service. This is useful for separating profiles based on the data they require access to.
 
 ---
@@ -51,13 +54,18 @@ Returns all workspaces the authenticated user profile is an owner or member of.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/workspaces/view-all-workspaces/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/workspaces/view-all-workspaces/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -78,13 +86,18 @@ Returns the workspace `{workspace-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/workspaces/view-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/workspaces/view-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -101,13 +114,18 @@ Initialises a new workspace.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/workspaces/initialise-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/workspaces/initialise-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -133,13 +151,18 @@ Creates the workspace `{workspace-id}`.
 <!-- {% include snippets/api/workspaces/create-a-workspace/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/workspaces/create-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/workspaces/create-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `201 Created`
@@ -165,13 +188,18 @@ Updates the workspace `{workspace-id}`.
 <!-- {% include snippets/api/workspaces/update-a-workspace/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/workspaces/update-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/workspaces/update-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -192,13 +220,18 @@ Deletes the workspace `{workspace-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/workspaces/delete-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/workspaces/delete-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`

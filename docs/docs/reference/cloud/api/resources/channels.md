@@ -3,6 +3,9 @@ title: Channels
 description: Matatika Channels resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Channels enable datasets to be categorised or grouped together. A single workspace can have multiple channels.
 
 ---
@@ -36,13 +39,18 @@ Initialise a channel.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/initialise-a-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/initialise-a-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -62,13 +70,18 @@ Returns the channel `{channel-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/view-a-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/view-a-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -89,13 +102,18 @@ Returns a channel in the workspace `{workspace-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/view-a-channel-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/view-a-channel-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -125,13 +143,18 @@ Parameter | Required | Format | Default Value | Description
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/view-all-channels-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/view-all-channels-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -154,13 +177,18 @@ This endpoint takes a `{channel-id}` (UUID) and based on the supplied value and 
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/create-a-channel-in-a-workspace-by-id/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/create-a-channel-in-a-workspace-by-id/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK / 201 Created`
@@ -180,13 +208,18 @@ Delete a channel.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/delete-a-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/delete-a-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`
@@ -202,13 +235,18 @@ Returns all channels in your news for the workspace.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/channels-in-news/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/channels-in-news/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -225,13 +263,18 @@ Adds a dataset to a channel with type list.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/add-dataset-to-list-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/add-dataset-to-list-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `201 Created`
@@ -247,13 +290,18 @@ Removes a dataset from a channel with type list.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/remove-dataset-from-list-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/remove-dataset-from-list-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`
@@ -269,13 +317,18 @@ Add workspace scope to a channel.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/add-workspace-scope-to-a-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/add-workspace-scope-to-a-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -292,13 +345,18 @@ Withdraw workspace scope from a channel.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/channels/withdraw-workspace-scope-from-a-channel/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/channels/withdraw-workspace-scope-from-a-channel/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`

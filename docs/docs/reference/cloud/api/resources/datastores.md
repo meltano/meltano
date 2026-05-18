@@ -3,6 +3,9 @@ title: Datastores
 description: Matatika Datastores resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Datastores define a destination for data loaded into a [workspace](workspaces) by [pipelines](pipelines). The default datastore for a workspace is its own PostgreSQL database hosted by Matatika, but this can be changed at any time to another datastore with your own credentials (see our supported [dataplugins](dataplugins) of type `LOADER`).
 
 ---
@@ -43,13 +46,18 @@ Returns the datastores in the workspace `{workspace-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -69,13 +77,18 @@ Returns the datastore `{datastore-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/datastores/view-a-datastore/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/datastores/view-a-datastore/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -95,13 +108,18 @@ Sets the datastore `{datastore-id}` as the workspace default.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/datastores/set-a-datastore-as-the-workspace-default/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/datastores/set-a-datastore-as-the-workspace-default/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -120,13 +138,18 @@ Initialises a new datastore in the workspace `{workspace-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -150,13 +173,18 @@ Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-i
 <!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK / 201 Created`
@@ -176,13 +204,18 @@ Deletes the datastore `{datastore-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/datastores/delete-a-datastore/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/datastores/delete-a-datastore/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`

@@ -3,6 +3,9 @@ title: Pipelines
 description: Matatika Pipelines resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 A pipeline defines a set of runnable actions composed from [datacomponents](datacomponents) to complete a set of tasks - for example, [ELT](https://en.wikipedia.org/wiki/Extract,_load,_transform). Pipelines are run as [jobs](jobs), either manually or on a predetermined schedule. Only a single pipeline can be run at any given time.
 
 ---
@@ -77,13 +80,18 @@ Returns all configured pipelines in the workspace `{workspace-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -104,13 +112,18 @@ Returns the pipeline `{pipeline-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/view-a-pipeline/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/view-a-pipeline/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -131,13 +144,18 @@ Initialises a new pipeline in the workspace `{workspace-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -162,13 +180,18 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 <!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK / 201 Created`
@@ -193,13 +216,18 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 <!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK / 201 Created`
@@ -224,13 +252,18 @@ Validates a pipeline configuration in the workspace `{workspace-id}`.
 <!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -255,13 +288,18 @@ Verifies the configuration of the pipeline `{pipeline-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/verify-a-pipeline/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/verify-a-pipeline/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -282,13 +320,18 @@ Deletes the pipeline `{pipeline-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/delete-a-pipeline/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/delete-a-pipeline/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`
@@ -308,13 +351,18 @@ Returns the pipeline metrics for each job of `{pipeline-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 - `200`: The dataset data (defaults to JSON format).

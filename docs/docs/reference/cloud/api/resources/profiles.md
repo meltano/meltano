@@ -3,6 +3,9 @@ title: Profiles
 description: Matatika Profiles resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Profiles are individual consumers of the Matatika service. A profile is automatically created for a user when they first access the app, or accept an invitation to a workspace from an existing member via email.
 
 ---
@@ -34,13 +37,18 @@ Returns all profiles under the authenticated user account.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/profiles/view-all-profiles/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/profiles/view-all-profiles/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -61,13 +69,18 @@ Returns the profile `{profile-id}`.
 
 #### Request
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/profiles/view-a-profile/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/profiles/view-a-profile/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -93,13 +106,18 @@ Creates or updates the user profile.
 <!-- {% include snippets/api/profiles/update-a-profile/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/profiles/update-a-profile/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/profiles/update-a-profile/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK / 201 Created`
@@ -126,13 +144,18 @@ A workspace can be set as default, which defines the environment the Matatika ap
 <!-- {% include snippets/api/profiles/set-a-workspace-as-default/request-body.md %} -->
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/profiles/set-a-workspace-as-default/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/profiles/set-a-workspace-as-default/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`

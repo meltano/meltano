@@ -3,6 +3,9 @@ title: Alerts
 description: Matatika Alerts resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Alerts can be created by users on [datasets](datasets). These alerts can then be used to inform users of information related to that dataset.
 
 ---
@@ -21,13 +24,18 @@ Initialises a new alert on a dataset.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -48,13 +56,18 @@ Create a new alert on a dataset.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `201 Created`
@@ -75,13 +88,18 @@ View alerts on a dataset.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -102,13 +120,18 @@ View an alert.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/alerts/view-an-alert/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/alerts/view-an-alert/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`

@@ -3,6 +3,9 @@ title: Jobs
 description: Matatika Jobs resource reference documentation
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 A job is an arbitrary task with some stored state, pertaining to the governing [workspace](workspaces). Typically, jobs are orchestrated by [pipeline](pipelines) operations, but can also represent tasks for the user to complete.
 
 ---
@@ -66,13 +69,18 @@ Returns all running or completed jobs for the workspace `{workspace-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -93,13 +101,18 @@ Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -120,13 +133,18 @@ Returns the job `{job-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/view-a-job/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/view-a-job/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `200 OK`
@@ -160,13 +178,18 @@ Media Type(s) | Description
 `application/stream+json` `application/x-ndjson` | Sets the response content type format to [NDJSON](http://ndjson.org/)
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 - `200`: The job logs in the format specified by associated request `Accept` header
@@ -188,13 +211,18 @@ Creates a new job from the pipeline `{pipeline-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `201 Created`
@@ -216,13 +244,18 @@ Stops the execution of the job `{job-id}`.
 #### Request
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/stop-a-job/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/stop-a-job/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `202 Accepted`
@@ -241,13 +274,18 @@ Deletes and stops the execution of the job `{job-id}`.
 - Job `{job-id}` must exist
 
 ##### Example Snippets
-cURL
+<Tabs>
+<TabItem value="curl" label="cURL">
 
 <!-- {% include snippets/api/jobs/delete-a-job/curl-request.md %} -->
 
-Python (`requests`)
+</TabItem>
+<TabItem value="python" label="Python (requests)">
 
 <!-- {% include snippets/api/jobs/delete-a-job/python-requests.md %} -->
+
+</TabItem>
+</Tabs>
 
 #### Response
 `204 No Content`
