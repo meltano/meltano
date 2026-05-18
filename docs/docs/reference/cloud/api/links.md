@@ -41,7 +41,7 @@ Query Parameter | Description | Syntax | Example
 --------------- | ----------- | ------ | -------
 `page` | The page of the collection | `page={page-number}` | `?page=1`
 `size` | The number of elements to display per page | `size={number-of-elements}` | `?size=20`
-`sort` | The property to sort the collection results by, in either ascending - `asc` - or descending - `desc` -  order | `sort={property-name},(asc|desc)` | `?sort=name,asc`
+`sort` | The property to sort the collection results by, in either ascending - `asc` - or descending - `desc` -  order | `sort={property-name},(asc\|desc)` | `?sort=name,asc`
 
 ---
 
