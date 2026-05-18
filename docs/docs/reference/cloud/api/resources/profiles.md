@@ -53,7 +53,7 @@ Python (`requests`)
 
 GET `/api/profiles/{profile-id}`
 
-Returns the profile `{profile-id`}.
+Returns the profile `{profile-id}`.
 
 #### Prerequisites
 
