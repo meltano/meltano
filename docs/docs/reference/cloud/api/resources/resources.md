@@ -1,6 +1,7 @@
 ---
 title: Resources
 description: Matatika resources resource reference documentation
+slug: resources
 components: request-md-components/resources
 snippets: snippets/api/resources
 ---
