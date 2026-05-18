@@ -29,18 +29,307 @@ Path | JSON Type | Format | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all comments on a dataset
+
+GET `/api/datasets/{dataset-id}/comments`
+
+Returns all comments on the dataset `{dataset-id}`.
+
+#### Prerequisites
+
+- Dataset `{dataset-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/view-all-comments-on-a-dataset/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/view-all-comments-on-a-dataset/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Comment](comments#comment) collection with HAL links.
+<!-- {% include snippets/api/comments/view-all-comments-on-a-dataset/response-body.md %} -->
 
 ---
+### View a comment
 
-<!-- {% include {{ page.components }}/view-all-comments-on-a-dataset.md %}
-{% include {{ page.components }}/view-a-comment.md %}
-{% include {{ page.components }}/view-the-edit-history-of-a-comment.md %}
-{% include {{ page.components }}/view-all-replies-to-a-comment.md %}
-{% include {{ page.components }}/initialise-a-comment-on-a-dataset.md %}
-{% include {{ page.components }}/initialise-a-reply-to-a-comment.md %}
-{% include {{ page.components }}/create-a-comment.md %}
-{% include {{ page.components }}/update-a-comment.md %}
-{% include {{ page.components }}/record-a-like-of-a-comment.md %}
-{% include {{ page.components }}/remove-a-like-from-a-comment.md %}
-{% include {{ page.components }}/delete-a-comment.md %} -->
+GET `/api/comments/{comment-id}`
+
+Returns the comment `{comment-id}`.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/view-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/view-a-comment/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Comment](comments#comment) with HAL links.
+<!-- {% include snippets/api/comments/view-a-comment/response-body.md %} -->
+
+---
+### View the edit history of a comment
+
+GET `/api/comments/{comment-id}/history`
+
+Returns the edit history of the comment `{comment-id}`.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/view-the-edit-history-of-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/view-the-edit-history-of-a-comment/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/comments/view-the-edit-history-of-a-comment/response-body.md %} -->
+
+---
+### View all replies to a comment
+
+GET `/api/comments/{comment-id}`
+
+Returns all replies to the comment `{comment-id}`.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/view-all-replies-to-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/view-all-replies-to-a-comment/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Comment](comments#comment) with HAL links.
+<!-- {% include snippets/api/comments/view-all-replies-to-a-comment/response-body.md %} -->
+
+---
+### Initialise a comment on a dataset
+
+POST `/api/datasets/{dataset-id}/comments`
+
+Initialises a new comment on the dataset `{dataset-id}`.
+
+#### Prerequisites
+
+- Dataset `{dataset-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/initialise-a-comment-on-a-dataset/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/initialise-a-comment-on-a-dataset/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Comment](comments#comment) with HAL links.
+<!-- {% include snippets/api/comments/initialise-a-comment-on-a-dataset/response-body.md %} -->
+
+---
+### Initialise a reply to a comment
+
+POST `/api/comments/{comment-id}`
+
+Initialises a new reply comment to the comment `{comment-id}`.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/initialise-a-reply-to-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/initialise-a-reply-to-a-comment/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Comment](comments#comment) with HAL links.
+<!-- {% include snippets/api/comments/initialise-a-reply-to-a-comment/response-body.md %} -->
+
+---
+### Create a comment
+
+PUT `/api/comments/{comment-id}`
+
+Creates the comment `{comment-id}`.
+
+#### Prerequisites
+
+- The comment must have been initialised in order to create it
+- The target dataset `{dataset-id}` or comment `{comment-id}` must exist
+
+#### Request
+##### Body
+[Comment](#comment) resource.
+<!-- {% include snippets/api/comments/create-a-comment/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/create-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/create-a-comment/python-requests.md %} -->
+
+#### Response
+`201 Created`
+
+[Comment](#comment) with HAL links.
+<!-- {% include snippets/api/comments/create-a-comment/response-body.md %} -->
+
+---
+### Update a comment
+
+PUT `/api/comments/{comment-id}`
+
+Updates the comment `{comment-id}`.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Body
+[Comment](#comment) resource.
+<!-- {% include snippets/api/comments/update-a-comment/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/view-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/view-a-comment/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Comment](comments#comment) with HAL links.
+<!-- {% include snippets/api/comments/view-a-comment/response-body.md %} -->
+
+---
+### Record a like of a comment
+
+PUT `/api/comments/{comment-id}/like`
+
+Records a like of the comment `{comment-id}` from the authenticated user profile.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/record-a-like-of-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/record-a-like-of-a-comment/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+No response body provided.
+
+---
+### Remove a like from a comment
+
+DELETE `/api/comments/{comment-id}/like`
+
+Removes a like of the comment `{comment-id}` from the authenticated user profile.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/remove-a-like-from-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/remove-a-like-from-a-comment/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---
+### Delete a comment
+
+DELETE `/api/comments/{comment-id}`
+
+Deletes the comment `{comment-id}`.
+
+#### Prerequisites
+
+- Comment `{comment-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/comments/delete-a-comment/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/comments/delete-a-comment/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---

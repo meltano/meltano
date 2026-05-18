@@ -8,14 +8,112 @@ Alerts can be created by users on [datasets](datasets). These alerts can then be
 
 ---
 
-#### Requests
+## Requests
+
+### Initialise an alert on a dataset
+
+POST `/datasets/{dataset-id}/alerts`
+
+Initialises a new alert on a dataset.
+
+#### Prerequisites
+- The authenticated user must own a Matatika account
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/response-body.md %} -->
 
 ---
 
-<!-- {% include {{ page.components }}/initialise-an-alert-on-a-dataset.md %}
+### Create an alert on a dataset
 
-{% include {{ page.components }}/create-an-alert-on-a-dataset.md %}
+PUT `/datasets/{dataset-id}/alerts/{alert-id}`
 
-{% include {{ page.components }}/view-alerts-on-a-dataset.md %}
+Create a new alert on a dataset.
 
-{% include {{ page.components }}/view-an-alert.md %} -->
+#### Prerequisites
+- The authenticated user must own a Matatika account
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/python-requests.md %} -->
+
+#### Response
+`201 Created`
+
+<!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/response-body.md %} -->
+
+---
+
+### View alerts on a dataset
+
+GET `/datasets/{dataset-id}/alerts`
+
+View alerts on a dataset.
+
+#### Prerequisites
+- The authenticated user must own a Matatika account
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/response-body.md %} -->
+
+---
+
+### View an alert
+
+GET `/alerts/{alert-id}`
+
+View an alert.
+
+#### Prerequisites
+- The authenticated user must own a Matatika account
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/alerts/view-an-alert/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/alerts/view-an-alert/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/alerts/view-an-alert/response-body.md %} -->
+
+---

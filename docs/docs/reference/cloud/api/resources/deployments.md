@@ -5,15 +5,57 @@ components: request-md-components/deployments
 ---
 
 Deployments let the user schedule a [job](jobs) to deploy the contents of their [workspace](workspaces) repository to their workspace in the Matatika cloud.
+
 This can be done manually or via a GitHub Webhook which you can see how to set up in our Quick Start Guide: [Workspace Deploy Hook]({{site.baseurl}}/how-to-guides/manage-workspaces/managing-config-from-github)
 
+---
+
+## Requests
+
+### Deploy your workspace repository
+
+POST `/api/workspaces/{workspaces-id}/deployments`
+
+Deploys the workspace `{workspace-id}`.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/deployment/deploy-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/deployment/deploy-workspace/python-requests.md %} -->
+
+#### Response
+`202 Accepted`
+
+[Job](jobs) with HAL links.
+<!-- {% include snippets/api/deployment/deploy-workspace/response-body.md %} -->
 
 ---
 
-#### Requests
+### GitHub webhook workspace deployment
+
+POST `/api/workspaces/{workspaces-id}/deployments/github-webhook`
+
+Receives `POST` requests from GitHub and starts a workspace deploy job.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/deployment/github-webhook-deploy/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/deployment/github-webhook-deploy/python-requests.md %} -->
+
+#### Response
+`202 Accepted`
+
+[Job](jobs) with HAL links.
+<!-- {% include snippets/api/deployment/github-webhook-deploy/response-body.md %} -->
 
 ---
-
-<!-- {% include {{ page.components }}/deploy-workspace.md %}
-
-{% include {{ page.components }}/github-webhook.md %} -->

@@ -14,12 +14,35 @@ User and member interactions that affect a dataset's score:
 
 ---
 
-#### Requests
+## Requests
 
-#### See Also
+### View the feed of a workspace
 
-- [View all datasets in a workspace](datasets#view-all-datasets-in-a-workspace)
+GET `/api/workspaces/{workspace-id}/feed`
+
+Returns the feed of the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/feed/view-a-workspace-feed/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/feed/view-a-workspace-feed/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Dataset](datasets#dataset) collection with HAL links.
+<!-- {% include snippets/api/feed/view-a-workspace-feed/response-body.md %} -->
 
 ---
 
-<!-- {% include {{ page.components }}/view-the-feed-of-a-workspace.md %} -->
+##### See Also
+
+- [View all datasets in a workspace](datasets#view-all-datasets-in-a-workspace)

@@ -42,9 +42,173 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
 
-#### See Also
+### View all workspaces
+
+GET `/api/workspaces`
+
+Returns all workspaces the authenticated user profile is an owner or member of.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/view-all-workspaces/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/view-all-workspaces/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Workspace](#workspace) collection with HAL links.
+<!-- {% include snippets/api/workspaces/view-all-workspaces/response-body.md %} -->
+
+---
+### View a workspace
+
+GET `/api/workspaces/{workspace-id}`
+
+Returns the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be a member of the workspace `{workspace-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/view-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/view-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Workspace](#workspace) with HAL links.
+<!-- {% include snippets/api/workspaces/view-a-workspace/response-body.md %} -->
+
+---
+### Initialise a workspace
+
+POST `/api/workspaces`
+
+Initialises a new workspace.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/initialise-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/initialise-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Workspace](#workspace) with HAL links.
+<!-- {% include snippets/api/workspaces/initialise-a-workspace/response-body.md %} -->
+
+---
+### Create a workspace
+
+PUT `/api/workspaces/{workspace-id}`
+
+Creates the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be the owner of workspace `{workspace-id}`
+- The workspace must have been [initialised](#initialise-a-workspace) in order to create it
+
+#### Request
+##### Body
+[Workspace](#workspace) resource.
+<!-- {% include snippets/api/workspaces/create-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/create-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/create-a-workspace/python-requests.md %} -->
+
+#### Response
+`201 Created`
+
+[Workspace](#workspace) with HAL links.
+<!-- {% include snippets/api/workspaces/create-a-workspace/response-body.md %} -->
+
+---
+### Update a workspace
+
+PUT `/api/workspaces/{workspace-id}`
+
+Updates the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be the owner of workspace `{workspace-id}`
+- The workspace must have been [created](#create-a-workspace) in order to update it
+
+#### Request
+##### Body
+[Workspace](#workspace) resource.
+<!-- {% include snippets/api/workspaces/update-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/update-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/update-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Workspace](#workspace) with HAL links.
+<!-- {% include snippets/api/workspaces/update-a-workspace/response-body.md %} -->
+
+---
+### Delete a workspace
+
+DELETE `/api/workspaces/{workspace-id}`
+
+Deletes the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be the owner of workspace `{workspace-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/delete-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/delete-a-workspace/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---
+
+##### See Also
 
 - [Set a workspace as default](profiles#set-a-workspace-as-default)
 - [View all invitations to a workspace](invitations#view-all-invitations-to-a-workspace)
@@ -61,12 +225,3 @@ Value | Description
 - [Create or update a pipeline in a workspace](pipelines#create-or-update-a-pipeline-in-a-workspace)
 - [Delete a pipeline](pipelines#delete-a-pipeline)
 - [View all running or completed jobs for a workspace](jobs#view-all-running-or-completed-jobs-for-a-workspace)
-
----
-
-<!-- {% include {{page.components}}/view-all-workspaces.md %}
-{% include {{page.components}}/view-a-workspace.md %}
-{% include {{page.components}}/initialise-a-workspace.md %}
-{% include {{page.components}}/create-a-workspace.md %}
-{% include {{page.components}}/update-a-workspace.md %}
-{% include {{page.components}}/delete-a-workspace.md %} -->

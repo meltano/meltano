@@ -31,13 +31,163 @@ Path | Type | Description
 ---- | ---- | -----------
 `s.name` | `s.kind` | Refer to `s.description`
 
-#### Requests
+## Requests
+
+### View all datastores in a workspace
+
+GET `/api/workspaces/{workspace-id}/datastores`
+
+Returns the datastores in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Datastore](#datastore) collection with HAL links.
+<!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/response-body.md %} -->
 
 ---
+### View a datastore
 
-<!-- {% include {{ page.components }}/view-all-datastores-in-a-workspace.md %}
-{% include {{ page.components }}/view-a-datastore.md %}
-{% include {{ page.components }}/set-a-datastore-as-the-workspace-default.md %}
-{% include {{ page.components }}/initialise-a-new-datastore-in-a-workspace.md %}
-{% include {{ page.components }}/create-or-update-a-datastore-in-a-workspace.md %}
-{% include {{ page.components }}/delete-a-datastore.md %} -->
+GET `/api/datastores/{datastore-id}`
+
+Returns the datastore `{datastore-id}`.
+
+#### Prerequisites
+- Datastore `{datastore-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datastores/view-a-datastore/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datastores/view-a-datastore/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Datastore](#datastore) with HAL links.
+<!-- {% include snippets/api/datastores/view-a-datastore/response-body.md %} -->
+
+---
+### Set a datastore as the workspace default
+
+PUT `/api/datastores/{datastore-id}/default`
+
+Sets the datastore `{datastore-id}` as the workspace default.
+
+#### Prerequisites
+- Datastore `{datastore-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datastores/set-a-datastore-as-the-workspace-default/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datastores/set-a-datastore-as-the-workspace-default/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+No response body provided.
+
+---
+### Initialise a new datastore in a workspace
+
+POST `/api/workspaces/{workspace-id}/datastores`
+
+Initialises a new datastore in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Datastore](#datastore) with HAL links.
+<!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/response-body.md %} -->
+
+---
+### Create or update a datastore in a workspace
+
+PUT `/api/workspaces/{workspace-id}/datastores/{datastore-id}`
+
+Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Body
+[Datastore](#datastore) resource.
+<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK / 201 Created`
+
+[Datastore](#datastore) with HAL links.
+<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/response-body.md %} -->
+
+---
+### Delete a datastore
+
+DELETE `/api/datastores/{datastore-id}`
+
+Deletes the datastore `{datastore-id}`.
+
+#### Prerequisites
+- Datastore `{datastore-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datastores/delete-a-datastore/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datastores/delete-a-datastore/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---

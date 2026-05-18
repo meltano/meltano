@@ -41,17 +41,155 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
 
-#### See Also
+### View all notifications
 
-- [Create or update a dataset message](datasets#create-or-update-a-dataset-message)
+GET `/api/notifications?all={all}&before={before}&since={since}`
+
+Returns all notifications for the authenticated user profile.
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`all` | No | Boolean | `false` | Whether or not to return both resolved and unresolved notifications
+`before` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to return any notifications created before
+`since` | No | ISO 8601 timestamp | `2021-02-11T11:12` | The instant to return any notifications created since
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/notifications/view-all-notifications/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/notifications/view-all-notifications/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Notification](#notification) collection with HAL links.
+<!-- {% include snippets/api/notifications/view-all-notifications/response-body.md %} -->
+
+---
+### View all notifications for a workspace
+
+GET `/api/workspaces/{workspaceId}/notifications?all={all}&before={before}&since={since}`
+
+Returns all notifications for the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`all` | No | Boolean | | Whether or not to return both resolved and unresolved notifications
+`before` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to return any notifications created before
+`since` | No | ISO 8601 timestamp | `2021-02-11T11:12` | The instant to return any notifications created since
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/notifications/view-all-notifications-for-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/notifications/view-all-notifications-for-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Notification](#notification) collection with HAL links.
+<!-- {% include snippets/api/notifications/view-all-notifications-for-a-workspace/response-body.md %} -->
+
+---
+### View a notification
+
+GET `/api/notifications/{notification-id}`
+
+Returns the notification `{notification-id}`.
+
+#### Prerequisites
+- Notification `{notification-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/notifications/view-a-notification/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/notifications/view-a-notification/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Notification](#notification) with HAL links.
+<!-- {% include snippets/api/notifications/view-a-notification/response-body.md %} -->
+
+---
+### Refresh notifications
+
+PUT `/api/notifications?since={since}&markAsResolved={markAsResolved}`
+
+Returns new notifications for the authenticated user profile, optionally marking existing notifications as resolved up to the moment the request was made or the supplied `since` parameter.
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`since` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to fetch any new notifications from
+`markAsResolved` | No | Boolean | `true` | Whether or not to mark notifications created up to `since` as resolved
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/notifications/refresh-notifications/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/notifications/refresh-notifications/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Notification](#notification) collection with HAL links.
+<!-- {% include snippets/api/notifications/refresh-notifications/response-body.md %} -->
+
+---
+### Delete a notification
+
+DELETE `/api/notifications/{notification-id}`
+
+Deletes the notification `{notification-id}`.
+
+#### Prerequisites
+- Notification `{notification-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/notifications/delete-a-notification/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/notifications/delete-a-notification/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
 
 ---
 
-<!-- {% include {{page.components}}/view-all-notifications.md %}
-{% include {{page.components}}/view-all-notifications-for-a-workspace.md %}
-{% include {{page.components}}/view-a-notification.md %}
-{% include {{page.components}}/refresh-notifications.md %}
-{% include {{page.components}}/delete-a-notification.md %} -->
+##### See Also
 
+- [Create or update a dataset message](datasets#create-or-update-a-dataset-message)

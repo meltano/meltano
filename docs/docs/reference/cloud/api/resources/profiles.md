@@ -25,11 +25,120 @@ Path | JSON Type | Format | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all profiles
+
+GET `/api/profiles`
+
+Returns all profiles under the authenticated user account.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/profiles/view-all-profiles/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/profiles/view-all-profiles/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Profile](#profile) collection with HAL links.
+<!-- {% include snippets/api/profiles/view-all-profiles/response-body.md %} -->
 
 ---
+### View a profile
 
-<!-- {% include {{page.components}}/view-all-profiles.md %}
-{% include {{page.components}}/view-a-profile.md %}
-{% include {{page.components}}/create-or-update-a-profile.md %}
-{% include {{page.components}}/set-a-workspace-as-default.md %} -->
+GET `/api/profiles/{profile-id}`
+
+Returns the profile `{profile-id`}.
+
+#### Prerequisites
+
+- Profile `{profile-id}` must exist under the authenticated user account
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/profiles/view-a-profile/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/profiles/view-a-profile/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Profile](#profile) with HAL links.
+<!-- {% include snippets/api/profiles/view-a-profile/response-body.md %} -->
+
+---
+### Create or update profile
+
+PUT `/api/profiles/{profile-id}`
+
+Creates or updates the user profile.
+
+#### Prerequisites
+
+- The authentication subject must match the profile ID `{profile-id}`
+
+#### Request
+
+##### Body
+[Profile](#profile) resource.
+<!-- {% include snippets/api/profiles/update-a-profile/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/profiles/update-a-profile/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/profiles/update-a-profile/python-requests.md %} -->
+
+#### Response
+`200 OK / 201 Created`
+
+[Profile](#profile) with HAL links.
+<!-- {% include snippets/api/profiles/update-a-profile/response-body.md %} -->
+
+---
+### Set a workspace as default
+
+PATCH `/api/profiles/{profile-id}`
+
+Sets a default workspace for the profile `{profile-id}`.
+
+#### Prerequisites
+
+- The authentication subject must match the profile ID `{profile-id}`
+
+A workspace can be set as default, which defines the environment the Matatika app will initially load for a given profile. The default workspace setting persists only for the profile that sets it.
+
+#### Request
+##### Body
+[Profile](#profile) resource.
+<!-- {% include snippets/api/profiles/set-a-workspace-as-default/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/profiles/set-a-workspace-as-default/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/profiles/set-a-workspace-as-default/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Profile](#profile) with HAL links.
+<!-- {% include snippets/api/profiles/set-a-workspace-as-default/response-body.md %} -->
+
+---

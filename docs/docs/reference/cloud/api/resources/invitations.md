@@ -38,14 +38,197 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all sent invitations
+
+GET `/api/invitations`
+
+Returns all invitations sent by the authenticated user profile.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/view-all-sent-invitations/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/view-all-sent-invitations/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Invitation](#invitation) collection with HAL links.
+<!-- {% include snippets/api/invitations/view-all-sent-invitations/response-body.md %} -->
 
 ---
+### View all received invitations
 
-<!-- {% include {{ page.components }}/view-all-sent-invitations.md %}
-{% include {{ page.components }}/view-all-received-invitations.md %}
-{% include {{ page.components }}/view-all-invitations-to-a-workspace.md %}
-{% include {{ page.components }}/create-an-invitation-to-a-workspace.md %}
-{% include {{ page.components }}/accept-an-invitation.md %}
-{% include {{ page.components }}/delete-an-invitation-to-a-workspace.md %}
-{% include {{ page.components }}/withdraw-an-invitation-to-a-workspace.md %} -->
+GET `/api/invitations?email={user-email}`
+
+Returns all invitations received by the authenticated user profile.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/view-all-received-invitations/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/view-all-received-invitations/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Invitation](#invitation) collection with HAL links.
+<!-- {% include snippets/api/invitations/view-all-received-invitations/response-body.md %} -->
+
+---
+### View all invitations to a workspace
+
+GET `/api/workspaces/{workspace-id}/invitations`
+
+*As a workspace owner...*
+
+Returns all active invitations to the workspace `{workspace-id}`.
+
+*As a workspace member...*
+
+Returns all active invitations to the workspace `{workspace-id}` sent by the authenticated user profile. 
+
+#### Prerequisites
+
+- The user must be a member of the workspace `{workspace-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Invitation](#invitation) collection with HAL links.
+<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/response-body.md %} -->
+
+---
+### Create an invitation to a workspace
+
+POST `/api/workspaces/{workspace-id}/invitations`
+
+Creates an invitation to the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be a member of the workspace `{workspace-id}`
+
+#### Request
+
+##### Body
+[Invitation](#invitation) resource.
+<!-- {% include snippets/api/invitations/create-an-invitation-to-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/create-an-invitation-to-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/create-an-invitation-to-a-workspace/python-requests.md %} -->
+
+#### Response
+`202 Accepted`
+
+No response body provided.
+
+---
+### Accept an invitation
+
+PATCH `/api/invitations/{invitation-id}`
+
+Accepts the invitation `{invitation-id}`.
+
+#### Prerequisites
+
+- Workspace `{workspace-id}` must exist
+- Invitation `{invitation-id}` must exist for the authenticated user profile
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/accept-an-invitation/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/accept-an-invitation/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Invitation](#invitation) with HAL links.
+<!-- {% include snippets/api/invitations/accept-an-invitation/response-body.md %} -->
+
+---
+### Delete an invitation
+
+DELETE `/api/invitations/{invitation-id}`
+
+Deletes a pending or revoked invitation `{invitation-id}`.
+
+#### Prerequisites
+
+- The authenticated user must be the owner of workspace the invitation belongs to
+- or the authenticated user must have sent the invitation `{invitation-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/delete-an-invitation-to-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/delete-an-invitation-to-a-workspace/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---
+### Withdraw an invitation
+
+PUT `/api/invitations/{invitation-id}/revoked`
+
+Withdraws the pending or accepted invitation `{invitation-id}`.
+
+#### Prerequisites
+
+- The authenticated user must be the owner of workspace the invitation belongs to
+- or the authenticated user must have sent the invitation `{invitation-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/invitations/withdraw-an-invitation-to-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/invitations/withdraw-an-invitation-to-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+No response body provided.
+
+---

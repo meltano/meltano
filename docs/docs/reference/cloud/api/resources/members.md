@@ -22,9 +22,59 @@ Path | JSON Type | Format | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all members of a workspace
+
+GET `/api/workspaces/{workspace-id}/members`
+
+Returns all members of the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be a member of the workspace `{workspace-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/view-all-members-of-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/view-all-members-of-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Member](#member) collection with HAL links.
+<!-- {% include snippets/api/workspaces/view-all-members-of-a-workspace/response-body.md %} -->
 
 ---
+### View a member of a workspace
 
-<!-- {% include {{page.components}}/view-all-members-of-a-workspace.md %}
-{% include {{page.components}}/view-a-member-of-a-workspace.md %} -->
+GET `/api/workspaces/{workspace-id}/members/{member-id}`
+
+Returns the member `{member-id}` of the workspace `{workspace-id}`.
+
+#### Prerequisites
+
+- The user must be a member of the workspace `{workspace-id}`
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Member](#member) with HAL links.
+<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/response-body.md %} -->
+
+---

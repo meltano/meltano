@@ -35,16 +35,275 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all subscriptions
+
+GET `/api/subscriptions`
+
+Returns all subscriptions for the authenticated user profile.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/view-all-subscriptions/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/view-all-subscriptions/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) collection with HAL links.
+<!-- {% include snippets/api/subscriptions/view-all-subscriptions/response-body.md %} -->
 
 ---
+### View all member subscriptions to a workspace
 
-<!-- {% include {{page.components}}/view-all-subscriptions.md %}
-{% include {{page.components}}/view-all-member-subscriptions-to-a-workspace.md %}
-{% include {{page.components}}/view-a-subscription.md %}
-{% include {{page.components}}/subscribe-to-a-workspace.md %}
-{% include {{page.components}}/subscribe-to-a-channel.md %}
-{% include {{page.components}}/subscribe-to-a-dataset.md %}
-{% include {{page.components}}/subscribe-to-a-pipeline.md %}
-{% include {{page.components}}/update-a-subscription.md %}
-{% include {{page.components}}/remove-a-subscription.md %} -->
+GET `/api/workspaces/{workspace-id}/members/subscriptions`
+
+Returns all member subscriptions to the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) collection with HAL links.
+<!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/response-body.md %} -->
+
+---
+### View a subscription
+
+GET `/api/subscriptions/{subscription-id}`
+
+Returns the subscription `{subscription-id}`.
+
+#### Prerequisites
+- Subscription `{subscription-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/view-a-subscription/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/view-a-subscription/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) with HAL links.
+<!-- {% include snippets/api/subscriptions/view-a-subscription/response-body.md %} -->
+
+---
+### Subscribe to a workspace
+
+POST `/api/workspaces/{workspace-id}/subscriptions`
+
+Subscribes the authenticated user profile to the workspace `{workspace-id}`.
+
+By default, the subscription is configured for all workspace events (see [Subscription Type](#subscription-type) for more information).
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to workspace events, in order to enable workspace-wide notifications for all [members](members) by default (applicable for the workspace owner only)
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) with HAL links.
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/response-body.md %} -->
+
+---
+### Subscribe to a channel
+
+POST `/api/channels/{channel-id}/subscriptions`
+
+Subscribes the authenticated user profile to the channel `{channel-id}`.
+
+By default, the subscription is configured for all channel events (see [Subscription Type](#subscription-type) for more information).
+
+#### Prerequisites
+- Channel `{channel-id}` must exist
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to channel events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) with HAL links.
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/response-body.md %} -->
+
+---
+### Subscribe to a dataset
+
+POST `/api/datasets/{dataset-id}/subscriptions`
+
+Subscribes the authenticated user profile to the dataset `{dataset-id}`.
+
+By default, the subscription is configured for all dataset events (see [Subscription Type](#subscription-type) for more information).
+
+#### Prerequisites
+- Dataset `{dataset-id}` must exist
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to dataset events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) with HAL links.
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/response-body.md %} -->
+
+---
+### Subscribe to a pipeline
+
+POST `/api/pipelines/{pipeline-id}/subscriptions`
+
+Subscribes the authenticated user profile to the pipeline `{pipeline-id}`.
+
+By default, the subscription is configured for all pipeline events (see [Subscription Type](#subscription-type) for more information).
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist
+
+#### Request
+##### Query Parameters
+
+Parameter | Required | Format | Default Value | Description
+--------- | -------- | ------ | ------------- | -----------
+`allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to pipeline events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) with HAL links.
+<!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/response-body.md %} -->
+
+---
+### Update a subscription
+
+PUT `/api/subscriptions/{subscription-id}`
+
+Updates the subscription `{subscription-id}`.
+
+#### Prerequisites
+- Subscription `{subscription-id}` must exist
+
+#### Request
+##### Body
+
+Path | JSON Type | Format | Description
+---- | ---- | ------ | -----------
+`type` | `string` | [Subscription Type](#subscription-type) | The type of subscription
+
+<!-- {% include snippets/api/subscriptions/update-a-subscription/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/update-a-subscription/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/update-a-subscription/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Subscription](#subscription) with HAL links.
+<!-- {% include snippets/api/subscriptions/update-a-subscription/response-body.md %} -->
+
+---
+### Remove a subscription
+
+DELETE `/api/subscriptions/{subscription-id}`
+
+Removes the subscription `{subscription-id}`.
+
+#### Prerequisites
+- Subscription `{subscription-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/subscriptions/remove-a-subscription/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/subscriptions/remove-a-subscription/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---

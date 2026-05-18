@@ -10,11 +10,122 @@ See [here]({{site.baseurl}}/api/links#search) for more information on constructi
 
 ---
 
-#### Requests
+## Requests
+
+### Search for datasets in a workspace by free text
+
+GET `/api/workspaces/{workspaces-id}/search?q={free-text}`
+
+Searches the workspace `{workspace-id}` for datasets by the free text `{free-text}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-free-text/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-free-text/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-free-text/response-body.md %} -->
+
+`204 No Content`
+
+No response body provided.
 
 ---
+### Search for datasets in a workspace by channel name
 
-<!-- {% include {{ page.components }}/search-for-datasets-in-a-workspace-by-free-text.md %}
-{% include {{ page.components }}/search-for-datasets-in-a-workspace-by-channel-name.md %}
-{% include {{ page.components }}/search-for-datasets-in-a-workspace-by-tag-name.md %}
-{% include {{ page.components }}/msearch-in-a-workspace-by-free-text.md %} -->
+GET `/api/workspaces/{workspaces-id}/search?q=in:{channel-name}`
+
+Searches the workspace `{workspace-id}` for datasets by the channel `{channel-name}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-channel-name/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-channel-name/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Dataset](datasets#dataset) collection with HAL links.
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-channel-name/response-body.md %} -->
+
+`204 No Content`
+
+No response body provided.
+
+---
+### Search for datasets in a workspace by tag name
+
+GET `/api/workspaces/{workspace-id}/search?q=tag:{tag-name}`
+
+Searches the workspace `{workspace-id}` for datasets by the tag `{tag-name}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-tag-name/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-tag-name/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-tag-name/response-body.md %} -->
+
+`204 No Content`
+
+No response body provided.
+
+---
+### Search for datasets in a workspace using msearch
+
+POST `/api/workspaces/{workspace-id}/datasets/_msearch`
+
+Searches the workspace `{workspace-id}` for datasets using an elastic search query.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/search/msearch-in-a-workspace-by-free-text/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/search/msearch-in-a-workspace-by-free-text/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+<!-- {% include snippets/api/search/msearch-in-a-workspace-by-free-text/response-body.md %} -->
+
+`204 No Content`
+
+No response body provided.
+
+---

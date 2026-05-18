@@ -53,14 +53,206 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all running or completed jobs for a workspace
+
+GET `/api/workspaces/{workspace-id}/jobs`
+
+Returns all running or completed jobs for the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Job](#job) collection with HAL links.
+<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/response-body.md %} -->
 
 ---
+### View all running or completed jobs for a pipeline
 
-<!-- {% include {{page.components}}/view-all-running-or-completed-jobs-for-a-workspace.md %}
-{% include {{page.components}}/view-all-running-or-completed-jobs-for-a-pipeline.md %}
-{% include {{page.components}}/view-a-job.md %}
-{% include {{page.components}}/view-the-logs-of-a-job.md %}
-{% include {{page.components}}/create-a-job-from-a-pipeline.md %}
-{% include {{page.components}}/stop-a-job.md %}
-{% include {{page.components}}/delete-a-job.md %} -->
+GET `/api/pipelines/{pipeline-id}/jobs`
+
+Returns all running or completed jobs for the pipeline `{pipeline-id}`.
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Job](#job) collection with HAL links.
+<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/response-body.md %} -->
+
+---
+### View a job
+
+GET `/api/jobs/{job-id}`
+
+Returns the job `{job-id}`.
+
+#### Prerequisites
+- Job `{job-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/view-a-job/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/view-a-job/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Job](#job) with HAL links.
+<!-- {% include snippets/api/jobs/view-a-job/response-body.md %} -->
+
+---
+### View the logs of a job
+
+GET `/api/jobs/{job-id}/logs?sequence={sequence}`
+
+Returns the logs of the job `{job-id}`.
+
+#### Prerequisites
+- Job `{job-id}` must exist
+
+#### Request
+##### Query Parameters
+
+Query Parameter | Format | Default Value | Description
+--------------- | ------ | ------------- | -----------
+`sequence` | Unsigned integer | `0` | The line number in the logs to read from
+
+##### Headers
+##### Accept
+
+Media Type(s) | Description
+------------- | -----------
+`text/plain` `*/*` | Sets the response content type format to plain text
+`application/stream+json` `application/x-ndjson` | Sets the response content type format to [NDJSON](http://ndjson.org/)
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/python-requests.md %} -->
+
+#### Response
+- `200`: The job logs in the format specified by associated request `Accept` header
+
+<!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/response-body.md %} -->
+
+- `204`: No response body provided.
+
+---
+### Create a job from a pipeline
+
+POST `/api/pipelines/{pipeline-id}/jobs`
+
+Creates a new job from the pipeline `{pipeline-id}`.
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist and not already be running
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/python-requests.md %} -->
+
+#### Response
+`201 Created`
+
+[Job](#job) with HAL links.
+<!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/response-body.md %} -->
+
+---
+### Stop a job
+
+PUT `/api/jobs/{job-id}/stopped`
+
+Stops the execution of the job `{job-id}`.
+
+#### Prerequisites
+- Job `{job-id}` must exist
+- Job `{job-id}` must have [status](#job-status) `RUNNING`
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/stop-a-job/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/stop-a-job/python-requests.md %} -->
+
+#### Response
+`202 Accepted`
+
+Job stop acceptance message.
+<!-- {% include snippets/api/jobs/stop-a-job/response-body.md %} -->
+
+---
+### Delete a job
+
+DELETE `/api/jobs/{job-id}`
+
+Deletes and stops the execution of the job `{job-id}`.
+
+#### Prerequisites
+- Job `{job-id}` must exist
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/jobs/delete-a-job/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/jobs/delete-a-job/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---

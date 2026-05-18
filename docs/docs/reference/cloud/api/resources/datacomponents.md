@@ -74,13 +74,159 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
+
+### View all datacomponents in a workspace
+
+GET `/api/workspaces/{workspace-id}/datacomponents`
+
+Returns all datacomponents in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datacomponents/view-all-datacomponents-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datacomponents/view-all-datacomponents-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Datacomponent](#datacomponent) collection with HAL links.
+<!-- {% include snippets/api/datacomponents/view-all-datacomponents-in-a-workspace/response-body.md %} -->
 
 ---
+### View a datacomponent
 
-<!-- {% include {{ page.components }}/view-all-datacomponents-in-a-workspace.md %}
-{% include {{ page.components }}/view-a-datacomponent.md %}
-{% include {{ page.components }}/initialise-a-new-datacomponent-in-a-workspace.md %}
-{% include {{ page.components }}/create-or-update-a-datacomponent-in-a-workspace.md %}
-{% include {{ page.components }}/update-a-datacomponent.md %}
-{% include {{ page.components }}/delete-a-datacomponent.md %} -->
+GET `/api/datacomponents/{datacomponent-id}`
+
+Returns the datacomponent `{datacomponent-id}`.
+
+#### Prerequisites
+- Datacomponent `{datacomponent-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datacomponents/view-a-datacomponent/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datacomponents/view-a-datacomponent/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Datacomponent](#datacomponent) with HAL links.
+<!-- {% include snippets/api/datacomponents/view-a-datacomponent/response-body.md %} -->
+
+---
+### Initialise a new datacomponent in a workspace
+
+POST `/api/workspaces/{workspace-id}/datacomponents`
+
+Initialises a new datacomponent in the workspace `{workspace-id}`.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datacomponents/initialise-a-new-datacomponent-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datacomponents/initialise-a-new-datacomponent-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[datacomponent](#datacomponent) with HAL links.
+<!-- {% include snippets/api/datacomponents/initialise-a-new-datacomponent-in-a-workspace/response-body.md %} -->
+
+---
+### Create or update a datacomponent in a workspace
+
+PUT `/api/workspaces/{workspace-id}/datacomponents/{datacomponent-id}`
+
+Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{workspace-id}`.
+
+#### Request
+##### Body
+[Datacomponent](#datacomponent) resource.
+<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK / 201 Created`
+
+[Datacomponent](#datacomponent) with HAL links.
+<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/response-body.md %} -->
+
+---
+### Update a datacomponent
+
+PUT `/api/datacomponents/{datacomponent-id}`
+
+Updates the datacomponent `{datacomponent-id}`.
+
+#### Prerequisites
+- Datacomponent `{datacomponent-id}` must exist
+
+#### Request
+##### Body
+[Datacomponent](#datacomponent) resource.
+<!-- {% include snippets/api/datacomponents/update-a-datacomponent/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datacomponents/update-a-datacomponent/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datacomponents/update-a-datacomponent/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Datacomponent](#datacomponent) with HAL links.
+<!-- {% include snippets/api/datacomponents/update-a-datacomponent/response-body.md %} -->
+
+---
+### Delete a datacomponent
+
+DELETE `/api/datacomponents/{datacomponent-id}`
+
+Deletes the datacomponent `{datacomponent-id}`.
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/datacomponents/delete-a-datacomponent/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/datacomponents/delete-a-datacomponent/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---

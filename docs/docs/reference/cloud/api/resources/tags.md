@@ -22,15 +22,79 @@ Path | JSON Type | Format | Description
 
 ---
 
-#### Requests
+## Requests
 
-#### See Also
+### View all tags in a workspace
 
-- [Search for datasets in a workspace by tag name](search#search-for-datasets-in-a-workspace-by-tag-name)
+GET `/api/workspaces/{workspace-id}/tags`
+
+Returns all tags in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/tags/view-all-tags-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/tags/view-all-tags-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Tag](#tag) collection with HAL links.
+
+<!-- {% include snippets/api/tags/view-all-tags-in-a-workspace/response-body.md %} -->
+
+---
+### View all tags in the news for a workspace
+
+GET `/api/workspaces/{workspace-id}/news/tags`
+
+Returns all tags in the news for the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Response
+`200 OK`
+
+[Tag](#tag) collection with HAL links.
+
+---
+### View a tag in a workspace
+
+GET `/api/workspaces/{workspace-id}/tags/{tag-id}`
+
+Returns the tag `{tag-id}` in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+- Tag `{tag-id}` must exist
+
+#### Request
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Tag](#tag) with HAL links.
+
+<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/response-body.md %} -->
 
 ---
 
-<!-- {% include {{ page.components }}/view-all-tags-in-a-workspace.md %}
-{% include {{ page.components }}/view-all-tags-in-the-news-for-a-workspace.md %}
-{% include {{ page.components }}/view-a-tag-in-a-workspace.md %} -->
+##### See Also
 
+- [Search for datasets in a workspace by tag name](search#search-for-datasets-in-a-workspace-by-tag-name)

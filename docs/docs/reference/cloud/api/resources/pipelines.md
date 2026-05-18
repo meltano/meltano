@@ -64,22 +64,270 @@ Value | Description
 
 ---
 
-#### Requests
+## Requests
 
-#### See Also
+### View all pipelines in a workspace
+
+GET `/api/workspaces/{workspace-id}/pipelines`
+
+Returns all configured pipelines in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Pipeline](#pipeline) collection with HAL links.
+<!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/response-body.md %} -->
+
+---
+### View a pipeline
+
+GET `/api/pipelines/{pipeline-id}`
+
+Returns the pipeline `{pipeline-id}`.
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/view-a-pipeline/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/view-a-pipeline/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Pipeline](#pipeline) with HAL links.
+<!-- {% include snippets/api/pipelines/view-a-pipeline/response-body.md %} -->
+
+---
+### Initialise a pipeline in a workspace
+
+POST `/api/workspaces/{workspace-id}/pipelines`
+
+Initialises a new pipeline in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Pipeline](#pipeline) with HAL links.
+<!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/response-body.md %} -->
+
+---
+### Create or update a pipeline in a workspace
+
+PUT `/api/workspaces/{workspace-id}/pipelines/{pipeline-id}`
+
+Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+
+##### Body
+[Pipeline](#pipeline) resource.
+<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK / 201 Created`
+
+[Pipeline](#pipeline) with HAL links.
+<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/response-body.md %} -->
+
+---
+### Create or update a pipeline as a draft
+
+PUT `/api/workspaces/{workspace-id}/pipelines/{pipeline-id}/draft`
+
+Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}` as a draft.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+
+##### Body
+[Pipeline](#pipeline) resource.
+<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/python-requests.md %} -->
+
+#### Response
+`200 OK / 201 Created`
+
+[Pipeline](#pipeline) with HAL links.
+<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/response-body.md %} -->
+
+---
+### Validate a pipeline configuration in a workspace
+
+POST `/api/workspaces/{workspace-id}/pipelines/validation`
+
+Validates a pipeline configuration in the workspace `{workspace-id}`.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+
+#### Request
+##### Body
+
+[Pipeline](#pipeline) resource.
+<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/request-body.md %} -->
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+No response body provided.
+
+`400 Bad Request`
+
+[Pipeline property](pipelines#properties) validation errors.
+<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/response-body.md %} -->
+
+---
+### Verify a pipeline
+
+POST `/api/pipelines/{pipeline-id}/verification`
+
+Verifies the configuration of the pipeline `{pipeline-id}`.
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/verify-a-pipeline/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/verify-a-pipeline/python-requests.md %} -->
+
+#### Response
+`200 OK`
+
+[Job](jobs#job) with HAL links.
+<!-- {% include snippets/api/pipelines/verify-a-pipeline/response-body.md %} -->
+
+---
+### Delete a pipeline
+
+DELETE `/api/pipelines/{pipeline-id}`
+
+Deletes the pipeline `{pipeline-id}`.
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/delete-a-pipeline/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/delete-a-pipeline/python-requests.md %} -->
+
+#### Response
+`204 No Content`
+
+No response body provided.
+
+---
+### View pipeline metrics
+
+GET `/api/pipelines/{pipeline-id}/metrics`
+
+Returns the pipeline metrics for each job of `{pipeline-id}`.
+
+#### Prerequisites
+- Pipeline `{pipeline-id}` must exist
+
+#### Request
+
+##### Example Snippets
+cURL
+
+<!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/curl-request.md %} -->
+
+Python (`requests`)
+
+<!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/python-requests.md %} -->
+
+#### Response
+- `200`: The dataset data (defaults to JSON format).
+
+<!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/response-body.md %} -->
+
+- `204`: No response body, metrics not enabled.
+
+---
+
+##### See Also
 
 - [View all running or completed jobs for a pipeline](jobs#view-all-running-or-completed-jobs-for-a-pipeline)
 - [Create a job from a pipeline](jobs#create-a-job-from-a-pipeline)
 - [Subscribe to a pipeline](subscriptions#subscribe-to-a-pipeline)
-
----
-
-<!-- {% include {{page.components}}/view-all-pipelines-in-a-workspace.md %}
-{% include {{page.components}}/view-a-pipeline.md %}
-{% include {{page.components}}/initialise-a-pipeline-in-a-workspace.md %}
-{% include {{page.components}}/create-or-update-a-pipeline-in-a-workspace.md %}
-{% include {{page.components}}/create-or-update-a-pipeline-as-a-draft.md %}
-{% include {{page.components}}/validate-a-pipeline-configuration-in-a-workspace.md %}
-{% include {{page.components}}/verify-a-pipeline.md %}
-{% include {{page.components}}/delete-a-pipeline.md %}
-{% include {{page.components}}/view-the-pipeline-metrics-data.md %} -->
