@@ -1,7 +1,6 @@
 ---
 title: Datacomponents
 description: Matatika Datacomponents resource reference documentation
-components: request-md-components/datacomponents
 ---
 
 Datacomponents hold configuration for [dataplugins](dataplugins), and are the building blocks for constructing [pipelines](pipelines). One dataplugin may be referenced by many datacomponents, each with a different set of `properties` for the dataplugin [`settings`](dataplugins#setting). One pipeline may reference multiple datacomponents.

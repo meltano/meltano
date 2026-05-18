@@ -1,7 +1,6 @@
 ---
 title: Channels
 description: Matatika Channels resource reference documentation
-components: request-md-components/channels
 ---
 
 Channels enable datasets to be categorised or grouped together. A single workspace can have multiple channels.

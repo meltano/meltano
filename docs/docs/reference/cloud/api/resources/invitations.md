@@ -1,7 +1,6 @@
 ---
 title: Invitations
 description: Matatika Invitations resource reference documentation
-components: request-md-components/invitations
 ---
 
 Invitations allow access to private workspaces. When an invitation is created, an email containing an access link to the workspace will be sent to the recipient. Invitations can be sent to email addresses under the allowed domains configured for a workspace.

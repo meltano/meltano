@@ -1,7 +1,6 @@
 ---
 title: Administrators
 description: Matatika Administrators resource reference documentation
-components: request-md-components/administrators
 ---
 
 Administrators are types of [members](members) with delegated [workspace](workspaces) management permissions, equivalent to those held by the workspace owner.

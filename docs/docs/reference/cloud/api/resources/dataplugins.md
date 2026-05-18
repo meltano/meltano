@@ -1,7 +1,6 @@
 ---
 title: Dataplugins
 description: Matatika Dataplugins resource reference documentation
-components: request-md-components/dataplugins
 ---
 
 Dataplugins simply define a source of data from a given repository. Matatika provides a number of pre-configured platform-wide dataplugins out-the-box, as well as the ability to create custom dataplugins through the API. From these, [pipeline](pipelines) jobs can be run to inject data into a workspace.

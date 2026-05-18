@@ -1,7 +1,6 @@
 ---
 title: Datastores
 description: Matatika Datastores resource reference documentation
-components: request-md-components/datastores
 ---
 
 Datastores define a destination for data loaded into a [workspace](workspaces) by [pipelines](pipelines). The default datastore for a workspace is its own PostgreSQL database hosted by Matatika, but this can be changed at any time to another datastore with your own credentials (see our supported [dataplugins](dataplugins) of type `LOADER`).

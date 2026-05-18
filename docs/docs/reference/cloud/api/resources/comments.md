@@ -1,7 +1,6 @@
 ---
 title: Comments
 description: Matatika Comments resource reference documentation
-components: request-md-components/comments
 ---
 
 Comments aid conversation and collaboration around workspace datasets. Comments can be made on datasets, or other comments to form threads.

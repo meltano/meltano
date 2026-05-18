@@ -1,7 +1,6 @@
 ---
 title: Pipelines
 description: Matatika Pipelines resource reference documentation
-components: request-md-components/pipelines
 ---
 
 A pipeline defines a set of runnable actions composed from [datacomponents](datacomponents) to complete a set of tasks - for example, [ELT](https://en.wikipedia.org/wiki/Extract,_load,_transform). Pipelines are run as [jobs](jobs), either manually or on a predetermined schedule. Only a single pipeline can be run at any given time.

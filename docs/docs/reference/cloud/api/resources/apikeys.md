@@ -1,7 +1,6 @@
 ---
 title: API Keys
 description: Matatika API Keys resource reference documentation
-components: request-md-components/apikeys
 ---
 
 API keys offer an alternate method of authentication to the Matatika API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/). Access using API key credentials is supported by the Matatika [CLI]({{site.baseurl}}/cli) and [SDK]({{site.baseurl}}/sdk), which allows a user to remain authenticated permanently.

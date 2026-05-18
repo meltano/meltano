@@ -1,7 +1,6 @@
 ---
 title: Profiles
 description: Matatika Profiles resource reference documentation
-components: request-md-components/profiles
 ---
 
 Profiles are individual consumers of the Matatika service. A profile is automatically created for a user when they first access the app, or accept an invitation to a workspace from an existing member via email.

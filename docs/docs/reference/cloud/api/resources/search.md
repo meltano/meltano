@@ -1,7 +1,6 @@
 ---
 title: Search
 description: Matatika Search resource reference documentation
-components: request-md-components/search
 ---
 
 [Datasets](datasets#dataset) can be searched for within their containing [workspace](workspaces). Searches can filter datasets by arbitrary text, [channel](channels) name, or [tag](tags) name.

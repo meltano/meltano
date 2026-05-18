@@ -1,7 +1,6 @@
 ---
 title: Jobs
 description: Matatika Jobs resource reference documentation
-components: request-md-components/jobs
 ---
 
 A job is an arbitrary task with some stored state, pertaining to the governing [workspace](workspaces). Typically, jobs are orchestrated by [pipeline](pipelines) operations, but can also represent tasks for the user to complete.

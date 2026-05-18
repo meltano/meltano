@@ -1,7 +1,6 @@
 ---
 title: Notifications
 description: Matatika Notifications resource reference documentation
-components: request-md-components/notifications
 ---
 
 Notifications are alerts triggered by certain events pertaining to a resource. To receive notifications for a specific resource, a user must have a [subscription](subscriptions) to the resource.

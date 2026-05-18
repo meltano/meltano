@@ -1,7 +1,6 @@
 ---
 title: Accounts
 description: Matatika Accounts resource reference documentation
-components: request-md-components/accounts
 ---
 
 Accounts are passive entities that store quota information for resources consumed by associated [profiles](profiles). An account is created for a user when they first sign up.

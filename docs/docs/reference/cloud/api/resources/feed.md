@@ -1,7 +1,6 @@
 ---
 title: Feed
 description: Matatika Feed resource reference documentation
-components: request-md-components/feed
 ---
 
 The feed returns the most relevant datasets for the authenticated user profile. [Member](members) interactions with datasets are scored, determining their position within the feed.

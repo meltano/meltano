@@ -1,7 +1,6 @@
 ---
 title: Datasets
 description: Matatika Datasets resource reference documentation
-components: request-md-components/datasets
 ---
 
 Datasets are modules of data that can be published to workspaces. Datasets are visualised in the Matatika app following the [Chart.js](https://www.chartjs.org/) specifications.

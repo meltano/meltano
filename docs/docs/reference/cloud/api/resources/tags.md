@@ -1,7 +1,6 @@
 ---
 title: Tags
 description: Matatika Tags resource reference documentation
-components: request-md-components/tags
 ---
 
 Tags are hash-prefixed keywords or phrases that appear in the title, description, or comments of a dataset. Tags can be used to index datasets by their contained tags with a search, which allows for topical dataset categorisation.

@@ -1,7 +1,6 @@
 ---
 title: Workspaces
 description: Matatika Workspaces resource reference documentation
-components: request-md-components/workspaces
 ---
 
 Workspaces allow users to operate within isolated instances of the Matatika service. This is useful for separating profiles based on the data they require access to.
