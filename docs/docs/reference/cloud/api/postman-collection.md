@@ -1,9 +1,6 @@
 ---
 title: Postman Collection
 description: Get started with a Postman collection for the Matatika API - contains all the requests and documentation.
-permalink: /api/postman-collection
-parent: API
-nav_order: 1
 ---
 
 We automatically maintain a fully-tested Postman collection for the Matatika API, which contains all the requests documented for each [resource](resources) type.

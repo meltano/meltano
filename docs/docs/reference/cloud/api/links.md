@@ -1,9 +1,6 @@
 ---
 title: Links
 description: Reference documentation for link relations used by the Matatika API to communicate the capabilities of our resources
-permalink: /api/links
-parent: API
-nav_order: 8
 ---
 
 The Matatika API uses link relations to communicate the capabilities of our resources.  Where you see a link with one of the following relations, you can expect our API to act accordingly provided nothing has changed in the meantime.

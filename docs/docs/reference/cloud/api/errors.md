@@ -1,9 +1,6 @@
 ---
 title: Status Codes and Errors
 description: Reference documentation for standard HTTP status codes and error structures returned from the Matatika API
-permalink: /api/errors
-parent: API
-nav_order: 2
 ---
 
 The Matatika API returns standard HTTP status codes and returns an error structure explaining all failing fields.  We use a standard templated error response across different scenarios so you can expect consistency in our error responses.
