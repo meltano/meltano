@@ -20,7 +20,7 @@ When you provide a script to a pipeline, we will still add your plugins properti
 
 ### Minimal Script
 
-The following runs an extract-load to sync data from `<tap>` to `<target>`. For a pipeline with datacomponents referencing this tap and target only, this script identical to what is run by default. 
+The following runs an extract-load to sync data from `<tap>` to `<target>`. For a pipeline with datacomponents referencing this tap and target only, this script identical to what is run by default.
 
 ```bash
 meltano run --state-id-suffix $PIPELINE_ID <tap> <target>
