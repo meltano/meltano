@@ -7,15 +7,9 @@ grand_parent: DataML
 nav_order: 2
 ---
 
-# {{page.title}}
-
----
-
 You can change the format and display of your chart by using the `metadata` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).
-{: .fs-5 }
 
 The `metadata` key relates to how the data from the [`query`](query) within the dataset is displayed as an insight.
-{: .fs-5 }
 
 ### Example
 

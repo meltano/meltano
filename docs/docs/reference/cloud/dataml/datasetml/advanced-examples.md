@@ -7,21 +7,15 @@ grand_parent: DataML
 nav_order: 5
 ---
 
-# {{page.title}}
-
----
-
 These charts are the output of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/) listed below each of them.
-{: .fs-5 }
 
-You can find the original YAML files in our [examples github repo](https://github.com/Matatika/matatika-examples/tree/master/example_datasets){:target="_blank"}.
-{: .fs-5 }
+You can find the original YAML files in our [examples github repo](https://github.com/Matatika/matatika-examples/tree/master/example_datasets).
 
 ---
 
 ## Labeled Axis
 
-{% include example_charts/advanced_examples/Example_Labeled_Scatter_Chart.html %}
+<!-- {% include example_charts/advanced_examples/Example_Labeled_Scatter_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -78,7 +72,7 @@ visualisation: |-
 
 ## Max Axis Scale
 
-{% include example_charts/advanced_examples/Example_Max_Scale_Line_Chart.html %}
+<!-- {% include example_charts/advanced_examples/Example_Max_Scale_Line_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -126,7 +120,7 @@ visualisation: |-
 
 ## Scale Start At 0
 
-{% include example_charts/advanced_examples/Example_Start_At_0_Line_Chart.html %}
+<!-- {% include example_charts/advanced_examples/Example_Start_At_0_Line_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -174,7 +168,7 @@ visualisation: |-
 
 ## Tick Scaling
 
-{% include example_charts/advanced_examples/Example_Tick_Scaling_Bar_Chart.html %}
+<!-- {% include example_charts/advanced_examples/Example_Tick_Scaling_Bar_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2

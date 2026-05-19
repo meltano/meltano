@@ -7,15 +7,9 @@ grand_parent: DataML
 nav_order: 1
 ---
 
-# {{page.title}}
-
----
-
 You can use different chart types by utilizing the `visualisation` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).
-{: .fs-5 }
 
 The `visualisation` key contains information about displaying the chart for the insight.
-{: .fs-5 }
 
 ### Example
 
@@ -45,13 +39,13 @@ Value | Description
 `scatter` | Scatter Chart.
 `treemap` | Treemap Chart.
 
-For more information on Chart.js, see their documentation at [https://www.chartjs.org/docs/latest/](https://www.chartjs.org/docs/latest/){:target="_blank"}
+For more information on Chart.js, see their documentation at [https://www.chartjs.org/docs/latest/](https://www.chartjs.org/docs/latest/)
 
 ---
 
 ## Mermaid diagrams
 
-[Mermaid diagrams](https://mermaid.js.org/intro/#diagram-types){:target="_blank"} are supported with the `mermaid` visualisation type. The [diagram syntax](https://mermaid.js.org/intro/syntax-reference.html){:target="_blank"} should be provided in `rawData`.
+[Mermaid diagrams](https://mermaid.js.org/intro/#diagram-types) are supported with the `mermaid` visualisation type. The [diagram syntax](https://mermaid.js.org/intro/syntax-reference.html) should be provided in `rawData`.
 
 ```yaml
 visualisation: |-

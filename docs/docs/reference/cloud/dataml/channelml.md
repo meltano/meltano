@@ -6,18 +6,11 @@ nav_order: 1
 parent: DataML
 ---
 
-# {{page.title}}
-
----
-
 Examples and reference documentation for organising your datasets into channels.
-{: .fs-5 }
 
 Use the Matatika channel YAML to group related datasets in your workspace as code.
-{: .fs-5 }
 
-Our channel files are stored as YAML files, you can read more about the YAML format and its syntax [here](https://yaml.org/){:target="_blank"}.
-{: .fs-5 }
+Our channel files are stored as YAML files, you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
 ---
 

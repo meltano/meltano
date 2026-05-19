@@ -7,12 +7,7 @@ parent: WorkspaceML
 grand_parent: DataML
 ---
 
-# {{page.title}}
-
----
-
 Invitations allow you to customise the onboarding experience for new members of your workspace.
-{: .fs-5 }
 
 ---
 

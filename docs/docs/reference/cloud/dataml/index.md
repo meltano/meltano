@@ -6,9 +6,4 @@ nav_order: 10
 has_children: true
 ---
 
-# {{page.title}}
-
----
-
 Examples and reference documentation for **Data Management Language** **(DataML)** artifacts.
-{: .fs-5 }

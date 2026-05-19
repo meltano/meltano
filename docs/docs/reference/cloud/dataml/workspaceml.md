@@ -7,24 +7,19 @@ parent: DataML
 has_children: true
 ---
 
-# {{page.title}}
-
----
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Reference documentation for the workspace configuration file.
-{: .fs-5 }
 
 Use the Matatika workspace YAML to configure your workspace as code.
-{: .fs-5 }
 
-The workspace file is stored in YAML file format, you can read more about the YAML format and its syntax [here](https://yaml.org/){:target="_blank"}.
-{: .fs-5 }
+The workspace file is stored in YAML file format, you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
 ---
 
 ### Example: `workspace.yml`
 
-{% raw %}
 ```yaml
 version: workspaces/v0.2
 name: My workspace
@@ -103,7 +98,6 @@ app_properties:
         </div>
     </div>
 ```
-{% endraw %}
 
 ### Key Information
 
@@ -128,8 +122,8 @@ Workspace configuration files with a `-*` suffix (e.g. `workspace-dev.yml`) defi
 
 Environment-specific workspace configuration files only need to contain the properties a user wants to override from the `workspace.yml` (`version` is required regardless).
 
-`workspace.yml`
-{: .tab .tabs-section-start}
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="workspace.yml" label="workspace.yml" default>
 
 ```yml
 version: workspaces/v0.2
@@ -152,15 +146,17 @@ data_store_paths:
   - datastores
 ```
 
-`workspace-dev.yml`
-{: .tab}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="workspace-dev.yml" label="workspace-dev.yml">
 
 ```yml
 version: workspaces/v0.2
 name: My workspace (dev)
 pipelines_image: my-workspace-image:latest-dev
 ```
-{: .tabs-section-end}
+
+  </TabItem>
+</Tabs>
 
 
 Further Reading: 

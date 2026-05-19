@@ -6,18 +6,11 @@ nav_order: 7
 parent: DataML
 ---
 
-# {{page.title}}
-
----
-
 Reference documentation for Meltano files.
-{: .fs-5 }
 
 [Meltano](https://meltano.com/) is a data automation tool and used to manage data plugins in [workspaces]({{site.baseurl}}/api/resources/workspaces). 
-{: .fs-5 }
 
 The [meltano.yml](https://docs.meltano.com/concepts/project#meltanoyml-project-file) file is where your workspace, a Meltano project, will store information about your data sources, [data stores]({{site.baseurl}}/dataml/datastoreml) and any other plugins used in your workspace.
-{: .fs-5 }
 
 ---
 

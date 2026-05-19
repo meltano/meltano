@@ -7,12 +7,7 @@ parent: WorkspaceML
 grand_parent: DataML
 ---
 
-# {{page.title}}
-
----
-
 Dashboards allow you to design a layout for data and datasets in your workspace. These are fully customizable and render custom HTML and CSS, letting you format them as required.
-{: .fs-5 }
 
 ---
 
@@ -20,7 +15,6 @@ You can create dashboards of your datasets in the Matataika app, by defining a f
 
 ### Example `workspace.yml`:
 
-{% raw %}
 ```yaml
 version: workspaces/v0.2
 name: My workspace
@@ -78,7 +72,6 @@ plugin_paths:
 data_store_paths:
   - datastores
 ```
-{% endraw %}
 
 ### Dashboard Settings
 

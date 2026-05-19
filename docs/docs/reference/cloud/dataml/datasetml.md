@@ -7,18 +7,11 @@ parent: DataML
 has_children: true
 ---
 
-# {{page.title}}
-
----
-
 Examples and reference documentation for datasets and visualisation.
-{: .fs-5 }
 
 Use the Matatika dataset YAML to create and format insights in your workspace as code.
-{: .fs-5 }
 
-Our dataset files are stored as YAML files, you can read more about the YAML format and its syntax [here](https://yaml.org/){:target="_blank"}.
-{: .fs-5 }
+Our dataset files are stored as YAML files, you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
 ---
 

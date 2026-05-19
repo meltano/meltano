@@ -7,21 +7,15 @@ grand_parent: DataML
 nav_order: 4
 ---
 
-# {{page.title}}
-
----
-
 These charts are the output of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/) listed below each of them.
-{: .fs-5 }
 
-You can find the original YAML files in our [examples github repo](https://github.com/Matatika/matatika-examples/tree/master/example_datasets){:target="_blank"}.
-{: .fs-5 }
+You can find the original YAML files in our [examples github repo](https://github.com/Matatika/matatika-examples/tree/master/example_datasets).
 
 ---
 
 ## Basic Bar Chart
 
-{% include example_charts/basic_charts/Example_Basic_Bar_Chart.html %}
+<!-- {% include example_charts/basic_charts/Example_Basic_Bar_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -56,7 +50,7 @@ visualisation: '{"chartjs-chart": {"chartType": "bar"}}'
 
 ## Grouped Bar Chart
 
-{% include example_charts/basic_charts/Example_Grouped_Bar_Chart.html %}
+<!-- {% include example_charts/basic_charts/Example_Grouped_Bar_Chart.html %} -->
 
 
 ```yaml
@@ -93,7 +87,7 @@ visualisation: '{"chartjs-chart": {"chartType": "bar"}}'
 
 ## Stacked Bar Chart
 
-{% include example_charts/basic_charts/Example_Stacked_Bar_Chart.html %}
+<!-- {% include example_charts/basic_charts/Example_Stacked_Bar_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -141,7 +135,7 @@ visualisation: |-
 
 ## Doughnut Chart
 
-{% include example_charts/basic_charts/Example_Basic_Doughnut_Chart.html %}
+<!-- {% include example_charts/basic_charts/Example_Basic_Doughnut_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -173,7 +167,7 @@ visualisation: '{"chartjs-chart": {"chartType": "doughnut"}}'
 
 ## Pie Chart
 
-{% include example_charts/basic_charts/Example_Basic_Pie_Chart.html %}
+<!-- {% include example_charts/basic_charts/Example_Basic_Pie_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2
@@ -216,7 +210,7 @@ visualisation: '{"chartjs-chart": {"chartType": "doughnut"}}'
 
 ## Line Chart
 
-{% include example_charts/basic_charts/Example_Basic_Line_Chart.html %}
+<!-- {% include example_charts/basic_charts/Example_Basic_Line_Chart.html %} -->
 
 ```yaml
 version: datasets/v0.2

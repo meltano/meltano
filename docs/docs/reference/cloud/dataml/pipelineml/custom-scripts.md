@@ -7,17 +7,13 @@ parent: PipelineML
 grand_parent: DataML
 ---
 
-# {{page.title}}
-
----
-
 Custom scripts can be used in [Pipelines]({{site.baseurl}}/glossary#pipeline) by choosing `Script` from `Section 2 - Clean, transform and organise` when creating or editing your data import or by defining an 'inline_script' in your [Pipeline YAML]({{site.baseurl}}/dataml/pipelineml/).
 
 ---
 
 ## Basics
 
-Custom scripts are bash scripts that generally invoke [Meltano](https://docs.meltano.com/guide/plugin-management){:target="_blank"} commands. As mentioned before you can also control the [data import's]({{site.baseurl}}/glossary#data-import) environment in these scripts.
+Custom scripts are bash scripts that generally invoke [Meltano](https://docs.meltano.com/guide/plugin-management) commands. As mentioned before you can also control the [data import's]({{site.baseurl}}/glossary#data-import) environment in these scripts.
 
 When you provide a `Script` to a pipeline, we will still add your plugins properties to the pipeline environment. Other than that, you are now in complete control of the environment, installation of plugins and execution of your pipeline.
 
@@ -56,7 +52,7 @@ By invoking other plugins through Meltano, you gain the benefit of Meltano takin
 
 ## Further Reading
 
-- [Matatika Examples of Custom Scripts](https://github.com/Matatika/matatika-examples/tree/master/example_data_import_scripts){:target="_blank"}
+- [Matatika Examples of Custom Scripts](https://github.com/Matatika/matatika-examples/tree/master/example_data_import_scripts)
 - [Matatika Default Pipeline Run Script](https://github.com/Matatika/matatika-examples/blob/master/example_data_import_scripts/default.sh)
-- [Matatika Technical Glossary](https://github.com/Matatika/matatika-examples/tree/master/matatika_technical_glossary#custom-data-source){:target="_blank"}
-- [Meltano Documentation](https://docs.meltano.com/guide/plugin-management){:target="_blank"}
+- [Matatika Technical Glossary](https://github.com/Matatika/matatika-examples/tree/master/matatika_technical_glossary#custom-data-source)
+- [Meltano Documentation](https://docs.meltano.com/guide/plugin-management)

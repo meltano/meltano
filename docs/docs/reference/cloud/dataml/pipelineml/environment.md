@@ -7,10 +7,6 @@ parent: PipelineML
 grand_parent: DataML
 ---
 
-# {{page.title}}
-
----
-
 [Pipelines]({{site.baseurl}}/glossary#data-import) have environments that are used to pass settings to your [data source]({{site.baseurl}}/glossary#data-source), [data stores]({{site.baseurl}}/glossary#data-store) and other plugins.
 
 ---
@@ -51,5 +47,5 @@ EXPORT <NEW_OR_EXISTING_SETTING_NAME>=<NEW_VALUE>
 
 ## Further Reading
 
-- [Meltano Documentation](https://docs.meltano.com/concepts/environments){:target="_blank"}
-- [Meltano Database URI Documentation](https://docs.meltano.com/reference/settings#database_uri){:target="_blank"}
+- [Meltano Documentation](https://docs.meltano.com/concepts/environments)
+- [Meltano Database URI Documentation](https://docs.meltano.com/reference/settings#database_uri)
