@@ -156,7 +156,7 @@ pipelines_image: my-workspace-image:latest-dev
 </Tabs>
 
 
-Further Reading: 
+Further Reading:
 
 - [API Workspaces](/reference/cloud/api/resources/workspaces)
 - [Data Store ML](/reference/cloud/dataml/datastoreml)

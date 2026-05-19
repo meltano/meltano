@@ -17,7 +17,7 @@ A pipeline defines a set of runnable actions composed from [datacomponents](data
 
 Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
-`id` | `string` | Version 4 UUID | The pipeline ID 
+`id` | `string` | Version 4 UUID | The pipeline ID
 `status` | `string` | [Pipeline Status](#pipeline-status)
 `name` | `string` | | The pipeline name
 `schedule` | `string` | Cron | The interval at which to launch a new job e.g. `0 0 9-17 * * MON-FRI` launches a job on the hour nine-to-five weekdays
@@ -35,7 +35,7 @@ Path | JSON Type | Format | Description
 
 ### Properties
 
-For each setting in the [datacomponents](datacomponents)' [dataplugin](dataplugins) [`settings`](dataplugins#setting) for each 
+For each setting in the [datacomponents](datacomponents)' [dataplugin](dataplugins) [`settings`](dataplugins#setting) for each
 
 Path | JSON Type | Format | Description
 ---- | --------- | ------ | -----------

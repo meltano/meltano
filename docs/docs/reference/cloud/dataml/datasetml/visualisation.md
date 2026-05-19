@@ -121,11 +121,11 @@ By default the background is white and the text is black, but in all our dataset
 ```yaml
 metadata: |-
   {
-      "name": "elementary_test_results", 
-      "label": "metric", 
+      "name": "elementary_test_results",
+      "label": "metric",
       "related_table": {
         "columns": [
-        ], 
+        ],
         "aggregates": [
             {"name": "total", "label": "Total", "description": "Total"},
             {"name": "pass", "label": "Pass", "description": "Pass"},
@@ -144,7 +144,7 @@ For our `html-metric`, the first color is always the background, then every othe
 
 ---
 
-Further Reading: 
+Further Reading:
 
 - [API Datasets](/reference/cloud/api/resources/datasets)
 - [Example Charts](basic-examples)

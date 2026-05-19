@@ -24,11 +24,11 @@ description: |-
   Stats for shops, visitor amount, and sales.
 metadata: |-
   {
-    "name": "customer", 
+    "name": "customer",
     "related_table": {
       "columns": [
         {"name": "sales", "label": "Sales", "description": "Number of Sales"}
-      ], 
+      ],
       "aggregates": [
         {"name": "visitors", "label": "Visitors", "description": "Number of Visitors"}
       ]
@@ -43,8 +43,8 @@ rawData: |-
     {"customer.name": "Shop Five", "customer.visitors": 890, "customer.sales": 800}
   ]
 visualisation: |-
-  {"chartjs-chart": 
-    {"chartType": "line", 
+  {"chartjs-chart":
+    {"chartType": "line",
       "options": {
         "scales": {
           "y": {
@@ -59,7 +59,7 @@ visualisation: |-
               "text": "Number of Sales"
             }
           }
-        }    
+        }
       }
     }
   }
@@ -81,11 +81,11 @@ description: |-
   Stats for shops, their sales target percentage and their actual sales percentage.
 metadata: |-
   {
-    "name": "customer", 
+    "name": "customer",
     "related_table": {
       "columns": [
         {"name": "name", "label": "Shop Name", "description": "Shop Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "sales_target_percent", "label": "Sales Target Percentage", "description": "Sales Target Percentage"},
         {"name": "sales_percent", "label": "Sales Percentage", "description": "Sales Percentage"}
@@ -101,8 +101,8 @@ rawData: |-
     {"customer.name": "Shop Five", "customer.sales_target_percent": 80, "customer.sales_percent": 74}
   ]
 visualisation: |-
-  {"chartjs-chart": 
-    {"chartType": "line", 
+  {"chartjs-chart":
+    {"chartType": "line",
       "options": {
         "scales": {
           "y": {
@@ -129,11 +129,11 @@ description: |-
   Stats for shops, visitor amount, and sales.
 metadata: |-
   {
-    "name": "customer", 
+    "name": "customer",
     "related_table": {
       "columns": [
         {"name": "name", "label": "Shop Name", "description": "Shop Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "visitors", "label": "Visitors", "description": "Number of Visitors"},
         {"name": "sales", "label": "Sales", "description": "Number of Sales"}
@@ -149,8 +149,8 @@ rawData: |-
     {"customer.name": "Shop Five", "customer.visitors": 890, "customer.sales": 800}
   ]
 visualisation: |-
-  {"chartjs-chart": 
-    {"chartType": "line", 
+  {"chartjs-chart":
+    {"chartType": "line",
       "options": {
         "scales": {
           "y": {
@@ -174,14 +174,14 @@ questions: How many deliveries does each shop have?
 description: |-
   #Example
 
-  This dataset show the shop and how many daily deliveries they recieve.
+  This dataset show the shop and how many daily deliveries they receive.
 metadata: |-
   {
-    "name": "shop", 
+    "name": "shop",
     "related_table": {
       "columns": [
         {"name": "name", "label": "Shop Name", "description": "Shop Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "daily_deliveries", "label": "Daily Deliveries", "description": "Daily Deliveries"}
       ]
@@ -194,7 +194,7 @@ rawData: |-
     {"shop.name": "Shop Three", "shop.daily_deliveries": 1}
   ]
 visualisation: |-
-  {"chartjs-chart": 
+  {"chartjs-chart":
     {"chartType": "bar",
       "options": {
         "scales": {
@@ -210,7 +210,3 @@ visualisation: |-
   }
 ```
 ---
-
-
-
-

@@ -24,11 +24,11 @@ description: |-
   Sun orbit data for some planets within our solar system.
 metadata: |-
   {
-    "name": "planet", 
+    "name": "planet",
     "related_table": {
       "columns": [
         {"name": "name", "label": "Planet Name", "description": "Planet Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "orbitduration", "label": "Orbit Duration (Earth Years)", "description": "Orbit Duration (Earth Years)"}
       ]
@@ -56,7 +56,7 @@ title: Example Grouped Bar Chart
 questions: How many Earth-years does it take for Jupiter to orbit the sun?
 description: |-
   #Example
-  
+
   Sun orbit data for some planets within our solar system.
 metadata: |-
   {
@@ -64,7 +64,7 @@ metadata: |-
     "related_table": {
       "columns": [
         {"name": "name", "label": "Planet Name", "description": "Planet Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "orbitduration", "label": "Orbit Duration (Earth Years)", "description": "Orbit Duration (Earth Years)"},
         {"name": "orbitdistance", "label": "Orbit Distance (Light Years)", "description": "Orbit Distance (Light Years)"}
@@ -100,7 +100,7 @@ metadata: |-
     "related_table": {
       "columns": [
         {"name": "name", "label": "Planet Name", "description": "Planet Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "orbitduration", "label": "Orbit Duration (Earth Years)", "description": "Orbit Duration (Earth Years)"},
         {"name": "orbitdistance", "label": "Orbit Distance (Light Years)", "description": "Orbit Distance (Light Years)"}
@@ -117,7 +117,7 @@ rawData: |-
 visualisation: |-
   {
     "chartjs-chart": {
-      "chartType": "bar", 
+      "chartType": "bar",
       "options": {
         "scales": {
           "x": {
@@ -140,14 +140,14 @@ title: Example Basic Doughnut Chart
 questions: What shop had the most visitors?
 description: |-
   #Example
-  
+
   Stats for shops and visitor amount.
 metadata: |-
   {
-    "name": "customer", 
+    "name": "customer",
     "related_table": {
       "columns": [
-      ], 
+      ],
       "aggregates": [
         {"name": "visitors", "label": "Visitors", "description": "Number of Visitors"},
         {"name": "sales", "label": "Sales", "description": "Number of Sales"}
@@ -172,14 +172,14 @@ title: Example Basic Pie Chart
 questions: For the last 7 days, how many visitors did Shop One have?
 description: |-
   #Example
-  
+
   Shop One visitors for the last 7 days.
 metadata: |-
   {
-    "name": "customer", 
+    "name": "customer",
     "related_table": {
       "columns": [
-      ], 
+      ],
       "aggregates": [
         {"name": "visitors_monday", "label": "Monday Visitors", "description": "Monday Visitors"},
         {"name": "visitors_tuesday", "label": "Tuesday Visitors", "description": "Tuesday Visitors"},
@@ -215,15 +215,15 @@ title: Example Basic Line Chart
 questions: Which shop had the most sales?
 description: |-
   #Example
-  
+
   Stats for shops, visitor amount, and sales.
 metadata: |-
   {
-    "name": "customer", 
+    "name": "customer",
     "related_table": {
       "columns": [
         {"name": "name", "label": "Shop Name", "description": "Shop Name"}
-      ], 
+      ],
       "aggregates": [
         {"name": "visitors", "label": "Visitors", "description": "Number of Visitors"},
         {"name": "sales", "label": "Sales", "description": "Number of Sales"}

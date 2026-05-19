@@ -30,7 +30,7 @@ metadata: |-
         "related_table": {
         "columns": [
             {"name": "report_date", "label": "Date", "description": "Date"}
-        ], 
+        ],
         "aggregates": [
             {"name": "total_users", "label": "Total Users", "description": "Total Users"}
         ]
@@ -39,13 +39,13 @@ metadata: |-
 visualisation: |-
     {"chartjs-chart": {"chartType": "bar"}}
 query: |-
-    SELECT 
+    SELECT
     report_date "google_analytics_locations.report_date"
     , sum(users) "google_analytics_locations.total_users"
     FROM google_analytics_locations
     WHERE report_date >= current_date - interval '14' day
     AND report_date < current_date
-    GROUP BY report_date 
+    GROUP BY report_date
     ORDER BY report_date
 ```
 
@@ -53,13 +53,13 @@ query: |-
 
 Path | JSON Type | Description
 ---- | --------- | -----------
-`version` | `string` | The version determines how the CLI handles publishing the dataset. 
+`version` | `string` | The version determines how the CLI handles publishing the dataset.
 `source` | `string`  | A channel name to be used to group up related datasets in your workspace.
 `title` | `string` | The title at the top of the insight.
 `questions` | `string` | Questions that your dataset answers, so people can find the dataset just by asking questions.
 `description` | `string` | Information about what the dataset is, how it's being filtered or displayed and other relevant information. You can also add `#tags`.
 `metadata` | `string` of JSON | Details about how the dataset's chart is laid out. [More Info](/reference/cloud/dataml/datasetml/metadata)
-`visulisation` | `string` of JSON | Details about the precise visualisation of the datasets chart. [More Info](/reference/cloud/dataml/datasetml/visualisation)
+`visualisation` | `string` of JSON | Details about the precise visualisation of the datasets chart. [More Info](/reference/cloud/dataml/datasetml/visualisation)
 `query` | `string` of SQL | The query that returns the data from your datastore for use in the dataset's chart and related table. [More Info](/reference/cloud/dataml/datasetml/query)
 `rawData` | `string` of a List | The rawData key allows you to hard-code data directly into your dataset.
 
@@ -82,7 +82,7 @@ The multiline string is generally the best way to display the `string` of JSON o
 
 ---
 
-Further Reading: 
+Further Reading:
 
 - [API Datasets](/reference/cloud/api/resources/datasets)
 - [Example Charts](/reference/cloud/dataml/datasetml/basic-examples)

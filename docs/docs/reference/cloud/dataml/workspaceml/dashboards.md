@@ -74,11 +74,11 @@ data_store_paths:
 
 Note that these settings are nested under `app_properties`.
 
-Setting | Description 
+Setting | Description
 ----------- | --------
 `DASHBOARD_PAGE_TITLE` | Dashboard page title
 `DASHBOARD_CONTENT` | Your dashboard content as HTML
-`APP_MENU_ITEMS` | Currently you have to provide an override for all pages showing in the app, including your new dashboard page. 
+`APP_MENU_ITEMS` | Currently you have to provide an override for all pages showing in the app, including your new dashboard page.
 
 A list of `faIcons` for your Dashboard can be found here: [FontAwesome Icons v5](https://fontawesome.com/v5/search). You can use any free icons as your dashboard icon, or to change the icon of an existing page.
 
@@ -113,7 +113,7 @@ Prop | Type | Description | Required | Default
 Renders a back button.
 
 #### `DownloadDataset`
-Download a dataset from the workspace. 
+Download a dataset from the workspace.
 
 Prop | Type | Description | Required | Default
 --- | --- | --- | --- | ---
@@ -122,7 +122,7 @@ Prop | Type | Description | Required | Default
 `tooltip` | String | The text displayed on hover | No | `Download {dataset title OR dataset alias}`
 
 #### `DownloadResource`
-Download a resource from the workspace. 
+Download a resource from the workspace.
 
 Prop | Type | Description | Required | Default
 --- | --- | --- | --- | ---

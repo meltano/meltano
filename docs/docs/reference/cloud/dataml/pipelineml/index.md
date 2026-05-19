@@ -48,6 +48,6 @@ Path | JSON Type | Description
 
 ---
 
-Further Reading: 
+Further Reading:
 
 - [API Pipelines](/reference/cloud/api/resources/pipelines)

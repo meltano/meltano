@@ -8,7 +8,7 @@ sidebar_position: 24
 import Examples from '@site/src/components/Examples'
 import Snippet from '@site/src/components/Snippet'
 
-Resources are files that are managed by a workspace. A resource is accessible from `/api/workspaces/{workspace-id}/resources` by its `path`. 
+Resources are files that are managed by a workspace. A resource is accessible from `/api/workspaces/{workspace-id}/resources` by its `path`.
 
 ---
 

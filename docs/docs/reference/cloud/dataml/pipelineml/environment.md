@@ -4,7 +4,7 @@ description: Reference documentation for pipeline environment customisation.
 sidebar_position: 1
 ---
 
-Pipelines have environments that are used to pass configuration to the underlying plugins it references. 
+Pipelines have environments that are used to pass configuration to the underlying plugins it references.
 
 ---
 
@@ -19,12 +19,12 @@ Some of these setting will be hidden with the value `***`, but when you copy and
 ### Default Environment
 
 Your pipeline's environment by default will contain:
-- Configuration values for all dataplugin settings set on the pipeline or referenced datacomponents  
+- Configuration values for all dataplugin settings set on the pipeline or referenced datacomponents
 - `EXTRACTOR`, if referencing a datacomponent backed by an extractor dataplugin
 - `LOADER`, if referencing a datacomponent/datastore backed by a loader dataplugin
-- `DBT_TARGET`, pertaining to a datasatore referenced by the pipeline, or the worksapce default
-- `DBT_SOURCE_SCHEMA`, pertaining to a datasatore referenced by the pipeline, or the worksapce default
-- `DBT_TARGET_SCHEMA`, pertaining to a datasatore referenced by the pipeline, or the worksapce default
+- `DBT_TARGET`, pertaining to a datasatore referenced by the pipeline, or the workspace default
+- `DBT_SOURCE_SCHEMA`, pertaining to a datasatore referenced by the pipeline, or the workspace default
+- `DBT_TARGET_SCHEMA`, pertaining to a datasatore referenced by the pipeline, or the workspace default
 - `MELTANO_STATE_BACKEND_URI`
 - `MELTANO_ENVIRONMENT`
 
