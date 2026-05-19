@@ -4,15 +4,15 @@ description: Reference documentation for pipeline custom scripts.
 sidebar_position: 2
 ---
 
-Custom scripts can be used in [Pipelines]({{site.baseurl}}/glossary#pipeline) by choosing `Script` from `Section 2 - Clean, transform and organise` when creating or editing your data import or by defining an 'inline_script' in your [Pipeline YAML](.).
+Custom scripts can be used in pipelines by choosing "Custom Bash Script" from the "Actions" tab when editing your pipeline in Meltano Cloud, or by defining an `script` in your [pipeline YAML file](.).
 
 ---
 
 ## Basics
 
-Custom scripts are bash scripts that generally invoke [Meltano](https://docs.meltano.com/guide/plugin-management) commands. As mentioned before you can also control the [data import's]({{site.baseurl}}/glossary#data-import) environment in these scripts.
+Custom scripts are Bash scripts that generally invoke Meltano commands. As mentioned before you can also control the pipeline environment in these scripts.
 
-When you provide a `Script` to a pipeline, we will still add your plugins properties to the pipeline environment. Other than that, you are now in complete control of the environment, installation of plugins and execution of your pipeline.
+When you provide a script to a pipeline, we will still add your plugins properties to the pipeline environment. Other than that, you are now in complete control of the environment, installation of plugins and execution of your pipeline.
 
 ---
 

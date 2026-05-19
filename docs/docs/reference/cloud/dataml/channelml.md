@@ -49,5 +49,4 @@ description: |-
 
 Further Reading: 
 
-- [Glossary Channels]({{site.baseurl}}/glossary#channel)
 - [API Channels](/reference/cloud/api/resources/channels)
