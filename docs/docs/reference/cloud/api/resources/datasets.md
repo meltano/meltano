@@ -3,8 +3,9 @@ title: Datasets
 description: Matatika Datasets resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Datasets are modules of data that can be published to workspaces. Datasets are visualised in the Matatika app following the [Chart.js](https://www.chartjs.org/) specifications.
 
@@ -35,7 +36,7 @@ Path | JSON Type | Format | Description
 `created` | `string` | ISO 8601 timestamp | The instant the dataset was create
 `score` | `number` | Decimal | The dataset score used to determine its position in the workspace [Feed](feed)
 
-<!-- {% include snippets/api/datasets/view-a-dataset/response-body.md %} -->
+<Snippet path="datasets/view-a-dataset/response-body.md" />
 
 ### Dataset Message
 
@@ -46,7 +47,7 @@ Path | JSON Type | Format | Description
 `message` | `string` | | The dataset message content
 `datasetId` | `string` | Version 4 UUID | The message subject dataset ID
 
-<!-- {% include snippets/api/datasets/create-or-update-a-dataset-message/response-body.md %} -->
+<Snippet path="datasets/create-or-update-a-dataset-message/response-body.md" />
 
 ---
 
@@ -69,12 +70,12 @@ Returns all datasets in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/view-all-datasets-in-a-workspace/curl-request.md %} -->
+<Snippet path="datasets/view-all-datasets-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/view-all-datasets-in-a-workspace/python-requests.md %} -->
+<Snippet path="datasets/view-all-datasets-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -83,7 +84,7 @@ Returns all datasets in the workspace `{workspace-id}`.
 `200 OK`
 
 [Dataset](#dataset) collection with HAL links.
-<!-- {% include snippets/api/datasets/view-all-datasets-in-a-workspace/response-body.md %} -->
+<Snippet path="datasets/view-all-datasets-in-a-workspace/response-body.md" />
 
 ---
 ### View all liked datasets in a workspace
@@ -103,12 +104,12 @@ Returns all datasets in the workspace `{workspace-id}` liked by the authenticate
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/view-datasets-in-a-workspace-liked-by-profile/curl-request.md %} -->
+<Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/view-datasets-in-a-workspace-liked-by-profile/python-requests.md %} -->
+<Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -117,7 +118,7 @@ Returns all datasets in the workspace `{workspace-id}` liked by the authenticate
 `200 OK`
 
 [Dataset](#dataset) collection with HAL links.
-<!-- {% include snippets/api/datasets/view-datasets-in-a-workspace-liked-by-profile/response-body.md %} -->
+<Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/response-body.md" />
 
 ---
 ### View datasets by channel
@@ -137,12 +138,12 @@ Returns datasets by the channel `{channel-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/view-datasets-by-channel/curl-request.md %} -->
+<Snippet path="datasets/view-datasets-by-channel/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/view-datasets-by-channel/python-requests.md %} -->
+<Snippet path="datasets/view-datasets-by-channel/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -151,7 +152,7 @@ Returns datasets by the channel `{channel-id}`.
 `200 OK`
 
 [Dataset](#dataset) collection with HAL links.
-<!-- {% include snippets/api/datasets/view-datasets-by-channel/response-body.md %} -->
+<Snippet path="datasets/view-datasets-by-channel/response-body.md" />
 
 ---
 ### View a dataset
@@ -170,12 +171,12 @@ Returns the dataset `{dataset-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/view-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/view-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/view-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/view-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -184,7 +185,7 @@ Returns the dataset `{dataset-id}`.
 `200 OK`
 
 [Dataset](#dataset) with HAL links.
-<!-- {% include snippets/api/datasets/view-a-dataset/response-body.md %} -->
+<Snippet path="datasets/view-a-dataset/response-body.md" />
 
 ---
 ### View a dataset in a workspace
@@ -205,12 +206,12 @@ Returns the dataset `{dataset-id-or-alias}` in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/view-a-dataset-in-a-workspace/curl-request.md %} -->
+<Snippet path="datasets/view-a-dataset-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/view-a-dataset-in-a-workspace/python-requests.md %} -->
+<Snippet path="datasets/view-a-dataset-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -219,7 +220,7 @@ Returns the dataset `{dataset-id-or-alias}` in the workspace `{workspace-id}`.
 `200 OK`
 
 [Dataset](#dataset) with HAL links.
-<!-- {% include snippets/api/datasets/view-a-dataset-in-a-workspace/response-body.md %} -->
+<Snippet path="datasets/view-a-dataset-in-a-workspace/response-body.md" />
 
 ---
 ### View the data of a dataset
@@ -248,12 +249,12 @@ Defaults to `application/json` (given `Accept */*` or no `Accept` header).
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/view-the-data-of-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/view-the-data-of-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/view-the-data-of-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/view-the-data-of-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -261,7 +262,7 @@ Defaults to `application/json` (given `Accept */*` or no `Accept` header).
 #### Response
 - `200`: The dataset data (defaults to JSON format).
 
-<!-- {% include snippets/api/datasets/view-the-data-of-a-dataset/response-body.md %} -->
+<Snippet path="datasets/view-the-data-of-a-dataset/response-body.md" />
 
 - `204`: No response body provided.
 
@@ -282,18 +283,18 @@ Publishes a dataset to the workspace `{workspace-id}`.
 Making the request with an existing `id` or `alias` will result in the respective dataset being overwritten.
 
 [Dataset](#dataset) resource.
-<!-- {% include snippets/api/datasets/publish-a-dataset-to-a-workspace/request-body.md %} -->
+<Snippet path="datasets/publish-a-dataset-to-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/publish-a-dataset-to-a-workspace/curl-request.md %} -->
+<Snippet path="datasets/publish-a-dataset-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/publish-a-dataset-to-a-workspace/python-requests.md %} -->
+<Snippet path="datasets/publish-a-dataset-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -302,7 +303,7 @@ Making the request with an existing `id` or `alias` will result in the respectiv
 `200 OK / 201 Created`
 
 [Dataset](#dataset) with HAL links.
-<!-- {% include snippets/api/datasets/publish-a-dataset-to-a-workspace/response-body.md %} -->
+<Snippet path="datasets/publish-a-dataset-to-a-workspace/response-body.md" />
 
 ---
 ### Edit a dataset
@@ -321,18 +322,18 @@ Edits the dataset `{dataset-id}`.
 
 This request can update one or more of the [dataset](#dataset) fields at once. With a single request, it is possible to - *for example* - edit the dataset `title` only, or both `title` and `description` (shown below).
 
-<!-- {% include snippets/api/datasets/edit-a-dataset/request-body.md %} -->
+<Snippet path="datasets/edit-a-dataset/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/edit-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/edit-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/edit-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/edit-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -341,7 +342,7 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 `200 OK`
 
 [Dataset](#dataset) with HAL links.
-<!-- {% include snippets/api/datasets/edit-a-dataset/response-body.md %} -->
+<Snippet path="datasets/edit-a-dataset/response-body.md" />
 
 ---
 ### Record a view of a dataset
@@ -361,12 +362,12 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/record-a-view-of-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/record-a-view-of-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/record-a-view-of-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/record-a-view-of-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -394,12 +395,12 @@ Records a like of the dataset `{dataset-id}` from the authenticated user profile
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/record-a-like-of-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/record-a-like-of-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/record-a-like-of-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/record-a-like-of-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -427,12 +428,12 @@ Removes a like of the dataset `{dataset-id}` from the authenticated user profile
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/remove-a-like-from-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/remove-a-like-from-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/remove-a-like-from-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/remove-a-like-from-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -459,12 +460,12 @@ Initialises a new dataset message for the dataset `{dataset-id}`
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/initialise-a-new-dataset-message/curl-request.md %} -->
+<Snippet path="datasets/initialise-a-new-dataset-message/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/initialise-a-new-dataset-message/python-requests.md %} -->
+<Snippet path="datasets/initialise-a-new-dataset-message/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -473,7 +474,7 @@ Initialises a new dataset message for the dataset `{dataset-id}`
 `200 OK`
 
 [Dataset Message](#dataset-message) with HAL links.
-<!-- {% include snippets/api/datasets/initialise-a-new-dataset-message/response-body.md %} -->
+<Snippet path="datasets/initialise-a-new-dataset-message/response-body.md" />
 
 ---
 ### Create or update a dataset message
@@ -490,18 +491,18 @@ Creates or updates the dataset message `{message-id}` for the dataset `{dataset-
 #### Request
 ##### Body
 [Dataset Message](#dataset-message) resource.
-<!-- {% include snippets/api/datasets/create-or-update-a-dataset-message/request-body.md %} -->
+<Snippet path="datasets/create-or-update-a-dataset-message/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/create-or-update-a-dataset-message/curl-request.md %} -->
+<Snippet path="datasets/create-or-update-a-dataset-message/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/create-or-update-a-dataset-message/python-requests.md %} -->
+<Snippet path="datasets/create-or-update-a-dataset-message/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -510,7 +511,7 @@ Creates or updates the dataset message `{message-id}` for the dataset `{dataset-
 `200 OK / 201 Created`
 
 [Dataset Message](#dataset-message) with HAL links.
-<!-- {% include snippets/api/datasets/create-or-update-a-dataset-message/response-body.md %} -->
+<Snippet path="datasets/create-or-update-a-dataset-message/response-body.md" />
 
 ---
 ### Delete a dataset
@@ -530,12 +531,12 @@ Deletes the dataset `{dataset-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datasets/delete-a-dataset/curl-request.md %} -->
+<Snippet path="datasets/delete-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datasets/delete-a-dataset/python-requests.md %} -->
+<Snippet path="datasets/delete-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>

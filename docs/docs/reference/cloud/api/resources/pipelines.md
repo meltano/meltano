@@ -3,8 +3,9 @@ title: Pipelines
 description: Matatika Pipelines resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 A pipeline defines a set of runnable actions composed from [datacomponents](datacomponents) to complete a set of tasks - for example, [ELT](https://en.wikipedia.org/wiki/Extract,_load,_transform). Pipelines are run as [jobs](jobs), either manually or on a predetermined schedule. Only a single pipeline can be run at any given time.
 
@@ -30,7 +31,7 @@ Path | JSON Type | Format | Description
 `actions` | `string[]` | Array of [datacomponent](datacomponents) `name`s or commands | The pipeline actions to run during a [job](jobs)
 `triggeredBy` | `string[]` | Array of [pipeline](pipelines) `name`s or workspace task identifiers | Pipelines or workspace tasks that will trigger the pipeline on successful completion<br/>Supported values for workspace tasks (case-insensitive):<ul><li>`deploy` - workspace [deployment](deployments)</li></ul>
 
-<!-- {% include snippets/api/pipelines/view-a-pipeline/response-body.md %} -->
+<Snippet path="pipelines/view-a-pipeline/response-body.md" />
 
 ### Properties
 
@@ -52,7 +53,7 @@ Path | JSON Type | Format | Description
 `{datacomponent_name}._select` | `string` | JSON array | Meltano [stream and property selection rules](https://docs.meltano.com/concepts/plugins#select-extra)
 `{datacomponent_name}._metadata` | `string` | JSON object | Meltano [stream and property metadata rules](https://docs.meltano.com/concepts/plugins#metadata-extra)
 
-<!-- {% include snippets/api/jobs/configure-extractor-datacomponent-stream-selection-and-metadata-for-a-pipeline/request-body.md %} -->
+<Snippet path="jobs/configure-extractor-datacomponent-stream-selection-and-metadata-for-a-pipeline/request-body.md" />
 
 ## Formats
 
@@ -85,12 +86,12 @@ Returns all configured pipelines in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/curl-request.md %} -->
+<Snippet path="pipelines/view-all-pipelines-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/python-requests.md %} -->
+<Snippet path="pipelines/view-all-pipelines-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -99,7 +100,7 @@ Returns all configured pipelines in the workspace `{workspace-id}`.
 `200 OK`
 
 [Pipeline](#pipeline) collection with HAL links.
-<!-- {% include snippets/api/pipelines/view-all-pipelines-in-a-workspace/response-body.md %} -->
+<Snippet path="pipelines/view-all-pipelines-in-a-workspace/response-body.md" />
 
 ---
 ### View a pipeline
@@ -119,12 +120,12 @@ Returns the pipeline `{pipeline-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/view-a-pipeline/curl-request.md %} -->
+<Snippet path="pipelines/view-a-pipeline/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/view-a-pipeline/python-requests.md %} -->
+<Snippet path="pipelines/view-a-pipeline/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -133,7 +134,7 @@ Returns the pipeline `{pipeline-id}`.
 `200 OK`
 
 [Pipeline](#pipeline) with HAL links.
-<!-- {% include snippets/api/pipelines/view-a-pipeline/response-body.md %} -->
+<Snippet path="pipelines/view-a-pipeline/response-body.md" />
 
 ---
 ### Initialise a pipeline in a workspace
@@ -153,12 +154,12 @@ Initialises a new pipeline in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/curl-request.md %} -->
+<Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/python-requests.md %} -->
+<Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -167,7 +168,7 @@ Initialises a new pipeline in the workspace `{workspace-id}`.
 `200 OK`
 
 [Pipeline](#pipeline) with HAL links.
-<!-- {% include snippets/api/pipelines/initialise-a-pipeline-in-a-workspace/response-body.md %} -->
+<Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/response-body.md" />
 
 ---
 ### Create or update a pipeline in a workspace
@@ -185,18 +186,18 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 
 ##### Body
 [Pipeline](#pipeline) resource.
-<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/request-body.md %} -->
+<Snippet path="pipelines/create-a-pipeline-in-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/curl-request.md %} -->
+<Snippet path="pipelines/create-a-pipeline-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/python-requests.md %} -->
+<Snippet path="pipelines/create-a-pipeline-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -205,7 +206,7 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 `200 OK / 201 Created`
 
 [Pipeline](#pipeline) with HAL links.
-<!-- {% include snippets/api/pipelines/create-a-pipeline-in-a-workspace/response-body.md %} -->
+<Snippet path="pipelines/create-a-pipeline-in-a-workspace/response-body.md" />
 
 ---
 ### Create or update a pipeline as a draft
@@ -223,18 +224,18 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 
 ##### Body
 [Pipeline](#pipeline) resource.
-<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/request-body.md %} -->
+<Snippet path="pipelines/create-a-pipeline-as-a-draft/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/curl-request.md %} -->
+<Snippet path="pipelines/create-a-pipeline-as-a-draft/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/python-requests.md %} -->
+<Snippet path="pipelines/create-a-pipeline-as-a-draft/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -243,7 +244,7 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 `200 OK / 201 Created`
 
 [Pipeline](#pipeline) with HAL links.
-<!-- {% include snippets/api/pipelines/create-a-pipeline-as-a-draft/response-body.md %} -->
+<Snippet path="pipelines/create-a-pipeline-as-a-draft/response-body.md" />
 
 ---
 ### Validate a pipeline configuration in a workspace
@@ -261,18 +262,18 @@ Validates a pipeline configuration in the workspace `{workspace-id}`.
 ##### Body
 
 [Pipeline](#pipeline) resource.
-<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/request-body.md %} -->
+<Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/curl-request.md %} -->
+<Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/python-requests.md %} -->
+<Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -285,7 +286,7 @@ No response body provided.
 `400 Bad Request`
 
 [Pipeline property](pipelines#properties) validation errors.
-<!-- {% include snippets/api/pipelines/validate-a-pipeline-configuration-in-a-workspace/response-body.md %} -->
+<Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/response-body.md" />
 
 ---
 ### Verify a pipeline
@@ -305,12 +306,12 @@ Verifies the configuration of the pipeline `{pipeline-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/verify-a-pipeline/curl-request.md %} -->
+<Snippet path="pipelines/verify-a-pipeline/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/verify-a-pipeline/python-requests.md %} -->
+<Snippet path="pipelines/verify-a-pipeline/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -319,7 +320,7 @@ Verifies the configuration of the pipeline `{pipeline-id}`.
 `200 OK`
 
 [Job](jobs#job) with HAL links.
-<!-- {% include snippets/api/pipelines/verify-a-pipeline/response-body.md %} -->
+<Snippet path="pipelines/verify-a-pipeline/response-body.md" />
 
 ---
 ### Delete a pipeline
@@ -339,12 +340,12 @@ Deletes the pipeline `{pipeline-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/delete-a-pipeline/curl-request.md %} -->
+<Snippet path="pipelines/delete-a-pipeline/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/delete-a-pipeline/python-requests.md %} -->
+<Snippet path="pipelines/delete-a-pipeline/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -372,12 +373,12 @@ Returns the pipeline metrics for each job of `{pipeline-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/curl-request.md %} -->
+<Snippet path="pipelines/view-the-pipeline-metrics-data/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/python-requests.md %} -->
+<Snippet path="pipelines/view-the-pipeline-metrics-data/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -385,7 +386,7 @@ Returns the pipeline metrics for each job of `{pipeline-id}`.
 #### Response
 - `200`: The dataset data (defaults to JSON format).
 
-<!-- {% include snippets/api/pipelines/view-the-pipeline-metrics-data/response-body.md %} -->
+<Snippet path="pipelines/view-the-pipeline-metrics-data/response-body.md" />
 
 - `204`: No response body, metrics not enabled.
 

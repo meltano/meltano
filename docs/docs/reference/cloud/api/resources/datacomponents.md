@@ -3,8 +3,9 @@ title: Datacomponents
 description: Matatika Datacomponents resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Datacomponents hold configuration for [dataplugins](dataplugins), and are the building blocks for constructing [pipelines](pipelines). One dataplugin may be referenced by many datacomponents, each with a different set of `properties` for the dataplugin [`settings`](dataplugins#setting). One pipeline may reference multiple datacomponents.
 
@@ -23,7 +24,7 @@ Path | JSON Type | Format | Description
 `dataPlugin` | `string` | | Create / update with [dataplugin](dataplugins#dataplugin) `fullyQualifiedName`
 `properties` | `object` | [`Properties`](#properties) | The datacomponent properties, defined by the [dataplugin](dataplugins) [`settings`](dataplugins#setting)<br/>Properties are key-value pairs, where keys reference setting `name`s
 
-<!-- {% include snippets/api/datacomponents/view-a-datacomponent/response-body.md %} -->
+<Snippet path="datacomponents/view-a-datacomponent/response-body.md" />
 
 #### Extractor Datacomponent
 Datacomponents that are backed by [dataplugins](dataplugins) of `type` `EXTRACTOR` expose the following additional configuration:
@@ -32,7 +33,7 @@ Path | JSON Type | Format | Description
 ---- | --------- | ------ | -----------
 `streams` | `object[]` | Array of [Stream](#stream)s | The available streams (populated after [verifying a pipeline](pipelines#verify-a-pipeline) that references this datacomponent)
 
-<!-- {% include snippets/api/jobs/view-an-extractor-datacomponent/response-body.md %} -->
+<Snippet path="jobs/view-an-extractor-datacomponent/response-body.md" />
 
 ### Properties
 
@@ -94,12 +95,12 @@ Returns all datacomponents in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datacomponents/view-all-datacomponents-in-a-workspace/curl-request.md %} -->
+<Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datacomponents/view-all-datacomponents-in-a-workspace/python-requests.md %} -->
+<Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -108,7 +109,7 @@ Returns all datacomponents in the workspace `{workspace-id}`.
 `200 OK`
 
 [Datacomponent](#datacomponent) collection with HAL links.
-<!-- {% include snippets/api/datacomponents/view-all-datacomponents-in-a-workspace/response-body.md %} -->
+<Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/response-body.md" />
 
 ---
 ### View a datacomponent
@@ -127,12 +128,12 @@ Returns the datacomponent `{datacomponent-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datacomponents/view-a-datacomponent/curl-request.md %} -->
+<Snippet path="datacomponents/view-a-datacomponent/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datacomponents/view-a-datacomponent/python-requests.md %} -->
+<Snippet path="datacomponents/view-a-datacomponent/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -141,7 +142,7 @@ Returns the datacomponent `{datacomponent-id}`.
 `200 OK`
 
 [Datacomponent](#datacomponent) with HAL links.
-<!-- {% include snippets/api/datacomponents/view-a-datacomponent/response-body.md %} -->
+<Snippet path="datacomponents/view-a-datacomponent/response-body.md" />
 
 ---
 ### Initialise a new datacomponent in a workspace
@@ -157,12 +158,12 @@ Initialises a new datacomponent in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datacomponents/initialise-a-new-datacomponent-in-a-workspace/curl-request.md %} -->
+<Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datacomponents/initialise-a-new-datacomponent-in-a-workspace/python-requests.md %} -->
+<Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -171,7 +172,7 @@ Initialises a new datacomponent in the workspace `{workspace-id}`.
 `200 OK`
 
 [datacomponent](#datacomponent) with HAL links.
-<!-- {% include snippets/api/datacomponents/initialise-a-new-datacomponent-in-a-workspace/response-body.md %} -->
+<Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/response-body.md" />
 
 ---
 ### Create or update a datacomponent in a workspace
@@ -185,18 +186,18 @@ Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{wor
 #### Request
 ##### Body
 [Datacomponent](#datacomponent) resource.
-<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/request-body.md %} -->
+<Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/curl-request.md %} -->
+<Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/python-requests.md %} -->
+<Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -205,7 +206,7 @@ Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{wor
 `200 OK / 201 Created`
 
 [Datacomponent](#datacomponent) with HAL links.
-<!-- {% include snippets/api/datacomponents/create-or-update-a-datacomponent-in-a-workspace/response-body.md %} -->
+<Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/response-body.md" />
 
 ---
 ### Update a datacomponent
@@ -222,18 +223,18 @@ Updates the datacomponent `{datacomponent-id}`.
 #### Request
 ##### Body
 [Datacomponent](#datacomponent) resource.
-<!-- {% include snippets/api/datacomponents/update-a-datacomponent/request-body.md %} -->
+<Snippet path="datacomponents/update-a-datacomponent/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datacomponents/update-a-datacomponent/curl-request.md %} -->
+<Snippet path="datacomponents/update-a-datacomponent/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datacomponents/update-a-datacomponent/python-requests.md %} -->
+<Snippet path="datacomponents/update-a-datacomponent/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -242,7 +243,7 @@ Updates the datacomponent `{datacomponent-id}`.
 `200 OK`
 
 [Datacomponent](#datacomponent) with HAL links.
-<!-- {% include snippets/api/datacomponents/update-a-datacomponent/response-body.md %} -->
+<Snippet path="datacomponents/update-a-datacomponent/response-body.md" />
 
 ---
 ### Delete a datacomponent
@@ -258,12 +259,12 @@ Deletes the datacomponent `{datacomponent-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datacomponents/delete-a-datacomponent/curl-request.md %} -->
+<Snippet path="datacomponents/delete-a-datacomponent/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datacomponents/delete-a-datacomponent/python-requests.md %} -->
+<Snippet path="datacomponents/delete-a-datacomponent/python-requests.md" />
 
 </TabItem>
 </Tabs>

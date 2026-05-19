@@ -3,8 +3,9 @@ title: API Keys
 description: Matatika API Keys resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 API keys offer an alternate method of authentication to the Matatika API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/). Access using API key credentials is supported by the Matatika [CLI]({{site.baseurl}}/cli) and [SDK]({{site.baseurl}}/sdk), which allows a user to remain authenticated permanently.
 
@@ -23,7 +24,7 @@ Path | JSON Type | Format | Description
 `clientId` | `string` | | The API key client ID
 `profileId` | `string` | | The API key owner profile ID
 
-<!-- {% include snippets/api/apikeys/view-an-api-key/response-body.md %} -->
+<Snippet path="apikeys/view-an-api-key/response-body.md" />
 
 ---
 
@@ -47,12 +48,12 @@ Returns all API keys owned by the authenticated user profile.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/apikeys/view-all-api-keys/curl-request.md %} -->
+<Snippet path="apikeys/view-all-api-keys/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/apikeys/view-all-api-keys/python-requests.md %} -->
+<Snippet path="apikeys/view-all-api-keys/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -61,7 +62,7 @@ Returns all API keys owned by the authenticated user profile.
 `200 OK`
 
 [API key](#api-key) collection with HAL links.
-<!-- {% include snippets/api/apikeys/view-all-api-keys/response-body.md %} -->
+<Snippet path="apikeys/view-all-api-keys/response-body.md" />
 
 ---
 ### View an API key
@@ -82,12 +83,12 @@ Returns the API key `{apikey-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/apikeys/view-an-api-key/curl-request.md %} -->
+<Snippet path="apikeys/view-an-api-key/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/apikeys/view-an-api-key/python-requests.md %} -->
+<Snippet path="apikeys/view-an-api-key/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -96,7 +97,7 @@ Returns the API key `{apikey-id}`.
 `200 OK`
 
 [API key](#api-key) with HAL links.
-<!-- {% include snippets/api/apikeys/view-an-api-key/response-body.md %} -->
+<Snippet path="apikeys/view-an-api-key/response-body.md" />
 
 ---
 ### Initialise an API key
@@ -116,12 +117,12 @@ Initialises a new API key.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/apikeys/initialise-an-api-key/curl-request.md %} -->
+<Snippet path="apikeys/initialise-an-api-key/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/apikeys/initialise-an-api-key/python-requests.md %} -->
+<Snippet path="apikeys/initialise-an-api-key/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -130,7 +131,7 @@ Initialises a new API key.
 `200 OK`
 
 [API key](#api-key) with HAL links.
-<!-- {% include snippets/api/apikeys/initialise-an-api-key/response-body.md %} -->
+<Snippet path="apikeys/initialise-an-api-key/response-body.md" />
 
 ---
 ### Create an API key
@@ -148,18 +149,18 @@ Creates the API key `{apikey-id}`.
 
 ##### Body
 [API key](#api-key) resource.
-<!-- {% include snippets/api/apikeys/create-an-api-key/request-body.md %} -->
+<Snippet path="apikeys/create-an-api-key/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/apikeys/create-an-api-key/curl-request.md %} -->
+<Snippet path="apikeys/create-an-api-key/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/apikeys/create-an-api-key/python-requests.md %} -->
+<Snippet path="apikeys/create-an-api-key/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -168,7 +169,7 @@ Creates the API key `{apikey-id}`.
 `201 Created`
 
 [API key](#api-key) with HAL links.
-<!-- {% include snippets/api/apikeys/create-an-api-key/response-body.md %} -->
+<Snippet path="apikeys/create-an-api-key/response-body.md" />
 
 ---
 ### Update an API key
@@ -186,18 +187,18 @@ Updates the API key `{apikey-id}`.
 
 ##### Body
 [API key](#api-key) resource.
-<!-- {% include snippets/api/apikeys/update-an-api-key/request-body.md %} -->
+<Snippet path="apikeys/update-an-api-key/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/apikeys/update-an-api-key/curl-request.md %} -->
+<Snippet path="apikeys/update-an-api-key/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/apikeys/update-an-api-key/python-requests.md %} -->
+<Snippet path="apikeys/update-an-api-key/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -206,7 +207,7 @@ Updates the API key `{apikey-id}`.
 `200 OK`
 
 [API key](#api-key) with HAL links.
-<!-- {% include snippets/api/apikeys/update-an-api-key/response-body.md %} -->
+<Snippet path="apikeys/update-an-api-key/response-body.md" />
 
 ---
 ### Delete an API key
@@ -227,12 +228,12 @@ Deletes the API key `{apikey-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/apikeys/delete-an-api-key/curl-request.md %} -->
+<Snippet path="apikeys/delete-an-api-key/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/apikeys/delete-an-api-key/python-requests.md %} -->
+<Snippet path="apikeys/delete-an-api-key/python-requests.md" />
 
 </TabItem>
 </Tabs>

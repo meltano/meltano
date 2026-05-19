@@ -3,8 +3,9 @@ title: Subscriptions
 description: Matatika Subscriptions resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Subscriptions are a declaration of interest in a particular resource, allowing a user to receive [notifications](notifications) when certain events occur. The events that trigger [notifications](notifications) are controlled by the [type of subscription](#subscription-type).
 
@@ -21,7 +22,7 @@ Path | JSON Type | Format | Description
 `lastModified` | `string` | ISO 8601 timestamp | The instant the subscription was last modified at
 `type` | `string` | [Subscription Type](#subscription-type) | The type of subscription
 
-<!-- {% include snippets/api/subscriptions/view-a-subscription/response-body.md %} -->
+<Snippet path="subscriptions/view-a-subscription/response-body.md" />
 
 ## Formats
 
@@ -52,12 +53,12 @@ Returns all subscriptions for the authenticated user profile.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/view-all-subscriptions/curl-request.md %} -->
+<Snippet path="subscriptions/view-all-subscriptions/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/view-all-subscriptions/python-requests.md %} -->
+<Snippet path="subscriptions/view-all-subscriptions/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -66,7 +67,7 @@ Returns all subscriptions for the authenticated user profile.
 `200 OK`
 
 [Subscription](#subscription) collection with HAL links.
-<!-- {% include snippets/api/subscriptions/view-all-subscriptions/response-body.md %} -->
+<Snippet path="subscriptions/view-all-subscriptions/response-body.md" />
 
 ---
 ### View all member subscriptions to a workspace
@@ -85,12 +86,12 @@ Returns all member subscriptions to the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/curl-request.md %} -->
+<Snippet path="subscriptions/view-all-member-subscriptions-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/python-requests.md %} -->
+<Snippet path="subscriptions/view-all-member-subscriptions-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -99,7 +100,7 @@ Returns all member subscriptions to the workspace `{workspace-id}`.
 `200 OK`
 
 [Subscription](#subscription) collection with HAL links.
-<!-- {% include snippets/api/subscriptions/view-all-member-subscriptions-to-a-workspace/response-body.md %} -->
+<Snippet path="subscriptions/view-all-member-subscriptions-to-a-workspace/response-body.md" />
 
 ---
 ### View a subscription
@@ -118,12 +119,12 @@ Returns the subscription `{subscription-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/view-a-subscription/curl-request.md %} -->
+<Snippet path="subscriptions/view-a-subscription/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/view-a-subscription/python-requests.md %} -->
+<Snippet path="subscriptions/view-a-subscription/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -132,7 +133,7 @@ Returns the subscription `{subscription-id}`.
 `200 OK`
 
 [Subscription](#subscription) with HAL links.
-<!-- {% include snippets/api/subscriptions/view-a-subscription/response-body.md %} -->
+<Snippet path="subscriptions/view-a-subscription/response-body.md" />
 
 ---
 ### Subscribe to a workspace
@@ -159,12 +160,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/curl-request.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/python-requests.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -173,7 +174,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Subscription](#subscription) with HAL links.
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-workspace/response-body.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-workspace/response-body.md" />
 
 ---
 ### Subscribe to a channel
@@ -200,12 +201,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/curl-request.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-channel/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/python-requests.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-channel/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -214,7 +215,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Subscription](#subscription) with HAL links.
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-channel/response-body.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-channel/response-body.md" />
 
 ---
 ### Subscribe to a dataset
@@ -241,12 +242,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/curl-request.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/python-requests.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -255,7 +256,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Subscription](#subscription) with HAL links.
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-dataset/response-body.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-dataset/response-body.md" />
 
 ---
 ### Subscribe to a pipeline
@@ -282,12 +283,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/curl-request.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-pipeline/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/python-requests.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-pipeline/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -296,7 +297,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Subscription](#subscription) with HAL links.
-<!-- {% include snippets/api/subscriptions/subscribe-to-a-pipeline/response-body.md %} -->
+<Snippet path="subscriptions/subscribe-to-a-pipeline/response-body.md" />
 
 ---
 ### Update a subscription
@@ -317,18 +318,18 @@ Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
 `type` | `string` | [Subscription Type](#subscription-type) | The type of subscription
 
-<!-- {% include snippets/api/subscriptions/update-a-subscription/request-body.md %} -->
+<Snippet path="subscriptions/update-a-subscription/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/update-a-subscription/curl-request.md %} -->
+<Snippet path="subscriptions/update-a-subscription/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/update-a-subscription/python-requests.md %} -->
+<Snippet path="subscriptions/update-a-subscription/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -337,7 +338,7 @@ Path | JSON Type | Format | Description
 `200 OK`
 
 [Subscription](#subscription) with HAL links.
-<!-- {% include snippets/api/subscriptions/update-a-subscription/response-body.md %} -->
+<Snippet path="subscriptions/update-a-subscription/response-body.md" />
 
 ---
 ### Remove a subscription
@@ -356,12 +357,12 @@ Removes the subscription `{subscription-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/subscriptions/remove-a-subscription/curl-request.md %} -->
+<Snippet path="subscriptions/remove-a-subscription/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/subscriptions/remove-a-subscription/python-requests.md %} -->
+<Snippet path="subscriptions/remove-a-subscription/python-requests.md" />
 
 </TabItem>
 </Tabs>

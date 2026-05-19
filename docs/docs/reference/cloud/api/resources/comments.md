@@ -3,8 +3,9 @@ title: Comments
 description: Matatika Comments resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Comments aid conversation and collaboration around workspace datasets. Comments can be made on datasets, or other comments to form threads.
 
@@ -27,7 +28,7 @@ Path | JSON Type | Format | Description
 `datasetId` | `string` | Version 4 UUID | The ID of the dataset comment subject
 `parentId` | `string` | Version 4 UUID | The ID of the parent comment
 
-<!-- {% include snippets/api/comments/view-a-comment/response-body.md %} -->
+<Snippet path="comments/view-a-comment/response-body.md" />
 
 ---
 
@@ -50,12 +51,12 @@ Returns all comments on the dataset `{dataset-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/view-all-comments-on-a-dataset/curl-request.md %} -->
+<Snippet path="comments/view-all-comments-on-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/view-all-comments-on-a-dataset/python-requests.md %} -->
+<Snippet path="comments/view-all-comments-on-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -64,7 +65,7 @@ Returns all comments on the dataset `{dataset-id}`.
 `200 OK`
 
 [Comment](comments#comment) collection with HAL links.
-<!-- {% include snippets/api/comments/view-all-comments-on-a-dataset/response-body.md %} -->
+<Snippet path="comments/view-all-comments-on-a-dataset/response-body.md" />
 
 ---
 ### View a comment
@@ -84,12 +85,12 @@ Returns the comment `{comment-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/view-a-comment/curl-request.md %} -->
+<Snippet path="comments/view-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/view-a-comment/python-requests.md %} -->
+<Snippet path="comments/view-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -98,7 +99,7 @@ Returns the comment `{comment-id}`.
 `200 OK`
 
 [Comment](comments#comment) with HAL links.
-<!-- {% include snippets/api/comments/view-a-comment/response-body.md %} -->
+<Snippet path="comments/view-a-comment/response-body.md" />
 
 ---
 ### View the edit history of a comment
@@ -118,12 +119,12 @@ Returns the edit history of the comment `{comment-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/view-the-edit-history-of-a-comment/curl-request.md %} -->
+<Snippet path="comments/view-the-edit-history-of-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/view-the-edit-history-of-a-comment/python-requests.md %} -->
+<Snippet path="comments/view-the-edit-history-of-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -131,7 +132,7 @@ Returns the edit history of the comment `{comment-id}`.
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/comments/view-the-edit-history-of-a-comment/response-body.md %} -->
+<Snippet path="comments/view-the-edit-history-of-a-comment/response-body.md" />
 
 ---
 ### View all replies to a comment
@@ -151,12 +152,12 @@ Returns all replies to the comment `{comment-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/view-all-replies-to-a-comment/curl-request.md %} -->
+<Snippet path="comments/view-all-replies-to-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/view-all-replies-to-a-comment/python-requests.md %} -->
+<Snippet path="comments/view-all-replies-to-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -165,7 +166,7 @@ Returns all replies to the comment `{comment-id}`.
 `200 OK`
 
 [Comment](comments#comment) with HAL links.
-<!-- {% include snippets/api/comments/view-all-replies-to-a-comment/response-body.md %} -->
+<Snippet path="comments/view-all-replies-to-a-comment/response-body.md" />
 
 ---
 ### Initialise a comment on a dataset
@@ -185,12 +186,12 @@ Initialises a new comment on the dataset `{dataset-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/initialise-a-comment-on-a-dataset/curl-request.md %} -->
+<Snippet path="comments/initialise-a-comment-on-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/initialise-a-comment-on-a-dataset/python-requests.md %} -->
+<Snippet path="comments/initialise-a-comment-on-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -199,7 +200,7 @@ Initialises a new comment on the dataset `{dataset-id}`.
 `200 OK`
 
 [Comment](comments#comment) with HAL links.
-<!-- {% include snippets/api/comments/initialise-a-comment-on-a-dataset/response-body.md %} -->
+<Snippet path="comments/initialise-a-comment-on-a-dataset/response-body.md" />
 
 ---
 ### Initialise a reply to a comment
@@ -219,12 +220,12 @@ Initialises a new reply comment to the comment `{comment-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/initialise-a-reply-to-a-comment/curl-request.md %} -->
+<Snippet path="comments/initialise-a-reply-to-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/initialise-a-reply-to-a-comment/python-requests.md %} -->
+<Snippet path="comments/initialise-a-reply-to-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -233,7 +234,7 @@ Initialises a new reply comment to the comment `{comment-id}`.
 `200 OK`
 
 [Comment](comments#comment) with HAL links.
-<!-- {% include snippets/api/comments/initialise-a-reply-to-a-comment/response-body.md %} -->
+<Snippet path="comments/initialise-a-reply-to-a-comment/response-body.md" />
 
 ---
 ### Create a comment
@@ -252,18 +253,18 @@ Creates the comment `{comment-id}`.
 #### Request
 ##### Body
 [Comment](#comment) resource.
-<!-- {% include snippets/api/comments/create-a-comment/request-body.md %} -->
+<Snippet path="comments/create-a-comment/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/create-a-comment/curl-request.md %} -->
+<Snippet path="comments/create-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/create-a-comment/python-requests.md %} -->
+<Snippet path="comments/create-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -272,7 +273,7 @@ Creates the comment `{comment-id}`.
 `201 Created`
 
 [Comment](#comment) with HAL links.
-<!-- {% include snippets/api/comments/create-a-comment/response-body.md %} -->
+<Snippet path="comments/create-a-comment/response-body.md" />
 
 ---
 ### Update a comment
@@ -290,18 +291,18 @@ Updates the comment `{comment-id}`.
 #### Request
 ##### Body
 [Comment](#comment) resource.
-<!-- {% include snippets/api/comments/update-a-comment/request-body.md %} -->
+<Snippet path="comments/update-a-comment/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/view-a-comment/curl-request.md %} -->
+<Snippet path="comments/view-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/view-a-comment/python-requests.md %} -->
+<Snippet path="comments/view-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -310,7 +311,7 @@ Updates the comment `{comment-id}`.
 `200 OK`
 
 [Comment](comments#comment) with HAL links.
-<!-- {% include snippets/api/comments/view-a-comment/response-body.md %} -->
+<Snippet path="comments/view-a-comment/response-body.md" />
 
 ---
 ### Record a like of a comment
@@ -330,12 +331,12 @@ Records a like of the comment `{comment-id}` from the authenticated user profile
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/record-a-like-of-a-comment/curl-request.md %} -->
+<Snippet path="comments/record-a-like-of-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/record-a-like-of-a-comment/python-requests.md %} -->
+<Snippet path="comments/record-a-like-of-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -363,12 +364,12 @@ Removes a like of the comment `{comment-id}` from the authenticated user profile
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/remove-a-like-from-a-comment/curl-request.md %} -->
+<Snippet path="comments/remove-a-like-from-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/remove-a-like-from-a-comment/python-requests.md %} -->
+<Snippet path="comments/remove-a-like-from-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -396,12 +397,12 @@ Deletes the comment `{comment-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/comments/delete-a-comment/curl-request.md %} -->
+<Snippet path="comments/delete-a-comment/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/comments/delete-a-comment/python-requests.md %} -->
+<Snippet path="comments/delete-a-comment/python-requests.md" />
 
 </TabItem>
 </Tabs>

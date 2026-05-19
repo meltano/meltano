@@ -3,8 +3,9 @@ title: Workspaces
 description: Matatika Workspaces resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Workspaces allow users to operate within isolated instances of the Matatika service. This is useful for separating profiles based on the data they require access to.
 
@@ -28,7 +29,7 @@ Path | JSON Type | Format | Description
 `status` | `string` | [Workspace Status](#workspace-status) | The workspace status
 `defaultWorkspace` | `bool` | | Whether or not the workspace is set as the default the authenticated user
 
-<!-- {% include snippets/api/workspaces/view-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/view-a-workspace/response-body.md" />
 
 ## Formats
 
@@ -59,12 +60,12 @@ Returns all workspaces the authenticated user profile is an owner or member of.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/view-all-workspaces/curl-request.md %} -->
+<Snippet path="workspaces/view-all-workspaces/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/view-all-workspaces/python-requests.md %} -->
+<Snippet path="workspaces/view-all-workspaces/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -73,7 +74,7 @@ Returns all workspaces the authenticated user profile is an owner or member of.
 `200 OK`
 
 [Workspace](#workspace) collection with HAL links.
-<!-- {% include snippets/api/workspaces/view-all-workspaces/response-body.md %} -->
+<Snippet path="workspaces/view-all-workspaces/response-body.md" />
 
 ---
 ### View a workspace
@@ -93,12 +94,12 @@ Returns the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/view-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/view-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/view-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/view-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -107,7 +108,7 @@ Returns the workspace `{workspace-id}`.
 `200 OK`
 
 [Workspace](#workspace) with HAL links.
-<!-- {% include snippets/api/workspaces/view-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/view-a-workspace/response-body.md" />
 
 ---
 ### Initialise a workspace
@@ -123,12 +124,12 @@ Initialises a new workspace.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/initialise-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/initialise-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/initialise-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/initialise-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -137,7 +138,7 @@ Initialises a new workspace.
 `200 OK`
 
 [Workspace](#workspace) with HAL links.
-<!-- {% include snippets/api/workspaces/initialise-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/initialise-a-workspace/response-body.md" />
 
 ---
 ### Create a workspace
@@ -156,18 +157,18 @@ Creates the workspace `{workspace-id}`.
 #### Request
 ##### Body
 [Workspace](#workspace) resource.
-<!-- {% include snippets/api/workspaces/create-a-workspace/request-body.md %} -->
+<Snippet path="workspaces/create-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/create-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/create-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/create-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/create-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -176,7 +177,7 @@ Creates the workspace `{workspace-id}`.
 `201 Created`
 
 [Workspace](#workspace) with HAL links.
-<!-- {% include snippets/api/workspaces/create-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/create-a-workspace/response-body.md" />
 
 ---
 ### Update a workspace
@@ -195,18 +196,18 @@ Updates the workspace `{workspace-id}`.
 #### Request
 ##### Body
 [Workspace](#workspace) resource.
-<!-- {% include snippets/api/workspaces/update-a-workspace/request-body.md %} -->
+<Snippet path="workspaces/update-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/update-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/update-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/update-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/update-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -215,7 +216,7 @@ Updates the workspace `{workspace-id}`.
 `200 OK`
 
 [Workspace](#workspace) with HAL links.
-<!-- {% include snippets/api/workspaces/update-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/update-a-workspace/response-body.md" />
 
 ---
 ### Delete a workspace
@@ -235,12 +236,12 @@ Deletes the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/delete-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/delete-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/delete-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/delete-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>

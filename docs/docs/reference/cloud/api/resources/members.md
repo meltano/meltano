@@ -3,8 +3,9 @@ title: Members
 description: Matatika Members resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Members are users that belong to a particular [workspace](workspaces). Every member is derived from a corresponding [profile](profiles#profile), inheriting its `id` and `name`. Within the scope of a workspace, each member is visible to one another, so operating with a reduced property set allows for enhanced data security.
 
@@ -20,7 +21,7 @@ Path | JSON Type | Format | Description
 `name` | `string` | | The member name (derived from corresponding profile name)
 `handle` | `string` | | The unique `@`-prefixed handle for this member (derived from corresponding profile handle)
 
-<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/view-a-member-of-a-workspace/response-body.md" />
 
 ---
 
@@ -43,12 +44,12 @@ Returns all members of the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/view-all-members-of-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/view-all-members-of-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/view-all-members-of-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/view-all-members-of-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -57,7 +58,7 @@ Returns all members of the workspace `{workspace-id}`.
 `200 OK`
 
 [Member](#member) collection with HAL links.
-<!-- {% include snippets/api/workspaces/view-all-members-of-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/view-all-members-of-a-workspace/response-body.md" />
 
 ---
 ### View a member of a workspace
@@ -77,12 +78,12 @@ Returns the member `{member-id}` of the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/view-a-member-of-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/view-a-member-of-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -91,6 +92,6 @@ Returns the member `{member-id}` of the workspace `{workspace-id}`.
 `200 OK`
 
 [Member](#member) with HAL links.
-<!-- {% include snippets/api/workspaces/view-a-member-of-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/view-a-member-of-a-workspace/response-body.md" />
 
 ---

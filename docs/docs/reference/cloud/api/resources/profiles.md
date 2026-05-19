@@ -3,8 +3,9 @@ title: Profiles
 description: Matatika Profiles resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Profiles are individual consumers of the Matatika service. A profile is automatically created for a user when they first access the app, or accept an invitation to a workspace from an existing member via email.
 
@@ -23,7 +24,7 @@ Path | JSON Type | Format | Description
 `email` | `string` | Email address | The profile email address
 `defaultWorkspace` | `object` | [`Workspace`](workspaces#workspace) | The profile default workspace
 
-<!-- {% include snippets/api/profiles/view-a-profile/response-body.md %} -->
+<Snippet path="profiles/view-a-profile/response-body.md" />
 
 ---
 
@@ -42,12 +43,12 @@ Returns all profiles under the authenticated user account.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/profiles/view-all-profiles/curl-request.md %} -->
+<Snippet path="profiles/view-all-profiles/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/profiles/view-all-profiles/python-requests.md %} -->
+<Snippet path="profiles/view-all-profiles/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -56,7 +57,7 @@ Returns all profiles under the authenticated user account.
 `200 OK`
 
 [Profile](#profile) collection with HAL links.
-<!-- {% include snippets/api/profiles/view-all-profiles/response-body.md %} -->
+<Snippet path="profiles/view-all-profiles/response-body.md" />
 
 ---
 ### View a profile
@@ -76,12 +77,12 @@ Returns the profile `{profile-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/profiles/view-a-profile/curl-request.md %} -->
+<Snippet path="profiles/view-a-profile/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/profiles/view-a-profile/python-requests.md %} -->
+<Snippet path="profiles/view-a-profile/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -90,7 +91,7 @@ Returns the profile `{profile-id}`.
 `200 OK`
 
 [Profile](#profile) with HAL links.
-<!-- {% include snippets/api/profiles/view-a-profile/response-body.md %} -->
+<Snippet path="profiles/view-a-profile/response-body.md" />
 
 ---
 ### Create or update profile
@@ -109,18 +110,18 @@ Creates or updates the user profile.
 
 ##### Body
 [Profile](#profile) resource.
-<!-- {% include snippets/api/profiles/update-a-profile/request-body.md %} -->
+<Snippet path="profiles/update-a-profile/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/profiles/update-a-profile/curl-request.md %} -->
+<Snippet path="profiles/update-a-profile/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/profiles/update-a-profile/python-requests.md %} -->
+<Snippet path="profiles/update-a-profile/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -129,7 +130,7 @@ Creates or updates the user profile.
 `200 OK / 201 Created`
 
 [Profile](#profile) with HAL links.
-<!-- {% include snippets/api/profiles/update-a-profile/response-body.md %} -->
+<Snippet path="profiles/update-a-profile/response-body.md" />
 
 ---
 ### Set a workspace as default
@@ -149,18 +150,18 @@ A workspace can be set as default, which defines the environment the Matatika ap
 #### Request
 ##### Body
 [Profile](#profile) resource.
-<!-- {% include snippets/api/profiles/set-a-workspace-as-default/request-body.md %} -->
+<Snippet path="profiles/set-a-workspace-as-default/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/profiles/set-a-workspace-as-default/curl-request.md %} -->
+<Snippet path="profiles/set-a-workspace-as-default/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/profiles/set-a-workspace-as-default/python-requests.md %} -->
+<Snippet path="profiles/set-a-workspace-as-default/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -169,6 +170,6 @@ A workspace can be set as default, which defines the environment the Matatika ap
 `200 OK`
 
 [Profile](#profile) with HAL links.
-<!-- {% include snippets/api/profiles/set-a-workspace-as-default/response-body.md %} -->
+<Snippet path="profiles/set-a-workspace-as-default/response-body.md" />
 
 ---

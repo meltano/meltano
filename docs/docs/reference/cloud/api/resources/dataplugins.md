@@ -3,8 +3,9 @@ title: Dataplugins
 description: Matatika Dataplugins resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Dataplugins simply define a source of data from a given repository. Matatika provides a number of pre-configured platform-wide dataplugins out-the-box, as well as the ability to create custom dataplugins through the API. From these, [pipeline](pipelines) jobs can be run to inject data into a workspace.
 
@@ -22,7 +23,7 @@ Path | JSON Type | Format | Description
 `repositoryUrl` | `string` | URL | The dataplugin repository URL
 `settings` | `object[]` | Array of [`Setting`](#setting)s | The dataplugin settings
 
-<!-- {% include snippets/api/dataplugins/view-a-dataplugin/response-body.md %} -->
+<Snippet path="dataplugins/view-a-dataplugin/response-body.md" />
 
 ### Setting
 
@@ -82,12 +83,12 @@ Returns all dataplugins supported by Matatika.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/view-all-supported-dataplugins/curl-request.md %} -->
+<Snippet path="dataplugins/view-all-supported-dataplugins/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/view-all-supported-dataplugins/python-requests.md %} -->
+<Snippet path="dataplugins/view-all-supported-dataplugins/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -96,7 +97,7 @@ Returns all dataplugins supported by Matatika.
 `200 OK`
 
 [Dataplugin](#dataplugin) collection with HAL links.
-<!-- {% include snippets/api/dataplugins/view-all-supported-dataplugins/response-body.md %} -->
+<Snippet path="dataplugins/view-all-supported-dataplugins/response-body.md" />
 
 ---
 ### View the Matatika `discovery.yml`
@@ -112,12 +113,12 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/view-the-matatika-discovery-yml/curl-request.md %} -->
+<Snippet path="dataplugins/view-the-matatika-discovery-yml/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/view-the-matatika-discovery-yml/python-requests.md %} -->
+<Snippet path="dataplugins/view-the-matatika-discovery-yml/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -126,7 +127,7 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 `200 OK`
 
 [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-<!-- {% include snippets/api/dataplugins/view-the-matatika-discovery-yml/response-body.md %} -->
+<Snippet path="dataplugins/view-the-matatika-discovery-yml/response-body.md" />
 
 ---
 ### View all workspace dataplugins
@@ -145,12 +146,12 @@ Returns all dataplugins available to the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/view-all-workspace-dataplugins/curl-request.md %} -->
+<Snippet path="dataplugins/view-all-workspace-dataplugins/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/view-all-workspace-dataplugins/python-requests.md %} -->
+<Snippet path="dataplugins/view-all-workspace-dataplugins/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -159,7 +160,7 @@ Returns all dataplugins available to the workspace `{workspace-id}`.
 `200 OK`
 
 [Dataplugin](#dataplugin) collection with HAL links.
-<!-- {% include snippets/api/dataplugins/view-all-workspace-dataplugins/response-body.md %} -->
+<Snippet path="dataplugins/view-all-workspace-dataplugins/response-body.md" />
 
 ---
 ### View a workspace `discovery.yml`
@@ -178,12 +179,12 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/view-a-workspace-discovery-yml/curl-request.md %} -->
+<Snippet path="dataplugins/view-a-workspace-discovery-yml/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/view-a-workspace-discovery-yml/python-requests.md %} -->
+<Snippet path="dataplugins/view-a-workspace-discovery-yml/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -192,7 +193,7 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 `200 OK`
 
 [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-<!-- {% include snippets/api/dataplugins/view-a-workspace-discovery-yml/response-body.md %} -->
+<Snippet path="dataplugins/view-a-workspace-discovery-yml/response-body.md" />
 
 ---
 ### View a dataplugin
@@ -211,12 +212,12 @@ Returns the dataplugin `{dataplugin-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/view-a-dataplugin/curl-request.md %} -->
+<Snippet path="dataplugins/view-a-dataplugin/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/view-a-dataplugin/python-requests.md %} -->
+<Snippet path="dataplugins/view-a-dataplugin/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -225,7 +226,7 @@ Returns the dataplugin `{dataplugin-id}`.
 `200 OK`
 
 [Dataplugin](#dataplugin) with HAL links.
-<!-- {% include snippets/api/dataplugins/view-a-dataplugin/response-body.md %} -->
+<Snippet path="dataplugins/view-a-dataplugin/response-body.md" />
 
 ---
 ### Initialise a new dataplugin
@@ -241,12 +242,12 @@ Initialises a new dataplugin.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/initialise-a-new-dataplugin/curl-request.md %} -->
+<Snippet path="dataplugins/initialise-a-new-dataplugin/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/initialise-a-new-dataplugin/python-requests.md %} -->
+<Snippet path="dataplugins/initialise-a-new-dataplugin/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -255,7 +256,7 @@ Initialises a new dataplugin.
 `200 OK`
 
 [Dataplugin](#dataplugin) with HAL links.
-<!-- {% include snippets/api/dataplugins/initialise-a-new-dataplugin/response-body.md %} -->
+<Snippet path="dataplugins/initialise-a-new-dataplugin/response-body.md" />
 
 ---
 ### Publish dataplugins from a `discovery.yml`
@@ -273,18 +274,18 @@ Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/
 
 ##### Body
 [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url)
-<!-- {% include snippets/api/dataplugins/publish-dataplugins-from-a-discovery-yml/request-body.md %} -->
+<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/publish-dataplugins-from-a-discovery-yml/curl-request.md %} -->
+<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/publish-dataplugins-from-a-discovery-yml/python-requests.md %} -->
+<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -293,7 +294,7 @@ Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/
 `201 Created`
 
 [Dataplugin](#dataplugin) collection with HAL links.
-<!-- {% include snippets/api/dataplugins/publish-dataplugins-from-a-discovery-yml/response-body.md %} -->
+<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/response-body.md" />
 
 ---
 ### Create a dataplugin
@@ -307,18 +308,18 @@ Creates the dataplugin `{dataplugin-id}`.
 #### Request
 ##### Body
 [Dataplugin](#dataplugin) resource.
-<!-- {% include snippets/api/dataplugins/create-a-dataplugin/request-body.md %} -->
+<Snippet path="dataplugins/create-a-dataplugin/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/create-a-dataplugin/curl-request.md %} -->
+<Snippet path="dataplugins/create-a-dataplugin/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/create-a-dataplugin/python-requests.md %} -->
+<Snippet path="dataplugins/create-a-dataplugin/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -327,7 +328,7 @@ Creates the dataplugin `{dataplugin-id}`.
 `201 Created`
 
 [Dataplugin](#dataplugin) with HAL links.
-<!-- {% include snippets/api/dataplugins/update-a-dataplugin/response-body.md %} -->
+<Snippet path="dataplugins/update-a-dataplugin/response-body.md" />
 
 ---
 ### Update a dataplugin
@@ -344,7 +345,7 @@ Updates the dataplugin `{dataplugin-id}`.
 #### Request
 ##### Body
 [Dataplugin](#dataplugin) resource.
-<!-- {% include snippets/api/dataplugins/update-a-dataplugin/request-body.md %} -->
+<Snippet path="dataplugins/update-a-dataplugin/request-body.md" />
 
 Path | JSON Type | Format | Description | Constraints
 ---- | ---- | ------ | ----------- | -----------
@@ -356,12 +357,12 @@ Path | JSON Type | Format | Description | Constraints
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/update-a-dataplugin/curl-request.md %} -->
+<Snippet path="dataplugins/update-a-dataplugin/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/update-a-dataplugin/python-requests.md %} -->
+<Snippet path="dataplugins/update-a-dataplugin/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -370,7 +371,7 @@ Path | JSON Type | Format | Description | Constraints
 `200 OK`
 
 [Dataplugin](#dataplugin) with HAL links.
-<!-- {% include snippets/api/dataplugins/update-a-dataplugin/response-body.md %} -->
+<Snippet path="dataplugins/update-a-dataplugin/response-body.md" />
 
 ---
 ### Delete a dataplugin
@@ -386,12 +387,12 @@ Deletes the dataplugin `{dataplugin-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/dataplugins/delete-a-dataplugin/curl-request.md %} -->
+<Snippet path="dataplugins/delete-a-dataplugin/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/dataplugins/delete-a-dataplugin/python-requests.md %} -->
+<Snippet path="dataplugins/delete-a-dataplugin/python-requests.md" />
 
 </TabItem>
 </Tabs>

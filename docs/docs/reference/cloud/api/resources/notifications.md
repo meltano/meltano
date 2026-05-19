@@ -3,8 +3,9 @@ title: Notifications
 description: Matatika Notifications resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Notifications are alerts triggered by certain events pertaining to a resource. To receive notifications for a specific resource, a user must have a [subscription](subscriptions) to the resource.
 
@@ -23,7 +24,7 @@ Path | JSON Type | Format | Description
 `type` | `string` | [Notification Type](#notification-type) | The type of notification
 `resolved` | `bool` | | Whether or not the notification has been read
 
-<!-- {% include snippets/api/notifications/view-a-notification/response-body.md %} -->
+<Snippet path="notifications/view-a-notification/response-body.md" />
 
 ## Formats
 
@@ -66,12 +67,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/notifications/view-all-notifications/curl-request.md %} -->
+<Snippet path="notifications/view-all-notifications/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/notifications/view-all-notifications/python-requests.md %} -->
+<Snippet path="notifications/view-all-notifications/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -80,7 +81,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Notification](#notification) collection with HAL links.
-<!-- {% include snippets/api/notifications/view-all-notifications/response-body.md %} -->
+<Snippet path="notifications/view-all-notifications/response-body.md" />
 
 ---
 ### View all notifications for a workspace
@@ -107,12 +108,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/notifications/view-all-notifications-for-a-workspace/curl-request.md %} -->
+<Snippet path="notifications/view-all-notifications-for-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/notifications/view-all-notifications-for-a-workspace/python-requests.md %} -->
+<Snippet path="notifications/view-all-notifications-for-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -121,7 +122,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Notification](#notification) collection with HAL links.
-<!-- {% include snippets/api/notifications/view-all-notifications-for-a-workspace/response-body.md %} -->
+<Snippet path="notifications/view-all-notifications-for-a-workspace/response-body.md" />
 
 ---
 ### View a notification
@@ -140,12 +141,12 @@ Returns the notification `{notification-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/notifications/view-a-notification/curl-request.md %} -->
+<Snippet path="notifications/view-a-notification/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/notifications/view-a-notification/python-requests.md %} -->
+<Snippet path="notifications/view-a-notification/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -154,7 +155,7 @@ Returns the notification `{notification-id}`.
 `200 OK`
 
 [Notification](#notification) with HAL links.
-<!-- {% include snippets/api/notifications/view-a-notification/response-body.md %} -->
+<Snippet path="notifications/view-a-notification/response-body.md" />
 
 ---
 ### Refresh notifications
@@ -177,12 +178,12 @@ Parameter | Required | Format | Default Value | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/notifications/refresh-notifications/curl-request.md %} -->
+<Snippet path="notifications/refresh-notifications/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/notifications/refresh-notifications/python-requests.md %} -->
+<Snippet path="notifications/refresh-notifications/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -191,7 +192,7 @@ Parameter | Required | Format | Default Value | Description
 `200 OK`
 
 [Notification](#notification) collection with HAL links.
-<!-- {% include snippets/api/notifications/refresh-notifications/response-body.md %} -->
+<Snippet path="notifications/refresh-notifications/response-body.md" />
 
 ---
 ### Delete a notification
@@ -210,12 +211,12 @@ Deletes the notification `{notification-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/notifications/delete-a-notification/curl-request.md %} -->
+<Snippet path="notifications/delete-a-notification/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/notifications/delete-a-notification/python-requests.md %} -->
+<Snippet path="notifications/delete-a-notification/python-requests.md" />
 
 </TabItem>
 </Tabs>

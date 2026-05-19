@@ -3,8 +3,9 @@ title: Tags
 description: Matatika Tags resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Tags are hash-prefixed keywords or phrases that appear in the title, description, or comments of a dataset. Tags can be used to index datasets by their contained tags with a search, which allows for topical dataset categorisation.
 
@@ -20,7 +21,7 @@ Path | JSON Type | Format | Description
 `name` | `string` | | The tag name
 `usage` | `number` | Unsigned integer | Number of times the tag is used within the workspace
 
-<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/response-body.md %} -->
+<Snippet path="tags/view-a-tag-in-a-workspace/response-body.md" />
 
 ---
 
@@ -42,12 +43,12 @@ Returns all tags in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/tags/view-all-tags-in-a-workspace/curl-request.md %} -->
+<Snippet path="tags/view-all-tags-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/tags/view-all-tags-in-a-workspace/python-requests.md %} -->
+<Snippet path="tags/view-all-tags-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -57,7 +58,7 @@ Returns all tags in the workspace `{workspace-id}`.
 
 [Tag](#tag) collection with HAL links.
 
-<!-- {% include snippets/api/tags/view-all-tags-in-a-workspace/response-body.md %} -->
+<Snippet path="tags/view-all-tags-in-a-workspace/response-body.md" />
 
 ---
 ### View all tags in the news for a workspace
@@ -94,12 +95,12 @@ Returns the tag `{tag-id}` in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/curl-request.md %} -->
+<Snippet path="tags/view-a-tag-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/python-requests.md %} -->
+<Snippet path="tags/view-a-tag-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -109,7 +110,7 @@ Returns the tag `{tag-id}` in the workspace `{workspace-id}`.
 
 [Tag](#tag) with HAL links.
 
-<!-- {% include snippets/api/tags/view-a-tag-in-a-workspace/response-body.md %} -->
+<Snippet path="tags/view-a-tag-in-a-workspace/response-body.md" />
 
 ---
 

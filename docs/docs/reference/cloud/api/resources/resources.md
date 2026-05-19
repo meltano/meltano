@@ -4,6 +4,7 @@ description: Matatika resources resource reference documentation
 slug: resources
 ---
 
+
 Resources are files that are managed by a workspace. A resource is accessible from `/api/workspaces/{workspace-id}/resources` by its `path`. 
 
 ---
@@ -20,7 +21,7 @@ Path | JSON Type | Format | Description
 `contentType` | `string` | [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) | The content type of the resource
 `content` | `string` | | The content of the resource
 
-<!-- {% include snippets/api/resources/view-a-resource-in-a-workspace/response-body.md %} -->
+<Snippet path="resources/view-a-resource-in-a-workspace/response-body.md" />
 
 ---
 
@@ -41,8 +42,8 @@ Returns the resource `{resource-path}` in the workspace `{workspace-id}`.
 #### Request
 ##### Example Snippets
 
-<!-- {% include snippets/api/resources/view-a-resource-in-a-workspace/curl-request.md %} -->
-<!-- {% include snippets/api/resources/view-a-resource-in-a-workspace/python-requests.md %} -->
+<Snippet path="resources/view-a-resource-in-a-workspace/curl-request.md" />
+<Snippet path="resources/view-a-resource-in-a-workspace/python-requests.md" />
 
 #### Response
 
@@ -50,7 +51,7 @@ Returns the resource `{resource-path}` in the workspace `{workspace-id}`.
 
 [Resource](#resource) with HAL links.
 
-<!-- {% include snippets/api/resources/view-a-resource-in-a-workspace/response-body.md %} -->
+<Snippet path="resources/view-a-resource-in-a-workspace/response-body.md" />
 
 ---
 
@@ -69,8 +70,8 @@ Returns the content of the resource `{resource-path}` in the workspace `{workspa
 #### Request
 ##### Example Snippets
 
-<!-- {% include snippets/api/resources/view-the-content-of-a-resource-in-a-workspace/curl-request.md %} -->
-<!-- {% include snippets/api/resources/view-the-content-of-a-resource-in-a-workspace/python-requests.md %} -->
+<Snippet path="resources/view-the-content-of-a-resource-in-a-workspace/curl-request.md" />
+<Snippet path="resources/view-the-content-of-a-resource-in-a-workspace/python-requests.md" />
 
 #### Response
 
@@ -78,7 +79,7 @@ Returns the content of the resource `{resource-path}` in the workspace `{workspa
 
 The resource content.
 
-<!-- {% include snippets/api/resources/view-the-content-of-a-resource-in-a-workspace/response-body.md %} -->
+<Snippet path="resources/view-the-content-of-a-resource-in-a-workspace/response-body.md" />
 
 ---
 
@@ -97,15 +98,15 @@ Returns all resources in the workspace `{workspace-id}`.
 #### Request
 ##### Example Snippets
 
-<!-- {% include snippets/api/resources/view-all-resources-in-a-workspace/curl-request.md %} -->
-<!-- {% include snippets/api/resources/view-all-resources-in-a-workspace/python-requests.md %} -->
+<Snippet path="resources/view-all-resources-in-a-workspace/curl-request.md" />
+<Snippet path="resources/view-all-resources-in-a-workspace/python-requests.md" />
 
 #### Response
 `200 OK`
 
 [Resource](#resource) collection with HAL links.
 
-<!-- {% include snippets/api/resources/view-all-resources-in-a-workspace/response-body.md %} -->
+<Snippet path="resources/view-all-resources-in-a-workspace/response-body.md" />
 
 ---
 
@@ -123,15 +124,15 @@ Publishes multiple resources to the workspace `{workspace-id}`.
 #### Request
 ##### Example Snippets
 
-<!-- {% include snippets/api/resources/publish-multiple-resources-to-a-workspace/curl-request.md %} -->
-<!-- {% include snippets/api/resources/publish-multiple-resources-to-a-workspace/python-requests.md %} -->
+<Snippet path="resources/publish-multiple-resources-to-a-workspace/curl-request.md" />
+<Snippet path="resources/publish-multiple-resources-to-a-workspace/python-requests.md" />
 
 #### Response
 `200 OK`
 
 [Resource](#resource) collection with HAL links.
 
-<!-- {% include snippets/api/resources/publish-multiple-resources-to-a-workspace/response-body.md %} -->
+<Snippet path="resources/publish-multiple-resources-to-a-workspace/response-body.md" />
 
 ---
 
@@ -151,19 +152,19 @@ Creates or updates the resource `{resource-path}` in the workspace `{workspace-i
 ##### Body
 [Resource](#resource) resource.
 
-<!-- {% include snippets/api/resources/create-or-update-a-resource-in-a-workspace/request-body.md %} -->
+<Snippet path="resources/create-or-update-a-resource-in-a-workspace/request-body.md" />
 
 ##### Example Snippets
 
-<!-- {% include snippets/api/resources/create-or-update-a-resource-in-a-workspace/curl-request.md %} -->
-<!-- {% include snippets/api/resources/create-or-update-a-resource-in-a-workspace/python-requests.md %} -->
+<Snippet path="resources/create-or-update-a-resource-in-a-workspace/curl-request.md" />
+<Snippet path="resources/create-or-update-a-resource-in-a-workspace/python-requests.md" />
 
 #### Response
 `200 OK / 201 Created`
 
 [Resource](#resource) with HAL links.
 
-<!-- {% include snippets/api/resources/create-or-update-a-resource-in-a-workspace/response-body.md %} -->
+<Snippet path="resources/create-or-update-a-resource-in-a-workspace/response-body.md" />
 
 ---
 
@@ -181,8 +182,8 @@ Deletes the resource `{resource-path}` in the workspace `{workspace-id}`.
 #### Request
 ##### Example Snippets
 
-<!-- {% include snippets/api/resources/delete-a-resource-in-a-workspace/curl-request.md %} -->
-<!-- {% include snippets/api/resources/delete-a-resource-in-a-workspace/python-requests.md %} -->
+<Snippet path="resources/delete-a-resource-in-a-workspace/curl-request.md" />
+<Snippet path="resources/delete-a-resource-in-a-workspace/python-requests.md" />
 
 #### Response
 `204 No Content`

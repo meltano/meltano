@@ -3,8 +3,9 @@ title: Deployments
 description: Matatika Deployments resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Deployments let the user schedule a [job](jobs) to deploy the contents of their [workspace](workspaces) repository to their workspace in the Matatika cloud.
 
@@ -27,12 +28,12 @@ Deploys the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/deployment/deploy-workspace/curl-request.md %} -->
+<Snippet path="deployment/deploy-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/deployment/deploy-workspace/python-requests.md %} -->
+<Snippet path="deployment/deploy-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -41,7 +42,7 @@ Deploys the workspace `{workspace-id}`.
 `202 Accepted`
 
 [Job](jobs) with HAL links.
-<!-- {% include snippets/api/deployment/deploy-workspace/response-body.md %} -->
+<Snippet path="deployment/deploy-workspace/response-body.md" />
 
 ---
 
@@ -58,12 +59,12 @@ Receives `POST` requests from GitHub and starts a workspace deploy job.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/deployment/github-webhook-deploy/curl-request.md %} -->
+<Snippet path="deployment/github-webhook-deploy/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/deployment/github-webhook-deploy/python-requests.md %} -->
+<Snippet path="deployment/github-webhook-deploy/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -72,6 +73,6 @@ Receives `POST` requests from GitHub and starts a workspace deploy job.
 `202 Accepted`
 
 [Job](jobs) with HAL links.
-<!-- {% include snippets/api/deployment/github-webhook-deploy/response-body.md %} -->
+<Snippet path="deployment/github-webhook-deploy/response-body.md" />
 
 ---

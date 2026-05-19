@@ -3,8 +3,9 @@ title: Datastores
 description: Matatika Datastores resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Datastores define a destination for data loaded into a [workspace](workspaces) by [pipelines](pipelines). The default datastore for a workspace is its own PostgreSQL database hosted by Matatika, but this can be changed at any time to another datastore with your own credentials (see our supported [dataplugins](dataplugins) of type `LOADER`).
 
@@ -51,12 +52,12 @@ Returns the datastores in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/curl-request.md %} -->
+<Snippet path="datastores/view-all-datastores-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/python-requests.md %} -->
+<Snippet path="datastores/view-all-datastores-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -65,7 +66,7 @@ Returns the datastores in the workspace `{workspace-id}`.
 `200 OK`
 
 [Datastore](#datastore) collection with HAL links.
-<!-- {% include snippets/api/datastores/view-all-datastores-in-a-workspace/response-body.md %} -->
+<Snippet path="datastores/view-all-datastores-in-a-workspace/response-body.md" />
 
 ---
 ### View a datastore
@@ -84,12 +85,12 @@ Returns the datastore `{datastore-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datastores/view-a-datastore/curl-request.md %} -->
+<Snippet path="datastores/view-a-datastore/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datastores/view-a-datastore/python-requests.md %} -->
+<Snippet path="datastores/view-a-datastore/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -98,7 +99,7 @@ Returns the datastore `{datastore-id}`.
 `200 OK`
 
 [Datastore](#datastore) with HAL links.
-<!-- {% include snippets/api/datastores/view-a-datastore/response-body.md %} -->
+<Snippet path="datastores/view-a-datastore/response-body.md" />
 
 ---
 ### Set a datastore as the workspace default
@@ -117,12 +118,12 @@ Sets the datastore `{datastore-id}` as the workspace default.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datastores/set-a-datastore-as-the-workspace-default/curl-request.md %} -->
+<Snippet path="datastores/set-a-datastore-as-the-workspace-default/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datastores/set-a-datastore-as-the-workspace-default/python-requests.md %} -->
+<Snippet path="datastores/set-a-datastore-as-the-workspace-default/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -149,12 +150,12 @@ Initialises a new datastore in the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/curl-request.md %} -->
+<Snippet path="datastores/initialise-a-new-datastore-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/python-requests.md %} -->
+<Snippet path="datastores/initialise-a-new-datastore-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -163,7 +164,7 @@ Initialises a new datastore in the workspace `{workspace-id}`.
 `200 OK`
 
 [Datastore](#datastore) with HAL links.
-<!-- {% include snippets/api/datastores/initialise-a-new-datastore-in-a-workspace/response-body.md %} -->
+<Snippet path="datastores/initialise-a-new-datastore-in-a-workspace/response-body.md" />
 
 ---
 ### Create or update a datastore in a workspace
@@ -180,18 +181,18 @@ Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-i
 #### Request
 ##### Body
 [Datastore](#datastore) resource.
-<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/request-body.md %} -->
+<Snippet path="datastores/create-a-datastore-in-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/curl-request.md %} -->
+<Snippet path="datastores/create-a-datastore-in-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/python-requests.md %} -->
+<Snippet path="datastores/create-a-datastore-in-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -200,7 +201,7 @@ Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-i
 `200 OK / 201 Created`
 
 [Datastore](#datastore) with HAL links.
-<!-- {% include snippets/api/datastores/create-a-datastore-in-a-workspace/response-body.md %} -->
+<Snippet path="datastores/create-a-datastore-in-a-workspace/response-body.md" />
 
 ---
 ### Delete a datastore
@@ -219,12 +220,12 @@ Deletes the datastore `{datastore-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/datastores/delete-a-datastore/curl-request.md %} -->
+<Snippet path="datastores/delete-a-datastore/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/datastores/delete-a-datastore/python-requests.md %} -->
+<Snippet path="datastores/delete-a-datastore/python-requests.md" />
 
 </TabItem>
 </Tabs>

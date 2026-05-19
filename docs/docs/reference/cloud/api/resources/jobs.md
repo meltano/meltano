@@ -3,8 +3,9 @@ title: Jobs
 description: Matatika Jobs resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 A job is an arbitrary task with some stored state, pertaining to the governing [workspace](workspaces). Typically, jobs are orchestrated by [pipeline](pipelines) operations, but can also represent tasks for the user to complete.
 
@@ -24,7 +25,7 @@ Path | JSON Type | Format | Description
 `startTime` | `string` | ISO 8601 timestamp | The instant at which the job run started
 `endTime` | `string` | ISO 8601 timestamp | The instant at which the job run ended
 
-<!-- {% include snippets/api/jobs/view-a-job/response-body.md %} -->
+<Snippet path="jobs/view-a-job/response-body.md" />
 
 ## Formats
 
@@ -74,12 +75,12 @@ Returns all running or completed jobs for the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/curl-request.md %} -->
+<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/python-requests.md %} -->
+<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -88,7 +89,7 @@ Returns all running or completed jobs for the workspace `{workspace-id}`.
 `200 OK`
 
 [Job](#job) collection with HAL links.
-<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-workspace/response-body.md %} -->
+<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/response-body.md" />
 
 ---
 ### View all running or completed jobs for a pipeline
@@ -108,12 +109,12 @@ Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/curl-request.md %} -->
+<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/python-requests.md %} -->
+<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -122,7 +123,7 @@ Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 `200 OK`
 
 [Job](#job) collection with HAL links.
-<!-- {% include snippets/api/jobs/view-all-running-or-completed-jobs-for-a-pipeline/response-body.md %} -->
+<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/response-body.md" />
 
 ---
 ### View a job
@@ -142,12 +143,12 @@ Returns the job `{job-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/view-a-job/curl-request.md %} -->
+<Snippet path="jobs/view-a-job/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/view-a-job/python-requests.md %} -->
+<Snippet path="jobs/view-a-job/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -156,7 +157,7 @@ Returns the job `{job-id}`.
 `200 OK`
 
 [Job](#job) with HAL links.
-<!-- {% include snippets/api/jobs/view-a-job/response-body.md %} -->
+<Snippet path="jobs/view-a-job/response-body.md" />
 
 ---
 ### View the logs of a job
@@ -189,12 +190,12 @@ Media Type(s) | Description
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/curl-request.md %} -->
+<Snippet path="jobs/view-the-logs-of-a-job-as-json/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/python-requests.md %} -->
+<Snippet path="jobs/view-the-logs-of-a-job-as-json/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -202,7 +203,7 @@ Media Type(s) | Description
 #### Response
 - `200`: The job logs in the format specified by associated request `Accept` header
 
-<!-- {% include snippets/api/jobs/view-the-logs-of-a-job-as-json/response-body.md %} -->
+<Snippet path="jobs/view-the-logs-of-a-job-as-json/response-body.md" />
 
 - `204`: No response body provided.
 
@@ -224,12 +225,12 @@ Creates a new job from the pipeline `{pipeline-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/curl-request.md %} -->
+<Snippet path="jobs/create-a-job-from-a-pipeline/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/python-requests.md %} -->
+<Snippet path="jobs/create-a-job-from-a-pipeline/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -238,7 +239,7 @@ Creates a new job from the pipeline `{pipeline-id}`.
 `201 Created`
 
 [Job](#job) with HAL links.
-<!-- {% include snippets/api/jobs/create-a-job-from-a-pipeline/response-body.md %} -->
+<Snippet path="jobs/create-a-job-from-a-pipeline/response-body.md" />
 
 ---
 ### Stop a job
@@ -259,12 +260,12 @@ Stops the execution of the job `{job-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/stop-a-job/curl-request.md %} -->
+<Snippet path="jobs/stop-a-job/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/stop-a-job/python-requests.md %} -->
+<Snippet path="jobs/stop-a-job/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -273,7 +274,7 @@ Stops the execution of the job `{job-id}`.
 `202 Accepted`
 
 Job stop acceptance message.
-<!-- {% include snippets/api/jobs/stop-a-job/response-body.md %} -->
+<Snippet path="jobs/stop-a-job/response-body.md" />
 
 ---
 ### Delete a job
@@ -291,12 +292,12 @@ Deletes and stops the execution of the job `{job-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/jobs/delete-a-job/curl-request.md %} -->
+<Snippet path="jobs/delete-a-job/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/jobs/delete-a-job/python-requests.md %} -->
+<Snippet path="jobs/delete-a-job/python-requests.md" />
 
 </TabItem>
 </Tabs>

@@ -3,8 +3,9 @@ title: Feed
 description: Matatika Feed resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 The feed returns the most relevant datasets for the authenticated user profile. [Member](members) interactions with datasets are scored, determining their position within the feed.
 
@@ -34,12 +35,12 @@ Returns the feed of the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/feed/view-a-workspace-feed/curl-request.md %} -->
+<Snippet path="feed/view-a-workspace-feed/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/feed/view-a-workspace-feed/python-requests.md %} -->
+<Snippet path="feed/view-a-workspace-feed/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -48,7 +49,7 @@ Returns the feed of the workspace `{workspace-id}`.
 `200 OK`
 
 [Dataset](datasets#dataset) collection with HAL links.
-<!-- {% include snippets/api/feed/view-a-workspace-feed/response-body.md %} -->
+<Snippet path="feed/view-a-workspace-feed/response-body.md" />
 
 ---
 

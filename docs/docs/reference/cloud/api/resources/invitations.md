@@ -3,8 +3,9 @@ title: Invitations
 description: Matatika Invitations resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Invitations allow access to private workspaces. When an invitation is created, an email containing an access link to the workspace will be sent to the recipient. Invitations can be sent to email addresses under the allowed domains configured for a workspace.
 
@@ -24,7 +25,7 @@ Path | JSON Type | Format | Description
 `creator` | `object` | [`Member`](members#member) | The invitation creator
 `workspace` | `object` | [`Workspace`](workspaces#workspace) | The invitation target workspace
 
-<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/response-body.md %} -->
+<Snippet path="invitations/view-all-invitations-to-a-workspace/response-body.md" />
 
 ## Formats
 
@@ -55,12 +56,12 @@ Returns all invitations sent by the authenticated user profile.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/view-all-sent-invitations/curl-request.md %} -->
+<Snippet path="invitations/view-all-sent-invitations/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/view-all-sent-invitations/python-requests.md %} -->
+<Snippet path="invitations/view-all-sent-invitations/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -69,7 +70,7 @@ Returns all invitations sent by the authenticated user profile.
 `200 OK`
 
 [Invitation](#invitation) collection with HAL links.
-<!-- {% include snippets/api/invitations/view-all-sent-invitations/response-body.md %} -->
+<Snippet path="invitations/view-all-sent-invitations/response-body.md" />
 
 ---
 ### View all received invitations
@@ -85,12 +86,12 @@ Returns all invitations received by the authenticated user profile.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/view-all-received-invitations/curl-request.md %} -->
+<Snippet path="invitations/view-all-received-invitations/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/view-all-received-invitations/python-requests.md %} -->
+<Snippet path="invitations/view-all-received-invitations/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -99,7 +100,7 @@ Returns all invitations received by the authenticated user profile.
 `200 OK`
 
 [Invitation](#invitation) collection with HAL links.
-<!-- {% include snippets/api/invitations/view-all-received-invitations/response-body.md %} -->
+<Snippet path="invitations/view-all-received-invitations/response-body.md" />
 
 ---
 ### View all invitations to a workspace
@@ -125,12 +126,12 @@ Returns all active invitations to the workspace `{workspace-id}` sent by the aut
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/curl-request.md %} -->
+<Snippet path="invitations/view-all-invitations-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/python-requests.md %} -->
+<Snippet path="invitations/view-all-invitations-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -139,7 +140,7 @@ Returns all active invitations to the workspace `{workspace-id}` sent by the aut
 `200 OK`
 
 [Invitation](#invitation) collection with HAL links.
-<!-- {% include snippets/api/invitations/view-all-invitations-to-a-workspace/response-body.md %} -->
+<Snippet path="invitations/view-all-invitations-to-a-workspace/response-body.md" />
 
 ---
 ### Create an invitation to a workspace
@@ -158,18 +159,18 @@ Creates an invitation to the workspace `{workspace-id}`.
 
 ##### Body
 [Invitation](#invitation) resource.
-<!-- {% include snippets/api/invitations/create-an-invitation-to-a-workspace/request-body.md %} -->
+<Snippet path="invitations/create-an-invitation-to-a-workspace/request-body.md" />
 
 ##### Example Snippets
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/create-an-invitation-to-a-workspace/curl-request.md %} -->
+<Snippet path="invitations/create-an-invitation-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/create-an-invitation-to-a-workspace/python-requests.md %} -->
+<Snippet path="invitations/create-an-invitation-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -198,12 +199,12 @@ Accepts the invitation `{invitation-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/accept-an-invitation/curl-request.md %} -->
+<Snippet path="invitations/accept-an-invitation/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/accept-an-invitation/python-requests.md %} -->
+<Snippet path="invitations/accept-an-invitation/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -212,7 +213,7 @@ Accepts the invitation `{invitation-id}`.
 `200 OK`
 
 [Invitation](#invitation) with HAL links.
-<!-- {% include snippets/api/invitations/accept-an-invitation/response-body.md %} -->
+<Snippet path="invitations/accept-an-invitation/response-body.md" />
 
 ---
 ### Delete an invitation
@@ -233,12 +234,12 @@ Deletes a pending or revoked invitation `{invitation-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/delete-an-invitation-to-a-workspace/curl-request.md %} -->
+<Snippet path="invitations/delete-an-invitation-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/delete-an-invitation-to-a-workspace/python-requests.md %} -->
+<Snippet path="invitations/delete-an-invitation-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -267,12 +268,12 @@ Withdraws the pending or accepted invitation `{invitation-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/invitations/withdraw-an-invitation-to-a-workspace/curl-request.md %} -->
+<Snippet path="invitations/withdraw-an-invitation-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/invitations/withdraw-an-invitation-to-a-workspace/python-requests.md %} -->
+<Snippet path="invitations/withdraw-an-invitation-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>

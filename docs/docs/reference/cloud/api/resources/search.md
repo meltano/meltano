@@ -3,8 +3,9 @@ title: Search
 description: Matatika Search resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 [Datasets](datasets#dataset) can be searched for within their containing [workspace](workspaces). Searches can filter datasets by arbitrary text, [channel](channels) name, or [tag](tags) name.
 
@@ -30,12 +31,12 @@ Searches the workspace `{workspace-id}` for datasets by the free text `{free-tex
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-free-text/curl-request.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-free-text/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-free-text/python-requests.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-free-text/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -43,7 +44,7 @@ Searches the workspace `{workspace-id}` for datasets by the free text `{free-tex
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-free-text/response-body.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-free-text/response-body.md" />
 
 `204 No Content`
 
@@ -66,12 +67,12 @@ Searches the workspace `{workspace-id}` for datasets by the channel `{channel-na
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-channel-name/curl-request.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-channel-name/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-channel-name/python-requests.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-channel-name/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -80,7 +81,7 @@ Searches the workspace `{workspace-id}` for datasets by the channel `{channel-na
 `200 OK`
 
 [Dataset](datasets#dataset) collection with HAL links.
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-channel-name/response-body.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-channel-name/response-body.md" />
 
 `204 No Content`
 
@@ -103,12 +104,12 @@ Searches the workspace `{workspace-id}` for datasets by the tag `{tag-name}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-tag-name/curl-request.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-tag-name/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-tag-name/python-requests.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-tag-name/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -116,7 +117,7 @@ Searches the workspace `{workspace-id}` for datasets by the tag `{tag-name}`.
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/search/search-for-datasets-in-a-workspace-by-tag-name/response-body.md %} -->
+<Snippet path="search/search-for-datasets-in-a-workspace-by-tag-name/response-body.md" />
 
 `204 No Content`
 
@@ -139,12 +140,12 @@ Searches the workspace `{workspace-id}` for datasets using an elastic search que
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/search/msearch-in-a-workspace-by-free-text/curl-request.md %} -->
+<Snippet path="search/msearch-in-a-workspace-by-free-text/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/search/msearch-in-a-workspace-by-free-text/python-requests.md %} -->
+<Snippet path="search/msearch-in-a-workspace-by-free-text/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -152,7 +153,7 @@ Searches the workspace `{workspace-id}` for datasets using an elastic search que
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/search/msearch-in-a-workspace-by-free-text/response-body.md %} -->
+<Snippet path="search/msearch-in-a-workspace-by-free-text/response-body.md" />
 
 `204 No Content`
 

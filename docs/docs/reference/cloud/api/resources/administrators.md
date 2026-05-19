@@ -3,8 +3,9 @@ title: Administrators
 description: Matatika Administrators resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Administrators are types of [members](members) with delegated [workspace](workspaces) management permissions, equivalent to those held by the workspace owner.
 
@@ -20,7 +21,7 @@ Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
 `administrator` | `bool` | | Whether or not the [member](members) is an administrator
 
-<!-- {% include snippets/api/workspaces/add-an-administrator-to-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/add-an-administrator-to-a-workspace/response-body.md" />
 
 ---
 
@@ -42,12 +43,12 @@ Returns all administrators of the workspace `{workspace-id}`.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/view-all-administrators-of-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/view-all-administrators-of-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/view-all-administrators-of-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/view-all-administrators-of-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -56,7 +57,7 @@ Returns all administrators of the workspace `{workspace-id}`.
 `200 OK`
 
 [Administrator](#administrator) collection with HAL links.
-<!-- {% include snippets/api/workspaces/view-all-administrators-of-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/view-all-administrators-of-a-workspace/response-body.md" />
 
 ---
 ### Add an administrator to a workspace
@@ -76,12 +77,12 @@ Adds the profile `{profile-id}` as an administrator to the workspace `{workspace
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/add-an-administrator-to-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/add-an-administrator-to-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/add-an-administrator-to-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/add-an-administrator-to-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -90,7 +91,7 @@ Adds the profile `{profile-id}` as an administrator to the workspace `{workspace
 `200 OK`
 
 [Administrator](#administrator) with HAL links.
-<!-- {% include snippets/api/workspaces/add-an-administrator-to-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/add-an-administrator-to-a-workspace/response-body.md" />
 
 ---
 ### Withdraw an administrator from a workspace
@@ -110,12 +111,12 @@ Withdraws the profile `{profile-id}` as an administrator from the workspace `{wo
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/workspaces/withdraw-an-administrator-from-a-workspace/curl-request.md %} -->
+<Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/workspaces/withdraw-an-administrator-from-a-workspace/python-requests.md %} -->
+<Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -124,6 +125,6 @@ Withdraws the profile `{profile-id}` as an administrator from the workspace `{wo
 `200 OK`
 
 [Administrator](#administrator) with HAL links.
-<!-- {% include snippets/api/workspaces/withdraw-an-administrator-from-a-workspace/response-body.md %} -->
+<Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/response-body.md" />
 
 ---

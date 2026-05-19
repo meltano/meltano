@@ -3,8 +3,9 @@ title: Alerts
 description: Matatika Alerts resource reference documentation
 ---
 
-import Tabs from '@theme/Tabs';
+import Snippet from '@site/src/components/Snippet';
 import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
 
 Alerts can be created by users on [datasets](datasets). These alerts can then be used to inform users of information related to that dataset.
 
@@ -29,12 +30,12 @@ Initialises a new alert on a dataset.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/curl-request.md %} -->
+<Snippet path="alerts/initialise-an-alert-on-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/python-requests.md %} -->
+<Snippet path="alerts/initialise-an-alert-on-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -42,7 +43,7 @@ Initialises a new alert on a dataset.
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/alerts/initialise-an-alert-on-a-dataset/response-body.md %} -->
+<Snippet path="alerts/initialise-an-alert-on-a-dataset/response-body.md" />
 
 ---
 
@@ -63,12 +64,12 @@ Create a new alert on a dataset.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/curl-request.md %} -->
+<Snippet path="alerts/create-an-alert-on-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/python-requests.md %} -->
+<Snippet path="alerts/create-an-alert-on-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -76,7 +77,7 @@ Create a new alert on a dataset.
 #### Response
 `201 Created`
 
-<!-- {% include snippets/api/alerts/create-an-alert-on-a-dataset/response-body.md %} -->
+<Snippet path="alerts/create-an-alert-on-a-dataset/response-body.md" />
 
 ---
 
@@ -97,12 +98,12 @@ View alerts on a dataset.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/curl-request.md %} -->
+<Snippet path="alerts/view-alerts-on-a-dataset/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/python-requests.md %} -->
+<Snippet path="alerts/view-alerts-on-a-dataset/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -110,7 +111,7 @@ View alerts on a dataset.
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/alerts/view-alerts-on-a-dataset/response-body.md %} -->
+<Snippet path="alerts/view-alerts-on-a-dataset/response-body.md" />
 
 ---
 
@@ -131,12 +132,12 @@ View an alert.
 <Tabs>
 <TabItem value="curl" label="cURL">
 
-<!-- {% include snippets/api/alerts/view-an-alert/curl-request.md %} -->
+<Snippet path="alerts/view-an-alert/curl-request.md" />
 
 </TabItem>
 <TabItem value="python" label="Python (requests)">
 
-<!-- {% include snippets/api/alerts/view-an-alert/python-requests.md %} -->
+<Snippet path="alerts/view-an-alert/python-requests.md" />
 
 </TabItem>
 </Tabs>
@@ -144,6 +145,6 @@ View an alert.
 #### Response
 `200 OK`
 
-<!-- {% include snippets/api/alerts/view-an-alert/response-body.md %} -->
+<Snippet path="alerts/view-an-alert/response-body.md" />
 
 ---
