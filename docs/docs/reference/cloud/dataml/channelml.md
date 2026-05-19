@@ -47,6 +47,6 @@ description: |-
 
 ---
 
-Further Reading: 
+##### See Also
 
-- [API Channels](/reference/cloud/api/resources/channels)
+- [Channels API resource](/reference/cloud/api/resources/channels)

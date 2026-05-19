@@ -155,8 +155,8 @@ pipelines_image: my-workspace-image:latest-dev
   </TabItem>
 </Tabs>
 
+---
 
-Further Reading: 
+##### See Also
 
-- [API Workspaces](/reference/cloud/api/resources/workspaces)
-- [Data Store ML](/reference/cloud/dataml/datastoreml)
+- [Workspaces API resource](/reference/cloud/api/resources/workspaces)

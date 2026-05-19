@@ -277,3 +277,4 @@ Returns the pipeline metrics for each job of `{pipeline-id}`.
 - [View all running or completed jobs for a pipeline](jobs#view-all-running-or-completed-jobs-for-a-pipeline)
 - [Create a job from a pipeline](jobs#create-a-job-from-a-pipeline)
 - [Subscribe to a pipeline](subscriptions#subscribe-to-a-pipeline)
+- [PipelineML](/reference/cloud/dataml/pipelineml/)

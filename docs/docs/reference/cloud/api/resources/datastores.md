@@ -159,3 +159,8 @@ Deletes the datastore `{datastore-id}`.
 No response body provided.
 
 ---
+
+##### See Also
+
+- [DatastoreML](/reference/cloud/dataml/datastoreml/)
+

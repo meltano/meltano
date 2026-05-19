@@ -4,7 +4,6 @@ description: Reference documentation for pipeline definition model.
 sidebar_position: 5
 ---
 
-Reference documentation for orchestration actions that import and process data.
 
 Use the pipeline YAML to orchestrate data actions in your workspace as code.
 
@@ -48,6 +47,6 @@ Path | JSON Type | Description
 
 ---
 
-Further Reading: 
+##### See Also
 
-- [API Pipelines](/reference/cloud/api/resources/pipelines)
+- [Pipelines API resource](/reference/cloud/api/resources/pipelines)

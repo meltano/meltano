@@ -82,7 +82,6 @@ The multiline string is generally the best way to display the `string` of JSON o
 
 ---
 
-Further Reading: 
+##### See Also
 
-- [API Datasets](/reference/cloud/api/resources/datasets)
-- [Example Charts](/reference/cloud/dataml/datasetml/basic-examples)
+- [Datasets API resource](/reference/cloud/api/resources/datasets)

@@ -194,3 +194,4 @@ No response body provided.
 - [Create or update a pipeline in a workspace](pipelines#create-or-update-a-pipeline-in-a-workspace)
 - [Delete a pipeline](pipelines#delete-a-pipeline)
 - [View all running or completed jobs for a workspace](jobs#view-all-running-or-completed-jobs-for-a-workspace)
+- [WorkspaceML](/reference/cloud/dataml/workspaceml/)

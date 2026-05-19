@@ -369,8 +369,6 @@ Deletes the dataset `{dataset-id}`.
 
 No response body provided.
 
----
-
 Further Reading:
 
 - [Meltano Cloud dataset YAML file](/reference/cloud/dataml/datasetml/)
@@ -385,3 +383,4 @@ Further Reading:
 - [Search for datasets in a workspace by channel name](search#search-for-datasets-in-a-workspace-by-channel-name)
 - [Search for datasets in a workspace by tag name](search#search-for-datasets-in-a-workspace-by-tag-name)
 - [Subscribe to a dataset](subscriptions#subscribe-to-a-dataset)
+- [DatasetML](/reference/cloud/dataml/datasetml/)
