@@ -7,7 +7,7 @@ sidebar_position: 22
 import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
 
-API keys offer an alternate method of authentication to the Meltano Cloud API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/). Access using API key credentials is supported by the Matatika [CLI]({{site.baseurl}}/cli) and [SDK]({{site.baseurl}}/sdk), which allows a user to remain authenticated permanently.
+API keys offer an alternate method of authentication to the Meltano Cloud API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/).
 
 ---
 
