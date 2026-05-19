@@ -20,23 +20,14 @@ When you provide a script to a pipeline, we will still add your plugins properti
 
 ### Minimal Script
 
-Generally at a minimum you will need to:
+The following runs an extract-load to sync data from `<tap>` to `<target>`. For a pipeline with datacomponents referencing this tap and target only, this script identical to what is run by default. 
 
 ```bash
-MELTANO_ENVIRONMENT=<env_name>
-meltano environment add <env_name>
-
-export MELTANO_ENVIRONMENT
-
-meltano install
-meltano run <tap_name> <target_name>
+meltano run --state-id-suffix $PIPELINE_ID <tap> <target>
 ```
 
-Adding a Meltano environment will allow your tap to save a state for next time it runs, if your tap supports this.
+`--state-id-suffix $PIPELINE_ID` ensures state is unique to the pipeline for the given tap/target combination.
 
-Running `meltano install` will install all plugins in your workspace. You can run `meltano install <plugin_type> <plugin_name>` to install specific ones if you wish.
-
-`meltano run <tap_name> <target_name>` is the actual command to run the data import and get your data into your data store.
 
 ### Using Meltano To Invoke Other Plugins
 
