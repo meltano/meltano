@@ -17,7 +17,7 @@ Tags are hash-prefixed keywords or phrases that appear in the title, description
 
 Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
-`id` | `string` | Version 4 UUID | The tag ID 
+`id` | `string` | Version 4 UUID | The tag ID
 `name` | `string` | | The tag name
 `usage` | `number` | Unsigned integer | Number of times the tag is used within the workspace
 

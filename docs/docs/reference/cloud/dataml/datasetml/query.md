@@ -14,17 +14,17 @@ You use the [`metadata`](metadata) key to format how you are displaying the retu
 
 ```yaml
 query: |-
-    SELECT 
+    SELECT
     report_date "google_analytics_locations.report_date"
     , sum(users) "google_analytics_locations.total_users"
     FROM google_analytics_locations
     WHERE report_date >= current_date - interval '14' day
     AND report_date < current_date
-    GROUP BY report_date 
+    GROUP BY report_date
     ORDER BY report_date
 ```
 ---
 
-Further Reading: 
+Further Reading:
 
 - [API Datasets](/reference/cloud/api/resources/datasets)

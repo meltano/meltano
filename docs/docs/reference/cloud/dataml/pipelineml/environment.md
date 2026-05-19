@@ -4,7 +4,7 @@ description: Reference documentation for pipeline environment customisation.
 sidebar_position: 1
 ---
 
-Pipelines have environments that are used to pass configuration to the underlying plugins it references. 
+Pipelines have environments that are used to pass configuration to the underlying plugins it references.
 
 ---
 
@@ -19,7 +19,14 @@ Some of these setting will be hidden with the value `***`, but when you copy and
 ### Default Environment
 
 Your pipeline's environment by default will contain:
-- All `properties` of the pipeline and referenced `data_components`, in the format `<PLUGIN_NAME>_<SETTING_NAME>`
+- Configuration values for all dataplugin settings set on the pipeline or referenced datacomponents
+- `EXTRACTOR`, if referencing a datacomponent backed by an extractor dataplugin
+- `LOADER`, if referencing a datacomponent/datastore backed by a loader dataplugin
+- `DBT_TARGET`, pertaining to a datasatore referenced by the pipeline, or the workspace default
+- `DBT_SOURCE_SCHEMA`, pertaining to a datasatore referenced by the pipeline, or the workspace default
+- `DBT_TARGET_SCHEMA`, pertaining to a datasatore referenced by the pipeline, or the workspace default
+- `MELTANO_STATE_BACKEND_URI`
+- `MELTANO_ENVIRONMENT`
 
   See [Configuring settings](/guide/configuration#configuring-settings) for more information on how Meltano handles plugin configuration from environment variables.
 
@@ -54,3 +61,10 @@ In your custom data import script you can add new or overwrite existing environm
 ```bash
 export <NEW_OR_EXISTING_SETTING_NAME>=<NEW_VALUE>
 ```
+
+---
+
+## Further Reading
+
+- [`MELTANO_STATE_BACKEND_URI](/reference/settings/#state_backenduri)
+- [`MELTANO_ENVIRONMENT`](/concepts/environments/#activation)

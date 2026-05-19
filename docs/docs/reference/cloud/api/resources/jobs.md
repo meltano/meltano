@@ -49,7 +49,7 @@ Value | Description
 ----- | -----------
 `WORKSPACE_INIT` | A system task to create a Meltano project in a [workspace](workspaces) repository - automatically run when a workspace is created
 `PIPELINE_CONFIG` | A system task to configure the Meltano project and publish [datasets](datasets) with reference to a [pipeline](pipelines) - automatically run when a pipeline is created, or a pipeline with a [`status`](pipelines#pipeline-status) of `FAILED` is updated
-`PIPELINE_VERFIY` | A system task to isplay and test the configuration of a [pipeline](pipelines)
+`PIPELINE_VERIFY` | A system task to display and test the configuration of a [pipeline](pipelines)
 `PIPELINE_RUN` | A system task to run a [pipeline](pipelines) to load data into the [workspace](workspaces)  default [datastore](datastores), or some other destination external to the platform - manually run by the user or automatically run on the defined `schedule`
 `PROFILE_COLLABORATE` | A user task to send an [invitation](invitations)
 `PROFILE_IMPORT` | A user task to create a [pipeline](pipelines)

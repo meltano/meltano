@@ -14,7 +14,7 @@ Accounts are passive entities that store quota information for resources consume
 
 Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
-`id` | `string` | Version 4 UUID | The account ID 
+`id` | `string` | Version 4 UUID | The account ID
 `created` | `string` | ISO 8601 timestamp | The instant at which the account was created
 `lastModified` | `string` | ISO 8601 timestamp | The instant at which the account was last modified
 `company` | `string` | | The name of the company associated with the account

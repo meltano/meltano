@@ -89,7 +89,7 @@ Returns all active invitations to the workspace `{workspace-id}`.
 
 *As a workspace member...*
 
-Returns all active invitations to the workspace `{workspace-id}` sent by the authenticated user profile. 
+Returns all active invitations to the workspace `{workspace-id}` sent by the authenticated user profile.
 
 #### Prerequisites
 

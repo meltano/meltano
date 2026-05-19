@@ -47,6 +47,6 @@ Path | JSON Type | Description
 
 ---
 
-##### See Also
+Further Reading:
 
 - [Pipelines API resource](/reference/cloud/api/resources/pipelines)

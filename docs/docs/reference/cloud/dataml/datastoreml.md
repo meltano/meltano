@@ -32,6 +32,6 @@ Path | JSON Type | Description
 
 ---
 
-##### See Also
+Further Reading:
 
 - [Datastores API resource](/reference/cloud/api/resources/datastore)

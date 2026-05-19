@@ -157,6 +157,6 @@ pipelines_image: my-workspace-image:latest-dev
 
 ---
 
-##### See Also
+Further Reading:
 
 - [Workspaces API resource](/reference/cloud/api/resources/workspaces)

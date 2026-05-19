@@ -39,7 +39,7 @@ Path | JSON Type | Format | Description
 `envAliases` | `string[]` | | Environment variable aliases for the setting
 `documentation` | `string` | URL | The setting documentation URL
 `oauth` | [`OAuth`](#oauth) | | The setting OAuth configuration
-`env` | `string` | | 
+`env` | `string` | |
 
 ### OAuth
 
@@ -57,7 +57,7 @@ Value | Description
 ----- | -----------
 `STRING` | String setting
 `INTEGER` | Integer setting
-`PASSWORD` | Password setting 
+`PASSWORD` | Password setting
 `HIDDEN` | Hidden setting
 `BOOLEAN` | Boolean setting
 `DATE_ISO8601` | ISO 8601 date setting
@@ -247,7 +247,7 @@ Updates the dataplugin `{dataplugin-id}`.
 Path | JSON Type | Format | Description | Constraints
 ---- | ---- | ------ | ----------- | -----------
 `description` | `string` | | A description of the dataplugin |
-`repositoryUrl` | `string` | | A URL to the dataplugin repository | 
+`repositoryUrl` | `string` | | A URL to the dataplugin repository |
 `settings` | `object[]` | Array of [`Setting`](#setting)s | The dataplugin settings |
 
 

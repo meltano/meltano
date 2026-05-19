@@ -17,7 +17,7 @@ Profiles are individual consumers of the Meltano Cloud service. A profile is aut
 
 Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
-`id` | `string` | Version 4 UUID | The profile ID 
+`id` | `string` | Version 4 UUID | The profile ID
 `name` | `string` | The full name of the person or entity represented by this profile
 `handle` | `string` | The unique `@`-prefixed handle for this profile (generated and read-only)
 `phone` | `string` | Phone number | The profile phone number

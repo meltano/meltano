@@ -115,7 +115,7 @@ Make a <span>PUT</span> request to this link to set a particular resource within
 ### `update`
 Make a <span>PUT</span> request to this link to update a resource. Expect `200 OK` to indicate the resource was successfully updated.
 
-### `withdraw` 
+### `withdraw`
 Make a <span>PUT</span> request to this link to withdraw a resource. Expect `200 OK` to indicate the resource was successfully withdrawn.
 
 ### `edit`

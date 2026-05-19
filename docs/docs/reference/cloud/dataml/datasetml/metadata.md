@@ -22,7 +22,7 @@ metadata: |-
                     "label": "Date",
                     "description": "Date"
                 }
-            ], 
+            ],
             "aggregates": [
                 {
                     "name": "total_users",
@@ -41,21 +41,21 @@ Metadata Key | Details
 `name` | Name of the sql table you are querying, or it alias if assigned.
 `label` | Chart label.
 `related_table` | Columns and aggregates to display in the chart.
-`columns` | x-axis catagories, usually dates or groups.
-`aggregates` | Bars, Points, Lines that show the information over the `columns` catagories.
+`columns` | x-axis categories, usually dates or groups.
+`aggregates` | Bars, Points, Lines that show the information over the `columns` categories.
 `links` | Can be defined to connect datasets or external links, either by clicking on specific aggregates, or defining a link globally.
 
 
 ## Post-processing
 `columns` and `aggregates` support post-processing to modify values before they are rendered by the visualisation. This can be supplied in one of two ways:
 
-- A named post-processor: `post_process` 
+- A named post-processor: `post_process`
 - An expression: `post_process_expr`
 
 When both `post_process` and `post_process_expr` are supplied for a single column or aggregate, `post_process_expr` will take precedence.
 
 ### Named post-processors
-Named post-processors are aliases for common processing methods. A named post-processor can be specified using `post_process`. 
+Named post-processors are aliases for common processing methods. A named post-processor can be specified using `post_process`.
 
 Name | Description
 --- | ---
@@ -112,7 +112,7 @@ metadata: |-
         "related_table": {
         "columns": [
             {"name": "report_date", "label": "Date", "description": "Date"}
-        ], 
+        ],
         "aggregates": [
             {"name": "total_users", "label": "Total Users", "description": "Total Users"}
         ]
@@ -133,7 +133,7 @@ metadata: |-
         "related_table": {
         "columns": [
             {"name": "report_date", "label": "Date", "description": "Date"}
-        ], 
+        ],
         "aggregates": [
             {"name": "total_users", "label": "Total Users", "description": "Total Users", "links": [
                     {"href": "https://developers.google.com/analytics", "target": "_blank"}]
@@ -144,7 +144,7 @@ metadata: |-
 ```
 ---
 
-Further Reading: 
+Further Reading:
 
 - [API Datasets](/reference/cloud/api/resources/datasets)
 - [Example Charts](basic-examples)
