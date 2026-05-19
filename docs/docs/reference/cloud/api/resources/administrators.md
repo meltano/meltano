@@ -1,6 +1,6 @@
 ---
 title: Administrators
-description: Matatika Administrators resource reference documentation
+description: Meltano Cloud administrators resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

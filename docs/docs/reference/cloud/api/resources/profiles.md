@@ -1,12 +1,12 @@
 ---
 title: Profiles
-description: Matatika Profiles resource reference documentation
+description: Meltano Cloud profiles resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
 
-Profiles are individual consumers of the Matatika service. A profile is automatically created for a user when they first access the app, or accept an invitation to a workspace from an existing member via email.
+Profiles are individual consumers of the Meltano Cloud service. A profile is automatically created for a user when they first access the app, or accept an invitation to a workspace from an existing member via email.
 
 ---
 
@@ -106,7 +106,7 @@ Sets a default workspace for the profile `{profile-id}`.
 
 - The authentication subject must match the profile ID `{profile-id}`
 
-A workspace can be set as default, which defines the environment the Matatika app will initially load for a given profile. The default workspace setting persists only for the profile that sets it.
+A workspace can be set as default, which defines the environment Meltano Cloud will initially load with for a given profile. The default workspace setting persists only for the profile that sets it.
 
 #### Body
 [Profile](#profile) resource.

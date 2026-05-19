@@ -1,6 +1,6 @@
 ---
 title: Subscriptions
-description: Matatika Subscriptions resource reference documentation
+description: Meltano Cloud subscriptions resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

@@ -1,12 +1,12 @@
 ---
 title: Datasets
-description: Matatika Datasets resource reference documentation
+description: Meltano Cloud datasets resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
 
-Datasets are modules of data that can be published to workspaces. Datasets are visualised in the Matatika app following the [Chart.js](https://www.chartjs.org/) specifications.
+Datasets are modules of data that can be published to workspaces. Datasets are visualised in Meltano Cloud following the [Chart.js](https://www.chartjs.org/) specifications.
 
 ---
 
@@ -372,7 +372,7 @@ No response body provided.
 
 Further Reading:
 
-- [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/)
+- [Meltano Cloud dataset YAML file]({{site.baseurl}}/dataml/datasetml/)
 - [Example Charts]({{site.baseurl}}/dataml/datasetml/basic-examples)
 
 ---

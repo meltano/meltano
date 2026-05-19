@@ -1,15 +1,15 @@
 ---
 title: Links
-description: Reference documentation for link relations used by the Matatika API to communicate the capabilities of our resources
+description: Reference documentation for link relations used by the Meltano Cloud API to communicate the capabilities of our resources
 ---
 
-The Matatika API uses link relations to communicate the capabilities of our resources.  Where you see a link with one of the following relations, you can expect our API to act accordingly provided nothing has changed in the meantime.
+The Meltano Cloud API uses link relations to communicate the capabilities of our resources.  Where you see a link with one of the following relations, you can expect our API to act accordingly provided nothing has changed in the meantime.
 
 ---
 
 ## Resource Type Relations
 
-All resource types define an item and collection relation. These appear as or in (alongside [actions](#actions)) link relations throughout the Matatika API.
+All resource types define an item and collection relation. These appear as or in (alongside [actions](#actions)) link relations throughout the Meltano Cloud API.
 
 Resource | Item relation | Collection relation
 -------- | ------------- | -------------------
@@ -53,13 +53,13 @@ A [`search` action](#search) indicates the acceptance of the `q` query parameter
 Type | Description | Syntax | Example
 ---- | ----------- | ------ | -------
 Free text | The free text to filter by | `{free-text}` | `?q=data%20insights`
-Channel | The [channel](resources/channels) to filter by | `in:{channel-name}` | `?q=in:matatika-limited`
+Channel | The [channel](resources/channels) to filter by | `in:{channel-name}` | `?q=in:meltano`
 Tag | The [tag](resources/tags) to filter by | `tag:{tag-name}` | `?q=tag:jupyternotebook`
 
-The Matatika API supports multiple filter definitions, including those of the same type:
+The Meltano Cloud API supports multiple filter definitions, including those of the same type:
 
 ```
-?q=data%20insights in:matatika-limited tag:jupyternotebook`
+?q=data%20insights in:meltano tag:jupyternotebook`
 ```
 
 ```

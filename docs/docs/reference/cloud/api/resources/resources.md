@@ -1,6 +1,6 @@
 ---
 title: Resources
-description: Matatika resources resource reference documentation
+description: Meltano Cloud resources resource reference documentation
 slug: resources
 ---
 

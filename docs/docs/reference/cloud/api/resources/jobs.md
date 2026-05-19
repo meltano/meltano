@@ -1,6 +1,6 @@
 ---
 title: Jobs
-description: Matatika Jobs resource reference documentation
+description: Meltano Cloud jobs resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

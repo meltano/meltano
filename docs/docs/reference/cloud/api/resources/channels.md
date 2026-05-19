@@ -1,6 +1,6 @@
 ---
 title: Channels
-description: Matatika Channels resource reference documentation
+description: Meltano Cloud channels resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

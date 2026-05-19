@@ -1,6 +1,6 @@
 ---
 title: Datacomponents
-description: Matatika Datacomponents resource reference documentation
+description: Meltano Cloud datacomponents resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

@@ -1,12 +1,12 @@
 ---
 title: Dataplugins
-description: Matatika Dataplugins resource reference documentation
+description: Meltano Cloud resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
 
-Dataplugins simply define a source of data from a given repository. Matatika provides a number of pre-configured platform-wide dataplugins out-the-box, as well as the ability to create custom dataplugins through the API. From these, [pipeline](pipelines) jobs can be run to inject data into a workspace.
+Dataplugins simply define a source of data from a given repository. Meltano Cloud provides a number of pre-configured platform-wide dataplugins out-the-box, as well as the ability to create custom dataplugins through the API. From these, [pipeline](pipelines) jobs can be run to inject data into a workspace.
 
 ---
 
@@ -75,7 +75,7 @@ Value | Description
 **GET** `/api/dataplugins`
 :::
 
-Returns all dataplugins supported by Matatika.
+Returns all dataplugins supported by Meltano Cloud.
 
 <Examples path="dataplugins/view-all-supported-dataplugins" />
 
@@ -86,13 +86,13 @@ Returns all dataplugins supported by Matatika.
 <Snippet path="dataplugins/view-all-supported-dataplugins/response-body.md" />
 
 ---
-### View the Matatika `discovery.yml`
+### View the `discovery.yml`
 
 :::info
 **GET** `/api/discovery.yml`
 :::
 
-Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins supported by Matatika.
+Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins supported by Meltano Cloud.
 
 <Examples path="dataplugins/view-the-matatika-discovery-yml" />
 

@@ -1,6 +1,6 @@
 ---
 title: Pipelines
-description: Matatika Pipelines resource reference documentation
+description: Meltano Cloud pipelines resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

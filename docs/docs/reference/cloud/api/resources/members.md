@@ -1,6 +1,6 @@
 ---
 title: Members
-description: Matatika Members resource reference documentation
+description: Meltano Cloud members resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

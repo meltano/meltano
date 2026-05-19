@@ -1,6 +1,6 @@
 ---
 title: Search
-description: Matatika Search resource reference documentation
+description: Meltano Cloud search resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

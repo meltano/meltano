@@ -1,12 +1,12 @@
 ---
 title: API Keys
-description: Matatika API Keys resource reference documentation
+description: Meltano Cloud API keys resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
 
-API keys offer an alternate method of authentication to the Matatika API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/). Access using API key credentials is supported by the Matatika [CLI]({{site.baseurl}}/cli) and [SDK]({{site.baseurl}}/sdk), which allows a user to remain authenticated permanently.
+API keys offer an alternate method of authentication to the Meltano Cloud API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/). Access using API key credentials is supported by the Matatika [CLI]({{site.baseurl}}/cli) and [SDK]({{site.baseurl}}/sdk), which allows a user to remain authenticated permanently.
 
 ---
 
@@ -38,7 +38,7 @@ Path | JSON Type | Format | Description
 Returns all API keys owned by the authenticated user profile.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 - The API key `{apikey-id}` must exist
 
 <Examples path="apikeys/view-all-api-keys" />
@@ -59,7 +59,7 @@ Returns all API keys owned by the authenticated user profile.
 Returns the API key `{apikey-id}`.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 - The API key `{apikey-id}` must exist
 
 <Examples path="apikeys/view-an-api-key" />
@@ -80,7 +80,7 @@ Returns the API key `{apikey-id}`.
 Initialises a new API key.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 <Examples path="apikeys/initialise-an-api-key" />
 
@@ -100,7 +100,7 @@ Initialises a new API key.
 Creates the API key `{apikey-id}`.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 
 #### Body
@@ -126,7 +126,7 @@ Creates the API key `{apikey-id}`.
 Updates the API key `{apikey-id}`.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 
 #### Body
@@ -152,7 +152,7 @@ Updates the API key `{apikey-id}`.
 Deletes the API key `{apikey-id}`.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 - The API key `{apikey-id}` must exist
 
 <Examples path="apikeys/delete-an-api-key" />

@@ -1,9 +1,9 @@
 ---
 title: Postman Collection
-description: Get started with a Postman collection for the Matatika API - contains all the requests and documentation.
+description: Get started with a Postman collection for the Meltano Cloud API - contains all the requests and documentation.
 ---
 
-We automatically maintain a fully-tested Postman collection for the Matatika API, which contains all the requests documented for each [resource](resources) type.
+We automatically maintain a fully-tested Postman collection for the Meltano Cloud API, which contains all the requests documented for each [resource](resources) type.
 
 Simply import the following collection URL into Postman to begin sending requests:
 
@@ -13,10 +13,10 @@ Simply import the following collection URL into Postman to begin sending request
 
 ## Setting Up Authorisation
 
-The following steps outline how to set-up authorisation in Postman for the Matatika API collection using a Bearer token:
+The following steps outline how to set-up authorisation in Postman for the Meltano Cloud API collection using a Bearer token:
 
-1. [Get a token from the Matatika app]({{site.baseurl}}/security#getting-a-developer-token)
-2. In the Postman application, locate the imported 'Matatika API' collection and click *Edit*
+1. [Get a token from Meltano Cloud]({{site.baseurl}}/security#getting-a-developer-token)
+2. In the Postman application, locate the imported 'Meltano Cloud API' collection and click *Edit*
 3. Under the *Variables* tab, locate the variable `BEARER_TOKEN` and paste the token into the *CURRENT VALUE* text field
 4. Click *Update*
 

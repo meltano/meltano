@@ -1,6 +1,6 @@
 ---
 title: Resources
-description: Reference documentation for the resources available via the Matatika API
+description: Reference documentation for the resources available via the Meltano Cloud API
 ---
 
-The Matatika API has the following available resources. Each page contains an overview of the resource object and available API requests that pertain to the resource.
+The Meltano Cloud API has the following available resources. Each page contains an overview of the resource object and available API requests that pertain to the resource.

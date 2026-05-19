@@ -1,6 +1,6 @@
 ---
 title: Feed
-description: Matatika Feed resource reference documentation
+description: Meltano Cloud feed resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

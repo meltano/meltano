@@ -1,12 +1,12 @@
 ---
 title: Workspaces
-description: Matatika Workspaces resource reference documentation
+description: Meltano Cloud workspaces resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
 
-Workspaces allow users to operate within isolated instances of the Matatika service. This is useful for separating profiles based on the data they require access to.
+Workspaces allow users to operate within isolated instances of the Meltano Cloud service. This is useful for separating profiles based on the data they require access to.
 
 ---
 

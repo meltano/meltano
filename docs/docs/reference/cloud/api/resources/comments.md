@@ -1,6 +1,6 @@
 ---
 title: Comments
-description: Matatika Comments resource reference documentation
+description: Meltano Cloud comments resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

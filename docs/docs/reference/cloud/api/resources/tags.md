@@ -1,6 +1,6 @@
 ---
 title: Tags
-description: Matatika Tags resource reference documentation
+description: Meltano Cloud tags resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

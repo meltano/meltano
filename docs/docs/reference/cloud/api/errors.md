@@ -1,16 +1,16 @@
 ---
 title: Status Codes and Errors
-description: Reference documentation for standard HTTP status codes and error structures returned from the Matatika API
+description: Reference documentation for standard HTTP status codes and error structures returned from the Meltano Cloud API
 ---
 
-The Matatika API returns standard HTTP status codes and returns an error structure explaining all failing fields.  We use a standard templated error response across different scenarios so you can expect consistency in our error responses.
+The Meltano Cloud API returns standard HTTP status codes and returns an error structure explaining all failing fields.  We use a standard templated error response across different scenarios so you can expect consistency in our error responses.
 
 ---
 
 In general:
 - Codes in the `2xx` range indicate success
 - Codes in the `4xx` range indicate an error with the request
-- Codes in the `5xx` range indicate an issue with the Matatika API
+- Codes in the `5xx` range indicate an issue with the Meltano Cloud API
 
 Status Code | Text | Description
 ----------- | ---- | -----------

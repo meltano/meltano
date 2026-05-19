@@ -1,6 +1,6 @@
 ---
 title: Invitations
-description: Matatika Invitations resource reference documentation
+description: Meltano Cloud invitations resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

@@ -1,6 +1,6 @@
 ---
 title: Notifications
-description: Matatika Notifications resource reference documentation
+description: Meltano Cloud notifications resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';

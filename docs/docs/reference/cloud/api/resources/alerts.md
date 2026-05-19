@@ -1,6 +1,6 @@
 ---
 title: Alerts
-description: Matatika Alerts resource reference documentation
+description: Meltano Cloud API alerts resource reference documentation
 ---
 
 import Examples from '@site/src/components/Examples';
@@ -21,7 +21,7 @@ Alerts can be created by users on [datasets](datasets). These alerts can then be
 Initialises a new alert on a dataset.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 <Examples path="alerts/initialise-an-alert-on-a-dataset" />
 
@@ -41,7 +41,7 @@ Initialises a new alert on a dataset.
 Create a new alert on a dataset.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 <Examples path="alerts/create-an-alert-on-a-dataset" />
 
@@ -61,7 +61,7 @@ Create a new alert on a dataset.
 View alerts on a dataset.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 <Examples path="alerts/view-alerts-on-a-dataset" />
 
@@ -81,7 +81,7 @@ View alerts on a dataset.
 View an alert.
 
 #### Prerequisites
-- The authenticated user must own a Matatika account
+- The authenticated user must own a Meltano Cloud account
 
 <Examples path="alerts/view-an-alert" />
 
