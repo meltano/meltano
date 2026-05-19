@@ -16,7 +16,7 @@ You can create dashboards of your datasets in the Matataika app, by defining a f
 version: workspaces/v0.2
 name: My workspace
 domains:
-  - matatika.com
+  - meltano.com
   - example.co.uk
 default_data_store: Warehouse
 state_data_store: Warehouse

@@ -6,7 +6,7 @@ sidebar_position: 4
 
 Reference documentation for interfaces to services that store data.
 
-Datastores define a destination for data loaded into a [workspace]({{site.baseurl}}/api/resources/workspaces) by [pipelines]({{site.baseurl}}/api/resources/pipelines). The default datastore for a workspace is called Warehouse and it is its own PostgreSQL database hosted by Matatika, but this can be changed at any time to another datastore with your own credentials (see our supported [dataplugins]({{site.baseurl}}/api/resources/dataplugins) of type `LOADER`).
+Datastores define a destination for data loaded into a [workspace](/reference/cloud/api/resources/workspaces) by [pipelines](/reference/cloud/api/resources/pipelines). The default datastore for a workspace is called Warehouse and it is its own PostgreSQL database provisioned by Meltano Cloud, but this can be changed at any time to another datastore with your own credentials (see our supported [dataplugins](/reference/cloud/api/resources/dataplugins) of type `LOADER`).
 
 Datastore definitions are stored as YAML file format - you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
@@ -34,4 +34,4 @@ Path | JSON Type | Description
 
 Further Reading: 
 
-- [API datastores]({{site.baseurl}}/api/resources/datastores)
+- [API datastores](/reference/cloud/api/resources/datastores)

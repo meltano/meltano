@@ -4,7 +4,7 @@ description: Dataset basic examples.
 sidebar_position: 4
 ---
 
-These charts are the output of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/) listed below each of them.
+These charts are the output of the [dataset YAML file](.) listed below each of them.
 
 You can find the original YAML files in our [examples github repo](https://github.com/Matatika/matatika-examples/tree/master/example_datasets).
 

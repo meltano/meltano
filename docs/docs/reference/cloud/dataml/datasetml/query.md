@@ -4,7 +4,7 @@ description: Reference documentation for dataset queries.
 sidebar_position: 3
 ---
 
-You select the data for your chart by using the `query` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).
+You select the data for your chart by using the `query` key of the [dataset YAML file](.).
 
 The `query` key in the dataset file is the sql query that is run against your chosen data store to retrieve data for use in displaying the insight.
 
@@ -27,4 +27,4 @@ query: |-
 
 Further Reading: 
 
-- [API Datasets]({{site.baseurl}}/api/resources/datasets)
+- [API Datasets](/reference/cloud/api/resources/datasets)

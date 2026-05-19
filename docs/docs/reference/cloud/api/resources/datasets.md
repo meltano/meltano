@@ -26,9 +26,9 @@ Path | JSON Type | Format | Description
 `description` | `string` | | The dataset description (may contain markdown)
 `questions` | `string` | | The dataset questions
 `rawData` | `string` | JSON | The dataset raw data
-`visualisation` | `string` | JSON | The dataset visualisation metadata. [More Info]({{site.baseurl}}/dataml/datasetml/visualisation)
-`metadata` | `string` | JSON | The dataset metadata. [More Info]({{site.baseurl}}/dataml/datasetml/metadata)
-`query` | `string` | SQL statement | The dataset query. [More Info]({{site.baseurl}}/dataml/datasetml/query)
+`visualisation` | `string` | JSON | The dataset visualisation metadata. [More Info](/reference/cloud/dataml/datasetml/visualisation)
+`metadata` | `string` | JSON | The dataset metadata. [More Info](/reference/cloud/dataml/datasetml/metadata)
+`query` | `string` | SQL statement | The dataset query. [More Info](/reference/cloud/dataml/datasetml/query)
 `likeCount` | `number` | Unsigned integer | The number of likes the dataset has received
 `likedByProfiles` | `object[]` | Array of [`Member`](members#member)s | The members that have liked the dataset
 `commentCount` | `number` | Unsigned integer | The number of comments the dataset has received
@@ -373,8 +373,8 @@ No response body provided.
 
 Further Reading:
 
-- [Meltano Cloud dataset YAML file]({{site.baseurl}}/dataml/datasetml/)
-- [Example Charts]({{site.baseurl}}/dataml/datasetml/basic-examples)
+- [Meltano Cloud dataset YAML file](/reference/cloud/dataml/datasetml/)
+- [Example Charts](/reference/cloud/dataml/datasetml/basic-examples)
 
 ---
 

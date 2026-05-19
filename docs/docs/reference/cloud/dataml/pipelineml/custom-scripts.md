@@ -4,7 +4,7 @@ description: Reference documentation for pipeline custom scripts.
 sidebar_position: 2
 ---
 
-Custom scripts can be used in [Pipelines]({{site.baseurl}}/glossary#pipeline) by choosing `Script` from `Section 2 - Clean, transform and organise` when creating or editing your data import or by defining an 'inline_script' in your [Pipeline YAML]({{site.baseurl}}/dataml/pipelineml/).
+Custom scripts can be used in [Pipelines]({{site.baseurl}}/glossary#pipeline) by choosing `Script` from `Section 2 - Clean, transform and organise` when creating or editing your data import or by defining an 'inline_script' in your [Pipeline YAML](.).
 
 ---
 
@@ -49,7 +49,6 @@ By invoking other plugins through Meltano, you gain the benefit of Meltano takin
 
 ## Further Reading
 
-- [Matatika Examples of Custom Scripts](https://github.com/Matatika/matatika-examples/tree/master/example_data_import_scripts)
-- [Matatika Default Pipeline Run Script](https://github.com/Matatika/matatika-examples/blob/master/example_data_import_scripts/default.sh)
-- [Matatika Technical Glossary](https://github.com/Matatika/matatika-examples/tree/master/matatika_technical_glossary#custom-data-source)
-- [Meltano Documentation](https://docs.meltano.com/guide/plugin-management)
+- [Examples of custom scripts](https://github.com/Matatika/matatika-examples/tree/master/example_data_import_scripts)
+- [Default pipeline run script](https://github.com/Matatika/matatika-examples/blob/master/example_data_import_scripts/default.sh)
+- [Technical glossary](https://github.com/Matatika/matatika-examples/tree/master/matatika_technical_glossary#custom-data-source)

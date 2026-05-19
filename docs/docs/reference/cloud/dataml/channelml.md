@@ -6,7 +6,7 @@ sidebar_position: 2
 
 Examples and reference documentation for organising your datasets into channels.
 
-Use the Matatika channel YAML to group related datasets in your workspace as code.
+Use the channel YAML to group related datasets in your workspace as code.
 
 Our channel files are stored as YAML files, you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
@@ -27,7 +27,7 @@ Path | JSON Type | Description
 ---- | --------- | -----------
 `version` | `string` | The version determines how the CLI handles publishing the channel. 
 `name` | `string`  | Alias of your channel. Unique to the workspace, used for updating and verify channel updates.
-`description` | `string` | Text displayed in the Matatika platform below the channel icon.
+`description` | `string` | Text displayed in Meltano Cloud below the channel icon.
 `image` | `string` | An image url or local reference for your channel icon. If left empty, will use the icon of the user who created the channel.
 
 ## String Formatting
@@ -50,4 +50,4 @@ description: |-
 Further Reading: 
 
 - [Glossary Channels]({{site.baseurl}}/glossary#channel)
-- [API Channels]({{site.baseurl}}/api/resources/channels)
+- [API Channels](/reference/cloud/api/resources/channels)

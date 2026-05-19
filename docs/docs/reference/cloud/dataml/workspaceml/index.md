@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 Reference documentation for the workspace configuration file.
 
-Use the Matatika workspace YAML to configure your workspace as code.
+Use the workspace YAML to configure your workspace as code.
 
 The workspace file is stored in YAML file format, you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
@@ -21,7 +21,7 @@ The workspace file is stored in YAML file format, you can read more about the YA
 version: workspaces/v0.2
 name: My workspace
 domains:
-  - matatika.com
+  - meltano.com
   - example.co.uk
 default_data_store: Warehouse
 state_data_store: Warehouse
@@ -102,8 +102,8 @@ Path | JSON Type | Description
 ---- | --------- | -----------
 `version`            | `string`   | The version identifies this artifact type.
 `name`               | `string`   | Name of your workspace.
-`default_data_store` | `string`   | Name of your workspace's default data store. (See [Data Store ML]({{site.baseurl}}/dataml/datastoreml)).  This controls the default for loading, query, transformation, and state (unless overridden with `state_data_store`).
-`state_data_store`   | `string`   | Name of your workspace's state data store. (See [Data Store ML]({{site.baseurl}}/dataml/datastoreml)). This controls where pipeline state is stored and **must** reference a Postgres, BigQuery or Snowflake database (defaults to the managed warehouse data store, same as `default_data_store`).
+`default_data_store` | `string`   | Name of your workspace's default data store. (See [Data Store ML](/reference/cloud/dataml/datastoreml)).  This controls the default for loading, query, transformation, and state (unless overridden with `state_data_store`).
+`state_data_store`   | `string`   | Name of your workspace's state data store. (See [Data Store ML](/reference/cloud/dataml/datastoreml)). This controls where pipeline state is stored and **must** reference a Postgres, BigQuery or Snowflake database (defaults to the managed warehouse data store, same as `default_data_store`).
 `pipelines_image`    | `string`   | The path name of an image to run pipelines from
 `image_url`          | `string`   | The Meltano tasks that will be run.
 `dataset_paths`      | `string[]` | Paths for your workspace to deploy datasets from.
@@ -126,7 +126,7 @@ Environment-specific workspace configuration files only need to contain the prop
 version: workspaces/v0.2
 name: My workspace
 domains:
-  - matatika.com
+  - meltano.com
   - example.co.uk
 default_data_store: Warehouse
 state_data_store: Warehouse
@@ -158,5 +158,5 @@ pipelines_image: my-workspace-image:latest-dev
 
 Further Reading: 
 
-- [API Workspaces]({{site.baseurl}}/api/resources/workspaces)
-- [Data Store ML]({{site.baseurl}}/dataml/datastoreml)
+- [API Workspaces](/reference/cloud/api/resources/workspaces)
+- [Data Store ML](/reference/cloud/dataml/datastoreml)

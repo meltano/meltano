@@ -4,7 +4,7 @@ description: Reference documentation for dataset visualisation customisation.
 sidebar_position: 2
 ---
 
-You can use different chart types by utilizing the `visualisation` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).
+You can use different chart types by utilizing the `visualisation` key of the [dataset YAML file](.).
 
 The `visualisation` key contains information about displaying the chart for the insight.
 
@@ -146,5 +146,5 @@ For our `html-metric`, the first color is always the background, then every othe
 
 Further Reading: 
 
-- [API Datasets]({{site.baseurl}}/api/resources/datasets)
+- [API Datasets](/reference/cloud/api/resources/datasets)
 - [Example Charts](basic-examples)

@@ -6,7 +6,7 @@ sidebar_position: 3
 
 Examples and reference documentation for datasets and visualisation.
 
-Use the Matatika dataset YAML to create and format insights in your workspace as code.
+Use the dataset YAML to create and format insights in your workspace as code.
 
 Our dataset files are stored as YAML files, you can read more about the YAML format and its syntax [here](https://yaml.org/).
 
@@ -58,9 +58,9 @@ Path | JSON Type | Description
 `title` | `string` | The title at the top of the insight.
 `questions` | `string` | Questions that your dataset answers, so people can find the dataset just by asking questions.
 `description` | `string` | Information about what the dataset is, how it's being filtered or displayed and other relevant information. You can also add `#tags`.
-`metadata` | `string` of JSON | Details about how the dataset's chart is laid out. [More Info]({{site.baseurl}}/dataml/datasetml/metadata)
-`visulisation` | `string` of JSON | Details about the precise visualisation of the datasets chart. [More Info]({{site.baseurl}}/dataml/datasetml/visualisation)
-`query` | `string` of SQL | The query that returns the data from your datastore for use in the dataset's chart and related table. [More Info]({{site.baseurl}}/dataml/datasetml/query)
+`metadata` | `string` of JSON | Details about how the dataset's chart is laid out. [More Info](/reference/cloud/dataml/datasetml/metadata)
+`visulisation` | `string` of JSON | Details about the precise visualisation of the datasets chart. [More Info](/reference/cloud/dataml/datasetml/visualisation)
+`query` | `string` of SQL | The query that returns the data from your datastore for use in the dataset's chart and related table. [More Info](/reference/cloud/dataml/datasetml/query)
 `rawData` | `string` of a List | The rawData key allows you to hard-code data directly into your dataset.
 
 ## String Formatting
@@ -84,5 +84,5 @@ The multiline string is generally the best way to display the `string` of JSON o
 
 Further Reading: 
 
-- [API Datasets]({{site.baseurl}}/api/resources/datasets)
-- [Example Charts]({{site.baseurl}}/dataml/datasetml/basic-examples)
+- [API Datasets](/reference/cloud/api/resources/datasets)
+- [Example Charts](/reference/cloud/dataml/datasetml/basic-examples)

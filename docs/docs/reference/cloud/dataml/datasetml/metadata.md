@@ -4,7 +4,7 @@ description: Reference documentation for dataset metadata.
 sidebar_position: 1
 ---
 
-You can change the format and display of your chart by using the `metadata` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).
+You can change the format and display of your chart by using the `metadata` key of the [dataset YAML file](.).
 
 The `metadata` key relates to how the data from the [`query`](query) within the dataset is displayed as an insight.
 
@@ -146,5 +146,5 @@ metadata: |-
 
 Further Reading: 
 
-- [API Datasets]({{site.baseurl}}/api/resources/datasets)
+- [API Datasets](/reference/cloud/api/resources/datasets)
 - [Example Charts](basic-examples)
