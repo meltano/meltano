@@ -25,7 +25,7 @@ Parameter | Required | Format | Default Value | Description
 --------- | -------- | ------ | ------------- | -----------
 `before` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to return any notifications created before
 `since` | No | ISO 8601 timestamp | `2021-02-11T11:12` | The instant to return any notifications created since
-`q` | No | Tag [filter]({{site.baseurl}}/api/links#filter) | | The tag(s) to search notifications by
+`q` | No | Tag [filter](/reference/cloud/api/links#filter) | | The tag(s) to search notifications by
 
 #### Response
 `200 OK`

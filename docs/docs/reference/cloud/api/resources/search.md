@@ -8,7 +8,7 @@ import Snippet from '@site/src/components/Snippet';
 
 [Datasets](datasets#dataset) can be searched for within their containing [workspace](workspaces). Searches can filter datasets by arbitrary text, [channel](channels) name, or [tag](tags) name.
 
-See [here]({{site.baseurl}}/api/links#search) for more information on constructing a search filter query.
+See [here](/reference/cloud/api/links#searching-and-filtering) for more information on constructing a search filter query.
 
 ---
 
