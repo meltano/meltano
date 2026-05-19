@@ -1,9 +1,6 @@
 ---
 title: DatastoreML
 description: Reference documentation for data store definition model.
-permalink: /dataml/datastoreml/
-nav_order: 4
-parent: DataML
 ---
 
 Reference documentation for interfaces to services that store data.

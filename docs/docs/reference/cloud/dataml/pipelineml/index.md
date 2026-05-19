@@ -1,10 +1,6 @@
 ---
 title: PipelineML
 description: Reference documentation for pipeline definition model.
-permalink: /dataml/pipelineml/
-nav_order: 3
-parent: DataML
-has_children: true
 ---
 
 Reference documentation for orchestration actions that import and process data.

@@ -1,10 +1,7 @@
 ---
 title: Advanced Examples
 description: Dataset advanced examples.
-permalink: /dataml/datasetml/advanced-examples
-parent: DatasetML
-grand_parent: DataML 
-nav_order: 5
+sidebar_position: 5
 ---
 
 These charts are the output of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/) listed below each of them.

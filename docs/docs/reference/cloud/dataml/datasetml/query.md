@@ -1,10 +1,7 @@
 ---
 title: Query
 description: Reference documentation for dataset queries.
-permalink: /dataml/datasetml/query
-parent: DatasetML
-grand_parent: DataML 
-nav_order: 3
+sidebar_position: 3
 ---
 
 You select the data for your chart by using the `query` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).

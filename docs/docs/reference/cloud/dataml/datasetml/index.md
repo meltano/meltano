@@ -1,10 +1,6 @@
 ---
 title: DatasetML
 description: Reference documentation for dataset definition model.
-permalink: /dataml/datasetml/
-nav_order: 2
-parent: DataML
-has_children: true
 ---
 
 Examples and reference documentation for datasets and visualisation.

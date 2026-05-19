@@ -1,10 +1,7 @@
 ---
 title: Visualisation
 description: Reference documentation for dataset visualisation customisation.
-permalink: /dataml/datasetml/visualisation
-parent: DatasetML
-grand_parent: DataML 
-nav_order: 1
+sidebar_position: 2
 ---
 
 You can use different chart types by utilizing the `visualisation` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).

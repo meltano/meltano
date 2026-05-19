@@ -1,10 +1,7 @@
 ---
 title: Custom Scripts
 description: Reference documentation for pipeline custom scripts.
-permalink: /dataml/pipelineml/custom-scripts
-nav_order: 2
-parent: PipelineML
-grand_parent: DataML
+sidebar_position: 2
 ---
 
 Custom scripts can be used in [Pipelines]({{site.baseurl}}/glossary#pipeline) by choosing `Script` from `Section 2 - Clean, transform and organise` when creating or editing your data import or by defining an 'inline_script' in your [Pipeline YAML]({{site.baseurl}}/dataml/pipelineml/).

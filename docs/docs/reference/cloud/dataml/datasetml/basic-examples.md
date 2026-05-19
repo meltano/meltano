@@ -1,10 +1,7 @@
 ---
 title: Basic Examples
 description: Dataset basic examples.
-permalink: /dataml/datasetml/basic-examples
-parent: DatasetML
-grand_parent: DataML 
-nav_order: 4
+sidebar_position: 4
 ---
 
 These charts are the output of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/) listed below each of them.

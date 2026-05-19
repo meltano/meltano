@@ -1,10 +1,7 @@
 ---
 title: Metadata
 description: Reference documentation for dataset metadata.
-permalink: /dataml/datasetml/metadata
-parent: DatasetML
-grand_parent: DataML 
-nav_order: 2
+sidebar_position: 1
 ---
 
 You can change the format and display of your chart by using the `metadata` key of the [Matatika dataset YAML file]({{site.baseurl}}/dataml/datasetml/).

@@ -1,10 +1,7 @@
 ---
 title: Environment
 description: Reference documentation for pipeline environment customisation.
-permalink: /dataml/pipelineml/environment
-nav_order: 1
-parent: PipelineML
-grand_parent: DataML
+sidebar_position: 1
 ---
 
 [Pipelines]({{site.baseurl}}/glossary#data-import) have environments that are used to pass settings to your [data source]({{site.baseurl}}/glossary#data-source), [data stores]({{site.baseurl}}/glossary#data-store) and other plugins.

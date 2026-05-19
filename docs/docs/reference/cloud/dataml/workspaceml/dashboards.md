@@ -1,10 +1,7 @@
 ---
 title: Dashboards
 description: Reference documentation for workspace dashboard customisation.
-permalink: /dataml/workspaceml/dashboards/
-nav_order: 2
-parent: WorkspaceML
-grand_parent: DataML
+sidebar_position: 2
 ---
 
 Dashboards allow you to design a layout for data and datasets in your workspace. These are fully customizable and render custom HTML and CSS, letting you format them as required.
