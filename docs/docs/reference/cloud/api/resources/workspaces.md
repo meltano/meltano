@@ -3,9 +3,8 @@ title: Workspaces
 description: Matatika Workspaces resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Workspaces allow users to operate within isolated instances of the Matatika service. This is useful for separating profiles based on the data they require access to.
 
@@ -55,16 +54,7 @@ Value | Description
 
 Returns all workspaces the authenticated user profile is an owner or member of.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/view-all-workspaces/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/view-all-workspaces/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/view-all-workspaces" />
 
 #### Response
 `200 OK`
@@ -85,16 +75,7 @@ Returns the workspace `{workspace-id}`.
 
 - The user must be a member of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/view-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/view-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/view-a-workspace" />
 
 #### Response
 `200 OK`
@@ -111,16 +92,7 @@ Returns the workspace `{workspace-id}`.
 
 Initialises a new workspace.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/initialise-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/initialise-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/initialise-a-workspace" />
 
 #### Response
 `200 OK`
@@ -142,20 +114,12 @@ Creates the workspace `{workspace-id}`.
 - The user must be the owner of workspace `{workspace-id}`
 - The workspace must have been [initialised](#initialise-a-workspace) in order to create it
 
-#### Request
-##### Body
+#### Body
 [Workspace](#workspace) resource.
 <Snippet path="workspaces/create-a-workspace/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/create-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/create-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/create-a-workspace" />
 
 #### Response
 `201 Created`
@@ -177,20 +141,12 @@ Updates the workspace `{workspace-id}`.
 - The user must be the owner of workspace `{workspace-id}`
 - The workspace must have been [created](#create-a-workspace) in order to update it
 
-#### Request
-##### Body
+#### Body
 [Workspace](#workspace) resource.
 <Snippet path="workspaces/update-a-workspace/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/update-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/update-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/update-a-workspace" />
 
 #### Response
 `200 OK`
@@ -211,16 +167,7 @@ Deletes the workspace `{workspace-id}`.
 
 - The user must be the owner of workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/delete-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/delete-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/delete-a-workspace" />
 
 #### Response
 `204 No Content`

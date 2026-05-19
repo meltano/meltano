@@ -3,9 +3,8 @@ title: Tags
 description: Matatika Tags resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Tags are hash-prefixed keywords or phrases that appear in the title, description, or comments of a dataset. Tags can be used to index datasets by their contained tags with a search, which allows for topical dataset categorisation.
 
@@ -38,16 +37,7 @@ Returns all tags in the workspace `{workspace-id}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="tags/view-all-tags-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="tags/view-all-tags-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="tags/view-all-tags-in-a-workspace" />
 
 #### Response
 `200 OK`
@@ -86,16 +76,7 @@ Returns the tag `{tag-id}` in the workspace `{workspace-id}`.
 - Workspace `{workspace-id}` must exist
 - Tag `{tag-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="tags/view-a-tag-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="tags/view-a-tag-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="tags/view-a-tag-in-a-workspace" />
 
 #### Response
 `200 OK`

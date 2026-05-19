@@ -3,9 +3,8 @@ title: Profiles
 description: Matatika Profiles resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Profiles are individual consumers of the Matatika service. A profile is automatically created for a user when they first access the app, or accept an invitation to a workspace from an existing member via email.
 
@@ -38,16 +37,7 @@ Path | JSON Type | Format | Description
 
 Returns all profiles under the authenticated user account.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="profiles/view-all-profiles/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="profiles/view-all-profiles/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="profiles/view-all-profiles" />
 
 #### Response
 `200 OK`
@@ -68,16 +58,7 @@ Returns the profile `{profile-id}`.
 
 - Profile `{profile-id}` must exist under the authenticated user account
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="profiles/view-a-profile/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="profiles/view-a-profile/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="profiles/view-a-profile" />
 
 #### Response
 `200 OK`
@@ -98,21 +79,13 @@ Creates or updates the user profile.
 
 - The authentication subject must match the profile ID `{profile-id}`
 
-#### Request
 
-##### Body
+#### Body
 [Profile](#profile) resource.
 <Snippet path="profiles/update-a-profile/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="profiles/update-a-profile/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="profiles/update-a-profile/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="profiles/update-a-profile" />
 
 #### Response
 `200 OK / 201 Created`
@@ -135,20 +108,12 @@ Sets a default workspace for the profile `{profile-id}`.
 
 A workspace can be set as default, which defines the environment the Matatika app will initially load for a given profile. The default workspace setting persists only for the profile that sets it.
 
-#### Request
-##### Body
+#### Body
 [Profile](#profile) resource.
 <Snippet path="profiles/set-a-workspace-as-default/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="profiles/set-a-workspace-as-default/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="profiles/set-a-workspace-as-default/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="profiles/set-a-workspace-as-default" />
 
 #### Response
 `200 OK`

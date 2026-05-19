@@ -3,9 +3,8 @@ title: API Keys
 description: Matatika API Keys resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 API keys offer an alternate method of authentication to the Matatika API using a [client ID and secret](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/). Access using API key credentials is supported by the Matatika [CLI]({{site.baseurl}}/cli) and [SDK]({{site.baseurl}}/sdk), which allows a user to remain authenticated permanently.
 
@@ -42,17 +41,7 @@ Returns all API keys owned by the authenticated user profile.
 - The authenticated user must own a Matatika account
 - The API key `{apikey-id}` must exist
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="apikeys/view-all-api-keys/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="apikeys/view-all-api-keys/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="apikeys/view-all-api-keys" />
 
 #### Response
 `200 OK`
@@ -73,17 +62,7 @@ Returns the API key `{apikey-id}`.
 - The authenticated user must own a Matatika account
 - The API key `{apikey-id}` must exist
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="apikeys/view-an-api-key/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="apikeys/view-an-api-key/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="apikeys/view-an-api-key" />
 
 #### Response
 `200 OK`
@@ -103,17 +82,7 @@ Initialises a new API key.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="apikeys/initialise-an-api-key/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="apikeys/initialise-an-api-key/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="apikeys/initialise-an-api-key" />
 
 #### Response
 `200 OK`
@@ -133,21 +102,13 @@ Creates the API key `{apikey-id}`.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
 
-##### Body
+#### Body
 [API key](#api-key) resource.
 <Snippet path="apikeys/create-an-api-key/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="apikeys/create-an-api-key/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="apikeys/create-an-api-key/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="apikeys/create-an-api-key" />
 
 #### Response
 `201 Created`
@@ -167,21 +128,13 @@ Updates the API key `{apikey-id}`.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
 
-##### Body
+#### Body
 [API key](#api-key) resource.
 <Snippet path="apikeys/update-an-api-key/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="apikeys/update-an-api-key/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="apikeys/update-an-api-key/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="apikeys/update-an-api-key" />
 
 #### Response
 `200 OK`
@@ -202,17 +155,7 @@ Deletes the API key `{apikey-id}`.
 - The authenticated user must own a Matatika account
 - The API key `{apikey-id}` must exist
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="apikeys/delete-an-api-key/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="apikeys/delete-an-api-key/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="apikeys/delete-an-api-key" />
 
 #### Response
 `204 No Content`

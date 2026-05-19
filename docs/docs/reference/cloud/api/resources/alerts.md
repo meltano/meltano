@@ -3,9 +3,8 @@ title: Alerts
 description: Matatika Alerts resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Alerts can be created by users on [datasets](datasets). These alerts can then be used to inform users of information related to that dataset.
 
@@ -24,17 +23,7 @@ Initialises a new alert on a dataset.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="alerts/initialise-an-alert-on-a-dataset/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="alerts/initialise-an-alert-on-a-dataset/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="alerts/initialise-an-alert-on-a-dataset" />
 
 #### Response
 `200 OK`
@@ -54,17 +43,7 @@ Create a new alert on a dataset.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="alerts/create-an-alert-on-a-dataset/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="alerts/create-an-alert-on-a-dataset/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="alerts/create-an-alert-on-a-dataset" />
 
 #### Response
 `201 Created`
@@ -84,17 +63,7 @@ View alerts on a dataset.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="alerts/view-alerts-on-a-dataset/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="alerts/view-alerts-on-a-dataset/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="alerts/view-alerts-on-a-dataset" />
 
 #### Response
 `200 OK`
@@ -114,17 +83,7 @@ View an alert.
 #### Prerequisites
 - The authenticated user must own a Matatika account
 
-#### Request
-
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="alerts/view-an-alert/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="alerts/view-an-alert/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="alerts/view-an-alert" />
 
 #### Response
 `200 OK`

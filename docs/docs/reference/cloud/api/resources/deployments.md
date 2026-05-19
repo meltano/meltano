@@ -3,9 +3,8 @@ title: Deployments
 description: Matatika Deployments resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Deployments let the user schedule a [job](jobs) to deploy the contents of their [workspace](workspaces) repository to their workspace in the Matatika cloud.
 
@@ -23,16 +22,7 @@ This can be done manually or via a GitHub Webhook which you can see how to set u
 
 Deploys the workspace `{workspace-id}`.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="deployment/deploy-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="deployment/deploy-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="deployment/deploy-workspace" />
 
 #### Response
 `202 Accepted`
@@ -50,16 +40,7 @@ Deploys the workspace `{workspace-id}`.
 
 Receives `POST` requests from GitHub and starts a workspace deploy job.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="deployment/github-webhook-deploy/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="deployment/github-webhook-deploy/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="deployment/github-webhook-deploy" />
 
 #### Response
 `202 Accepted`

@@ -3,9 +3,8 @@ title: Feed
 description: Matatika Feed resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 The feed returns the most relevant datasets for the authenticated user profile. [Member](members) interactions with datasets are scored, determining their position within the feed.
 
@@ -30,16 +29,7 @@ Returns the feed of the workspace `{workspace-id}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="feed/view-a-workspace-feed/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="feed/view-a-workspace-feed/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="feed/view-a-workspace-feed" />
 
 #### Response
 `200 OK`

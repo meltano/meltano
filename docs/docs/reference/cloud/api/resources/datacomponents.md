@@ -3,9 +3,8 @@ title: Datacomponents
 description: Matatika Datacomponents resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Datacomponents hold configuration for [dataplugins](dataplugins), and are the building blocks for constructing [pipelines](pipelines). One dataplugin may be referenced by many datacomponents, each with a different set of `properties` for the dataplugin [`settings`](dataplugins#setting). One pipeline may reference multiple datacomponents.
 
@@ -90,16 +89,7 @@ Returns all datacomponents in the workspace `{workspace-id}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datacomponents/view-all-datacomponents-in-a-workspace" />
 
 #### Response
 `200 OK`
@@ -119,16 +109,7 @@ Returns the datacomponent `{datacomponent-id}`.
 #### Prerequisites
 - Datacomponent `{datacomponent-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datacomponents/view-a-datacomponent/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datacomponents/view-a-datacomponent/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datacomponents/view-a-datacomponent" />
 
 #### Response
 `200 OK`
@@ -145,16 +126,7 @@ Returns the datacomponent `{datacomponent-id}`.
 
 Initialises a new datacomponent in the workspace `{workspace-id}`.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datacomponents/initialise-a-new-datacomponent-in-a-workspace" />
 
 #### Response
 `200 OK`
@@ -171,20 +143,12 @@ Initialises a new datacomponent in the workspace `{workspace-id}`.
 
 Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{workspace-id}`.
 
-#### Request
-##### Body
+#### Body
 [Datacomponent](#datacomponent) resource.
 <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datacomponents/create-or-update-a-datacomponent-in-a-workspace" />
 
 #### Response
 `200 OK / 201 Created`
@@ -204,20 +168,12 @@ Updates the datacomponent `{datacomponent-id}`.
 #### Prerequisites
 - Datacomponent `{datacomponent-id}` must exist
 
-#### Request
-##### Body
+#### Body
 [Datacomponent](#datacomponent) resource.
 <Snippet path="datacomponents/update-a-datacomponent/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datacomponents/update-a-datacomponent/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datacomponents/update-a-datacomponent/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datacomponents/update-a-datacomponent" />
 
 #### Response
 `200 OK`
@@ -234,16 +190,7 @@ Updates the datacomponent `{datacomponent-id}`.
 
 Deletes the datacomponent `{datacomponent-id}`.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datacomponents/delete-a-datacomponent/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datacomponents/delete-a-datacomponent/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datacomponents/delete-a-datacomponent" />
 
 #### Response
 `204 No Content`

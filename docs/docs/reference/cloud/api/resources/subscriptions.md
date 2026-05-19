@@ -3,9 +3,8 @@ title: Subscriptions
 description: Matatika Subscriptions resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Subscriptions are a declaration of interest in a particular resource, allowing a user to receive [notifications](notifications) when certain events occur. The events that trigger [notifications](notifications) are controlled by the [type of subscription](#subscription-type).
 
@@ -48,16 +47,7 @@ Value | Description
 
 Returns all subscriptions for the authenticated user profile.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/view-all-subscriptions/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/view-all-subscriptions/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/view-all-subscriptions" />
 
 #### Response
 `200 OK`
@@ -77,16 +67,7 @@ Returns all member subscriptions to the workspace `{workspace-id}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/view-all-member-subscriptions-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/view-all-member-subscriptions-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/view-all-member-subscriptions-to-a-workspace" />
 
 #### Response
 `200 OK`
@@ -106,16 +87,7 @@ Returns the subscription `{subscription-id}`.
 #### Prerequisites
 - Subscription `{subscription-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/view-a-subscription/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/view-a-subscription/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/view-a-subscription" />
 
 #### Response
 `200 OK`
@@ -137,22 +109,14 @@ By default, the subscription is configured for all workspace events (see [Subscr
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-##### Query Parameters
+#### Query Parameters
 
 Parameter | Required | Format | Default Value | Description
 --------- | -------- | ------ | ------------- | -----------
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to workspace events, in order to enable workspace-wide notifications for all [members](members) by default (applicable for the workspace owner only)
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/subscribe-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/subscribe-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/subscribe-to-a-workspace" />
 
 #### Response
 `200 OK`
@@ -174,22 +138,14 @@ By default, the subscription is configured for all channel events (see [Subscrip
 #### Prerequisites
 - Channel `{channel-id}` must exist
 
-#### Request
-##### Query Parameters
+#### Query Parameters
 
 Parameter | Required | Format | Default Value | Description
 --------- | -------- | ------ | ------------- | -----------
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to channel events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/subscribe-to-a-channel/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/subscribe-to-a-channel/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/subscribe-to-a-channel" />
 
 #### Response
 `200 OK`
@@ -211,22 +167,14 @@ By default, the subscription is configured for all dataset events (see [Subscrip
 #### Prerequisites
 - Dataset `{dataset-id}` must exist
 
-#### Request
-##### Query Parameters
+#### Query Parameters
 
 Parameter | Required | Format | Default Value | Description
 --------- | -------- | ------ | ------------- | -----------
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to dataset events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/subscribe-to-a-dataset/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/subscribe-to-a-dataset/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/subscribe-to-a-dataset" />
 
 #### Response
 `200 OK`
@@ -248,22 +196,14 @@ By default, the subscription is configured for all pipeline events (see [Subscri
 #### Prerequisites
 - Pipeline `{pipeline-id}` must exist
 
-#### Request
-##### Query Parameters
+#### Query Parameters
 
 Parameter | Required | Format | Default Value | Description
 --------- | -------- | ------ | ------------- | -----------
 `allMembers` | No | Boolean | `false` | Whether or not to subscribe the workspace to pipeline events, enabling notifications for all [members](members) by default (applicable for the workspace owner only)
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/subscribe-to-a-pipeline/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/subscribe-to-a-pipeline/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/subscribe-to-a-pipeline" />
 
 #### Response
 `200 OK`
@@ -283,8 +223,7 @@ Updates the subscription `{subscription-id}`.
 #### Prerequisites
 - Subscription `{subscription-id}` must exist
 
-#### Request
-##### Body
+#### Body
 
 Path | JSON Type | Format | Description
 ---- | ---- | ------ | -----------
@@ -293,14 +232,7 @@ Path | JSON Type | Format | Description
 <Snippet path="subscriptions/update-a-subscription/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/update-a-subscription/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/update-a-subscription/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/update-a-subscription" />
 
 #### Response
 `200 OK`
@@ -320,16 +252,7 @@ Removes the subscription `{subscription-id}`.
 #### Prerequisites
 - Subscription `{subscription-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="subscriptions/remove-a-subscription/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="subscriptions/remove-a-subscription/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="subscriptions/remove-a-subscription" />
 
 #### Response
 `204 No Content`

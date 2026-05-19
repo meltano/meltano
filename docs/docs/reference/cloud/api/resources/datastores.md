@@ -3,9 +3,8 @@ title: Datastores
 description: Matatika Datastores resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Datastores define a destination for data loaded into a [workspace](workspaces) by [pipelines](pipelines). The default datastore for a workspace is its own PostgreSQL database hosted by Matatika, but this can be changed at any time to another datastore with your own credentials (see our supported [dataplugins](dataplugins) of type `LOADER`).
 
@@ -47,16 +46,7 @@ Returns the datastores in the workspace `{workspace-id}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datastores/view-all-datastores-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datastores/view-all-datastores-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datastores/view-all-datastores-in-a-workspace" />
 
 #### Response
 `200 OK`
@@ -76,16 +66,7 @@ Returns the datastore `{datastore-id}`.
 #### Prerequisites
 - Datastore `{datastore-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datastores/view-a-datastore/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datastores/view-a-datastore/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datastores/view-a-datastore" />
 
 #### Response
 `200 OK`
@@ -105,16 +86,7 @@ Sets the datastore `{datastore-id}` as the workspace default.
 #### Prerequisites
 - Datastore `{datastore-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datastores/set-a-datastore-as-the-workspace-default/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datastores/set-a-datastore-as-the-workspace-default/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datastores/set-a-datastore-as-the-workspace-default" />
 
 #### Response
 `200 OK`
@@ -133,16 +105,7 @@ Initialises a new datastore in the workspace `{workspace-id}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datastores/initialise-a-new-datastore-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datastores/initialise-a-new-datastore-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datastores/initialise-a-new-datastore-in-a-workspace" />
 
 #### Response
 `200 OK`
@@ -162,20 +125,12 @@ Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-i
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-##### Body
+#### Body
 [Datastore](#datastore) resource.
 <Snippet path="datastores/create-a-datastore-in-a-workspace/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datastores/create-a-datastore-in-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datastores/create-a-datastore-in-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datastores/create-a-datastore-in-a-workspace" />
 
 #### Response
 `200 OK / 201 Created`
@@ -195,16 +150,7 @@ Deletes the datastore `{datastore-id}`.
 #### Prerequisites
 - Datastore `{datastore-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="datastores/delete-a-datastore/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="datastores/delete-a-datastore/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="datastores/delete-a-datastore" />
 
 #### Response
 `204 No Content`

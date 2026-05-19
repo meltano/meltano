@@ -3,9 +3,8 @@ title: Members
 description: Matatika Members resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Members are users that belong to a particular [workspace](workspaces). Every member is derived from a corresponding [profile](profiles#profile), inheriting its `id` and `name`. Within the scope of a workspace, each member is visible to one another, so operating with a reduced property set allows for enhanced data security.
 
@@ -39,16 +38,7 @@ Returns all members of the workspace `{workspace-id}`.
 
 - The user must be a member of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/view-all-members-of-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/view-all-members-of-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/view-all-members-of-a-workspace" />
 
 #### Response
 `200 OK`
@@ -69,16 +59,7 @@ Returns the member `{member-id}` of the workspace `{workspace-id}`.
 
 - The user must be a member of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/view-a-member-of-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/view-a-member-of-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/view-a-member-of-a-workspace" />
 
 #### Response
 `200 OK`

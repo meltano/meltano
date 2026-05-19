@@ -3,9 +3,8 @@ title: Administrators
 description: Matatika Administrators resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Administrators are types of [members](members) with delegated [workspace](workspaces) management permissions, equivalent to those held by the workspace owner.
 
@@ -38,16 +37,7 @@ Returns all administrators of the workspace `{workspace-id}`.
 #### Prerequisites
 - The user must be a member of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/view-all-administrators-of-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/view-all-administrators-of-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/view-all-administrators-of-a-workspace" />
 
 #### Response
 `200 OK`
@@ -68,16 +58,7 @@ Adds the profile `{profile-id}` as an administrator to the workspace `{workspace
 - The authenticated user profile must be the owner of the workspace `{workspace-id}`
 - The profile `{profile-id}` must be a [member](members) of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/add-an-administrator-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/add-an-administrator-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/add-an-administrator-to-a-workspace" />
 
 #### Response
 `200 OK`
@@ -98,16 +79,7 @@ Withdraws the profile `{profile-id}` as an administrator from the workspace `{wo
 - The authenticated user profile must be the owner of the workspace `{workspace-id}`
 - The profile `{profile-id}` must be an administrator of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="workspaces/withdraw-an-administrator-from-a-workspace" />
 
 #### Response
 `200 OK`

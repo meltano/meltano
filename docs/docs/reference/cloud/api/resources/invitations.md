@@ -3,9 +3,8 @@ title: Invitations
 description: Matatika Invitations resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Invitations allow access to private workspaces. When an invitation is created, an email containing an access link to the workspace will be sent to the recipient. Invitations can be sent to email addresses under the allowed domains configured for a workspace.
 
@@ -51,16 +50,7 @@ Value | Description
 
 Returns all invitations sent by the authenticated user profile.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/view-all-sent-invitations/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/view-all-sent-invitations/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/view-all-sent-invitations" />
 
 #### Response
 `200 OK`
@@ -77,16 +67,7 @@ Returns all invitations sent by the authenticated user profile.
 
 Returns all invitations received by the authenticated user profile.
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/view-all-received-invitations/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/view-all-received-invitations/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/view-all-received-invitations" />
 
 #### Response
 `200 OK`
@@ -113,16 +94,7 @@ Returns all active invitations to the workspace `{workspace-id}` sent by the aut
 
 - The user must be a member of the workspace `{workspace-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/view-all-invitations-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/view-all-invitations-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/view-all-invitations-to-a-workspace" />
 
 #### Response
 `200 OK`
@@ -143,21 +115,13 @@ Creates an invitation to the workspace `{workspace-id}`.
 
 - The user must be a member of the workspace `{workspace-id}`
 
-#### Request
 
-##### Body
+#### Body
 [Invitation](#invitation) resource.
 <Snippet path="invitations/create-an-invitation-to-a-workspace/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/create-an-invitation-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/create-an-invitation-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/create-an-invitation-to-a-workspace" />
 
 #### Response
 `202 Accepted`
@@ -178,16 +142,7 @@ Accepts the invitation `{invitation-id}`.
 - Workspace `{workspace-id}` must exist
 - Invitation `{invitation-id}` must exist for the authenticated user profile
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/accept-an-invitation/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/accept-an-invitation/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/accept-an-invitation" />
 
 #### Response
 `200 OK`
@@ -209,16 +164,7 @@ Deletes a pending or revoked invitation `{invitation-id}`.
 - The authenticated user must be the owner of workspace the invitation belongs to
 - or the authenticated user must have sent the invitation `{invitation-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/delete-an-invitation-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/delete-an-invitation-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/delete-an-invitation-to-a-workspace" />
 
 #### Response
 `204 No Content`
@@ -239,16 +185,7 @@ Withdraws the pending or accepted invitation `{invitation-id}`.
 - The authenticated user must be the owner of workspace the invitation belongs to
 - or the authenticated user must have sent the invitation `{invitation-id}`
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="invitations/withdraw-an-invitation-to-a-workspace/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="invitations/withdraw-an-invitation-to-a-workspace/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="invitations/withdraw-an-invitation-to-a-workspace" />
 
 #### Response
 `200 OK`

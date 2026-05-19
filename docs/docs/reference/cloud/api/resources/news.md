@@ -19,8 +19,7 @@ Returns the news for the workspace `{workspace-id}`.
 
 Unlike [View all notifications](notifications#view-all-notifications), this returns all notifications triggered by subscriptions configured for both the workspace and authenticated user profile.
 
-#### Request
-##### Query Parameters
+#### Query Parameters
 
 Parameter | Required | Format | Default Value | Description
 --------- | -------- | ------ | ------------- | -----------

@@ -3,9 +3,8 @@ title: Comments
 description: Matatika Comments resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 Comments aid conversation and collaboration around workspace datasets. Comments can be made on datasets, or other comments to form threads.
 
@@ -46,16 +45,7 @@ Returns all comments on the dataset `{dataset-id}`.
 
 - Dataset `{dataset-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/view-all-comments-on-a-dataset/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/view-all-comments-on-a-dataset/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/view-all-comments-on-a-dataset" />
 
 #### Response
 `200 OK`
@@ -76,16 +66,7 @@ Returns the comment `{comment-id}`.
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/view-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/view-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/view-a-comment" />
 
 #### Response
 `200 OK`
@@ -106,16 +87,7 @@ Returns the edit history of the comment `{comment-id}`.
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/view-the-edit-history-of-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/view-the-edit-history-of-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/view-the-edit-history-of-a-comment" />
 
 #### Response
 `200 OK`
@@ -135,16 +107,7 @@ Returns all replies to the comment `{comment-id}`.
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/view-all-replies-to-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/view-all-replies-to-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/view-all-replies-to-a-comment" />
 
 #### Response
 `200 OK`
@@ -165,16 +128,7 @@ Initialises a new comment on the dataset `{dataset-id}`.
 
 - Dataset `{dataset-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/initialise-a-comment-on-a-dataset/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/initialise-a-comment-on-a-dataset/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/initialise-a-comment-on-a-dataset" />
 
 #### Response
 `200 OK`
@@ -195,16 +149,7 @@ Initialises a new reply comment to the comment `{comment-id}`.
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/initialise-a-reply-to-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/initialise-a-reply-to-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/initialise-a-reply-to-a-comment" />
 
 #### Response
 `200 OK`
@@ -226,20 +171,12 @@ Creates the comment `{comment-id}`.
 - The comment must have been initialised in order to create it
 - The target dataset `{dataset-id}` or comment `{comment-id}` must exist
 
-#### Request
-##### Body
+#### Body
 [Comment](#comment) resource.
 <Snippet path="comments/create-a-comment/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/create-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/create-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/create-a-comment" />
 
 #### Response
 `201 Created`
@@ -260,20 +197,12 @@ Updates the comment `{comment-id}`.
 
 - Comment `{comment-id}` must exist
 
-#### Request
-##### Body
+#### Body
 [Comment](#comment) resource.
 <Snippet path="comments/update-a-comment/request-body.md" />
 
 
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/view-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/view-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/view-a-comment" />
 
 #### Response
 `200 OK`
@@ -294,16 +223,7 @@ Records a like of the comment `{comment-id}` from the authenticated user profile
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/record-a-like-of-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/record-a-like-of-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/record-a-like-of-a-comment" />
 
 #### Response
 `200 OK`
@@ -323,16 +243,7 @@ Removes a like of the comment `{comment-id}` from the authenticated user profile
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/remove-a-like-from-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/remove-a-like-from-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/remove-a-like-from-a-comment" />
 
 #### Response
 `204 No Content`
@@ -352,16 +263,7 @@ Deletes the comment `{comment-id}`.
 
 - Comment `{comment-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="comments/delete-a-comment/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="comments/delete-a-comment/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="comments/delete-a-comment" />
 
 #### Response
 `204 No Content`

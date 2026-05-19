@@ -3,9 +3,8 @@ title: Search
 description: Matatika Search resource reference documentation
 ---
 
+import Examples from '@site/src/components/Examples';
 import Snippet from '@site/src/components/Snippet';
-import TabItem from '@theme/TabItem';
-import Tabs from '@theme/Tabs';
 
 [Datasets](datasets#dataset) can be searched for within their containing [workspace](workspaces). Searches can filter datasets by arbitrary text, [channel](channels) name, or [tag](tags) name.
 
@@ -26,16 +25,7 @@ Searches the workspace `{workspace-id}` for datasets by the free text `{free-tex
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="search/search-for-datasets-in-a-workspace-by-free-text/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="search/search-for-datasets-in-a-workspace-by-free-text/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="search/search-for-datasets-in-a-workspace-by-free-text" />
 
 #### Response
 `200 OK`
@@ -58,16 +48,7 @@ Searches the workspace `{workspace-id}` for datasets by the channel `{channel-na
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="search/search-for-datasets-in-a-workspace-by-channel-name/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="search/search-for-datasets-in-a-workspace-by-channel-name/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="search/search-for-datasets-in-a-workspace-by-channel-name" />
 
 #### Response
 `200 OK`
@@ -91,16 +72,7 @@ Searches the workspace `{workspace-id}` for datasets by the tag `{tag-name}`.
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="search/search-for-datasets-in-a-workspace-by-tag-name/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="search/search-for-datasets-in-a-workspace-by-tag-name/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="search/search-for-datasets-in-a-workspace-by-tag-name" />
 
 #### Response
 `200 OK`
@@ -123,16 +95,7 @@ Searches the workspace `{workspace-id}` for datasets using an elastic search que
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
 
-#### Request
-
-<Tabs className="meltano-tabs" queryString="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
-    <Snippet path="search/msearch-in-a-workspace-by-free-text/curl-request.md" />
-  </TabItem>
-  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
-    <Snippet path="search/msearch-in-a-workspace-by-free-text/python-requests.md" />
-  </TabItem>
-</Tabs>
+<Examples path="search/msearch-in-a-workspace-by-free-text" />
 
 #### Response
 `200 OK`
