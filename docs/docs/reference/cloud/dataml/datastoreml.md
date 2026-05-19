@@ -1,6 +1,7 @@
 ---
 title: DatastoreML
 description: Reference documentation for data store definition model.
+sidebar_position: 4
 ---
 
 Reference documentation for interfaces to services that store data.

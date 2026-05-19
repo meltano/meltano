@@ -1,6 +1,7 @@
 ---
 title: meltano.yml
 description: Reference documentation for meltano.yml
+sidebar_position: 6
 ---
 
 Reference documentation for Meltano files.

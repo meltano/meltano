@@ -1,6 +1,7 @@
 ---
 title: PipelineML
 description: Reference documentation for pipeline definition model.
+sidebar_position: 5
 ---
 
 Reference documentation for orchestration actions that import and process data.

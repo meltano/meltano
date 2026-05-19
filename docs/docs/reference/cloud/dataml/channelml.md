@@ -1,6 +1,7 @@
 ---
 title: ChannelML
 description: Reference documentation for channel definition model.
+sidebar_position: 2
 ---
 
 Examples and reference documentation for organising your datasets into channels.

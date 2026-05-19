@@ -1,6 +1,7 @@
 ---
 title: WorkspaceML
 description: Reference documentation for workspace definition model.
+sidebar_position: 1
 ---
 
 import Tabs from '@theme/Tabs';

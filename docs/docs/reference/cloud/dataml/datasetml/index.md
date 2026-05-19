@@ -1,6 +1,7 @@
 ---
 title: DatasetML
 description: Reference documentation for dataset definition model.
+sidebar_position: 3
 ---
 
 Examples and reference documentation for datasets and visualisation.
