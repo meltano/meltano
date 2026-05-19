@@ -1,6 +1,7 @@
 ---
 title: Profiles
 description: Meltano Cloud profiles resource reference documentation
+sidebar_position: 2
 ---
 
 import Examples from '@site/src/components/Examples';

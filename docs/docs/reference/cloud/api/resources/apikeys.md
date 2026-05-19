@@ -1,6 +1,7 @@
 ---
 title: API Keys
 description: Meltano Cloud API keys resource reference documentation
+sidebar_position: 22
 ---
 
 import Examples from '@site/src/components/Examples';

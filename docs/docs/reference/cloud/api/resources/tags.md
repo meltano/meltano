@@ -1,6 +1,7 @@
 ---
 title: Tags
 description: Meltano Cloud tags resource reference documentation
+sidebar_position: 11
 ---
 
 import Examples from '@site/src/components/Examples';

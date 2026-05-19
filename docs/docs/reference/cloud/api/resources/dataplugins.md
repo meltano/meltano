@@ -1,6 +1,7 @@
 ---
 title: Dataplugins
 description: Meltano Cloud resource reference documentation
+sidebar_position: 15
 ---
 
 import Examples from '@site/src/components/Examples';

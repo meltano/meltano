@@ -1,6 +1,7 @@
 ---
 title: Members
 description: Meltano Cloud members resource reference documentation
+sidebar_position: 6
 ---
 
 import Examples from '@site/src/components/Examples';

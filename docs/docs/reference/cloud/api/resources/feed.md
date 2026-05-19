@@ -1,6 +1,7 @@
 ---
 title: Feed
 description: Meltano Cloud feed resource reference documentation
+sidebar_position: 13
 ---
 
 import Examples from '@site/src/components/Examples';

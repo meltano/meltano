@@ -1,6 +1,7 @@
 ---
 title: Jobs
 description: Meltano Cloud jobs resource reference documentation
+sidebar_position: 19
 ---
 
 import Examples from '@site/src/components/Examples';

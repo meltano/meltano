@@ -1,6 +1,7 @@
 ---
 title: Search
 description: Meltano Cloud search resource reference documentation
+sidebar_position: 12
 ---
 
 import Examples from '@site/src/components/Examples';

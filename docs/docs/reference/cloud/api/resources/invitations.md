@@ -1,6 +1,7 @@
 ---
 title: Invitations
 description: Meltano Cloud invitations resource reference documentation
+sidebar_position: 4
 ---
 
 import Examples from '@site/src/components/Examples';

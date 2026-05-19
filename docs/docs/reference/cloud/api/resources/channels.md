@@ -1,6 +1,7 @@
 ---
 title: Channels
 description: Meltano Cloud channels resource reference documentation
+sidebar_position: 7
 ---
 
 import Examples from '@site/src/components/Examples';

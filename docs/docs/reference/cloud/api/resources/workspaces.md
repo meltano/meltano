@@ -1,6 +1,7 @@
 ---
 title: Workspaces
 description: Meltano Cloud workspaces resource reference documentation
+sidebar_position: 3
 ---
 
 import Examples from '@site/src/components/Examples';

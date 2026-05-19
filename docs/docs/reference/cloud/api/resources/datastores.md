@@ -1,6 +1,7 @@
 ---
 title: Datastores
 description: Meltano Cloud datastores resource reference documentation
+sidebar_position: 17
 ---
 
 import Examples from '@site/src/components/Examples';

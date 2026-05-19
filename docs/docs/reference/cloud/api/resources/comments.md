@@ -1,6 +1,7 @@
 ---
 title: Comments
 description: Meltano Cloud comments resource reference documentation
+sidebar_position: 10
 ---
 
 import Examples from '@site/src/components/Examples';

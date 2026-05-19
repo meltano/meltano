@@ -1,6 +1,7 @@
 ---
 title: Datacomponents
 description: Meltano Cloud datacomponents resource reference documentation
+sidebar_position: 16
 ---
 
 import Examples from '@site/src/components/Examples';

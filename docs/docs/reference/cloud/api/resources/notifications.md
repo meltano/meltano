@@ -1,6 +1,7 @@
 ---
 title: Notifications
 description: Meltano Cloud notifications resource reference documentation
+sidebar_position: 21
 ---
 
 import Examples from '@site/src/components/Examples';

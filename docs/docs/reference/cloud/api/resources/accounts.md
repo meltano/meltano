@@ -1,6 +1,7 @@
 ---
 title: Accounts
 description: Meltano Cloud accounts resource reference documentation
+sidebar_position: 1
 ---
 
 Accounts are passive entities that store quota information for resources consumed by associated [profiles](profiles). An account is created for a user when they first sign up.

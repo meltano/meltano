@@ -1,6 +1,7 @@
 ---
 title: Deployments
 description: Meltano Cloud deployments resource reference documentation
+sidebar_position: 23
 ---
 
 import Examples from '@site/src/components/Examples';

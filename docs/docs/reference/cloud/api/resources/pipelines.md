@@ -1,6 +1,7 @@
 ---
 title: Pipelines
 description: Meltano Cloud pipelines resource reference documentation
+sidebar_position: 18
 ---
 
 import Examples from '@site/src/components/Examples';

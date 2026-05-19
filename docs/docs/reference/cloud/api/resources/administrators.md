@@ -1,6 +1,7 @@
 ---
 title: Administrators
 description: Meltano Cloud administrators resource reference documentation
+sidebar_position: 5
 ---
 
 import Examples from '@site/src/components/Examples';

@@ -2,6 +2,7 @@
 title: Resources
 description: Meltano Cloud resources resource reference documentation
 slug: resources
+sidebar_position: 24
 ---
 
 import Examples from '@site/src/components/Examples'

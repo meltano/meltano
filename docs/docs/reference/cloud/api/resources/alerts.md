@@ -1,6 +1,7 @@
 ---
 title: Alerts
 description: Meltano Cloud API alerts resource reference documentation
+sidebar_position: 9
 ---
 
 import Examples from '@site/src/components/Examples';

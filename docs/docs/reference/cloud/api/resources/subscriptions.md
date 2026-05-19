@@ -1,6 +1,7 @@
 ---
 title: Subscriptions
 description: Meltano Cloud subscriptions resource reference documentation
+sidebar_position: 20
 ---
 
 import Examples from '@site/src/components/Examples';

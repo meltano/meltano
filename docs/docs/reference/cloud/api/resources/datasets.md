@@ -1,6 +1,7 @@
 ---
 title: Datasets
 description: Meltano Cloud datasets resource reference documentation
+sidebar_position: 8
 ---
 
 import Examples from '@site/src/components/Examples';
