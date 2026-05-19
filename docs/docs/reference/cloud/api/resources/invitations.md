@@ -52,18 +52,14 @@ Value | Description
 Returns all invitations sent by the authenticated user profile.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/view-all-sent-invitations/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/view-all-sent-invitations/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/view-all-sent-invitations/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/view-all-sent-invitations/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -82,18 +78,14 @@ Returns all invitations sent by the authenticated user profile.
 Returns all invitations received by the authenticated user profile.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/view-all-received-invitations/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/view-all-received-invitations/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/view-all-received-invitations/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/view-all-received-invitations/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -122,18 +114,14 @@ Returns all active invitations to the workspace `{workspace-id}` sent by the aut
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/view-all-invitations-to-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/view-all-invitations-to-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/view-all-invitations-to-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/view-all-invitations-to-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -161,18 +149,14 @@ Creates an invitation to the workspace `{workspace-id}`.
 [Invitation](#invitation) resource.
 <Snippet path="invitations/create-an-invitation-to-a-workspace/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/create-an-invitation-to-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/create-an-invitation-to-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/create-an-invitation-to-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/create-an-invitation-to-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -195,18 +179,14 @@ Accepts the invitation `{invitation-id}`.
 - Invitation `{invitation-id}` must exist for the authenticated user profile
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/accept-an-invitation/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/accept-an-invitation/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/accept-an-invitation/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/accept-an-invitation/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -230,18 +210,14 @@ Deletes a pending or revoked invitation `{invitation-id}`.
 - or the authenticated user must have sent the invitation `{invitation-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/delete-an-invitation-to-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/delete-an-invitation-to-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/delete-an-invitation-to-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/delete-an-invitation-to-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -264,18 +240,14 @@ Withdraws the pending or accepted invitation `{invitation-id}`.
 - or the authenticated user must have sent the invitation `{invitation-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="invitations/withdraw-an-invitation-to-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="invitations/withdraw-an-invitation-to-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="invitations/withdraw-an-invitation-to-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="invitations/withdraw-an-invitation-to-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

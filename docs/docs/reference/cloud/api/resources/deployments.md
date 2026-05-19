@@ -24,18 +24,14 @@ This can be done manually or via a GitHub Webhook which you can see how to set u
 Deploys the workspace `{workspace-id}`.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="deployment/deploy-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="deployment/deploy-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="deployment/deploy-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="deployment/deploy-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -55,18 +51,14 @@ Deploys the workspace `{workspace-id}`.
 Receives `POST` requests from GitHub and starts a workspace deploy job.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="deployment/github-webhook-deploy/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="deployment/github-webhook-deploy/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="deployment/github-webhook-deploy/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="deployment/github-webhook-deploy/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

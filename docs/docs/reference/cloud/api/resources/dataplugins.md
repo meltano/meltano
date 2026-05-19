@@ -79,18 +79,14 @@ Value | Description
 Returns all dataplugins supported by Matatika.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/view-all-supported-dataplugins/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/view-all-supported-dataplugins/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/view-all-supported-dataplugins/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/view-all-supported-dataplugins/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -109,18 +105,14 @@ Returns all dataplugins supported by Matatika.
 Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins supported by Matatika.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/view-the-matatika-discovery-yml/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/view-the-matatika-discovery-yml/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/view-the-matatika-discovery-yml/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/view-the-matatika-discovery-yml/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -142,18 +134,14 @@ Returns all dataplugins available to the workspace `{workspace-id}`.
 - Workspace `{workspace-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/view-all-workspace-dataplugins/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/view-all-workspace-dataplugins/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/view-all-workspace-dataplugins/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/view-all-workspace-dataplugins/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -175,18 +163,14 @@ Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#
 - Workspace `{workspace-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/view-a-workspace-discovery-yml/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/view-a-workspace-discovery-yml/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/view-a-workspace-discovery-yml/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/view-a-workspace-discovery-yml/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -208,18 +192,14 @@ Returns the dataplugin `{dataplugin-id}`.
 - Dataplugin `{dataplugin-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/view-a-dataplugin/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/view-a-dataplugin/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/view-a-dataplugin/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/view-a-dataplugin/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -238,18 +218,14 @@ Returns the dataplugin `{dataplugin-id}`.
 Initialises a new dataplugin.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/initialise-a-new-dataplugin/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/initialise-a-new-dataplugin/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/initialise-a-new-dataplugin/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/initialise-a-new-dataplugin/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -276,18 +252,14 @@ Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/
 [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url)
 <Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -310,18 +282,14 @@ Creates the dataplugin `{dataplugin-id}`.
 [Dataplugin](#dataplugin) resource.
 <Snippet path="dataplugins/create-a-dataplugin/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/create-a-dataplugin/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/create-a-dataplugin/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/create-a-dataplugin/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/create-a-dataplugin/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -353,18 +321,14 @@ Path | JSON Type | Format | Description | Constraints
 `repositoryUrl` | `string` | | A URL to the dataplugin repository | 
 `settings` | `object[]` | Array of [`Setting`](#setting)s | The dataplugin settings |
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/update-a-dataplugin/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/update-a-dataplugin/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/update-a-dataplugin/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/update-a-dataplugin/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -383,18 +347,14 @@ Path | JSON Type | Format | Description | Constraints
 Deletes the dataplugin `{dataplugin-id}`.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="dataplugins/delete-a-dataplugin/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="dataplugins/delete-a-dataplugin/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="dataplugins/delete-a-dataplugin/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="dataplugins/delete-a-dataplugin/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

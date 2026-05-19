@@ -71,18 +71,14 @@ Returns all running or completed jobs for the workspace `{workspace-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -105,18 +101,14 @@ Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -139,18 +131,14 @@ Returns the job `{job-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/view-a-job/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/view-a-job/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/view-a-job/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/view-a-job/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -186,18 +174,14 @@ Media Type(s) | Description
 `text/plain` `*/*` | Sets the response content type format to plain text
 `application/stream+json` `application/x-ndjson` | Sets the response content type format to [NDJSON](http://ndjson.org/)
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/view-the-logs-of-a-job-as-json/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/view-the-logs-of-a-job-as-json/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/view-the-logs-of-a-job-as-json/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/view-the-logs-of-a-job-as-json/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -221,18 +205,14 @@ Creates a new job from the pipeline `{pipeline-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/create-a-job-from-a-pipeline/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/create-a-job-from-a-pipeline/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/create-a-job-from-a-pipeline/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/create-a-job-from-a-pipeline/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -256,18 +236,14 @@ Stops the execution of the job `{job-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/stop-a-job/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/stop-a-job/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/stop-a-job/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/stop-a-job/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -288,18 +264,14 @@ Deletes and stops the execution of the job `{job-id}`.
 #### Prerequisites
 - Job `{job-id}` must exist
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="jobs/delete-a-job/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="jobs/delete-a-job/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="jobs/delete-a-job/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="jobs/delete-a-job/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

@@ -63,18 +63,14 @@ Parameter | Required | Format | Default Value | Description
 `before` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to return any notifications created before
 `since` | No | ISO 8601 timestamp | `2021-02-11T11:12` | The instant to return any notifications created since
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="notifications/view-all-notifications/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="notifications/view-all-notifications/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="notifications/view-all-notifications/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="notifications/view-all-notifications/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -104,18 +100,14 @@ Parameter | Required | Format | Default Value | Description
 `before` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to return any notifications created before
 `since` | No | ISO 8601 timestamp | `2021-02-11T11:12` | The instant to return any notifications created since
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="notifications/view-all-notifications-for-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="notifications/view-all-notifications-for-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="notifications/view-all-notifications-for-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="notifications/view-all-notifications-for-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -137,18 +129,14 @@ Returns the notification `{notification-id}`.
 - Notification `{notification-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="notifications/view-a-notification/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="notifications/view-a-notification/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="notifications/view-a-notification/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="notifications/view-a-notification/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -174,18 +162,14 @@ Parameter | Required | Format | Default Value | Description
 `since` | No | ISO 8601 timestamp | The instant at which the request was made | The instant to fetch any new notifications from
 `markAsResolved` | No | Boolean | `true` | Whether or not to mark notifications created up to `since` as resolved
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="notifications/refresh-notifications/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="notifications/refresh-notifications/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="notifications/refresh-notifications/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="notifications/refresh-notifications/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -207,18 +191,14 @@ Deletes the notification `{notification-id}`.
 - Notification `{notification-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="notifications/delete-a-notification/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="notifications/delete-a-notification/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="notifications/delete-a-notification/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="notifications/delete-a-notification/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

@@ -82,18 +82,14 @@ Returns all configured pipelines in the workspace `{workspace-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/view-all-pipelines-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/view-all-pipelines-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/view-all-pipelines-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/view-all-pipelines-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -116,18 +112,14 @@ Returns the pipeline `{pipeline-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/view-a-pipeline/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/view-a-pipeline/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/view-a-pipeline/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/view-a-pipeline/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -150,18 +142,14 @@ Initialises a new pipeline in the workspace `{workspace-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -188,18 +176,14 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 [Pipeline](#pipeline) resource.
 <Snippet path="pipelines/create-a-pipeline-in-a-workspace/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/create-a-pipeline-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/create-a-pipeline-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/create-a-pipeline-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/create-a-pipeline-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -226,18 +210,14 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 [Pipeline](#pipeline) resource.
 <Snippet path="pipelines/create-a-pipeline-as-a-draft/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/create-a-pipeline-as-a-draft/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/create-a-pipeline-as-a-draft/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/create-a-pipeline-as-a-draft/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/create-a-pipeline-as-a-draft/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -264,18 +244,14 @@ Validates a pipeline configuration in the workspace `{workspace-id}`.
 [Pipeline](#pipeline) resource.
 <Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -302,18 +278,14 @@ Verifies the configuration of the pipeline `{pipeline-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/verify-a-pipeline/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/verify-a-pipeline/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/verify-a-pipeline/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/verify-a-pipeline/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -336,18 +308,14 @@ Deletes the pipeline `{pipeline-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/delete-a-pipeline/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/delete-a-pipeline/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/delete-a-pipeline/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/delete-a-pipeline/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -369,18 +337,14 @@ Returns the pipeline metrics for each job of `{pipeline-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="pipelines/view-the-pipeline-metrics-data/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="pipelines/view-the-pipeline-metrics-data/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="pipelines/view-the-pipeline-metrics-data/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="pipelines/view-the-pipeline-metrics-data/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

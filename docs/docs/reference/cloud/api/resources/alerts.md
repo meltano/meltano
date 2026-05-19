@@ -26,18 +26,14 @@ Initialises a new alert on a dataset.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="alerts/initialise-an-alert-on-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="alerts/initialise-an-alert-on-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="alerts/initialise-an-alert-on-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="alerts/initialise-an-alert-on-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -60,18 +56,14 @@ Create a new alert on a dataset.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="alerts/create-an-alert-on-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="alerts/create-an-alert-on-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="alerts/create-an-alert-on-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="alerts/create-an-alert-on-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -94,18 +86,14 @@ View alerts on a dataset.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="alerts/view-alerts-on-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="alerts/view-alerts-on-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="alerts/view-alerts-on-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="alerts/view-alerts-on-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -128,18 +116,14 @@ View an alert.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="alerts/view-an-alert/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="alerts/view-an-alert/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="alerts/view-an-alert/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="alerts/view-an-alert/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

@@ -91,18 +91,14 @@ Returns all datacomponents in the workspace `{workspace-id}`.
 - Workspace `{workspace-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -124,18 +120,14 @@ Returns the datacomponent `{datacomponent-id}`.
 - Datacomponent `{datacomponent-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datacomponents/view-a-datacomponent/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datacomponents/view-a-datacomponent/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datacomponents/view-a-datacomponent/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datacomponents/view-a-datacomponent/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -154,18 +146,14 @@ Returns the datacomponent `{datacomponent-id}`.
 Initialises a new datacomponent in the workspace `{workspace-id}`.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -188,18 +176,14 @@ Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{wor
 [Datacomponent](#datacomponent) resource.
 <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -225,18 +209,14 @@ Updates the datacomponent `{datacomponent-id}`.
 [Datacomponent](#datacomponent) resource.
 <Snippet path="datacomponents/update-a-datacomponent/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datacomponents/update-a-datacomponent/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datacomponents/update-a-datacomponent/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datacomponents/update-a-datacomponent/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datacomponents/update-a-datacomponent/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -255,18 +235,14 @@ Updates the datacomponent `{datacomponent-id}`.
 Deletes the datacomponent `{datacomponent-id}`.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datacomponents/delete-a-datacomponent/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datacomponents/delete-a-datacomponent/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datacomponents/delete-a-datacomponent/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datacomponents/delete-a-datacomponent/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

@@ -39,18 +39,14 @@ Returns all administrators of the workspace `{workspace-id}`.
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="workspaces/view-all-administrators-of-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="workspaces/view-all-administrators-of-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="workspaces/view-all-administrators-of-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="workspaces/view-all-administrators-of-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -73,18 +69,14 @@ Adds the profile `{profile-id}` as an administrator to the workspace `{workspace
 - The profile `{profile-id}` must be a [member](members) of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="workspaces/add-an-administrator-to-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="workspaces/add-an-administrator-to-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="workspaces/add-an-administrator-to-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="workspaces/add-an-administrator-to-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -107,18 +99,14 @@ Withdraws the profile `{profile-id}` as an administrator from the workspace `{wo
 - The profile `{profile-id}` must be an administrator of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="workspaces/withdraw-an-administrator-from-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

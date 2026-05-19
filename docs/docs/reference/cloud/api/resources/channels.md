@@ -41,18 +41,14 @@ Path | JSON Type | Format | Description
 Initialise a channel.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/initialise-a-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/initialise-a-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/initialise-a-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/initialise-a-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -74,18 +70,14 @@ Returns the channel `{channel-id}`.
 - Channel `{channel-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/view-a-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/view-a-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/view-a-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/view-a-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -108,18 +100,14 @@ Returns a channel in the workspace `{workspace-id}`.
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/view-a-channel-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/view-a-channel-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/view-a-channel-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/view-a-channel-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -151,18 +139,14 @@ Parameter | Required | Format | Default Value | Description
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/view-all-channels-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/view-all-channels-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/view-all-channels-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/view-all-channels-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -187,18 +171,14 @@ This endpoint takes a `{channel-id}` (UUID) and based on the supplied value and 
 - The user must be a admin in the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/create-a-channel-in-a-workspace-by-id/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/create-a-channel-in-a-workspace-by-id/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/create-a-channel-in-a-workspace-by-id/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/create-a-channel-in-a-workspace-by-id/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -220,18 +200,14 @@ Delete a channel.
 - The user must be a admin of the workspace the channel is in.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/delete-a-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/delete-a-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/delete-a-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/delete-a-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -249,18 +225,14 @@ No response body provided.
 Returns all channels in your news for the workspace.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/channels-in-news/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/channels-in-news/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/channels-in-news/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/channels-in-news/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -279,18 +251,14 @@ Returns all channels in your news for the workspace.
 Adds a dataset to a channel with type list.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/add-dataset-to-list-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/add-dataset-to-list-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/add-dataset-to-list-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/add-dataset-to-list-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -308,18 +276,14 @@ No response body provided.
 Removes a dataset from a channel with type list.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/remove-dataset-from-list-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/remove-dataset-from-list-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/remove-dataset-from-list-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/remove-dataset-from-list-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -337,18 +301,14 @@ No response body provided.
 Add workspace scope to a channel.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/add-workspace-scope-to-a-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/add-workspace-scope-to-a-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/add-workspace-scope-to-a-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/add-workspace-scope-to-a-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -367,18 +327,14 @@ Add workspace scope to a channel.
 Withdraw workspace scope from a channel.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="channels/withdraw-workspace-scope-from-a-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="channels/withdraw-workspace-scope-from-a-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="channels/withdraw-workspace-scope-from-a-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="channels/withdraw-workspace-scope-from-a-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

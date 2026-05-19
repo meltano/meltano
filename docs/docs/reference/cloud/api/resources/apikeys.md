@@ -44,18 +44,14 @@ Returns all API keys owned by the authenticated user profile.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="apikeys/view-all-api-keys/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="apikeys/view-all-api-keys/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="apikeys/view-all-api-keys/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="apikeys/view-all-api-keys/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -79,18 +75,14 @@ Returns the API key `{apikey-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="apikeys/view-an-api-key/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="apikeys/view-an-api-key/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="apikeys/view-an-api-key/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="apikeys/view-an-api-key/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -113,18 +105,14 @@ Initialises a new API key.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="apikeys/initialise-an-api-key/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="apikeys/initialise-an-api-key/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="apikeys/initialise-an-api-key/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="apikeys/initialise-an-api-key/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -151,18 +139,14 @@ Creates the API key `{apikey-id}`.
 [API key](#api-key) resource.
 <Snippet path="apikeys/create-an-api-key/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="apikeys/create-an-api-key/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="apikeys/create-an-api-key/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="apikeys/create-an-api-key/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="apikeys/create-an-api-key/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -189,18 +173,14 @@ Updates the API key `{apikey-id}`.
 [API key](#api-key) resource.
 <Snippet path="apikeys/update-an-api-key/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="apikeys/update-an-api-key/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="apikeys/update-an-api-key/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="apikeys/update-an-api-key/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="apikeys/update-an-api-key/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -224,18 +204,14 @@ Deletes the API key `{apikey-id}`.
 
 #### Request
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="apikeys/delete-an-api-key/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="apikeys/delete-an-api-key/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="apikeys/delete-an-api-key/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="apikeys/delete-an-api-key/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

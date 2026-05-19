@@ -31,18 +31,14 @@ Returns the feed of the workspace `{workspace-id}`.
 - Workspace `{workspace-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="feed/view-a-workspace-feed/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="feed/view-a-workspace-feed/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="feed/view-a-workspace-feed/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="feed/view-a-workspace-feed/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

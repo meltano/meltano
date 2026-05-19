@@ -40,18 +40,14 @@ Returns all members of the workspace `{workspace-id}`.
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="workspaces/view-all-members-of-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="workspaces/view-all-members-of-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="workspaces/view-all-members-of-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="workspaces/view-all-members-of-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -74,18 +70,14 @@ Returns the member `{member-id}` of the workspace `{workspace-id}`.
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="workspaces/view-a-member-of-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="workspaces/view-a-member-of-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="workspaces/view-a-member-of-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="workspaces/view-a-member-of-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

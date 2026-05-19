@@ -39,18 +39,14 @@ Path | JSON Type | Format | Description
 Returns all profiles under the authenticated user account.
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="profiles/view-all-profiles/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="profiles/view-all-profiles/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="profiles/view-all-profiles/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="profiles/view-all-profiles/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -73,18 +69,14 @@ Returns the profile `{profile-id}`.
 - Profile `{profile-id}` must exist under the authenticated user account
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="profiles/view-a-profile/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="profiles/view-a-profile/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="profiles/view-a-profile/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="profiles/view-a-profile/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -112,18 +104,14 @@ Creates or updates the user profile.
 [Profile](#profile) resource.
 <Snippet path="profiles/update-a-profile/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="profiles/update-a-profile/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="profiles/update-a-profile/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="profiles/update-a-profile/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="profiles/update-a-profile/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -152,18 +140,14 @@ A workspace can be set as default, which defines the environment the Matatika ap
 [Profile](#profile) resource.
 <Snippet path="profiles/set-a-workspace-as-default/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="profiles/set-a-workspace-as-default/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="profiles/set-a-workspace-as-default/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="profiles/set-a-workspace-as-default/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="profiles/set-a-workspace-as-default/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response

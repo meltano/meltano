@@ -66,18 +66,14 @@ Returns all datasets in the workspace `{workspace-id}`.
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/view-all-datasets-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/view-all-datasets-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/view-all-datasets-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/view-all-datasets-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -100,18 +96,14 @@ Returns all datasets in the workspace `{workspace-id}` liked by the authenticate
 - The user must be a member of the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -134,18 +126,14 @@ Returns datasets by the channel `{channel-id}`.
 - Channel `{channel-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/view-datasets-by-channel/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/view-datasets-by-channel/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/view-datasets-by-channel/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/view-datasets-by-channel/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -167,18 +155,14 @@ Returns the dataset `{dataset-id}`.
 - Dataset `{dataset-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/view-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/view-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/view-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/view-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -202,18 +186,14 @@ Returns the dataset `{dataset-id-or-alias}` in the workspace `{workspace-id}`.
 - Dataset `{dataset-id-or-alias}` must exist within the workspace `{workspace-id}`
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/view-a-dataset-in-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/view-a-dataset-in-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/view-a-dataset-in-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/view-a-dataset-in-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -245,18 +225,14 @@ Media Type(s) | Description
 
 Defaults to `application/json` (given `Accept */*` or no `Accept` header).
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/view-the-data-of-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/view-the-data-of-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/view-the-data-of-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/view-the-data-of-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -285,18 +261,14 @@ Making the request with an existing `id` or `alias` will result in the respectiv
 [Dataset](#dataset) resource.
 <Snippet path="datasets/publish-a-dataset-to-a-workspace/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/publish-a-dataset-to-a-workspace/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/publish-a-dataset-to-a-workspace/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/publish-a-dataset-to-a-workspace/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/publish-a-dataset-to-a-workspace/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -324,18 +296,14 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 
 <Snippet path="datasets/edit-a-dataset/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/edit-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/edit-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/edit-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/edit-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -358,18 +326,14 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 - Dataset `{dataset-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/record-a-view-of-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/record-a-view-of-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/record-a-view-of-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/record-a-view-of-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -391,18 +355,14 @@ Records a like of the dataset `{dataset-id}` from the authenticated user profile
 - Dataset `{dataset-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/record-a-like-of-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/record-a-like-of-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/record-a-like-of-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/record-a-like-of-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -424,18 +384,14 @@ Removes a like of the dataset `{dataset-id}` from the authenticated user profile
 - Dataset `{dataset-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/remove-a-like-from-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/remove-a-like-from-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/remove-a-like-from-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/remove-a-like-from-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -456,18 +412,14 @@ Initialises a new dataset message for the dataset `{dataset-id}`
 - Dataset `{dataset-id}` must exist
 
 #### Requests
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/initialise-a-new-dataset-message/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/initialise-a-new-dataset-message/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/initialise-a-new-dataset-message/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/initialise-a-new-dataset-message/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -493,18 +445,14 @@ Creates or updates the dataset message `{message-id}` for the dataset `{dataset-
 [Dataset Message](#dataset-message) resource.
 <Snippet path="datasets/create-or-update-a-dataset-message/request-body.md" />
 
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/create-or-update-a-dataset-message/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/create-or-update-a-dataset-message/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/create-or-update-a-dataset-message/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/create-or-update-a-dataset-message/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
@@ -527,18 +475,14 @@ Deletes the dataset `{dataset-id}`.
 - Dataset `{dataset-id}` must exist
 
 #### Request
-##### Example Snippets
-<Tabs>
-<TabItem value="curl" label="cURL">
 
-<Snippet path="datasets/delete-a-dataset/curl-request.md" />
-
-</TabItem>
-<TabItem value="python" label="Python (requests)">
-
-<Snippet path="datasets/delete-a-dataset/python-requests.md" />
-
-</TabItem>
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="curl" label="cURL" default>
+    <Snippet path="datasets/delete-a-dataset/curl-request.md" />
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="python" label="Python (requests)">
+    <Snippet path="datasets/delete-a-dataset/python-requests.md" />
+  </TabItem>
 </Tabs>
 
 #### Response
