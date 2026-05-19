@@ -7,7 +7,9 @@ We automatically maintain a fully-tested Postman collection for the Meltano Clou
 
 Simply import the following collection URL into Postman to begin sending requests:
 
-`{{site.matatika.links.www}}/docs/matatika.json`
+```
+https://docs.meltano.com/reference/cloud/api/meltano-cloud-postman.json
+```
 
 ---
 
