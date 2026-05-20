@@ -9,7 +9,10 @@ import Snippet from '@site/src/components/Snippet';
 
 Deployments let the user schedule a [job](jobs) to deploy the contents of their [workspace](workspaces) repository to their workspace in Meltano Cloud.
 
-This can be done manually or via a GitHub Webhook which you can see how to set up in our Quick Start Guide: [Workspace Deploy Hook]({{site.baseurl}}/how-to-guides/manage-workspaces/managing-config-from-github)
+This can be done manually or via a [GitHub repository webhook](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks#creating-a-repository-webhook):
+- Payload URL: `https://app.meltano.com/api/workspaces/<workspace_id>/deployments/github-webhook`
+- Content type: `application/json`
+- Secret: "Deployment Secret" from workspace settings in Meltano Cloud
 
 ---
 
