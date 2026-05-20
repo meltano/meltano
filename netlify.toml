@@ -7,7 +7,7 @@
   publish = "build"
 
   # Default build command.
-  command = "npm install && npm run build"
+  command = "npm install && npm run fetch-api-snippets && npm run build"
 
 [[redirects]]
   from = "http://melta.no/*"

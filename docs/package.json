@@ -7,6 +7,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "fetch-api-snippets": "node scripts/fetch-api-snippets.mjs",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
@@ -35,6 +36,9 @@
     "prism-react-renderer": "^2.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "optionalDependencies": {
+    "@azure/storage-blob": "^12.31.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.1",
