@@ -1,6 +1,7 @@
 ---
 title: Links
 description: Reference documentation for link relations used by the Meltano Cloud API to communicate the capabilities of our resources
+sidebar_position: 4
 ---
 
 The Meltano Cloud API uses link relations to communicate the capabilities of our resources.  Where you see a link with one of the following relations, you can expect our API to act accordingly provided nothing has changed in the meantime.

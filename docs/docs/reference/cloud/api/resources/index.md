@@ -1,6 +1,7 @@
 ---
 title: Resources
 description: Reference documentation for the resources available via the Meltano Cloud API
+sidebar_position: 3
 ---
 
 import DocCardList from '@theme/DocCardList';
