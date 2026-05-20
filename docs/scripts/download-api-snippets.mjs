@@ -6,12 +6,13 @@
  *   AZURE_STORAGE_CONTAINER         - blob container name
  *
  * Optional:
- *   SNIPPETS_EXCLUDE - comma-separated list of blob name prefixes to skip
+ *   SNIPPETS_EXCLUDE - comma-separated list of glob patterns to skip (supports * and **)
  */
 
 import { BlobServiceClient } from '@azure/storage-blob';
 import { access, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { minimatch } from 'minimatch';
 
 const OUTPUT_DIR = 'docs/reference/cloud/api/resources/_snippets';
 const PREFIX = 'api/';
@@ -25,14 +26,14 @@ async function main() {
   const container = process.env.AZURE_STORAGE_CONTAINER;
   if (!container) throw new Error('AZURE_STORAGE_CONTAINER is required');
 
-  const excludePrefixes = (process.env.SNIPPETS_EXCLUDE ?? '').split(',').filter(Boolean);
+  const excludeGlobs = process.env.SNIPPETS_EXCLUDE?.split(',') ?? [];
 
   const containerClient = BlobServiceClient.fromConnectionString(connStr).getContainerClient(container);
 
   const downloads = [];
 
   for await (const blob of containerClient.listBlobsFlat({ prefix: PREFIX })) {
-    if (excludePrefixes.some((p) => blob.name.startsWith(p))) {
+    if (excludeGlobs.some((p) => minimatch(blob.name, p))) {
       console.log(`  skipped: ${blob.name}`);
       continue;
     }
