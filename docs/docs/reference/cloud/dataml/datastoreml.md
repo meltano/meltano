@@ -16,7 +16,7 @@ Datastore definitions are stored as YAML file format - you can read more about t
 
 ```yaml
 version: datastores/v0.1
-data_plugin: loaders/target-snowflake--matatika
+data_plugin: loaders/target-snowflake--meltanolabs
 properties:
   max-threads: -1
 ```

@@ -18,7 +18,7 @@ Our channel files are stored as YAML files, you can read more about the YAML for
 version: channels/v0.1
 name: Google Analytics
 description: Google Analytics
-picture: https://www.matatika.com/wp-content/uploads/2020/03/google_analytics-icon.svg
+picture: /assets/images/datasource/tap-google-analytics.svg
 ```
 
 ### Key Information
