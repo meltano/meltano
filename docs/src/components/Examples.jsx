@@ -17,7 +17,7 @@ const Examples = ({ path }) => {
 
   return <>
     <h5>Examples</h5>
-    <Tabs className="meltano-tabs" queryString="meltano-tabs">
+    <Tabs className="meltano-tabs">
       {available.map(({ value, label, file }) => (
         <TabItem
           key={value}
