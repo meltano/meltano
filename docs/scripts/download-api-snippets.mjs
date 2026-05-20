@@ -4,6 +4,9 @@
  * Required env vars:
  *   AZURE_STORAGE_CONNECTION_STRING - Azure Storage connection string
  *   AZURE_STORAGE_CONTAINER         - blob container name
+ *
+ * Optional:
+ *   SNIPPETS_EXCLUDE - comma-separated list of blob name prefixes to skip
  */
 
 import { BlobServiceClient } from '@azure/storage-blob';
@@ -22,11 +25,17 @@ async function main() {
   const container = process.env.AZURE_STORAGE_CONTAINER;
   if (!container) throw new Error('AZURE_STORAGE_CONTAINER is required');
 
+  const excludePrefixes = (process.env.SNIPPETS_EXCLUDE ?? '').split(',').filter(Boolean);
+
   const containerClient = BlobServiceClient.fromConnectionString(connStr).getContainerClient(container);
 
   const downloads = [];
 
   for await (const blob of containerClient.listBlobsFlat({ prefix: PREFIX })) {
+    if (excludePrefixes.some((p) => blob.name.startsWith(p))) {
+      console.log(`  skipped: ${blob.name}`);
+      continue;
+    }
     const localPath = join(OUTPUT_DIR, blob.name.slice(PREFIX.length));
     const download = mkdir(dirname(localPath), { recursive: true })
       .then(() => containerClient.getBlobClient(blob.name).downloadToFile(localPath))
