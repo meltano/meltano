@@ -40,10 +40,10 @@ async function main() {
   }
 
   await Promise.all(downloads);
-  console.log(`Fetched ${downloads.length} snippet(s)`);
+  console.log(`Downloaded ${downloads.length} snippet(s)`);
 }
 
 main().catch((err) => {
-  console.error('fetch-api-snippets failed:', err.message);
+  console.error('download-api-snippets failed:', err.message);
   process.exit(1);
 });

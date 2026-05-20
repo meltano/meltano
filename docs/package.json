@@ -7,7 +7,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "fetch-api-snippets": "node scripts/fetch-api-snippets.mjs",
+    "download-api-snippets": "node scripts/download-api-snippets.mjs",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
