@@ -34,4 +34,4 @@ Path | JSON Type | Description
 
 Further Reading:
 
-- [Datastores API resource](/reference/cloud/api/resources/datastore)
+- [Datastores API resource](/reference/cloud/api/resources/datastores)
