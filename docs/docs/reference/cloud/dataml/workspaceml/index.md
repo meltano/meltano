@@ -4,6 +4,7 @@ description: Reference documentation for workspace definition model.
 sidebar_position: 1
 ---
 
+import DocCardList from '@theme/DocCardList';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -160,3 +161,7 @@ pipelines_image: my-workspace-image:latest-dev
 Further Reading:
 
 - [Workspaces API resource](/reference/cloud/api/resources/workspaces)
+
+---
+
+<DocCardList />

@@ -4,6 +4,8 @@ description: Reference documentation for dataset definition model.
 sidebar_position: 3
 ---
 
+import DocCardList from '@theme/DocCardList';
+
 Examples and reference documentation for datasets and visualisation.
 
 Use the dataset YAML to create and format insights in your workspace as code.
@@ -86,3 +88,7 @@ Further Reading:
 
 - [API Datasets](/reference/cloud/api/resources/datasets)
 - [Example Charts](/reference/cloud/dataml/datasetml/basic-examples)
+
+---
+
+<DocCardList />

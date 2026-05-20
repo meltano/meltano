@@ -4,6 +4,7 @@ description: Reference documentation for pipeline definition model.
 sidebar_position: 5
 ---
 
+import DocCardList from '@theme/DocCardList';
 
 Use the pipeline YAML to orchestrate data actions in your workspace as code.
 
@@ -50,3 +51,7 @@ Path | JSON Type | Description
 Further Reading:
 
 - [Pipelines API resource](/reference/cloud/api/resources/pipelines)
+
+---
+
+<DocCardList />
