@@ -431,7 +431,7 @@ def print_config(
     help=(
         "Show all settings, including optional settings at their default values. "
         "By default only required, configured, and custom settings are shown. "
-        "Has no effect when combined with --filter."
+        "Ignored when --filter is set; --filter always searches all settings."
     ),
 )
 @click.option(
@@ -545,8 +545,8 @@ def list_settings(
     for bucket in buckets:
         bucket.sort(key=lambda item: item[0])
 
-    # When filtering, the user is searching — optional-at-defaults are not
-    # hidden, the filter result IS the narrowed view.
+    # When filtering, the user is searching, so optional-at-defaults are not
+    # hidden; the filter result is the narrowed view.
     if filter_pattern is not None:
         needle = filter_pattern.lower()
         _required, _configured, _optional, _custom, _custom_extras = (
@@ -567,8 +567,8 @@ def list_settings(
             ("Custom:", _custom),
         ]
         # Preserve the historical un-headered listing when there's only an
-        # Optional bucket — adding a `Optional:` header in that case would be a
-        # gratuitous output change for `--all --extras` callers.
+        # Optional bucket (adding an `Optional:` header in that case would be
+        # a gratuitous output change for `--all --extras` callers).
         if not _configured:
             _section_defs[1] = (None, _optional)
     else:

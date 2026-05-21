@@ -523,7 +523,7 @@ class TestCliConfig:
         assert "Required:" in result.stdout
         # Optional section is hidden
         assert "Optional:" not in result.stdout
-        # `start_date` is an optional non-required setting at default — hidden
+        # `start_date` is an optional non-required setting at default (hidden)
         assert "\nstart_date" not in result.stdout
 
         # Hidden-count summary appears with the exact expected wording.
@@ -728,6 +728,49 @@ class TestCliConfig:
 
         assert "No settings match" in result.stdout
         assert "definitely-does-not-exist" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_whitespace_only_treated_as_unset(
+        self, cli_runner, tap
+    ) -> None:
+        """`--filter "   "` is normalized to no filter (default subset behavior)."""
+        result = cli_runner.invoke(cli, ["config", "list", "--filter", "   ", tap.name])
+        assert_cli_runner(result)
+
+        assert "Optional:" not in result.stdout
+        assert "Use --all to show all." in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_all_flag_ignored(self, cli_runner, tap) -> None:
+        """`--all --filter` produces the same output as `--filter` alone."""
+        filtered = cli_runner.invoke(
+            cli, ["config", "list", "--filter", "auth", tap.name]
+        )
+        assert_cli_runner(filtered)
+        filtered_with_all = cli_runner.invoke(
+            cli, ["config", "list", "--all", "--filter", "auth", tap.name]
+        )
+        assert_cli_runner(filtered_with_all)
+
+        assert filtered.stdout == filtered_with_all.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_list_filter_no_match_extras(self, cli_runner, tap) -> None:
+        """`--extras --filter` with zero matches still prints the no-match notice."""
+        result = cli_runner.invoke(
+            cli,
+            [
+                "config",
+                "list",
+                "--extras",
+                "--filter",
+                "definitely-does-not-exist",
+                tap.name,
+            ],
+        )
+        assert_cli_runner(result)
+
+        assert "No settings match" in result.stdout
 
 
 class TestRequiredLabel:
