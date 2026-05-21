@@ -99,6 +99,7 @@ Returns all datacomponents in the workspace `{workspace-id}`.
 <Snippet path="datacomponents/view-all-datacomponents-in-a-workspace/response-body.md" />
 
 ---
+
 ### View a datacomponent
 
 :::info
@@ -119,6 +120,7 @@ Returns the datacomponent `{datacomponent-id}`.
 <Snippet path="datacomponents/view-a-datacomponent/response-body.md" />
 
 ---
+
 ### Initialise a new datacomponent in a workspace
 
 :::info
@@ -136,6 +138,7 @@ Initialises a new datacomponent in the workspace `{workspace-id}`.
 <Snippet path="datacomponents/initialise-a-new-datacomponent-in-a-workspace/response-body.md" />
 
 ---
+
 ### Create or update a datacomponent in a workspace
 
 :::info
@@ -158,6 +161,7 @@ Creates or updates the datacomponent `{datacomponent-id}` in the workspace `{wor
 <Snippet path="datacomponents/create-or-update-a-datacomponent-in-a-workspace/response-body.md" />
 
 ---
+
 ### Update a datacomponent
 
 :::info
@@ -183,6 +187,7 @@ Updates the datacomponent `{datacomponent-id}`.
 <Snippet path="datacomponents/update-a-datacomponent/response-body.md" />
 
 ---
+
 ### Delete a datacomponent
 
 :::info

@@ -47,6 +47,7 @@ Returns all administrators of the workspace `{workspace-id}`.
 <Snippet path="workspaces/view-all-administrators-of-a-workspace/response-body.md" />
 
 ---
+
 ### Add an administrator to a workspace
 
 :::info
@@ -68,6 +69,7 @@ Adds the profile `{profile-id}` as an administrator to the workspace `{workspace
 <Snippet path="workspaces/add-an-administrator-to-a-workspace/response-body.md" />
 
 ---
+
 ### Withdraw an administrator from a workspace
 
 :::info

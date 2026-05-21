@@ -74,6 +74,7 @@ Returns all datasets in the workspace `{workspace-id}`.
 <Snippet path="datasets/view-all-datasets-in-a-workspace/response-body.md" />
 
 ---
+
 ### View all liked datasets in a workspace
 
 :::info
@@ -95,6 +96,7 @@ Returns all datasets in the workspace `{workspace-id}` liked by the authenticate
 <Snippet path="datasets/view-datasets-in-a-workspace-liked-by-profile/response-body.md" />
 
 ---
+
 ### View datasets by channel
 
 :::info
@@ -116,6 +118,7 @@ Returns datasets by the channel `{channel-id}`.
 <Snippet path="datasets/view-datasets-by-channel/response-body.md" />
 
 ---
+
 ### View a dataset
 
 :::info
@@ -136,6 +139,7 @@ Returns the dataset `{dataset-id}`.
 <Snippet path="datasets/view-a-dataset/response-body.md" />
 
 ---
+
 ### View a dataset in a workspace
 
 :::info
@@ -158,6 +162,7 @@ Returns the dataset `{dataset-id-or-alias}` in the workspace `{workspace-id}`.
 <Snippet path="datasets/view-a-dataset-in-a-workspace/response-body.md" />
 
 ---
+
 ### View the data of a dataset
 
 :::info
@@ -190,6 +195,7 @@ Defaults to `application/json` (given `Accept */*` or no `Accept` header).
 - `204`: No response body provided.
 
 ---
+
 ### Publish a dataset to a workspace
 
 :::info
@@ -217,6 +223,7 @@ Making the request with an existing `id` or `alias` will result in the respectiv
 <Snippet path="datasets/publish-a-dataset-to-a-workspace/response-body.md" />
 
 ---
+
 ### Edit a dataset
 
 :::info
@@ -244,6 +251,7 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 <Snippet path="datasets/edit-a-dataset/response-body.md" />
 
 ---
+
 ### Record a view of a dataset
 
 :::info
@@ -264,6 +272,7 @@ This request can update one or more of the [dataset](#dataset) fields at once. W
 No response body provided.
 
 ---
+
 ### Record a like of a dataset
 
 :::info
@@ -284,6 +293,7 @@ Records a like of the dataset `{dataset-id}` from the authenticated user profile
 No response body provided.
 
 ---
+
 ### Remove a like from a dataset
 
 :::info
@@ -304,6 +314,7 @@ Removes a like of the dataset `{dataset-id}` from the authenticated user profile
 No response body provided.
 
 ---
+
 ### Initialise a new dataset message
 
 :::info
@@ -325,6 +336,7 @@ Initialises a new dataset message for the dataset `{dataset-id}`
 <Snippet path="datasets/initialise-a-new-dataset-message/response-body.md" />
 
 ---
+
 ### Create or update a dataset message
 
 :::info
@@ -350,6 +362,7 @@ Creates or updates the dataset message `{message-id}` for the dataset `{dataset-
 <Snippet path="datasets/create-or-update-a-dataset-message/response-body.md" />
 
 ---
+
 ### Delete a dataset
 
 :::info

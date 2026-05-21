@@ -38,6 +38,7 @@ Searches the workspace `{workspace-id}` for datasets by the free text `{free-tex
 No response body provided.
 
 ---
+
 ### Search for datasets in a workspace by channel name
 
 :::info
@@ -62,6 +63,7 @@ Searches the workspace `{workspace-id}` for datasets by the channel `{channel-na
 No response body provided.
 
 ---
+
 ### Search for datasets in a workspace by tag name
 
 :::info
@@ -85,6 +87,7 @@ Searches the workspace `{workspace-id}` for datasets by the tag `{tag-name}`.
 No response body provided.
 
 ---
+
 ### Search for datasets in a workspace using msearch
 
 :::info

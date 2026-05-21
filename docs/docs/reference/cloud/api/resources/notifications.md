@@ -72,6 +72,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="notifications/view-all-notifications/response-body.md" />
 
 ---
+
 ### View all notifications for a workspace
 
 :::info
@@ -101,6 +102,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="notifications/view-all-notifications-for-a-workspace/response-body.md" />
 
 ---
+
 ### View a notification
 
 :::info
@@ -121,6 +123,7 @@ Returns the notification `{notification-id}`.
 <Snippet path="notifications/view-a-notification/response-body.md" />
 
 ---
+
 ### Refresh notifications
 
 :::info
@@ -146,6 +149,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="notifications/refresh-notifications/response-body.md" />
 
 ---
+
 ### Delete a notification
 
 :::info

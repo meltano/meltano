@@ -48,6 +48,7 @@ Returns all tags in the workspace `{workspace-id}`.
 <Snippet path="tags/view-all-tags-in-a-workspace/response-body.md" />
 
 ---
+
 ### View all tags in the news for a workspace
 
 :::info
@@ -65,6 +66,7 @@ Returns all tags in the news for the workspace `{workspace-id}`.
 [Tag](#tag) collection with HAL links.
 
 ---
+
 ### View a tag in a workspace
 
 :::info

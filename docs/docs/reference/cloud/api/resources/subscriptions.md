@@ -57,6 +57,7 @@ Returns all subscriptions for the authenticated user profile.
 <Snippet path="subscriptions/view-all-subscriptions/response-body.md" />
 
 ---
+
 ### View all member subscriptions to a workspace
 
 :::info
@@ -77,6 +78,7 @@ Returns all member subscriptions to the workspace `{workspace-id}`.
 <Snippet path="subscriptions/view-all-member-subscriptions-to-a-workspace/response-body.md" />
 
 ---
+
 ### View a subscription
 
 :::info
@@ -97,6 +99,7 @@ Returns the subscription `{subscription-id}`.
 <Snippet path="subscriptions/view-a-subscription/response-body.md" />
 
 ---
+
 ### Subscribe to a workspace
 
 :::info
@@ -126,6 +129,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="subscriptions/subscribe-to-a-workspace/response-body.md" />
 
 ---
+
 ### Subscribe to a channel
 
 :::info
@@ -155,6 +159,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="subscriptions/subscribe-to-a-channel/response-body.md" />
 
 ---
+
 ### Subscribe to a dataset
 
 :::info
@@ -184,6 +189,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="subscriptions/subscribe-to-a-dataset/response-body.md" />
 
 ---
+
 ### Subscribe to a pipeline
 
 :::info
@@ -213,6 +219,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="subscriptions/subscribe-to-a-pipeline/response-body.md" />
 
 ---
+
 ### Update a subscription
 
 :::info
@@ -242,6 +249,7 @@ Path | JSON Type | Format | Description
 <Snippet path="subscriptions/update-a-subscription/response-body.md" />
 
 ---
+
 ### Remove a subscription
 
 :::info

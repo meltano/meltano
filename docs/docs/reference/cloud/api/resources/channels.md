@@ -49,6 +49,7 @@ Initialise a channel.
 <Snippet path="channels/initialise-a-channel/response-body.md" />
 
 ---
+
 ### View a channel
 
 :::info
@@ -69,6 +70,7 @@ Returns the channel `{channel-id}`.
 <Snippet path="channels/view-a-channel/response-body.md" />
 
 ---
+
 ### View a channel in a workspace
 
 :::info
@@ -90,6 +92,7 @@ Returns a channel in the workspace `{workspace-id}`.
 <Snippet path="channels/view-a-channel-in-a-workspace/response-body.md" />
 
 ---
+
 ### View all channels in a workspace
 
 :::info
@@ -119,6 +122,7 @@ Parameter | Required | Format | Default Value | Description
 <Snippet path="channels/view-all-channels-in-a-workspace/response-body.md" />
 
 ---
+
 ### Create or Update a channel in a workspace
 
 :::info
@@ -142,6 +146,7 @@ This endpoint takes a `{channel-id}` (UUID) and based on the supplied value and 
 <Snippet path="channels/create-a-channel-in-a-workspace-by-id/response-body.md" />
 
 ---
+
 ### Delete a channel
 
 :::info
@@ -161,6 +166,7 @@ Delete a channel.
 No response body provided.
 
 ---
+
 ### View all channels in your workspace news
 
 :::info
@@ -178,6 +184,7 @@ Returns all channels in your news for the workspace.
 <Snippet path="channels/channels-in-news/response-body.md" />
 
 ---
+
 ### Add a dataset to a list channel
 
 :::info
@@ -194,6 +201,7 @@ Adds a dataset to a channel with type list.
 No response body provided.
 
 ---
+
 ### Remove a dataset from a list channel
 
 :::info
@@ -210,6 +218,7 @@ Removes a dataset from a channel with type list.
 No response body provided.
 
 ---
+
 ### Add workspace scope to a channel
 
 :::info
@@ -227,6 +236,7 @@ Add workspace scope to a channel.
 <Snippet path="channels/add-workspace-scope-to-a-channel/response-body.md" />
 
 ---
+
 ### Withdraw workspace scope from a channel
 
 :::info

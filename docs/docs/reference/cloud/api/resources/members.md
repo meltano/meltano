@@ -48,6 +48,7 @@ Returns all members of the workspace `{workspace-id}`.
 <Snippet path="workspaces/view-all-members-of-a-workspace/response-body.md" />
 
 ---
+
 ### View a member of a workspace
 
 :::info

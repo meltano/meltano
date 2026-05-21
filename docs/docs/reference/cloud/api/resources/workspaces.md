@@ -64,6 +64,7 @@ Returns all workspaces the authenticated user profile is an owner or member of.
 <Snippet path="workspaces/view-all-workspaces/response-body.md" />
 
 ---
+
 ### View a workspace
 
 :::info
@@ -85,6 +86,7 @@ Returns the workspace `{workspace-id}`.
 <Snippet path="workspaces/view-a-workspace/response-body.md" />
 
 ---
+
 ### Initialise a workspace
 
 :::info
@@ -102,6 +104,7 @@ Initialises a new workspace.
 <Snippet path="workspaces/initialise-a-workspace/response-body.md" />
 
 ---
+
 ### Create a workspace
 
 :::info
@@ -129,6 +132,7 @@ Creates the workspace `{workspace-id}`.
 <Snippet path="workspaces/create-a-workspace/response-body.md" />
 
 ---
+
 ### Update a workspace
 
 :::info
@@ -156,6 +160,7 @@ Updates the workspace `{workspace-id}`.
 <Snippet path="workspaces/update-a-workspace/response-body.md" />
 
 ---
+
 ### Delete a workspace
 
 :::info

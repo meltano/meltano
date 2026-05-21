@@ -55,6 +55,7 @@ Returns all comments on the dataset `{dataset-id}`.
 <Snippet path="comments/view-all-comments-on-a-dataset/response-body.md" />
 
 ---
+
 ### View a comment
 
 :::info
@@ -76,6 +77,7 @@ Returns the comment `{comment-id}`.
 <Snippet path="comments/view-a-comment/response-body.md" />
 
 ---
+
 ### View the edit history of a comment
 
 :::info
@@ -96,6 +98,7 @@ Returns the edit history of the comment `{comment-id}`.
 <Snippet path="comments/view-the-edit-history-of-a-comment/response-body.md" />
 
 ---
+
 ### View all replies to a comment
 
 :::info
@@ -117,6 +120,7 @@ Returns all replies to the comment `{comment-id}`.
 <Snippet path="comments/view-all-replies-to-a-comment/response-body.md" />
 
 ---
+
 ### Initialise a comment on a dataset
 
 :::info
@@ -138,6 +142,7 @@ Initialises a new comment on the dataset `{dataset-id}`.
 <Snippet path="comments/initialise-a-comment-on-a-dataset/response-body.md" />
 
 ---
+
 ### Initialise a reply to a comment
 
 :::info
@@ -159,6 +164,7 @@ Initialises a new reply comment to the comment `{comment-id}`.
 <Snippet path="comments/initialise-a-reply-to-a-comment/response-body.md" />
 
 ---
+
 ### Create a comment
 
 :::info
@@ -186,6 +192,7 @@ Creates the comment `{comment-id}`.
 <Snippet path="comments/create-a-comment/response-body.md" />
 
 ---
+
 ### Update a comment
 
 :::info
@@ -212,6 +219,7 @@ Updates the comment `{comment-id}`.
 <Snippet path="comments/view-a-comment/response-body.md" />
 
 ---
+
 ### Record a like of a comment
 
 :::info
@@ -232,6 +240,7 @@ Records a like of the comment `{comment-id}` from the authenticated user profile
 No response body provided.
 
 ---
+
 ### Remove a like from a comment
 
 :::info
@@ -252,6 +261,7 @@ Removes a like of the comment `{comment-id}` from the authenticated user profile
 No response body provided.
 
 ---
+
 ### Delete a comment
 
 :::info

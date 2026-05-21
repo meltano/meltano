@@ -78,6 +78,7 @@ Returns all running or completed jobs for the workspace `{workspace-id}`.
 <Snippet path="jobs/view-all-running-or-completed-jobs-for-a-workspace/response-body.md" />
 
 ---
+
 ### View all running or completed jobs for a pipeline
 
 :::info
@@ -98,6 +99,7 @@ Returns all running or completed jobs for the pipeline `{pipeline-id}`.
 <Snippet path="jobs/view-all-running-or-completed-jobs-for-a-pipeline/response-body.md" />
 
 ---
+
 ### View a job
 
 :::info
@@ -118,6 +120,7 @@ Returns the job `{job-id}`.
 <Snippet path="jobs/view-a-job/response-body.md" />
 
 ---
+
 ### View the logs of a job
 
 :::info
@@ -154,6 +157,7 @@ Media Type(s) | Description
 - `204`: No response body provided.
 
 ---
+
 ### Create a job from a pipeline
 
 :::info
@@ -174,6 +178,7 @@ Creates a new job from the pipeline `{pipeline-id}`.
 <Snippet path="jobs/create-a-job-from-a-pipeline/response-body.md" />
 
 ---
+
 ### Stop a job
 
 :::info
@@ -195,6 +200,7 @@ Job stop acceptance message.
 <Snippet path="jobs/stop-a-job/response-body.md" />
 
 ---
+
 ### Delete a job
 
 :::info
