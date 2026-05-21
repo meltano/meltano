@@ -124,26 +124,6 @@ Returns all dataplugins available to the workspace `{workspace-id}`.
 <Snippet path="dataplugins/view-all-workspace-dataplugins/response-body.md" />
 
 ---
-### View a workspace `discovery.yml`
-
-:::info
-**GET** `/api/workspaces/{workspace-id}/discovery.yml`
-:::
-
-Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins available to the workspace `{workspace-id}`.
-
-#### Prerequisites
-- Workspace `{workspace-id}` must exist
-
-<Examples path="dataplugins/view-a-workspace-discovery-yml" />
-
-#### Response
-`200 OK`
-
-[Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-<Snippet path="dataplugins/view-a-workspace-discovery-yml/response-body.md" />
-
----
 ### View a dataplugin
 
 :::info
