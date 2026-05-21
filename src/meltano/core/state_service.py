@@ -93,6 +93,7 @@ class StateService:
         Returns:
             A dict with state_ids as keys and state payloads as values.
         """
+        logger.info("Reading state from %s", self.state_store_manager.label)
         return {
             state_id: self.get_state(state_id)
             for state_id in self.state_store_manager.get_state_ids(state_id_pattern)
@@ -202,6 +203,7 @@ class StateService:
         Returns:
             Dict representing state that would be used in the next run.
         """
+        logger.info("Reading state from %s", self.state_store_manager.label)
         if state := self.state_store_manager.get(state_id=state_id):
             return json.loads(state.json_merged())
         return {}
@@ -268,6 +270,7 @@ class StateService:
         Returns:
             A dict mapping each state_id to ``{"completed": ..., "partial": ...}``.
         """
+        logger.info("Exporting state from %s", self.state_store_manager.label)
         return {s.state_id: s.to_dict() for s in self.state_store_manager.get_all()}
 
     def import_state(self, states: dict[str, dict[str, t.Any]]) -> int:
