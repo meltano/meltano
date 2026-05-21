@@ -320,7 +320,6 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info("Reading state from %s", self.label)
         try:
             with self.get_reader(self.get_state_path(state_id)) as reader:
                 return MeltanoState.from_file(state_id, reader)
