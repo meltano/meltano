@@ -108,6 +108,8 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      with:
+        cache-suffix: ${{ matrix.id }}
 
     - name: Install Nox
       env:
@@ -148,13 +150,6 @@ jobs:
         name: coverage-data-${{ matrix.id }}
         path: ".coverage.*"
 
-    - name: Upload test logs
-      if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-      with:
-        name: test-logs-${{ matrix.id }}
-        path: pytest.log
-
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
@@ -178,6 +173,8 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      with:
+        cache-suffix: coverage
 
     - name: Install Nox
       env:
@@ -218,6 +215,8 @@ jobs:
 
     - name: Setup uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      with:
+        cache-suffix: ${{ matrix.id }}
 
     - name: Install Nox
       env:

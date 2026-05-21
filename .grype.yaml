@@ -1,6 +1,10 @@
 # Grype configuration to reduce noise from vulnerabilities outside our control
 # https://github.com/anchore/grype#specifying-matches-to-ignore
 
+# Exclude paths that are not included in the published Docker images
+exclude:
+  - "./docs/**"
+
 ignore:
   # Ignore vulnerabilities with no fix available - we can't do anything about these
   - fix-state: not-fixed

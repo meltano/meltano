@@ -2283,9 +2283,11 @@
           "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_ID": "md5(record.get('ipv4prefix', record.get('ipv6prefix')))",
           "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_IPV4": "record.get('ipv4prefix', '')",
           "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_IPV6": "record.get('ipv6prefix', '')",
+          "MELTANO_MAP_TRANSFORMER__LOG_PARSER": "singer-sdk",
           "MELTANO_MAP_TRANSFORMER__MAPPING": "true",
           "MELTANO_MAP_TRANSFORMER__MAPPINGS": "[{\"name\": \"coalesce-gcp-ips\", \"config\": {\"stream_maps\": {\"gcp_ips\": {\"ipv4prefix\": null, \"ipv6prefix\": null, \"ipv4\": \"record.get('ipv4prefix', '')\", \"ipv6\": \"record.get('ipv6prefix', '')\", \"id\": \"md5(record.get('ipv4prefix', record.get('ipv6prefix')))\"}}}}]",
           "MELTANO_MAP_TRANSFORMER__MAPPING_NAME": "coalesce-gcp-ips",
+          "MELTANO_MAP__LOG_PARSER": "singer-sdk",
           "MELTANO_MAP__MAPPING": "true",
           "MELTANO_MAP__MAPPINGS": "[{\"name\": \"coalesce-gcp-ips\", \"config\": {\"stream_maps\": {\"gcp_ips\": {\"ipv4prefix\": null, \"ipv6prefix\": null, \"ipv4\": \"record.get('ipv4prefix', '')\", \"ipv6\": \"record.get('ipv6prefix', '')\", \"id\": \"md5(record.get('ipv4prefix', record.get('ipv6prefix')))\"}}}}]",
           "MELTANO_MAP__MAPPING_NAME": "coalesce-gcp-ips"
@@ -3042,6 +3044,5 @@
       "name": "marts_refresh"
     }
   ],
-  "send_anonymous_usage_stats": false,
-  "version": 1
+  "send_anonymous_usage_stats": false
 }

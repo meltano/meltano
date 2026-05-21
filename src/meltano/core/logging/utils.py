@@ -33,6 +33,47 @@ else:
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
+
+class SafeStreamHandler(logging.StreamHandler):
+    """A StreamHandler that gracefully handles non-encodable characters.
+
+    On Windows, the default console encoding (e.g. cp1252) may not support
+    all Unicode characters, causing UnicodeEncodeError when logging plugin
+    output containing non-ASCII text. This handler falls back to
+    'backslashreplace' error handling — unencodable characters are escaped
+    rather than raising an error and dropping the log entry.
+
+    This handler is not used by default. See the Meltano logging guide for
+    instructions on opting in via a custom ``logging.yaml`` config.
+    """
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a record, falling back to backslashreplace on encode errors."""
+        stream = self.stream
+        try:
+            msg = self.format(record)
+            stream.write(msg + self.terminator)
+            self.flush()
+        except UnicodeEncodeError:
+            # Re-encode the message with backslashreplace to avoid data loss
+            # while still producing readable output.
+            try:
+                encoding = getattr(stream, "encoding", "utf-8") or "utf-8"
+                stream.write(
+                    self.format(record)
+                    .encode(encoding, errors="backslashreplace")
+                    .decode(encoding, errors="replace")
+                    + self.terminator
+                )
+                self.flush()
+            except Exception:  # noqa: BLE001
+                self.handleError(record)
+        except RecursionError:  # pragma: no cover
+            raise
+        except Exception:  # noqa: BLE001  # pragma: no cover
+            self.handleError(record)
+
+
 LEVELS: dict[str, int] = {
     "debug": logging.DEBUG,
     "info": logging.INFO,

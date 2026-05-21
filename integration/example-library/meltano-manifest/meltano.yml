@@ -1,4 +1,3 @@
-version: 1
 default_environment: userdev
 annotations:
   example.service:

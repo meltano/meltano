@@ -1,14 +1,9 @@
 name: Dependency Review
 
 on:
-  schedule:
-    - cron: '12 12 * * *'
-  # pull_request_target is safe because this only performs static analysis
-  pull_request_target:  # zizmor: ignore[dangerous-triggers]
+  pull_request:
     paths:
       - '**.lock'
-  workflow_dispatch:
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -27,8 +22,7 @@ jobs:
           persist-credentials: false
 
       - name: GitHub dependency vulnerability check
-        if: ${{ github.event_name == 'pull_request_target' }}
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           allow-ghsas: |
             GHSA-w853-jp5j-5j7f

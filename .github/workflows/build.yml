@@ -28,18 +28,36 @@ jobs:
   build:
     name: Wheel and SDist
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       name: ${{ steps.baipp.outputs.package_name }}
       version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
+    - name: Get latest release tag (re-roll)
+      id: get-release-tag
+      if: github.event_name == 'schedule'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |  # zizmor: ignore[template-injection]
+        tag=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName' | sort -V | tail -1)
+        if [[ -z "$tag" ]]; then
+          echo "::error::No stable releases found; cannot determine tag for re-roll"
+          exit 1
+        fi
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+
     - name: Check out the repository
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
+        ref: ${{ steps.get-release-tag.outputs.tag || github.sha }}
 
     - name: Setup uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      with:
+        enable-cache: false
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -63,12 +81,12 @@ jobs:
         uv run scripts/alembic_freeze.py
 
     - name: Release Marker
-      if: github.event_name == 'release' && github.event.action == 'published'
+      if: (github.event_name == 'release' && github.event.action == 'published') || github.event_name == 'schedule'
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      uses: hynek/build-and-inspect-python-package@fe0a0fb1925ca263d076ca4f2c13e93a6e92a33e # v2.17.0
+      uses: hynek/build-and-inspect-python-package@d44ca7d91762de7a7d5436ddae667c6da6d1c3df # v2.18.0
       id: baipp
 
   build_docker:
@@ -97,10 +115,22 @@ jobs:
         - true
 
     steps:
+    - name: Set registry
+      id: set-registry
+      run: |
+        if [[ "${GITHUB_EVENT_NAME}" == "release" && "${GITHUB_EVENT_ACTION}" == "published" ]] || [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
+          echo "registry=docker.io" >> "$GITHUB_OUTPUT"
+        else
+          echo "registry=ghcr.io" >> "$GITHUB_OUTPUT"
+        fi
+      env:
+        GITHUB_EVENT_ACTION: ${{ github.event.action }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+
     - name: Set the workflow inputs
       id: set-inputs
       env:
-        REGISTRY: ${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}
+        REGISTRY: ${{ steps.set-registry.outputs.registry }}
       # This step makes it so that the same workflow inputs can be accessed
       # regardless of what event triggered it.
       run: |
@@ -110,10 +140,12 @@ jobs:
         persist-credentials: false
     - name: Setup uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      with:
+        enable-cache: false
 
     - name: Get latest published release version
       id: get-latest-version
-      if: github.event_name == 'release' && github.event.action == 'published'
+      if: steps.set-registry.outputs.registry == 'docker.io'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |  # zizmor: ignore[template-injection]
@@ -176,7 +208,8 @@ jobs:
         # - The trigger is a push to the main branch
         # - The trigger is a workflow dispatch
         # - The trigger is a release and the action is 'published'
-        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' )}}
+        # - The trigger is a weekly schedule (re-roll latest release with updated base image)
+        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' ) || github.event_name == 'schedule' }}
         token: ${{ secrets.GITHUB_TOKEN }}
         tags: ${{ env.IMAGE_TAGS }}
         registry: ${{ steps.set-inputs.outputs.registry }}

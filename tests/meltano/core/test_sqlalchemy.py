@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing as t
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -7,11 +8,18 @@ import sqlalchemy as sa
 
 from meltano.core.sqlalchemy import DateTimeUTC
 
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 class TestSQLAlchemyModels:
     @pytest.fixture
-    def engine(self) -> sa.Engine:
-        return sa.create_engine("sqlite:///:memory:")
+    def engine(self) -> Generator[sa.Engine, None, None]:
+        engine = sa.create_engine("sqlite:///:memory:")
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture
     def table(self, engine: sa.Engine) -> sa.Table:

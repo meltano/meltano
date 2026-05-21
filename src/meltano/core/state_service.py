@@ -262,6 +262,32 @@ class StateService:
         """
         self.set_state(state_id_dst, json.dumps(self.get_state(state_id_src)))
 
+    def export_state(self) -> dict[str, dict[str, t.Any]]:
+        """Export all states as a mapping preserving the completed/partial split.
+
+        Returns:
+            A dict mapping each state_id to ``{"completed": ..., "partial": ...}``.
+        """
+        return {s.state_id: s.to_dict() for s in self.state_store_manager.get_all()}
+
+    def import_state(self, states: dict[str, dict[str, t.Any]]) -> int:
+        """Import states from a mapping, overwriting any existing state.
+
+        Args:
+            states: dict mapping state_id to ``{"completed": ..., "partial": ...}``
+
+        Returns:
+            The number of states written.
+        """
+        return self.state_store_manager.set_all(
+            MeltanoState(
+                state_id=state_id,
+                completed_state=entry.get("completed"),
+                partial_state=entry.get("partial"),
+            )
+            for state_id, entry in states.items()
+        )
+
     def move_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Move state from Job state_id_src to Job state_id_dst.
 

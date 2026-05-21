@@ -1,18 +1,31 @@
 from __future__ import annotations
 
+import sys
 import typing as t
+from http import HTTPStatus
 from unittest import mock
 
 import click
 import pytest
-from requests import HTTPError, Response
+import requests
+import requests.exceptions
+from requests import Response
 from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
-from meltano.core.hub.client import HubConnectionError, HubPluginVariantNotFoundError
+from meltano.core.hub.client import (
+    HubConnectionError,
+    HubPluginTypeNotFoundError,
+    HubPluginVariantNotFoundError,
+)
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections import Counter
@@ -115,21 +128,15 @@ class TestMeltanoHubService:
     def test_server_error(self, project: Project) -> None:
         with pytest.raises(
             HubConnectionError,
-            match=r"Could not connect to Meltano Hub. 500 Server Error",
+            match=r"Internal Server Error",
         ) as exc_info:
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,
                 "this-returns-500",
             )
 
-        assert isinstance(exc_info.value.__cause__, HTTPError)
-        assert isinstance(exc_info.value.__cause__.response, Response)
-        assert exc_info.value.__cause__.response.status_code == 500
-        assert exc_info.value.__cause__.response.json() == {"error": "Server error"}
-        assert exc_info.value.__cause__.response.url == (
-            "https://hub.meltano.com/meltano/api/v1/plugins/extractors"
-            "/this-returns-500--original"
-        )
+        assert isinstance(exc_info.value, HubConnectionError)
+        assert str(exc_info.value) == "Internal Server Error."
 
     def test_request_headers(self, project: Project) -> None:
         with mock.patch("click.get_current_context") as get_context:
@@ -150,9 +157,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
+            @override
             def send(
                 self,
-                request,  # noqa: ARG002
+                request,
+                *args,
                 **kwargs,
             ):
                 nonlocal send_kwargs
@@ -175,9 +184,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
+            @override
             def send(
                 self,
-                request,  # noqa: ARG002
+                request,
+                *args,
                 **kwargs,
             ):
                 nonlocal send_kwargs
@@ -195,3 +206,40 @@ class TestMeltanoHubService:
         monkeypatch.setenv("HTTPS_PROXY", "https://www.example.com:3128/")
         hub._get(mock_url)
         assert send_kwargs["proxies"] == {"https": "https://www.example.com:3128/"}
+
+    def test_connection_error(self, project: Project) -> None:
+        with (
+            mock.patch.object(
+                project.hub_service.session,
+                "send",
+                side_effect=requests.exceptions.ConnectionError,
+            ),
+            pytest.raises(HubConnectionError) as exc_info,
+        ):
+            project.hub_service._get(project.hub_service.hub_api_url)
+
+        assert str(exc_info.value) == "Could not connect to Meltano Hub."
+        assert isinstance(exc_info.value.__cause__, requests.exceptions.ConnectionError)
+
+    def test_plugin_type_not_found_error(self, project: Project) -> None:
+        mock_response = Response()
+        mock_response.status_code = HTTPStatus.NOT_FOUND
+
+        with (
+            mock.patch.object(project.hub_service, "_get", return_value=mock_response),
+            pytest.raises(HubPluginTypeNotFoundError) as exc_info,
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+        assert "is not supported in Meltano Hub" in str(exc_info.value)
+
+    def test_server_error_on_index(self, project: Project) -> None:
+        mock_response = Response()
+        mock_response.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+        mock_response.reason = "Internal Server Error"
+
+        with (
+            mock.patch.object(project.hub_service, "_get", return_value=mock_response),
+            pytest.raises(HubConnectionError, match="Internal Server Error"),
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)

@@ -109,7 +109,7 @@ def _run_cli() -> None:
         except ProjectReadonly as err:
             raise CliError(  # noqa: TRY003
                 f"The requested action could not be completed: {err}",  # noqa: EM102
-            ) from err
+            ) from None
         except KeyboardInterrupt:
             raise
         except MeltanoError as err:

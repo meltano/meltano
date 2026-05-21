@@ -33,7 +33,10 @@ def check_indent(json_path: Path, indent: int) -> None:
     # If the indent is as-expected, then a trip through `json.loads` and
     # `json.dumps` should produce the same text, usually. This isn't true in
     # general, but it's sufficient for our use in the tests here.
-    assert json.dumps(json.loads(text), indent=indent if indent > 0 else None) == text
+    assert (
+        json.dumps(json.loads(text), indent=indent if indent > 0 else None)
+        == text.strip()
+    )
 
 
 def get_schema_warnings(log: StructuredLogCapture) -> list[dict[str, t.Any]]:

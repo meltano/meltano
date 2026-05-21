@@ -1060,6 +1060,21 @@ class TestCliAdd:
                 force=False,
             )
 
+    def test_add_bad_plugin_type(self, cli_runner: MeltanoCliRunner) -> None:
+        res = cli_runner.invoke(
+            cli,
+            [
+                "add",
+                "--plugin-type=not-a-valid-type",
+                "tap-mock",
+            ],
+        )
+        assert res.exit_code == 2
+        assert (
+            "Invalid value for '--plugin-type': 'not-a-valid-type' is not a valid PluginType"  # noqa: E501
+            in res.stderr
+        )
+
     @pytest.mark.usefixtures("reset_project_context")
     def test_add_with_python_version_auto_selection(
         self,

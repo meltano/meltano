@@ -1,4 +1,3 @@
-version: 1
 default_environment: dev
 project_id: 95ed0825-997f-4baf-9c13-bae04ac44fe1
 environments:

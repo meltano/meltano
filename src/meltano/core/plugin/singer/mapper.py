@@ -29,6 +29,7 @@ class SingerMapper(SingerPlugin):
     __plugin_type__ = PluginType.MAPPERS
 
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
+        *SingerPlugin.EXTRA_SETTINGS,
         SettingDefinition(
             name="_mappings",
             kind=SettingKind.ARRAY,
