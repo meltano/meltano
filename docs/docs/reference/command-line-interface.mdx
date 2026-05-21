@@ -525,9 +525,13 @@ An `--extras` flag can be passed to view or list only extras instead.
 Be aware that `meltano config reset <plugin>` resets both regular settings _and_ extras.
 
 ```bash
-# List all extras for the specified plugin with their names,
-# environment variables, and current values
+# List extras for the specified plugin with their names,
+# environment variables, and current values. By default, optional extras at
+# their default values are hidden; pass --all to include them or --filter to
+# search across all extras.
 meltano config list <plugin> --extras
+meltano config list <plugin> --extras --all
+meltano config list <plugin> --extras --filter <substring>
 
 # View the plugin's current extras
 meltano config print <plugin> --extras

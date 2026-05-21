@@ -631,6 +631,10 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert "start_date" in result.stdout
+        # In filter mode, optional-at-default matches surface under `Optional:`
+        # and the hidden-count summary is suppressed.
+        assert "Optional:" in result.stdout
+        assert "Use --all to show all." not in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_only_configured(
