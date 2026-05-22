@@ -190,6 +190,13 @@ class MockAdapter(BaseAdapter):
         cert: t.Any | None = None,  # noqa: ARG002
         proxies: abc.Mapping[str, str] | None = None,  # noqa: ARG002
     ):
+        if "/meltano/api/v1/plugins" not in request.path_url:
+            response = requests.Response()
+            response.request = request
+            response.url = request.url
+            response.status_code = 404
+            response._content = b""
+            return response
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
 
         response = requests.Response()
