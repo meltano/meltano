@@ -39,7 +39,7 @@
   },
   "optionalDependencies": {
     "@azure/storage-blob": "^12.31.0",
-    "minimatch": "^9.0.9"
+    "minimatch": "^10.2.5"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.1",
