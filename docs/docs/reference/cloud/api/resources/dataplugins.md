@@ -148,33 +148,6 @@ Initialises a new dataplugin.
 
 ---
 
-### Publish dataplugins from a `discovery.yml`
-
-:::info
-**POST** `/api/workspaces/{workspace-id}/discovery.yml`
-:::
-
-Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-
-#### Prerequisites
-- Workspace `{workspace-id}` must exist
-
-
-#### Body
-[Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url)
-<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/request-body.md" />
-
-
-<Examples path="dataplugins/publish-dataplugins-from-a-discovery-yml" />
-
-#### Response
-`201 Created`
-
-[Dataplugin](#dataplugin) collection with HAL links.
-<Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/response-body.md" />
-
----
-
 ### Create a dataplugin
 
 :::info
