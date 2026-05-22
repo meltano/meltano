@@ -56,6 +56,7 @@ Returns the datastores in the workspace `{workspace-id}`.
 <Snippet path="datastores/view-all-datastores-in-a-workspace/response-body.md" />
 
 ---
+
 ### View a datastore
 
 :::info
@@ -76,6 +77,7 @@ Returns the datastore `{datastore-id}`.
 <Snippet path="datastores/view-a-datastore/response-body.md" />
 
 ---
+
 ### Set a datastore as the workspace default
 
 :::info
@@ -95,6 +97,7 @@ Sets the datastore `{datastore-id}` as the workspace default.
 No response body provided.
 
 ---
+
 ### Initialise a new datastore in a workspace
 
 :::info
@@ -115,6 +118,7 @@ Initialises a new datastore in the workspace `{workspace-id}`.
 <Snippet path="datastores/initialise-a-new-datastore-in-a-workspace/response-body.md" />
 
 ---
+
 ### Create or update a datastore in a workspace
 
 :::info
@@ -140,6 +144,7 @@ Creates or updates the datastore `{datastore-id}` in the workspace `{workspace-i
 <Snippet path="datastores/create-a-datastore-in-a-workspace/response-body.md" />
 
 ---
+
 ### Delete a datastore
 
 :::info

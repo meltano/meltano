@@ -47,6 +47,7 @@ Returns all profiles under the authenticated user account.
 <Snippet path="profiles/view-all-profiles/response-body.md" />
 
 ---
+
 ### View a profile
 
 :::info
@@ -68,6 +69,7 @@ Returns the profile `{profile-id}`.
 <Snippet path="profiles/view-a-profile/response-body.md" />
 
 ---
+
 ### Create or update profile
 
 :::info
@@ -95,6 +97,7 @@ Creates or updates the user profile.
 <Snippet path="profiles/update-a-profile/response-body.md" />
 
 ---
+
 ### Set a workspace as default
 
 :::info

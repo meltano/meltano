@@ -87,23 +87,7 @@ Returns all dataplugins supported by Meltano Cloud.
 <Snippet path="dataplugins/view-all-supported-dataplugins/response-body.md" />
 
 ---
-### View the `discovery.yml`
 
-:::info
-**GET** `/api/discovery.yml`
-:::
-
-Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins supported by Meltano Cloud.
-
-<Examples path="dataplugins/view-the-matatika-discovery-yml" />
-
-#### Response
-`200 OK`
-
-[Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-<Snippet path="dataplugins/view-the-matatika-discovery-yml/response-body.md" />
-
----
 ### View all workspace dataplugins
 
 :::info
@@ -124,26 +108,7 @@ Returns all dataplugins available to the workspace `{workspace-id}`.
 <Snippet path="dataplugins/view-all-workspace-dataplugins/response-body.md" />
 
 ---
-### View a workspace `discovery.yml`
 
-:::info
-**GET** `/api/workspaces/{workspace-id}/discovery.yml`
-:::
-
-Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins available to the workspace `{workspace-id}`.
-
-#### Prerequisites
-- Workspace `{workspace-id}` must exist
-
-<Examples path="dataplugins/view-a-workspace-discovery-yml" />
-
-#### Response
-`200 OK`
-
-[Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-<Snippet path="dataplugins/view-a-workspace-discovery-yml/response-body.md" />
-
----
 ### View a dataplugin
 
 :::info
@@ -164,6 +129,7 @@ Returns the dataplugin `{dataplugin-id}`.
 <Snippet path="dataplugins/view-a-dataplugin/response-body.md" />
 
 ---
+
 ### Initialise a new dataplugin
 
 :::info
@@ -181,6 +147,7 @@ Initialises a new dataplugin.
 <Snippet path="dataplugins/initialise-a-new-dataplugin/response-body.md" />
 
 ---
+
 ### Publish dataplugins from a `discovery.yml`
 
 :::info
@@ -207,6 +174,7 @@ Publishes dataplugins from a [Meltano `discovery.yml`](https://docs.meltano.com/
 <Snippet path="dataplugins/publish-dataplugins-from-a-discovery-yml/response-body.md" />
 
 ---
+
 ### Create a dataplugin
 
 :::info
@@ -229,6 +197,7 @@ Creates the dataplugin `{dataplugin-id}`.
 <Snippet path="dataplugins/update-a-dataplugin/response-body.md" />
 
 ---
+
 ### Update a dataplugin
 
 :::info
@@ -260,6 +229,7 @@ Path | JSON Type | Format | Description | Constraints
 <Snippet path="dataplugins/update-a-dataplugin/response-body.md" />
 
 ---
+
 ### Delete a dataplugin
 
 :::info

@@ -89,6 +89,7 @@ Returns all configured pipelines in the workspace `{workspace-id}`.
 <Snippet path="pipelines/view-all-pipelines-in-a-workspace/response-body.md" />
 
 ---
+
 ### View a pipeline
 
 :::info
@@ -109,6 +110,7 @@ Returns the pipeline `{pipeline-id}`.
 <Snippet path="pipelines/view-a-pipeline/response-body.md" />
 
 ---
+
 ### Initialise a pipeline in a workspace
 
 :::info
@@ -129,6 +131,7 @@ Initialises a new pipeline in the workspace `{workspace-id}`.
 <Snippet path="pipelines/initialise-a-pipeline-in-a-workspace/response-body.md" />
 
 ---
+
 ### Create or update a pipeline in a workspace
 
 :::info
@@ -155,6 +158,7 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 <Snippet path="pipelines/create-a-pipeline-in-a-workspace/response-body.md" />
 
 ---
+
 ### Create or update a pipeline as a draft
 
 :::info
@@ -181,6 +185,7 @@ Creates or updates the pipeline `{pipeline-id}` in the workspace `{workspace-id}
 <Snippet path="pipelines/create-a-pipeline-as-a-draft/response-body.md" />
 
 ---
+
 ### Validate a pipeline configuration in a workspace
 
 :::info
@@ -211,6 +216,7 @@ No response body provided.
 <Snippet path="pipelines/validate-a-pipeline-configuration-in-a-workspace/response-body.md" />
 
 ---
+
 ### Verify a pipeline
 
 :::info
@@ -231,6 +237,7 @@ Verifies the configuration of the pipeline `{pipeline-id}`.
 <Snippet path="pipelines/verify-a-pipeline/response-body.md" />
 
 ---
+
 ### Delete a pipeline
 
 :::info
@@ -250,6 +257,7 @@ Deletes the pipeline `{pipeline-id}`.
 No response body provided.
 
 ---
+
 ### View pipeline metrics
 
 :::info

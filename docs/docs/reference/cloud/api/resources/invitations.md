@@ -60,6 +60,7 @@ Returns all invitations sent by the authenticated user profile.
 <Snippet path="invitations/view-all-sent-invitations/response-body.md" />
 
 ---
+
 ### View all received invitations
 
 :::info
@@ -77,6 +78,7 @@ Returns all invitations received by the authenticated user profile.
 <Snippet path="invitations/view-all-received-invitations/response-body.md" />
 
 ---
+
 ### View all invitations to a workspace
 
 :::info
@@ -104,6 +106,7 @@ Returns all active invitations to the workspace `{workspace-id}` sent by the aut
 <Snippet path="invitations/view-all-invitations-to-a-workspace/response-body.md" />
 
 ---
+
 ### Create an invitation to a workspace
 
 :::info
@@ -130,6 +133,7 @@ Creates an invitation to the workspace `{workspace-id}`.
 No response body provided.
 
 ---
+
 ### Accept an invitation
 
 :::info
@@ -152,6 +156,7 @@ Accepts the invitation `{invitation-id}`.
 <Snippet path="invitations/accept-an-invitation/response-body.md" />
 
 ---
+
 ### Delete an invitation
 
 :::info
@@ -173,6 +178,7 @@ Deletes a pending or revoked invitation `{invitation-id}`.
 No response body provided.
 
 ---
+
 ### Withdraw an invitation
 
 :::info
