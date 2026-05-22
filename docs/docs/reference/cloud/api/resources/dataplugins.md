@@ -88,24 +88,6 @@ Returns all dataplugins supported by Meltano Cloud.
 
 ---
 
-### View the `discovery.yml`
-
-:::info
-**GET** `/api/discovery.yml`
-:::
-
-Returns a [Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url) containing all dataplugins supported by Meltano Cloud.
-
-<Examples path="dataplugins/view-the-matatika-discovery-yml" />
-
-#### Response
-`200 OK`
-
-[Meltano `discovery.yml`](https://docs.meltano.com/reference/settings#discovery_url).
-<Snippet path="dataplugins/view-the-matatika-discovery-yml/response-body.md" />
-
----
-
 ### View all workspace dataplugins
 
 :::info
