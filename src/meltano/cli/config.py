@@ -480,13 +480,6 @@ def list_settings(
         redacted=safe,
     )
 
-    # Normalize `--filter`: strip surrounding whitespace and treat empty/
-    # whitespace-only values as not set. An empty pattern would match every
-    # setting (`"" in name`), and a stray trailing space would silently fail
-    # to match (e.g. `--filter "ssl "` would not match `"ssl"`).
-    if filter_pattern is not None:
-        filter_pattern = filter_pattern.strip() or None
-
     validation_groups: list[list[str]] = (
         plugin.settings_group_validation if plugin else []
     ) or []
@@ -544,6 +537,13 @@ def list_settings(
     buckets = [_required, _configured, _optional, _custom, _custom_extras]
     for bucket in buckets:
         bucket.sort(key=lambda item: item[0])
+
+    # Normalize `--filter`: strip surrounding whitespace and treat empty/
+    # whitespace-only values as not set. An empty pattern would match every
+    # setting (`"" in name`), and a stray trailing space would silently fail
+    # to match (e.g. `--filter "ssl "` would not match `"ssl"`).
+    if filter_pattern is not None:
+        filter_pattern = filter_pattern.strip() or None
 
     # When filtering, the user is searching, so optional-at-defaults are not
     # hidden; the filter result is the narrowed view.
