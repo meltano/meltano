@@ -11,6 +11,7 @@ from meltano.cli import cli
 if t.TYPE_CHECKING:
     from collections import Counter
 
+    import pytest
     from click.testing import CliRunner
 
     from meltano.core.project import Project
@@ -22,7 +23,9 @@ class TestCliHub:
         project: Project,
         cli_runner: CliRunner,
         hub_request_counter: Counter,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
         with mock.patch(
             "requests.adapters.HTTPAdapter.send",
             project.hub_service.session.get_adapter(
