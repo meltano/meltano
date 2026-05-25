@@ -600,7 +600,7 @@ def list_settings(
             )
 
     if filter_pattern is not None and not sections:
-        click.echo(f"No settings match {filter_pattern!r}.")
+        click.secho(f"No settings match {filter_pattern!r}.", fg="yellow")
 
     if hidden_optional_count > 0:
         if sections:
