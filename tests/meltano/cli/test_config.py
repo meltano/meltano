@@ -514,7 +514,11 @@ class TestCliConfig:
         assert "Optional:" not in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_default_hides_optional(self, cli_runner, tap) -> None:
+    def test_config_list_default_hides_optional(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """Default `meltano config list` hides optional settings at defaults."""
         result = cli_runner.invoke(cli, ["config", "list", tap.name])
         assert_cli_runner(result)
@@ -545,7 +549,12 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_hidden_count_one(self, cli_runner, tap, project) -> None:
+    def test_config_list_hidden_count_one(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        project: Project,
+    ) -> None:
         """Hidden-count summary reports the count when exactly one is hidden."""
         plugin = project.plugins.find_plugin(
             tap.name, plugin_type=tap.type, configurable=True
@@ -578,7 +587,11 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_all_shows_optional(self, cli_runner, tap) -> None:
+    def test_config_list_all_shows_optional(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--all` restores the full listing including Optional."""
         result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
         assert_cli_runner(result)
@@ -590,7 +603,10 @@ class TestCliConfig:
         assert "\nstart_date" in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_meltano_default_hides_all(self, cli_runner) -> None:
+    def test_config_list_meltano_default_hides_all(
+        self,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
         """Meltano itself has no required settings; default hides them all."""
         result = cli_runner.invoke(cli, ["config", "list", "meltano"])
         assert_cli_runner(result)
@@ -599,7 +615,11 @@ class TestCliConfig:
         assert "Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_substring(self, cli_runner, tap) -> None:
+    def test_config_list_filter_substring(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--filter` performs case-insensitive substring matching on names."""
         result = cli_runner.invoke(
             cli, ["config", "list", "--filter", "AUTH", tap.name]
@@ -621,7 +641,11 @@ class TestCliConfig:
         assert "Use --all to show all" not in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_searches_all(self, cli_runner, tap) -> None:
+    def test_config_list_filter_searches_all(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--filter` finds optional-at-default settings that the default hides."""
         # `start_date` is at default (not in `Configured:`). Without --filter
         # and without --all, it would be hidden.
@@ -638,7 +662,11 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_only_configured(
-        self, cli_runner, tap, session, plugin_settings_service_factory
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        session,
+        plugin_settings_service_factory,
     ) -> None:
         """`--filter` matching a configured setting renders Configured: only."""
         pss = plugin_settings_service_factory(tap)
@@ -656,7 +684,11 @@ class TestCliConfig:
             assert "Optional:" not in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_literal_substring(self, cli_runner, tap) -> None:
+    def test_config_list_filter_literal_substring(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--filter` treats its pattern as a literal substring (no regex)."""
         # `auth.` (with the literal dot) should match both auth.username and
         # auth.password but nothing else.
@@ -671,7 +703,9 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_empty_string_treated_as_unset(
-        self, cli_runner, tap
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
     ) -> None:
         """`--filter ""` is treated as no filter (default subset behavior)."""
         result = cli_runner.invoke(cli, ["config", "list", "--filter", "", tap.name])
@@ -682,7 +716,11 @@ class TestCliConfig:
         assert "Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_with_extras(self, cli_runner, tap) -> None:
+    def test_config_list_filter_with_extras(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--filter` composes with `--extras`, narrowing the extras listing."""
         result = cli_runner.invoke(
             cli, ["config", "list", "--extras", "--filter", "_select", tap.name]
@@ -695,7 +733,11 @@ class TestCliConfig:
         assert "\ntest " not in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_extras_default_hides_optional(self, cli_runner, tap) -> None:
+    def test_config_list_extras_default_hides_optional(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--extras` alone hides default-valued non-custom extras."""
         result = cli_runner.invoke(cli, ["config", "list", "--extras", tap.name])
         assert_cli_runner(result)
@@ -706,7 +748,11 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_list_extras_configured_section(
-        self, cli_runner, tap, session, plugin_settings_service_factory
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        session,
+        plugin_settings_service_factory,
     ) -> None:
         """`--all --extras` shows `Configured:` above non-default extras."""
         pss = plugin_settings_service_factory(tap)
@@ -722,7 +768,11 @@ class TestCliConfig:
             assert result.stdout.index("Configured:") < result.stdout.index("_select")
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_no_match(self, cli_runner, tap) -> None:
+    def test_config_list_filter_no_match(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--filter` with no matches prints a clear notice."""
         result = cli_runner.invoke(
             cli,
@@ -735,7 +785,9 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_list_filter_whitespace_only_treated_as_unset(
-        self, cli_runner, tap
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
     ) -> None:
         """`--filter "   "` is normalized to no filter (default subset behavior)."""
         result = cli_runner.invoke(cli, ["config", "list", "--filter", "   ", tap.name])
@@ -745,7 +797,11 @@ class TestCliConfig:
         assert "Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_all_flag_ignored(self, cli_runner, tap) -> None:
+    def test_config_list_filter_all_flag_ignored(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--all --filter` produces the same output as `--filter` alone."""
         filtered = cli_runner.invoke(
             cli, ["config", "list", "--filter", "auth", tap.name]
@@ -759,7 +815,11 @@ class TestCliConfig:
         assert filtered.stdout == filtered_with_all.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_no_match_extras(self, cli_runner, tap) -> None:
+    def test_config_list_filter_no_match_extras(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
         """`--extras --filter` with zero matches still prints the no-match notice."""
         result = cli_runner.invoke(
             cli,
