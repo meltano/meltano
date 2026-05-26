@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 import json
 import sys
 import tempfile
@@ -55,6 +56,15 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 _SettingBucket = list[tuple[str, dict[str, t.Any]]]
+
+
+class _Bucket(enum.Enum):
+    REQUIRED = enum.auto()
+    CONFIGURED = enum.auto()
+    OPTIONAL = enum.auto()
+    CUSTOM = enum.auto()
+    CUSTOM_EXTRAS = enum.auto()
+
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -503,11 +513,7 @@ def list_settings(
         click.echo()
 
     # Bucket settings into groups
-    _required: _SettingBucket = []
-    _configured: _SettingBucket = []
-    _optional: _SettingBucket = []
-    _custom: _SettingBucket = []
-    _custom_extras: _SettingBucket = []
+    buckets: dict[_Bucket, _SettingBucket] = {key: [] for key in _Bucket}
 
     for name, config_metadata in full_config.items():
         setting_def: SettingDefinition = config_metadata["setting"]
@@ -515,27 +521,26 @@ def list_settings(
 
         if extras:
             if setting_def.is_custom:
-                _custom.append((name, config_metadata))
+                buckets[_Bucket.CUSTOM].append((name, config_metadata))
             elif source is not SettingValueStore.DEFAULT:
-                _configured.append((name, config_metadata))
+                buckets[_Bucket.CONFIGURED].append((name, config_metadata))
             else:
-                _optional.append((name, config_metadata))
+                buckets[_Bucket.OPTIONAL].append((name, config_metadata))
         elif setting_def.is_extra:
             if setting_def.is_custom:
-                _custom_extras.append((name, config_metadata))
+                buckets[_Bucket.CUSTOM_EXTRAS].append((name, config_metadata))
             else:
                 continue
         elif setting_def.is_custom:
-            _custom.append((name, config_metadata))
+            buckets[_Bucket.CUSTOM].append((name, config_metadata))
         elif name in setting_groups:
-            _required.append((name, config_metadata))
+            buckets[_Bucket.REQUIRED].append((name, config_metadata))
         elif source is not SettingValueStore.DEFAULT:
-            _configured.append((name, config_metadata))
+            buckets[_Bucket.CONFIGURED].append((name, config_metadata))
         else:
-            _optional.append((name, config_metadata))
+            buckets[_Bucket.OPTIONAL].append((name, config_metadata))
 
-    buckets = [_required, _configured, _optional, _custom, _custom_extras]
-    for bucket in buckets:
+    for bucket in buckets.values():
         bucket.sort(key=lambda item: item[0])
 
     # Normalize `--filter`: strip surrounding whitespace and treat empty/
@@ -549,13 +554,14 @@ def list_settings(
     # hidden; the filter result is the narrowed view.
     if filter_pattern is not None:
         needle = filter_pattern.lower()
-        _required, _configured, _optional, _custom, _custom_extras = (
-            [item for item in bucket if needle in item[0].lower()] for bucket in buckets
-        )
+        buckets = {
+            key: [item for item in bucket if needle in item[0].lower()]
+            for key, bucket in buckets.items()
+        }
         hidden_optional_count = 0
     elif not show_all:
-        hidden_optional_count = len(_optional)
-        _optional = []
+        hidden_optional_count = len(buckets[_Bucket.OPTIONAL])
+        buckets[_Bucket.OPTIONAL] = []
     else:
         hidden_optional_count = 0
 
@@ -564,21 +570,21 @@ def list_settings(
         # Preserve the historical un-headered listing when there's only an
         # Optional bucket (adding an `Optional:` header in that case would be
         # a gratuitous output change for `--all --extras` callers).
-        optional_label = "Optional:" if _configured else None
+        optional_label = "Optional:" if buckets[_Bucket.CONFIGURED] else None
         _section_defs: list[tuple[str | None, _SettingBucket]] = [
-            ("Configured:", _configured),
-            (optional_label, _optional),
-            ("Custom:", _custom),
+            ("Configured:", buckets[_Bucket.CONFIGURED]),
+            (optional_label, buckets[_Bucket.OPTIONAL]),
+            ("Custom:", buckets[_Bucket.CUSTOM]),
         ]
     else:
         _section_defs = [
-            ("Required:", _required),
-            ("Configured:", _configured),
-            ("Optional:", _optional),
-            ("Custom, possibly unsupported by the plugin:", _custom),
+            ("Required:", buckets[_Bucket.REQUIRED]),
+            ("Configured:", buckets[_Bucket.CONFIGURED]),
+            ("Optional:", buckets[_Bucket.OPTIONAL]),
+            ("Custom, possibly unsupported by the plugin:", buckets[_Bucket.CUSTOM]),
             (
                 "Custom extras, plugin-specific options handled by Meltano:",
-                _custom_extras,
+                buckets[_Bucket.CUSTOM_EXTRAS],
             ),
         ]
     sections = [(h, b) for h, b in _section_defs if b]
@@ -606,7 +612,7 @@ def list_settings(
             click.echo()
         click.echo(
             f"Optional settings with default values: {hidden_optional_count} "
-            f"hidden. Use --all to show all."
+            "hidden. Use --all to show all."
         )
 
     if docs_url := settings.docs_url:
