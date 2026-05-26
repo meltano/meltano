@@ -561,16 +561,15 @@ def list_settings(
 
     # Build ordered section list
     if extras:
-        _section_defs: list[tuple[str | None, _SettingBucket]] = [
-            ("Configured:", _configured),
-            ("Optional:", _optional),
-            ("Custom:", _custom),
-        ]
         # Preserve the historical un-headered listing when there's only an
         # Optional bucket (adding an `Optional:` header in that case would be
         # a gratuitous output change for `--all --extras` callers).
-        if not _configured:
-            _section_defs[1] = (None, _optional)
+        optional_label = "Optional:" if _configured else None
+        _section_defs: list[tuple[str | None, _SettingBucket]] = [
+            ("Configured:", _configured),
+            (optional_label, _optional),
+            ("Custom:", _custom),
+        ]
     else:
         _section_defs = [
             ("Required:", _required),
