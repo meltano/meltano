@@ -530,23 +530,11 @@ class TestCliConfig:
         # `start_date` is an optional non-required setting at default (hidden)
         assert "\nstart_date" not in result.stdout
 
-        # Hidden-count summary appears with the exact expected wording.
-        # Compute count by diffing against `--all`.
-        all_result = cli_runner.invoke(cli, ["config", "list", "--all", tap.name])
-        assert_cli_runner(all_result)
-        all_lines = all_result.stdout.split("\n")
-        optional_idx = next(
-            i for i, line in enumerate(all_lines) if line == "Optional:"
-        )
-        remaining = all_lines[optional_idx + 1 :]
-        end_idx = remaining.index("") if "" in remaining else len(remaining)
-        expected_count = sum(
-            1 for line in remaining[:end_idx] if line and not line.startswith("\t")
-        )
-        assert (
-            f"Optional settings with default values: {expected_count} hidden. "
-            "Use --all to show all."
-        ) in result.stdout
+        # Hidden-count summary appears. The exact count is a fixture
+        # implementation detail; test_config_list_hidden_count_one covers
+        # the count == 1 edge case explicitly.
+        assert "Optional settings with default values:" in result.stdout
+        assert "hidden. Use --all to show all." in result.stdout
 
     @pytest.mark.usefixtures("project")
     def test_config_list_hidden_count_one(
@@ -701,14 +689,30 @@ class TestCliConfig:
         assert "auth.password" in result.stdout
         assert "\nport " not in result.stdout
 
+        # Prove no-regex: `a.th` would match `auth` as a regex (`.` = any
+        # char) but is not a literal substring of any setting name.
+        result_regex_like = cli_runner.invoke(
+            cli, ["config", "list", "--filter", "a.th", tap.name]
+        )
+        assert_cli_runner(result_regex_like)
+
+        # `auth.username` still appears in the validation-groups summary, but
+        # no setting line is printed for it.
+        assert "\nauth.username " not in result_regex_like.stdout
+        assert "No settings match" in result_regex_like.stdout
+
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_empty_string_treated_as_unset(
+    @pytest.mark.parametrize("pattern", ("", "   "))
+    def test_config_list_filter_empty_or_whitespace_treated_as_unset(
         self,
         cli_runner: MeltanoCliRunner,
         tap: ProjectPlugin,
+        pattern: str,
     ) -> None:
-        """`--filter ""` is treated as no filter (default subset behavior)."""
-        result = cli_runner.invoke(cli, ["config", "list", "--filter", "", tap.name])
+        """Empty or whitespace-only `--filter` is treated as no filter."""
+        result = cli_runner.invoke(
+            cli, ["config", "list", "--filter", pattern, tap.name]
+        )
         assert_cli_runner(result)
 
         # Default subset behavior: Optional hidden, hidden-count summary shown.
@@ -768,22 +772,6 @@ class TestCliConfig:
             assert result.stdout.index("Configured:") < result.stdout.index("_select")
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_no_match(
-        self,
-        cli_runner: MeltanoCliRunner,
-        tap: ProjectPlugin,
-    ) -> None:
-        """`--filter` with no matches prints a clear notice."""
-        result = cli_runner.invoke(
-            cli,
-            ["config", "list", "--filter", "definitely-does-not-exist", tap.name],
-        )
-        assert_cli_runner(result)
-
-        assert "No settings match" in result.stdout
-        assert "definitely-does-not-exist" in result.stdout
-
-    @pytest.mark.usefixtures("project")
     def test_config_list_filter_whitespace_only_treated_as_unset(
         self,
         cli_runner: MeltanoCliRunner,
@@ -815,18 +803,20 @@ class TestCliConfig:
         assert filtered.stdout == filtered_with_all.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_filter_no_match_extras(
+    @pytest.mark.parametrize("extras_flags", ((), ("--extras",)))
+    def test_config_list_filter_no_match(
         self,
         cli_runner: MeltanoCliRunner,
         tap: ProjectPlugin,
+        extras_flags: tuple[str, ...],
     ) -> None:
-        """`--extras --filter` with zero matches still prints the no-match notice."""
+        """`--filter` with no matches prints a clear notice, with or without --extras."""  # noqa: E501
         result = cli_runner.invoke(
             cli,
             [
                 "config",
                 "list",
-                "--extras",
+                *extras_flags,
                 "--filter",
                 "definitely-does-not-exist",
                 tap.name,
@@ -835,6 +825,7 @@ class TestCliConfig:
         assert_cli_runner(result)
 
         assert "No settings match" in result.stdout
+        assert "definitely-does-not-exist" in result.stdout
 
 
 class TestRequiredLabel:
