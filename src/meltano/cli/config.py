@@ -466,6 +466,13 @@ def list_settings(
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
 
+    # Normalize `--filter`: strip surrounding whitespace and treat empty/
+    # whitespace-only values as not set. An empty pattern would match every
+    # setting (`"" in name`), and a stray trailing space would silently fail
+    # to match (e.g. `--filter "ssl "` would not match `"ssl"`).
+    if filter_pattern is not None:
+        filter_pattern = filter_pattern.strip() or None
+
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
     ctx.obj["session"] = session
@@ -542,13 +549,6 @@ def list_settings(
 
     for bucket in buckets.values():
         bucket.sort(key=lambda item: item[0])
-
-    # Normalize `--filter`: strip surrounding whitespace and treat empty/
-    # whitespace-only values as not set. An empty pattern would match every
-    # setting (`"" in name`), and a stray trailing space would silently fail
-    # to match (e.g. `--filter "ssl "` would not match `"ssl"`).
-    if filter_pattern is not None:
-        filter_pattern = filter_pattern.strip() or None
 
     # When filtering, the user is searching, so optional-at-defaults are not
     # hidden; the filter result is the narrowed view.
