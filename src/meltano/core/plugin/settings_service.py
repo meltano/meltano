@@ -47,8 +47,9 @@ class PluginSettingsService(SettingsService):
         # Fetch environment configs from parent plugin if inherit_from is used
         parent_env = {}
         if self.inherited_settings_service:
-            parent_env = self.inherited_settings_service.env_override
-
+            # Safe shallow copy clone to avoid reference mutability side-effects
+            parent_env = dict(self.inherited_settings_service.env_override)
+            
         self.env_override = {
             # parent/inherited configuration environment values:
             **parent_env,
