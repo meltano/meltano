@@ -1,34 +1,50 @@
-
 import React from 'react';
 import styles from './features.module.scss';
 import Link from '@docusaurus/Link';
 
 const FeatureList = [
   {
-    title: 'Tutorial',
-    Svg: require('@site/static/img/homepage/tutorial.svg').default,
+    title: 'Cloud',
+    Svg: require('@site/static/img/homepage/cloud.svg').default,
     description: (
       <>
-        Get started with Meltano and run data pipelines with a source
-        and destination of your choosing.
+        Fully managed hosted service. Hosted pipelines, workspaces, secrets, and
+        monitoring. No infrastructure to run. Connect with us, get access and
+        start moving data in minutes.{' '}
       </>
     ),
     link: {
-      title: 'View Tutorials',
-      url: 'tutorials/',
+      title: 'Get Started',
+      url: '/getting-started/cloud-overview',
     },
   },
   {
-    title: 'Product Docs',
-    Svg: require('@site/static/img/homepage/book-open.svg').default,
+    title: 'Community',
+    Svg: require('@site/static/img/homepage/community.svg').default,
     description: (
       <>
-        Dive into how Meltano works and how to use it to build your data-powered applications.
+        Self-hosted. The full-featured open-source edition. Run locally or on
+        your own infrastructure. Includes the CLI, the Hub, and community
+        plugins.
       </>
     ),
     link: {
-      title: 'Go to Docs',
-      url: '/guide',
+      title: 'Get Started',
+      url: '/getting-started/community-overview',
+    },
+  },
+  {
+    title: 'Open',
+    Svg: require('@site/static/img/homepage/open.svg').default,
+    description: (
+      <>
+        Open source (MIT). The core Singer-based ELT engine. Bring your own
+        orchestration, storage, and infrastructure. Fully self-managed.
+      </>
+    ),
+    link: {
+      title: 'Get Started',
+      url: '/getting-started/meltano-at-a-glance',
     },
   },
   {
@@ -36,7 +52,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/hub.svg').default,
     description: (
       <>
-        Explore the library of 600+ connectors and tools within the Meltano ecosystem.
+        Explore the library of 600+ connectors and tools within the Meltano
+        ecosystem.
       </>
     ),
     link: {
@@ -50,7 +67,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/sdk.svg').default,
     description: (
       <>
-        Build your own Meltano connector to move data from any source to any destination.
+        Build your own Meltano connector to move data from any source to any
+        destination.
       </>
     ),
     link: {
@@ -64,7 +82,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/rocket.svg').default,
     description: (
       <>
-        Explore many of the connectors built with the Meltano SDK in their home on GitHub: Meltano Labs.
+        Explore many of the connectors built with the Meltano SDK in their home
+        on GitHub: Meltano Labs.
       </>
     ),
     link: {
@@ -79,14 +98,14 @@ const FeatureList = [
 function Feature({ Svg, title, description, link }) {
   return (
     <div className={styles.card}>
-      <div className="text-left z-10">
+      <div className="text-left z-10 flex flex-col h-full">
         <div className={styles.header}>
           <Svg className={styles.featureSvg} role="img" />
           <h4 className="text-2xl font-semibold ms-2">{title}</h4>
         </div>
-        <p className="p2 mt-3 mb-6">{description}</p>
+        <p className="p2 mt-3 mb-6 flex-1">{description}</p>
         {/* eslint-disable-next-line react/prop-types */}
-        <Link to={link.url} target={link.target} className="btn main-btn">
+        <Link to={link.url} target={link.target} className="btn main-btn mt-auto">
           {/* eslint-disable-next-line react/prop-types */}
           {link.title}
         </Link>
