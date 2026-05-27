@@ -44,7 +44,14 @@ class PluginSettingsService(SettingsService):
                 self.plugin.name,
             )
 
+        # Fetch environment configs from parent plugin if inherit_from is used
+        parent_env = {}
+        if self.inherited_settings_service:
+            parent_env = self.inherited_settings_service.env_override
+
         self.env_override = {
+            # parent/inherited configuration environment values:
+            **parent_env,
             # project level environment variables:
             **self.project.settings.env,
             # project level settings as env vars (e.g. `MELTANO_PROJECT_ID`):
