@@ -49,7 +49,7 @@ class PluginSettingsService(SettingsService):
         if self.inherited_settings_service:
             # Safe shallow copy clone to avoid reference mutability side-effects
             parent_env = dict(self.inherited_settings_service.env_override)
-            
+
         self.env_override = {
             # parent/inherited configuration environment values:
             **parent_env,
