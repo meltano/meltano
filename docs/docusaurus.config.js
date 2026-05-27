@@ -5,6 +5,7 @@
 const {themes} = require('prism-react-renderer');
 const lightCodeTheme = themes.oneLight;
 const darkCodeTheme = themes.oneDark;
+const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -51,9 +52,11 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-        gtag: {
-          trackingID: ['G-Z3RR2S48WN'],
-        },
+        ...(isProd && {
+          gtag: {
+            trackingID: ['G-Z3RR2S48WN'],
+          },
+        }),
       }),
     ],
   ],
@@ -87,7 +90,7 @@ const config = {
             position: 'right',
           },
           {
-            to: '/getting-started/installation/',
+            to: '/getting-started/which-meltano/',
             label: 'Get Started',
             position: 'left',
             className: 'header-get-started-link',
@@ -99,13 +102,6 @@ const config = {
             position: 'left',
             className: 'header-tutorials-link',
             'aria-label': 'Tutorials',
-          },
-          {
-            to: '/getting-started/',
-            label: 'Docs',
-            position: 'left',
-            className: 'header-docs-link',
-            'aria-label': 'Docs',
           },
           {
             to: '/changelog',
