@@ -5,7 +5,7 @@ from __future__ import annotations
 import typing as t
 from datetime import datetime
 
-from sqlalchemy.orm import Mapped, mapped_column  # noqa: TC002
+from sqlalchemy.orm import Mapped, mapped_column
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
