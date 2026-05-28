@@ -1100,7 +1100,7 @@ class TestPluginSettingsService:
         # 1. Initialize the child service (which builds its parent)
         child_service = plugin_settings_service_factory(inherited_tap)
         parent_service = child_service.inherited_settings_service
-        
+
         # 2. Assert they are distinct memory objects (shallow copy)
         assert child_service.env_override is not parent_service.env_override
 
