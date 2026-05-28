@@ -39,6 +39,19 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/meltano/meltano/blob/main/docs',
+          async sidebarItemsGenerator({defaultSidebarItemsGenerator, ...args}) {
+            const items = await defaultSidebarItemsGenerator(args);
+            function filterIndexDocs(sidebarItems) {
+              return sidebarItems
+                .filter(item => !(item.type === 'doc' && item.id.endsWith('/index')))
+                .map(item =>
+                  item.type === 'category'
+                    ? {...item, items: filterIndexDocs(item.items)}
+                    : item,
+                );
+            }
+            return filterIndexDocs(items);
+          },
         },
         blog: {
           routeBasePath: '/changelog',
