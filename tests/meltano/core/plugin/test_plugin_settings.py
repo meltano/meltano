@@ -1096,14 +1096,14 @@ class TestPluginSettingsService:
         plugin_settings_service_factory,
         inherited_tap: ProjectPlugin,
     ) -> None:
-        """Test that child plugins safely clone parent env_override instead of referencing it."""
-        # 1. Initialize the child service (which automatically builds its parent)
+        """Test child plugins safely clone parent env_override."""
+        # 1. Initialize the child service (which builds its parent)
         child_service = plugin_settings_service_factory(inherited_tap)
         parent_service = child_service.inherited_settings_service
-
-        # 2. Assert they are NOT the exact same dictionary object in memory (shallow copy check)
+        
+        # 2. Assert they are distinct memory objects (shallow copy)
         assert child_service.env_override is not parent_service.env_override
 
-        # 3. Verify mutation isolation (modifying child does not poison parent state)
+        # 3. Verify mutation isolation (child state won't poison parent)
         child_service.env_override["CHILD_EXCLUSIVE_KEY"] = "isolated"
         assert "CHILD_EXCLUSIVE_KEY" not in parent_service.env_override
