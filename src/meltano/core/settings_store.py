@@ -13,7 +13,7 @@ from operator import eq
 
 import dotenv
 import sqlalchemy
-import sqlalchemy.orm
+import sqlalchemy.exc
 import structlog
 
 from meltano.core.environment import NoActiveEnvironment
@@ -371,7 +371,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
     @property
     @abstractmethod
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str]:
         """Abstract environment values property."""
 
     def get(
@@ -443,13 +443,17 @@ class EnvStoreManager(BaseEnvStoreManager):
     label = "the environment"
 
     @property
-    def env(self) -> dict[str, str | None]:
+    def env(self) -> dict[str, str]:
         """Return values from the calling terminals environment.
 
         Returns:
-            Values found in the calling terminals environment.
+            Values found in the calling terminals environment, excluding any
+            keys that originated from the project's .env file (those are
+            handled by DotEnvStoreManager, even if load_dotenv has injected
+            them into os.environ for in-process SDK use).
         """
-        return self.settings_service.env
+        dotenv = self.project.dotenv_env
+        return {k: v for k, v in self.settings_service.env.items() if k not in dotenv}
 
     def get(
         self,
@@ -1009,7 +1013,7 @@ class DbStoreManager(SettingsStoreManager):
 
             self.log(f"Read key '{name}' from system database: {value!r}")
             return value, {}  # noqa: TRY300
-        except (sqlalchemy.orm.exc.NoResultFound, KeyError):
+        except (sqlalchemy.exc.NoResultFound, KeyError):
             return None, {}
 
     def set(

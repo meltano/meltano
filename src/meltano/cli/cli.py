@@ -10,6 +10,7 @@ from pathlib import Path
 
 import click
 import structlog
+from dotenv import load_dotenv
 
 from meltano import __version__
 from meltano.cli.utils import InstrumentedGroup
@@ -126,6 +127,7 @@ def cli(
 
     try:
         project = Project.find(dotenv_file=env_file)
+        load_dotenv(dotenv_path=project.dotenv, override=False)
         setup_logging(project)
         logger.debug(
             "Meltano %s, Python %s, %s (%s)",
