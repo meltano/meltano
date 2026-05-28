@@ -1090,3 +1090,26 @@ class TestPluginSettingsService:
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         assert subject.get("stacked_env_var") is None
+
+    def test_inherited_env_override(
+        self,
+        plugin_settings_service_factory,
+        tap: ProjectPlugin,
+        inherited_tap: ProjectPlugin,
+        monkeypatch,
+    ) -> None:
+        """Test that child plugins correctly inherit env_override from their parent."""
+        # 1. Set a specific env var on the parent plugin
+        parent_service = plugin_settings_service_factory(tap)
+        parent_env_key = "DBT_POSTGRES_HOST"
+        parent_env_val = "parent-host"
+        
+        # Manually inject into the parent's environment context
+        monkeypatch.setitem(parent_service.env_override, parent_env_key, parent_env_val)
+
+        # 2. Initialize the child service (which inherits from tap)
+        child_service = plugin_settings_service_factory(inherited_tap)
+
+        # 3. Assert that the child now sees the parent's environment variable
+        # Our fix ensures the child service merges the parent's env_override
+        assert child_service.env_override.get(parent_env_key) == parent_env_val
