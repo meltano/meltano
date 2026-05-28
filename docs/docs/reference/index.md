@@ -6,18 +6,15 @@ toc: false
 ---
 
 :::info
-
-  <p><strong>Contributions are welcome!</strong></p>
-  <p>If there's a document you want to see that's not here, we welcome contributions to add it! Submit a <a href="https://github.com/meltano/meltano/tree/main/docs">pull request</a> with your doc and the Meltano team will help you polish it for release. You may also <a href="https://github.com/meltano/meltano/issues/new">submit an issue</a> to help us gauge interest in new docs.</p>
+  **Contributions are welcome!**
+  If there's a document you want to see that's not here, we welcome contributions to add it! Submit a [pull request](https://github.com/meltano/meltano/tree/main/docs) with your doc and the Meltano team will help you polish it for release. You may also [submit an issue](https://github.com/meltano/meltano/issues/new) to help us gauge interest in new docs.
 :::
 
 ## Index
 
-<ul>
-<li><a href="/reference/command-line-interface">Command Line</a></li>
-<li><a href="/reference/settings">Settings</a></li>
-<li><a href="/reference/plugin-definition-syntax">Plugin Definition Syntax</a></li>
-<li><a href="/reference/glossary">Glossary</a></li>
-<li><a href="/reference/cloud">Cloud</a></li>
-<li><a href="/reference/ui">Meltano UI and REST API Server (Deprecated)</a></li>
-</ul>
+- [Command Line](/reference/command-line-interface)
+- [Settings](/reference/settings)
+- [Plugin Definition Syntax](/reference/plugin-definition-syntax)
+- [Glossary](/reference/glossary)
+- [Cloud](/reference/cloud)
+- [Meltano UI and REST API Server (Deprecated)](/reference/ui)
