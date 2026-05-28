@@ -8,7 +8,7 @@ toc: false
 :::info
 **Contributions are welcome!**
 
-  If there's a document you want to see that's not here, we welcome contributions to add it! Submit a [pull request](https://github.com/meltano/meltano/tree/main/docs) with your doc and the Meltano team will help you polish it for release. You may also [submit an issue](https://github.com/meltano/meltano/issues/new) to help us gauge interest in new docs.
+If there's a document you want to see that's not here, we welcome contributions to add it! Submit a [pull request](https://github.com/meltano/meltano/tree/main/docs) with your doc and the Meltano team will help you polish it for release. You may also [submit an issue](https://github.com/meltano/meltano/issues/new) to help us gauge interest in new docs.
 :::
 
 ## Index
