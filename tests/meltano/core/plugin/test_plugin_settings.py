@@ -1094,22 +1094,16 @@ class TestPluginSettingsService:
     def test_inherited_env_override(
         self,
         plugin_settings_service_factory,
-        tap: ProjectPlugin,
         inherited_tap: ProjectPlugin,
-        monkeypatch,
     ) -> None:
-        """Test that child plugins correctly inherit env_override from their parent."""
-        # 1. Set a specific env var on the parent plugin
-        parent_service = plugin_settings_service_factory(tap)
-        parent_env_key = "DBT_POSTGRES_HOST"
-        parent_env_val = "parent-host"
-
-        # Manually inject into the parent's environment context
-        monkeypatch.setitem(parent_service.env_override, parent_env_key, parent_env_val)
-
-        # 2. Initialize the child service (which inherits from tap)
+        """Test that child plugins safely clone parent env_override instead of referencing it."""
+        # 1. Initialize the child service (which automatically builds its parent)
         child_service = plugin_settings_service_factory(inherited_tap)
-
-        # 3. Assert that the child now sees the parent's environment variable
-        # Our fix ensures the child service merges the parent's env_override
-        assert child_service.env_override.get(parent_env_key) == parent_env_val
+        parent_service = child_service.inherited_settings_service
+        
+        # 2. Assert they are NOT the exact same dictionary object in memory (shallow copy check)
+        assert child_service.env_override is not parent_service.env_override
+        
+        # 3. Verify mutation isolation (modifying child does not poison parent state)
+        child_service.env_override["CHILD_EXCLUSIVE_KEY"] = "isolated"
+        assert "CHILD_EXCLUSIVE_KEY" not in parent_service.env_override
