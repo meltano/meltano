@@ -44,15 +44,13 @@ class PluginSettingsService(SettingsService):
                 self.plugin.name,
             )
 
-        # Fetch environment configs from parent plugin if inherit_from is used
-        parent_env = {}
-        if self.inherited_settings_service:
-            # Safe shallow copy clone to avoid reference mutability side-effects
-            parent_env = dict(self.inherited_settings_service.env_override)
-
         self.env_override = {
-            # parent/inherited configuration environment values:
-            **parent_env,
+            # Fetch environment configs from parent plugin if inherit_from is used
+            **(
+                self.inherited_settings_service.env_override
+                if self.inherited_settings_service
+                else {}
+            ),
             # project level environment variables:
             **self.project.settings.env,
             # project level settings as env vars (e.g. `MELTANO_PROJECT_ID`):

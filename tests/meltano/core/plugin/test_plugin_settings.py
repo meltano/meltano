@@ -1101,9 +1101,6 @@ class TestPluginSettingsService:
         child_service = plugin_settings_service_factory(inherited_tap)
         parent_service = child_service.inherited_settings_service
 
-        # 2. Assert they are distinct memory objects (shallow copy)
-        assert child_service.env_override is not parent_service.env_override
-
-        # 3. Verify mutation isolation (child state won't poison parent)
+        # 2. Verify mutation isolation (child state won't poison parent)
         child_service.env_override["CHILD_EXCLUSIVE_KEY"] = "isolated"
         assert "CHILD_EXCLUSIVE_KEY" not in parent_service.env_override
