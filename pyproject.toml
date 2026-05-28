@@ -294,7 +294,6 @@ module = [
   "meltano.core.plugin.dbt.*",
   "meltano.core.plugin.meltano_file",
   "meltano.core.plugin.project_plugin",
-  "meltano.core.plugin.settings_service",
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
