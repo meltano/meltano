@@ -1095,12 +1095,28 @@ class TestPluginSettingsService:
         self,
         plugin_settings_service_factory,
         inherited_tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Test child plugins safely clone parent env_override."""
         # 1. Initialize the child service (which builds its parent)
         child_service = plugin_settings_service_factory(inherited_tap)
         parent_service = child_service.inherited_settings_service
+        assert parent_service is not None
 
         # 2. Verify mutation isolation (child state won't poison parent)
         child_service.env_override["CHILD_EXCLUSIVE_KEY"] = "isolated"
         assert "CHILD_EXCLUSIVE_KEY" not in parent_service.env_override
+
+        # 3. Verify parent's `env:` block inheritance
+        parent = inherited_tap.parent
+        monkeypatch.setattr(parent, "env", {"PARENT_ENV_VAR": "from_parent_env"})
+        child_service = plugin_settings_service_factory(inherited_tap)
+        assert child_service.env_override.get("PARENT_ENV_VAR") == "from_parent_env"
+
+        # 4. Child's own env_override kwarg takes priority over parent's `env:` block.
+        monkeypatch.setattr(parent, "env", {"SHARED_ENV_VAR": "from_parent"})
+        child_service = plugin_settings_service_factory(
+            inherited_tap,
+            env_override={"SHARED_ENV_VAR": "from_child"},
+        )
+        assert child_service.env_override.get("SHARED_ENV_VAR") == "from_child"
