@@ -26,7 +26,7 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Generator
 
     from sqlalchemy.orm import Session
 
@@ -34,10 +34,12 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
 
-    PluginSettingsServiceFactory: t.TypeAlias = Callable[
-        [ProjectPlugin],
-        PluginSettingsService,
-    ]
+    class PluginSettingsServiceFactory(t.Protocol):
+        def __call__(
+            self,
+            plugin: ProjectPlugin,
+            env_override: dict | None = None,
+        ) -> PluginSettingsService: ...
 
 
 @pytest.mark.order(0)
@@ -86,7 +88,7 @@ def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
 
 
 @pytest.fixture
-def environment(project: Project) -> Generator[Environment, None, None]:
+def environment(project: Project) -> Generator[Environment | None, None, None]:
     project.activate_environment("dev")
     try:
         yield project.environment
@@ -223,7 +225,10 @@ class TestPluginSettingsService:
         """Casting is disabled for expandable strings."""
         monkeypatch.setenv("PORT", "4444")
         service = plugin_settings_service_factory(inherited_tap)
+
         parent = service.inherited_settings_service
+        assert parent is not None
+
         parent.set(
             "port",
             "5555",
@@ -1093,7 +1098,7 @@ class TestPluginSettingsService:
 
     def test_inherited_env_override(
         self,
-        plugin_settings_service_factory,
+        plugin_settings_service_factory: PluginSettingsServiceFactory,
         inherited_tap: ProjectPlugin,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
