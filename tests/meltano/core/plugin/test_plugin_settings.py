@@ -1103,7 +1103,7 @@ class TestPluginSettingsService:
         parent_service = plugin_settings_service_factory(tap)
         parent_env_key = "DBT_POSTGRES_HOST"
         parent_env_val = "parent-host"
-        
+
         # Manually inject into the parent's environment context
         monkeypatch.setitem(parent_service.env_override, parent_env_key, parent_env_val)
 
