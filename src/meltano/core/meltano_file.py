@@ -27,7 +27,7 @@ class MeltanoFile(Canonical):
 
     version: int
     requires_meltano: str | None
-    plugins: dict[PluginType, list[ProjectPlugin]]
+    plugins: Canonical
     schedules: list[Schedule]
     environments: list[Environment]
     jobs: list[TaskSets]
