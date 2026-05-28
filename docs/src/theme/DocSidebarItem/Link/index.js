@@ -318,7 +318,6 @@ const BADGE_CONFIG = {
   open: { label: 'Open', className: styles.badgeOpen },
 };
 
- 
 export default function DocSidebarItemLink({
   item,
   onItemClick,
