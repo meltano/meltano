@@ -263,6 +263,97 @@ def json_formatter(
     )
 
 
+# The field Google Cloud Logging reads to populate `LogEntry.sourceLocation`.
+# https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
+_GCP_SOURCE_LOCATION_KEY = "logging.googleapis.com/sourceLocation"
+
+
+def _google_cloud_logging_processor(
+    logger: structlog.typing.WrappedLogger,  # noqa: ARG001
+    name: str,  # noqa: ARG001
+    event_dict: structlog.typing.EventDict,
+) -> structlog.typing.EventDict:
+    """Map Meltano's log keys onto the special fields Google Cloud Logging reads.
+
+    Google Cloud Logging (formerly Stackdriver) only recognises a structured log
+    entry when it finds its own "special fields". This renames the keys structlog
+    emits so severity-based filtering and alerting work without any downstream
+    remapping:
+
+    - ``level`` becomes ``severity`` (upper-cased to match the GCL severities)
+    - ``event`` becomes ``message``
+    - callsite parameters become ``logging.googleapis.com/sourceLocation``
+
+    Args:
+        logger: The logger instance.
+        name: The logger name.
+        event_dict: The event dictionary.
+
+    Returns:
+        The event dictionary with Google Cloud Logging special fields.
+    """
+    if (level := event_dict.pop("level", None)) is not None:
+        # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
+        # all valid Google Cloud Logging severities once upper-cased.
+        event_dict["severity"] = level.upper()
+
+    if "event" in event_dict:
+        event_dict["message"] = event_dict.pop("event")
+
+    # Present only when callsite_parameters is enabled.
+    pathname = event_dict.pop("pathname", None)
+    lineno = event_dict.pop("lineno", None)
+    func_name = event_dict.pop("func_name", None)
+    if pathname is not None or lineno is not None or func_name is not None:
+        source_location: dict[str, t.Any] = {}
+        if pathname is not None:
+            source_location["file"] = pathname
+        if lineno is not None:
+            # GCL expects `line` as a string.
+            source_location["line"] = str(lineno)
+        if func_name is not None:
+            source_location["function"] = func_name
+        event_dict[_GCP_SOURCE_LOCATION_KEY] = source_location
+
+    return event_dict
+
+
+def google_cloud_logging_formatter(
+    *,
+    callsite_parameters: bool = False,
+    dict_tracebacks: bool = True,
+    show_locals: bool = False,
+) -> structlog.stdlib.ProcessorFormatter:
+    """Create a JSON formatter compatible with Google Cloud Logging.
+
+    Unlike :func:`json_formatter`, this renames structlog's keys to the special
+    fields Google Cloud Logging (formerly Stackdriver) expects, so logs are
+    ingested as structured entries with the correct severity instead of an opaque
+    JSON string. See
+    https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields.
+
+    Args:
+        callsite_parameters: Whether to include source location
+            (``logging.googleapis.com/sourceLocation``) in the JSON output.
+        dict_tracebacks: Whether to include tracebacks in the JSON output.
+        show_locals: Whether to include local variables in the traceback.
+
+    Returns:
+        A configured Google Cloud Logging JSON formatter.
+    """
+    return _process_formatter(
+        *_processors_from_kwargs(
+            callsite_parameters=callsite_parameters,
+            dict_tracebacks=dict_tracebacks,
+            show_locals=show_locals,
+        ),
+        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+        structlog.stdlib.ExtraAdder(),
+        _google_cloud_logging_processor,
+        structlog.processors.JSONRenderer(),
+    )
+
+
 def _event_renderer(
     logger: structlog.typing.WrappedLogger,  # noqa: ARG001
     name: str,  # noqa: ARG001

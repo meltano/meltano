@@ -280,6 +280,75 @@ class TestLogFormatters:
         message_dict = json.loads(output)
         assert "locals" not in message_dict["exception"][0]["frames"][0]
 
+    def test_google_cloud_logging_formatter_severity_and_message(self, record) -> None:
+        formatter = formatters.google_cloud_logging_formatter()
+        message_dict = json.loads(formatter.format(record))
+
+        # GCL special fields are present...
+        assert message_dict["severity"] == "INFO"
+        assert message_dict["message"] == "test"
+        assert "timestamp" in message_dict
+
+        # ...and the structlog-native keys they replace are gone.
+        assert "level" not in message_dict
+        assert "event" not in message_dict
+
+    def test_google_cloud_logging_formatter_severity_levels(self) -> None:
+        formatter = formatters.google_cloud_logging_formatter()
+        for level, severity in (
+            (logging.DEBUG, "DEBUG"),
+            (logging.INFO, "INFO"),
+            (logging.WARNING, "WARNING"),
+            (logging.ERROR, "ERROR"),
+            (logging.CRITICAL, "CRITICAL"),
+        ):
+            record = logging.LogRecord(
+                name="test",
+                level=level,
+                pathname="/path/to/my_module.py",
+                lineno=1,
+                msg="test",
+                args=None,
+                exc_info=None,
+            )
+            message_dict = json.loads(formatter.format(record))
+            assert message_dict["severity"] == severity
+
+    def test_google_cloud_logging_formatter_source_location(self, record) -> None:
+        # Without callsite parameters there is no source location.
+        formatter = formatters.google_cloud_logging_formatter()
+        message_dict = json.loads(formatter.format(record))
+        assert "logging.googleapis.com/sourceLocation" not in message_dict
+
+        # With callsite parameters the source location is populated.
+        formatter = formatters.google_cloud_logging_formatter(
+            callsite_parameters=True,
+        )
+        message_dict = json.loads(formatter.format(record))
+        source_location = message_dict["logging.googleapis.com/sourceLocation"]
+        assert source_location["file"] == "/path/to/my_module.py"
+        assert source_location["line"] == "1"
+        assert source_location["function"] == "my_func"
+
+    def test_google_cloud_logging_formatter_exception(
+        self,
+        record_with_exception,
+    ) -> None:
+        formatter = formatters.google_cloud_logging_formatter()
+        message_dict = json.loads(formatter.format(record_with_exception))
+
+        assert message_dict["severity"] == "ERROR"
+        assert message_dict["message"] == "test"
+
+        exception_list = message_dict["exception"]
+        assert isinstance(exception_list, list)
+        assert exception_list[0]["exc_type"] == "ValueError"
+        assert exception_list[0]["exc_value"] == "Not a real error"
+
+        formatter = formatters.google_cloud_logging_formatter(dict_tracebacks=False)
+        message_dict = json.loads(formatter.format(record_with_exception))
+        assert "exception" not in message_dict
+
     def test_plain_formatter(self, record) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
         formatter.logger = logging.getLogger("test")  # noqa: TID251

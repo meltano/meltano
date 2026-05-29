@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .formatters import (
     console_log_formatter,
+    google_cloud_logging_formatter,
     json_formatter,
     key_value_formatter,
     plain_formatter,
@@ -33,6 +34,7 @@ __all__ = [
     "SizeThresholdJobLogException",
     "capture_subprocess_output",
     "console_log_formatter",
+    "google_cloud_logging_formatter",
     "json_formatter",
     "key_value_formatter",
     "plain_formatter",
