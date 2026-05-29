@@ -366,6 +366,20 @@ class TestLogFormatters:
         )
         assert "logging.googleapis.com/sourceLocation" not in event_dict
 
+    def test_google_cloud_logging_formatter_function_only(self) -> None:
+        # Only func_name present, and no level or event keys: the remaining
+        # source location field is included and nothing else is mapped.
+        event_dict = formatters._google_cloud_logging_processor(
+            None,
+            "info",
+            {"func_name": "my_func"},
+        )
+        assert event_dict["logging.googleapis.com/sourceLocation"] == {
+            "function": "my_func",
+        }
+        assert "severity" not in event_dict
+        assert "message" not in event_dict
+
     def test_google_cloud_logging_formatter_exception(
         self,
         record_with_exception,
