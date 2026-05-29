@@ -22,8 +22,8 @@ class PluginSettingsService(SettingsService):
         self,
         project: Project,
         plugin: ProjectPlugin,
-        *args,  # noqa: ANN002
-        **kwargs,  # noqa: ANN003
+        *args: t.Any,
+        **kwargs: t.Any,
     ):
         """Create a new plugin settings manager.
 
@@ -45,6 +45,12 @@ class PluginSettingsService(SettingsService):
             )
 
         self.env_override = {
+            # Fetch environment configs from parent plugin if inherit_from is used
+            **(
+                self.inherited_settings_service.env_override
+                if self.inherited_settings_service
+                else {}
+            ),
             # project level environment variables:
             **self.project.settings.env,
             # project level settings as env vars (e.g. `MELTANO_PROJECT_ID`):

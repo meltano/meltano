@@ -18,6 +18,7 @@ from meltano.core.plugin_lock_service import PluginLockService
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
+    from meltano.core.behavior.canonical import Canonical
     from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.base import BasePlugin
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -120,7 +121,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
-    def current_plugins(self) -> dict[PluginType, list[ProjectPlugin]]:
+    def current_plugins(self) -> Canonical:
         """Return the current plugins.
 
         Returns:
@@ -131,7 +132,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
     @contextmanager
     def update_plugins(
         self,
-    ) -> Generator[dict[PluginType, list[ProjectPlugin]], None, None]:
+    ) -> Generator[Canonical, None, None]:
         """Update the current plugins.
 
         Yields:
@@ -308,7 +309,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         plugin_name: str,
         plugin: ProjectPlugin,
     ) -> ProjectPlugin | None:
-        mapping_name = plugin.extra_config.get("_mapping_name")
+        mapping_name: str | None = plugin.extra_config.get("_mapping_name")
         if mapping_name == plugin_name:
             all_mappings = self.find_plugins_by_mapping_name(mapping_name)
             if len(all_mappings) > 1:
