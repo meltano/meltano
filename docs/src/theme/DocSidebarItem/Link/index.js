@@ -334,6 +334,10 @@ export default function DocSidebarItemLink({
   const badgeType = customProps?.badgeType;
   const badgeConfig = badgeType ? BADGE_CONFIG[badgeType] : null;
 
+  if (customProps?.hide_from_sidebar) {
+    return null;
+  }
+
   return (
     <li
       className={clsx(
@@ -385,6 +389,7 @@ DocSidebarItemLink.propTypes = {
     customProps: PropTypes.shape({
       icon: PropTypes.string,
       badgeType: PropTypes.string,
+      hide_from_sidebar: PropTypes.bool,
     }),
   }).isRequired,
   onItemClick: PropTypes.func,
