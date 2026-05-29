@@ -74,6 +74,22 @@ class TestLogFormatters:
         monkeypatch.delenv("FORCE_COLOR", raising=False)
 
     @pytest.fixture
+    def isolated_logger(self):
+        """A stdlib logger whose level is restored after the test.
+
+        Some formatters consult the logger level (e.g. ``filter_by_level``), so
+        the plain formatter tests need to set it. Stdlib loggers are global
+        singletons, so the level is restored afterwards to avoid leaking state
+        into other tests that share the ``test`` logger name.
+        """
+        logger = logging.getLogger("test")  # noqa: TID251
+        original_level = logger.level
+        try:
+            yield logger
+        finally:
+            logger.setLevel(original_level)
+
+    @pytest.fixture
     def record(self):
         return logging.LogRecord(
             name="test",
@@ -349,16 +365,16 @@ class TestLogFormatters:
         message_dict = json.loads(formatter.format(record_with_exception))
         assert "exception" not in message_dict
 
-    def test_plain_formatter(self, record) -> None:
+    def test_plain_formatter(self, record, isolated_logger) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
-        formatter.logger = logging.getLogger("test")  # noqa: TID251
+        formatter.logger = isolated_logger
         formatter.logger.setLevel(logging.INFO)
         output = formatter.format(record)
         assert output == "INFO test"
 
-    def test_plain_formatter_drop_event(self, record) -> None:
+    def test_plain_formatter_drop_event(self, record, isolated_logger) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
-        formatter.logger = logging.getLogger("test")  # noqa: TID251
+        formatter.logger = isolated_logger
         formatter.logger.setLevel(logging.WARNING)
 
         with pytest.raises(structlog.exceptions.DropEvent):
