@@ -346,6 +346,26 @@ class TestLogFormatters:
         assert source_location["line"] == "1"
         assert source_location["function"] == "my_func"
 
+    def test_google_cloud_logging_formatter_partial_source_location(self) -> None:
+        # Only the present callsite fields are included.
+        event_dict = formatters._google_cloud_logging_processor(
+            None,
+            "info",
+            {"event": "test", "level": "info", "pathname": "/a.py", "lineno": 10},
+        )
+        source_location = event_dict["logging.googleapis.com/sourceLocation"]
+        assert source_location == {"file": "/a.py", "line": "10"}
+        assert "function" not in source_location
+
+    def test_google_cloud_logging_formatter_no_source_location(self) -> None:
+        # No callsite fields means no sourceLocation key at all.
+        event_dict = formatters._google_cloud_logging_processor(
+            None,
+            "info",
+            {"event": "test", "level": "info"},
+        )
+        assert "logging.googleapis.com/sourceLocation" not in event_dict
+
     def test_google_cloud_logging_formatter_exception(
         self,
         record_with_exception,
@@ -364,6 +384,18 @@ class TestLogFormatters:
         formatter = formatters.google_cloud_logging_formatter(dict_tracebacks=False)
         message_dict = json.loads(formatter.format(record_with_exception))
         assert "exception" not in message_dict
+
+    def test_google_cloud_logging_formatter_locals(
+        self,
+        record_with_exception,
+    ) -> None:
+        formatter = formatters.google_cloud_logging_formatter(show_locals=True)
+        message_dict = json.loads(formatter.format(record_with_exception))
+        assert "locals" in message_dict["exception"][0]["frames"][0]
+
+        formatter = formatters.google_cloud_logging_formatter(show_locals=False)
+        message_dict = json.loads(formatter.format(record_with_exception))
+        assert "locals" not in message_dict["exception"][0]["frames"][0]
 
     def test_plain_formatter(self, record, isolated_logger) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")

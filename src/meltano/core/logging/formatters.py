@@ -294,8 +294,9 @@ def _google_cloud_logging_processor(
     """
     if (level := event_dict.pop("level", None)) is not None:
         # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
-        # all valid Google Cloud Logging severities once upper-cased.
-        event_dict["severity"] = level.upper()
+        # all valid Google Cloud Logging severities once upper-cased. Coerce to
+        # str first in case a non-string level slips into the event dict.
+        event_dict["severity"] = str(level).upper()
 
     if "event" in event_dict:
         event_dict["message"] = event_dict.pop("event")
