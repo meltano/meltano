@@ -367,7 +367,7 @@ class SettingsService(metaclass=ABCMeta):
         )
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
-            expanded_value = do_expand_env_vars(  # type: ignore[type-var]
+            expanded_value = do_expand_env_vars(
                 value,
                 env=expandable_env,
                 if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]

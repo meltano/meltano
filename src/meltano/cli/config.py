@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 import json
 import sys
 import tempfile
@@ -55,6 +56,15 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 _SettingBucket = list[tuple[str, dict[str, t.Any]]]
+
+
+class _Bucket(enum.Enum):
+    REQUIRED = enum.auto()
+    CONFIGURED = enum.auto()
+    OPTIONAL = enum.auto()
+    CUSTOM = enum.auto()
+    CUSTOM_EXTRAS = enum.auto()
+
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -417,13 +427,29 @@ def print_config(
     cls=PartialInstrumentedCmd,
     name="list",
     short_help=(
-        "List all settings for the specified plugin with their names, "
+        "List settings for the specified plugin with their names, "
         "environment variables, and current values."
     ),
 )
 @click.argument("plugin_name")
 @click.option("--plugin-type", type=PluginTypeArg())
 @click.option("--extras", is_flag=True, help="List only plugin extras.")
+@click.option(
+    "--all",
+    "show_all",
+    is_flag=True,
+    help=(
+        "Show all settings, including optional settings at their default values. "
+        "By default only required, configured, and custom settings are shown. "
+        "Ignored when --filter is set; --filter always searches all settings."
+    ),
+)
+@click.option(
+    "--filter",
+    "filter_pattern",
+    metavar="SUBSTRING",
+    help="Show only settings whose name contains SUBSTRING (case-insensitive).",
+)
 @pass_project(migrate=True)
 @click.pass_context
 def list_settings(
@@ -433,10 +459,19 @@ def list_settings(
     plugin_name: str,
     plugin_type: PluginType | None,
     extras: bool,
+    show_all: bool,
+    filter_pattern: str | None,
 ) -> None:
-    """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
+    """List settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
+
+    # Normalize `--filter`: strip surrounding whitespace and treat empty/
+    # whitespace-only values as not set. An empty pattern would match every
+    # setting (`"" in name`), and a stray trailing space would silently fail
+    # to match (e.g. `--filter "ssl "` would not match `"ssl"`).
+    if filter_pattern is not None:
+        filter_pattern = filter_pattern.strip() or None
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -470,6 +505,11 @@ def list_settings(
         for setting_name in group:
             setting_groups[setting_name].append(i)
     num_groups = len(validation_groups)
+    # The validation groups summary orients users on what `Required:` means.
+    # Always emit it for non-extras listings (including filter mode): without
+    # it, `--filter` matches that fall in a single validation group would be
+    # framed under `Required:` as if they were the full required set, which
+    # is misleading for plugins with alternative validation groups.
     if not extras and num_groups > 1:
         click.echo("Setting groups (one of the following combinations is required):")
         for i, group in enumerate(validation_groups, 1):
@@ -480,11 +520,7 @@ def list_settings(
         click.echo()
 
     # Bucket settings into groups
-    _required: _SettingBucket = []
-    _configured: _SettingBucket = []
-    _optional: _SettingBucket = []
-    _custom: _SettingBucket = []
-    _custom_extras: _SettingBucket = []
+    buckets: dict[_Bucket, _SettingBucket] = {key: [] for key in _Bucket}
 
     for name, config_metadata in full_config.items():
         setting_def: SettingDefinition = config_metadata["setting"]
@@ -492,41 +528,63 @@ def list_settings(
 
         if extras:
             if setting_def.is_custom:
-                _custom.append((name, config_metadata))
+                buckets[_Bucket.CUSTOM].append((name, config_metadata))
+            elif source is not SettingValueStore.DEFAULT:
+                buckets[_Bucket.CONFIGURED].append((name, config_metadata))
             else:
-                _optional.append((name, config_metadata))
+                buckets[_Bucket.OPTIONAL].append((name, config_metadata))
         elif setting_def.is_extra:
             if setting_def.is_custom:
-                _custom_extras.append((name, config_metadata))
+                buckets[_Bucket.CUSTOM_EXTRAS].append((name, config_metadata))
             else:
                 continue
         elif setting_def.is_custom:
-            _custom.append((name, config_metadata))
+            buckets[_Bucket.CUSTOM].append((name, config_metadata))
         elif name in setting_groups:
-            _required.append((name, config_metadata))
+            buckets[_Bucket.REQUIRED].append((name, config_metadata))
         elif source is not SettingValueStore.DEFAULT:
-            _configured.append((name, config_metadata))
+            buckets[_Bucket.CONFIGURED].append((name, config_metadata))
         else:
-            _optional.append((name, config_metadata))
+            buckets[_Bucket.OPTIONAL].append((name, config_metadata))
 
-    for bucket in (_required, _configured, _optional, _custom, _custom_extras):
+    for bucket in buckets.values():
         bucket.sort(key=lambda item: item[0])
+
+    # When filtering, the user is searching, so optional-at-defaults are not
+    # hidden; the filter result is the narrowed view.
+    if filter_pattern is not None:
+        needle = filter_pattern.lower()
+        buckets = {
+            key: [item for item in bucket if needle in item[0].lower()]
+            for key, bucket in buckets.items()
+        }
+        hidden_optional_count = 0
+    elif not show_all:
+        hidden_optional_count = len(buckets[_Bucket.OPTIONAL])
+        buckets[_Bucket.OPTIONAL] = []
+    else:
+        hidden_optional_count = 0
 
     # Build ordered section list
     if extras:
+        # Preserve the historical un-headered listing when there's only an
+        # Optional bucket (adding an `Optional:` header in that case would be
+        # a gratuitous output change for `--all --extras` callers).
+        optional_label = "Optional:" if buckets[_Bucket.CONFIGURED] else None
         _section_defs: list[tuple[str | None, _SettingBucket]] = [
-            (None, _optional),
-            ("Custom:", _custom),
+            ("Configured:", buckets[_Bucket.CONFIGURED]),
+            (optional_label, buckets[_Bucket.OPTIONAL]),
+            ("Custom:", buckets[_Bucket.CUSTOM]),
         ]
     else:
         _section_defs = [
-            ("Required:", _required),
-            ("Configured:", _configured),
-            ("Optional:", _optional),
-            ("Custom, possibly unsupported by the plugin:", _custom),
+            ("Required:", buckets[_Bucket.REQUIRED]),
+            ("Configured:", buckets[_Bucket.CONFIGURED]),
+            ("Optional:", buckets[_Bucket.OPTIONAL]),
+            ("Custom, possibly unsupported by the plugin:", buckets[_Bucket.CUSTOM]),
             (
                 "Custom extras, plugin-specific options handled by Meltano:",
-                _custom_extras,
+                buckets[_Bucket.CUSTOM_EXTRAS],
             ),
         ]
     sections = [(h, b) for h, b in _section_defs if b]
@@ -545,6 +603,17 @@ def list_settings(
                 num_groups=num_groups,
                 safe=safe,
             )
+
+    if filter_pattern is not None and not sections:
+        click.secho(f"No settings match {filter_pattern!r}.", fg="yellow")
+
+    if hidden_optional_count > 0:
+        if sections:
+            click.echo()
+        click.echo(
+            f"Optional settings with default values: {hidden_optional_count} "
+            "hidden. Use --all to show all."
+        )
 
     if docs_url := settings.docs_url:
         click.echo()
