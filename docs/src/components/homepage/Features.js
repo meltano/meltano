@@ -4,6 +4,20 @@ import Link from '@docusaurus/Link';
 
 const FeatureList = [
   {
+    title: 'Open',
+    Svg: require('@site/static/img/homepage/open.svg').default,
+    description: (
+      <>
+        Open source (MIT). The core Singer-based ELT engine. Bring your own
+        orchestration, storage, and infrastructure. Fully self-managed.
+      </>
+    ),
+    link: {
+      title: 'Get Started',
+      url: '/getting-started/meltano-at-a-glance',
+    },
+  },
+  {
     title: 'Cloud',
     Svg: require('@site/static/img/homepage/cloud.svg').default,
     description: (
@@ -19,32 +33,17 @@ const FeatureList = [
     },
   },
   {
-    title: 'Community',
-    Svg: require('@site/static/img/homepage/community.svg').default,
+    title: 'Reference',
+    Svg: require('@site/static/img/homepage/book-open.svg').default,
     description: (
       <>
-        Self-hosted. The full-featured open-source edition. Run locally or on
-        your own infrastructure. Includes the CLI, the Hub, and community
-        plugins.
+        Browse the full Meltano reference documentation — CLI commands, settings,
+        plugin definition syntax, and more.
       </>
     ),
     link: {
-      title: 'Get Started',
-      url: '/getting-started/community-overview',
-    },
-  },
-  {
-    title: 'Open',
-    Svg: require('@site/static/img/homepage/open.svg').default,
-    description: (
-      <>
-        Open source (MIT). The core Singer-based ELT engine. Bring your own
-        orchestration, storage, and infrastructure. Fully self-managed.
-      </>
-    ),
-    link: {
-      title: 'Get Started',
-      url: '/getting-started/meltano-at-a-glance',
+      title: 'View Reference',
+      url: '/reference',
     },
   },
   {
