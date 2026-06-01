@@ -10,7 +10,7 @@ We automatically maintain a fully-tested Postman collection for the Meltano Clou
 Simply import the following collection URL into Postman to begin sending requests:
 
 ```
-https://docs.meltano.com/reference/cloud/api/meltano-cloud-postman.json
+https://docs.meltano.com/reference/cloud/api/postman_collection.json
 ```
 
 ---
