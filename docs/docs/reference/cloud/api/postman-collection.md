@@ -2,7 +2,6 @@
 title: Postman Collection
 description: Get started with a Postman collection for the Meltano Cloud API - contains all the requests and documentation.
 sidebar_position: 1
-draft: true
 ---
 
 import BrowserOnly from '@docusaurus/BrowserOnly';
