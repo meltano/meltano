@@ -573,12 +573,7 @@ ENV_VAR_PATTERN = re.compile(
     re.VERBOSE,
 )
 
-Expandable = t.TypeVar(
-    "Expandable",
-    str,
-    Mapping[str, "Expandable"],
-    Sequence["Expandable"],
-)
+Expandable: t.TypeAlias = str | Mapping[str, "Expandable"] | list["Expandable"]
 
 
 class EnvVarMissingBehavior(IntEnum):
@@ -589,13 +584,53 @@ class EnvVarMissingBehavior(IntEnum):
     ignore = 2
 
 
+@t.overload
 def expand_env_vars(
-    raw_value: Expandable,
+    raw_value: None,
     env: Mapping[str, str],
     *,
     if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
     flat: bool = False,
-) -> Expandable:
+) -> None: ...
+
+
+@t.overload
+def expand_env_vars(
+    raw_value: str,
+    env: Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> str: ...
+
+
+@t.overload
+def expand_env_vars(
+    raw_value: list,
+    env: Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> list: ...
+
+
+@t.overload
+def expand_env_vars(
+    raw_value: Mapping,
+    env: Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> Mapping: ...
+
+
+def expand_env_vars(
+    raw_value: Expandable | None,
+    env: Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> Expandable | None:
     """Expand/interpolate provided env vars into a string or env mapping.
 
     By default, attempting to expand an env var which is not defined in the

@@ -22,8 +22,8 @@ class PluginSettingsService(SettingsService):
         self,
         project: Project,
         plugin: ProjectPlugin,
-        *args,  # noqa: ANN002
-        **kwargs,  # noqa: ANN003
+        *args: t.Any,
+        **kwargs: t.Any,
     ):
         """Create a new plugin settings manager.
 
