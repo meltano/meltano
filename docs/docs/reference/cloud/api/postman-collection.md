@@ -2,16 +2,18 @@
 title: Postman Collection
 description: Get started with a Postman collection for the Meltano Cloud API - contains all the requests and documentation.
 sidebar_position: 1
-draft: true
 ---
+
+import BrowserOnly from '@docusaurus/BrowserOnly';
+import CodeBlock from '@theme/CodeBlock';
 
 We automatically maintain a fully-tested Postman collection for the Meltano Cloud API, which contains all the requests documented for each [resource](resources) type.
 
 Simply import the following collection URL into Postman to begin sending requests:
 
-```
-https://docs.meltano.com/reference/cloud/api/meltano-cloud-postman.json
-```
+<BrowserOnly>
+  {() => <CodeBlock>{window.location.origin}/reference/cloud/api/postman_collection.json</CodeBlock>}
+</BrowserOnly>
 
 ---
 
