@@ -3467,7 +3467,7 @@
                 }
               ]
             },
-            "description": "Returns new notifications for the authenticated user profile, optionally marking existing notifications recieved as read before a specific instant."
+            "description": "Returns new notifications for the authenticated user profile, optionally marking existing notifications received as read before a specific instant."
           },
           "response": []
         },
