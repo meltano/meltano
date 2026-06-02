@@ -1,10 +1,16 @@
 from __future__ import annotations  # noqa: D100
 
 import inspect
+import sys
 
 from meltano.core.plugin.base import PluginDefinition
 
 from . import PluginRef
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 
 class PluginNotFoundError(Exception):
@@ -18,7 +24,8 @@ class PluginNotFoundError(Exception):
             self.plugin_type = "plugin"
             self.plugin_name = plugin_or_name
 
-    def __str__(self) -> str:  # noqa: D105
+    @override
+    def __str__(self) -> str:
         return (
             f"{self.plugin_type.capitalize()} '{self.plugin_name}' is not "
             "known to Meltano"
@@ -32,7 +39,8 @@ class PluginNotSupportedError(Exception):
         """Construct a PluginNotSupportedError instance."""
         self.plugin = plugin
 
-    def __str__(self) -> str:  # noqa: D105
+    @override
+    def __str__(self) -> str:
         return (
             "Operation not supported for "
             f"{self.plugin.type.descriptor} '{self.plugin.name}'"
@@ -67,5 +75,6 @@ class InvalidPluginDefinitionError(Exception):
         else:
             self.reason = "incorrect format"
 
-    def __str__(self) -> str:  # noqa: D105
+    @override
+    def __str__(self) -> str:
         return f"Plugin definition is invalid: {self.reason}"

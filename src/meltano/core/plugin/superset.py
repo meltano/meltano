@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 import typing as t
 from contextlib import suppress
 
@@ -17,6 +18,11 @@ from meltano.core.setting_definition import SettingDefinition
 
 from . import BasePlugin, PluginType
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
@@ -26,6 +32,7 @@ logger = structlog.getLogger(__name__)
 class SupersetInvoker(PluginInvoker):
     """Invoker that prepares env for Superset."""
 
+    @override
     def env(self) -> dict[str, str]:
         """Environment variables for Superset.
 
@@ -53,6 +60,7 @@ class Superset(BasePlugin):
     ]
 
     @property
+    @override
     def config_files(self) -> dict[str, str]:
         """Return the configuration files required by the plugin.
 
