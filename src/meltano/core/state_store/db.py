@@ -70,6 +70,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
+    @override
     def get(self, state_id: str) -> MeltanoState | None:
         """Get the job state for the given state_id.
 

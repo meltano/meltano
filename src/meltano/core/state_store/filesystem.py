@@ -366,6 +366,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
     @property
+    @override
     def label(self) -> str:
         return "Local Filesystem"  # pragma: no cover
 
@@ -502,6 +503,7 @@ class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
     delimiter = "\\"
 
     @property
+    @override
     def label(self) -> str:
         return "Local Windows Filesystem"  # pragma: no cover
 
