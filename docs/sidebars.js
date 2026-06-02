@@ -25,7 +25,7 @@ const sidebars = {
         {
           type: 'doc',
           id: 'getting-started/which-meltano',
-          label: 'Which Meltano is right for me?',
+          label: 'Which Meltano is right for you?',
         },
         // MELTANO CLOUD
         {
@@ -44,38 +44,6 @@ const sidebars = {
           id: 'getting-started/cloud-quickstart',
           label: 'Quickstart',
           customProps: { badgeType: 'cloud', icon: 'bell' },
-        },
-        // MELTANO COMMUNITY
-        {
-          type: 'html',
-          value: 'MELTANO COMMUNITY',
-          className: 'sidebar-section-label',
-        },
-        {
-          type: 'doc',
-          id: 'getting-started/community-overview',
-          label: 'Overview',
-          customProps: { badgeType: 'community', icon: 'connect' },
-        },
-        {
-          type: 'doc',
-          id: 'getting-started/installation',
-          customProps: { badgeType: 'community', icon: 'download' },
-        },
-        {
-          type: 'doc',
-          id: 'getting-started/part1',
-          customProps: { icon: 'connect' },
-        },
-        {
-          type: 'doc',
-          id: 'getting-started/part2',
-          customProps: { icon: 'database' },
-        },
-        {
-          type: 'doc',
-          id: 'getting-started/part3',
-          customProps: { icon: 'process' },
         },
         // MELTANO OPEN
         {
