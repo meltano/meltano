@@ -300,6 +300,7 @@ module = [
 ]
 
 [tool.ty.rules]
+missing-override-decorator = "error"
 unused-type-ignore-comment = "ignore"
 
 [tool.ty.src]

@@ -4,10 +4,16 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 import typing as t
 from abc import ABC, abstractmethod
 
 from .models import ParsedLogRecord, PluginException
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 logger = logging.getLogger(__name__)  # noqa: TID251
 
@@ -41,6 +47,7 @@ class SingerSDKLogParser(LogParser):
         "message",
     }
 
+    @override
     def parse(self, line: str) -> ParsedLogRecord | None:
         """Parse Singer SDK JSON log line.
 
@@ -90,6 +97,7 @@ class SingerSDKLogParser(LogParser):
 class PassthroughLogParser(LogParser):
     """Fallback parser that passes through unparsed lines."""
 
+    @override
     def parse(self, line: str) -> ParsedLogRecord | None:
         """Return line as-is with minimal structure.
 

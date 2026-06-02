@@ -22,12 +22,17 @@ from meltano.core.utils import get_no_color_flag
 
 from .renderers import MeltanoConsoleRenderer
 
-logger = structlog.getLogger(__name__)
-
 if sys.version_info >= (3, 11):
     from enum import StrEnum
 else:
     from backports.strenum import StrEnum
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
+logger = structlog.getLogger(__name__)
 
 
 if t.TYPE_CHECKING:
@@ -47,6 +52,7 @@ class SafeStreamHandler(logging.StreamHandler):
     instructions on opting in via a custom ``logging.yaml`` config.
     """
 
+    @override
     def emit(self, record: logging.LogRecord) -> None:
         """Emit a record, falling back to backslashreplace on encode errors."""
         stream = self.stream

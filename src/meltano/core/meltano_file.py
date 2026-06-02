@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import sys
 import typing as t
 import warnings
 
@@ -12,6 +13,11 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.task_sets import TaskSets
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -136,6 +142,7 @@ class MeltanoFile(Canonical):
                 result.append(ELTSchedule(**schedule))
         return result
 
+    @override
     def __iter__(self):  # noqa: ANN204
         """Return an iterator over the attributes.
 

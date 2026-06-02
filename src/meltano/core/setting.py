@@ -1,5 +1,6 @@
 from __future__ import annotations  # noqa: D100
 
+import sys
 import typing as t
 
 from sqlalchemy import types
@@ -8,6 +9,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 from meltano.core.sqlalchemy import StrPK  # noqa: TC001
 
 from .models import SystemModel
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 
 class Setting(SystemModel):  # noqa: D101
@@ -24,6 +30,7 @@ class Setting(SystemModel):  # noqa: D101
     value: Mapped[t.Optional[str]] = mapped_column(types.PickleType)  # noqa: UP045
     enabled: Mapped[bool] = mapped_column(default=False)
 
-    def __repr__(self) -> str:  # noqa: D105
+    @override
+    def __repr__(self) -> str:
         enabled_marker = "E" if self.enabled else ""
         return f"<({self.namespace}) {self.name}={self.value} {enabled_marker}>"
