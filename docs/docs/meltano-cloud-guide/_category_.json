@@ -1,0 +1,11 @@
+{
+  "label": "Meltano Cloud Guide",
+  "position": 1,
+  "customProps": {
+    "icon": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE4LjUgMTAuNUMxOC4zIDcuNSAxNS45IDUgMTMgNUMxMC43IDUgOC43IDYuNCA3LjkgOC40QzUuNSA4LjcgMy43IDEwLjggNCAxMy4yQzQuMyAxNS42IDYuMyAxNy40IDguOCAxNy40SDE4LjJDMjAuMyAxNy40IDIyIDE1LjcgMjIgMTMuNkMyMiAxMS45IDIwLjYgMTAuNSAxOC45IDEwLjVIMTguNVoiIGZpbGw9IiMzQTY0RkEiLz4KPHBhdGggZD0iTTEwLjIgMTMuMkwxMiAxNUwxNC44IDEyLjIiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+"
+  },
+  "link": {
+    "type": "generated-index",
+    "title": "Meltano Cloud Guide"
+  }
+}
