@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from functools import cached_property
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.environment import EnvironmentPluginConfig
@@ -100,6 +106,7 @@ class PluginSettingsService(SettingsService):
         self.env_override.update(environment_plugin_env)
 
     @property
+    @override
     def project_settings_service(self) -> SettingsService:
         """Get the settings service for the active project.
 
@@ -109,6 +116,7 @@ class PluginSettingsService(SettingsService):
         return self.project.settings
 
     @property
+    @override
     def label(self) -> str:
         """Get the label for this plugin.
 
@@ -118,6 +126,7 @@ class PluginSettingsService(SettingsService):
         return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
 
     @property
+    @override
     def docs_url(self) -> str:
         """Get the documentation URL for this plugin.
 
@@ -126,6 +135,7 @@ class PluginSettingsService(SettingsService):
         """
         return self.plugin.docs
 
+    @override
     def setting_env_vars(
         self,
         setting_def: SettingDefinition,
@@ -148,6 +158,7 @@ class PluginSettingsService(SettingsService):
         )
 
     @property
+    @override
     def db_namespace(self):  # noqa: ANN201
         """Return namespace for setting value records in system database.
 
@@ -158,6 +169,7 @@ class PluginSettingsService(SettingsService):
         return f"{self.plugin.type}.{self.plugin.name}.default"
 
     @property
+    @override
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings.
 
@@ -174,6 +186,7 @@ class PluginSettingsService(SettingsService):
         return settings
 
     @property
+    @override
     def meltano_yml_config(self):  # noqa: ANN201
         """Return current configuration in `meltano.yml`.
 
@@ -193,6 +206,7 @@ class PluginSettingsService(SettingsService):
             return self.environment_plugin_config.config_with_extras
         return {}
 
+    @override
     def update_meltano_yml_config(self, config: dict) -> None:
         """Update configuration in `meltano.yml`.
 
@@ -232,6 +246,7 @@ class PluginSettingsService(SettingsService):
             else None
         )
 
+    @override
     def process_config(self, config: dict[str, t.Any]) -> dict[str, t.Any]:
         """Process configuration dictionary to be passed to plugin.
 

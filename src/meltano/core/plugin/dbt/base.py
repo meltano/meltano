@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from pathlib import Path
 
@@ -15,6 +16,11 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.transform_add_service import TransformAddService
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin_install_service import PluginInstaller
@@ -26,7 +32,8 @@ logger = structlog.stdlib.get_logger(__name__)
 class DbtInvoker(PluginInvoker):
     """dbt plugin invoker."""
 
-    def Popen_options(self):  # noqa: ANN201, N802
+    @override
+    def Popen_options(self) -> dict[str, t.Any]:
         """Get options for `subprocess.Popen`.
 
         Returns:
@@ -115,6 +122,7 @@ class DbtTransformPlugin(BasePlugin):
         super().__init__(*args, **kwargs)
         self.installer: PluginInstaller = install_dbt_plugin
 
+    @override
     def is_invokable(self) -> bool:
         """Return whether the plugin is invokable.
 

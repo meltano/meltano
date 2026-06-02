@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import typing as t
 from datetime import datetime, timezone
 
@@ -18,6 +19,11 @@ from meltano.core.state_service import (
 )
 
 from . import PluginType, SingerPlugin
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -116,6 +122,7 @@ class SingerTarget(SingerPlugin):
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 
+    @override
     def exec_args(self, plugin_invoker: PluginInvoker) -> list[str | Path]:
         """Get command-line args to pass to the plugin.
 
@@ -128,6 +135,7 @@ class SingerTarget(SingerPlugin):
         return ["--config", plugin_invoker.files["config"]]
 
     @property
+    @override
     def config_files(self) -> dict[str, str]:
         """Get config files for this target.
 
@@ -141,6 +149,7 @@ class SingerTarget(SingerPlugin):
         }
 
     @property
+    @override
     def output_files(self) -> dict[str, str]:
         """Get output files for this target.
 
