@@ -36,6 +36,11 @@ from meltano.core.utils import (
     truthy,
 )
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -651,6 +656,7 @@ class Project:
             make_dirs=make_dirs,
         )
 
+    @override
     def __eq__(self, other: object) -> bool:
         """Project equivalence check.
 
@@ -662,6 +668,7 @@ class Project:
         """
         return self.root == getattr(other, "root", object())
 
+    @override
     def __hash__(self) -> int:
         """Project hash.
 
@@ -670,6 +677,7 @@ class Project:
         """
         return self.root.__hash__()
 
+    @override
     def __repr__(self) -> str:
         """Project representation.
 

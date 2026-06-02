@@ -20,6 +20,11 @@ from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections import abc
 
@@ -55,6 +60,7 @@ def write_sep_line(title: str, sepchar: str, **kwargs) -> None:  # noqa: ANN003
 class CommandLineRunner(ValidationsRunner):
     """Validator that runs in the CLI."""
 
+    @override
     async def run_test(self, name: str) -> int:
         """Run a test command.
 

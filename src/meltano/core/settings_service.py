@@ -24,6 +24,11 @@ else:
     from backports.strenum import StrEnum
     from typing_extensions import Self
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
 
@@ -70,6 +75,7 @@ class FeatureNotAllowedException(Exception):
         super().__init__(feature)
         self.feature = feature
 
+    @override
     def __str__(self) -> str:
         """Represent the error as a string.
 
