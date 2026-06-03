@@ -324,7 +324,6 @@ exclude = [
   "src/meltano/core/project_plugins_service.py",
   "src/meltano/core/runner/dbt.py",
   "src/meltano/core/runner/singer.py",
-  "src/meltano/core/settings_store.py",
   "src/meltano/core/sqlalchemy.py",
   "src/meltano/core/tracking/**",
   "src/meltano/core/utils/**",
