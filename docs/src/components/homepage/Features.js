@@ -2,36 +2,32 @@ import React from 'react';
 import styles from './features.module.scss';
 import Link from '@docusaurus/Link';
 
+const openEdition = {
+  Svg: require('@site/static/img/homepage/open.svg').default,
+  name: 'Open',
+  desc: 'The open-source, self-hosted foundation of Meltano. Own every part of your data infrastructure, on your own servers, free forever. Best for teams with DevOps capacity who want full control with zero vendor dependency.',
+  features: [
+    { text: 'You host and manage everything on your own servers', type: 'base' },
+    { text: 'Access to 600+ connectors', type: 'base' },
+    { text: 'Free, you pay only for your own infra', type: 'base' },
+  ],
+  cta: { title: 'Get Started', url: '/getting-started/meltano-at-a-glance' },
+};
+
+const cloudEdition = {
+  Svg: require('@site/static/img/homepage/cloud.svg').default,
+  name: 'Cloud',
+  desc: 'A fully managed hosted service built on top of Meltano Open. Pipelines, workspaces, secrets, and monitoring are all handled for you. No infrastructure to provision, patch, or maintain. Best for data teams who want to move fast without managing the plumbing.',
+  features: [
+    { text: 'Meltano hosts, scales, and maintains everything for you', type: 'base' },
+    { text: 'Access to 600+ and custom connectors', type: 'base' },
+    { text: 'Paid plans based on compute hours', type: 'base' },
+    { text: 'Built-in pipeline monitoring and alerts', type: 'base' },
+  ],
+  cta: { title: 'Get Started', url: '/getting-started/cloud-overview' },
+};
+
 const FeatureList = [
-  {
-    title: 'Open',
-    Svg: require('@site/static/img/homepage/open.svg').default,
-    description: (
-      <>
-        Open source (MIT). The core Singer-based ELT engine. Bring your own
-        orchestration, storage, and infrastructure. Fully self-managed.
-      </>
-    ),
-    link: {
-      title: 'Get Started',
-      url: '/getting-started/meltano-at-a-glance',
-    },
-  },
-  {
-    title: 'Cloud',
-    Svg: require('@site/static/img/homepage/cloud.svg').default,
-    description: (
-      <>
-        Fully managed hosted service. Hosted pipelines, workspaces, secrets, and
-        monitoring. No infrastructure to run. Connect with us, get access and
-        start moving data in minutes.{' '}
-      </>
-    ),
-    link: {
-      title: 'Get Started',
-      url: '/getting-started/cloud-overview',
-    },
-  },
   {
     title: 'Reference',
     Svg: require('@site/static/img/homepage/book-open.svg').default,
@@ -41,10 +37,7 @@ const FeatureList = [
         plugin definition syntax, and more.
       </>
     ),
-    link: {
-      title: 'View Reference',
-      url: '/reference',
-    },
+    link: { title: 'View Reference', url: '/reference' },
   },
   {
     title: 'Meltano Hub',
@@ -55,11 +48,7 @@ const FeatureList = [
         ecosystem.
       </>
     ),
-    link: {
-      title: 'Go to Hub',
-      url: 'https://hub.meltano.com',
-      target: '_blank',
-    },
+    link: { title: 'Go to Hub', url: 'https://hub.meltano.com', target: '_blank' },
   },
   {
     title: 'SDK',
@@ -70,11 +59,7 @@ const FeatureList = [
         destination.
       </>
     ),
-    link: {
-      title: 'Go to SDK',
-      url: 'https://sdk.meltano.com',
-      target: '_blank',
-    },
+    link: { title: 'Go to SDK', url: 'https://sdk.meltano.com', target: '_blank' },
   },
   {
     title: 'SDK in Action',
@@ -85,13 +70,39 @@ const FeatureList = [
         on GitHub: Meltano Labs.
       </>
     ),
-    link: {
-      title: 'View Examples',
-      url: 'https://github.com/meltanolabs/',
-      target: '_blank',
-    },
+    link: { title: 'View Examples', url: 'https://github.com/meltanolabs/', target: '_blank' },
   },
 ];
+
+// Each direct child maps to one subgrid row: header / desc / metric / features / cta
+function EditionCard({ Svg, name, desc, metric, metricLabel, chip, features, cta }) {
+  return (
+    <div className="edition-card">
+      <div className={styles.header}>
+        <Svg className={styles.featureSvg} role="img" />
+        <h4 className="text-2xl font-semibold ms-2">{name}</h4>
+      </div>
+
+      <p className="p2">{desc}</p>
+
+      <ul className="edition-features">
+        {features.map((f, i) => (
+          <li key={i} className="edition-features__item">
+            {f.type === 'add'
+              ? <span className="edition-features__add">+</span>
+              : <span className="edition-features__check">✓</span>
+            }
+            {f.text}
+          </li>
+        ))}
+      </ul>
+
+      <Link to={cta.url} className="btn main-btn">
+        {cta.title}
+      </Link>
+    </div>
+  );
+}
 
 // eslint-disable-next-line react/prop-types
 function Feature({ Svg, title, description, link }) {
@@ -117,7 +128,11 @@ export default function HomepageFeatures() {
   return (
     <section className="md:my-20">
       <div className="container relative">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="edition-grid">
+          <EditionCard {...openEdition} />
+          <EditionCard {...cloudEdition} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {FeatureList.map((props, idx) => (
             <Feature key={idx} {...props} />
           ))}
