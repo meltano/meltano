@@ -96,7 +96,7 @@ class SettingsService(metaclass=ABCMeta):
         project: Project,
         *,
         show_hidden: bool = True,
-        env_override: dict[str, t.Any] | None = None,
+        env_override: dict[str, str] | None = None,
         config_override: dict | None = None,
     ):
         """Create a new settings service instance.
@@ -109,7 +109,7 @@ class SettingsService(metaclass=ABCMeta):
         """
         self.project = project
         self.show_hidden = show_hidden
-        self.env_override: dict[str, t.Any] = env_override or {}
+        self.env_override: dict[str, str] = env_override or {}
         self.config_override = config_override or {}
         self._setting_defs: list[SettingDefinition] | None = None
 
@@ -196,7 +196,7 @@ class SettingsService(metaclass=ABCMeta):
         return flatten(self.meltano_yml_config, "dot")
 
     @property
-    def env(self) -> dict[str, t.Any]:
+    def env(self) -> dict[str, str]:
         """Return the environment as a dict.
 
         Returns:

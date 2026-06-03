@@ -371,7 +371,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
     @property
     @abstractmethod
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str]:
         """Abstract environment values property."""
 
     def get(
@@ -443,7 +443,7 @@ class EnvStoreManager(BaseEnvStoreManager):
     label = "the environment"
 
     @property
-    def env(self) -> dict[str, str | None]:
+    def env(self) -> dict[str, str]:
         """Return values from the calling terminals environment.
 
         Returns:

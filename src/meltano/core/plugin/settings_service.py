@@ -50,7 +50,7 @@ class PluginSettingsService(SettingsService):
                 self.plugin.name,
             )
 
-        self.env_override = {
+        self.env_override: dict[str, str] = {
             # Fetch environment configs from parent plugin if inherit_from is used
             **(
                 self.inherited_settings_service.env_override

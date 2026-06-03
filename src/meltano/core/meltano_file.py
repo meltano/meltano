@@ -37,7 +37,7 @@ class MeltanoFile(Canonical):
     schedules: list[Schedule]
     environments: list[Environment]
     jobs: list[TaskSets]
-    env: dict[str, str | None]
+    env: dict[str, str]
     extras: dict[str, t.Any]
 
     def __init__(
