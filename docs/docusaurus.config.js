@@ -104,6 +104,13 @@ const config = {
             'aria-label': 'Tutorials',
           },
           {
+            to: '/reference',
+            label: 'Reference',
+            position: 'left',
+            className: 'header-reference-link',
+            'aria-label': 'Reference',
+          },
+          {
             to: '/changelog',
             label: 'Changelog',
             position: 'left',
