@@ -67,6 +67,22 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Meltano Cloud Guide',
+      customProps: require('./docs/meltano-cloud-guide/_category_.json').customProps,
+      link: { type: 'doc', id: 'meltano-cloud-guide/index' },
+      collapsed: false,
+      items: [
+        { type: 'doc', id: 'meltano-cloud-guide/stores' },
+        { type: 'doc', id: 'meltano-cloud-guide/plugins' },
+        { type: 'doc', id: 'meltano-cloud-guide/workspace-settings' },
+        { type: 'doc', id: 'meltano-cloud-guide/invite' },
+        { type: 'doc', id: 'meltano-cloud-guide/profile-security' },
+        { type: 'doc', id: 'meltano-cloud-guide/logging-monitoring' },
+      ],
+    },
+
+    {
+      type: 'category',
       label: require('./docs/guide/_category_.json').label,
       customProps: require('./docs/guide/_category_.json').customProps,
       link: { type: 'doc', id: 'guide/index' },
