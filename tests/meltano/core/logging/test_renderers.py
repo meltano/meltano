@@ -62,6 +62,10 @@ def exception() -> PluginException:
                 line="raise CustomException('Custom exception message') from err",
             ),
         ],
+        notes=[
+            "Note 1",
+            "Note 2",
+        ],
     )
 
 
@@ -127,6 +131,9 @@ def expected_exception_output() -> str:
         During handling of the above exception, another exception occurred:
 
         ValueError: An invalid value was provided
+
+        Note 1
+        Note 2
     """)
 
 
