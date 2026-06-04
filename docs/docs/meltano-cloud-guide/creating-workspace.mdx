@@ -1,0 +1,105 @@
+---
+title: Creating a Workspace
+description: Creating a workspace in Meltano Cloud.
+sidebar_position: 1
+---
+
+# Workspaces
+
+A **workspace** is your isolated data environment in Meltano, think of it as a dedicated project folder for a team, client, or use case. Each workspace has its own pipelines, data sources, data store connections, and configuration, all backed by a Git repository.
+
+You can be a member of multiple workspaces and each one operates independently.
+
+---
+
+## Before you begin
+
+You need a Meltano account to create a workspace. If you don't have one yet, book a call with us on [meltano.com](https://meltano.com)
+
+---
+
+## Create a workspace
+
+#### Option 1 - Empty workspace (recommended for new projects)
+
+When you sign in to Meltano for the first time, you'll be prompted to create your first workspace automatically.
+
+To create additional workspaces:
+
+1. Open the workspace selector from the top navigation bar.
+2. Click **New Workspace**.
+3. Fill in the **Name** field - this is how you'll identify the workspace across the platform.
+4. _(Optional)_ Add **Approved Domains** to restrict membership to users with a specific email domain (e.g. `yourcompany.com`).
+5. Click **Continue**.
+
+Your workspace is ready.You can now:
+
+- [Create a data import pipeline](#next-steps)
+- [Manage your workspace via the Lab or API](#manage-your-workspace)
+
+---
+
+#### Option 2 - From an existing GitHub repository
+
+If you already have a Meltano project in a GitHub repository - or a project previously created in Matatika - you can import it directly.
+
+1. On the new workspace screen, expand the **Advanced** section.
+2. Paste your GitHub repository **URL** into the field provided.
+3. _(Optional)_ Specify a **branch** if you want to use something other than the default branch.
+4. Click **Continue**.
+
+Meltano will scaffold your workspace using the configuration from that repository. Once created, the workspace Lab manages your configuration independently of the source repo — changes you make in the UI won't automatically push back to the original repository.
+
+:::tip Supported repositories
+This works with any repository created by Matatika or any existing Meltano project.
+:::
+
+---
+
+## Manage your workspace
+
+Once a workspace exists, you can manage it through three surfaces:
+
+| Surface | Best for |
+|---|---|
+| **Meltano Lab** (UI) | Day-to-day pipeline management, exploring data, adding connectors |
+| **Meltano API** | Programmatic access, automation, CI/CD integrations |
+| **VS Code (local)** | Running pipelines locally, editing config files directly |
+
+### Workspace settings
+
+Access workspace settings by clicking your **profile image** (top-right) and selecting **Settings**. From here you can:
+
+- Rename your workspace
+- Copy the backing GitHub repository URL (useful for local development)
+- Manage approved domains and member access
+
+### Running pipelines locally
+
+Every Meltano workspace is backed by a GitHub repository. To run pipelines on your own machine:
+
+1. In the Meltano app, go to **Settings** and copy the repository URL.
+2. Clone it locally:
+   ```bash
+   git clone https://github.com/your-org/your-workspace
+   ```
+3. Change into the cloned directory and create a `.env` file with your credentials.
+4. Navigate to **Lab → Pipelines**, expand the pipeline you want to run, and follow the local run instructions shown there.
+
+:::info Prerequisites for local runs
+You'll need **Git**, **Python ≥ 3.8**, and **Meltano** installed. A virtual environment is strongly recommended.
+:::
+
+---
+
+## Workspace concepts
+
+| Concept | What it means |
+|---|---|
+| **Git-backed config** | Every change made in the UI is committed to a single Git repository. The UI is a reflection of what's in Git - not the other way around. |
+| **Isolated data store** | Each workspace connects to its own data warehouse (Snowflake, Redshift, Azure Synapse, etc.) and cannot access another workspace's data. |
+| **Role-based access** | Members can be assigned as **Owner**, **Administrator**, or **Member**. |
+| **Approved Domains** | Optionally restrict who can join the workspace by email domain. |
+
+---
+

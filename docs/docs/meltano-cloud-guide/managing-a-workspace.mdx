@@ -1,0 +1,336 @@
+---
+title: Managing a Workspace
+description: How-to guides for managing workspace configuration, environments, DataOps workflows, and custom pipeline images in Meltano.
+sidebar_position: 2
+---
+# Manage Workspaces
+
+This section covers how to manage your Meltano workspace configuration across four key areas: syncing config from GitHub, using environments to separate settings by stage, promoting changes through a DataOps workflow, and speeding up pipelines with a custom Docker image.
+
+---
+
+## Managing Config from GitHub
+
+**Time required: 5 minutes**
+
+### Prerequisites
+
+You must have:
+
+- Admin or owner access to the workspace you want to configure
+- Admin rights to the workspace GitHub repository (available on Meltano premium plans)
+
+### Overview
+
+Meltano supports a full DataOps lifecycle where all of your workspace configuration is version-controlled in a GitHub repository. When you push a change to that repository, a **deployment** can be triggered automatically to sync those changes into your live workspace.
+
+Think of it like a direct line from your code editor to your running workspace. You make a change, push it to GitHub, and Meltano picks it up without any manual steps in between.
+
+There are two ways to trigger a deployment:
+
+- **GitHub Webhook** (covered in this guide): every push to the repository automatically deploys your workspace
+- **Manual deployment**: use the Meltano API or Postman collection to trigger a deployment on demand
+
+### Setting up a GitHub Webhook
+
+A webhook is a notification that GitHub sends to Meltano the moment you push new code. Meltano receives that notification and immediately redeploys your workspace using the latest configuration.
+
+##### Step 1 - Find your workspace ID
+
+1. Open your workspace in Meltano.
+2. Look at the URL in your browser. It will contain a UUID that looks like this: `https://app.meltano.com/workspaces/e8e23b01-1eca-4021-a054-dc653756b4cd`
+3. Copy that UUID. This is your `workspace_id`.
+
+##### Step 2 - Find your deployment secret
+
+1. In your workspace, open **Settings**.
+2. Locate the **Deployment Secret** field and copy its value.
+
+##### Step 3 - Add the webhook in GitHub
+
+1. Navigate to your workspace repository on GitHub.
+2. Go to **Settings** > **Webhooks** > **Add webhook**.
+3. Fill in the fields as follows:
+
+| Field | Value |
+|---|---|
+| Payload URL | `https://app.meltano.com/api/workspaces/<workspace_id>/deployments/github-webhook` |
+| Content type | `application/json` |
+| Secret | Your Deployment Secret from Step 2 |
+
+4. Click **Add webhook**.
+
+From this point on, every push to your workspace repository will automatically trigger a deployment and update your live workspace.
+
+### Triggering a manual deployment
+
+If you prefer to deploy on demand rather than on every push, you can use the Meltano API. The [Deployments API reference](#) and the [Postman collection](#) both support this.
+
+:::tip When to use this
+This setup is most useful when your workspace configuration is managed by a team and you want every approved merge to automatically roll out to your workspace, reducing the chance of config drift between what is in GitHub and what is actually running.
+:::
+
+---
+
+## Managing Config with Environments
+
+**Time required: 5 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- A Meltano account
+
+#### Overview
+
+Every Meltano workspace is backed by [Meltano environments](https://docs.meltano.com/concepts/environments), a way to keep separate configuration for different stages of your data work, such as development, staging, and production. Each environment can have its own connector settings, credentials, and plugin config, all stored in your `meltano.yml` file.
+
+When a workspace loads, it reads from whichever environment is currently set as the default. Changing the default environment swaps out the configuration that all pipelines in that workspace will use.
+
+Three environments are created automatically when a workspace is set up:
+
+- `dev` (default)
+- `staging`
+- `prod`
+
+### How configuration works in `meltano.yml`
+
+Configuration is layered. Each environment block can override specific settings from the base plugin definition. If a setting is not specified in the active environment, the base value is used as a fallback.
+
+Here is an example using `tap-auth0` across three environments:
+
+```yaml
+version: 1
+default_environment: dev
+project_id: 8c07f654-6908-4b51-acef-8de3d37aecac
+environments:
+  - name: dev
+    config:
+      plugins:
+        extractors:
+          - name: tap-auth0
+            config:
+              client_id: 39Pu9tTomnTv594VAFYnmRvkEpSlI7a6
+  - name: staging
+    config:
+      plugins:
+        extractors:
+          - name: tap-auth0
+            config:
+              client_id: 4Zd5QXqHKNoKq4ySx8CP1UBm5eIUgh7t
+  - name: prod
+    config:
+      plugins:
+        extractors:
+          - name: tap-auth0
+            config:
+              client_id: u4kcVHKUD9lkbUbXA3eXCt88scStaqHM
+              domain: matatika.eu.auth0.com
+plugins:
+  extractors:
+    - name: tap-auth0
+      config:
+        domain: matatika-staging.eu.auth0.com
+```
+
+Here is what gets loaded depending on which environment is active:
+
+| Active environment | `client_id` | `domain` |
+|---|---|---|
+| `dev` | `39Pu9tTomnTv594VAFYnmRvkEpSlI7a6` | `matatika-staging.eu.auth0.com` (from base) |
+| `staging` | `4Zd5QXqHKNoKq4ySx8CP1UBm5eIUgh7t` | `matatika-staging.eu.auth0.com` (from base) |
+| `prod` | `u4kcVHKUD9lkbUbXA3eXCt88scStaqHM` | `matatika.eu.auth0.com` (from `prod` override) |
+
+Notice that `prod` is the only environment with its own `domain` value. For `dev` and `staging`, the domain falls back to what is defined in the base `tap-auth0` block.
+
+### Switching the active environment
+
+The active environment is initially set by the `default_environment` property in your `meltano.yml`. You can change it at any time from the workspace UI:
+
+1. Open the workspace drop-down menu.
+2. Select **Settings**.
+3. Update the **Active environment** field to the environment you want.
+4. Click **Save**.
+
+Once saved, all pipelines in the workspace will load configuration from the newly selected environment. To verify what values a pipeline will use at runtime, open the pipeline and check the **Environment** tab.
+
+:::note
+Switching environments changes the configuration loaded for every pipeline in the workspace. If you are running a shared workspace, make sure your team is aware before making this change.
+:::
+
+---
+
+## Promoting Changes with DataOps
+
+**Time required: 10 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- A Meltano account
+
+#### Overview
+
+DataOps is an agile approach to managing data pipelines with the same discipline applied to software development: test changes before they reach production, promote them through defined stages, and keep a full history of what changed and when.
+
+In Meltano, you implement this by creating separate workspaces for each stage of your pipeline lifecycle, one for development, one for staging, and one for production. Each workspace points at the same underlying GitHub repository but operates on a different branch or merge state, and runs with its own active environment configuration.
+
+### Setting up a three-workspace DataOps workflow
+
+##### Step 1 - Create your workspaces
+
+Create three separate workspaces to represent each stage:
+
+**Development workspace** (e.g. `My Workspace (dev)`):
+1. Open the workspace drop-down menu.
+2. Select **New workspace**.
+3. Enter a name in the **Name** field.
+4. Click **Save**.
+
+**Staging workspace** (e.g. `My Workspace (staging)`):
+
+Repeat the steps above with a staging-appropriate name.
+
+Then set the active environment to `staging`:
+1. Open the drop-down menu and select **Settings**.
+2. Set **Active environment** to `staging`.
+3. Click **Save**.
+
+**Production workspace** (e.g. `My Workspace`):
+
+Repeat the workspace creation steps, then set the active environment to `prod` following the same process.
+
+##### Step 2 - Develop and test in dev
+
+Make all changes and run your pipelines in the development workspace. The repository URL for each workspace can be found in its **Settings** page.
+
+##### Step 3 - Promote dev changes to staging
+
+Once your changes are tested in dev, merge them into the staging workspace repository:
+
+```bash
+git clone git@github.com:YourOrg/My-Workspace-staging-kklcdol
+cd My-Workspace-staging-kklcdol
+
+git remote add dev git@github.com:YourOrg/My-Workspace-dev-zgtzhjd
+git pull -X theirs --allow-unrelated-histories dev main
+
+# review the changes before pushing
+git push
+```
+
+:::caution
+The `-X theirs` flag tells Git to prefer the incoming changes from the dev branch when there are conflicts. Review the result carefully before pushing to make sure nothing unexpected was overwritten.
+:::
+
+##### Step 4 - Promote staging changes to production
+
+Once staging has been validated, merge into the production workspace repository:
+
+```bash
+git clone git@github.com:YourOrg/My-Workspace-setarqi
+cd My-Workspace-setarqi
+
+git remote add staging git@github.com:YourOrg/My-Workspace-staging-kklcdol
+git pull -X theirs --allow-unrelated-histories staging main
+
+# review the changes before pushing
+git push
+```
+
+If you have a GitHub Webhook configured on any of these workspaces, pushing will automatically trigger a deployment. See the [Managing Config from GitHub](#managing-config-from-github) section above for setup instructions.
+
+:::tip Why this pattern works
+Each workspace is isolated. Development activity cannot affect production data. Promotions happen through Git, so every change is auditable and reversible. Combining this with environment-specific configuration means credentials and connection details are always appropriate for the stage being run.
+:::
+
+---
+
+## Running Pipelines with a Custom Image
+
+**Time required: 10 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- A Meltano account
+- Meltano deployed in your own cloud environment
+
+#### Overview
+
+By default, when a pipeline runs in Meltano, the platform spins up a container that clones your workspace repository, installs all the required plugins, and then executes your pipeline. This works well for most cases, but it adds startup time every single run.
+
+A **custom pipelines image** lets you pre-bake that setup work into a Docker image at build time. When the pipeline runs, the container starts from your pre-built image and skips the install step entirely. The result is noticeably faster pipeline execution, especially for workspaces with many plugins or large dependencies.
+
+You can also use a custom image to bring in packages, system dependencies, or custom scripts that the default base image does not include.
+
+##### Step 1 - Point Meltano at your container registry
+
+In your catalog deployment environment, set the `MELTANO_DATAFLOW_DOCKERREGISTRY` variable to the registry where your custom image will be stored:
+
+```bash
+# Private Azure Container Registry
+MELTANO_DATAFLOW_DOCKERREGISTRY=meltano.azurecr.io
+
+# Docker Hub
+MELTANO_DATAFLOW_DOCKERREGISTRY=docker.io
+```
+
+##### Step 2 - Write a Dockerfile for your workspace
+
+The only hard requirement is that your workspace directory must be set as the working directory inside the image. Everything else can be customised to your needs.
+
+**Minimal example:**
+
+```dockerfile
+RUN mkdir workspace
+WORKDIR /workspace
+
+COPY . .
+```
+
+**Example with pre-installed plugins:**
+
+This is the most common pattern. Pre-running `meltano install` at build time means your plugins are already installed when the container starts, removing that step from each pipeline run.
+
+```dockerfile
+FROM meltano.azurecr.io/meltano/meltano-catalog-shelltask:latest-dev
+
+RUN mkdir workspace
+WORKDIR /workspace
+
+COPY . .
+
+RUN meltano install
+
+# Remove pip temporary files to keep the image size smaller
+RUN rm -rf ~/.cache
+```
+
+A working reference example is available in the [`example-github-analytics`](https://github.com/Matatika/example-github-analytics/blob/2b0966d9f2fd5b6563d013edde65b8b5a98fe7bc/Dockerfile) repository.
+
+##### Step 3 - Build and push the image
+
+Build your image locally and push it to the registry you configured in Step 1:
+
+```bash
+docker build -t <registry host>/<image name> .
+docker push <registry host>/<image name>
+```
+
+The `<image name>` here must match the value you set for `pipelines_image` in your `workspace.yml`:
+
+```yaml
+pipelines_image: <image name>
+```
+
+You can see how this is wired together in the `example-github-analytics` reference files:
+- [`workspace.yml`](https://github.com/Matatika/example-github-analytics/blob/2b0966d9f2fd5b6563d013edde65b8b5a98fe7bc/workspace.yml#L3)
+- [`azure-pipelines.yml`](https://github.com/Matatika/example-github-analytics/blob/2b0966d9f2fd5b6563d013edde65b8b5a98fe7bc/azure-pipelines.yml#L11-L15)
+
+:::tip Automating image builds
+For teams running frequent deployments, consider adding a CI step (such as an Azure Pipelines or GitHub Actions workflow) that automatically builds and pushes a new image whenever the workspace repository changes. This keeps your custom image in sync with your configuration without manual intervention.
+:::
