@@ -187,6 +187,7 @@ class TestPluginException:
             type="CustomException",
             module="my_package.my_module",
             message="Custom exception message",
+            notes=["First note", "Second note"],
         )
         processor = structlog.processors.JSONRenderer()
         logger = structlog.get_logger()
