@@ -112,7 +112,7 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud-guide/logging-monitoring' },
       ],
     },
- 
+
     {
       type: 'category',
       label: require('./docs/guide/_category_.json').label,
