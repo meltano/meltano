@@ -319,6 +319,7 @@ class SettingDefinition(NameEq, Canonical):
 
         self._verbatim.add("value")
 
+    @override
     def __repr__(self) -> str:
         """Return string representation.
 

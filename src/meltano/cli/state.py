@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import json.decoder
 import re
+import sys
 import typing as t
 from datetime import datetime as dt
 from datetime import timezone as tz
@@ -21,6 +22,11 @@ from meltano.core.block.block_parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.state_service import InvalidJobStateError, StateService
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -42,6 +48,7 @@ class MutuallyExclusiveOptionsError(Exception):
         super().__init__(*options)
         self.options = options
 
+    @override
     def __str__(self) -> str:
         """Represent the error as a string."""
         return f"Must provide exactly one of: {','.join(self.options)}"

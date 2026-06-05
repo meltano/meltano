@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 
 import structlog
@@ -12,6 +13,11 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from os import PathLike
@@ -39,6 +45,7 @@ class FilePlugin(BasePlugin):
         ),
     ]
 
+    @override
     def is_invokable(self) -> bool:
         """Return whether the plugin is invokable.
 
@@ -47,6 +54,7 @@ class FilePlugin(BasePlugin):
         """
         return False
 
+    @override
     def should_add_to_file(self) -> bool:
         """Return whether the plugin should be added to `meltano.yml`.
 

@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from enum import Enum
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from asyncio.streams import StreamReader
@@ -21,7 +27,8 @@ class ExitCode(int, Enum):  # noqa: D101
 class Error(Exception):
     """Base exception for ELT errors."""
 
-    def exit_code(self):  # noqa: ANN201, D102
+    def exit_code(self) -> ExitCode:
+        """Return the exit code for this error."""
         return ExitCode.FAIL
 
 
@@ -47,6 +54,7 @@ class MeltanoError(Error):
         self.instruction = instruction
         super().__init__(reason, instruction, *args, **kwargs)
 
+    @override
     def __str__(self) -> str:
         """Return a string representation of the error.
 
@@ -63,7 +71,8 @@ class MeltanoError(Error):
 class ExtractError(Error):
     """Error in the extraction process, like API errors."""
 
-    def exit_code(self):  # noqa: ANN201, D102
+    @override
+    def exit_code(self) -> ExitCode:
         return ExitCode.NO_RETRY
 
 

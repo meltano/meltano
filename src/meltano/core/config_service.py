@@ -106,7 +106,7 @@ class ConfigService:
             meltano_yml.extras = config
 
     @property
-    def env(self) -> dict[str, str | None]:
+    def env(self) -> dict[str, str]:
         """Return the top-level env vars from meltano.yml.
 
         Returns:

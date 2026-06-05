@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import asyncio.subprocess
+import sys
 import typing as t
 from contextlib import suppress
 
@@ -11,6 +12,11 @@ from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
 from meltano.core.runner import RunnerError
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from asyncio.subprocess import Process
@@ -291,6 +297,7 @@ class SingerBlock(InvokerBase, IOBlock):
         self.plugin_args = plugin_args
 
     @property
+    @override
     def producer(self) -> bool:
         """Whether this plugin is a producer.
 
@@ -302,6 +309,7 @@ class SingerBlock(InvokerBase, IOBlock):
         return self.invoker.plugin.type in PRODUCERS
 
     @property
+    @override
     def consumer(self) -> bool:
         """Whether this plugin is a consumer.
 
@@ -313,6 +321,7 @@ class SingerBlock(InvokerBase, IOBlock):
         return self.invoker.plugin.type in CONSUMERS
 
     @property
+    @override
     def has_state(self) -> bool:
         """Whether this plugin has state.
 
@@ -321,6 +330,7 @@ class SingerBlock(InvokerBase, IOBlock):
         """
         return "state" in self.invoker.capabilities
 
+    @override
     async def start(self) -> None:
         """Start the SingerBlock by invoking the underlying plugin.
 
@@ -341,6 +351,7 @@ class SingerBlock(InvokerBase, IOBlock):
         except Exception as err:
             raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err  # noqa: EM102, TRY003
 
+    @override
     async def stop(self, *, kill: bool = True) -> None:
         """Stop (kill) the underlying process and cancel output proxying.
 

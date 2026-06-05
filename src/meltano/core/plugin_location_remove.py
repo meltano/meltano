@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+import sys
 import typing as t
 from abc import ABC, abstractmethod
 from enum import Enum
@@ -15,6 +16,11 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 
 from .settings_store import SettingValueStore
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -92,6 +98,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
         self.plugins_settings_service = PluginSettingsService(project, plugin)
         self.session = project_engine(project)[1]
 
+    @override
     def remove(self) -> None:
         """Remove the plugin's settings from the system db `plugin_settings` table.
 
@@ -125,6 +132,7 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
         super().__init__(plugin, str(project.meltanofile.relative_to(project.root)))
         self.project = project
 
+    @override
     def remove(self) -> None:
         """Remove the plugin from `meltano.yml`."""
         try:
@@ -159,6 +167,7 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
 
         self.paths = list(lockfile_dir.glob(glob_expr))
 
+    @override
     def remove(self) -> None:
         """Remove the plugin from `plugins/`."""
         if not self.paths:
@@ -190,6 +199,7 @@ class InstallationRemoveManager(PluginLocationRemoveManager):
         super().__init__(plugin, str(path.parent.relative_to(project.root)))
         self.path = path
 
+    @override
     def remove(self) -> None:
         """Remove the plugin installation from `.meltano`."""
         if not self.path.exists():
