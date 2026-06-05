@@ -29,6 +29,11 @@ else:
     from backports.strenum import StrEnum
     from typing_extensions import Unpack
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
     from pathlib import Path
@@ -123,6 +128,7 @@ class UnknownCommandError(InvokerError):
         self.plugin = plugin
         self.command = command
 
+    @override
     def __str__(self) -> str:
         """Return error message.
 

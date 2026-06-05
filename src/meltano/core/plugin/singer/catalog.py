@@ -352,7 +352,8 @@ class SelectionType(StrEnum):
         """
         return self not in {SelectionType.EXCLUDED, SelectionType.UNSUPPORTED}
 
-    def __add__(self, other: object) -> SelectionType:  # ty:ignore[invalid-method-override]
+    @override
+    def __add__(self, other: object) -> SelectionType:
         """Combine two selection types.
 
         Args:

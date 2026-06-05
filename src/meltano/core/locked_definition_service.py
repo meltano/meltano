@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.plugin_repository import PluginRepository
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
@@ -25,6 +31,7 @@ class LockedDefinitionService(PluginRepository):
         self.project = project
         self.lock_service = PluginLockService(project)
 
+    @override
     def find_definition(
         self,
         plugin_type: PluginType,
@@ -50,6 +57,7 @@ class LockedDefinitionService(PluginRepository):
             variant_name=variant_name,
         )
 
+    @override
     def find_base_plugin(
         self,
         plugin_type: PluginType,

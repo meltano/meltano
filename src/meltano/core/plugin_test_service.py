@@ -6,6 +6,7 @@ import asyncio
 import asyncio.subprocess
 import json
 import json.decoder
+import sys
 import typing as t
 from abc import ABC, abstractmethod
 
@@ -13,6 +14,11 @@ import structlog
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin_invoker import PluginInvoker
@@ -70,6 +76,7 @@ class PluginTestService(ABC):
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
+    @override
     async def validate(self, **kwargs: t.Any) -> tuple[bool, str | None]:
         """Validate extractor configuration.
 
@@ -122,6 +129,7 @@ class ExtractorTestService(PluginTestService):
 class LoaderTestService(PluginTestService):
     """Handle loader test operations."""
 
+    @override
     async def validate(self, **kwargs: t.Any) -> tuple[bool, str | None]:
         """Validate loader configuration by sending test Singer messages.
 

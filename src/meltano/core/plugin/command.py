@@ -3,12 +3,18 @@
 from __future__ import annotations
 
 import shlex
+import sys
 import typing as t
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.container.container_spec import ContainerSpec
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
@@ -87,6 +93,7 @@ class Command(Canonical):
         return expanded
 
     @classmethod
+    @override
     def as_canonical(cls, target):  # noqa: ANN001, ANN206
         """Serialize the target command.
 
@@ -105,6 +112,7 @@ class Command(Canonical):
         return canonical
 
     @classmethod
+    @override
     def parse(cls, obj: str | dict) -> Command:
         """Deserialize data into a Command.
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from http import HTTPStatus
 
@@ -18,6 +19,11 @@ from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin import BasePlugin
@@ -220,6 +226,7 @@ class MeltanoHubService(PluginRepository):
         except requests.exceptions.ConnectionError as connection_err:
             raise HubConnectionError from connection_err
 
+    @override
     def find_definition(
         self,
         plugin_type: PluginType,
@@ -275,6 +282,7 @@ class MeltanoHubService(PluginRepository):
             is_default_variant=variant_name == plugin.default_variant,
         )
 
+    @override
     def find_base_plugin(
         self,
         plugin_type: PluginType,

@@ -21,6 +21,11 @@ from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
 from meltano.core.utils import IncompatibleMeltanoVersionError, get_no_color_flag
 
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
+
 logger = structlog.stdlib.get_logger(__name__)
 
 
@@ -33,7 +38,8 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> t.Any:  # noqa: ANN002, ANN003, ANN401
+    @override
+    def main(self, *args: t.Any, **kwargs: t.Any) -> t.Any:
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from datetime import datetime
 
@@ -11,6 +12,11 @@ from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import StateType  # noqa: TC001
 from meltano.core.utils import merge
+
+if sys.version_info >= (3, 12):
+    from typing import override  # noqa: ICN003
+else:
+    from typing_extensions import override
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -35,6 +41,7 @@ class JobState(SystemModel):
     partial_state: Mapped[t.Optional[StateType]]  # noqa: UP045
     completed_state: Mapped[t.Optional[StateType]]  # noqa: UP045
 
+    @override
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.
 
