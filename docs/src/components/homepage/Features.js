@@ -12,7 +12,7 @@ const openEdition = {
     { text: 'Access to 600+ built-in connectors', type: 'base' },
     { text: 'Free, you pay only for your own infra', type: 'base' },
   ],
-  cta: { title: 'Get Started', url: '/getting-started/meltano-at-a-glance' },
+  cta: { title: 'Get Started', url: '/meltano-open/meltano-at-a-glance' },
 };
 
 const cloudEdition = {
@@ -25,7 +25,7 @@ const cloudEdition = {
     { text: 'Paid plans based on compute hours', type: 'base' },
     { text: 'Built-in pipeline monitoring and alerts', type: 'base' },
   ],
-  cta: { title: 'Get Started', url: '/getting-started/cloud-overview' },
+  cta: { title: 'Get Started', url: '/meltano-cloud/cloud-overview' },
 };
 
 const FeatureList = [
