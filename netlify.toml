@@ -152,5 +152,3 @@
   to = "https://docs.meltano.com/meltano-open/installation"
   status = 301
   force = true
-
-
