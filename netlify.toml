@@ -149,6 +149,6 @@
 
   [[redirects]]
   from = "*/getting-started/installation"
-  to = "https://docs.meltano.com/meltano-open/installation"
+  to = "https://docs.meltano.com/guide/installation-guide"
   status = 301
   force = true
