@@ -73,7 +73,7 @@ your project-specific Docker image will already contain all of your project file
 
 Just like on your local machine, the most straightforward way to install Meltano
 onto a production environment is to
-[use `uv` to install the `meltano` package from PyPI](/getting-started/installation).
+[use `uv` to install the `meltano` package from PyPI](/meltano-open/installation).
 
 If you add `meltano` (or `meltano==<version>`) to your project's `requirements.txt`
 file, you can choose to automatically run `uv pip install -r requirements.txt` on your

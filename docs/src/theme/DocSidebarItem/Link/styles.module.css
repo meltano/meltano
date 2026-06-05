@@ -1,0 +1,78 @@
+.menuLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: #98A2B3;
+  transition: color 0.15s ease;
+}
+
+.iconActive {
+  opacity: 1;
+  color: var(--ifm-menu-color-active);
+}
+
+.labelGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  min-width: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badgeCloud {
+  background-color: rgba(238, 243, 254, 1);
+  color: rgba(52, 81, 178, 1);
+  border: 1px solid rgba(176, 196, 251, 1);
+}
+
+[data-theme='dark'] .badgeCloud {
+  background-color: rgba(58, 100, 250, 0.2);
+  color: #8aabff;
+}
+
+.badgeCommunity {
+  background-color: rgba(231, 221, 255, 1);
+  color: rgba(73, 35, 169, 1);
+  border: 1px solid rgba(203, 187, 241, 1);
+}
+
+[data-theme='dark'] .badgeCommunity {
+  background-color: rgba(73, 35, 169, 0.2);
+  color: #8aabff;
+}
+
+.badgeOpen {
+  background-color: rgba(74, 124, 20, 0.12);
+  color: rgba(39, 80, 10, 1);
+  border: 1px solid rgba(151, 196, 89, 1);
+}
+
+[data-theme='dark'] .badgeOpen {
+  background-color: rgba(153, 206, 85, 0.2);
+  color: #99ce55;
+}

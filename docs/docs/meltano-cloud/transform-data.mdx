@@ -1,0 +1,108 @@
+---
+title: Transform Data
+description: Learn how to use dbt to write and run data transforms in your Meltano workspace, including creating sources, models, and running them locally.
+sidebar_label: Transform Data
+sidebar_position: 10
+---
+
+# Transform Data
+
+**Time required: 15 minutes**
+
+---
+
+### Prerequisites
+
+You must have:
+
+- Completed the Setup your Development Environment guide
+- A workspace repository cloned to your local machine
+
+---
+
+### Overview
+
+A data transform is a layer of logic that reshapes one set of data into another. This is the "T" in [ELT](https://en.wikipedia.org/wiki/Extract,_load,_transform). A simple example would be calculating the total amount each customer has spent across all their orders, combining data from two separate source tables into a single clean output.
+
+Meltano uses [dbt](https://www.getdbt.com/) as its transformation tool. dbt operates on the concept of transforms-as-code, where each transform is defined as a templated SQL file committed to your workspace repository. This means transforms are version-controlled, reviewable, and testable in exactly the same way as your pipeline configuration.
+
+All transform files live under the `transforms/models` directory of your workspace repository.
+
+---
+
+#### Step 1 - Create a source
+
+A dbt source defines the raw database schema that your models will read from. Sources are declared in a YAML file, which tells dbt where to find your tables and which schema to use at runtime.
+
+Create a file such as `my_source.yml` under `transforms/models`:
+
+```yaml
+version: 2
+
+sources:
+  - name: my_source
+    schema: "{{ env_var('DBT_SOURCE_SCHEMA') }}"
+    tables:
+      - name: customers
+      - name: orders
+```
+
+The `env_var` function pulls the schema name from an environment variable at runtime, so you can point the same model at different schemas across your dev, staging, and prod environments without changing the file.
+
+For the full list of source properties, see the [dbt source properties reference](https://docs.getdbt.com/reference/source-properties).
+
+---
+
+#### Step 2 - Create a model
+
+A dbt model defines a database table that dbt creates and keeps up to date. Each model is a single SQL file that selects and transforms data from your sources.
+
+Create a file such as `my_model.sql` under `transforms/models`:
+
+```sql
+{{ config(materialized='table') }}
+
+with customers as (
+    select * from {{ source('my_source', 'customers') }}
+),
+orders as (
+    select * from {{ source('my_source', 'orders') }}
+),
+final as (
+  select
+    c.id,
+    c.name,
+    SUM(o.product_price * o.quantity) as total_spend
+  from customers c
+  join orders o on o.customer_id = c.id
+  group by c.id, c.name
+  order by total_spend desc
+)
+select * from final
+```
+
+The `{{ config(materialized='table') }}` block at the top tells dbt to create a physical table in your data store each time the model runs. The `{{ source(...) }}` references connect the model to the source tables defined in the previous step.
+
+For a full reference of dbt Jinja functions available in models, see the [dbt Jinja functions docs](https://docs.getdbt.com/reference/dbt-jinja-functions).
+
+---
+
+#### Step 3 - Run your models
+
+dbt models require the source tables to exist before they can run. If the raw data is not yet in your data store, you will need to [run your data import locally](/meltano-cloud/importing-data#running-your-data-import-locally) first.
+
+Once the source data is in place, install and run dbt from your workspace directory:
+
+```bash
+# Install the dbt transformer plugin
+meltano install transformer dbt
+
+# Run all dbt models in the project
+meltano invoke dbt run
+```
+
+For the full set of `dbt run` options, see the [dbt run reference](https://docs.getdbt.com/reference/commands/run).
+
+:::tip Running transforms in a pipeline
+When a pipeline that includes dbt is run in the Meltano platform, all models in the project are executed automatically as part of that pipeline run. You do not need to trigger dbt separately.
+:::

@@ -1,0 +1,89 @@
+---
+title: Connect a Store
+description: Learn about stores in Meltano Cloud.
+layout: doc
+sidebar_position: 5
+---
+
+### Data Stores
+
+Navigate to **Workspace → Stores** from the left navigation bar to view, add, and manage the data stores connected to your workspace.
+
+---
+
+#### Overview
+
+- Every Meltano workspace comes with a default **PostgreSQL** data store called **Warehouse**, managed by Meltano out of the box.
+- The Warehouse data store is automatically set as both `MANAGED` and `DEFAULT` when your workspace is created.
+- Changing the default data store affects where **data imports load data into** and where **datasets query data from**.
+---
+
+#### Store Labels
+
+#### `MANAGED`
+
+- Only the default **Warehouse** data store carries the `MANAGED` label.
+- A `MANAGED` store **cannot be edited or deleted**.
+- Meltano provides this store so you can run and test pipelines immediately, and to store pipeline state and bookmarks for future runs.
+#### `DEFAULT`
+
+- The `DEFAULT` store is the one your workspace uses automatically in pipelines and as the data source for datasets.
+- You can create additional stores and set any of them as `DEFAULT` if needed.
+- Non-default stores can still be used in specific pipelines - they just won't be selected automatically.
+- **Note:** The default store cannot be deleted until another store is set as the default.
+---
+
+#### Supported Data Stores
+
+Meltano supports the following data stores for powering your workspace:
+
+- **PostgreSQL**
+- **Snowflake**
+- **BigQuery**
+- **Microsoft SQL Server**
+> **Custom data stores** (those not natively provided by Meltano) support loading data via data import runs, but **do not support querying via datasets**. If a custom store is set as default, data will load normally but all datasets will appear empty.
+
+---
+
+#### Adding a New Data Store
+
+**Prerequisites:**
+- Owner or admin access to a Meltano workspace.
+- Credentials for a supported database (PostgreSQL, Snowflake, BigQuery, or MS SQL).
+
+**Steps:**
+
+1. Go to **Workspace → Stores** in the left navigation bar.
+2. Click **Add** on the Stores page.
+3. On the next screen, select your preferred data store and click **Install**, then click **Add**.
+4. Enter the required credentials and connection properties for the selected store.
+5. Click **Save**, then navigate back to the **Stores** page.
+---
+
+#### Setting a Data Store as Default
+
+1. On the **Stores** page, locate the data store you want to set as default.
+2. Click the **three-dot menu (⋮)** on that store's card.
+3. Select **Make Default** from the dropdown.
+**What changes after setting a new default:**
+- All future data imports will load into the new default store (unless a specific store is chosen manually).
+- All datasets will query from the new default store.
+- The previous Meltano-managed PostgreSQL database is **not affected** - no data is moved or deleted - and can be made the default again at any time.
+---
+
+#### Editing a Data Store
+
+1. Click the **three-dot menu (⋮)** on the store card.
+2. Select **Edit** to update the store's credentials or connection properties.
+3. Save your changes.
+> `MANAGED` stores cannot be edited.
+
+---
+
+#### Deleting a Data Store
+
+1. Click the **three-dot menu (⋮)** on the store card.
+2. Select **Delete** from the dropdown.
+3. A confirmation modal will appear with the message **"This action cannot be undone."**
+4. Click **Delete** to confirm, or **Cancel** to return to the Stores page.
+> A store marked as `DEFAULT` cannot be deleted. Set another store as the default first before attempting to delete it.

@@ -1,0 +1,49 @@
+---
+title: Add a Plugin to a Pipeline
+description: Learn about plugins in Meltano Cloud.
+layout: doc
+sidebar_position: 8
+---
+
+# Plugins
+
+Access plugins from the **left navigation bar** by selecting **Workspace → Plugins**. This section lets you manage all Singer.io taps, dbt transforms, and Matatika datasets that power your data pipelines.
+
+The Plugins page is organized into three tabs: **Installed**, **Available**, and **Custom**.
+
+---
+
+#### Installed
+
+View and manage all plugins currently installed in your workspace.
+
+- A **search bar** at the top lets you quickly find any installed plugin by name.
+- Each installed plugin card displays the plugin name, type, and variant.
+- **Add to Pipeline** - Click the **Pipeline** button on any plugin card to add it directly to a pipeline without leaving this page.
+- **Delete a Plugin** - Click the **three-dot menu (⋮)** on a plugin card and select **Delete** to remove it from your workspace.
+---
+
+#### Available
+
+Browse and install from the full library of plugins ready for use.
+
+- A **search bar** lets you search across **550+ available plugins**.
+- Each plugin card shows the plugin name, type, and a brief description.
+- **Install a Plugin** - Click the **Install** button on any plugin card to add it to your workspace. It will then appear under the Installed tab.
+- **Delete a Plugin** - Click the **three-dot menu (⋮)** on a plugin card and select **Delete** if you need to remove it.
+---
+
+#### Custom
+
+Add your own custom data sources to the workspace by uploading a Meltano `discovery.yml` file.
+
+Your discovery file describes all the Singer.io taps, dbt transforms, and Matatika datasets used to import, transform, and visualise your data.
+
+- Click the **Add** button to open the custom plugin modal.
+- In the modal, you can:
+  - **Upload a file** - Select and upload your `discovery.yml` directly.
+  - **Write YAML manually** - Type or paste your YAML content directly into the editor box.
+  - **Reset** - Clear the editor and start over using the reset option.
+- Click **Cancel** at any time to close the modal without saving.
+> **Need help with discovery files?**
+> Browse examples in the [Meltano Documentation](https://docs.meltano.com/getting-started/)

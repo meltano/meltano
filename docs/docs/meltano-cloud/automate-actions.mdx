@@ -1,0 +1,158 @@
+---
+title: Automate Actions
+description: How-to guides for creating custom pipelines, scheduling Jupyter Notebooks, and monitoring pipeline activity in Meltano.
+sidebar_label: Automate Actions
+sidebar_position: 7
+---
+
+# Automate Actions
+
+This section covers how to go beyond basic data imports and automate more complex workflows in Meltano: building custom pipelines with full control over plugin execution order, running Jupyter Notebooks on a schedule, and setting up pipeline monitoring so you are notified the moment something goes wrong.
+
+---
+
+## Create a Custom Pipeline
+
+**Time required: 5 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- A Meltano account
+- A workspace created through the Meltano app or API
+
+#### Overview
+
+A custom pipeline gives you complete control over which plugins run, in what order, and on what schedule. Unlike a standard data import pipeline, which is tied to a single data source, a custom pipeline lets you chain any combination of installed plugins together. Teams use custom pipelines to run reports, send email notifications, execute tests, or orchestrate multi-step workflows that do not fit the standard extract-load-transform pattern.
+
+##### Steps
+
+1. In your workspace, go to **Lab**, then the **Pipelines** page.
+2. Click the **+ Pipeline** button in the top right.
+3. Fill in the **Name** field, then click the empty square with the plus sign to start adding plugins.
+4. In the plugin picker, find the plugin you want to add from either the **Existing** or **New** tabs.
+
+:::tip Installing plugins first
+You can only add plugins that have already been installed in your workspace. If the plugin you need is not listed, install it first via **Lab** > **Plugins** > **Available**.
+:::
+
+5. Repeat step 4 to add as many plugins as your pipeline requires, in the order they should execute.
+6. Expand the **Settings** menu, then each plugin's sub-section, and fill in all required fields marked with an asterisk (`*`).
+7. In the **Clean, transform and organise** section, choose whether to use the default actions or supply your own custom actions or script.
+8. In the **Automate your import** section, choose how often the pipeline should run. Select from the preset schedules or use **Custom** to define your own using cron syntax.
+9. Click **Save**. A confirmation bar will appear at the top of the screen.
+10. Go back to the **Pipelines** screen. A config job will run for the next one to two minutes to commit your pipeline configuration to your workspace repository.
+11. Once the config job has completed, you can run the pipeline manually or let it run on its schedule.
+
+:::note
+Do not attempt to run the pipeline while the config job is still in progress.
+:::
+
+### Import pipelines
+
+When your custom pipeline includes a data source plugin (an extractor), you can create it as an **import pipeline** instead. Import pipelines automatically include Meltano-supported companion plugins for that data source, such as pre-built data models and datasets that appear in your workspace.
+
+---
+
+## Execute a Jupyter Notebook on a Schedule
+
+**Time required: 10 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- A Meltano account
+- A workspace created through the Meltano app or API
+- A Jupyter Notebook you want to run on a schedule
+
+#### Overview
+
+Meltano can execute Jupyter Notebooks as part of a pipeline, on whatever schedule you define. This is useful for automating recurring reports, data processing tasks, or machine learning model runs that live in a notebook rather than a standalone script. Once a notebook has run, you can extend the pipeline further to send the output by email, publish it to your workspace, or chain it with other notebooks.
+
+### Setting up the notebook
+
+1. In your workspace, go to **Lab**, then **Settings** and copy the repository URL.
+2. Clone your workspace repository to your local machine:
+
+```bash
+git clone https://github.com/YourOrg/your-workspace
+```
+
+3. Place your Jupyter Notebook inside the `notebook/` directory of the cloned repository.
+4. Commit and push the notebook back to GitHub:
+
+```bash
+git add notebook/your_notebook.ipynb
+git commit -m "Add scheduled notebook"
+git push
+```
+
+### Creating the pipeline
+
+1. In your workspace, go to **Lab**, then **Plugins**.
+2. On the **Available** tab, find the **Notebook** plugin and click **Install**.
+3. Go to the **Pipelines** page and click **+ Pipeline**.
+4. Fill in the **Name** field, then click the square with the `+` sign and add the Notebook plugin from the **New** tab.
+5. Expand **Settings** and then the **notebook** sub-section.
+6. Fill in the **Path** field with the path to your notebook, for example: `notebook/your_notebook.ipynb`.
+7. Expand **Actions**, click **Custom**, and select the appropriate `notebook:` command from the dropdown. Use `notebook:run` as your default unless you need a specific conversion or export behaviour.
+8. Expand **Schedule** and choose how often the pipeline should run.
+9. Click **Save**. A confirmation bar will appear at the top of the screen.
+10. Return to the **Pipelines** screen and wait for the config job to complete (typically 10 to 20 seconds).
+11. Once the config job has finished, run the pipeline manually or leave it to its schedule.
+
+### What to expect when the pipeline runs
+
+When running in Meltano Cloud, no cell outputs or files are committed to the workspace repository after execution. Effects are only visible externally if the notebook triggers an action such as sending an email or a Slack notification.
+
+### Extending the pipeline
+
+Once the notebook is running on a schedule, you can build on it by chaining additional plugins in the same pipeline.
+
+**Send an email**
+
+Install the **Sendgrid** plugin from the Plugins page and add it after the Notebook plugin in your pipeline. Configure the recipient, subject, body, and any attachments. You can use the Notebook plugin's built-in PDF conversion to generate a formatted report and attach it automatically.
+
+**Publish the notebook to your workspace**
+
+Install the **Meltano** plugin from the Plugins page and add it to the pipeline. Configure it to publish the executed notebook to your workspace so other workspace members can view the latest results whenever they need.
+
+**Chain multiple notebooks**
+
+You can add multiple Notebook plugin steps to a single pipeline, passing data or state from one notebook to the next. Each step runs in sequence, in the order defined in the pipeline.
+
+---
+
+## Watch Pipelines
+
+**Time required: 5 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- A Meltano account
+- A workspace with at least one pipeline already created
+
+#### Overview
+
+When pipelines run on a schedule or are triggered automatically, you need to know immediately if something goes wrong. Watching a pipeline subscribes you to notifications for that pipeline, delivered both in the Meltano app and by email. You can choose to be notified only on errors or for all activity.
+
+### Watching a pipeline
+
+1. In the Meltano app, go to your workspace **Lab** and select **Pipelines**.
+2. Find the pipeline you want to monitor and click the **eye icon** on its row.
+3. Select your notification level:
+
+| Option | When you are notified |
+|---|---|
+| **Errors** | Jobs that ended with an error; jobs that were skipped |
+| **All activity** | Jobs that started; jobs that ended (regardless of status) |
+
+:::tip Which level to choose
+Use **Errors** for production pipelines where you only need to act when something breaks. Use **All activity** when you are setting up a new pipeline and want full visibility into its run behaviour until you are confident it is stable.
+:::
+
+You can update or remove a watch at any time by clicking the eye icon again on the same pipeline.
