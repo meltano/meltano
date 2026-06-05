@@ -80,3 +80,77 @@
   to = "https://docs.meltano.com/meltano-cloud/transform-data"
   status = 301
   force = true
+
+[[redirects]]
+  from = "*/docs/tutorials/*"
+  to = "https://docs.meltano.com/meltano-cloud/creating-workspace"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/*"
+  to = "https://docs.meltano.com/meltano-cloud/cloud-overview"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/getting-started/installation"
+  to = "https://docs.meltano.com/meltano-open/meltano-at-a-glance"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/getting-started/matatika-cloud"
+  to = "https://docs.meltano.com/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/getting-started/your-cloud"
+  to = "https://docs.meltano.com/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/getting-started/community-edition"
+  to = "https://docs.meltano.com/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/getting-started/meltano"
+  to = "https://docs.meltano.com/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/getting-started/cloud-overview"
+  to = "https://docs.meltano.com/meltano-cloud/cloud-overview"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/getting-started/cloud-quickstart"
+  to = "https://docs.meltano.com/meltano-cloud/cloud-quickstart"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/getting-started/meltano-at-a-glance"
+  to = "https://docs.meltano.com/meltano-cloud/cloud-quickstart"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/getting-started/cloud-quickstart"
+  to = "https://docs.meltano.com/meltano-open/meltano-at-a-glance"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/getting-started/installation"
+  to = "https://docs.meltano.com/meltano-open/installation"
+  status = 301
+  force = true
+
+  
