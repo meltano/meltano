@@ -3,6 +3,8 @@ title: Meltano for ELT at a Glance
 description: If you want to know why you should use Meltano, here's a quick overview of the basics of all of it.
 layout: doc
 sidebar_position: 1
+redirect_from:
+  - /getting-started/meltano-at-a-glance
 ---
 ## Meltano the Data Integration Engine for ELT?
 

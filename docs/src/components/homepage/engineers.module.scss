@@ -71,6 +71,10 @@ Remove sticky scroll of architecture
   display: inline-block;
 }
 
+.engineers-title {
+  text-align: center;
+}
+
 @media all and (max-width: 768px) {
   .meltano-gives-table-head {
     display: none;

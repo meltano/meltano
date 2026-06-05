@@ -1,0 +1,251 @@
+---
+title: Importing Data
+description: How-to guides for adding plugins, creating pipelines, running imports locally, and connecting custom data sources in Meltano.
+sidebar_label: Importing Data
+sidebar_position: 9
+---
+
+# Importing Data
+
+This section covers everything you need to get data flowing into your Meltano workspace: installing a plugin, setting up a data import pipeline, running an import on your local machine, and connecting a fully custom data source.
+
+---
+
+## Adding a Plugin to Your Workspace
+
+**Time required: 5 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- Access to a workspace
+- Admin permissions for that workspace
+
+#### Overview
+
+Plugins are the building blocks of data imports in Meltano. An extractor plugin pulls data from a source (such as Google Analytics, Shopify, or a spreadsheet), and a loader plugin writes it to your data store. Before you can create a pipeline, the relevant plugin needs to be installed in your workspace.
+
+### Steps
+
+1. In your workspace, click the **Lab** button in the left menu.
+2. Select **Plugins** and open the **Available** tab.
+3. Find or search for the plugin you want to install.
+4. Click **Install**.
+
+The plugin is now added to your workspace and committed to its backing repository.
+
+From here, your next step depends on what kind of plugin you installed:
+
+- If you installed a **data source plugin** (an extractor), continue to the [Create a Data Import Pipeline](#create-a-data-import-pipeline) section below.
+- If you installed a different plugin type or want full control over execution, see the Create a Custom Pipeline guide.
+
+:::tip Can't find the plugin you need?
+If your data source is not listed in the Available tab, you can bring in your own. See the [Adding a Custom Data Source](#adding-a-custom-data-source) section further down this page.
+:::
+
+---
+
+## Create a Data Import Pipeline
+
+**Time required: 5 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- Access to a workspace
+- Admin permissions for that workspace
+- A data source plugin already installed (see [Adding a Plugin to Your Workspace](#adding-a-plugin-to-your-workspace) above)
+
+#### Overview
+
+A data import pipeline connects an extractor to your data store and runs it on a schedule you define. Each data source has its own required settings, and guidance for each one is shown on the right side of the screen as you configure it.
+
+##### Steps
+
+1. In your workspace, click **Lab** in the left menu, then go to **Plugins** and open the **Available** tab.
+2. Find or search for your data source and click **Install**. You will be moved to the **Installed** tab.
+3. Click the **+ Pipeline** button next to your chosen data source plugin.
+4. In the **Name** field at the top, give your pipeline a clear, recognisable name.
+5. Expand the settings sections and fill in all required fields, which are marked with an asterisk (`*`). Some sources use a **Connect to Google** button instead.
+6. In the **Clean, transform and organise** section, choose whether to use the default import actions or supply your own custom actions or script.
+7. In the **Automate your import** section, set how often the pipeline should run. You can choose from preset schedules or define a custom one using cron syntax.
+8. Click **Save**. A confirmation bar will appear at the top of the screen.
+9. Navigate to the **Pipelines** screen. For the next one to two minutes a **config job** will run to set up your pipeline and commit the changes to your workspace repository.
+10. Once the config job has finished, you can run the pipeline manually or leave it to run on its schedule.
+
+:::note
+Do not attempt to run the pipeline while the config job is still in progress. Wait for it to complete before triggering a manual run.
+:::
+
+---
+
+## Running Your Data Import Locally
+
+**Time required: 15 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- Owner or admin access to the workspace containing the pipeline
+- [Git](https://git-scm.com/downloads) installed
+- Python 3.8 or higher installed
+- Meltano installed (a virtual environment is recommended)
+
+#### Overview
+
+Every Meltano workspace is backed by a GitHub repository containing a Meltano project. You can clone that repository to your local machine and run any of your data import pipelines without using the cloud platform at all. This is useful for debugging, development, or simply running a pipeline from your own environment.
+
+#### Setup
+
+1. In the Meltano app, switch to the workspace that contains the pipeline you want to run locally.
+2. Navigate to **Settings** and copy the repository URL.
+3. Clone the repository to your local machine:
+
+```bash
+git clone https://github.com/YourOrg/your-workspace
+```
+
+4. Change into the cloned directory and create a new `.env` file:
+
+```bash
+cd your-workspace
+touch .env
+```
+
+5. Back in the Meltano app, go to **Lab**, then **Pipelines**, and expand the pipeline you want to run.
+6. Open the **Environment** tab and click the `.env` text field to copy the environment configuration for that pipeline.
+7. Paste the copied values into the `.env` file you created. It will look something like this:
+
+```bash
+TAP_EXAMPLE_CLIENT_ID=your-client-id
+TAP_EXAMPLE_CLIENT_SECRET=your-client-secret
+TAP_EXAMPLE_START_DATE=2022-01-01T00:00
+TARGET_EXAMPLE_HOST=example.host.com
+TARGET_EXAMPLE_PORT=1234
+TARGET_EXAMPLE_DB=your-database
+TARGET_EXAMPLE_SCHEMA=your-schema
+TARGET_EXAMPLE_USERNAME=your-username
+TARGET_EXAMPLE_PASSWORD=your-password
+```
+
+A working example of a locally configured workspace is available at the [Meltano examples repository](https://github.com/Matatika/matatika-examples/tree/master/example_local_data_import_workspace).
+
+#### Running the pipeline
+
+If you are using a virtual environment, activate it before running these commands.
+
+1. Install the extractor:
+
+```bash
+meltano install extractor tap-example
+```
+
+2. Install the loader:
+
+```bash
+meltano install loader target-example
+```
+
+3. Run the pipeline:
+
+```bash
+meltano run tap-example target-example
+```
+
+Replace `tap-example` and `target-example` with the actual plugin names from your workspace configuration.
+
+:::tip Finding your plugin names
+Your plugin names are visible in the pipeline settings in the Meltano app, and are also defined in the `meltano.yml` file in your cloned repository.
+:::
+
+---
+
+## Adding a Custom Data Source
+
+**Time required: 15 minutes**
+
+#### Prerequisites
+
+You must have:
+
+- Admin or owner access to the workspace you want to use
+
+#### Overview
+
+If the data source you need is not available in the plugin catalogue, Meltano supports adding fully custom data sources using a plugin definition file. You can define your extractor, any related transforms, and file bundles (which contain pre-built datasets for visualisation) all in one step by pasting or uploading a YAML definition.
+
+The example below walks through adding a custom version of `tap-spreadsheets-anywhere`, renamed to `tap-example-custom-data-source`, including an analyze file bundle that automatically publishes datasets to your workspace once the import runs.
+
+##### Step 1 - Open the custom source importer
+
+1. In your workspace, click the **Lab** button.
+2. Go to the **Pipelines** page.
+3. Click **+ Import**.
+4. Select the **Custom** tab and click **Connect** on the Custom option.
+
+##### Step 2 - Paste your plugin definition
+
+In the popup window, paste your plugin definition YAML. The file can have any name but must follow the correct Meltano plugin YAML format.
+
+For this example, use the following definition:
+
+```yaml
+extractors:
+  - name: tap-example-custom-data-source
+    variant: matatika
+    namespace: tap_example_custom_data_source
+    pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+    executable: tap-spreadsheets-anywhere
+    capabilities:
+      - catalog
+      - discover
+      - state
+    settings:
+      - name: tables
+        kind: array
+files:
+  - name: analyze-example-custom-data-source
+    variant: matatika
+    namespace: tap_example_custom_data_source
+    update:
+      analyze/datasets/tap-example-custom-data-source: true
+    pip_url: git+https://github.com/Matatika/analyze-example-custom-data-source.git
+```
+
+The `files` block adds an analyze bundle that shares the same namespace as the extractor. When Meltano sees a matching namespace during a data import config job, it automatically installs the bundle and publishes its datasets to your workspace so you can immediately visualise the imported data.
+
+##### Step 3 - Configure the pipeline settings
+
+After clicking **Next**, you will be on the pipeline settings screen:
+
+1. Expand the **tap-example-custom-data-source** section.
+2. For the **Tables** array field, paste the following to use a sample CSV file:
+
+```json
+[{
+  "path": "https://raw.githubusercontent.com/Matatika/matatika-examples/master/example_adding_a_custom_data_source",
+  "name": "imdb_top_20_films",
+  "pattern": "imdb_top_20_films.csv",
+  "start_date": "2021-01-01T00:00:00Z",
+  "key_properties": ["rank"],
+  "format": "csv"
+}]
+```
+
+3. Leave **Section 2 (Clean, transform and organise)** on **Default** for this example.
+4. Leave **Section 3 (Automate your import)** on **Manual** for this example.
+5. Click **Save**.
+
+##### Step 4 - Run the data import
+
+After saving, a config job will start automatically on the Pipelines screen. This job adds your custom data source and its associated analyze bundle to the workspace repository. Once it completes:
+
+1. Click the **Start job** button (solid arrow) next to your new pipeline to run the import.
+2. When the job finishes, the datasets from the analyze bundle will be visible and populated in your workspace.
+
+:::note
+The config job must complete before you attempt to run the data import. Running too early will result in an error.
+:::

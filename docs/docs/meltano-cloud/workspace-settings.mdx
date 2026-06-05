@@ -1,0 +1,55 @@
+---
+title: Workspace Settings
+description: Configure your workspace identity, repository connections, security credentials, and external logging services.
+layout: doc
+sidebar_position: 11
+---
+
+Navigate to **Workspace → Settings** from the left navigation bar to manage your workspace configuration - from basic identity settings to repository connections, security credentials, and external log streaming.
+
+---
+
+#### General
+
+#### Name
+
+- Give your workspace a name that your users will instantly recognise.
+- **Note:** Renaming the workspace also renames the associated repository. This may break any automation you have already configured that references the old name.
+#### Approved Domains
+
+- Control who can be invited to your workspace by specifying a list of approved email domains.
+- Users can only send invitations to people whose email addresses belong to the listed domains.
+- Leave this field **empty** to allow invitations to any domain.
+#### Image
+
+- Upload a workspace image to help members quickly confirm they are in the right workspace.
+- A recognisable logo or avatar is especially useful in workspaces shared across multiple teams.
+#### Active Environment
+
+- Set the name of the environment whose configuration your workspace should use.
+- The environment must already exist in your `meltano.yml` file under the `environments` section.
+- See the [Environments documentation](https://docs.meltano.com/concepts/environments) for more information.
+---
+
+#### Repository & Credentials
+
+These fields connect your workspace to its underlying Git repository and control secure access.
+
+- **Repo URL** : The URL of the repository linked to this workspace.
+- **Repository Branch** : The branch your workspace is currently tracking. Click the **copy icon** to copy the branch name.
+- **Repository Directory** : The root directory within the repository used by this workspace. Click the **copy icon** to copy the path.
+- **SSH Private Key** : The private key used for repository authentication. Click the **copy icon** to copy the key value.
+- **GitHub Installation ID** : The ID associated with your GitHub App installation for this workspace.
+- **Deployment Secret** : A secret token used to authenticate deployments.
+  - Click the **copy icon** to copy the current secret.
+  - Click **Regenerate** to generate a new secret. Use this when rotating credentials or if a secret is compromised.
+---
+
+#### Delete Workspace
+
+- Click the **Delete** button to permanently remove this workspace.
+- A confirmation modal will appear with the message **"This action cannot be undone."**
+- Click **Delete** in the modal to confirm, or **Close** to cancel and return to settings.
+> ⚠️ Deletion is irreversible. Ensure you have backed up any important data or configuration before proceeding.
+
+---
