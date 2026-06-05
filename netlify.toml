@@ -26,3 +26,57 @@
   to = "https://docs.arch.dev/"
   status = 301
   force = true
+
+[[redirects]]
+  from = "*/tutorials/creating-workspaces/"
+  to = "https://docs.meltano.com/meltano-cloud/creating-workspace"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/tutorials/importing-data/"
+  to = "https://docs.meltano.com/meltano-cloud/importing-data"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/manage-workspaces/"
+  to = "https://docs.meltano.com/meltano-cloud/managing-a-workspace"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/manage-workspaces/"
+  to = "https://docs.meltano.com/meltano-cloud/managing-a-workspace"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/import-data/"
+  to = "https://docs.meltano.com/meltano-cloud/importing-data"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/automate-actions/"
+  to = "https://docs.meltano.com/meltano-cloud/automate-actions"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/manage-data-stores/"
+  to = "https://docs.meltano.com/meltano-cloud/stores"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/setup-your-development-environment"
+  to = "https://docs.meltano.com/meltano-cloud/setup-development-environment"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/docs/how-to-guides/transform-data"
+  to = "https://docs.meltano.com/meltano-cloud/transform-data"
+  status = 301
+  force = true
