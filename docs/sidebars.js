@@ -42,10 +42,10 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/managing-a-workspace' },
         {
           type: 'category',
-          label: 'Stores',
-          link: { type: 'doc', id: 'meltano-cloud/stores/index' },
+          label: 'Connect a store',
+          link: { type: 'doc', id: 'meltano-cloud/Connect a store/index' },
           items: [
-            { type: 'doc', id: 'meltano-cloud/stores/snowflake-guides' },
+            { type: 'doc', id: 'meltano-cloud/Connect a store/snowflake-guides' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
