@@ -18,10 +18,10 @@ Whitelisting IP addresses adds an extra layer of security to your Snowflake data
 This approach blocks all internet traffic except approved IP addresses, such as:
 
 * Developers
-* Data ingestion services like Matatika
+* Data ingestion services like Meltano
 * Other trusted applications
 
-The Matatika platform is hosted in an Azure data center within the United Kingdom and connects from the following IP address:
+The Meltano platform is hosted in an Azure data center within the United Kingdom and connects from the following IP address:
 
 ```text
 51.137.148.226
@@ -35,13 +35,13 @@ CREATE NETWORK RULE block_all_public_access
   TYPE = IPV4
   VALUE_LIST = ('0.0.0.0/0');
 
-CREATE NETWORK RULE allow_matatika_access_rule
+CREATE NETWORK RULE allow_meltano_access_rule
   MODE = INGRESS
   TYPE = IPV4
   VALUE_LIST = ('51.137.148.226');
 
 CREATE NETWORK POLICY secure_data_policy
-  ALLOWED_NETWORK_RULE_LIST = ('allow_matatika_access_rule')
+  ALLOWED_NETWORK_RULE_LIST = ('allow_meltano_access_rule')
   BLOCKED_NETWORK_RULE_LIST = ('block_all_public_access');
 ```
 
