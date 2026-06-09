@@ -154,20 +154,20 @@
   force = true
 
   [[redirects]]
-  from = "*/docs/snowflake-developer-guides/*"
-  to = "https://docs.meltano.com/meltano-cloud/snowflake-guides"
+  from = "*/docs/snowflake-developer-guides"
+  to = "/meltano-cloud/stores/snowflake-guides"
   status = 301
   force = true
 
   [[redirects]]
   from = "*/docs/snowflake-developer-guides/whitelist-ip-policy/"
-  to = "https://docs.meltano.com/meltano-cloud/snowflake-guides"
+  to = "/meltano-cloud/stores/snowflake-guides"
   status = 301
   force = true
 
   [[redirects]]
   from = "*/docs/snowflake-developer-guides/key-pair-authentication/"
-  to = "https://docs.meltano.com/meltano-cloud/snowflake-guides"
+  to = "/meltano-cloud/stores/snowflake-guides"
   status = 301
   force = true
 

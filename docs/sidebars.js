@@ -58,7 +58,7 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/logging-monitoring' },
         { type: 'doc', id: 'meltano-cloud/profile-security' },
         { type: 'doc', id: 'meltano-cloud/invite' },
-        { type: 'doc', id: 'meltano-cloud/snowflake-guides' },
+        //{ type: 'doc', id: 'meltano-cloud/snowflake-guides' },
       ],
     },
 
