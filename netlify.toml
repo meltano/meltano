@@ -154,7 +154,7 @@
   force = true
 
   [[redirects]]
-  from = "*/docs/snowflake-developer-guides"
+  from = "*/docs/snowflake-developer-guides/"
   to = "/meltano-cloud/stores/snowflake-guides"
   status = 301
   force = true
@@ -170,4 +170,3 @@
   to = "/meltano-cloud/stores/snowflake-guides"
   status = 301
   force = true
-
