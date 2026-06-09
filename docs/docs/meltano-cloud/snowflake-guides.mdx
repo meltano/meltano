@@ -1,0 +1,170 @@
+---
+title:  Snowflake Developer Guides
+description: Add whitelist ip ranges nad key pair authentication
+layout: doc
+sidebar_position: 15
+---
+
+# Snowflake Developer Guides
+
+Our team at Meltano regularly shares best practices for secure and efficient analytics engineering. Whether you're new to analytics or an experienced developer, these guides provide practical setup instructions for common Snowflake security configurations.
+
+
+# Whitelist IP Ranges
+<br />
+
+Whitelisting IP addresses adds an extra layer of security to your Snowflake data warehouse by only allowing trusted clients to connect.
+
+This approach blocks all internet traffic except approved IP addresses, such as:
+
+* Developers
+* Data ingestion services like Matatika
+* Other trusted applications
+
+The Matatika platform is hosted in an Azure data center within the United Kingdom and connects from the following IP address:
+
+```text
+51.137.148.226
+```
+
+### Create Network Rules
+
+```sql
+CREATE NETWORK RULE block_all_public_access
+  MODE = INGRESS
+  TYPE = IPV4
+  VALUE_LIST = ('0.0.0.0/0');
+
+CREATE NETWORK RULE allow_matatika_access_rule
+  MODE = INGRESS
+  TYPE = IPV4
+  VALUE_LIST = ('51.137.148.226');
+
+CREATE NETWORK POLICY secure_data_policy
+  ALLOWED_NETWORK_RULE_LIST = ('allow_matatika_access_rule')
+  BLOCKED_NETWORK_RULE_LIST = ('block_all_public_access');
+```
+
+For complete details, see the Snowflake Network Policy documentation.
+
+### Apply the Policy
+
+Apply the policy to the entire account:
+
+```sql
+ALTER ACCOUNT SET NETWORK_POLICY = secure_data_policy;
+```
+
+Or apply it to a specific user:
+
+```sql
+ALTER USER joe SET NETWORK_POLICY = secure_data_policy;
+```
+
+---
+
+
+# Key Pair Authentication
+<br />
+
+Two-factor authentication (2FA) is one of the simplest ways to secure Snowflake accounts for human users.
+
+For services and automated systems, key-pair authentication provides a more secure alternative to passwords.
+
+Snowflake is also phasing out basic password-only authentication, making key-pair authentication the recommended approach for unattended services such as data ingestion pipelines.
+
+For full details, see the [Snowflake Key-pair authentication documentation](https://docs.snowflake.com/en/user-guide/key-pair-auth)
+
+### Step 1: Generate a Private Key
+
+Run the following command in your terminal:
+
+```bash
+openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -v1 PBE-SHA1-3DES -out rsa_key.p8
+```
+
+This creates an encrypted private key.
+
+### Step 2: Generate a Public Key
+
+Generate a public key from the private key:
+
+```bash
+openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
+```
+
+### Step 3: Securely Store Your Keys
+
+Treat the private key (`rsa_key.p8`) like a password:
+
+* Do not share it
+* Do not commit it to source control
+* Store it securely in a password vault such as 1Password
+
+Store the following securely:
+
+* `rsa_key.p8` (private key)
+* `rsa_key.pub` (public key)
+* Encryption password
+
+### Step 4: Assign the Public Key to a Snowflake User
+
+```sql
+ALTER USER example_user SET RSA_PUBLIC_KEY='MIIBIjANBgkqh...';
+```
+
+Only the user owner or users with the `SECURITYADMIN` role (or higher) can modify user settings.
+
+Do not include the public key delimiters in the SQL statement.
+
+### Step 5: Verify the Public Key Fingerprint
+
+#### Retrieve the Fingerprint
+
+```sql
+DESC USER example_user;
+
+SELECT SUBSTR(
+  (
+    SELECT "value"
+    FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
+    WHERE "property" = 'RSA_PUBLIC_KEY_FP'
+  ),
+  LEN('SHA256:') + 1
+);
+```
+
+Example output:
+
+```text
+Azk1Pq...
+```
+
+#### Generate a Fingerprint from the Public Key
+
+```bash
+openssl rsa -pubin -in rsa_key.pub -outform DER \
+| openssl dgst -sha256 -binary \
+| openssl enc -base64
+```
+
+Example output:
+
+```text
+writing RSA key
+Azk1Pq...
+```
+
+If both outputs match, the public key has been configured correctly.
+
+---
+
+## Interested in Security?
+
+Restricting access to your Snowflake account and reducing reliance on passwords helps protect against attacks such as:
+
+* Phishing
+* Brute force attacks
+* Credential stuffing
+
+At Meltano, we take security seriously and are always happy to discuss ways to improve the security posture of your data platform.

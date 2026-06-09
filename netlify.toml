@@ -152,3 +152,22 @@
   to = "https://docs.meltano.com/guide/installation-guide"
   status = 301
   force = true
+
+  [[redirects]]
+  from = "*/docs/snowflake-developer-guides/*"
+  to = "https://docs.meltano.com/meltano-cloud/snowflake-guides"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/docs/snowflake-developer-guides/whitelist-ip-policy/"
+  to = "https://docs.meltano.com/meltano-cloud/snowflake-guides"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/docs/snowflake-developer-guides/key-pair-authentication/"
+  to = "https://docs.meltano.com/meltano-cloud/snowflake-guides"
+  status = 301
+  force = true
+
