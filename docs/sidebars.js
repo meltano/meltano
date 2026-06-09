@@ -40,7 +40,15 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/cloud-quickstart' },
         { type: 'doc', id: 'meltano-cloud/creating-workspace' },
         { type: 'doc', id: 'meltano-cloud/managing-a-workspace' },
-        { type: 'doc', id: 'meltano-cloud/stores' },
+        {
+          type: 'category',
+          label: 'Connect a store',
+          link: { type: 'doc', id: 'meltano-cloud/connect-a-store/index' },
+          items: [
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/snowflake-guides' },
+            //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
+          ],
+        },
         { type: 'doc', id: 'meltano-cloud/setup-development-environment' },
         { type: 'doc', id: 'meltano-cloud/automate-actions' },
         { type: 'doc', id: 'meltano-cloud/plugins' },
@@ -50,7 +58,6 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/logging-monitoring' },
         { type: 'doc', id: 'meltano-cloud/profile-security' },
         { type: 'doc', id: 'meltano-cloud/invite' },
-        { type: 'doc', id: 'meltano-cloud/snowflake-guides' },
       ],
     },
 
