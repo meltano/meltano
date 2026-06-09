@@ -43,9 +43,9 @@ const sidebars = {
         {
           type: 'category',
           label: 'Connect a store',
-          link: { type: 'doc', id: 'meltano-cloud/Connect a store/index' },
+          link: { type: 'doc', id: 'meltano-cloud/connect-a-store/index' },
           items: [
-            { type: 'doc', id: 'meltano-cloud/Connect a store/snowflake-guides' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/snowflake-guides' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
