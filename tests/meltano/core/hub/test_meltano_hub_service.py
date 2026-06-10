@@ -126,17 +126,11 @@ class TestMeltanoHubService:
         assert project.hub_service.session.headers["Authorization"] == "Bearer s3cr3t"
 
     def test_server_error(self, project: Project) -> None:
-        with pytest.raises(
-            HubConnectionError,
-            match=r"Internal Server Error",
-        ) as exc_info:
+        with pytest.raises(HubConnectionError, match=r"Internal Server Error \(500\)"):
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,
                 "this-returns-500",
             )
-
-        assert isinstance(exc_info.value, HubConnectionError)
-        assert str(exc_info.value) == "Internal Server Error."
 
     def test_request_headers(self, project: Project) -> None:
         with mock.patch("click.get_current_context") as get_context:
@@ -214,11 +208,13 @@ class TestMeltanoHubService:
                 "send",
                 side_effect=requests.exceptions.ConnectionError,
             ),
-            pytest.raises(HubConnectionError) as exc_info,
+            pytest.raises(
+                HubConnectionError,
+                match=r"Could not connect to Meltano Hub\.",
+            ) as exc_info,
         ):
             project.hub_service._get(project.hub_service.hub_api_url)
 
-        assert str(exc_info.value) == "Could not connect to Meltano Hub."
         assert isinstance(exc_info.value.__cause__, requests.exceptions.ConnectionError)
 
     def test_plugin_type_not_found_error(self, project: Project) -> None:
@@ -227,11 +223,23 @@ class TestMeltanoHubService:
 
         with (
             mock.patch.object(project.hub_service, "_get", return_value=mock_response),
-            pytest.raises(HubPluginTypeNotFoundError) as exc_info,
+            pytest.raises(
+                HubPluginTypeNotFoundError,
+                match="is not supported in Meltano Hub",
+            ),
         ):
             project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
 
-        assert "is not supported in Meltano Hub" in str(exc_info.value)
+    def test_plugin_type_auth_error(self, project: Project) -> None:
+        mock_response = Response()
+        mock_response.status_code = HTTPStatus.UNAUTHORIZED
+        mock_response.reason = "Unauthorized"
+
+        with (
+            mock.patch.object(project.hub_service, "_get", return_value=mock_response),
+            pytest.raises(HubConnectionError, match=r"Unauthorized \(401\)"),
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
 
     def test_server_error_on_index(self, project: Project) -> None:
         mock_response = Response()
@@ -240,6 +248,6 @@ class TestMeltanoHubService:
 
         with (
             mock.patch.object(project.hub_service, "_get", return_value=mock_response),
-            pytest.raises(HubConnectionError, match="Internal Server Error"),
+            pytest.raises(HubConnectionError, match=r"Internal Server Error \(500\)"),
         ):
             project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
