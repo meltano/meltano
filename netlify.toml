@@ -170,4 +170,3 @@
   to = "/meltano-cloud/connect-a-store/snowflake-guides"
   status = 301
   force = true
-
