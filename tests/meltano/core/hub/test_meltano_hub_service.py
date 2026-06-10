@@ -126,7 +126,10 @@ class TestMeltanoHubService:
         assert project.hub_service.session.headers["Authorization"] == "Bearer s3cr3t"
 
     def test_server_error(self, project: Project) -> None:
-        with pytest.raises(HubConnectionError, match=r"Internal Server Error \(500\)"):
+        with pytest.raises(
+            HubConnectionError,
+            match=r"Internal Server Error \(500\): can not retrieve plugin",
+        ):
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,
                 "this-returns-500",
@@ -237,7 +240,10 @@ class TestMeltanoHubService:
 
         with (
             mock.patch.object(project.hub_service, "_get", return_value=mock_response),
-            pytest.raises(HubConnectionError, match=r"Unauthorized \(401\)"),
+            pytest.raises(
+                HubConnectionError,
+                match=r"Unauthorized \(401\): can not retrieve plugins of type",
+            ),
         ):
             project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
 
