@@ -1,0 +1,34 @@
+---
+title: Log Routing and Monitoring
+description: Configure your workspace identity, repository connections, security credentials, and external logging services.
+layout: doc
+sidebar_position: 12
+---
+
+Stream your workspace pipeline logs to external monitoring platforms for real-time visibility and alerting.
+
+---
+
+#### Datadog Log Streaming
+
+Send workspace logs directly to Datadog for monitoring, alerting, and observability across your pipelines.
+
+**Requirements:** A Datadog API key and an active Datadog account.
+
+##### Setting Up Datadog
+
+1. Open **Workspace Settings** and scroll to the **External Logging Services** section.
+2. Click **Add Credential** under the Datadog section.
+3. Fill in the following details:
+   - **API Key** : Your Datadog API key.
+   - **Region** : Select the Datadog region that matches your account to ensure logs reach the correct data centre.
+   - **Service Name** *(optional)* : Tag logs with a service name to filter them and build focused dashboards in Datadog.
+4. Click **Save** : logs will begin streaming to Datadog immediately.
+##### Managing Your Datadog Credentials
+
+- **Pause streaming** : Click the **Active** toggle on your Datadog credentials card to switch it to **Paused**. Logs will stop streaming without removing your credentials.
+- **Resume streaming** : Click the **Paused** toggle to switch back to **Active**. Log streaming resumes immediately.
+- **Delete credentials** : Remove your Datadog credentials at any time, for example when rotating API keys or switching regions. Re-add them to resume streaming.
+##### How It Works
+
+Logs are shipped from the **Logback layer** directly to Datadog - no extra infrastructure required. Settings take effect at runtime, so you can adjust configuration without redeploying your workspace.

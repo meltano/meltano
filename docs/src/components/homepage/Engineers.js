@@ -58,7 +58,7 @@ const Engineers = ({ data }) => {
       >
         <div className={styles.container}>
           <div className="heading">
-            <h2 className="my-6" dangerouslySetInnerHTML={{ __html: data.engineersTitle }} />
+            <h2 className={`my-6 ${styles['engineers-title']}`} dangerouslySetInnerHTML={{ __html: data.engineersTitle }} />
             <p
               className="heading-description p2"
               dangerouslySetInnerHTML={{ __html: data.engineersText }}

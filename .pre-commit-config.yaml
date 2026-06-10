@@ -52,34 +52,34 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.4.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v10.4.1 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
         args: ['--fix', '--config=docs/eslint.config.js']
         additional_dependencies:
-          - "eslint@10.4.0" # Keep this in sync with the rev above!
+          - "eslint@10.4.1" # Keep this in sync with the rev above!
 
           - "eslint-config-prettier@10.1.8"
-          - "eslint-plugin-prettier@5.5.5"
+          - "eslint-plugin-prettier@5.5.6"
           - "eslint-plugin-react@7.37.5"
           - "eslint-plugin-vue@10.9.1"
           - "prettier@3.8.3"
           - "globals@17.6.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.14
+    rev: v0.15.15
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.16
+    rev: 0.11.17
     hooks:
       - id: uv-lock
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.46.3
+    rev: v1.47.0
     hooks:
       - id: typos

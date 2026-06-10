@@ -91,6 +91,7 @@ class SingerPlugin(BasePlugin):
         _pop_non_leaf_keys(processed_config)
         return processed_config
 
+    @override
     def exec_env(self, plugin_invoker: PluginInvoker) -> dict[str, str]:
         """Get the environment variables for this tap.
 

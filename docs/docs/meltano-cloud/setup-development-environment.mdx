@@ -1,0 +1,64 @@
+---
+title: Setup your Dev environment
+description: Learn how to set up a local development environment for your Meltano workspace, manage configuration changes, and use VS Code for workspace development.
+sidebar_position: 6
+---
+
+# Setup your Development Environment
+**Time required: 10 minutes**
+
+---
+### Prerequisites
+
+You must have:
+
+- [`git`](https://github.com/git-guides/install-git) installed, or [GitHub Desktop](https://desktop.github.com/) if you prefer a visual interface
+
+---
+
+### Overview
+
+Within an organisation, importing and transforming data into analytics-ready models requires careful collaboration across code artifacts such as sources, pipelines, models, and datasets. To manage these changes safely, teams need to develop and test in an isolated environment before promoting anything to production.
+
+A Meltano workspace manages the configuration of your project for a specific environment, and all project code is committed to a Git repository with full version control. Keeping environments separate means you can have dedicated spaces for development, testing, and stable production workloads. This model is portable by design: you can clone a workspace repository locally, make changes using standard `meltano` commands, and push those changes back to have them automatically deployed.
+
+---
+
+### Working with Meltano locally
+
+A Meltano workspace project is a standard Meltano project and can be treated as one. Once the workspace repository has been cloned to your local machine, you can run any `meltano` command against it as normal. Common use cases include:
+
+- Adding or updating plugin configuration in `meltano.yml`
+- Running a pipeline manually with `meltano run` to test it before it goes on a schedule
+- Debugging extraction or loading issues without affecting the live workspace
+
+Any changes you make locally can be committed and pushed back to the remote repository. If you have a GitHub Webhook configured, those changes will be picked up and deployed to your workspace automatically. See the [Managing Config from GitHub](/meltano-cloud/managing-a-workspace) guide for setup instructions.
+
+---
+
+### Using VS Code
+
+VS Code can be used as a full development environment for your workspace. Meltano workspaces support a dev container configuration, which means VS Code can spin up a properly configured container environment with a single click.
+
+#### Setup steps
+
+1. Clone your workspace repository and open the folder in VS Code:
+
+```bash
+git clone https://github.com/YourOrg/your-workspace
+code your-workspace
+```
+
+2. VS Code will detect the dev container configuration and display a pop-up: **"Folder contains a Dev Container configuration file. Reopen folder to develop in a container."** Click **Reopen in Container**.
+
+:::tip Alternative way to open
+If the pop-up does not appear, click the **Open a Remote Window** button in the bottom-left corner of VS Code, then select **Reopen in Container** from the command palette.
+:::
+
+3. Once the container environment has finished initialising, VS Code will be mounted at the `workspaces` directory. From here you can clone additional workspaces, make changes, and commit and push directly within VS Code.
+
+---
+
+:::note About DataML artifacts
+Meltano workspace repositories contain deployable entities defined as [Data Management Language (DataML)](https://www.matatika.com/docs/dataml) artifacts, alongside standard Meltano plugin `.lock` files, `meltano.yml` schedules, jobs, plugins, and configuration. All of these are interpreted as Meltano entities when the workspace is deployed.
+:::
