@@ -274,7 +274,11 @@ class MeltanoHubService(PluginRepository):
         response = self._get(url)
 
         if response.status_code >= HTTPStatus.BAD_REQUEST:
-            raise HubConnectionError(response.reason)
+            reason = (
+                f"{response.reason or 'Unknown reason'} ({response.status_code}): "
+                "can not retrieve plugin"
+            )
+            raise HubConnectionError(reason)
 
         return PluginDefinition(
             **response.json(),
@@ -329,15 +333,15 @@ class MeltanoHubService(PluginRepository):
         url = self.plugin_type_endpoint(plugin_type)
         response = self._get(url)
 
-        if (
-            HTTPStatus.BAD_REQUEST
-            <= response.status_code
-            < HTTPStatus.TOO_MANY_REQUESTS
-        ):
+        if response.status_code == HTTPStatus.NOT_FOUND:
             raise HubPluginTypeNotFoundError(plugin_type)
 
-        if HTTPStatus.INTERNAL_SERVER_ERROR <= response.status_code < 600:
-            raise HubConnectionError(response.reason)
+        if response.status_code >= HTTPStatus.BAD_REQUEST:
+            reason = (
+                f"{response.reason or 'Unknown reason'} ({response.status_code}): "
+                f"can not retrieve plugins of type '{plugin_type.singular}'"
+            )
+            raise HubConnectionError(reason)
 
         plugins: dict[str, dict[str, t.Any]] = response.json()
         return {
