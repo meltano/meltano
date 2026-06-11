@@ -141,31 +141,31 @@
   status = 301
   force = true
 
-  [[redirects]]
+[[redirects]]
   from = "*/getting-started/cloud-quickstart"
   to = "https://docs.meltano.com/meltano-open/meltano-at-a-glance"
   status = 301
   force = true
 
-  [[redirects]]
+[[redirects]]
   from = "*/getting-started/installation"
   to = "https://docs.meltano.com/guide/installation-guide"
   status = 301
   force = true
 
-  [[redirects]]
+[[redirects]]
   from = "*/docs/snowflake-developer-guides"
   to = "/meltano-cloud/connect-a-store/snowflake-guides"
   status = 301
   force = true
 
-  [[redirects]]
+[[redirects]]
   from = "*/docs/snowflake-developer-guides/whitelist-ip-policy/"
   to = "/meltano-cloud/connect-a-store/snowflake-guides"
   status = 301
   force = true
 
-  [[redirects]]
+[[redirects]]
   from = "*/docs/snowflake-developer-guides/key-pair-authentication/"
   to = "/meltano-cloud/connect-a-store/snowflake-guides"
   status = 301
