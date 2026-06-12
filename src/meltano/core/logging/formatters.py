@@ -235,11 +235,7 @@ def key_value_formatter(
     )
 
 
-def _google_cloud_logging_processor(
-    logger: structlog.typing.WrappedLogger,  # noqa: ARG001
-    name: str,  # noqa: ARG001
-    event_dict: structlog.typing.EventDict,
-) -> structlog.typing.EventDict:
+def _get_google_cloud_logging_processor(*, callsite_parameters: bool) -> Processor:
     """Map Meltano's log keys onto the special fields Google Cloud Logging reads.
 
     Google Cloud Logging (formerly Stackdriver) only recognises a structured log
@@ -250,44 +246,55 @@ def _google_cloud_logging_processor(
     - ``level`` becomes ``severity`` (upper-cased to match the GCL severities)
     - ``event`` becomes ``message``
     - callsite parameters become ``logging.googleapis.com/sourceLocation``
-
-    Args:
-        logger: The logger instance.
-        name: The logger name.
-        event_dict: The event dictionary.
-
-    Returns:
-        The event dictionary with Google Cloud Logging special fields.
     """
-    # The field Google Cloud Logging reads to populate `LogEntry.sourceLocation`.
-    # https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
-    gcp_source_location_key = "logging.googleapis.com/sourceLocation"
 
-    if (level := event_dict.pop("level", None)) is not None:
-        # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
-        # all valid Google Cloud Logging severities once upper-cased. Coerce to
-        # str first in case a non-string level slips into the event dict.
-        event_dict["severity"] = str(level).upper()
+    def _gcl_processor(
+        logger: structlog.typing.WrappedLogger,  # noqa: ARG001
+        name: str,  # noqa: ARG001
+        event_dict: structlog.typing.EventDict,
+    ) -> structlog.typing.EventDict:
+        """Process event dict for GCL.
 
-    if "event" in event_dict:
-        event_dict["message"] = event_dict.pop("event")
+        Args:
+            logger: The logger instance.
+            name: The logger name.
+            event_dict: The event dictionary.
 
-    # Present only when callsite_parameters is enabled.
-    pathname = event_dict.pop("pathname", None)
-    lineno = event_dict.pop("lineno", None)
-    func_name = event_dict.pop("func_name", None)
-    if pathname is not None or lineno is not None or func_name is not None:
-        source_location: dict[str, t.Any] = {}
-        if pathname is not None:
-            source_location["file"] = pathname
-        if lineno is not None:
-            # GCL expects `line` as a string.
-            source_location["line"] = str(lineno)
-        if func_name is not None:
-            source_location["function"] = func_name
-        event_dict[gcp_source_location_key] = source_location
+        Returns:
+            The event dictionary with Google Cloud Logging special fields.
+        """
+        # The field Google Cloud Logging reads to populate `LogEntry.sourceLocation`.
+        # https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
+        gcp_source_location_key = "logging.googleapis.com/sourceLocation"
 
-    return event_dict
+        if (level := event_dict.pop("level", None)) is not None:
+            # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
+            # all valid Google Cloud Logging severities once upper-cased. Coerce to
+            # str first in case a non-string level slips into the event dict.
+            event_dict["severity"] = str(level).upper()
+
+        if "event" in event_dict:
+            event_dict["message"] = event_dict.pop("event")
+
+        # Present only when callsite_parameters is enabled.
+        if callsite_parameters:
+            pathname = event_dict.pop("pathname", None)
+            lineno = event_dict.pop("lineno", None)
+            func_name = event_dict.pop("func_name", None)
+            if pathname is not None or lineno is not None or func_name is not None:
+                source_location: dict[str, t.Any] = {}
+                if pathname is not None:
+                    source_location["file"] = pathname
+                if lineno is not None:
+                    # GCL expects `line` as a string.
+                    source_location["line"] = str(lineno)
+                if func_name is not None:
+                    source_location["function"] = func_name
+                event_dict[gcp_source_location_key] = source_location
+
+        return event_dict
+
+    return _gcl_processor
 
 
 def json_formatter(
@@ -319,7 +326,9 @@ def json_formatter(
     """
     preset_processors: list[Processor] = []
     if preset == "google-cloud-logging":
-        preset_processors.append(_google_cloud_logging_processor)
+        preset_processors.append(
+            _get_google_cloud_logging_processor(callsite_parameters=callsite_parameters)
+        )
     elif preset is not None:
         msg = f"Unknown json_formatter preset: {preset!r}"  # type: ignore[unreachable]
         raise ValueError(msg)
