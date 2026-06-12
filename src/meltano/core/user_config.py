@@ -185,6 +185,10 @@ def get_user_config_service(config_path: Path | None = None) -> UserConfigServic
         return _user_config_service
 
     with _user_config_service_lock:
+        if _user_config_service is not None and (
+            config_path is None or config_path == _user_config_service.config_path
+        ):
+            return _user_config_service
         _user_config_service = UserConfigService(config_path)
         return _user_config_service
 
