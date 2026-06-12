@@ -278,19 +278,12 @@ def _get_google_cloud_logging_processor(*, callsite_parameters: bool) -> Process
 
         # Present only when callsite_parameters is enabled.
         if callsite_parameters:
-            pathname = event_dict.pop("pathname", None)
-            lineno = event_dict.pop("lineno", None)
-            func_name = event_dict.pop("func_name", None)
-            if pathname is not None or lineno is not None or func_name is not None:
-                source_location: dict[str, t.Any] = {}
-                if pathname is not None:
-                    source_location["file"] = pathname
-                if lineno is not None:
-                    # GCL expects `line` as a string.
-                    source_location["line"] = str(lineno)
-                if func_name is not None:
-                    source_location["function"] = func_name
-                event_dict[gcp_source_location_key] = source_location
+            event_dict[gcp_source_location_key] = {
+                "file": event_dict.pop("pathname"),
+                # GCL expects `line` as a string.
+                "line": str(event_dict.pop("lineno")),
+                "function": event_dict.pop("func_name", None),
+            }
 
         return event_dict
 

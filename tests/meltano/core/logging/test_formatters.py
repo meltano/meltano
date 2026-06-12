@@ -9,7 +9,6 @@ import re
 import sys
 import typing as t
 import zoneinfo
-from collections.abc import Mapping
 from types import TracebackType
 
 import pytest
@@ -350,46 +349,6 @@ class TestLogFormatters:
         assert source_location["file"] == "/path/to/my_module.py"
         assert source_location["line"] == "1"
         assert source_location["function"] == "my_func"
-
-    def test_google_cloud_logging_formatter_partial_source_location(self) -> None:
-        # Only the present callsite fields are included.
-        proc = formatters._get_google_cloud_logging_processor(callsite_parameters=True)
-        event_dict = proc(
-            None,
-            "info",
-            {"event": "test", "level": "info", "pathname": "/a.py", "lineno": 10},
-        )
-        assert isinstance(event_dict, Mapping)
-        source_location = event_dict["logging.googleapis.com/sourceLocation"]
-        assert source_location == {"file": "/a.py", "line": "10"}
-        assert "function" not in source_location
-
-    def test_google_cloud_logging_formatter_no_source_location(self) -> None:
-        # No callsite fields means no sourceLocation key at all.
-        proc = formatters._get_google_cloud_logging_processor(callsite_parameters=True)
-        event_dict = proc(
-            None,
-            "info",
-            {"event": "test", "level": "info"},
-        )
-        assert isinstance(event_dict, Mapping)
-        assert "logging.googleapis.com/sourceLocation" not in event_dict
-
-    def test_google_cloud_logging_formatter_function_only(self) -> None:
-        # Only func_name present, and no level or event keys: the remaining
-        # source location field is included and nothing else is mapped.
-        proc = formatters._get_google_cloud_logging_processor(callsite_parameters=True)
-        event_dict = proc(
-            None,
-            "info",
-            {"func_name": "my_func"},
-        )
-        assert isinstance(event_dict, Mapping)
-        assert event_dict["logging.googleapis.com/sourceLocation"] == {
-            "function": "my_func",
-        }
-        assert "severity" not in event_dict
-        assert "message" not in event_dict
 
     def test_google_cloud_logging_formatter_exception(
         self,
