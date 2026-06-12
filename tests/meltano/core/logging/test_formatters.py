@@ -330,6 +330,7 @@ class TestLogFormatters:
             )
             message_dict = json.loads(formatter.format(record))
             assert message_dict["severity"] == severity
+            assert "level" not in message_dict
 
     def test_google_cloud_logging_formatter_source_location(self, record) -> None:
         # Without callsite parameters there is no source location.
