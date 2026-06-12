@@ -297,7 +297,7 @@ class TestLogFormatters:
         assert "locals" not in message_dict["exception"][0]["frames"][0]
 
     def test_google_cloud_logging_formatter_severity_and_message(self, record) -> None:
-        formatter = formatters.google_cloud_logging_formatter()
+        formatter = formatters.json_formatter(preset="google-cloud-logging")
         message_dict = json.loads(formatter.format(record))
 
         # GCL special fields are present...
@@ -310,7 +310,7 @@ class TestLogFormatters:
         assert "event" not in message_dict
 
     def test_google_cloud_logging_formatter_severity_levels(self) -> None:
-        formatter = formatters.google_cloud_logging_formatter()
+        formatter = formatters.json_formatter(preset="google-cloud-logging")
         for level, severity in (
             (logging.DEBUG, "DEBUG"),
             (logging.INFO, "INFO"),
@@ -332,12 +332,13 @@ class TestLogFormatters:
 
     def test_google_cloud_logging_formatter_source_location(self, record) -> None:
         # Without callsite parameters there is no source location.
-        formatter = formatters.google_cloud_logging_formatter()
+        formatter = formatters.json_formatter(preset="google-cloud-logging")
         message_dict = json.loads(formatter.format(record))
         assert "logging.googleapis.com/sourceLocation" not in message_dict
 
         # With callsite parameters the source location is populated.
-        formatter = formatters.google_cloud_logging_formatter(
+        formatter = formatters.json_formatter(
+            preset="google-cloud-logging",
             callsite_parameters=True,
         )
         message_dict = json.loads(formatter.format(record))
@@ -384,7 +385,7 @@ class TestLogFormatters:
         self,
         record_with_exception,
     ) -> None:
-        formatter = formatters.google_cloud_logging_formatter()
+        formatter = formatters.json_formatter(preset="google-cloud-logging")
         message_dict = json.loads(formatter.format(record_with_exception))
 
         assert message_dict["severity"] == "ERROR"
@@ -395,7 +396,10 @@ class TestLogFormatters:
         assert exception_list[0]["exc_type"] == "ValueError"
         assert exception_list[0]["exc_value"] == "Not a real error"
 
-        formatter = formatters.google_cloud_logging_formatter(dict_tracebacks=False)
+        formatter = formatters.json_formatter(
+            preset="google-cloud-logging",
+            dict_tracebacks=False,
+        )
         message_dict = json.loads(formatter.format(record_with_exception))
         assert "exception" not in message_dict
 
@@ -403,13 +407,23 @@ class TestLogFormatters:
         self,
         record_with_exception,
     ) -> None:
-        formatter = formatters.google_cloud_logging_formatter(show_locals=True)
+        formatter = formatters.json_formatter(
+            preset="google-cloud-logging",
+            show_locals=True,
+        )
         message_dict = json.loads(formatter.format(record_with_exception))
         assert "locals" in message_dict["exception"][0]["frames"][0]
 
-        formatter = formatters.google_cloud_logging_formatter(show_locals=False)
+        formatter = formatters.json_formatter(
+            preset="google-cloud-logging",
+            show_locals=False,
+        )
         message_dict = json.loads(formatter.format(record_with_exception))
         assert "locals" not in message_dict["exception"][0]["frames"][0]
+
+    def test_json_formatter_unknown_preset(self) -> None:
+        with pytest.raises(ValueError, match="Unknown json_formatter preset"):
+            formatters.json_formatter(preset="not-a-real-preset")
 
     def test_plain_formatter(self, record, isolated_logger) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")

@@ -330,10 +330,10 @@ Logging (formerly Stackdriver) recognizes a JSON line as a structured entry only
 `severity`, `message`, and `timestamp`. As a result, logs produced by `json_formatter` are ingested as plain text at
 `INFO` severity, and severity-based filtering and alerting are unavailable.
 
-To produce logs that Google Cloud Logging parses correctly, use `google_cloud_logging_formatter`. It renames `event` to
-`message` and `level` to `severity`, allowing Cloud Logging to assign the appropriate severity to each entry. This is
-suitable when Cloud Logging captures `stdout` or `stderr` directly, such as on Cloud Run or GKE, when running
-`meltano run`, `meltano invoke`, or `meltano el`:
+To produce logs that Google Cloud Logging parses correctly, set the `json_formatter` `preset` option to
+`google-cloud-logging`. The preset renames `event` to `message` and `level` to `severity`, allowing Cloud Logging to
+assign the appropriate severity to each entry. This is suitable when Cloud Logging captures `stdout` or `stderr`
+directly, such as on Cloud Run or GKE, when running `meltano run`, `meltano invoke`, or `meltano el`:
 
 ```yaml
 version: 1
@@ -341,7 +341,8 @@ disable_existing_loggers: false
 
 formatters:
   google_cloud:
-    (): meltano.core.logging.google_cloud_logging_formatter
+    (): meltano.core.logging.json_formatter
+    preset: google-cloud-logging
 
 handlers:
   console:
@@ -356,13 +357,14 @@ root:
   handlers: [console]
 ```
 
-To include the source location of each log entry, enable callsite parameters. The formatter then adds a
+To include the source location of each log entry, enable callsite parameters. The preset then adds a
 `logging.googleapis.com/sourceLocation` field containing the file, line, and function:
 
 ```yaml
 formatters:
   google_cloud:
-    (): meltano.core.logging.google_cloud_logging_formatter
+    (): meltano.core.logging.json_formatter
+    preset: google-cloud-logging
     callsite_parameters: true
 ```
 
