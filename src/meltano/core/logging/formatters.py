@@ -330,8 +330,8 @@ def json_formatter(
             dict_tracebacks=dict_tracebacks,
             show_locals=show_locals,
         ),
-        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.stdlib.ExtraAdder(),
+        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         *preset_processors,
         structlog.processors.JSONRenderer(),
     )
