@@ -91,7 +91,7 @@ class TestLogFormatters:
 
     @pytest.fixture
     def record(self):
-        return logging.LogRecord(
+        rec = logging.LogRecord(
             name="test",
             level=logging.INFO,
             pathname="/path/to/my_module.py",
@@ -101,6 +101,9 @@ class TestLogFormatters:
             exc_info=None,
             func="my_func",
         )
+        rec.__dict__["extra_int"] = 1
+        rec.__dict__["extra_str"] = "foo"
+        return rec
 
     @pytest.fixture
     def record_with_exception(self, exc_info: ExcInfo, tmp_path: Path):
@@ -176,16 +179,22 @@ class TestLogFormatters:
         output = formatter.format(record)
         assert "foo=bar" not in output
         assert "baz=qux" not in output
+        assert "extra_int=1" not in output
+        assert "extra_str=foo" not in output
 
-        formatter = formatters.console_log_formatter(include_keys=["foo"])
+        formatter = formatters.console_log_formatter(include_keys=["foo", "extra_int"])
         output = formatter.format(record)
         assert "foo=bar" in output
         assert "baz=qux" not in output
+        assert "extra_int=1" in output
+        assert "extra_str=foo" not in output
 
         formatter = formatters.console_log_formatter(all_keys=True)
         output = formatter.format(record)
         assert "foo=bar" in output
         assert "baz=qux" in output
+        assert "extra_int=1" in output
+        assert "extra_str=foo" in output
 
     def test_key_value_formatter(self, record):
         formatter = formatters.key_value_formatter()
@@ -199,6 +208,13 @@ class TestLogFormatters:
         assert "lineno=1" in output
         assert "func_name='my_func'" in output
         assert f"process={os.getpid()}" in output
+
+    def test_json_formatter_extra(self, record) -> None:
+        formatter = formatters.json_formatter()
+        output = formatter.format(record)
+        message_dict = json.loads(output)
+        assert message_dict["extra_int"] == 1
+        assert message_dict["extra_str"] == "foo"
 
     def test_json_formatter_callsite_parameters(self, record):
         formatter = formatters.json_formatter(callsite_parameters=True)
