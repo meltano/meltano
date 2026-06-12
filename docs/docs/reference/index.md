@@ -20,4 +20,3 @@ If there's a document you want to see that's not here, we welcome contributions 
 - [Plugin Definition Syntax](/reference/plugin-definition-syntax)
 - [Glossary](/reference/glossary)
 - [Cloud](/reference/cloud)
-- [Meltano UI and REST API Server (Deprecated)](/reference/ui)
