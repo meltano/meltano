@@ -344,6 +344,8 @@ class TestLogFormatters:
             callsite_parameters=True,
         )
         message_dict = json.loads(formatter.format(record))
+        assert isinstance(message_dict.get("process"), int)
+
         source_location = message_dict["logging.googleapis.com/sourceLocation"]
         assert source_location["file"] == "/path/to/my_module.py"
         assert source_location["line"] == "1"
