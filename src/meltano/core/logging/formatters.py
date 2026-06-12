@@ -235,14 +235,6 @@ def key_value_formatter(
     )
 
 
-# Value accepted by the json_formatter `preset` option for Google Cloud Logging.
-GOOGLE_CLOUD_LOGGING_PRESET = "google-cloud-logging"
-
-# The field Google Cloud Logging reads to populate `LogEntry.sourceLocation`.
-# https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
-_GCP_SOURCE_LOCATION_KEY = "logging.googleapis.com/sourceLocation"
-
-
 def _google_cloud_logging_processor(
     logger: structlog.typing.WrappedLogger,  # noqa: ARG001
     name: str,  # noqa: ARG001
@@ -267,6 +259,10 @@ def _google_cloud_logging_processor(
     Returns:
         The event dictionary with Google Cloud Logging special fields.
     """
+    # The field Google Cloud Logging reads to populate `LogEntry.sourceLocation`.
+    # https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
+    gcp_source_location_key = "logging.googleapis.com/sourceLocation"
+
     if (level := event_dict.pop("level", None)) is not None:
         # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
         # all valid Google Cloud Logging severities once upper-cased. Coerce to
@@ -289,7 +285,7 @@ def _google_cloud_logging_processor(
             source_location["line"] = str(lineno)
         if func_name is not None:
             source_location["function"] = func_name
-        event_dict[_GCP_SOURCE_LOCATION_KEY] = source_location
+        event_dict[gcp_source_location_key] = source_location
 
     return event_dict
 
@@ -322,10 +318,10 @@ def json_formatter(
         ValueError: If an unknown preset is given.
     """
     preset_processors: list[Processor] = []
-    if preset == GOOGLE_CLOUD_LOGGING_PRESET:
+    if preset == "google-cloud-logging":
         preset_processors.append(_google_cloud_logging_processor)
     elif preset is not None:
-        msg = f"Unknown json_formatter preset: {preset!r}"
+        msg = f"Unknown json_formatter preset: {preset!r}"  # type: ignore[unreachable]
         raise ValueError(msg)
 
     return _process_formatter(
