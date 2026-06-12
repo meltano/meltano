@@ -267,14 +267,12 @@ def _get_google_cloud_logging_processor(*, callsite_parameters: bool) -> Process
         # https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
         gcp_source_location_key = "logging.googleapis.com/sourceLocation"
 
-        if (level := event_dict.pop("level", None)) is not None:
-            # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
-            # all valid Google Cloud Logging severities once upper-cased. Coerce to
-            # str first in case a non-string level slips into the event dict.
-            event_dict["severity"] = str(level).upper()
+        # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
+        # all valid Google Cloud Logging severities once upper-cased. Coerce to
+        # str first in case a non-string level slips into the event dict.
+        event_dict["severity"] = str(event_dict.pop("level", "info")).upper()
 
-        if "event" in event_dict:
-            event_dict["message"] = event_dict.pop("event")
+        event_dict["message"] = event_dict.pop("event")
 
         # Present only when callsite_parameters is enabled.
         if callsite_parameters:
