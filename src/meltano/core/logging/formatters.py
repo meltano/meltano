@@ -235,53 +235,6 @@ def key_value_formatter(
     )
 
 
-def json_formatter(
-    *,
-    callsite_parameters: bool = False,
-    dict_tracebacks: bool = True,
-    show_locals: bool = False,
-    preset: t.Literal["google-cloud-logging"] | None = None,
-) -> structlog.stdlib.ProcessorFormatter:
-    """Create a logging formatter that renders lines in JSON format.
-
-    Args:
-        callsite_parameters: Whether to include callsite parameters in the JSON output.
-        dict_tracebacks: Whether to include tracebacks in the JSON output.
-        show_locals: Whether to include local variables in the traceback.
-        preset: Optional output preset that adapts the rendered fields for a
-            specific log sink. ``"google-cloud-logging"`` renames ``event`` to
-            ``message`` and ``level`` to ``severity`` (and emits
-            ``logging.googleapis.com/sourceLocation`` when callsite parameters
-            are enabled) so that Google Cloud Logging ingests the lines as
-            structured entries with the correct severity. See
-            https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields.
-
-    Returns:
-        A configured JSON formatter.
-
-    Raises:
-        ValueError: If an unknown preset is given.
-    """
-    preset_processors: list[Processor] = []
-    if preset == GOOGLE_CLOUD_LOGGING_PRESET:
-        preset_processors.append(_google_cloud_logging_processor)
-    elif preset is not None:
-        msg = f"Unknown json_formatter preset: {preset!r}"
-        raise ValueError(msg)
-
-    return _process_formatter(
-        *_processors_from_kwargs(
-            callsite_parameters=callsite_parameters,
-            dict_tracebacks=dict_tracebacks,
-            show_locals=show_locals,
-        ),
-        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-        structlog.stdlib.ExtraAdder(),
-        *preset_processors,
-        structlog.processors.JSONRenderer(),
-    )
-
-
 # Value accepted by the json_formatter `preset` option for Google Cloud Logging.
 GOOGLE_CLOUD_LOGGING_PRESET = "google-cloud-logging"
 
@@ -339,6 +292,53 @@ def _google_cloud_logging_processor(
         event_dict[_GCP_SOURCE_LOCATION_KEY] = source_location
 
     return event_dict
+
+
+def json_formatter(
+    *,
+    callsite_parameters: bool = False,
+    dict_tracebacks: bool = True,
+    show_locals: bool = False,
+    preset: t.Literal["google-cloud-logging"] | None = None,
+) -> structlog.stdlib.ProcessorFormatter:
+    """Create a logging formatter that renders lines in JSON format.
+
+    Args:
+        callsite_parameters: Whether to include callsite parameters in the JSON output.
+        dict_tracebacks: Whether to include tracebacks in the JSON output.
+        show_locals: Whether to include local variables in the traceback.
+        preset: Optional output preset that adapts the rendered fields for a
+            specific log sink. ``"google-cloud-logging"`` renames ``event`` to
+            ``message`` and ``level`` to ``severity`` (and emits
+            ``logging.googleapis.com/sourceLocation`` when callsite parameters
+            are enabled) so that Google Cloud Logging ingests the lines as
+            structured entries with the correct severity. See
+            https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields.
+
+    Returns:
+        A configured JSON formatter.
+
+    Raises:
+        ValueError: If an unknown preset is given.
+    """
+    preset_processors: list[Processor] = []
+    if preset == GOOGLE_CLOUD_LOGGING_PRESET:
+        preset_processors.append(_google_cloud_logging_processor)
+    elif preset is not None:
+        msg = f"Unknown json_formatter preset: {preset!r}"
+        raise ValueError(msg)
+
+    return _process_formatter(
+        *_processors_from_kwargs(
+            callsite_parameters=callsite_parameters,
+            dict_tracebacks=dict_tracebacks,
+            show_locals=show_locals,
+        ),
+        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+        structlog.stdlib.ExtraAdder(),
+        *preset_processors,
+        structlog.processors.JSONRenderer(),
+    )
 
 
 def _event_renderer(
