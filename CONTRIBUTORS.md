@@ -206,6 +206,9 @@ Thanks go to these wonderful people ([emoji key](https://allcontributors.org/emo
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/toroleapinc"><img src="https://avatars.githubusercontent.com/u/88481784?v=4?s=100" width="100px;" alt="edvatar"/><br /><sub><b>edvatar</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=toroleapinc" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ChidiebereNjoku"><img src="https://avatars.githubusercontent.com/u/144056487?v=4?s=100" width="100px;" alt="ChidiebereNjoku"/><br /><sub><b>ChidiebereNjoku</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=ChidiebereNjoku" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DRACULA1729"><img src="https://avatars.githubusercontent.com/u/110762985?v=4?s=100" width="100px;" alt="Sushant Pandey"/><br /><sub><b>Sushant Pandey</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=DRACULA1729" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
