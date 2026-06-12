@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 import typing as t
+from dataclasses import KW_ONLY, dataclass, field
+
+import ruamel.yaml as yaml
 
 from meltano.core.behavior import NameEq
-from meltano.core.behavior.canonical import Canonical
+from meltano.core.behavior._dataclass import (
+    CanonicalDataclassMeta,
+    CanonicalDataclassMixin,
+)
 from meltano.core.job import JobFinder as StateJobFinder
 
 if t.TYPE_CHECKING:
@@ -201,35 +207,15 @@ def _parse_value(value: str, field_index: int, /) -> int | None:
     return None
 
 
-class Schedule(NameEq, Canonical):
+@dataclass(eq=False)
+class Schedule(NameEq, CanonicalDataclassMixin, metaclass=CanonicalDataclassMeta):
     """A base schedule class."""
 
+    _: KW_ONLY
+
     name: str
-    interval: str | None
-    env: dict[str, str]
-
-    def __init__(
-        self,
-        *,
-        name: str,
-        interval: str | None,
-        env: dict[str, str] | None = None,
-        **kwargs: t.Any,
-    ):
-        """Initialize a Schedule.
-
-        Args:
-            name: The name of the schedule.
-            interval: The interval of the schedule.
-            env: The env for this schedule.
-            kwargs: The keyword arguments to initialize the schedule with.
-        """
-        super().__init__(**kwargs)
-
-        # Attributes will be listed in meltano.yml in this order:
-        self.name = name
-        self.interval = interval
-        self.env = env or {}
+    interval: str | None = None
+    env: dict[str, str] = field(default_factory=dict)
 
     @property
     def cron_interval(self) -> str | None:
@@ -243,33 +229,13 @@ class Schedule(NameEq, Canonical):
         )
 
 
+@dataclass(eq=False)
 class ELTSchedule(Schedule):
     """A schedule is an elt command or a job configured to run at a certain interval."""
 
     extractor: str
     loader: str
-    transform: str
-
-    def __init__(
-        self,
-        *,
-        extractor: str,
-        loader: str,
-        transform: str,
-        **kwargs: t.Any,
-    ):
-        """Initialize a Schedule.
-
-        Args:
-            extractor: The name of the extractor.
-            loader: The name of the loader.
-            transform: The transform statement (eg: skip, only, run)
-            kwargs: The keyword arguments to initialize the schedule with.
-        """
-        super().__init__(**kwargs)
-        self.extractor = extractor
-        self.loader = loader
-        self.transform = transform
+    transform: t.Literal["skip", "only", "run"]
 
     @property
     def elt_args(self) -> list[str]:
@@ -305,17 +271,14 @@ class ELTSchedule(Schedule):
         return StateJobFinder(self.name).latest_success(session)
 
 
+@dataclass(eq=False)
 class JobSchedule(Schedule):
     """A schedule is a job configured to run at a certain interval."""
 
     job: str
 
-    def __init__(self, *, job: str, **kwargs: t.Any) -> None:
-        """Initialize a Schedule.
 
-        Args:
-            job: The name of the job.
-            kwargs: The keyword arguments to initialize the schedule with.
-        """
-        super().__init__(**kwargs)
-        self.job = job
+# Register YAML representers for Schedule classes
+yaml.add_multi_representer(Schedule, Schedule.yaml)
+yaml.add_multi_representer(ELTSchedule, ELTSchedule.yaml)
+yaml.add_multi_representer(JobSchedule, JobSchedule.yaml)
