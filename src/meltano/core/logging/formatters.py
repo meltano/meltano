@@ -235,11 +235,65 @@ def key_value_formatter(
     )
 
 
+def _get_google_cloud_logging_processor(*, callsite_parameters: bool) -> Processor:
+    """Map Meltano's log keys onto the special fields Google Cloud Logging reads.
+
+    Google Cloud Logging (formerly Stackdriver) only recognises a structured log
+    entry when it finds its own "special fields". This renames the keys structlog
+    emits so severity-based filtering and alerting work without any downstream
+    remapping:
+
+    - ``level`` becomes ``severity`` (upper-cased to match the GCL severities)
+    - ``event`` becomes ``message``
+    - callsite parameters become ``logging.googleapis.com/sourceLocation``
+    """
+
+    def _gcl_processor(
+        logger: structlog.typing.WrappedLogger,  # noqa: ARG001
+        name: str,  # noqa: ARG001
+        event_dict: structlog.typing.EventDict,
+    ) -> structlog.typing.EventDict:
+        """Process event dict for GCL.
+
+        Args:
+            logger: The logger instance.
+            name: The logger name.
+            event_dict: The event dictionary.
+
+        Returns:
+            The event dictionary with Google Cloud Logging special fields.
+        """
+        # The field Google Cloud Logging reads to populate `LogEntry.sourceLocation`.
+        # https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields
+        gcp_source_location_key = "logging.googleapis.com/sourceLocation"
+
+        # Python/Meltano level names (DEBUG, INFO, WARNING, ERROR, CRITICAL) are
+        # all valid Google Cloud Logging severities once upper-cased. Coerce to
+        # str first in case a non-string level slips into the event dict.
+        event_dict["severity"] = str(event_dict.pop("level", "info")).upper()
+
+        event_dict["message"] = event_dict.pop("event")
+
+        # Present only when callsite_parameters is enabled.
+        if callsite_parameters:
+            event_dict[gcp_source_location_key] = {
+                "file": event_dict.pop("pathname"),
+                # GCL expects `line` as a string.
+                "line": str(event_dict.pop("lineno")),
+                "function": event_dict.pop("func_name", None),
+            }
+
+        return event_dict
+
+    return _gcl_processor
+
+
 def json_formatter(
     *,
     callsite_parameters: bool = False,
     dict_tracebacks: bool = True,
     show_locals: bool = False,
+    preset: t.Literal["google-cloud-logging"] | None = None,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in JSON format.
 
@@ -247,10 +301,29 @@ def json_formatter(
         callsite_parameters: Whether to include callsite parameters in the JSON output.
         dict_tracebacks: Whether to include tracebacks in the JSON output.
         show_locals: Whether to include local variables in the traceback.
+        preset: Optional output preset that adapts the rendered fields for a
+            specific log sink. ``"google-cloud-logging"`` renames ``event`` to
+            ``message`` and ``level`` to ``severity`` (and emits
+            ``logging.googleapis.com/sourceLocation`` when callsite parameters
+            are enabled) so that Google Cloud Logging ingests the lines as
+            structured entries with the correct severity. See
+            https://cloud.google.com/logging/docs/agent/logging/configuration#special-fields.
 
     Returns:
         A configured JSON formatter.
+
+    Raises:
+        ValueError: If an unknown preset is given.
     """
+    preset_processors: list[Processor] = []
+    if preset == "google-cloud-logging":
+        preset_processors.append(
+            _get_google_cloud_logging_processor(callsite_parameters=callsite_parameters)
+        )
+    elif preset is not None:
+        msg = f"Unknown json_formatter preset: {preset!r}"  # type: ignore[unreachable]
+        raise ValueError(msg)
+
     return _process_formatter(
         *_processors_from_kwargs(
             callsite_parameters=callsite_parameters,
@@ -259,6 +332,7 @@ def json_formatter(
         ),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.stdlib.ExtraAdder(),
+        *preset_processors,
         structlog.processors.JSONRenderer(),
     )
 
