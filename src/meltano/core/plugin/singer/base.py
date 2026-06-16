@@ -150,6 +150,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
                 keys=default
 
                 [logger_root]
+                level={log_level}
                 handlers=console
 
                 [handler_console]
