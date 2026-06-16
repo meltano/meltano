@@ -182,7 +182,10 @@ class SingerPlugin(BasePlugin):
                 keys=default
 
                 [logger_root]
+                level={log_level}
                 handlers=console
+                formatter=default
+                propagate=0
 
                 [handler_console]
                 class=StreamHandler
