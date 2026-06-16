@@ -184,8 +184,6 @@ class SingerPlugin(BasePlugin):
                 [logger_root]
                 level={log_level}
                 handlers=console
-                formatter=default
-                propagate=0
 
                 [handler_console]
                 class=StreamHandler
