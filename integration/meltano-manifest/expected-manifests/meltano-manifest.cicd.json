@@ -3200,6 +3200,5 @@
       "name": "marts_refresh"
     }
   ],
-  "send_anonymous_usage_stats": false,
-  "version": 1
+  "send_anonymous_usage_stats": false
 }
