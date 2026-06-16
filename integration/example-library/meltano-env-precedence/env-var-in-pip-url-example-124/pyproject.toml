@@ -1,16 +1,19 @@
-[tool.poetry]
+[project]
 name = "env-var-in-pip-url-example-124"
 version = "0.1.0"
 description = ""
-authors = ["Meltano <hello@meltano.com>"]
-packages = [{include = "example.py"}]
+authors = [{ name = "Meltano", email = "hello@meltano.com" }]
+requires-python = ">=3.10"
 
-[tool.poetry.scripts]
+[project.scripts]
 echo = "example:echo"
 
-[tool.poetry.dependencies]
-python = "^3.9"
+[tool.hatch.build.targets.sdist]
+include = ["example.py"]
+
+[tool.hatch.build.targets.wheel]
+include = ["example.py"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

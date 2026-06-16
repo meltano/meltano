@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091
 
 set -euo pipefail
 
@@ -12,7 +13,7 @@ grep "Block run completed            block_type=InvokerCommand.*err=None.*set_nu
 grep "Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=1 cmd_type=command.*name=dbt-postgres.*stdio=stderr" $LOG_FILE
 
 # we could also run psql statements
-# check for the existance of files
+# check for the existence of files
 # etc
 source "$(git rev-parse --show-toplevel)/integration/commons.sh"
 cd "${TEST_DOCS_DIR}"
