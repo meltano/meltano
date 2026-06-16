@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.9.4 (2026-06-16)
+
+### 🐛 Fixes
+
+- [#10105](https://github.com/meltano/meltano/issues/10105) Avoid swallowing Pipelinewise plugin logs by setting the level for the root logger (#10104)
+
 ## v3.9.3 (2026-04-13)
 
 ### 📦 Packaging changes
