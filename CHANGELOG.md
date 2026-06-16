@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### 🐛 Fixes
 
-- [#10106](https://github.com/meltano/meltano/issues/10106) Avoid swallowing Pipelinewise plugin logs by setting the level for the root logger (#10104)
+- [#10106](https://github.com/meltano/meltano/issues/10106) Avoid swallowing PipelineWise plugin logs by setting the level for the root logger (#10104)
 
 ## v4.2.0 (2026-04-10)
 
