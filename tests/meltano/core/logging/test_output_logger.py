@@ -13,7 +13,7 @@ import pytest
 import structlog
 from structlog.testing import LogCapture
 
-from meltano.core.logging.models import ParsedLogRecord
+from meltano.core.logging.models import ParsedLogRecord, PluginException, TracebackFrame
 from meltano.core.logging.output_logger import Out, OutputLogger
 
 if t.TYPE_CHECKING:
@@ -340,6 +340,68 @@ class TestOutputLogger:
         assert entry["log_level"] == "info"
         assert entry["name"] == "test_singer"
         assert entry["record_count"] == 100
+        assert "plugin_exception" not in entry
+
+    def test_writeline_with_singer_sdk_exception(
+        self,
+        subject: OutputLogger,
+        log_output: LogCapture,
+    ) -> None:
+        """Test writeline method with Singer SDK parser configured."""
+        # Create an Out instance with singer-sdk parser
+        out = subject.out("test_singer", log_parser="singer-sdk")
+
+        # Singer SDK structured log line
+        singer_log = json.dumps(
+            {
+                "level": "info",
+                "pid": 12345,
+                "logger_name": "tap_example.streams",
+                "ts": 1703097600.123456,
+                "thread_name": "MainThread",
+                "app_name": "tap-example",
+                "stream_name": "users",
+                "message": "Processing records",
+                "exception": {
+                    "type": "ValueError",
+                    "module": "builtins",
+                    "message": "Test exception",
+                    "traceback": [
+                        {
+                            "filename": "/path/to/file.py",
+                            "function": "my_function",
+                            "lineno": 140,
+                            "line": "        raise ValueError(msg)\n",
+                        }
+                    ],
+                },
+                "extra": {
+                    "record_count": 100,
+                },
+            },
+        )
+
+        out.writeline(singer_log)
+
+        # Verify the log was parsed and structured correctly
+        assert len(log_output.entries) == 1
+        entry = log_output.entries[0]
+
+        assert entry["plugin_exception"] == PluginException(
+            type="ValueError",
+            module="builtins",
+            message="Test exception",
+            traceback=[
+                TracebackFrame(
+                    filename="/path/to/file.py",
+                    function="my_function",
+                    lineno=140,
+                    line="        raise ValueError(msg)\n",
+                )
+            ],
+            cause=None,
+            context=None,
+        )
 
     def test_writeline_with_parser_error_log(
         self,
