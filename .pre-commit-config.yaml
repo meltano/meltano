@@ -27,7 +27,7 @@ repos:
       - id: no-commit-to-branch
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.2
+    rev: 0.37.3
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -58,24 +58,24 @@ repos:
         files: \.[jt]sx?$
         args: ['--fix', '--config=docs/eslint.config.js']
         additional_dependencies:
-          - "eslint@10.4.1" # Keep this in sync with the rev above!
+          - "eslint@10.5.0" # Keep this in sync with the rev above!
 
           - "eslint-config-prettier@10.1.8"
           - "eslint-plugin-prettier@5.5.6"
           - "eslint-plugin-react@7.37.5"
           - "eslint-plugin-vue@10.9.2"
-          - "prettier@3.8.3"
+          - "prettier@3.8.4"
           - "globals@17.6.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.16
+    rev: v0.15.17
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.19
+    rev: 0.11.21
     hooks:
       - id: uv-lock
 
