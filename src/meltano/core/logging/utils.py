@@ -156,7 +156,7 @@ def default_config(
 
     match log_format:
         case LogFormat.colored:
-            no_color = get_no_color_flag()
+            no_color = get_no_color_flag() or not sys.stderr.isatty()
 
             if no_color:
                 formatter = rich_exception_formatter_factory(

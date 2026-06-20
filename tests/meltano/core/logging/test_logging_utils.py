@@ -84,6 +84,9 @@ def test_default_logging_config_format(
     expected: str,
     monkeypatch: pytest.MonkeyPatch,
 ):
+    if log_format is LogFormat.colored:
+        monkeypatch.setattr("sys.stderr.isatty", lambda: True)
+
     config = default_config("info", log_format=log_format)
     assert log_format in config["formatters"]
     assert config["handlers"]["console"]["formatter"] == log_format
