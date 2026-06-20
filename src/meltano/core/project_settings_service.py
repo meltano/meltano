@@ -120,7 +120,7 @@ class ProjectSettingsService(SettingsService):
     @property
     @override
     def label(self) -> str:
-        """Project abel."""
+        """Project label."""
         return "Meltano"
 
     @property
