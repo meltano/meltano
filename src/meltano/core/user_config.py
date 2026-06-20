@@ -157,7 +157,6 @@ class UserConfigService:
     @property
     def yaml(self) -> YamlSettings:
         """YAML formatting settings as a YamlSettings object."""
-        """A dictionary of YAML formatting settings."""
         return self.config.yaml
 
 
