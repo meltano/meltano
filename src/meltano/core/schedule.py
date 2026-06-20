@@ -233,11 +233,7 @@ class Schedule(NameEq, Canonical):
 
     @property
     def cron_interval(self) -> str | None:
-        """Return the explicit cron interval expression for a cron alias.
-
-        Returns:
-            The cron expression.
-        """
+        """Explicit cron interval expression for a cron alias."""
         return (
             CRON_INTERVALS.get(self.interval, self.interval) if self.interval else None
         )
@@ -273,12 +269,9 @@ class ELTSchedule(Schedule):
 
     @property
     def elt_args(self) -> list[str]:
-        """Return the list of arguments to pass to the elt command.
+        """List of arguments to pass to the elt command.
 
         Only valid if the schedule is an elt schedule.
-
-        Returns:
-            The list of arguments to pass to the elt command.
 
         Raises:
             NotImplementedError: If the schedule is a job.

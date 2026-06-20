@@ -238,11 +238,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
     @property
     def attrs(self) -> CommentedMap:
-        """Return the attributes of the current instance.
-
-        Returns:
-            Attributes of the current instance.
-        """
+        """The attributes of the current instance."""
         return self._dict
 
     def is_attr_set(self, attr):  # noqa: ANN001, ANN201

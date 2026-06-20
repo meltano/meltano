@@ -132,23 +132,15 @@ class MeltanoHubService(PluginRepository):
 
     @property
     def hub_api_url(self) -> str:
-        """Return the URL of the Hub API.
-
-        Returns:
-            The URL of the Hub API.
-        """
+        """The URL of the Hub API."""
         hub_api_root = self.project.settings.get("hub_api_root")
         hub_url = self.project.settings.get("hub_url")
 
         return hub_api_root or f"{hub_url}/meltano/api/v1"
 
     @property
-    def hub_url_auth(self) -> str:
-        """Return the `hub_url_auth` setting.
-
-        Returns:
-            The `hub_url_auth` setting.
-        """
+    def hub_url_auth(self) -> str | None:
+        """The `hub_url_auth` setting."""
         return self.project.settings.get("hub_url_auth")
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:

@@ -35,11 +35,7 @@ class ValidationOutcome(StrEnum):
 
     @property
     def color(self) -> str:
-        """Return terminal color for this outcome.
-
-        Returns:
-            The string name of a color for this outcome.
-        """
+        """Terminal color for this outcome."""
         return "green" if self == ValidationOutcome.SUCCESS else "red"
 
     @classmethod
@@ -74,11 +70,7 @@ class ValidationsRunner(metaclass=ABCMeta):
 
     @property
     def plugin_name(self) -> str:
-        """Get underlying plugin name.
-
-        Returns:
-            The name of the plugin to run.
-        """
+        """Underlying plugin name to run."""
         return self.invoker.plugin.name
 
     def select_test(self, name: str) -> None:

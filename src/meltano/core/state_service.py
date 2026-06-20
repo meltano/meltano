@@ -105,11 +105,11 @@ class StateService:
         Args:
             job: either an existing Job to modify state for, or a state_id
 
-        Raises:
-            TypeError: if job is not of type Job or str
-
         Returns:
             A new job with given state_id, or the given Job
+
+        Raises:
+            TypeError: if job is not of type Job or str
         """
         if isinstance(job, str):
             now = datetime.datetime.now(datetime.timezone.utc)
