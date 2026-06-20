@@ -138,56 +138,32 @@ class Project:
 
     @cached_property
     def config_service(self) -> ConfigService:
-        """Get the project config service.
-
-        Returns:
-            A `ConfigService` instance for this project.
-        """
+        """A `ConfigService` instance for this project."""
         return ConfigService(self)
 
     @cached_property
     def project_files(self) -> ProjectFiles:
-        """Return a singleton `ProjectFiles` file manager instance.
-
-        Returns:
-            `ProjectFiles` file manager.
-        """
+        """`ProjectFiles` file manager."""
         return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
     @cached_property
     def settings(self) -> ProjectSettingsService:
-        """Get the project settings.
-
-        Returns:
-            A `ProjectSettingsService` instance for this project.
-        """
+        """A `ProjectSettingsService` instance for this project."""
         return ProjectSettingsService(self)
 
     @cached_property
     def plugins(self) -> ProjectPluginsService:
-        """Get the project plugins.
-
-        Returns:
-            A `ProjectPluginsService` instance for this project.
-        """
+        """A `ProjectPluginsService` instance for this project."""
         return ProjectPluginsService(self)
 
     @cached_property
     def hub_service(self) -> MeltanoHubService:
-        """Get the Meltano Hub service.
-
-        Returns:
-            A `MeltanoHubService` instance for this project.
-        """
+        """A `MeltanoHubService` instance for this project."""
         return MeltanoHubService(self)
 
     @cached_property
     def dirs(self) -> ProjectDirsService:
-        """Get the project directories service.
-
-        Returns:
-            A `ProjectDirsService` instance for this project.
-        """
+        """A `ProjectDirsService` instance for this project."""
         return ProjectDirsService.from_project(self)
 
     @cached_property
@@ -196,20 +172,12 @@ class Project:
 
     @property
     def user_agent(self) -> str:
-        """Get the user agent for this project.
-
-        Returns:
-            the user agent string for this project
-        """
+        """The user-agent for this project."""
         return f"Meltano/{get_meltano_version()}"
 
     @property
     def env(self) -> dict[str, str]:
-        """Get environment variables for this project.
-
-        Returns:
-            dict of environment variables and values for this project.
-        """
+        """Environment variables for this project."""
         environment_name = self.environment.name if self.environment else ""
         return {
             PROJECT_ROOT_ENV: str(self.root),
@@ -280,11 +248,7 @@ class Project:
 
     @property
     def file_version(self) -> int:
-        """Get the version of Meltano found in this project's meltano.yml.
-
-        Returns:
-            the Project's meltano version
-        """
+        """The version of Meltano found in this project's meltano.yml."""
         return self.meltano.version
 
     @classmethod
@@ -342,13 +306,10 @@ class Project:
 
     @property
     def meltano(self) -> MeltanoFileTypeHint:
-        """Return a copy of the current meltano config.
+        """A copy of the current meltano config.
 
         Raises:
             EmptyMeltanoFileException: The `meltano.yml` file is empty.
-
-        Returns:
-            The current meltano config.
         """
         from meltano.core.meltano_file import MeltanoFile
 
@@ -405,20 +366,12 @@ class Project:
 
     @property
     def meltanofile(self) -> Path:
-        """Get the path to this project's meltano.yml.
-
-        Returns:
-            the path to this project meltano.yml
-        """
+        """Path to this project's meltano.yml."""
         return self.root.joinpath("meltano.yml")
 
     @property
     def dotenv(self) -> Path:
-        """Get the path to this project's .env file.
-
-        Returns:
-            the path to this project's .env file
-        """
+        """Path to this project's .env file."""
         if self.dotenv_file:
             return (
                 self.dotenv_file
@@ -429,10 +382,9 @@ class Project:
 
     @cached_property
     def dotenv_env(self) -> dict[str, str]:
-        """Get values from this project's .env file.
+        """Values from this project's .env file.
 
-        Returns:
-            Values found in this project's .env file, with None values filtered out.
+        With None values filtered out.
         """
         return {k: v for k, v in dotenv_values(self.dotenv).items() if v is not None}
 

@@ -45,7 +45,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def command(self) -> str | None:
-        """Get the plugin command to use when invoking the plugin (if any)."""
+        """The plugin command to use when invoking the plugin (if any)."""
         raise NotImplementedError
 
     @abstractmethod
@@ -109,11 +109,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 
     @property
     def command_args(self) -> str | None:
-        """Get the command args to use when invoking the plugin.
-
-        Returns:
-            The command args if any.
-        """
+        """The command args to use when invoking the plugin."""
         return self._command_args
 
     async def _start(self) -> None:

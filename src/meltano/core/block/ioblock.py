@@ -21,13 +21,10 @@ class IOBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def stdin(self) -> StreamWriter | None:
-        """Get the `StreamWriter` that should be used for writes, if any.
+        """The `StreamWriter` that should be used for writes, if any.
 
         Raises:
             NotImplementedError
-
-        Returns:
-            StreamWriter
         """
         raise NotImplementedError
 
@@ -46,7 +43,7 @@ class IOBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def string_id(self) -> str:
-        """Return a string identifier for this block."""
+        """A string identifier for this block."""
         raise NotImplementedError
 
     @property

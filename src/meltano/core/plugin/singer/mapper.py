@@ -58,7 +58,7 @@ class SingerMapper(SingerPlugin):
     @property
     @override
     def config_files(self) -> dict[str, str]:
-        """Return the configuration files required by the plugin."""
+        """Configuration files required by the plugin."""
         return {
             "config": f"mapper.{self.instance_uuid}.config.json",
             "singer_sdk_logging": "mapper.singer_sdk_logging.json",

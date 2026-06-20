@@ -58,20 +58,12 @@ class ProjectFiles:
 
     @property
     def meltano(self) -> CommentedMap:
-        """Return the contents of this project's `meltano.yml`.
-
-        Returns:
-            The contents of this projects `meltano.yml`.
-        """
+        """Contents of this project's `meltano.yml`."""
         return yaml.load(self._meltano_file_path)
 
     @property
     def include_paths(self) -> list[Path]:
-        """Return list of paths derived from glob patterns defined in the meltanofile.
-
-        Returns:
-            List of paths derived from glob patterns defined in the meltanofile.
-        """
+        """List of paths derived from glob patterns defined in the meltanofile."""
         include_path_patterns = self.meltano.get("include_paths", [])
         return self._resolve_include_paths(include_path_patterns)
 

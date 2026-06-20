@@ -152,7 +152,7 @@ class Manifest:
 
     @cached_property
     def _schema_validator(self) -> jsonschema.protocols.Validator:
-        """Return a cached validator for the manifest schema.
+        """A cached validator for the manifest schema.
 
         The validator class is automatically determined from the schema's
         $schema field using jsonschema.validators.validator_for().

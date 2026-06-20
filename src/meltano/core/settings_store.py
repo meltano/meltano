@@ -173,11 +173,7 @@ class SettingValueStore(StrEnum):
 
     @property
     def manager(self: Self) -> type[SettingsStoreManager]:
-        """Return store manager for this store.
-
-        Returns:
-            SettingsStoreManager for this store.
-        """
+        """Store manager for this store."""
         # ordering here is not significant, other than being consistent with
         # the order of precedence.
         managers: dict[str, type[SettingsStoreManager]] = {
@@ -195,20 +191,12 @@ class SettingValueStore(StrEnum):
 
     @property
     def label(self) -> str:
-        """Return printable label.
-
-        Returns:
-            Printable label.
-        """
+        """Printable label."""
         return self.manager.label
 
     @property
     def writable(self) -> bool:
-        """Return if this store is writable.
-
-        Returns:
-            True if store is writable.
-        """
+        """Whether this store is writable."""
         return self.manager.writable
 
     def overrides(self, source: SettingValueStore) -> bool:
@@ -399,15 +387,15 @@ class BaseEnvStoreManager(SettingsStoreManager):
             setting_def: SettingDefinition instance.
             cast_value: Whether to cast the value according to `setting_def`.
 
+        Returns:
+            A tuple the got value and a dictionary containing metadata.
+
         Raises:
             StoreNotSupportedError: if setting_def not passed.
             ConflictingSettingValueException: if multiple conflicting values for the
                 same setting are provided.
             MultipleEnvVarsSetException: if multiple environment variables are set for
                 the same setting.
-
-        Returns:
-            A tuple the got value and a dictionary containing metadata.
         """
         if not setting_def:
             reason = "Can not retrieve unknown setting from environment variables"
@@ -456,11 +444,7 @@ class EnvStoreManager(BaseEnvStoreManager):
     @property
     @override
     def env(self) -> dict[str, str]:
-        """Return values from the calling terminals environment.
-
-        Returns:
-            Values found in the calling terminals environment.
-        """
+        """Values from the calling terminals environment."""
         return self.settings_service.env
 
     @override
@@ -525,11 +509,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     @property
     @override
     def env(self) -> dict[str, str]:
-        """Return values from the .env file.
-
-        Returns:
-            A dictionary of values found in the .env file.
-        """
+        """Dictionary of values from the .env file."""
         if self._env is None:
             self._env = self.project.dotenv_env
         return self._env
@@ -570,11 +550,11 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             value: New value to set.
             setting_def: SettingDefinition.
 
-        Raises:
-            StoreNotSupportedError: if setting_def not provided.
-
         Returns:
             An empty dictionary.
+
+        Raises:
+            StoreNotSupportedError: if setting_def not provided.
         """
         if not setting_def:
             reason = f"Unknown setting '{name}' can not be set in `.env`"
@@ -848,11 +828,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
     @property
     def flat_config(self) -> dict:
-        """Get dictionary of flattened configuration.
-
-        Returns:
-            A dictionary of flattened configuration.
-        """
+        """Dictionary of flattened configuration."""
         if self._flat_config is None:
             self._flat_config = self.settings_service.flat_meltano_yml_config
         return self._flat_config
@@ -901,11 +877,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
     @property
     @override
     def flat_config(self) -> dict[str, t.Any]:
-        """Get dictionary of flattened configuration.
-
-        Returns:
-            A dictionary of flattened configuration.
-        """
+        """Dictionary of flattened configuration."""
         # TODO: Remove this cast when we have a better way to get the settings service
         # type or when we figure how the settings service type should be narrowed
         # per-manager.
@@ -1117,20 +1089,12 @@ class DbStoreManager(SettingsStoreManager):
 
     @property
     def namespace(self) -> str:
-        """Return the current SettingService namespace.
-
-        Returns:
-            The current SettingService namespace
-        """
+        """Current SettingService namespace."""
         return self.settings_service.db_namespace
 
     @property
     def all_settings(self) -> dict[str, str | None]:
-        """Fetch all settings from the system database for this namespace that are enabled.
-
-        Returns:
-            A dictionary of Setting models.
-        """  # noqa: E501
+        """All settings from the system database for this namespace that are enabled."""
         if self._all_settings is None:
             self._all_settings = {
                 setting.name: setting.value
@@ -1202,11 +1166,7 @@ class InheritedStoreManager(SettingsStoreManager):
 
     @property
     def inherited_settings_service(self) -> SettingsService:
-        """Return settings service to inherit configuration from.
-
-        Returns:
-            A SettingsService to inherit configuration from.
-        """
+        """Settings service to inherit configuration from."""
         service = self.settings_service.inherited_settings_service
         if service is None:
             msg = "Inherited settings service is missing"
@@ -1216,11 +1176,7 @@ class InheritedStoreManager(SettingsStoreManager):
 
     @property
     def config_with_metadata(self) -> dict:
-        """Return all inherited config and metadata.
-
-        Returns:
-            A dictionary containing config and metadata.
-        """
+        """All inherited config and metadata."""
         if self._config_with_metadata is None:
             self._config_with_metadata = (
                 self.inherited_settings_service.config_with_metadata(**self._kwargs)
@@ -1315,22 +1271,14 @@ class AutoStoreManager(SettingsStoreManager):
 
     @property
     def sources(self) -> list[SettingValueStore]:
-        """Return a list of readable SettingValueStore.
-
-        Returns:
-            A list of readable SettingValueStore
-        """
+        """A list of readable SettingValueStore."""
         sources = SettingValueStore.readables()
         sources.remove(SettingValueStore.AUTO)
         return sources
 
     @property
     def stores(self) -> list[SettingValueStore]:
-        """Return a list of writable SettingValueStore.
-
-        Returns:
-            A list of writable SettingValueStore
-        """
+        """A list of writable SettingValueStore."""
         stores = SettingValueStore.writables()
         stores.remove(SettingValueStore.AUTO)
         return stores

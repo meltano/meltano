@@ -107,11 +107,7 @@ class EnvironmentContext(SelfDescribingJson):
 
     @cached_property
     def system_info(self) -> dict[str, t.Any]:
-        """Get system information.
-
-        Returns:
-            A dictionary containing system information.
-        """
+        """A dictionary containing system information."""
         try:
             freedesktop_data = platform.freedesktop_os_release()
         except Exception:  # noqa: BLE001

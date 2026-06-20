@@ -83,12 +83,9 @@ class ProjectSettingsService(SettingsService):
     @property
     @override
     def project_settings_service(self) -> Self:
-        """Get the settings service for this project.
+        """Settings service for this project.
 
         For ProjectSettingsService, just returns self.
-
-        Returns:
-            self
         """
         return self
 
@@ -123,51 +120,31 @@ class ProjectSettingsService(SettingsService):
     @property
     @override
     def label(self) -> str:
-        """Return label.
-
-        Returns:
-            Project label.
-        """
+        """Project abel."""
         return "Meltano"
 
     @property
     @override
     def docs_url(self) -> str:
-        """Return docs URL.
-
-        Returns:
-            URL for Meltano doc site.
-        """
+        """URL for Meltano doc site."""
         return "https://docs.meltano.com/reference/settings"
 
     @property
     @override
     def db_namespace(self) -> str:
-        """Return namespace for setting value records in system database.
-
-        Returns:
-            Namespace for setting value records in system database.
-        """
+        """Namespace for setting value records in system database."""
         return "meltano"
 
     @property
     @override
     def setting_definitions(self) -> list[SettingDefinition]:
-        """Return definitions of supported settings.
-
-        Returns:
-            A list of defined settings.
-        """
+        """Definitions of supported settings."""
         return self.project.config_service.settings
 
     @property
     @override
     def meltano_yml_config(self) -> dict[str, t.Any]:
-        """Return current configuration in `meltano.yml`.
-
-        Returns:
-            Current configuration in `meltano.yml`.
-        """
+        """Current configuration in `meltano.yml`."""
         return self.project.config_service.current_config
 
     @override
