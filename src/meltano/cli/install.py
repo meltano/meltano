@@ -120,18 +120,18 @@ def _get_schedule_plugins(project: Project, schedule_name: str) -> set[ProjectPl
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()
     if isinstance(schedule_obj, ELTSchedule):
-        for plugin_name in (schedule_obj.extractor, schedule_obj.loader):
-            schedule_plugins.add(project.plugins.find_plugin(plugin_name))
+        schedule_plugins.add(project.plugins.find_plugin(schedule_obj.extractor))
+        schedule_plugins.add(project.plugins.find_plugin(schedule_obj.loader))
     elif isinstance(schedule_obj, JobSchedule):
         task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
         for blocks in task_sets.flat_args_per_set:
             parser = BlockParser(logger, project, blocks)
-            for plugin in parser.plugins:
-                schedule_plugins.add(
-                    project.plugins.find_plugin(plugin.info["name"])
-                    if plugin.type == PluginType.MAPPERS
-                    else plugin,
-                )
+            schedule_plugins.update(
+                project.plugins.find_plugin(plugin.info["name"])
+                if plugin.type == PluginType.MAPPERS
+                else plugin
+                for plugin in parser.plugins
+            )
     else:  # pragma: no cover
         msg = f"Invalid schedule type: {type(schedule_obj)}"
         raise ValueError(msg)  # noqa: TRY004
