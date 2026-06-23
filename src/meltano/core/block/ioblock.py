@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 if t.TYPE_CHECKING:
     from asyncio import StreamWriter, Task
@@ -11,7 +11,7 @@ if t.TYPE_CHECKING:
     from meltano.core.logging.utils import SubprocessOutputWriter
 
 
-class IOBlock(metaclass=ABCMeta):
+class IOBlock(ABC):
     """A block that consumes, produces, or both (i.e. transforms) output.
 
     Underlying implementation could be subprocesses (e.g. Singer Plugins), or

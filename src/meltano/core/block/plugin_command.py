@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 import structlog
 
@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-class PluginCommandBlock(metaclass=ABCMeta):
+class PluginCommandBlock(ABC):
     """Basic PluginCommand interface specification."""
 
     string_id: str

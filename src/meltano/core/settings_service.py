@@ -7,7 +7,7 @@ import os
 import sys
 import typing as t
 import warnings
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
 import structlog
@@ -81,7 +81,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(metaclass=ABCMeta):
+class SettingsService(ABC):
     """Abstract base class for managing settings."""
 
     LOGGING = False
