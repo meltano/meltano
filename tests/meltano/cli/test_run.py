@@ -1376,6 +1376,7 @@ class TestCliRunScratchpadOne:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.delenv("FORCE_COLOR", raising=False)
+        monkeypatch.setattr("sys.stderr.isatty", lambda: True)
         # toggle color in logging configuration
         logging_config = default_config(log_level="info")
         if not colors:
