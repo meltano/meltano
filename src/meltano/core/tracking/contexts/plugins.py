@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+from itertools import starmap
 
 import structlog
 from snowplow_tracker import SelfDescribingJson
@@ -64,7 +65,7 @@ class PluginsTrackingContext(SelfDescribingJson):
             PluginsContextSchema.url,
             {
                 "context_uuid": str(new_context_uuid()),
-                "plugins": [_from_plugin(plugin, cmd) for plugin, cmd in plugins],
+                "plugins": list(starmap(_from_plugin, plugins)),
             },
         )
 
