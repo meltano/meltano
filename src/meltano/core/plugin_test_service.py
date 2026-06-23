@@ -193,8 +193,10 @@ class LoaderTestService(PluginTestService):
                 )
                 return (
                     True,
-                    "Successfully processed test data for loader "
-                    f"'{self.plugin_invoker.plugin.name}'.",
+                    (
+                        "Successfully processed test data for loader "
+                        f"'{self.plugin_invoker.plugin.name}'."
+                    ),
                 )
             return (  # noqa: TRY300
                 False,
