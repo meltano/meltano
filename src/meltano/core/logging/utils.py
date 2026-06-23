@@ -139,12 +139,14 @@ def default_config(
     log_level: str,
     *,
     log_format: LogFormat = LogFormat.colored,
+    colors: bool | None = None,
 ) -> dict:
     """Generate a default logging config.
 
     Args:
         log_level: set log levels to provided level.
         log_format: set log format to provided format.
+        colors: whether output should be colored when colors are available.
 
     Returns:
          A logging config suitable for use with `logging.config.dictConfig`.
@@ -157,16 +159,16 @@ def default_config(
 
     match log_format:
         case LogFormat.colored:
-            colors = sys.stderr.isatty() and not get_no_color_flag()
-            # Pre-build now so terminal detection runs before any stream capture
-            # (e.g. Click's CliRunner replaces sys.stdout with StringIO on entry,
-            # causing structlog's get_default_column_styles to see a non-tty and
-            # return plain styles even when colors=True).
-            colored_formatter = console_log_formatter(
-                colors=colors,
-                max_frames=max_frames,
+            colors = (
+                colors
+                if colors is not None
+                else (sys.stderr.isatty() and not get_no_color_flag())
             )
-            formatter_config = {"()": lambda: colored_formatter}
+            formatter_config = {
+                "()": console_log_formatter,
+                "colors": colors,
+                "max_frames": max_frames,
+            }
         case LogFormat.uncolored:
             formatter_config = {
                 "()": console_log_formatter,

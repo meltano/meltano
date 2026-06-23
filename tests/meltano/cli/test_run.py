@@ -1363,7 +1363,7 @@ class TestCliRunScratchpadOne:
     def test_color_console_exception_handler(
         self,
         colors,
-        cli_runner,
+        cli_runner: MeltanoCliRunner,
         tap,
         target,
         tap_process,
@@ -1373,12 +1373,7 @@ class TestCliRunScratchpadOne:
         monkeypatch.delenv("FORCE_COLOR", raising=False)
         monkeypatch.setattr("sys.stderr.isatty", lambda: True)
         # toggle color in logging configuration
-        logging_config = default_config(log_level="info")
-        if not colors:
-            logging_config["formatters"]["colored"] = {
-                "()": "meltano.core.logging.console_log_formatter",
-                "colors": colors,
-            }
+        logging_config = default_config(log_level="info", colors=colors)
 
         # In this scenario, the tap fails on the third read. Target should
         # still complete.
