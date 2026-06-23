@@ -1409,10 +1409,7 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args)
             ansi_color_escape = re.compile(r"\x1b\[[0-9;]+m")
             match = ansi_color_escape.search(result.stderr)
-            if colors:
-                assert match
-            else:
-                assert not match
+            assert (colors and match is not None) or (not colors and match is None)
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
