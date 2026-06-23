@@ -28,7 +28,9 @@ if t.TYPE_CHECKING:
 
 
 class MockIOBlock(IOBlock):
-    string_id = "mock-io-block"
+    @property
+    def string_id(self):
+        return "mock-io-block"
 
 
 @pytest.fixture(scope="class")

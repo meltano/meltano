@@ -153,6 +153,7 @@ def default_config(
     numeric_level = parse_log_level(log_level.lower())
     log_level = log_level.upper()
     max_frames = _FRAMES_DEBUG if log_level == "DEBUG" else _FRAMES_DEFAULT
+    formatter_config: dict[str, t.Any]
 
     match log_format:
         case LogFormat.colored:
