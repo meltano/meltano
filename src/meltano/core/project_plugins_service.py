@@ -452,7 +452,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         """
         yield from (
             plugin
-            for _, plugins in self.plugins_by_type(ensure_parent=ensure_parent).items()
+            for plugins in self.plugins_by_type(ensure_parent=ensure_parent).values()
             for plugin in plugins
         )
 
