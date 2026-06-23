@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import enum
 import json
+import operator
 import sys
 import tempfile
 import typing as t
@@ -548,7 +549,7 @@ def list_settings(
             buckets[_Bucket.OPTIONAL].append((name, config_metadata))
 
     for bucket in buckets.values():
-        bucket.sort(key=lambda item: item[0])
+        bucket.sort(key=operator.itemgetter(0))
 
     # When filtering, the user is searching, so optional-at-defaults are not
     # hidden; the filter result is the narrowed view.
