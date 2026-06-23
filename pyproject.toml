@@ -174,8 +174,6 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
   'error',
-  # pytest warnings
-  'once:Class-scoped fixture defined as instance method is deprecated:pytest.PytestRemovedIn10Warning',
   # First-party warnings
   '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
   'once::meltano.core._compat.MeltanoInternalDeprecationWarning',

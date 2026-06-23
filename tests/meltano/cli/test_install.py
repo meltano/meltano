@@ -14,7 +14,8 @@ from meltano.core.project_add_service import PluginAlreadyAddedException
 
 class TestCliInstall:
     @pytest.fixture(scope="class")
-    def tap_gitlab(self, project_add_service):
+    @classmethod
+    def tap_gitlab(cls, project_add_service):
         try:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
         except PluginAlreadyAddedException as err:
