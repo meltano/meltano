@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 import sys
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory
@@ -51,7 +51,7 @@ class ValidationOutcome(StrEnum):
         return cls.SUCCESS if exit_code == EXIT_CODE_OK else cls.FAILURE
 
 
-class ValidationsRunner(metaclass=ABCMeta):
+class ValidationsRunner(ABC):
     """Class to collect all validations defined for a plugin."""
 
     def __init__(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 if t.TYPE_CHECKING:
     from meltano.core.block.ioblock import IOBlock
@@ -24,7 +24,7 @@ class BlockSetValidationError(Exception):
         super().__init__(f"{message}: {error}")
 
 
-class BlockSet(t.Generic[_T], metaclass=ABCMeta):
+class BlockSet(ABC, t.Generic[_T]):
     """Currently the only complex block set is our `ExtractLoadBlocks` type.
 
     Theoretically, this is the bare minimum that we need to run and terminate
