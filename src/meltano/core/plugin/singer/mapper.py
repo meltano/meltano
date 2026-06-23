@@ -65,11 +65,12 @@ class SingerMapper(SingerPlugin):
             "pipelinewise_singer_logging": "mapper.pipelinewise_logging.conf",
         }
 
+    @override
     @hook("before_configure")
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session: Session,  # noqa: ARG002
+        session: Session,
     ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]

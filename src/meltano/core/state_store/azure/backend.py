@@ -72,6 +72,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
+    @override
     def client(self) -> BlobServiceClient:
         """Authenticated azure.storage.blob.BlobServiceClient.
 

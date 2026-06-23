@@ -412,7 +412,7 @@ class PluginInvoker:
                 else {}
             )
 
-        env = {
+        env: dict[str, str] = {
             **self.plugin.exec_env(self),
             **expanded_project_env,
             **self.project.dotenv_env,

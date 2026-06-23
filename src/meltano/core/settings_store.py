@@ -903,6 +903,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
+    @override
     @contextmanager
     def update_config(self) -> Generator[dict, None, None]:
         """Update Meltano Environment configuration.

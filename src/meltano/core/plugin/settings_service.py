@@ -202,6 +202,7 @@ class PluginSettingsService(SettingsService):
         self.project.plugins.update_environment_plugin(self.environment_plugin_config)
 
     @cached_property
+    @override
     def inherited_settings_service(self) -> PluginSettingsService | None:
         """Settings service to inherit configuration from."""
         return (
