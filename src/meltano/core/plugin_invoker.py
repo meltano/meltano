@@ -236,8 +236,8 @@ class PluginInvoker:
         """A mapping of file IDs to file names."""
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
         return {
-            _key: self.plugin_config_service.run_dir.joinpath(filename)
-            for _key, filename in plugin_files.items()
+            key: self.plugin_config_service.run_dir.joinpath(filename)
+            for key, filename in plugin_files.items()
         }
 
     async def prepare(self, session: Session) -> None:

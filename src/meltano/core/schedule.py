@@ -84,8 +84,8 @@ def is_valid_cron(expression: str) -> bool:
     """
     # Handle predefined aliases
     expr = expression.strip().lower()
-    if _expr := CRON_INTERVALS.get(expr):
-        expr = _expr
+    if expr_ := CRON_INTERVALS.get(expr):
+        expr = expr_
 
     # Split into fields
     fields = expr.split()

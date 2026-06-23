@@ -336,7 +336,7 @@ async def _run_el_command(
     run_id = run_id or new_run_id()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
-    _state_strategy = StateStrategy.from_cli_args(
+    state_strategy_ = StateStrategy.from_cli_args(
         merge_state=merge_state,
         state_strategy=state_strategy,
     )
@@ -374,7 +374,7 @@ async def _run_el_command(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            state_strategy=_state_strategy,
+            state_strategy=state_strategy_,
             run_id=run_id,
         )
 

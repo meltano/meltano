@@ -572,13 +572,13 @@ def list_settings(
         # Optional bucket (adding an `Optional:` header in that case would be
         # a gratuitous output change for `--all --extras` callers).
         optional_label = "Optional:" if buckets[_Bucket.CONFIGURED] else None
-        _section_defs: list[tuple[str | None, _SettingBucket]] = [
+        section_defs: list[tuple[str | None, _SettingBucket]] = [
             ("Configured:", buckets[_Bucket.CONFIGURED]),
             (optional_label, buckets[_Bucket.OPTIONAL]),
             ("Custom:", buckets[_Bucket.CUSTOM]),
         ]
     else:
-        _section_defs = [
+        section_defs = [
             ("Required:", buckets[_Bucket.REQUIRED]),
             ("Configured:", buckets[_Bucket.CONFIGURED]),
             ("Optional:", buckets[_Bucket.OPTIONAL]),
@@ -588,7 +588,7 @@ def list_settings(
                 buckets[_Bucket.CUSTOM_EXTRAS],
             ),
         ]
-    sections = [(h, b) for h, b in _section_defs if b]
+    sections = [(h, b) for h, b in section_defs if b]
 
     for i, (header, bucket) in enumerate(sections):
         if i > 0:

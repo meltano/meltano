@@ -1027,11 +1027,11 @@ def parse_date(date_string: str) -> str:
     if re.match(REGEX_ISO8601, date_string):
         return date_string
 
-    if _parsed := dateparser.parse(
+    if parsed := dateparser.parse(
         date_string,
         settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},
     ):
-        return _parsed.isoformat()
+        return parsed.isoformat()
 
     return date_string
 
