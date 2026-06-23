@@ -8,7 +8,6 @@ import typing as t
 import warnings
 from functools import cached_property
 
-import google
 import google.api_core.exceptions
 import google.cloud.storage
 import structlog.stdlib

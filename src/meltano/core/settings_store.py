@@ -12,7 +12,6 @@ from functools import reduce
 from operator import eq
 
 import dotenv
-import sqlalchemy
 import sqlalchemy.exc
 import structlog
 
