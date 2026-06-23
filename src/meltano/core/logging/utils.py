@@ -15,12 +15,13 @@ import structlog
 import yaml
 
 from meltano.core.logging.formatters import (
+    console_log_formatter,
     get_default_foreign_pre_chain,
-    rich_exception_formatter_factory,
+    json_formatter,
+    key_value_formatter,
+    plain_formatter,
 )
 from meltano.core.utils import get_no_color_flag
-
-from .renderers import MeltanoConsoleRenderer
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -118,7 +119,7 @@ def parse_log_level(log_level: str) -> int:
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def read_config(config_file: os.PathLike[str] | None = None) -> dict | None:
+def read_config(config_file: Path | None = None) -> dict | None:
     """Read a logging config yaml from disk.
 
     Args:
@@ -128,7 +129,7 @@ def read_config(config_file: os.PathLike[str] | None = None) -> dict | None:
         dict: parsed yaml config
     """
     if config_file and os.path.exists(config_file):  # noqa: PTH110
-        with open(config_file) as cf:  # noqa: PTH123
+        with config_file.open() as cf:
             return yaml.safe_load(cf.read())
     else:
         return None
@@ -152,76 +153,35 @@ def default_config(
     numeric_level = parse_log_level(log_level.lower())
     log_level = log_level.upper()
     max_frames = _FRAMES_DEBUG if log_level == "DEBUG" else _FRAMES_DEFAULT
-    foreign_pre_chain = get_default_foreign_pre_chain()
+    formatter_config: dict[str, t.Any]
 
     match log_format:
         case LogFormat.colored:
-            no_color = get_no_color_flag() or not sys.stderr.isatty()
-
-            if no_color:
-                formatter = rich_exception_formatter_factory(
-                    no_color=True,
-                    max_frames=max_frames,
-                )
-            else:
-                formatter = rich_exception_formatter_factory(
-                    color_system="truecolor",
-                    max_frames=max_frames,
-                )
-            formatter_config = {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": MeltanoConsoleRenderer(
-                    colors=not no_color,
-                    exception_formatter=formatter,
-                ),
-                "foreign_pre_chain": foreign_pre_chain,
-            }
-
-        case LogFormat.json:
-            formatter_config = {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    structlog.processors.dict_tracebacks,
-                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    structlog.processors.JSONRenderer(),
-                ],
-                "foreign_pre_chain": foreign_pre_chain,
-            }
-        case LogFormat.key_value:
-            formatter_config = {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.KeyValueRenderer(
-                    key_order=["timestamp", "level", "event", "logger"],
-                ),
-                "foreign_pre_chain": foreign_pre_chain,
-            }
+            colors = sys.stderr.isatty() and not get_no_color_flag()
+            # Pre-build now so terminal detection runs before any stream capture
+            # (e.g. Click's CliRunner replaces sys.stdout with StringIO on entry,
+            # causing structlog's get_default_column_styles to see a non-tty and
+            # return plain styles even when colors=True).
+            colored_formatter = console_log_formatter(
+                colors=colors,
+                max_frames=max_frames,
+            )
+            formatter_config = {"()": lambda: colored_formatter}
         case LogFormat.uncolored:
             formatter_config = {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": MeltanoConsoleRenderer(
-                    colors=False,
-                    exception_formatter=rich_exception_formatter_factory(
-                        no_color=True,
-                        max_frames=max_frames,
-                    ),
-                ),
-                "foreign_pre_chain": foreign_pre_chain,
+                "()": console_log_formatter,
+                "colors": False,
+                "max_frames": max_frames,
+            }
+        case LogFormat.json:
+            formatter_config = {"()": json_formatter}
+        case LogFormat.key_value:
+            formatter_config = {
+                "()": key_value_formatter,
+                "key_order": ["timestamp", "level", "event", "logger"],
             }
         case LogFormat.plain:
-            formatter_config = {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    structlog.stdlib.filter_by_level,
-                    structlog.stdlib.add_logger_name,
-                    structlog.stdlib.add_log_level,
-                    structlog.stdlib.PositionalArgumentsFormatter(),
-                    structlog.processors.StackInfoRenderer(),
-                    structlog.processors.format_exc_info,
-                    structlog.processors.UnicodeDecoder(),
-                    lambda _logger, _name, event_dict: event_dict["event"],
-                ],
-                "foreign_pre_chain": foreign_pre_chain,
-            }
+            formatter_config = {"()": plain_formatter}
         case _:  # pragma: no cover
             t.assert_never(log_format)
 
@@ -272,7 +232,7 @@ def default_config(
 def setup_logging(
     project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
-    log_config: os.PathLike[str] | None = None,
+    log_config: os.PathLike[str] | str | None = None,
     log_format: LogFormat = LogFormat.colored,
 ) -> None:
     """Configure logging for a meltano project.
