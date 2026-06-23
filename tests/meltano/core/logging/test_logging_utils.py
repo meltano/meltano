@@ -50,30 +50,60 @@ async def test_capture_subprocess_output() -> None:
 
 
 @pytest.mark.parametrize(
-    ("log_format", "expected"),
+    ("log_format", "force_color", "isatty", "expected"),
     (
         pytest.param(
             LogFormat.colored,
+            False,
+            True,
             "\x1b[2m2021-01-01T00:00:00Z\x1b[0m [\x1b[32minfo     \x1b[0m] \x1b[36mmeltano     \x1b[0m \x1b[1mtest                          \x1b[0m",  # noqa: E501
             id="colored",
         ),
         pytest.param(
+            LogFormat.colored,
+            False,
+            False,
+            "2021-01-01T00:00:00Z [info     ] meltano      test",
+            id="colored-non-tty",
+        ),
+        pytest.param(
+            LogFormat.colored,
+            True,
+            False,
+            "\x1b[2m2021-01-01T00:00:00Z\x1b[0m [\x1b[32minfo     \x1b[0m] \x1b[36mmeltano     \x1b[0m \x1b[1mtest                          \x1b[0m",  # noqa: E501
+            id="colored-non-tty-force-color",
+            marks=(
+                pytest.mark.xfail(
+                    reason="FORCE_COLOR is not honored at the moment",
+                    strict=True,
+                )
+            ),
+        ),
+        pytest.param(
             LogFormat.uncolored,
+            False,
+            True,
             "2021-01-01T00:00:00Z [info     ] meltano      test",
             id="uncolored",
         ),
         pytest.param(
             LogFormat.json,
+            False,
+            True,
             '{"event": "test", "level": "info", "timestamp": "2021-01-01T00:00:00Z"}',
             id="json",
         ),
         pytest.param(
             LogFormat.key_value,
+            False,
+            True,
             "timestamp='2021-01-01T00:00:00Z' level='info' event='test' logger=None",
             id="key_value",
         ),
         pytest.param(
             LogFormat.plain,
+            False,
+            True,
             "test",
             id="plain",
         ),
@@ -81,11 +111,13 @@ async def test_capture_subprocess_output() -> None:
 )
 def test_default_logging_config_format(
     log_format: LogFormat,
+    force_color: bool,  # noqa: FBT001
+    isatty: bool,  # noqa: FBT001
     expected: str,
     monkeypatch: pytest.MonkeyPatch,
 ):
-    if log_format is LogFormat.colored:
-        monkeypatch.setattr("sys.stderr.isatty", lambda: True)
+    monkeypatch.setenv("FORCE_COLOR", "1" if force_color else "")
+    monkeypatch.setattr("sys.stderr.isatty", lambda: isatty)
 
     config = default_config("info", log_format=log_format)
     assert log_format in config["formatters"]
