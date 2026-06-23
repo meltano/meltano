@@ -10,7 +10,6 @@ from unittest.mock import AsyncMock
 import pytest
 
 from meltano.cli import cli
-from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
@@ -25,12 +24,6 @@ if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.logging.job_logging_service import JobLoggingService
     from meltano.core.project import Project
-
-
-class MockIOBlock(IOBlock):
-    @property
-    def string_id(self):
-        return "mock-io-block"
 
 
 @pytest.fixture(scope="class")
