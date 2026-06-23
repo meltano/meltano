@@ -97,11 +97,11 @@ class PluginsTrackingContext(SelfDescribingJson):
         Args:
             blk: The block to create the context for.
 
-        Raises:
-            TypeError: `blk` is not a `BlockSet` or `PluginCommandBlock`.
-
         Returns:
             The PluginsTrackingContext for the given block.
+
+        Raises:
+            TypeError: `blk` is not a `BlockSet` or `PluginCommandBlock`.
         """
         if isinstance(blk, BlockSet):
             plugins: list[tuple[ProjectPlugin, str]] = [

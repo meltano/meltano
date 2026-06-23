@@ -600,11 +600,11 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def get_transformer(self) -> ProjectPlugin:
         """Get first available Transformer plugin.
 
-        Raises:
-            PluginNotFoundError: If there is no transformer.
-
         Returns:
             First available transformer plugin.
+
+        Raises:
+            PluginNotFoundError: If there is no transformer.
         """
         if transformer := next(
             iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)),
