@@ -129,7 +129,7 @@ To renew the token later:
 ```sql
 ALTER DATABASE SCOPED CREDENTIAL [target_mssql_credential]
     WITH IDENTITY = N'SHARED ACCESS SIGNATURE',
-         SECRET   = N'<new-sas-token>';
+         SECRET   = N'<new-sas-token-without-leading-?>';
 ```
 
 ##### Option B: Managed Identity
