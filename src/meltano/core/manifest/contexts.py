@@ -83,12 +83,12 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
     Args:
         plugin_name: The name of the plugin to be run.
 
+    Yields:
+        `None`.
+
     Raises:
         ValueError: No plugin was found matching the given plugin name within
             the active manifest.
-
-    Yields:
-        `None`.
     """
     manifest = _get_active_manifest()
 
@@ -116,12 +116,12 @@ def schedule_context(schedule_name: str) -> Iterator[None]:
     Args:
         schedule_name: The name of the schedule to be run.
 
+    Yields:
+        `None`.
+
     Raises:
         ValueError: No schedule was found matching the given schedule name
             within the active manifest.
-
-    Yields:
-        `None`.
     """
     schedules = _get_active_manifest().data["schedules"]
 
@@ -144,12 +144,12 @@ def job_context(job_name: str) -> Iterator[None]:
     Args:
         job_name: The name of the job to be run.
 
+    Yields:
+        `None`.
+
     Raises:
         ValueError: No job was found matching the given job name within the
             active manifest.
-
-    Yields:
-        `None`.
     """
     jobs = _get_active_manifest().data["jobs"]
 

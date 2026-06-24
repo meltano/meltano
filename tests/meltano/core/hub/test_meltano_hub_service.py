@@ -7,7 +7,6 @@ from unittest import mock
 
 import click
 import pytest
-import requests
 import requests.exceptions
 from requests import Response
 from requests.adapters import BaseAdapter

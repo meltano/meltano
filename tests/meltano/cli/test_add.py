@@ -919,11 +919,11 @@ class TestCliAdd:
 
     def test_add_with_python_version(self, cli_runner: CliRunner) -> None:
         venv_service: VirtualEnvService = None
-        _orig = VirtualEnvService.from_plugin
+        orig = VirtualEnvService.from_plugin
 
         def mock_from_plugin(project, plugin):
             nonlocal venv_service
-            venv_service = _orig(project, plugin, backend_class=MockBackend)
+            venv_service = orig(project, plugin, backend_class=MockBackend)
             return venv_service
 
         python = "python3.X"

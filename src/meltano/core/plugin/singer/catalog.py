@@ -758,7 +758,7 @@ class ListSelectedExecutor(CatalogExecutor):
 
     @property
     def selected_properties(self) -> dict[str, set[str]]:
-        """Get selected streams and properties."""
+        """Selected streams and properties."""
         # we don't want to mutate the visitor result
         properties = self.properties.copy()
 

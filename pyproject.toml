@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.2.0"
+version = "4.2.1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -49,7 +49,7 @@ dependencies = [
   "smart-open>=7.0.5,<8",
   "snowplow-tracker>=1.0.4,<2",
   "sqlalchemy>=2.0.35,<2.1",
-  "structlog>=25.5.0,<26",
+  "structlog>=25.5.0,<27",
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
@@ -146,7 +146,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy~=2.1.0",
-  "ty==0.0.47",
+  "ty==0.0.49",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -241,7 +241,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.2.0"
+version = "4.2.1"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [

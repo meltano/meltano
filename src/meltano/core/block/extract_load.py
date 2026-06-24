@@ -301,11 +301,7 @@ class ELBContextBuilder:
 
     @property
     def elt_run_dir(self) -> Path | None:
-        """Get the run directory for the current job.
-
-        Returns:
-            The run directory for the current job.
-        """
+        """The run directory for the current job."""
         if self._job:  # pragma: no cover
             return self.project.dirs.job(self._job.job_name, str(self._job.run_id))
 
@@ -388,10 +384,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
 
     @property
     def state_service(self) -> StateService:
-        """Get StateService for managing state for this BlockSet.
-
-        Returns:
-            A StateService using this BlockSet's context's session
+        """StateService for managing state for this BlockSet.
 
         Raises:
             BlockSetHasNoStateError: if no Block in this BlockSet has state capability
@@ -558,11 +551,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
 
     @property
     def process_futures(self) -> list[asyncio.Task]:
-        """Return the futures of the blocks subprocess calls.
-
-        Returns:
-            The list of all process futures.
-        """
+        """The futures of the blocks subprocess calls."""
         if self._process_futures is None:
             self._process_futures = [block.process_future for block in self.blocks]
         return self._process_futures

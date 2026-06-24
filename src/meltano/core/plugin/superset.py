@@ -62,11 +62,7 @@ class Superset(BasePlugin):
     @property
     @override
     def config_files(self) -> dict[str, str]:
-        """Return the configuration files required by the plugin.
-
-        Returns:
-            Dictionary of config file identifiers and filenames
-        """
+        """Configuration files required by the plugin."""
         return {"config": "superset_config.py"}
 
     @hook("before_configure")

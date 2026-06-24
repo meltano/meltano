@@ -72,11 +72,9 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
+    @override
     def client(self) -> BlobServiceClient:
-        """Get an authenticated azure.storage.blob.BlobServiceClient.
-
-        Returns:
-            An authenticated azure.storage.blob.BlobServiceClient
+        """Authenticated azure.storage.blob.BlobServiceClient.
 
         Raises:
             MeltanoError: If connection string is not provided.

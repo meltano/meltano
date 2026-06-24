@@ -157,11 +157,7 @@ class BlockParser:  # noqa: D101
 
     @property
     def plugins(self) -> list[ProjectPlugin]:
-        """Return the list of plugins in the block.
-
-        Returns:
-            A list of ProjectPlugin.
-        """
+        """The list of plugins in the block."""
         return self._plugins
 
     def _expand_jobs(self, blocks: list[str], task_sets: TaskSetsService) -> list[str]:

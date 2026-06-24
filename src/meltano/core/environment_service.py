@@ -52,12 +52,12 @@ class EnvironmentService:
         Args:
             environment: An environment to add.
 
+        Returns:
+            The newly added environment.
+
         Raises:
             EnvironmentAlreadyExistsError: If an environment with the same name
                 already exists.
-
-        Returns:
-            The newly added environment.
         """
         with self.project.meltano_update() as meltano:
             # guard if it already exists

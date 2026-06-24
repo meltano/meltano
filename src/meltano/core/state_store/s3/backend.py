@@ -94,10 +94,7 @@ class S3StateStoreManager(CloudStateStoreManager):
     @cached_property
     @override
     def client(self) -> S3Client:
-        """Get an authenticated boto3.Client.
-
-        Returns:
-            A boto3.Client.
+        """An authenticated boto3.Client.
 
         Raises:
             InvalidStateBackendConfigurationException: when configured AWS

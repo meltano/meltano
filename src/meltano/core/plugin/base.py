@@ -86,11 +86,7 @@ class PluginType(YAMLEnum):
 
     @property
     def descriptor(self) -> str:
-        """Return the descriptor of the plugin type.
-
-        Returns:
-            The descriptor of the plugin type.
-        """
+        """Descriptor of the plugin type."""
         return "file bundle" if self is self.__class__.FILES else self.singular
 
     @property
@@ -208,20 +204,12 @@ class PluginRef(Canonical):
 
     @property
     def type(self) -> PluginType:
-        """Return the type of the plugin.
-
-        Returns:
-            The type of the plugin.
-        """
+        """The type of the plugin."""
         return self._type
 
     @property
     def plugin_dir_name(self) -> str:
-        """Return the plugin directory name.
-
-        Returns:
-            The plugin directory name.
-        """
+        """The plugin directory name."""
         return self.name
 
     def __eq__(self, other: PluginRef) -> bool:
@@ -480,11 +468,7 @@ class PluginDefinition(PluginRef):
 
     @property
     def variant_labels(self):  # noqa: ANN201
-        """Return labels for supported variants.
-
-        Returns:
-            The labels for the supported variants.
-        """
+        """Labels for supported variants."""
         return ", ".join([self.variant_label(variant) for variant in self.variants])
 
     @classmethod
@@ -589,47 +573,27 @@ class BasePlugin(HookObject):
 
     @property
     def variant(self) -> str:
-        """Return the variant name.
-
-        Returns:
-            The variant name.
-        """
+        """The variant name."""
         return self._variant.name
 
     @property
     def executable(self) -> str:
-        """Return the plugin executable.
-
-        Returns:
-            The executable name.
-        """
+        """The plugin executable."""
         return self._variant.executable or self._plugin_def.name
 
     @property
     def extras(self):  # noqa: ANN201
-        """Return the plugin extras.
-
-        Returns:
-            The extras.
-        """
+        """Plugin extras."""
         return {**self._plugin_def.extras, **self._variant.extras}
 
     @property
     def all_commands(self):  # noqa: ANN201
-        """Return a dictionary of supported commands.
-
-        Returns:
-            A dictionary of supported commands.
-        """
+        """A dictionary of supported commands."""
         return self._variant.commands
 
     @property
     def test_commands(self) -> dict[str, Command]:
-        """Return a the test command for this plugin.
-
-        Returns:
-            The test command for this plugin.
-        """
+        """Dictionary of test commands for this plugin."""
         return {
             name: command
             for name, command in self.all_commands.items()
@@ -638,20 +602,12 @@ class BasePlugin(HookObject):
 
     @property
     def all_settings(self):  # noqa: ANN201
-        """Return a list of settings.
-
-        Returns:
-            A list of settings.
-        """
+        """The full list of settings for this plugin."""
         return self._variant.settings
 
     @property
     def extra_settings(self):  # noqa: ANN201
-        """Return the extra settings for this plugin.
-
-        Returns:
-            The extra settings for this plugin.
-        """
+        """The extra settings for this plugin."""
         defaults = {f"_{name}": value for name, value in self.extras.items()}
 
         existing_settings = []
@@ -677,11 +633,7 @@ class BasePlugin(HookObject):
 
     @property
     def all_requires(self):  # noqa: ANN201
-        """Return a list of requires.
-
-        Returns:
-            A list of requires.
-        """
+        """A list of transitive plugin requirements."""
         return self._variant.requires
 
     def env_prefixes(
@@ -761,20 +713,12 @@ class BasePlugin(HookObject):
 
     @property
     def config_files(self) -> dict[str, str]:
-        """Return a list of stubbed files created for this plugin.
-
-        Returns:
-            A list of stubbed files created for this plugin.
-        """
+        """A list of stubbed files created for this plugin."""
         return {}
 
     @property
     def output_files(self) -> dict[str, str]:
-        """Return a list of stubbed files created for this plugin.
-
-        Returns:
-            A list of stubbed files created for this plugin.
-        """
+        """A list of stubbed files created for this plugin."""
         return {}
 
     def process_config(self, config: dict) -> dict:
@@ -790,11 +734,7 @@ class BasePlugin(HookObject):
 
     @property
     def definition(self) -> PluginDefinition:
-        """Return the plugin definition.
-
-        Returns:
-            The plugin definition.
-        """
+        """The plugin definition."""
         return self._plugin_def
 
 
