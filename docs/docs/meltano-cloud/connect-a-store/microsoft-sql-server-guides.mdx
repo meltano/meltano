@@ -220,7 +220,7 @@ Add the `azure_blob_storage` settings to your `target-mssql` configuration:
 {
   "azure_blob_storage": {
     "account_name": "mystorageaccount",
-    "sas_token": "sv=2023-11-03&ss=b&srt=o&sp=rwdlacupiytfx&...",
+    "sas_token": "sv=2023-11-03&sr=c&sp=rwdc&se=2027-01-01T00:00:00Z&sig=...",
     "container": "mssql-stage",
     "path_prefix": "target-mssql"
   }
@@ -230,9 +230,20 @@ Add the `azure_blob_storage` settings to your `target-mssql` configuration:
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `account_name` | Yes | | Azure Storage account name |
-| `sas_token` | Yes | | SAS token (without a leading `?`) |
+| `sas_token` | Yes | | SAS token (without a leading `?`) or storage account access key |
 | `container` | Yes | | Blob container used as the staging area |
 | `path_prefix` | No | `target-mssql` | Virtual directory prefix inside the container |
+
+Despite its name, `sas_token` accepts either a SAS token or the storage account's access key — the value is passed directly to the Azure Blob Storage client as its credential.
+
+Choosing between the two:
+
+| Credential | Benefits | Drawbacks |
+|---|---|---|
+| **SAS token** | Can be scoped to a single container with only the permissions it needs (`rwdc`), and has an expiry — limiting the blast radius if leaked. | Expires, so it must be rotated before the expiry date or uploads will start failing. |
+| **Storage account key** | Never expires, so there is nothing to rotate on a schedule. | Grants full read/write/delete access to *every* container in the account; cannot be scoped or time-limited, so a leak compromises the whole storage account. |
+
+We recommend a SAS token, scoped as narrowly as possible. The `az storage container generate-sas` command [above](#azure-blob-storage) produces a *service SAS* limited to one container — the tightest scope for this use case. (SAS tokens can also be account-wide; an *account SAS* spans the whole storage account and offers little advantage over the account key for staging.) Use an account key only when token rotation is impractical, and rotate it manually if it is ever exposed.
 
 ### Performance notes
 
