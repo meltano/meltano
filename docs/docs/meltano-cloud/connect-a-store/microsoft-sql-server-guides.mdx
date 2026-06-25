@@ -93,7 +93,7 @@ SAS=$(az storage container generate-sas \
 
 ### SQL Server one-time DBA setup
 
-The target does not create the credential or external data source — a DBA must configure them once before the initial run.
+The target does not create the credential or external data source - a DBA must configure them once before the initial run.
 
 #### Step 1: Create a database master key
 
@@ -234,23 +234,23 @@ Add the `azure_blob_storage` settings to your `target-mssql` configuration:
 | `container` | Yes | | Blob container used as the staging area |
 | `path_prefix` | No | `target-mssql` | Virtual directory prefix inside the container |
 
-Despite its name, `sas_token` accepts either a SAS token or the storage account's access key — the value is passed directly to the Azure Blob Storage client as its credential.
+Despite its name, `sas_token` accepts either a SAS token or the storage account's access key - the value is passed directly to the Azure Blob Storage client as its credential.
 
 Choosing between the two:
 
 | Credential | Benefits | Drawbacks |
 |---|---|---|
-| **SAS token** | Can be scoped to a single container with only the permissions it needs (`rwdc`), and has an expiry — limiting the blast radius if leaked. | Expires, so it must be rotated before the expiry date or uploads will start failing. |
+| **SAS token** | Can be scoped to a single container with only the permissions it needs (`rwdc`), and has an expiry - limiting the blast radius if leaked. | Expires, so it must be rotated before the expiry date or uploads will start failing. |
 | **Storage account key** | Never expires, so there is nothing to rotate on a schedule. | Grants full read/write/delete access to *every* container in the account; cannot be scoped or time-limited, so a leak compromises the whole storage account. |
 
-We recommend a SAS token, scoped as narrowly as possible. The `az storage container generate-sas` command [above](#azure-blob-storage) produces a *service SAS* limited to one container — the tightest scope for this use case. (SAS tokens can also be account-wide; an *account SAS* spans the whole storage account and offers little advantage over the account key for staging.) Use an account key only when token rotation is impractical, and rotate it manually if it is ever exposed.
+We recommend a SAS token, scoped as narrowly as possible. The `az storage container generate-sas` command [above](#azure-blob-storage) produces a *service SAS* limited to one container - the tightest scope for this use case. (SAS tokens can also be account-wide; an *account SAS* spans the whole storage account and offers little advantage over the account key for staging.) Use an account key only when token rotation is impractical, and rotate it manually if it is ever exposed.
 
 ### Performance notes
 
 - **Minimum SQL Server version:** 2017 (14.x). Azure SQL Database and Azure SQL Managed Instance are fully supported.
 - **Batch size:** use a larger `batch_size_rows` to distribute the overhead of per-batch blob communication (e.g. `"batch_size_rows": 50000`).
 - **Booleans:** stored as `BIT` in the staged file, inserted into the target's `VARCHAR(1)` column as `0`/`1`.
-- **Complex types (objects, arrays):** encoded to JSON strings, stored as `NVARCHAR(MAX)` — matching the non-staged approach.
+- **Complex types (objects, arrays):** encoded to JSON strings, stored as `NVARCHAR(MAX)` - matching the non-staged approach.
 
 ---
 
