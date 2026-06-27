@@ -33,7 +33,6 @@ else:
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable, Iterator
-    from io import TextIOWrapper
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -113,7 +112,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         return self.join_path(self.uri.removesuffix(self.state_dir), path)
 
     @contextmanager
-    def get_reader(self, path: str) -> Iterator[TextIOWrapper]:
+    def get_reader(self, path: str) -> Iterator[t.TextIO]:
         """Get reader for given path.
 
         Args:
@@ -132,7 +131,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             yield reader
 
     @contextmanager
-    def get_writer(self, path: str) -> Iterator[TextIOWrapper]:
+    def get_writer(self, path: str) -> Iterator[t.TextIO]:
         """Get writer for given path.
 
         Args:
