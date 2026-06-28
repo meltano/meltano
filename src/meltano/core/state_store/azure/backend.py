@@ -16,6 +16,12 @@ if sys.version_info >= (3, 12):
 else:
     from typing_extensions import override
 
+if t.TYPE_CHECKING:
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 class AZStorageStateStoreManager(CloudStateStoreManager):
     """State backend for Azure Blob Storage."""
@@ -118,11 +124,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 raise e  # noqa: TRY201
 
     @override
-    def list_all_files(
-        self,
-        *,
-        with_prefix: bool = True,
-    ) -> t.Generator[str, None, None]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str]:
         """List all files in the backend.
 
         Args:

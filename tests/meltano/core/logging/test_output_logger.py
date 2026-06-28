@@ -17,8 +17,12 @@ from meltano.core.logging.models import ParsedLogRecord
 from meltano.core.logging.output_logger import Out, OutputLogger
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
     from pathlib import Path
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def assert_lines(output, *lines) -> None:
@@ -28,7 +32,7 @@ def assert_lines(output, *lines) -> None:
 
 class TestOutputLogger:
     @pytest.fixture
-    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+    def log(self, tmp_path: Path) -> Generator[t.IO[str]]:
         with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
             yield file
 
@@ -57,10 +61,7 @@ class TestOutputLogger:
         return LogCapture()
 
     @pytest.fixture(autouse=True)
-    def fixture_configure_structlog(
-        self,
-        log_output: LogCapture,
-    ) -> Generator[None, None, None]:
+    def fixture_configure_structlog(self, log_output: LogCapture) -> Generator[None]:
         original_config = structlog.get_config()
         structlog.configure(
             processors=[log_output],
@@ -73,10 +74,7 @@ class TestOutputLogger:
             structlog.configure(**original_config)
 
     @pytest.fixture(name="redirect_handler")
-    def redirect_handler(
-        self,
-        subject: OutputLogger,
-    ) -> Generator[logging.Handler, None, None]:
+    def redirect_handler(self, subject: OutputLogger) -> Generator[logging.Handler]:
         formatter = structlog.stdlib.ProcessorFormatter(
             # use a json renderer so output is easier to verify
             processor=structlog.processors.JSONRenderer(),

@@ -6,7 +6,12 @@ import typing as t
 from contextlib import suppress
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def meltano_config_env_locations(
@@ -44,7 +49,7 @@ class JsonschemaRefLocationParser:
         self,
         schema: dict[str, t.Any] | None = None,
         path: tuple[str, ...] = (),
-    ) -> Generator[str, None, None]:
+    ) -> Generator[str]:
         """Parse the jsonschema to find the locations of the target ref.
 
         Args:

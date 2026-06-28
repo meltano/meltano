@@ -15,12 +15,18 @@ from meltano.core.job import Job
 from meltano.core.logging import OutputLogger
 
 if t.TYPE_CHECKING:
+    import sys
     from pathlib import Path
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 class TestSingerBlocks:
     @pytest.fixture
-    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+    def log(self, tmp_path: Path) -> Generator[t.IO[str]]:
         with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
             yield file
 

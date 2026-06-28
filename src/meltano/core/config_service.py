@@ -14,10 +14,16 @@ from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.setting_definition import SettingDefinition
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from meltano.core.meltano_file import MeltanoFile
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -51,7 +57,7 @@ class ConfigService:
         return self.project.meltano
 
     @contextmanager
-    def update_meltano_yml(self) -> Generator[MeltanoFile, None, None]:
+    def update_meltano_yml(self) -> Generator[MeltanoFile]:
         """Update meltano.yml.
 
         This method is a context manager that will update meltano.yml with the
