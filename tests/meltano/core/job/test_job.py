@@ -23,7 +23,7 @@ if t.TYPE_CHECKING:
 
 
 class TestJob:
-    def sample_job(self, payload=None):
+    def sample_job(self, payload=None) -> Job:
         return Job(
             job_name="meltano:sample-elt",
             state=State.IDLE,
@@ -132,9 +132,14 @@ class TestJob:
             )
         subject = self.sample_job({"original_state": 1}).save(session)
 
-        with pytest.raises(SystemExit):
+        async def _run_with_sigterm() -> None:
             async with subject.run(session):
                 signal.raise_signal(signal.SIGTERM)
+                # I/O poll needed to dispatch the signal callback
+                await asyncio.sleep(0.01)
+
+        with pytest.raises(SystemExit):
+            await _run_with_sigterm()
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None

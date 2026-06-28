@@ -6,7 +6,7 @@ import asyncio
 import os
 import signal
 import typing as t
-from contextlib import asynccontextmanager, contextmanager, suppress
+from contextlib import asynccontextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntEnum
 
@@ -27,13 +27,19 @@ from meltano.core.sqlalchemy import (
 from meltano.core.utils import new_run_id
 
 if t.TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Generator
+    from collections.abc import AsyncGenerator
 
     from sqlalchemy.orm import Session
 
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
+
+_sigint_received: bool = False
+
+
+def _was_sigint_received() -> bool:
+    return _sigint_received
 
 
 class InconsistentStateError(Error):
@@ -278,9 +284,8 @@ class Job(SystemModel):
             self.start()
             self.save(session)
 
-            with self._handling_sigterm(session):
-                async with self._heartbeating(session):
-                    yield
+            async with self._handling_sigterm(session), self._heartbeating(session):
+                yield
 
             self.success()
             self.save(session)
@@ -391,21 +396,47 @@ class Job(SystemModel):
             with suppress(asyncio.CancelledError):
                 await heartbeat_future
 
-    @contextmanager
-    def _handling_sigterm(
+    @asynccontextmanager
+    async def _handling_sigterm(
         self,
         session: Session,  # noqa: ARG002
-    ) -> Generator[None, None, None]:
-        def handler(*_) -> t.NoReturn:
-            sigterm_status = 143
-            raise SystemExit(sigterm_status)
+    ) -> AsyncGenerator[None, None]:
+        global _sigint_received
+        _sigint_received = False
 
-        original_termination_handler = signal.signal(signal.SIGTERM, handler)
+        loop = asyncio.get_running_loop()
+        task = asyncio.current_task()
+        sigterm_received = False
 
+        def sigterm_handler() -> None:
+            nonlocal sigterm_received
+            sigterm_received = True
+            if task is not None:
+                task.cancel("SIGTERM")
+
+        original_sigint = signal.getsignal(signal.SIGINT)
+
+        def sigint_wrapper(sig: int, frame: t.Any) -> None:  # noqa: ANN401
+            global _sigint_received
+            _sigint_received = True
+            if callable(original_sigint):
+                t.cast("t.Callable[[int, t.Any], None]", original_sigint)(sig, frame)
+
+        with suppress(
+            NotImplementedError
+        ):  # Windows: loop.add_signal_handler is unavailable
+            loop.add_signal_handler(signal.SIGTERM, sigterm_handler)
+        signal.signal(signal.SIGINT, sigint_wrapper)
         try:
             yield
+        except asyncio.CancelledError:
+            if sigterm_received:
+                raise SystemExit(143) from None
+            raise
         finally:
-            signal.signal(signal.SIGTERM, original_termination_handler)
+            with suppress(NotImplementedError):  # Windows
+                loop.remove_signal_handler(signal.SIGTERM)
+            signal.signal(signal.SIGINT, original_sigint)
 
     def _error_message(self, err: BaseException) -> str:
         if isinstance(err, SystemExit):
