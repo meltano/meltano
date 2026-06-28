@@ -32,7 +32,13 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Iterator
+    from collections.abc import Iterable
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -112,7 +118,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         return self.join_path(self.uri.removesuffix(self.state_dir), path)
 
     @contextmanager
-    def get_reader(self, path: str) -> Iterator[t.TextIO]:
+    def get_reader(self, path: str) -> Generator[t.TextIO]:
         """Get reader for given path.
 
         Args:
@@ -131,7 +137,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             yield reader
 
     @contextmanager
-    def get_writer(self, path: str) -> Iterator[t.TextIO]:
+    def get_writer(self, path: str) -> Generator[t.TextIO]:
         """Get writer for given path.
 
         Args:
@@ -266,12 +272,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
 
     @override
     @contextmanager
-    def acquire_lock(
-        self,
-        state_id: str,
-        *,
-        retry_seconds: float,
-    ) -> Generator[None, None, None]:
+    def acquire_lock(self, state_id: str, *, retry_seconds: float) -> Generator[None]:
         """Context manager for locking state_id during reads and writes.
 
         Args:
@@ -602,7 +603,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         return self.join_path(self.uri.removesuffix(self.prefix), path)
 
     @abstractmethod
-    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterable[str]:
         """List all files in the backend.
 
         Args:

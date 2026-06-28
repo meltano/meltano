@@ -42,11 +42,14 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
-
     from meltano.core._types import StrPath
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
     from meltano.core.plugin.base import PluginRef
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -59,7 +62,7 @@ PROJECT_SYS_DIR_ROOT_ENV = "MELTANO_SYS_DIR_ROOT"
 MELTANO_USER_AGENT_ENV = "MELTANO_USER_AGENT"
 
 
-def walk_parent_directories() -> Generator[Path, None, None]:
+def walk_parent_directories() -> Generator[Path]:
     """Yield each directory starting with the current up to the root.
 
     Yields:
@@ -321,7 +324,7 @@ class Project:
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
-    def meltano_update(self) -> Generator[MeltanoFileTypeHint, None, None]:
+    def meltano_update(self) -> Generator[MeltanoFileTypeHint]:
         """Yield the current meltano configuration.
 
         Update the meltanofile if the context ends gracefully.
@@ -406,7 +409,7 @@ class Project:
             self.refresh(environment=None)
 
     @contextmanager
-    def dotenv_update(self) -> Generator[Path, None, None]:
+    def dotenv_update(self) -> Generator[Path]:
         """Raise error if project is readonly.
 
         Used in context where .env files would be updated.

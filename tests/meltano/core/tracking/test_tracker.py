@@ -21,12 +21,17 @@ from meltano.core.tracking.tracker import TelemetrySettings, Tracker, new_client
 from meltano.core.utils import hash_sha256, new_project_id
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from snowplow_tracker import SelfDescribing
 
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:
@@ -46,7 +51,7 @@ def check_analytics_json(project: Project) -> None:
 
 
 @contextmanager
-def delete_analytics_json(project: Project) -> Generator[None, None, None]:
+def delete_analytics_json(project: Project) -> Generator[None]:
     (project.dirs.meltano() / "analytics.json").unlink(missing_ok=True)
     try:
         yield

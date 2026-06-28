@@ -32,8 +32,15 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
 
 if t.TYPE_CHECKING:
+    import sys
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 TEST_STATE_ID = "test_job"
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
@@ -183,7 +190,7 @@ class TestExtractLoadBlocks:
             logger.setLevel(orig)
 
     @pytest.fixture
-    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+    def log(self, tmp_path: Path) -> Generator[t.IO[str]]:
         with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
             yield file
 

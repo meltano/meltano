@@ -30,11 +30,17 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable
+    from collections.abc import Iterable
 
     from meltano.core.project import Project
     from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_store import SettingsStoreManager
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -679,7 +685,7 @@ class SettingsService(ABC):
         feature: str,
         *,
         raise_error: bool = True,
-    ) -> Generator[bool, None, None]:
+    ) -> Generator[bool]:
         """Gate code paths based on feature flags.
 
         Args:

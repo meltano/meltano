@@ -20,7 +20,11 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -156,7 +160,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
                 raise e  # noqa: TRY201
 
     @override
-    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str]:
         """List all files in the backend.
 
         Args:

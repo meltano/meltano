@@ -36,9 +36,14 @@ from meltano.core.state_store.google.backend import GCSStateStoreManager
 from meltano.core.state_store.s3.backend import S3StateStoreManager
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    import sys
 
     import faker
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def on_windows() -> bool:
@@ -477,7 +482,7 @@ class TestS3StateStoreManager:
         monkeypatch.delenv("AWS_PROFILE", raising=False)
 
     @contextmanager
-    def stubber(self) -> Iterator[Stubber]:
+    def stubber(self) -> Generator[Stubber]:
         with patch(
             "meltano.core.state_store.s3.backend.S3StateStoreManager.client",
             new_callable=PropertyMock,

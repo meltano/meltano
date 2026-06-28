@@ -28,8 +28,8 @@ from .future_utils import first_failed_future, handle_producer_line_length_limit
 from .singer import SingerBlock
 
 if t.TYPE_CHECKING:
+    import sys
     import uuid
-    from collections.abc import AsyncIterator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -39,6 +39,12 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
     from .ioblock import IOBlock
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import AsyncGenerator
+    else:
+        from typing_extensions import AsyncGenerator
+
 
 logger = structlog.getLogger(__name__)
 
@@ -606,7 +612,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncGenerator[None]:
         """Start the blocks in the block set.
 
         Yields:

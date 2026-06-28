@@ -33,13 +33,16 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
-
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_service import SettingsService
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -904,7 +907,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
 
     @override
     @contextmanager
-    def update_config(self) -> Generator[dict, None, None]:
+    def update_config(self) -> Generator[dict]:
         """Update Meltano Environment configuration.
 
         Yields:
