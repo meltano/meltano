@@ -216,7 +216,7 @@ jobs:
     - name: Setup uv
       uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
       with:
-        cache-suffix: ${{ matrix.id }}
+        cache-suffix: typing
 
     - name: Install Nox
       env:

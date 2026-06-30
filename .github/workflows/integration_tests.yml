@@ -95,4 +95,4 @@ jobs:
       env:
         INTEGRATION_TEST_NAME: ${{ matrix.integration_test }}
       run: |
-        uv run bash integration/validate.sh $INTEGRATION_TEST_NAME
+        uv run bash integration/validate.sh "$INTEGRATION_TEST_NAME"
