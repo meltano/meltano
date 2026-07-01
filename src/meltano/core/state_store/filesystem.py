@@ -32,8 +32,13 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Iterator
-    from io import TextIOWrapper
+    from collections.abc import Iterable
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -113,7 +118,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         return self.join_path(self.uri.removesuffix(self.state_dir), path)
 
     @contextmanager
-    def get_reader(self, path: str) -> Iterator[TextIOWrapper]:
+    def get_reader(self, path: str) -> Generator[t.TextIO]:
         """Get reader for given path.
 
         Args:
@@ -132,7 +137,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             yield reader
 
     @contextmanager
-    def get_writer(self, path: str) -> Iterator[TextIOWrapper]:
+    def get_writer(self, path: str) -> Generator[t.TextIO]:
         """Get writer for given path.
 
         Args:
@@ -161,7 +166,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
     @property
     @abstractmethod
     def client(self) -> t.Any:  # noqa: ANN401
-        """Get a client for performing fs operations.
+        """Client for performing fs operations.
 
         Used for cloud backends, particularly in deleting and listing blobs.
         """
@@ -170,7 +175,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
     @property
     @abstractmethod
     def state_dir(self) -> str:
-        """Get the path (either filepath or prefix) that state should be stored at."""
+        """Path (either filepath or prefix) that state should be stored at."""
         ...
 
     def get_path(self, state_id: str, filename: str | None = None) -> str:
@@ -267,12 +272,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
 
     @override
     @contextmanager
-    def acquire_lock(
-        self,
-        state_id: str,
-        *,
-        retry_seconds: float,
-    ) -> Generator[None, None, None]:
+    def acquire_lock(self, state_id: str, *, retry_seconds: float) -> Generator[None]:
         """Context manager for locking state_id during reads and writes.
 
         Args:
@@ -397,7 +397,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     @property
     @override
     def client(self) -> None:
-        """Get a client for performing fs operations.
+        """Client for performing fs operations.
 
         Returns:
             None
@@ -407,7 +407,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     @property
     @override
     def state_dir(self) -> str:
-        """Get the path that state should be stored at.
+        """Path that state should be stored at.
 
         Returns:
             The relevant path
@@ -587,11 +587,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
     @property
     @override
     def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
+        """Prefix where state should be stored at."""
         return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
 
     @override
@@ -607,7 +603,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         return self.join_path(self.uri.removesuffix(self.prefix), path)
 
     @abstractmethod
-    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterable[str]:
         """List all files in the backend.
 
         Args:

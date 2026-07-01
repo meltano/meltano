@@ -46,10 +46,10 @@ jobs:
           echo "::error::No stable releases found; cannot determine tag for re-roll"
           exit 1
         fi
-        echo "tag=$tag" >> $GITHUB_OUTPUT
+        echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
     - name: Check out the repository
-      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       with:
         persist-credentials: false
         ref: ${{ steps.get-release-tag.outputs.tag || github.sha }}
@@ -69,7 +69,7 @@ jobs:
       run: |
         version=$(uvx --from toml-cli toml get --toml-path=pyproject.toml project.version)
         tag=$(echo "${GITHUB_REF}" | awk '{split($0,p,"/"); print p[3]}')
-        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and package version ('v$version') do not match!"; exit 1; fi;
+        if [ "v$version" != "$tag" ]; then echo "Release tag ('$tag') and package version ('v$version') do not match!"; exit 1; fi;
 
     - name: uv install
       # Required to run `alembic_freeze.py`
@@ -134,8 +134,8 @@ jobs:
       # This step makes it so that the same workflow inputs can be accessed
       # regardless of what event triggered it.
       run: |
-        echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
-    - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        echo "registry=$REGISTRY" >> "$GITHUB_OUTPUT"
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       with:
         persist-credentials: false
     - name: Setup uv
@@ -150,7 +150,7 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |  # zizmor: ignore[template-injection]
         latest=$(gh release list --repo ${{ github.repository }} --exclude-pre-releases --limit 1000 --json tagName --jq '.[].tagName | ltrimstr("v")' | sort -V | tail -1)
-        echo "version=$latest" >> $GITHUB_OUTPUT
+        echo "version=$latest" >> "$GITHUB_OUTPUT"
 
     - name: Generate tags
       id: generate-tags
@@ -181,20 +181,20 @@ jobs:
         echo "If this is not a dry run, the image will be published with the following tags:"
         cat tags
 
-        echo 'IMAGE_TAGS<<EOF' >> $GITHUB_ENV
-        echo "$(cat tags)" >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
+        echo 'IMAGE_TAGS<<EOF' >> "$GITHUB_ENV"
+        echo "$(cat tags)" >> "$GITHUB_ENV"
+        echo 'EOF' >> "$GITHUB_ENV"
 
     - name: Set registry username and password
       id: user-and-pass
       run: |
         if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "ghcr.io" ]]; then
-          echo "username=${GITHUB_ACTOR}" >> $GITHUB_OUTPUT
-          echo "password=${GITHUB_TOKEN}" >> $GITHUB_OUTPUT
+          echo "username=${GITHUB_ACTOR}" >> "$GITHUB_OUTPUT"
+          echo "password=${GITHUB_TOKEN}" >> "$GITHUB_OUTPUT"
         fi
         if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "docker.io" ]]; then
-          echo "username=meltano" >> $GITHUB_OUTPUT
-          echo "password=${DOCKERHUB_TOKEN}" >> $GITHUB_OUTPUT
+          echo "username=meltano" >> "$GITHUB_OUTPUT"
+          echo "password=${DOCKERHUB_TOKEN}" >> "$GITHUB_OUTPUT"
         fi
       env:
         DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -231,7 +231,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       with:
         persist-credentials: false
 

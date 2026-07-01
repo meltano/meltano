@@ -9,12 +9,17 @@ import sqlalchemy as sa
 from meltano.core.sqlalchemy import DateTimeUTC
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 class TestSQLAlchemyModels:
     @pytest.fixture
-    def engine(self) -> Generator[sa.Engine, None, None]:
+    def engine(self) -> Generator[sa.Engine]:
         engine = sa.create_engine("sqlite:///:memory:")
         try:
             yield engine

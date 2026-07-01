@@ -51,6 +51,8 @@ class PluginException:
     cause: PluginException | None = None
     #: The context of the exception.
     context: PluginException | None = None
+    #: The optional exception notes (Python 3.11+)
+    notes: list[str] | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> PluginException:
@@ -80,6 +82,7 @@ class PluginException:
             traceback=exc_traceback,
             cause=exc_cause,
             context=exc_context,
+            notes=data.get("notes"),
         )
 
     def to_dict(self) -> dict:
@@ -104,6 +107,8 @@ class PluginException:
             result["cause"] = self.cause.to_dict()
         if self.context:
             result["context"] = self.context.to_dict()
+        if self.notes:
+            result["notes"] = self.notes
         return result
 
     def __structlog__(self) -> dict:

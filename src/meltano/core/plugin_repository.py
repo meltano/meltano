@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 from meltano.core.plugin.factory import base_plugin_factory
 
@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
-class PluginRepository(metaclass=ABCMeta):
+class PluginRepository(ABC):
     """A generic plugin definition repository."""
 
     @abstractmethod

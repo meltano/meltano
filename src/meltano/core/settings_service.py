@@ -7,7 +7,7 @@ import os
 import sys
 import typing as t
 import warnings
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
 import structlog
@@ -30,11 +30,17 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable
+    from collections.abc import Iterable
 
     from meltano.core.project import Project
     from meltano.core.setting_definition import EnvVar, SettingDefinition
     from meltano.core.settings_store import SettingsStoreManager
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -55,11 +61,7 @@ class FeatureFlags(StrEnum):
 
     @property
     def setting_name(self) -> str:
-        """Return the setting name for this feature flag.
-
-        Returns:
-            The setting name for this feature flag.
-        """
+        """Setting name for this feature flag."""
         return f"{FEATURE_FLAG_PREFIX}.{self.value}"
 
 
@@ -85,7 +87,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(metaclass=ABCMeta):
+class SettingsService(ABC):
     """Abstract base class for managing settings."""
 
     LOGGING = False
@@ -116,58 +118,42 @@ class SettingsService(metaclass=ABCMeta):
     @property
     @abstractmethod
     def label(self) -> str:
-        """Return label.
-
-        Returns:
-            Label for the settings service.
-        """
+        """Label for the settings service."""
 
     @property
     @abstractmethod
     def docs_url(self) -> str:
-        """Return docs URL.
-
-        Returns:
-            URL for Meltano doc site.
-        """
+        """Docs URL."""
 
     @property
     @abstractmethod
     def project_settings_service(self) -> SettingsService:
-        """Get a project settings service.
-
-        Returns:
-            A ProjectSettingsService
-        """
+        """Project settings service."""
 
     @property
     def env_prefixes(self) -> list[str]:
-        """Return prefixes for setting environment variables.
-
-        Returns:
-            prefixes for settings environment variables
-        """
+        """Prefixes for setting environment variables."""
         return ["meltano"]
 
     @property
     @abstractmethod
     def db_namespace(self) -> str:
-        """Return namespace for setting value records in system database."""
+        """Namespace for setting value records in system database."""
 
     @property
     @abstractmethod
     def setting_definitions(self) -> list[SettingDefinition]:
-        """Return definitions of supported settings."""
+        """Definitions of supported settings."""
 
     @property
     def inherited_settings_service(self) -> Self | None:
-        """Return settings service to inherit configuration from."""
+        """Settings service to inherit configuration from."""
         return None
 
     @property
     @abstractmethod
     def meltano_yml_config(self) -> dict:
-        """Return current configuration in `meltano.yml`."""
+        """Current configuration in `meltano.yml`."""
 
     @abstractmethod
     def update_meltano_yml_config(self, config: dict) -> None:
@@ -197,11 +183,7 @@ class SettingsService(metaclass=ABCMeta):
 
     @property
     def env(self) -> dict[str, str]:
-        """Return the environment as a dict.
-
-        Returns:
-            the environment as a dict.
-        """
+        """Environment as a dict."""
         return {**os.environ, **self.env_override}
 
     def config_with_metadata(
@@ -703,7 +685,7 @@ class SettingsService(metaclass=ABCMeta):
         feature: str,
         *,
         raise_error: bool = True,
-    ) -> Generator[bool, None, None]:
+    ) -> Generator[bool]:
         """Gate code paths based on feature flags.
 
         Args:

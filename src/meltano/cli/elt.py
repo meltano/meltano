@@ -33,6 +33,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import new_run_id, run_async
 
 if t.TYPE_CHECKING:
+    import sys
     import uuid
 
     from sqlalchemy.orm import Session
@@ -42,6 +43,11 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginDefinition
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import AsyncGenerator
+    else:
+        from typing_extensions import AsyncGenerator
 
 DUMPABLES = {
     "catalog": (PluginType.EXTRACTORS, "catalog"),
@@ -336,7 +342,7 @@ async def _run_el_command(
     run_id = run_id or new_run_id()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
-    _state_strategy = StateStrategy.from_cli_args(
+    state_strategy_ = StateStrategy.from_cli_args(
         merge_state=merge_state,
         state_strategy=state_strategy,
     )
@@ -374,7 +380,7 @@ async def _run_el_command(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            state_strategy=_state_strategy,
+            state_strategy=state_strategy_,
             run_id=run_id,
         )
 
@@ -492,7 +498,7 @@ async def _run_job(
 async def _redirect_output(
     log: structlog.stdlib.BoundLogger,
     output_logger: OutputLogger,
-) -> t.AsyncGenerator[None, None]:
+) -> AsyncGenerator[None]:
     meltano_stdout = output_logger.out(
         "meltano",
         log.bind(stdio="stdout", cmd_type="elt"),

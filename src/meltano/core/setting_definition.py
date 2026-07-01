@@ -88,11 +88,7 @@ class EnvVar:
 
     @property
     def definition(self) -> str:
-        """Return env var definition.
-
-        Returns:
-            Env var definition.
-        """
+        """Env var definition."""
         prefix = "!" if self.negated else ""
         return f"{prefix}{self.key}"
 
@@ -188,11 +184,7 @@ class SettingKind(YAMLEnum):
 
     @cached_property
     def is_sensitive(self) -> bool:
-        """Return whether the setting kind is sensitive.
-
-        Returns:
-            True if the setting kind is sensitive.
-        """
+        """Whether the setting kind is sensitive."""
         return self in {
             SettingKind.PASSWORD,
             SettingKind.OAUTH,
@@ -392,31 +384,20 @@ class SettingDefinition(NameEq, Canonical):
 
     @property
     def is_extra(self) -> bool:
-        """Return whether setting is a config extra.
+        """Whether setting is a config extra.
 
         See https://docs.meltano.com/reference/command-line-interface#how-to-use-plugin-extras
-
-        Returns:
-            True if setting is a config extra.
         """
         return self.name.startswith("_")
 
     @property
     def is_custom(self) -> bool:
-        """Return whether the setting is custom, i.e. user-defined in `meltano.yml`.
-
-        Returns:
-            True if the setting is custom (user defined).
-        """
+        """Whether the setting is custom, i.e. user-defined in `meltano.yml`."""
         return self._custom
 
     @property
     def is_redacted(self) -> bool:
-        """Return whether the setting value is redacted.
-
-        Returns:
-            True if setting value is redacted.
-        """
+        """Whether the setting value is redacted."""
         return self.sensitive
 
     def env_vars(
@@ -476,11 +457,11 @@ class SettingDefinition(NameEq, Canonical):
             expected_type: The Python type class of the expected type. Used to
                 ensure that the parsed value is of the expected type.
 
-        Raises:
-            parse_error: Parsing failed, or the parsed value had an unexpected type.
-
         Returns:
             The parsed value.
+
+        Raises:
+            parse_error: Parsing failed, or the parsed value had an unexpected type.
         """
         parse_error = ValueError(
             f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}",

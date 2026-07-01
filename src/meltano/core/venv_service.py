@@ -22,11 +22,16 @@ import structlog
 from meltano.core.error import AsyncSubprocessError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Sequence
+    from collections.abc import Iterable, Sequence
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 if sys.version_info >= (3, 11):
     from typing import Self  # noqa: ICN003
@@ -105,13 +110,10 @@ class VirtualEnv:
 
     @cached_property
     def lib_dir(self) -> Path:
-        """Return the lib directory of the virtual environment.
+        """The lib directory of the virtual environment.
 
         Raises:
             MeltanoError: The current system is not supported.
-
-        Returns:
-            The lib directory of the virtual environment.
         """
         if self._system == "Windows":
             return self.root / "Lib"
@@ -120,13 +122,10 @@ class VirtualEnv:
 
     @cached_property
     def bin_dir(self) -> Path:
-        """Return the bin directory of the virtual environment.
+        """The bin directory of the virtual environment.
 
         Raises:
             MeltanoError: The current system is not supported.
-
-        Returns:
-            The bin directory of the virtual environment.
         """
         if self._system == "Windows":
             return self.root / "Scripts"
@@ -135,13 +134,10 @@ class VirtualEnv:
 
     @cached_property
     def site_packages_dir(self) -> Path:
-        """Return the site-packages directory of the virtual environment.
+        """The site-packages directory of the virtual environment.
 
         Raises:
             MeltanoError: The current system is not supported.
-
-        Returns:
-            The site-packages directory of the virtual environment.
         """
         if self._system == "Windows":
             return self.lib_dir / "site-packages"
@@ -154,11 +150,7 @@ class VirtualEnv:
 
     @cached_property
     def python_version_tuple(self) -> tuple[int, int, int]:
-        """Return the Python version tuple of the virtual environment.
-
-        Returns:
-            The Python version tuple of the virtual environment.
-        """
+        """The Python version tuple of the virtual environment."""
         if self.python_path == sys.executable:
             return sys.version_info[:3]
 
@@ -235,7 +227,7 @@ class VirtualEnv:
         """
 
         # A generator is used to perform the checks lazily
-        def checks() -> Generator[bool, None, None]:
+        def checks() -> Generator[bool]:
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args
@@ -259,11 +251,11 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
             and returns its error string or `None`.
         kwargs: Keyword arguments for `asyncio.create_subprocess_exec`.
 
-    Raises:
-        AsyncSubprocessError: The command failed.
-
     Returns:
         The subprocess.
+
+    Raises:
+        AsyncSubprocessError: The command failed.
     """
     run = await asyncio.create_subprocess_exec(
         *args,
@@ -555,11 +547,11 @@ class VirtualEnvService:
     async def create(self) -> Process:
         """Create a new virtual environment.
 
-        Raises:
-            AsyncSubprocessError: The virtual environment could not be created.
-
         Returns:
             The Python process creating the virtual environment.
+
+        Raises:
+            AsyncSubprocessError: The virtual environment could not be created.
         """
         logger.debug(
             "Creating virtual environment for '%s/%s'",
@@ -598,11 +590,11 @@ class VirtualEnvService:
             force: Whether to ignore the Python version required by plugins.
             env: Environment variables to pass to the subprocess.
 
-        Raises:
-            AsyncSubprocessError: The command failed.
-
         Returns:
             The process running `pip install` with the provided args.
+
+        Raises:
+            AsyncSubprocessError: The command failed.
         """
         if clean:
             await self.create()
@@ -816,11 +808,11 @@ class VirtualenvBackend(VenvBackend):
         Args:
             env: Environment variables to pass to the subprocess.
 
-        Raises:
-            AsyncSubprocessError: Failed to upgrade pip to the latest version.
-
         Returns:
             The process running `pip install --upgrade ...`.
+
+        Raises:
+            AsyncSubprocessError: Failed to upgrade pip to the latest version.
         """
         return await self.install_pip_args(("--upgrade", "pip"), env=env)
 

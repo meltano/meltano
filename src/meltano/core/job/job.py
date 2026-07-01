@@ -27,9 +27,14 @@ from meltano.core.sqlalchemy import (
 from meltano.core.utils import new_run_id
 
 if t.TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Generator
+    import sys
 
     from sqlalchemy.orm import Session
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import AsyncGenerator, Generator
+    else:
+        from typing_extensions import AsyncGenerator, Generator
 
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
@@ -261,7 +266,7 @@ class Job(SystemModel):
         return transition
 
     @asynccontextmanager
-    async def run(self, session: Session) -> AsyncGenerator[None, None]:
+    async def run(self, session: Session) -> AsyncGenerator[None]:
         """Run wrapped code in context of a job.
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and
@@ -375,7 +380,7 @@ class Job(SystemModel):
             await asyncio.sleep(1)
 
     @asynccontextmanager
-    async def _heartbeating(self, session: Session) -> AsyncGenerator[None, None]:
+    async def _heartbeating(self, session: Session) -> AsyncGenerator[None]:
         """Provide a context for heartbeating jobs.
 
         Args:
@@ -392,10 +397,7 @@ class Job(SystemModel):
                 await heartbeat_future
 
     @contextmanager
-    def _handling_sigterm(
-        self,
-        session: Session,  # noqa: ARG002
-    ) -> Generator[None, None, None]:
+    def _handling_sigterm(self, session: Session) -> Generator[None]:  # noqa: ARG002
         def handler(*_) -> t.NoReturn:
             sigterm_status = 143
             raise SystemExit(sigterm_status)

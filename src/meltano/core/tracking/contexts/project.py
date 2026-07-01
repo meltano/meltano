@@ -68,13 +68,10 @@ class ProjectContext(SelfDescribingJson):
 
     @property
     def environment_name(self) -> str | None:
-        """Get the name of the active environment.
+        """Name of the active environment.
 
-        Only the hash of this value is reported to Snowplow.
-
-        Returns:
-            The name of the active environment, or `None` if there is no active
-            environment.
+        `None` if there is no active environment. Only the hash of this value is
+        reported to Snowplow.
         """
         return self._environment_name
 

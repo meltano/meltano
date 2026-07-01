@@ -13,9 +13,16 @@ import typing as t
 from contextlib import contextmanager, suppress
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator, Mapping
+    import sys
+    from collections.abc import Mapping
 
     from meltano.core.manifest.manifest import Manifest
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 _active_manifest: list[Manifest] = []
 
@@ -28,7 +35,7 @@ def _get_active_manifest() -> Manifest:
 
 
 @contextmanager
-def _manifest_context(manifest: Manifest) -> Iterator[None]:
+def _manifest_context(manifest: Manifest) -> Generator[None]:
     _active_manifest.append(manifest)
     try:
         yield
@@ -37,7 +44,7 @@ def _manifest_context(manifest: Manifest) -> Iterator[None]:
 
 
 @contextmanager
-def _env_context(env: Mapping[str, str]) -> Iterator[None]:
+def _env_context(env: Mapping[str, str]) -> Generator[None]:
     unique_keys = env.keys() - os.environ.keys()
     shared_keys = env.keys() & os.environ.keys()
     prev = {k: v for k, v in os.environ.items() if k in shared_keys}
@@ -53,7 +60,7 @@ def _env_context(env: Mapping[str, str]) -> Iterator[None]:
 
 
 @contextmanager
-def manifest_context(manifest: Manifest) -> Iterator[None]:
+def manifest_context(manifest: Manifest) -> Generator[None]:
     """Establish a context within which Meltano can run using a given manifest.
 
     All relevant general (i.e. excluding plugin-specific, schedule-specific,
@@ -74,7 +81,7 @@ def manifest_context(manifest: Manifest) -> Iterator[None]:
 
 
 @contextmanager
-def plugin_context(plugin_name: str) -> Iterator[None]:
+def plugin_context(plugin_name: str) -> Generator[None]:
     """Establish a context within which a plugin can be run.
 
     All relevant env vars for the specified plugin will be set in the process
@@ -83,12 +90,12 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
     Args:
         plugin_name: The name of the plugin to be run.
 
+    Yields:
+        `None`.
+
     Raises:
         ValueError: No plugin was found matching the given plugin name within
             the active manifest.
-
-    Yields:
-        `None`.
     """
     manifest = _get_active_manifest()
 
@@ -107,7 +114,7 @@ def plugin_context(plugin_name: str) -> Iterator[None]:
 
 
 @contextmanager
-def schedule_context(schedule_name: str) -> Iterator[None]:
+def schedule_context(schedule_name: str) -> Generator[None]:
     """Establish a context within which a schedule can be run.
 
     All relevant env vars for the specified schedule will be set in the process
@@ -116,12 +123,12 @@ def schedule_context(schedule_name: str) -> Iterator[None]:
     Args:
         schedule_name: The name of the schedule to be run.
 
+    Yields:
+        `None`.
+
     Raises:
         ValueError: No schedule was found matching the given schedule name
             within the active manifest.
-
-    Yields:
-        `None`.
     """
     schedules = _get_active_manifest().data["schedules"]
 
@@ -135,7 +142,7 @@ def schedule_context(schedule_name: str) -> Iterator[None]:
 
 
 @contextmanager
-def job_context(job_name: str) -> Iterator[None]:
+def job_context(job_name: str) -> Generator[None]:
     """Establish a context within which a job can be run.
 
     All relevant env vars for the specified job will be set in the process for
@@ -144,12 +151,12 @@ def job_context(job_name: str) -> Iterator[None]:
     Args:
         job_name: The name of the job to be run.
 
+    Yields:
+        `None`.
+
     Raises:
         ValueError: No job was found matching the given job name within the
             active manifest.
-
-    Yields:
-        `None`.
     """
     jobs = _get_active_manifest().data["jobs"]
 

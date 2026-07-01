@@ -17,7 +17,8 @@ if t.TYPE_CHECKING:
 
 class TestCliRemove:
     @pytest.fixture(scope="class")
-    def tap_gitlab(self, project_add_service: ProjectAddService):
+    @classmethod
+    def tap_gitlab(cls, project_add_service: ProjectAddService):
         try:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
         except PluginAlreadyAddedException as err:

@@ -1,7 +1,7 @@
 {
   "name": "docs.meltano.com",
   "license": "MIT",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "https://meltano.com",
   "private": true,
   "scripts": {
@@ -28,9 +28,9 @@
   },
   "homepage": "https://meltano.com",
   "dependencies": {
-    "@docusaurus/core": "3.10.0",
+    "@docusaurus/core": "3.10.1",
     "@docusaurus/plugin-google-gtag": "3.10.1",
-    "@docusaurus/preset-classic": "3.10.0",
+    "@docusaurus/preset-classic": "3.10.1",
     "@mdx-js/react": "^3.1.1",
     "clsx": "^2.1.1",
     "prism-react-renderer": "^2.4.1",

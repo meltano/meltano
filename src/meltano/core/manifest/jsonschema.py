@@ -6,7 +6,12 @@ import typing as t
 from contextlib import suppress
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def meltano_config_env_locations(
@@ -44,7 +49,7 @@ class JsonschemaRefLocationParser:
         self,
         schema: dict[str, t.Any] | None = None,
         path: tuple[str, ...] = (),
-    ) -> Generator[str, None, None]:
+    ) -> Generator[str]:
         """Parse the jsonschema to find the locations of the target ref.
 
         Args:
@@ -85,13 +90,13 @@ class JsonschemaRefLocationParser:
                 element is a jq filter that can be applied to each previous
                 element up to the root of the root schema.
 
+        Returns:
+            The jsonschema the provided ref refers to.
+
         Raises:
             ValueError: Attempted to resolve a non-local reference.
             RecursionError: Attempted to resolve a recursive reference.
             KeyError: A component of the path in the ref was not found.
-
-        Returns:
-            The jsonschema the provided ref refers to.
         """
         with suppress(KeyError):
             return self._resolved_refs[ref]

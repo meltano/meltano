@@ -28,8 +28,8 @@ from .future_utils import first_failed_future, handle_producer_line_length_limit
 from .singer import SingerBlock
 
 if t.TYPE_CHECKING:
+    import sys
     import uuid
-    from collections.abc import AsyncIterator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -39,6 +39,12 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
     from .ioblock import IOBlock
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import AsyncGenerator
+    else:
+        from typing_extensions import AsyncGenerator
+
 
 logger = structlog.getLogger(__name__)
 
@@ -301,11 +307,7 @@ class ELBContextBuilder:
 
     @property
     def elt_run_dir(self) -> Path | None:
-        """Get the run directory for the current job.
-
-        Returns:
-            The run directory for the current job.
-        """
+        """The run directory for the current job."""
         if self._job:  # pragma: no cover
             return self.project.dirs.job(self._job.job_name, str(self._job.run_id))
 
@@ -388,10 +390,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
 
     @property
     def state_service(self) -> StateService:
-        """Get StateService for managing state for this BlockSet.
-
-        Returns:
-            A StateService using this BlockSet's context's session
+        """StateService for managing state for this BlockSet.
 
         Raises:
             BlockSetHasNoStateError: if no Block in this BlockSet has state capability
@@ -558,11 +557,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
 
     @property
     def process_futures(self) -> list[asyncio.Task]:
-        """Return the futures of the blocks subprocess calls.
-
-        Returns:
-            The list of all process futures.
-        """
+        """The futures of the blocks subprocess calls."""
         if self._process_futures is None:
             self._process_futures = [block.process_future for block in self.blocks]
         return self._process_futures
@@ -617,7 +612,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncGenerator[None]:
         """Start the blocks in the block set.
 
         Yields:

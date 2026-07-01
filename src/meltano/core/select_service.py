@@ -33,12 +33,12 @@ class SelectService:  # noqa: D101
 
     @property
     def extractor(self) -> ProjectPlugin:
-        """Retrieve extractor ProjectPlugin object."""
+        """Extractor ProjectPlugin object."""
         return self._extractor
 
     @property
     def current_select(self) -> list[str]:
-        """Get the current select patterns.
+        """Current select patterns.
 
         Returns:
             The current select pattern.

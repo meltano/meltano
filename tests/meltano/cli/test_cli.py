@@ -31,8 +31,15 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
+    import sys
+
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.project_init_service import ProjectInitService
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
@@ -75,7 +82,7 @@ class TestCli:
         self,
         tmp_path: Path,
         project_init_service: ProjectInitService,
-    ) -> t.Generator[Project, None, None]:
+    ) -> Generator[Project]:
         os.chdir(tmp_path)
         project = project_init_service.init(activate=False)
         Project._default = None
@@ -115,7 +122,7 @@ class TestCli:
         pushd(incompatible_version_project.root)
         result = cli_runner.invoke(cli, ["config"])
         assert result.exit_code == 3
-        assert re.match("You're using .* but this project requires .*", result.output)
+        assert re.match(r"You're using .* but this project requires .*", result.output)
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
@@ -493,8 +500,15 @@ class TestCliColors:
                 {},
                 None,
                 True,
+                False,
+                id="log-colors-disabled-by-default-when-stderr-is-not-tty",
+            ),
+            pytest.param(
+                {},
+                _get_dummy_logging_config(colors=True),
                 True,
-                id="colors-enabled-by-default",
+                True,
+                id="custom-log-config-colors-still-enabled",
             ),
             pytest.param(
                 {
@@ -545,8 +559,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-f-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-no-color-f",
             ),
             pytest.param(
                 {
@@ -554,8 +568,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-FALSE-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-no-color-FALSE",
             ),
             pytest.param(
                 {
@@ -563,8 +577,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-invalid-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-invalid-no-color",
             ),
         ),
     )

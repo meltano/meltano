@@ -185,11 +185,7 @@ class PluginInstallService:
 
     @cached_property
     def parallelism(self) -> int:
-        """Return the number of parallel installation processes to use.
-
-        Returns:
-            The number of parallel installation processes to use.
-        """
+        """Number of parallel installation processes to use."""
         if self._parallelism is None:
             return cpu_count()
         if self._parallelism < 1:

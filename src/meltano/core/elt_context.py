@@ -78,11 +78,7 @@ class PluginContext(t.NamedTuple):
 
     @property
     def env(self) -> dict[str, str]:
-        """Get complete plugin environment dict.
-
-        Returns:
-            Complete plugin environment dict.
-        """
+        """Complete plugin environment dict."""
         return {**self.plugin.info_env, **self.config_env()}
 
 
@@ -154,11 +150,7 @@ class ELTContext(ELContextProtocol):
 
     @property
     def elt_run_dir(self) -> Path | None:
-        """Get the ELT run directory.
-
-        Returns:
-            The job dir, if a Job is provided, else None.
-        """
+        """ELT run directory."""
         if self.job:
             return self.project.dirs.job(self.job.job_name, str(self.job.run_id))
 

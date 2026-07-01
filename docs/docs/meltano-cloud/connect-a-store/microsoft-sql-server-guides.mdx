@@ -1,0 +1,266 @@
+---
+title: Microsoft SQL Server Store
+description: Whitelist IP ranges and set up Azure Blob Storage staging
+layout: doc
+sidebar_position: 16
+---
+
+# Microsoft SQL Server Store
+
+Our team at Meltano regularly shares best practices for secure and efficient analytics engineering. Whether you're new to analytics or an experienced developer, these guides provide practical setup instructions for common Microsoft SQL Server configurations.
+
+
+# Whitelist IP Ranges
+<br />
+
+Whitelisting IP addresses adds an extra layer of security to your SQL Server by only allowing trusted clients to connect.
+
+This approach blocks all internet traffic except approved IP addresses, such as:
+
+* Developers
+* Data ingestion services like Meltano
+* Other trusted applications
+
+The Meltano platform is hosted in an Azure data center within the United Kingdom and connects from the following IP address:
+
+```text
+51.137.148.226
+```
+
+### Create a Firewall Rule
+
+For **Azure SQL Database**, add a server-level firewall rule allowing this address:
+
+```sql
+EXECUTE sp_set_firewall_rule
+    @name = N'AllowMeltano',
+    @start_ip_address = '51.137.148.226',
+    @end_ip_address = '51.137.148.226';
+```
+
+Or using the `az` CLI:
+
+```bash
+az sql server firewall-rule create \
+  --resource-group <rg> \
+  --server <server> \
+  --name AllowMeltano \
+  --start-ip-address 51.137.148.226 \
+  --end-ip-address 51.137.148.226
+```
+
+For complete details, see the [Azure SQL Database firewall documentation](https://learn.microsoft.com/en-us/azure/azure-sql/database/firewall-configure).
+
+---
+
+
+# Azure Blob Storage Staging
+<br />
+
+By default, [`target-mssql`](https://github.com/MeltanoLabs/target-mssql) loads records row by row. For large data volumes you can enable Azure Blob Storage staging, which is significantly faster.
+
+Staging streamlines data loading through a three-phase process:
+
+1. Each batch serializes to JSON on disk.
+2. The file uploads to Azure Blob Storage.
+3. SQL Server retrieves it via `OPENROWSET(BULK …, DATA_SOURCE = …)` and runs either `INSERT` (append-only) or `MERGE` (upsert).
+
+The blob is removed following successful completion.
+
+### Prerequisites
+
+#### Azure Blob Storage
+
+Establish a Storage Account (general-purpose v2), a container such as `mssql-stage`, and a SAS token limited to that container with the minimum permissions: **Read**, **Write**, **Create**, and **Delete** on the **Object** resource type.
+
+Using the `az` CLI:
+
+```bash
+KEY=$(az storage account keys list \
+  --account-name <storage_account> \
+  --query "[0].value" \
+  --output tsv)
+
+SAS=$(az storage container generate-sas \
+  --account-name <storage_account> \
+  --name mssql-stage \
+  --permissions rwdc \
+  --expiry 2027-01-01T00:00:00Z \
+  --https-only \
+  --account-key "$KEY" \
+  --output tsv)
+```
+
+### SQL Server one-time DBA setup
+
+The target does not create the credential or external data source - a DBA must configure them once before the initial run.
+
+#### Step 1: Create a database master key
+
+This is required once per database:
+
+```sql
+IF NOT EXISTS (SELECT 1 FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##')
+    CREATE MASTER KEY ENCRYPTION BY PASSWORD = '<strong-password>';
+```
+
+#### Step 2: Create a database scoped credential
+
+Pick one of the two options below.
+
+##### Option A: SAS token
+
+Straightforward to implement; the token has an expiration and needs periodic renewal.
+
+```sql
+/*
+-- To recreate the object, first run:
+DROP EXTERNAL DATA SOURCE target_mssql_stage;
+DROP DATABASE SCOPED CREDENTIAL [target_mssql_credential];
+*/
+
+CREATE DATABASE SCOPED CREDENTIAL [target_mssql_credential]
+    WITH IDENTITY = N'SHARED ACCESS SIGNATURE',
+         SECRET   = N'<sas-token-without-leading-?>';
+```
+
+To renew the token later:
+
+```sql
+ALTER DATABASE SCOPED CREDENTIAL [target_mssql_credential]
+    WITH IDENTITY = N'SHARED ACCESS SIGNATURE',
+         SECRET   = N'<new-sas-token-without-leading-?>';
+```
+
+##### Option B: Managed Identity
+
+No credentials requiring rotation. Requires an Azure SQL Server (not on-premises) with a system-assigned managed identity enabled.
+
+**Prerequisites (Azure portal or CLI):**
+
+1. Activate the system-assigned managed identity on the Azure SQL Server:
+   - Portal: **Azure SQL Server → Security → Identity → System assigned managed identity → On**
+   - CLI: `az sql server update --name <server> --resource-group <rg> --assign-identity`
+
+2. Assign the SQL Server's managed identity the **Storage Blob Data Owner** (or **Storage Blob Data Reader**) role on the container:
+   - Portal: **Storage account → Access Control (IAM) → + Add → Add role assignment**, then select the "Storage Blob Data Owner" role for the SQL Server managed identity.
+   - CLI:
+
+     ```bash
+     PRINCIPAL_ID=$(az sql server show \
+       --name <server> \
+       --resource-group <rg> \
+       --query "identity.principalId" \
+       --output tsv)
+
+     az role assignment create \
+       --assignee "$PRINCIPAL_ID" \
+       --role "Storage Blob Data Owner" \
+       --scope "/subscriptions/<subscription-id>/resourceGroups/<rg>/providers/Microsoft.Storage/storageAccounts/<account_name>/blobServices/default/containers/<container>"
+     ```
+
+**SQL:**
+
+```sql
+/*
+-- To recreate the object, first run:
+DROP EXTERNAL DATA SOURCE target_mssql_stage;
+DROP DATABASE SCOPED CREDENTIAL [target_mssql_credential];
+*/
+
+CREATE DATABASE SCOPED CREDENTIAL [target_mssql_credential]
+    WITH IDENTITY = N'MANAGED IDENTITY';
+```
+
+#### Step 3: Create the external data source
+
+Point it at the container:
+
+```sql
+CREATE EXTERNAL DATA SOURCE [target_mssql_stage]
+    WITH (
+        TYPE       = BLOB_STORAGE,
+        LOCATION   = N'https://<account_name>.blob.core.windows.net/<container>',
+        CREDENTIAL = [target_mssql_credential]
+    );
+```
+
+#### Step 4: Grant the target user permissions
+
+```sql
+-- Database-level (run in the target database)
+ALTER ROLE db_datareader ADD MEMBER [<db-user>];      -- SELECT on all tables
+ALTER ROLE db_datawriter ADD MEMBER [<db-user>];      -- INSERT, UPDATE, DELETE on all tables
+GRANT CREATE TABLE TO [<db-user>];                    -- create target tables for new streams
+GRANT ALTER ANY EXTERNAL DATA SOURCE TO [<db-user>];  -- create the EXTERNAL DATA SOURCE on first run
+
+-- Server-level (run as sysadmin in master)
+GRANT ADMINISTER DATABASE BULK OPERATIONS TO [<db-user>];   -- execute OPENROWSET(BULK …)
+```
+
+> **On-premises SQL Server 2017+** also requires Ad Hoc Distributed Queries:
+> ```sql
+> EXEC sp_configure 'show advanced options', 1; RECONFIGURE;
+> EXEC sp_configure 'Ad Hoc Distributed Queries', 1; RECONFIGURE;
+> ```
+> Azure SQL Database has this enabled automatically.
+
+To remove the objects if necessary:
+
+```sql
+DROP EXTERNAL DATA SOURCE [target_mssql_stage];
+DROP DATABASE SCOPED CREDENTIAL [target_mssql_credential];
+```
+
+### Configuration
+
+Add the `azure_blob_storage` settings to your `target-mssql` configuration:
+
+```json
+{
+  "azure_blob_storage": {
+    "account_name": "mystorageaccount",
+    "sas_token": "sv=2023-11-03&sr=c&sp=rwdc&se=2027-01-01T00:00:00Z&sig=...",
+    "container": "mssql-stage",
+    "path_prefix": "target-mssql"
+  }
+}
+```
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `account_name` | Yes | | Azure Storage account name |
+| `sas_token` | Yes | | SAS token (without a leading `?`) or storage account access key |
+| `container` | Yes | | Blob container used as the staging area |
+| `path_prefix` | No | `target-mssql` | Virtual directory prefix inside the container |
+
+Despite its name, `sas_token` accepts either a SAS token or the storage account's access key - the value is passed directly to the Azure Blob Storage client as its credential.
+
+Choosing between the two:
+
+| Credential | Benefits | Drawbacks |
+|---|---|---|
+| **SAS token** | Can be scoped to a single container with only the permissions it needs (`rwdc`), and has an expiry - limiting the blast radius if leaked. | Expires, so it must be rotated before the expiry date or uploads will start failing. |
+| **Storage account key** | Never expires, so there is nothing to rotate on a schedule. | Grants full read/write/delete access to *every* container in the account; cannot be scoped or time-limited, so a leak compromises the whole storage account. |
+
+We recommend a SAS token, scoped as narrowly as possible. The `az storage container generate-sas` command [above](#azure-blob-storage) produces a *service SAS* limited to one container - the tightest scope for this use case. (SAS tokens can also be account-wide; an *account SAS* spans the whole storage account and offers little advantage over the account key for staging.) Use an account key only when token rotation is impractical, and rotate it manually if it is ever exposed.
+
+### Performance notes
+
+- **Minimum SQL Server version:** 2017 (14.x). Azure SQL Database and Azure SQL Managed Instance are fully supported.
+- **Batch size:** use a larger `batch_size_rows` to distribute the overhead of per-batch blob communication (e.g. `"batch_size_rows": 50000`).
+- **Booleans:** stored as `BIT` in the staged file, inserted into the target's `VARCHAR(1)` column as `0`/`1`.
+- **Complex types (objects, arrays):** encoded to JSON strings, stored as `NVARCHAR(MAX)` - matching the non-staged approach.
+
+---
+
+
+## Interested in Security?
+
+Restricting network access to your SQL Server and avoiding long-lived credentials (for example, by using a Managed Identity for blob staging) helps protect against attacks such as:
+
+* Phishing
+* Brute force attacks
+* Credential stuffing
+
+At Meltano, we take security seriously and are always happy to discuss ways to improve the security posture of your data platform.

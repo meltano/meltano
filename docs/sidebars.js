@@ -116,6 +116,7 @@ const sidebars = {
           link: { type: 'doc', id: 'meltano-cloud/connect-a-store/index' },
           items: [
             { type: 'doc', id: 'meltano-cloud/connect-a-store/snowflake-guides' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/microsoft-sql-server-guides' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },

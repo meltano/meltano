@@ -647,15 +647,15 @@ def expand_env_vars(
             `False` for backwards-compatibility. Setting to `True` is recommend
             for performance, safety, and cleanliness reasons.
 
-    Raises:
-        EnvironmentVariableNotSetError: Attempted to expand an env var that was not
-            defined in the provided env dict, and `if_missing` was
-            `EnvVarMissingBehavior.raise_exception`.
-
     Returns:
         The string or env dict with env vars expanded. For backwards
         compatibility, if anything other than an `str` or mapping is provided
         as the `raw_value`, it is returned unchanged.
+
+    Raises:
+        EnvironmentVariableNotSetError: Attempted to expand an env var that was not
+            defined in the provided env dict, and `if_missing` was
+            `EnvVarMissingBehavior.raise_exception`.
     """
     if_missing = EnvVarMissingBehavior(if_missing)
 
@@ -1027,11 +1027,11 @@ def parse_date(date_string: str) -> str:
     if re.match(REGEX_ISO8601, date_string):
         return date_string
 
-    if _parsed := dateparser.parse(
+    if parsed := dateparser.parse(
         date_string,
         settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},
     ):
-        return _parsed.isoformat()
+        return parsed.isoformat()
 
     return date_string
 
