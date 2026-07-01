@@ -43,8 +43,9 @@ class HubPluginTypeNotFoundError(MeltanoError):
         """
         self.plugin_type = plugin_type
         super().__init__(
-            f"{self.plugin_type.descriptor.capitalize()} is not supported in "
-            f"Meltano Hub. Available plugin types: {PluginType.plurals()}"
+            f"{self.plugin_type.descriptor.capitalize()} is not supported in Meltano Hub",  # noqa: E501
+            "Check that it matches one of the available plugin types: "
+            f"{PluginType.plurals()}",
         )
 
 
