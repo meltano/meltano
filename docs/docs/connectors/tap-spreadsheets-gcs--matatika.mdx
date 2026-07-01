@@ -1,0 +1,44 @@
+---
+title: Spreadsheets GCS
+description: A software tool that allows users to sync data from spreadsheets stored in Google Cloud Storage into their chosen targets.
+sidebar_position: 48
+---
+
+# Spreadsheets GCS
+
+## Overview
+
+Spreadsheets GCS is a software tool that allows users to sync data from spreadsheets stored in Google Cloud Storage into their chosen targets.
+
+## Prerequisites
+
+**Tables:**
+1. Ensure you have access to the spreadsheet stored in Google Cloud Storage that you want to connect to
+2. Identify the name of the table or tables you want to extract data from
+
+**Google Application Credentials:**
+1. Log in to the [Google Cloud Console](https://console.cloud.google.com)
+2. Navigate to IAM & Admin > Service Accounts
+3. Create or select a service account with access to your GCS bucket
+4. Generate a JSON key for the service account
+5. Use the JSON file content or its path as the credential value
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Tables** | The tables to connect to and use in the application | Array |
+| **Google Application Credentials** | JSON content or path to service account credentials | Credential |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-spreadsheets-anywhere)
