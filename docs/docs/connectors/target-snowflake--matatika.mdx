@@ -1,0 +1,85 @@
+---
+title: Snowflake
+description: A cloud-based data warehousing platform for storing, processing, and analyzing large volumes of structured and semi-structured data.
+sidebar_position: 43
+---
+
+# Snowflake
+
+## Overview
+
+Snowflake is a cloud-based data warehousing platform that enables businesses to store, process, and analyze large volumes of structured and semi-structured data. The connector leverages Snowflake's scalable architecture, which separates compute and storage, allowing independent scaling and pay-per-use pricing. Key capabilities include SQL querying, BI/ETL tool integration, and secure data sharing.
+
+## Prerequisites
+
+**Account:**
+1. Log in to the Snowflake web interface
+2. Your account identifier is shown in the URL or can be provided by your Snowflake administrator
+
+**Username:**
+1. Use the username you log in to Snowflake with
+
+**Private Key or Password:**
+1. The password method is being phased out for non-human connections
+2. Generate a private key pair and upload the public key to your Snowflake user profile
+
+**Role:**
+1. Log in to Snowflake and navigate to your user settings
+2. Use the role you want to apply for this connection
+
+**Database:**
+1. Log in to Snowflake and navigate to the Databases section
+2. Use the name of the database you want to connect to
+
+**Warehouse:**
+1. Log in to Snowflake and navigate to the Warehouses section
+2. Use the name of the warehouse (processing profile) you want to use
+
+**Schema:**
+1. Log in to Snowflake and navigate to the relevant database
+2. Use the name of the schema you want to write data to
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Account** | Your account identifier for Snowflake | String |
+| **Database** | Initial database for the session | String |
+| **Schema** | Initial schema for the session | String |
+| **Default Target Schema** | Default database schema for all streams | String |
+| **User** | Login name for your Snowflake user | String |
+| **Private Key** | Base64 encoded private key for KeyPair authentication | Credential |
+| **Private Key Passphrase** | Passphrase to decrypt encrypted private key | Credential |
+| **Warehouse** | Initial warehouse/processing profile | String |
+| **Role** | Initial role for the session | String |
+| **Add Record Metadata** | Whether to add metadata columns | Boolean |
+| **Batch Size Rows** | Maximum rows per batch | Integer |
+| **Clean Up Batch Files** | Remove batch files after processing | Boolean |
+| **Faker Config Locale** | LCID locale strings for localized output | String |
+| **Faker Config Seed** | Seed value for deterministic Faker output | Integer |
+| **Flattening Enabled** | Enable schema flattening for nested properties | Boolean |
+| **Flattening Max Depth** | Maximum depth for schema flattening | Integer |
+| **Hard Delete** | Hard delete records option | Boolean |
+| **Load Method** | `upsert` (MERGE) or `overwrite` (COPY) | String |
+| **Stream Map Config** | User-defined config for map expressions | Object |
+| **Stream Maps** | Configuration for stream maps capability | Object |
+| **Use Browser Authentication** | SSO authentication via external browser | Boolean |
+| **Validate Records** | Validate incoming stream schemas | Boolean |
+| **Timestamp Type** | Date-time property timestamp type | String |
+| **Quoted Identifiers Ignore Case** | Uppercase storage for quoted identifiers | Boolean |
+| **Normalise Casing** | Normalize identifiers to snake_case | Boolean |
+| **Use Raw Stream Names** | Use raw stream names as table names | Boolean |
+| **Date-time Error Treatment** | Handle invalid date-time values | String |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/target-snowflake)

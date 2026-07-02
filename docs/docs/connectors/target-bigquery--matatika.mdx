@@ -1,0 +1,49 @@
+---
+title: Google BigQuery
+description: Load data into Google BigQuery, a cloud-based data warehouse supporting petabyte-scale storage, SQL queries, real-time streaming, and machine learning.
+sidebar_position: 19
+---
+
+# Google BigQuery
+
+## Overview
+
+A cloud-based data warehousing platform enabling storage, management, and analysis of large datasets through SQL-like queries, with support for petabyte-scale data, real-time streaming, and machine learning capabilities.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Service Account Key json** | The service account key JSON for authenticating with Google BigQuery. | Object |
+| **Project** | The Google Cloud project ID. | String |
+| **Dataset** | The BigQuery dataset to load data into. | String |
+| **Location** | The geographic location of the BigQuery dataset. | String |
+| **Batch Size** | Number of records to include in each batch load. | Integer |
+| **Fail Fast** | Whether to fail immediately on any error. | Boolean |
+| **Timeout** | Timeout duration for BigQuery operations. | String |
+| **Denormalized** | Whether to write denormalized data. | Boolean |
+| **Method** | The method to use for loading data. | String |
+| **Generate View** | Whether to generate a view on top of the loaded table. | Boolean |
+| **Bucket** | The Google Cloud Storage bucket to use for staging data. | String |
+| **Partition Granularity** | The granularity for partitioning the BigQuery table. | String |
+| **Cluster On Key Properties** | Whether to cluster the table on key properties. | Boolean |
+| **Upsert** | Whether to perform upsert operations instead of inserts. | Boolean |
+| **Overwrite** | Whether to overwrite existing data. | Boolean |
+| **Dedupe Before Upsert** | Whether to deduplicate records before performing upserts. | Boolean |
+| **Stream Maps** | Custom stream maps for transforming data. | Object |
+| **Stream Map Config** | Configuration for stream map expressions. | Object |
+| **Flattening Enabled** | Whether to enable automatic schema flattening. | Boolean |
+| **Flattening Max Depth** | Maximum depth for schema flattening. | Integer |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/target-bigquery)

@@ -1,0 +1,56 @@
+---
+title: PostgreSQL
+description: Extract data from a PostgreSQL open-source relational database into your Meltano pipeline.
+sidebar_position: 38
+---
+
+# PostgreSQL
+
+## Overview
+
+PostgreSQL is an open-source relational database management system known for its reliability, scalability, and robustness. It serves organizations across various sizes and encompasses advanced capabilities including transactions, triggers, and stored procedures, alongside emphasis on data integrity through encryption and authentication mechanisms.
+
+## Prerequisites
+
+Obtain the following connection details from your system administrator or hosting provider before configuring this connector:
+
+1. **Host** - The hostname or IP address of the PostgreSQL server.
+2. **Port** - The port number the PostgreSQL server is listening on (default: 5432, though your setup may differ).
+3. **User** - The username to use when connecting to the PostgreSQL server.
+4. **Password** - The password to use when connecting to the PostgreSQL server.
+5. **Database Name** - The name of the PostgreSQL database to connect to.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Host** | The hostname or IP address of the PostgreSQL server | String |
+| **Port** | The port number on which the PostgreSQL server is listening | Integer |
+| **User** | The username to use when connecting to the PostgreSQL server | String |
+| **Password** | The password to use when connecting to the PostgreSQL server | Credential |
+| **Database Name** | The name of the PostgreSQL database to connect to | String |
+| **SSL** | Whether to use SSL encryption for server connections | Boolean |
+| **Filter Schemas** | A comma-separated list of schemas to include or exclude | String |
+| **Default Replication Method** | The default replication method to use when replicating data | String |
+| **Max Run Seconds** | The maximum number of seconds to run the replication task | Integer |
+| **Logical Poll Total Seconds** | The total number of seconds to wait for new changes | Integer |
+| **Break At End LSN** | Whether to halt replication upon reaching end LSN | Boolean |
+| **SSH Tunnel Host** | Address of the bastion host | String |
+| **SSH Tunnel Port** | Port for bastion host connection | Integer |
+| **SSH Tunnel Private Key** | Base64-encoded key for key-pair authentication | Credential |
+| **SSH Tunnel Private Key Password** | Password for private key authentication | Credential |
+| **SSH Tunnel Username** | Username for bastion host connection | String |
+| **SSH Tunnel Password** | Password for basic authentication | Credential |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/pipelinewise-tap-postgres)
