@@ -44,7 +44,7 @@ settings:
   value: 104_857_600 # 100 MiB
   description: Size in bytes of the buffer between extractor and loader that stores Singer messages.
 - name: python
-  description: Python version to use for plugins, specified as a path or executable name. Can be overridden per-plugin.
+  description: Python version to use for plugins, specified as a path, executable name, or version number. If unset, Meltano will use a project-level `.python-version` file when present. Can be overridden per-plugin.
 - name: auto_install
   kind: boolean
   value: true

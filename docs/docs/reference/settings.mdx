@@ -33,7 +33,7 @@ to list all available settings with their names, environment variables, and curr
 
 ### <a name="plugin-python"></a>`python`
 
-The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`. You can set it at the time you add a plugin using [`meltano add --python <python>`](/reference/command-line-interface#add).
+The python version to use for this plugin, specified as a path, as the name of an executable to find within a directory in `$PATH`, or as a version number like `3.11`. You can set it at the time you add a plugin using [`meltano add --python <python>`](/reference/command-line-interface#add).
 
 If not specified, [the top-level `python` setting will be used](#project-python), or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).
 
@@ -89,9 +89,9 @@ export MELTANO_DEFAULT_ENVIRONMENT=prod
 
 - [Environment variable](../guide/configuration#configuring-settings): `MELTANO_PYTHON`
 
-The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
+The python version to use for plugins, specified as a path, as the name of an executable to find within a directory in `$PATH`, or as a version number like `3.11`.
 
-If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment).
+If not specified, Meltano will use the first non-empty line from a project-level `.python-version` file when present. If neither the setting nor `.python-version` is present, the python executable that was used to run Meltano will be used (within a separate virtual environment).
 
 [This can be overridden on a per-plugin basis by setting the `python` property for the plugin.](#plugin-python)
 
@@ -106,6 +106,12 @@ python: /path/to/python3.10 # or just python3.10 if it's in your $PATH
 plugins:
   extractors: ...
   loaders: ...
+```
+
+Or commit a `.python-version` file at the project root:
+
+```text
+3.11
 ```
 
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
