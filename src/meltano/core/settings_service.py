@@ -12,6 +12,7 @@ from contextlib import contextmanager
 
 import structlog
 
+from meltano.core.constants import UNSET
 from meltano.core.setting_definition import SettingKind
 from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
@@ -356,6 +357,8 @@ class SettingsService(ABC):
 
         manager = source_manager or source.manager(self, **kwargs)
         value, get_metadata = manager.get(name, setting_def=setting_def)
+        if value is UNSET:
+            value = None
         metadata.update(get_metadata)
 
         # Can't do conventional SettingsService.feature_flag call to check;
