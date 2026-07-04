@@ -75,8 +75,11 @@ class SingerPlugin(BasePlugin):
 
     @override
     def process_config(self, config: dict) -> dict:
-        non_null_config = {k: v for k, v in config.items() if v is not None}
-        processed_config = nest_object(non_null_config)
+        # `SettingsService.as_dict` has already dropped settings that were
+        # never configured anywhere (`None` from the `DEFAULT` store). Any
+        # `None` remaining here was deliberately set by the user and should
+        # be passed through to the plugin as-is.
+        processed_config = nest_object(config)
         # Result at this point will contain duplicate entries for nested config
         # options. We need to pop those redundant entries recursively.
 

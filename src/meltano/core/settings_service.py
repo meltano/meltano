@@ -253,9 +253,20 @@ class SettingsService(ABC):
         config_metadata = self.config_with_metadata(*args, **kwargs)
 
         if process:
+            # A setting that was never configured anywhere resolves to
+            # `None` via its `DEFAULT` store - that's not a value plugins
+            # should see. A setting deliberately set to `null` in some other
+            # store is a real, meaningful value and should be kept. This
+            # only applies to the processed config sent to plugins; the
+            # unprocessed dict (below) keeps every definition so callers can
+            # rely on all settings/extras being present as keys.
             config = {
                 key: metadata["setting"].post_process_value(metadata["value"])
                 for key, metadata in config_metadata.items()
+                if not (
+                    metadata["value"] is None
+                    and metadata.get("source") is SettingValueStore.DEFAULT
+                )
             }
             config = self.process_config(config)
         else:

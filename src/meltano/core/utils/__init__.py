@@ -29,6 +29,7 @@ import structlog
 from packaging.specifiers import SpecifierSet
 from requests.auth import HTTPBasicAuth
 
+from meltano.core.constants import UNSET
 from meltano.core.error import MeltanoError
 
 if sys.version_info >= (3, 14):
@@ -243,7 +244,7 @@ def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
 def nest(
     d: dict[str, t.Any],
     path: str,
-    value: t.Any = None,  # noqa: ANN401
+    value: t.Any = UNSET,  # noqa: ANN401
     maxsplit: int = -1,
     *,
     force: bool = False,
@@ -253,7 +254,9 @@ def nest(
     Args:
         d: the dictionary to operate on
         path: the dot-delimited path to operate on
-        value: the value to set at the given path
+        value: the value to set at the given path. If omitted, an empty
+            dict is used, to be filled in by the caller. An explicit `None`
+            is a real, meaningful value, and is kept as-is.
         maxsplit: maximum number of splits to split path by
         force: if true, write an empty dict
 
@@ -275,7 +278,7 @@ def nest(
         >>> d
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
     """
-    if value is None:
+    if value is UNSET:
         value = {}
 
     if isinstance(path, str):
