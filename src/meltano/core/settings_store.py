@@ -15,6 +15,7 @@ import dotenv
 import sqlalchemy.exc
 import structlog
 
+from meltano.core.constants import UNSET
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.setting import Setting
@@ -254,7 +255,7 @@ class SettingsStoreManager(ABC):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Abstract get method.
 
         Args:
@@ -347,7 +348,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get value by name from the .env file.
 
         Args:
@@ -363,7 +364,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
             self.log(f"Read key '{name}' from config override: {value!r}")
             return value, {}  # noqa: TRY300
         except KeyError:
-            return None, {}
+            return UNSET, {}
 
 
 class BaseEnvStoreManager(SettingsStoreManager):
@@ -381,7 +382,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get value by name from the .env file.
 
         Args:
@@ -403,8 +404,8 @@ class BaseEnvStoreManager(SettingsStoreManager):
             reason = "Can not retrieve unknown setting from environment variables"
             raise StoreNotSupportedError(reason)
 
-        value: str | None
-        vals_with_metadata = []
+        value: t.Any
+        vals_with_metadata: list[tuple[str | None, dict]] = []
         for env_var in self.setting_env_vars(setting_def):
             with suppress(KeyError):
                 value = env_var.get(self.env)
@@ -418,7 +419,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
                 [metadata["env_var"] for _, metadata in vals_with_metadata],
             )
 
-        value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
+        value, metadata = vals_with_metadata[0] if vals_with_metadata else (UNSET, {})
         return (
             cast_setting_value(value, metadata, setting_def)
             if cast_value
@@ -456,7 +457,7 @@ class EnvStoreManager(BaseEnvStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get value by name from the .env file.
 
         Args:
@@ -469,7 +470,7 @@ class EnvStoreManager(BaseEnvStoreManager):
         """
         value, metadata = super().get(name, setting_def, cast_value=cast_value)
 
-        if value is not None:
+        if value is not UNSET:
             env_key = metadata["env_var"]
             self.log(f"Read key '{env_key}' from the environment: {value!r}")
 
@@ -523,7 +524,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get value by name from the .env file.
 
         Args:
@@ -536,7 +537,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         """
         value, metadata = super().get(name, setting_def, cast_value=cast_value)
 
-        if value is not None:
+        if value is not UNSET:
             env_key = metadata["env_var"]
             self.log(f"Read key '{env_key}' from `.env`: {value!r}")
 
@@ -693,7 +694,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get value by name from the system database.
 
         Args:
@@ -728,7 +729,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
                 metadata["key"] for _, metadata in vals_with_metadata
             )
 
-        value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
+        value, metadata = vals_with_metadata[0] if vals_with_metadata else (UNSET, {})
         return (
             cast_setting_value(value, metadata, setting_def)
             if cast_value
@@ -988,7 +989,7 @@ class DbStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get value by name from the system database.
 
         Args:
@@ -1013,7 +1014,7 @@ class DbStoreManager(SettingsStoreManager):
             self.log(f"Read key '{name}' from system database: {value!r}")
             return value, {}  # noqa: TRY300
         except (sqlalchemy.exc.NoResultFound, KeyError):
-            return None, {}
+            return UNSET, {}
 
     @override
     def set(
@@ -1140,7 +1141,7 @@ class InheritedStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
@@ -1158,8 +1159,12 @@ class InheritedStoreManager(SettingsStoreManager):
             raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101, TRY003
 
         value, metadata = self.get_with_metadata(setting_def.name)
-        if value is None or metadata["source"] is SettingValueStore.DEFAULT:
-            return None, {}
+        if (
+            value is UNSET
+            or value is None
+            or metadata.get("source") is SettingValueStore.DEFAULT
+        ):
+            return UNSET, {}
 
         self.log(f"Read key '{name}' from inherited: {value!r}")
         return value, {
@@ -1196,7 +1201,7 @@ class InheritedStoreManager(SettingsStoreManager):
             A tuple containing the got value and accompanying metadata dictionary.
         """
         if self.bulk:
-            metadata = self.config_with_metadata[name]
+            metadata = self.config_with_metadata.get(name, {"value": UNSET})
             return metadata["value"], metadata
 
         return self.inherited_settings_service.get_with_metadata(name, **self._kwargs)
@@ -1214,7 +1219,7 @@ class DefaultStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
@@ -1383,7 +1388,7 @@ class AutoStoreManager(SettingsStoreManager):
         *,
         cast_value: bool = False,
         **kwargs,  # noqa: ANN003
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[t.Any, dict]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
@@ -1399,7 +1404,7 @@ class AutoStoreManager(SettingsStoreManager):
         setting_def = setting_def or self.find_setting(name)
 
         metadata: dict = {}
-        value = None
+        value: t.Any = UNSET
         found_source = None
 
         for source in self.sources:
@@ -1420,8 +1425,14 @@ class AutoStoreManager(SettingsStoreManager):
 
             found_source = source
 
-            if value is not None:
+            # `value` may legitimately be `None` (e.g. explicitly set to
+            # `null`), which is a real, found value - only `UNSET` means
+            # this store doesn't have the setting, so keep looking.
+            if value is not UNSET:
                 break
+
+        if value is UNSET:
+            value = None
 
         found_source = t.cast("SettingValueStore", found_source)
         metadata["source"] = found_source
@@ -1504,7 +1515,7 @@ class AutoStoreManager(SettingsStoreManager):
                 metadata["store"] = store
             except StoreNotSupportedError as err:
                 # Only raise if we're sure we were going to unset something
-                if value is not None:
+                if value is not UNSET:
                     error = err
 
         if error:

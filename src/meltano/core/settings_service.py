@@ -353,12 +353,18 @@ class SettingsService(ABC):
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}",
             cast_value=True,
         )
+        match strict_env_var_mode:
+            case True:
+                env_var_behavior = EnvVarMissingBehavior.raise_exception
+            case _:
+                env_var_behavior = EnvVarMissingBehavior.use_empty_str
+
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(
                 value,
                 env=expandable_env,
-                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
+                if_missing=env_var_behavior,
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
             if value and not expanded_value:  # The whole string was missing env vars
@@ -397,7 +403,7 @@ class SettingsService(ABC):
                             object_source = nested_source
 
                 if object_value:
-                    value = object_value  # type: ignore[assignment]
+                    value = object_value
                     metadata["source"] = object_source
 
             # Only cast if the setting is not expandable,

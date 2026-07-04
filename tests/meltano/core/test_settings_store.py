@@ -12,6 +12,7 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
+    UNSET,
     AutoStoreManager,
     DotEnvStoreManager,
     EnvStoreManager,
@@ -539,7 +540,7 @@ class TestMeltanoYmlStoreManager:
                 setting_def=subject.settings_service.find_setting("regular"),
             )
 
-        assert get() == (None, {})
+        assert get() == (UNSET, {})
 
         subject.flat_config["basic"] = "alias_value"
 
@@ -631,7 +632,7 @@ class TestInheritedStoreManager:
             "from_default",
             Store.DEFAULT,
         )
-        assert get() == (None, {})
+        assert get() == (UNSET, {})
 
         # Non-default values are inherited
         inherited_settings.set("regular", "$YML_VALUE", store=Store.MELTANO_YML)
