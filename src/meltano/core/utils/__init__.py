@@ -678,7 +678,7 @@ def expand_env_vars(
         if default_operator:
             if default_operator == ":-":
                 val = env.get(var)
-                if val:
+                if val is not None and val != "":
                     return str(val)
                 logger.debug(
                     f"Variable '${var}' is not set or empty. Using default value.",  # noqa: G004

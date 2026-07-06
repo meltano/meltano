@@ -209,6 +209,13 @@ def test_unflatten() -> None:
         ),
         pytest.param(
             "${ENV_VAR:-fallback}",
+            {"ENV_VAR": 0},
+            {},
+            "0",
+            id="default-colon-dash-falsy-non-empty",
+        ),
+        pytest.param(
+            "${ENV_VAR:-fallback}",
             {},
             {},
             "fallback",
