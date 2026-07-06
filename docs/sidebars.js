@@ -47,6 +47,7 @@ const sidebars = {
           items: [
             { type: 'doc', id: 'meltano-cloud/connect-a-store/snowflake-guides' },
             { type: 'doc', id: 'meltano-cloud/connect-a-store/microsoft-sql-server-guides' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/clickhouse-store' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
