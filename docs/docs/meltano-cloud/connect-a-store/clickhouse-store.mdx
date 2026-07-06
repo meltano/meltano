@@ -55,8 +55,9 @@ In the ClickHouse Cloud console, open your service → **Settings** → **Securi
 51.137.148.226/32   # Meltano
 ```
 
-Leave the list empty of `0.0.0.0/0` (Anywhere) so that only the addresses you
-add explicitly can connect.
+Ensure there is no `0.0.0.0/0` (Anywhere) entry in the IP Access List: if one
+already exists, remove it so that only specific IP addresses (including Meltano’s)
+that you add explicitly can connect.
 
 ### Self-managed ClickHouse[​](#self-managed-clickhouse "Direct link to Self-managed ClickHouse")
 
