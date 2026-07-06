@@ -230,10 +230,10 @@ See [Configuration](#configuration) above for the full settings reference
 
 #### Choose a load method[​](#choose-a-load-method "Direct link to Choose a load method")
 
-- **Append-only (default)** - writes every record. Best for immutable event /
+- **Append-only** - writes every record. Best for immutable event /
   time-series streams and for incremental syncs, and avoids the cost of post-load
   `OPTIMIZE`. Recommended default.
-- **Upsert** - deduplicates by primary key using `ReplacingMergeTree` +
+- **Upsert** (default) - deduplicates by primary key using `ReplacingMergeTree` +
   `optimize_after`. Use only when you deliberately re-load overlapping keys. Set
   the store's `engine_type` to `ReplacingMergeTree`, `load_method` to `upsert`,
   and enable `optimize_after`.
