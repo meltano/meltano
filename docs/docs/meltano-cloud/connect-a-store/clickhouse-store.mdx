@@ -29,7 +29,7 @@ walkthrough links back to.
   `async_insert`).
 - **ClickHouse Cloud** is supported over its HTTPS interface (port `8443`).
 
-# Whitelist IP Ranges
+## Whitelist IP Ranges
 <br />
 Restricting inbound connections to trusted clients is the single most effective
 way to protect your ClickHouse instance. Only the following should be able to
@@ -55,9 +55,8 @@ In the ClickHouse Cloud console, open your service → **Settings** → **Securi
 51.137.148.226/32   # Meltano
 ```
 
-Ensure there is no `0.0.0.0/0` (Anywhere) entry in the IP Access List: if one
-already exists, remove it so that only specific IP addresses (including Meltano’s)
-that you add explicitly can connect.
+Leave the list empty of `0.0.0.0/0` (Anywhere) so that only the addresses you
+add explicitly can connect.
 
 ### Self-managed ClickHouse[​](#self-managed-clickhouse "Direct link to Self-managed ClickHouse")
 
