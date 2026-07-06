@@ -80,6 +80,6 @@ repos:
       - id: uv-lock
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1
+    rev: v1.48.0
     hooks:
       - id: typos
