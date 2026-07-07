@@ -1,0 +1,39 @@
+---
+title: OpenWeatherMap
+description: Extract real-time and historical weather data and forecasts from OpenWeatherMap into your Meltano pipeline.
+sidebar_position: 35
+---
+
+# OpenWeatherMap
+
+## Overview
+
+OpenWeatherMap provides weather data and forecasts for various locations around the world. It delivers real-time and historical weather information, plus 5-day and 16-day forecasts including temperature, humidity, wind speed/direction, and precipitation. Industries utilizing this service span agriculture, transportation, energy, and tourism for weather-informed decision-making.
+
+## Prerequisites
+
+1. Create an account on the [OpenWeatherMap website](https://openweathermap.org) and generate an API Key to authenticate and authorize access to the OpenWeatherMap API.
+2. Know the name of the city for which you want to retrieve current weather data.
+3. Obtain the longitude and latitude coordinates for the location where you need forecast weather data (available through map applications or by searching online).
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **API Key** | A unique identifier used to authenticate and authorize access to the OpenWeatherMap API | Credential |
+| **Current Weather City Name** | The name of the city for which current weather data is requested | String |
+| **Forecast Weather Longitude** | The longitude of the location for which forecast weather data is requested | String |
+| **Forecast Weather Latitude** | The latitude of the location for which forecast weather data is requested | String |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-openweathermap)

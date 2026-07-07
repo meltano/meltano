@@ -1,0 +1,34 @@
+---
+title: TikTok Ads
+description: Extract advertising data from TikTok Ads including campaigns, ad groups, creatives, and performance reports.
+sidebar_position: 56
+---
+
+# TikTok Ads
+
+## Overview
+
+TikTok Ads is a social media advertising platform for businesses to promote their products or services on TikTok. The connector enables businesses to create and manage ads with various formats including in-feed ads, brand takeovers, and hashtag challenges. It provides analytics and targeting capabilities to optimize campaigns. The extractor supports standard TikTok Ads streams plus custom basic reports.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Advertiser IDs** | The TikTok advertiser account IDs to sync | Array |
+| **Start Date** | The earliest record date to sync | String |
+| **Include Deleted** | Include deleted entities in supported streams | Boolean |
+| **Lookback** | Number of days prior to today to refetch data | Integer |
+| **Custom Basic Report** | List of TikTok basic report definitions to expose as streams | Array |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-tiktok)
