@@ -97,13 +97,6 @@ const config = {
             'aria-label': 'Platform',
           },
           {
-            to: '/connectors',
-            label: 'Connectors',
-            position: 'left',
-            className: 'header-connectors-link',
-            'aria-label': 'Connectors',
-          },
-          {
             to: '/changelog',
             label: 'Changelog',
             position: 'left',
