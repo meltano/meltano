@@ -37,7 +37,7 @@ const sidebars = {
       collapsed: true,
       items: [
         { type: 'doc', id: 'meltano-cloud/cloud-overview' },
-{ type: 'doc', id: 'meltano-cloud/creating-workspace' },
+        { type: 'doc', id: 'meltano-cloud/creating-workspace' },
         { type: 'doc', id: 'meltano-cloud/managing-a-workspace' },
         {
           type: 'category',
