@@ -92,7 +92,7 @@ class InteractiveConfig:
 
     @property
     def configurable_settings(self):  # noqa: ANN201
-        """Return settings available for interactive configuration."""
+        """Settings available for interactive configuration."""
         return self.settings.config_with_metadata(
             session=self.session,
             extras=self.extras,
@@ -101,7 +101,7 @@ class InteractiveConfig:
 
     @property
     def setting_choices(self) -> list[tuple[str, str, str]]:
-        """Return simplified setting choices, for easy printing."""
+        """Simplified setting choices, for easy printing."""
         setting_choices: list[tuple[str, str, str]] = []
         for index, (name, config_metadata) in enumerate(
             self.configurable_settings.items(),

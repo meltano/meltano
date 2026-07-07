@@ -135,11 +135,11 @@ def connect(
         max_retries: The maximum number of retries that will be attempted.
         retry_timeout: The number of seconds to wait between retries.
 
-    Raises:
-        OperationalError: Error during DB connection - max retries exceeded.
-
     Returns:
         A connection to the database.
+
+    Raises:
+        OperationalError: Error during DB connection - max retries exceeded.
     """
     attempt = 0
     while True:

@@ -172,7 +172,7 @@ class StateStoreManager(ABC):
     @property
     @abstractmethod
     def label(self) -> str:
-        """Get the label for the StateStoreManager."""
+        """Label for the StateStoreManager."""
         ...
 
     @abstractmethod

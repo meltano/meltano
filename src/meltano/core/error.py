@@ -92,7 +92,7 @@ class AsyncSubprocessError(Exception):
 
     @property
     async def stderr(self) -> str | None:
-        """Return the output of the process to stderr."""
+        """The output of the process to stderr."""
         if not self._stderr:
             return None
         if not isinstance(self._stderr, str):

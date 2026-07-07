@@ -221,11 +221,7 @@ class Tracker:  # - too many (public) methods
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
-        """Get the contexts that will accompany events fired by this tracker.
-
-        Returns:
-            The contexts that will accompany events fired by this tracker.
-        """
+        """Contexts that will accompany events fired by this tracker."""
         from meltano.core.tracking.contexts import ExceptionContext
 
         # The `ExceptionContext` is re-created every time this is accessed
@@ -432,11 +428,7 @@ class Tracker:  # - too many (public) methods
 
     @property
     def analytics_json_path(self) -> Path:
-        """Return path to the 'analytics.json' file.
-
-        Returns:
-            Path to 'analytics.json' file.
-        """
+        """Path to the 'analytics.json' file."""
         return self.project.dirs.meltano().joinpath("analytics.json")
 
     def load_saved_telemetry_settings(self) -> TelemetrySettings:

@@ -29,7 +29,6 @@ __all__ = [
     "LogFormat",
     "MissingJobLogException",
     "OutputLogger",
-    "OutputLogger",
     "SizeThresholdJobLogException",
     "capture_subprocess_output",
     "console_log_formatter",

@@ -85,13 +85,13 @@ class JsonschemaRefLocationParser:
                 element is a jq filter that can be applied to each previous
                 element up to the root of the root schema.
 
+        Returns:
+            The jsonschema the provided ref refers to.
+
         Raises:
             ValueError: Attempted to resolve a non-local reference.
             RecursionError: Attempted to resolve a recursive reference.
             KeyError: A component of the path in the ref was not found.
-
-        Returns:
-            The jsonschema the provided ref refers to.
         """
         with suppress(KeyError):
             return self._resolved_refs[ref]

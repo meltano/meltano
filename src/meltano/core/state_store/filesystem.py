@@ -161,7 +161,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
     @property
     @abstractmethod
     def client(self) -> t.Any:  # noqa: ANN401
-        """Get a client for performing fs operations.
+        """Client for performing fs operations.
 
         Used for cloud backends, particularly in deleting and listing blobs.
         """
@@ -170,7 +170,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
     @property
     @abstractmethod
     def state_dir(self) -> str:
-        """Get the path (either filepath or prefix) that state should be stored at."""
+        """Path (either filepath or prefix) that state should be stored at."""
         ...
 
     def get_path(self, state_id: str, filename: str | None = None) -> str:
@@ -397,7 +397,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     @property
     @override
     def client(self) -> None:
-        """Get a client for performing fs operations.
+        """Client for performing fs operations.
 
         Returns:
             None
@@ -407,7 +407,7 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     @property
     @override
     def state_dir(self) -> str:
-        """Get the path that state should be stored at.
+        """Path that state should be stored at.
 
         Returns:
             The relevant path
@@ -587,11 +587,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
     @property
     @override
     def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
+        """Prefix where state should be stored at."""
         return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
 
     @override

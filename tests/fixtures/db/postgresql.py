@@ -4,7 +4,6 @@ import contextlib
 import os
 
 import pytest
-import sqlalchemy
 import sqlalchemy.exc
 from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool

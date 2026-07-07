@@ -37,11 +37,7 @@ class ConfigService:
 
     @cached_property
     def settings(self) -> list[SettingDefinition]:
-        """Return the project settings.
-
-        Returns:
-            The project settings.
-        """
+        """Project settings."""
         with bundle.root.joinpath("settings.yml").open() as settings_yaml:
             content = yaml.safe_load(settings_yaml)
 
@@ -51,11 +47,7 @@ class ConfigService:
 
     @cached_property
     def current_meltano_yml(self) -> MeltanoFile:
-        """Return the current `meltano.yml` contents.
-
-        Returns:
-            The contents of `meltano.yml`.
-        """
+        """Current `meltano.yml` contents."""
         return self.project.meltano
 
     @contextmanager
@@ -89,11 +81,7 @@ class ConfigService:
 
     @property
     def current_config(self):  # noqa: ANN201
-        """Return the current configuration.
-
-        Returns:
-            The current configuration.
-        """
+        """Current configuration."""
         return self.current_meltano_yml.extras
 
     def update_config(self, config: dict[str, t.Any]) -> None:
@@ -107,9 +95,5 @@ class ConfigService:
 
     @property
     def env(self) -> dict[str, str]:
-        """Return the top-level env vars from meltano.yml.
-
-        Returns:
-            A dictionary of (unexpanded) environment variables.
-        """
+        """Top-level (unexpanded) env vars from meltano.yml."""
         return self.current_meltano_yml.env

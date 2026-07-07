@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+from itertools import starmap
 
 import structlog
 from snowplow_tracker import SelfDescribingJson
@@ -64,7 +65,7 @@ class PluginsTrackingContext(SelfDescribingJson):
             PluginsContextSchema.url,
             {
                 "context_uuid": str(new_context_uuid()),
-                "plugins": [_from_plugin(plugin, cmd) for plugin, cmd in plugins],
+                "plugins": list(starmap(_from_plugin, plugins)),
             },
         )
 
@@ -97,11 +98,11 @@ class PluginsTrackingContext(SelfDescribingJson):
         Args:
             blk: The block to create the context for.
 
-        Raises:
-            TypeError: `blk` is not a `BlockSet` or `PluginCommandBlock`.
-
         Returns:
             The PluginsTrackingContext for the given block.
+
+        Raises:
+            TypeError: `blk` is not a `BlockSet` or `PluginCommandBlock`.
         """
         if isinstance(blk, BlockSet):
             plugins: list[tuple[ProjectPlugin, str]] = [

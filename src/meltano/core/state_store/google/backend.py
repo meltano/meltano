@@ -8,7 +8,6 @@ import typing as t
 import warnings
 from functools import cached_property
 
-import google
 import google.api_core.exceptions
 import google.cloud.storage
 import structlog.stdlib
@@ -104,11 +103,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
     @cached_property
     @override
     def client(self) -> google.cloud.storage.Client:
-        """Get an authenticated google.cloud.storage.Client.
-
-        Returns:
-            A google.cloud.storage.Client.
-        """
+        """Authenticated google.cloud.storage.Client."""
         if self.application_credentials_json:
             # Parse JSON string and create client from service account info
             try:

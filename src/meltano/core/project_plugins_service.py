@@ -122,11 +122,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
     @cached_property
     def current_plugins(self) -> Canonical:
-        """Return the current plugins.
-
-        Returns:
-            The current plugins.
-        """
+        """Current plugins."""
         return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
@@ -175,14 +171,14 @@ class ProjectPluginsService:  # (too many methods, attributes)
                 and it is the same variant. Note: Updates are only allowed for
                 plugins with matching variants to prevent configuration conflicts.
 
+        Returns:
+            The added plugin and flags indicating the operation result.
+
         Raises:
             PluginAlreadyAddedException: If the plugin is already added and either:
                 - `update=False` (default behavior)
                 - `update=True` but the new plugin has a different variant than
                   the existing plugin (prevents accidental variant changes)
-
-        Returns:
-            The added plugin and flags indicating the operation result.
         """
         # FIXME: `should_add_to_file` is a method from `BasePlugin`, which is
         #        not a subclass of `ProjectPlugin`. I've left this call to it
@@ -456,7 +452,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         """
         yield from (
             plugin
-            for _, plugins in self.plugins_by_type(ensure_parent=ensure_parent).items()
+            for plugins in self.plugins_by_type(ensure_parent=ensure_parent).values()
             for plugin in plugins
         )
 
@@ -604,11 +600,11 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def get_transformer(self) -> ProjectPlugin:
         """Get first available Transformer plugin.
 
-        Raises:
-            PluginNotFoundError: If there is no transformer.
-
         Returns:
             First available transformer plugin.
+
+        Raises:
+            PluginNotFoundError: If there is no transformer.
         """
         if transformer := next(
             iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)),

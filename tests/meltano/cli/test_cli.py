@@ -115,7 +115,7 @@ class TestCli:
         pushd(incompatible_version_project.root)
         result = cli_runner.invoke(cli, ["config"])
         assert result.exit_code == 3
-        assert re.match("You're using .* but this project requires .*", result.output)
+        assert re.match(r"You're using .* but this project requires .*", result.output)
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
@@ -493,8 +493,15 @@ class TestCliColors:
                 {},
                 None,
                 True,
+                False,
+                id="log-colors-disabled-by-default-when-stderr-is-not-tty",
+            ),
+            pytest.param(
+                {},
+                _get_dummy_logging_config(colors=True),
                 True,
-                id="colors-enabled-by-default",
+                True,
+                id="custom-log-config-colors-still-enabled",
             ),
             pytest.param(
                 {
@@ -545,8 +552,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-f-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-no-color-f",
             ),
             pytest.param(
                 {
@@ -554,8 +561,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-FALSE-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-no-color-FALSE",
             ),
             pytest.param(
                 {
@@ -563,8 +570,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-invalid-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-invalid-no-color",
             ),
         ),
     )
