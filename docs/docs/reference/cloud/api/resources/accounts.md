@@ -51,6 +51,29 @@ Returns all accounts the authenticated user profile is an owner of.
 
 ---
 
+### View an account
+
+:::info
+**GET** `/api/accounts/{account-id}`
+:::
+
+Returns the account `{account-id}`.
+
+#### Prerequisites
+
+- Account `{account-id}` must exist
+- The authenticated user profile must be an owner of the account `{account-id}`
+
+<Examples path="accounts/view-an-account" />
+
+#### Response
+`200 OK`
+
+[Account](#account) with HAL links.
+<Snippet path="accounts/view-an-account/response-body.md" />
+
+---
+
 ### Initialise a new account
 
 :::info
