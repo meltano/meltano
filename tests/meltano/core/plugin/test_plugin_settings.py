@@ -26,13 +26,18 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from sqlalchemy.orm import Session
 
     from meltano.core.environment import Environment
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
     class PluginSettingsServiceFactory(t.Protocol):
         def __call__(
@@ -88,7 +93,7 @@ def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
 
 
 @pytest.fixture
-def environment(project: Project) -> Generator[Environment | None, None, None]:
+def environment(project: Project) -> Generator[Environment | None]:
     project.activate_environment("dev")
     try:
         yield project.environment

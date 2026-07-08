@@ -35,7 +35,6 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -48,6 +47,11 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.command import Command
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import AsyncGenerator
+    else:
+        from typing_extensions import AsyncGenerator
 
     class InvokerInitKwargs(t.TypedDict, total=False):
         """Keyword arguments for the Invoker constructor."""
@@ -275,7 +279,7 @@ class PluginInvoker:
             self._prepared = False
 
     @asynccontextmanager
-    async def prepared(self, session: Session) -> t.AsyncGenerator[None, None]:
+    async def prepared(self, session: Session) -> AsyncGenerator[None]:
         """Context manager that prepares plugin config.
 
         Args:
@@ -451,7 +455,7 @@ class PluginInvoker:
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
         **kwargs: t.Any,
-    ) -> AsyncGenerator[tuple[list[str], dict[str, t.Any], dict[str, t.Any]], None]:
+    ) -> AsyncGenerator[tuple[list[str], dict[str, t.Any], dict[str, t.Any]]]:
         """Invoke a command.
 
         Args:

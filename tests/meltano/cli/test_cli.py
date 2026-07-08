@@ -31,8 +31,15 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
+    import sys
+
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.project_init_service import ProjectInitService
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
@@ -75,7 +82,7 @@ class TestCli:
         self,
         tmp_path: Path,
         project_init_service: ProjectInitService,
-    ) -> t.Generator[Project, None, None]:
+    ) -> Generator[Project]:
         os.chdir(tmp_path)
         project = project_init_service.init(activate=False)
         Project._default = None

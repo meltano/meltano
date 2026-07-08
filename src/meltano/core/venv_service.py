@@ -22,11 +22,16 @@ import structlog
 from meltano.core.error import AsyncSubprocessError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Sequence
+    from collections.abc import Iterable, Sequence
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 if sys.version_info >= (3, 11):
     from typing import Self  # noqa: ICN003
@@ -222,7 +227,7 @@ class VirtualEnv:
         """
 
         # A generator is used to perform the checks lazily
-        def checks() -> Generator[bool, None, None]:
+        def checks() -> Generator[bool]:
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args

@@ -12,6 +12,7 @@ import uuid
 from contextlib import contextmanager, suppress
 from datetime import datetime, timezone
 from enum import Enum, auto
+from functools import cached_property
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -33,7 +34,8 @@ from meltano.core.tracking.schemas import (
 from meltano.core.utils import format_exception, uuid7
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Mapping
+    import sys
+    from collections.abc import Mapping
     from pathlib import Path
 
     from meltano.core.project import Project
@@ -43,7 +45,11 @@ if t.TYPE_CHECKING:
         ProjectContext,
     )
 
-from functools import cached_property
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -296,10 +302,7 @@ class Tracker:  # - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(
-        self,
-        *extra_contexts: SelfDescribingJson,
-    ) -> Generator[Tracker, None, None]:
+    def with_contexts(self, *extra_contexts: SelfDescribingJson) -> Generator[Tracker]:
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:

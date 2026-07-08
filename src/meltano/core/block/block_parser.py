@@ -19,8 +19,8 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.task_sets_service import TaskSetsService
 
 if t.TYPE_CHECKING:
+    import sys
     import uuid
-    from collections.abc import Generator
 
     import structlog
 
@@ -28,6 +28,11 @@ if t.TYPE_CHECKING:
     from meltano.core.block.singer import SingerBlock
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
@@ -190,7 +195,7 @@ class BlockParser:  # noqa: D101
     def find_blocks(
         self,
         offset: int = 0,
-    ) -> Generator[ExtractLoadBlocks | InvokerCommand, None, None]:
+    ) -> Generator[ExtractLoadBlocks | InvokerCommand]:
         """Find all blocks in the invocation.
 
         Args:

@@ -12,11 +12,16 @@ from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 @contextmanager
-def cd(path: Path) -> Generator[Path, None, None]:
+def cd(path: Path) -> Generator[Path]:
     prev_dir = Path.cwd()
     os.chdir(path)
     try:
@@ -26,11 +31,7 @@ def cd(path: Path) -> Generator[Path, None, None]:
 
 
 @contextmanager
-def tmp_project(
-    name: str,
-    source: Path,
-    compatible_copy_tree,
-) -> Generator[Project, None, None]:
+def tmp_project(name: str, source: Path, compatible_copy_tree) -> Generator[Project]:
     project_init_service = ProjectInitService(name)
     blank_project = project_init_service.init()
     logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004

@@ -17,8 +17,13 @@ else:
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable
+    from collections.abc import Iterable
     from types import TracebackType
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 class UnsupportedStateBackendURIError(Exception):
@@ -269,12 +274,7 @@ class StateStoreManager(ABC):
 
     @abstractmethod
     @contextmanager
-    def acquire_lock(
-        self,
-        state_id: str,
-        *,
-        retry_seconds: float,
-    ) -> Generator[None, None, None]:
+    def acquire_lock(self, state_id: str, *, retry_seconds: float) -> Generator[None]:
         """Acquire a naive lock for the given job's state.
 
         Args:
