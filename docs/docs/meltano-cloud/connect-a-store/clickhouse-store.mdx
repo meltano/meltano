@@ -159,7 +159,7 @@ fields are `host`, `database`, and a password.
 | `secure` | No | `false` | Connect over HTTPS/TLS. Enable for ClickHouse Cloud; set `port` to `8443`. |
 | `verify` | No | `true` | Verify the server's TLS certificate when `secure` is enabled. |
 | `engine_type` | No | `MergeTree` | Table engine. `MergeTree` for append-only; `ReplacingMergeTree` (with `optimize_after`) for upserts. `Replicated*` engines also require `table_path`, `replica_name`, `cluster_name`. |
-| `load_method` | No | `append-only` | `append-only` writes all records; `upsert` deduplicates by primary key (ReplacingMergeTree + `optimize_after`); `overwrite` replaces all rows. |
+| `load_method` | No | `upsert` | `upsert` deduplicates by primary key (ReplacingMergeTree + `optimize_after`); `append-only` writes all records; `overwrite` replaces all rows. |
 | `optimize_after` | No | `false` | Run `OPTIMIZE TABLE` after each load. Required for `ReplacingMergeTree` upserts to collapse duplicates. |
 | `order_by_keys` | No | stream key | `ORDER BY` key. For `ReplacingMergeTree` this is the dedup key. |
 | `default_target_schema` | No | - | Overrides the target database. On ClickHouse the database is the schema, so prefer setting `database` directly. |
