@@ -213,4 +213,3 @@ Sets the profile `{profile-id}` as the primary owner of the account `{account-id
 <Snippet path="accounts/set-an-account-owner/response-body.md" />
 
 ---
-
