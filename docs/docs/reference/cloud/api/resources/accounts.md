@@ -21,10 +21,13 @@ Path | JSON Type | Format | Description
 `created` | `string` | ISO 8601 timestamp | The instant at which the account was created
 `lastModified` | `string` | ISO 8601 timestamp | The instant at which the account was last modified
 `company` | `string` | | The name of the company associated with the account
+`ownerEmail` | `string` | Email address | The email address of the owner profile
+`ownerProfileId` | `string` | | The ID of the owner profile
 `maxWorkspaces` | `number` | Unsigned integer | The maximum number of workspaces that can be created under the account
 `maxRows` | `number` | Unsigned integer | The maximum number of managed database rows available to the account
 `minutesPerMonth` | `number` | Unsigned integer | The number of [pipeline](pipelines) run minutes available to the account per month
 `minutesUsed` | `number` | Unsigned integer | The number of [pipeline](pipelines) run minutes used by the account per month
+`maxClients` | `number` | Unsigned integer | The number of [API key](apikeys) clients available to the account
 
 ---
 
