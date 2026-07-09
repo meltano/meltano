@@ -102,7 +102,7 @@ Creates the account `{account-id}`.
 
 #### Prerequisites
 
-- The `ownerEmail` must match the authenticated user profile's email address, unless the authenticated user profile is a super profile
+- The `ownerEmail` must match the authenticated user profile's email address
 
 #### Body
 [Account](#account) resource.

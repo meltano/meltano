@@ -140,7 +140,8 @@ Sets the working account `{account-id}` for the profile `{profile-id}`.
 
 - Profile `{profile-id}` must exist
 - Account `{account-id}` must exist
-- The authenticated user profile must be a super profile, or the authentication subject must match the profile ID `{profile-id}` and be an owner of the account `{account-id}`
+- The authentication subject must match the profile ID `{profile-id}`
+- The profile `{profile-id}` must be an owner of the account `{account-id}`
 
 <Examples path="profiles/set-the-working-account-for-a-profile" />
 
