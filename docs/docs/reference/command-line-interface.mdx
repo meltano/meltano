@@ -1260,6 +1260,9 @@ meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
 # run a pipeline with timeout set via environment variable
 MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
 
+# force a new run even if a pipeline with the same State ID is already running
+MELTANO_RUN_FORCE=1 meltano --environment=dev run tap-gitlab target-postgres
+
 # run a pipeline with state-id-suffix set via environment variable
 MELTANO_RUN_STATE_ID_SUFFIX=pipeline-alias meltano --environment=dev run tap-gitlab target-postgres
 
