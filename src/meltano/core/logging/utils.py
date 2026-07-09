@@ -157,15 +157,15 @@ def default_config(
 
     match log_format:
         case LogFormat.colored:
-            colors = (
-                sys.stderr.isatty() or get_boolean_env_var("FORCE_COLOR")
-            ) and not get_no_color_flag()
             # Pre-build now so terminal detection runs before any stream capture
             # (e.g. Click's CliRunner replaces sys.stdout with StringIO on entry,
             # causing structlog's get_default_column_styles to see a non-tty and
             # return plain styles even when colors=True).
             colored_formatter = console_log_formatter(
-                colors=colors,
+                colors=(
+                    (sys.stderr.isatty() or get_boolean_env_var("FORCE_COLOR"))
+                    and not get_no_color_flag()
+                ),
                 max_frames=max_frames,
             )
             formatter_config = {"()": lambda: colored_formatter}
