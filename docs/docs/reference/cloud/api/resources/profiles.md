@@ -23,6 +23,7 @@ Path | JSON Type | Format | Description
 `phone` | `string` | Phone number | The profile phone number
 `email` | `string` | Email address | The profile email address
 `defaultWorkspace` | `object` | [`Workspace`](workspaces#workspace) | The profile default workspace
+`workingAccount` | `object` | [`Account`](accounts#account) | The profile working account under which new workspaces are created
 
 <Snippet path="profiles/view-a-profile/response-body.md" />
 
@@ -124,5 +125,30 @@ A workspace can be set as default, which defines the environment Meltano Cloud w
 
 [Profile](#profile) with HAL links.
 <Snippet path="profiles/set-a-workspace-as-default/response-body.md" />
+
+---
+
+### Set the working account for a profile
+
+:::info
+**PUT** `/api/profiles/{profile-id}/working-account/{account-id}`
+:::
+
+Sets the working account `{account-id}` for the profile `{profile-id}`.
+
+#### Prerequisites
+
+- Profile `{profile-id}` must exist
+- Account `{account-id}` must exist
+- The authentication subject must match the profile ID `{profile-id}`
+- The profile `{profile-id}` must be an owner of the account `{account-id}`
+
+<Examples path="profiles/set-the-working-account-for-a-profile" />
+
+#### Response
+`200 OK`
+
+[Profile](#profile) with HAL links.
+<Snippet path="profiles/set-the-working-account-for-a-profile/response-body.md" />
 
 ---
