@@ -23,7 +23,7 @@ Path | JSON Type | Format | Description
 `phone` | `string` | Phone number | The profile phone number
 `email` | `string` | Email address | The profile email address
 `defaultWorkspace` | `object` | [`Workspace`](workspaces#workspace) | The profile default workspace
-`workingAccount` | `object` | [`Account`](accounts#account) | The profile working account, under which new workspaces are created
+`workingAccount` | `object` | [`Account`](accounts#account) | The profile working account under which new workspaces are created
 
 <Snippet path="profiles/view-a-profile/response-body.md" />
 
