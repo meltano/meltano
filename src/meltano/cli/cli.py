@@ -208,6 +208,14 @@ def detect_selected_environment(  # noqa: D417
         logger.info("No Meltano environment was selected")
     elif environment:
         return environment, False
-    elif project.settings.get("default_environment"):
-        return project.settings.get("default_environment"), True
+    elif default_env := project.settings.get("default_environment"):
+        return default_env, True
+    elif "default_environment" in project.settings.flat_meltano_yml_config:
+        logger.warning(
+            "The `default_environment` setting in `meltano.yml` is explicitly set "
+            "to null. To use no default environment, remove the `default_environment` "
+            "key from `meltano.yml`.",
+        )
+
+    logger.info("No Meltano environment was selected")
     return None, False

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import platform
 import re
@@ -22,18 +23,22 @@ import meltano
 from asserts import assert_cli_runner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
+from meltano.cli.cli import detect_selected_environment
 from meltano.cli.params import UUIDParamType
 from meltano.cli.utils import CliError
+from meltano.core.environment import Environment
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import NotFound
 from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
     import sys
 
     from fixtures.cli import MeltanoCliRunner
+    from meltano.core.project_files import ProjectFiles
     from meltano.core.project_init_service import ProjectInitService
 
     if sys.version_info >= (3, 13):
@@ -136,6 +141,7 @@ class TestCli:
         assert Project._default is None
         pushd(test_cli_project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
+        assert isinstance(Project._default, Project)
         assert Project._default.readonly
 
     @pytest.mark.order(2)
@@ -149,6 +155,7 @@ class TestCli:
         assert Project._default is None
         pushd(test_cli_project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
+        assert isinstance(Project._default, Project)
         assert Project._default.readonly
 
     def test_environment_precedence(
@@ -183,10 +190,9 @@ class TestCli:
             }
         for source, name in environment_names.items():
             assert results[source].exit_code
-            assert (
-                results[source].exception.args[0]
-                == f"Environment {name!r} was not found."
-            )
+            exc = results[source].exception
+            assert isinstance(exc, NotFound)
+            assert exc.args[0] == f"Environment {name!r} was not found."
 
     def test_version(self, cli_runner) -> None:
         cli_version = cli_runner.invoke(cli, ["--version"])
@@ -196,8 +202,8 @@ class TestCli:
     @pytest.mark.usefixtures("deactivate_project")
     def test_default_environment_is_activated(
         self,
-        project_files_cli,
-        cli_runner,
+        project_files_cli: ProjectFiles,
+        cli_runner: MeltanoCliRunner,
         pushd,
     ) -> None:
         pushd(project_files_cli.root)
@@ -205,7 +211,30 @@ class TestCli:
             cli,
             ["test"],
         )
+        assert isinstance(Project._default, Project)
+        assert isinstance(Project._default.environment, Environment)
         assert Project._default.environment.name == "test-meltano-environment"
+
+    def test_default_environment_meltano_yaml_null_warns(
+        self,
+        project: Project,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        with (
+            caplog.at_level(logging.WARNING, logger="meltano.cli.cli"),
+            mock.patch.object(
+                ProjectSettingsService,
+                "flat_meltano_yml_config",
+                new_callable=lambda: property(lambda _: {"default_environment": None}),
+            ),
+        ):
+            result = detect_selected_environment(
+                cli_environment=None,
+                cli_no_environment=False,
+                project=project,
+            )
+        assert result == (None, False)
+        assert any("default_environment" in r.message for r in caplog.records)
 
     @pytest.mark.usefixtures("deactivate_project")
     def test_environment_flag_overrides_default(
@@ -220,6 +249,8 @@ class TestCli:
             ["--environment", "test-subconfig-2-yml", "test"],
         )
 
+        assert isinstance(Project._default, Project)
+        assert isinstance(Project._default.environment, Environment)
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
     @pytest.mark.usefixtures("deactivate_project")
@@ -236,6 +267,8 @@ class TestCli:
             cli,
             ["test"],
         )
+        assert isinstance(Project._default, Project)
+        assert isinstance(Project._default.environment, Environment)
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
     @pytest.mark.usefixtures("deactivate_project")
@@ -250,6 +283,7 @@ class TestCli:
             cli,
             ["--environment", "null", "hub", "ping"],
         )
+        assert isinstance(Project._default, Project)
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
@@ -264,6 +298,7 @@ class TestCli:
             cli,
             ["--environment", "NULL", "hub", "ping"],
         )
+        assert isinstance(Project._default, Project)
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
@@ -278,6 +313,7 @@ class TestCli:
             cli,
             ["--no-environment", "hub", "ping"],
         )
+        assert isinstance(Project._default, Project)
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
@@ -292,6 +328,7 @@ class TestCli:
             cli,
             ["--no-environment", "--environment", "null", "hub", "ping"],
         )
+        assert isinstance(Project._default, Project)
         assert Project._default.environment is None
 
     def test_handle_meltano_error(self) -> None:
@@ -305,7 +342,7 @@ class TestCli:
         cli_runner,
         test_cli_project: Project,
         tmp_path: Path,
-    ) -> t.NoReturn:
+    ) -> None:
         project = test_cli_project
         with cd(project.dirs.root):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
