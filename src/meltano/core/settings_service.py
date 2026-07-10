@@ -12,6 +12,7 @@ from contextlib import contextmanager
 
 import structlog
 
+from meltano.core.constants import UNSET
 from meltano.core.setting_definition import SettingKind
 from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
@@ -253,9 +254,20 @@ class SettingsService(ABC):
         config_metadata = self.config_with_metadata(*args, **kwargs)
 
         if process:
+            # A setting that was never configured anywhere resolves to
+            # `None` via its `DEFAULT` store - that's not a value plugins
+            # should see. A setting deliberately set to `null` in some other
+            # store is a real, meaningful value and should be kept. This
+            # only applies to the processed config sent to plugins; the
+            # unprocessed dict (below) keeps every definition so callers can
+            # rely on all settings/extras being present as keys.
             config = {
                 key: metadata["setting"].post_process_value(metadata["value"])
                 for key, metadata in config_metadata.items()
+                if not (
+                    metadata["value"] is None
+                    and metadata.get("source") is SettingValueStore.DEFAULT
+                )
             }
             config = self.process_config(config)
         else:
@@ -345,6 +357,8 @@ class SettingsService(ABC):
 
         manager = source_manager or source.manager(self, **kwargs)
         value, get_metadata = manager.get(name, setting_def=setting_def)
+        if value is UNSET:
+            value = None
         metadata.update(get_metadata)
 
         # Can't do conventional SettingsService.feature_flag call to check;
@@ -353,12 +367,18 @@ class SettingsService(ABC):
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}",
             cast_value=True,
         )
+        match strict_env_var_mode:
+            case True:
+                env_var_behavior = EnvVarMissingBehavior.raise_exception
+            case _:
+                env_var_behavior = EnvVarMissingBehavior.use_empty_str
+
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(
                 value,
                 env=expandable_env,
-                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
+                if_missing=env_var_behavior,
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
             if value and not expanded_value:  # The whole string was missing env vars
@@ -397,7 +417,7 @@ class SettingsService(ABC):
                             object_source = nested_source
 
                 if object_value:
-                    value = object_value  # type: ignore[assignment]
+                    value = object_value
                     metadata["source"] = object_source
 
             # Only cast if the setting is not expandable,
