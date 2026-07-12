@@ -10,8 +10,6 @@ import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
-import structlog
-
 from meltano.core.setting_definition import SettingKind
 from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
@@ -40,9 +38,6 @@ if t.TYPE_CHECKING:
         from collections.abc import Generator
     else:
         from typing_extensions import Generator
-
-
-logger = structlog.stdlib.get_logger(__name__)
 
 
 # sentinel value to use to prevent leaking sensitive data
@@ -90,7 +85,6 @@ class FeatureNotAllowedException(Exception):
 class SettingsService(ABC):
     """Abstract base class for managing settings."""
 
-    LOGGING = False
     supports_environments = True
 
     def __init__(
@@ -324,8 +318,6 @@ class SettingsService(ABC):
         if setting_def:
             name = setting_def.name
 
-        self.log(f"Getting setting '{name}'")
-
         metadata: dict[str, t.Any] = {
             "name": name,
             "source": source,
@@ -414,8 +406,6 @@ class SettingsService(ABC):
                 metadata["redacted"] = True
                 value = redacted_value
 
-        self.log(f"Got setting {name!r} with metadata: {metadata}")
-
         if setting_def is None and metadata["source"] is SettingValueStore.DEFAULT:
             warnings.warn(
                 (
@@ -478,8 +468,6 @@ class SettingsService(ABC):
         Returns:
             the new value and metadata for the setting
         """
-        self.log(f"Setting setting '{path}'")
-
         if isinstance(path, str):
             path = [path]
 
@@ -521,7 +509,6 @@ class SettingsService(ABC):
             ),
         )
 
-        self.log(f"Set setting {name!r} with metadata: {metadata}")
         return value, metadata
 
     def set(self, *args: t.Any, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
@@ -554,24 +541,19 @@ class SettingsService(ABC):
         Returns:
             the metadata for the setting
         """
-        self.log(f"Unsetting setting '{path}'")
-
         if isinstance(path, str):
             path = [path]
 
         name = ".".join(path)
         setting_def = self.find_setting(name)
 
-        metadata = {
+        return {
             "name": name,
             "path": path,
             "store": store,
             "setting": setting_def,
             **store.manager(self, **kwargs).unset(name, path, setting_def=setting_def),
         }
-
-        self.log(f"Unset setting {name!r} with metadata: {metadata}")
-        return metadata
 
     def reset(
         self,
@@ -588,9 +570,7 @@ class SettingsService(ABC):
         Returns:
             the metadata for the setting
         """
-        metadata = {"store": store, **store.manager(self, **kwargs).reset()}
-        self.log(f"Reset settings with metadata: {metadata}")
-        return metadata
+        return {"store": store, **store.manager(self, **kwargs).reset()}
 
     def definitions(self, *, extras: bool | None = None) -> Iterable[SettingDefinition]:
         """Return setting definitions along with extras.
@@ -669,15 +649,6 @@ class SettingsService(ABC):
             environment variable for given setting
         """
         return self.setting_env_vars(setting_def)[0].key
-
-    def log(self, message: str) -> None:
-        """Log the given message.
-
-        Args:
-            message: the message to log
-        """
-        if self.LOGGING:
-            logger.debug(message)
 
     @contextmanager
     def feature_flag(
