@@ -6,6 +6,7 @@ import signal
 import typing as t
 import uuid
 from datetime import datetime, timedelta, timezone
+from unittest import mock
 
 import pytest
 
@@ -14,6 +15,7 @@ from meltano.core.job.job import (
     HEARTBEATLESS_JOB_VALID_HOURS,
     Job,
     State,
+    sigterm_received,
 )
 
 if t.TYPE_CHECKING:
@@ -125,21 +127,97 @@ class TestJob:
         assert subject.payload["error"] == "The process was interrupted"
 
     @pytest.mark.asyncio
-    async def test_run_terminated(self, session) -> None:
+    async def test_run_terminated(
+        self,
+        session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", False)
         subject = self.sample_job({"original_state": 1}).save(session)
+        cleanup_completed = False
 
-        with pytest.raises(SystemExit):
+        # SIGTERM must cancel the task running the job rather than abort it
+        # immediately, so in-flight work (e.g. plugin graceful shutdown) can
+        # complete: https://github.com/meltano/meltano/issues/9981
+        async def run_job() -> None:
+            nonlocal cleanup_completed
             async with subject.run(session):
-                signal.raise_signal(signal.SIGTERM)
+                try:
+                    signal.raise_signal(signal.SIGTERM)
+                    await asyncio.sleep(30)
+                except asyncio.CancelledError:
+                    cleanup_completed = True
+                    raise
 
+        with pytest.raises(asyncio.CancelledError):
+            await run_job()
+
+        assert cleanup_completed
+        assert sigterm_received()
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was terminated"
+
+    @pytest.mark.asyncio
+    async def test_run_terminated_signal_handler_fallback(
+        self,
+        session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Without loop signal handlers (e.g. Windows), SIGTERM exits directly."""
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
+            )
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", False)
+        subject = self.sample_job({"original_state": 1}).save(session)
+        loop = asyncio.get_running_loop()
+
+        async def run_job() -> None:
+            async with subject.run(session):
+                signal.raise_signal(signal.SIGTERM)
+
+        with (
+            mock.patch.object(
+                type(loop),
+                "add_signal_handler",
+                side_effect=NotImplementedError,
+            ),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            await run_job()
+
+        assert exc_info.value.code == 143
+        assert sigterm_received()
+        assert subject.state is State.FAIL
+        assert subject.payload["error"] == "The process was terminated"
+
+    def test_handling_sigterm_without_event_loop(
+        self,
+        session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Outside a running loop, SIGTERM falls back to a direct exit."""
+        if platform.system() == "Windows":
+            pytest.xfail(
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
+            )
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", False)
+        subject = self.sample_job()
+
+        with (
+            pytest.raises(SystemExit) as exc_info,
+            subject._handling_sigterm(session),
+        ):
+            signal.raise_signal(signal.SIGTERM)
+
+        assert exc_info.value.code == 143
+        assert sigterm_received()
 
     def test_run_id(self, session) -> None:
         job = Job()
