@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useHistory, useLocation } from '@docusaurus/router';
+import React, { useEffect } from "react";
+import { useHistory, useLocation } from "@docusaurus/router";
 
 // Netlify "Pretty URLs" serves pages at a trailing-slash URL on first load
 // (e.g. /resources/accounts/), while in-app navigation uses the slashless
@@ -12,8 +12,8 @@ export default function Root({ children }) {
   const { pathname, search, hash } = useLocation();
 
   useEffect(() => {
-    if (pathname.length > 1 && pathname.endsWith('/')) {
-      history.replace({ pathname: pathname.replace(/\/+$/, ''), search, hash });
+    if (pathname.length > 1 && pathname.endsWith("/")) {
+      history.replace({ pathname: pathname.replace(/\/+$/, ""), search, hash });
     }
   }, [pathname, search, hash, history]);
 
