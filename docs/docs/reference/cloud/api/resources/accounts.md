@@ -258,3 +258,7 @@ Transfers the workspace `{workspace-id}` to the account `{account-id}`.
 <Snippet path="accounts/transfer-a-workspace/response-body.md" />
 
 ---
+
+##### See Also
+
+- [Set the working account for a profile](profiles#set-the-working-account-for-a-profile)
