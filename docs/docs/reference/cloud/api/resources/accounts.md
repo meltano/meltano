@@ -236,3 +236,25 @@ Sets the profile `{profile-id}` as the primary owner of the account `{account-id
 <Snippet path="accounts/set-an-account-owner/response-body.md" />
 
 ---
+
+### Transfer a workspace
+
+:::info
+**PUT** `/api/accounts/{account-id}/workspaces/{workspace-id}/transfer`
+:::
+
+Transfers the workspace `{workspace-id}` to the account `{account-id}`.
+
+#### Prerequisites
+
+- The user must be the owner of the account `{account-id}`
+
+<Examples path="workspaces/transfer-a-workspace" />
+
+#### Response
+`200 OK`
+
+[Workspace](#workspace) with HAL links.
+<Snippet path="accounts/transfer-a-workspace/response-body.md" />
+
+---
