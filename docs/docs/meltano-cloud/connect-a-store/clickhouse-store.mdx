@@ -1,0 +1,376 @@
+---
+title: ClickHouse Store
+description: Whitelist IP ranges, set up authentication, and connect ClickHouse as a full data store
+layout: doc
+sidebar_position: 17
+---
+
+# ClickHouse Store
+
+Our team at Meltano regularly shares best practices for secure and efficient
+analytics engineering. This guide covers the security best practices and
+connection settings for using ClickHouse as a store with Meltano - whitelisting,
+authentication, connection settings and tuning the loader for OLAP workloads -
+and then walks through connecting ClickHouse as a **full data store** (loader,
+state backend and dbt transforms together).
+
+If you just want to get connected, jump to
+[Set up ClickHouse as a full data store](#set-up-clickhouse-as-a-full-data-store)
+
+The sections before it are the security and settings reference that the
+walkthrough links back to.
+
+## Supported versions
+
+- **ClickHouse server 22.8 or newer.** Earlier versions (e.g. 21.8) fail on the
+  loader's default native bulk-insert path - the HTTP client sends `lz4`
+  compression that older servers don't recognise. 22.8+ supports the full
+  feature set the loader relies on (`ReplacingMergeTree` + `FINAL` + `OPTIMIZE`,
+  `async_insert`).
+- **ClickHouse Cloud** is supported over its HTTPS interface (port `8443`).
+
+## Whitelist IP Ranges
+<br />
+Restricting inbound connections to trusted clients is the single most effective
+way to protect your ClickHouse instance. Only the following should be able to
+reach it-
+
+- Your own data team and BI tools
+- Your dbt/analytics runners
+- Meltano
+
+The Meltano platform is hosted in an Azure data center within the United
+Kingdom and connects to your store from a single static egress IP address:
+
+```text
+51.137.148.226
+```
+
+### ClickHouse Cloud[​](#clickhouse-cloud "Direct link to ClickHouse Cloud")
+
+In the ClickHouse Cloud console, open your service → **Settings** → **Security** →
+**IP Access List** and add an allowed entry:
+
+```text
+51.137.148.226/32   # Meltano
+```
+
+Ensure there is no `0.0.0.0/0` (Anywhere) entry in the IP Access List: if one
+already exists, remove it so that only specific IP addresses (including Meltano’s)
+that you add explicitly can connect.
+
+### Self-managed ClickHouse[​](#self-managed-clickhouse "Direct link to Self-managed ClickHouse")
+
+Restrict the service user to Meltano's IP in your users configuration
+(`users.xml` or a file under `users.d/`). The `import_runner` user referenced
+below is created in [Authentication](#authentication) - create it first, then
+apply this network restriction:
+
+```xml
+<clickhouse>
+  <users>
+    <import_runner>
+      <networks>
+        <ip>51.137.148.226/32</ip>
+      </networks>
+    </import_runner>
+  </users>
+</clickhouse>
+```
+
+See the [ClickHouse user settings documentation](https://clickhouse.com/docs/operations/settings/settings-users)
+for the full `<networks>` syntax.
+
+---
+
+## Authentication
+
+Create a dedicated service user for Meltano rather than reusing `default`. This
+lets you scope permissions and rotate the credential independently.
+
+### Step 1: Create the user and database[​](#step-1-create-the-user-and-database "Direct link to Step 1: Create the user and database")
+
+Run the following as an administrator. ClickHouse has no schema namespace
+distinct from the database - **a database *is* the schema** - so grants are
+scoped at the database level.
+
+```sql
+-- Dedicated load target database (this is also the "schema")
+CREATE DATABASE IF NOT EXISTS meltano;
+
+-- Service user
+CREATE USER IF NOT EXISTS import_runner IDENTIFIED WITH sha256_password BY '<strong-password>';
+```
+
+### Step 2: Grant permissions[​](#step-2-grant-permissions "Direct link to Step 2: Grant permissions")
+
+```sql
+-- Permissions the loader needs to create and maintain target tables
+GRANT SELECT, INSERT, ALTER, CREATE TABLE, DROP TABLE, OPTIMIZE
+  ON meltano.* TO import_runner;
+```
+
+If you also use ClickHouse as your **state backend** (recommended - see
+[Set up ClickHouse as a full data store](#set-up-clickhouse-as-a-full-data-store)
+below), the same user and grant already cover it, since the state table lives
+in `meltano.state`.
+
+### Step 3: Use TLS in production[​](#step-3-use-tls-in-production "Direct link to Step 3: Use TLS in production")
+
+For any store reachable over the public internet, connect over HTTPS/TLS. Set
+`secure: true` and use the TLS port `8443` (ClickHouse Cloud terminates TLS on
+`8443` by default). Keep `verify: true` so the server certificate is validated.
+
+For full details on ClickHouse authentication options, see the
+[ClickHouse user settings documentation](https://clickhouse.com/docs/operations/settings/settings-users).
+
+---
+
+## Configuration
+
+Connect the store with the following settings - you'll enter them when creating
+the store in the platform (see [Step 2 of the
+walkthrough](#step-2-connect-the-clickhouse-store) below). The minimum required
+fields are `host`, `database`, and a password.
+
+```json
+{
+  "host": "your-instance.clickhouse.cloud",
+  "port": 8443,
+  "driver": "http",
+  "username": "import_runner",
+  "password": "<strong-password>",
+  "database": "meltano",
+  "secure": true,
+  "verify": true,
+  "engine_type": "MergeTree",
+  "load_method": "append-only"
+}
+```
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `host` | Yes | - | ClickHouse host. |
+| `port` | No | `8123` | `8123` for the HTTP driver (`8443` when `secure`), or `9000` for the native driver. |
+| `driver` | No | `http` | Client driver: `http` (bulk-insert over the HTTP interface), `native`, or `asynch`. |
+| `username` | No | `default` | ClickHouse user. |
+| `password` | Yes | - | ClickHouse password. |
+| `database` | Yes | - | Target database. ClickHouse has no separate schema - the database *is* the schema. |
+| `secure` | No | `false` | Connect over HTTPS/TLS. Enable for ClickHouse Cloud; set `port` to `8443`. |
+| `verify` | No | `true` | Verify the server's TLS certificate when `secure` is enabled. |
+| `engine_type` | No | `MergeTree` | Table engine. `MergeTree` for append-only; `ReplacingMergeTree` (with `optimize_after`) for upserts. `Replicated*` engines also require `table_path`, `replica_name`, `cluster_name`. |
+| `load_method` | No | `upsert` | `upsert` deduplicates by primary key (ReplacingMergeTree + `optimize_after`); `append-only` writes all records; `overwrite` replaces all rows. |
+| `optimize_after` | No | `false` | Run `OPTIMIZE TABLE` after each load. Required for `ReplacingMergeTree` upserts to collapse duplicates. |
+| `order_by_keys` | No | stream key | `ORDER BY` key. For `ReplacingMergeTree` this is the dedup key. |
+| `default_target_schema` | No | - | Overrides the target database. On ClickHouse the database is the schema, so prefer setting `database` directly. |
+| `async_insert` | No | `false` | Server-side async inserts for the HTTP driver - coalesces small inserts to reduce part churn on high-volume ingestion. |
+| `batch_size_rows` | No | `10000` | Rows per load batch. |
+| `add_record_metadata` | No | `true` | Add `_sdc_*` metadata columns. Required for `activate-version` / hard-delete. |
+
+An SSH tunnel (bastion host) is also supported via the `ssh_tunnel.*` settings if
+your ClickHouse instance is not directly reachable.
+
+---
+
+## Set up ClickHouse as a full data store
+<br />
+
+ClickHouse is supported as a **full data store** in Meltano - meaning all
+pieces work together:
+
+1. **Loader** - `target-clickhouse` writes your extracted data into ClickHouse.
+2. **Transforms** - `dbt-clickhouse` runs your dbt models against ClickHouse.
+
+This section walks through connecting all of the above.
+
+### Prerequisites[​](#prerequisites "Direct link to Prerequisites")
+
+- A running ClickHouse instance (ClickHouse Cloud or self-managed), reachable
+  from Meltano. See [Whitelist IP Ranges](#whitelist-ip-ranges) above for
+  network whitelisting and TLS.
+- Admin access to create a user and database.
+- The host, port and a service credential.
+
+### Step 1: Create a service user and database[​](#step-1-create-a-service-user-and-database "Direct link to Step 1: Create a service user and database")
+
+Run as an administrator (see [Authentication](#authentication) above for the
+least-privilege rationale). If you already created the user and database while
+following the Authentication section, you can skip straight to Step 2 - the
+statements below are safe to re-run either way:
+
+```sql
+CREATE DATABASE IF NOT EXISTS meltano;
+
+CREATE USER IF NOT EXISTS import_runner IDENTIFIED WITH sha256_password BY '<strong-password>';
+
+GRANT SELECT, INSERT, ALTER, CREATE TABLE, DROP TABLE, OPTIMIZE
+  ON meltano.* TO import_runner;
+```
+
+The same user and database are reused for the loader, the state backend, and
+dbt.
+
+### Step 2: Connect the ClickHouse store[​](#step-2-connect-the-clickhouse-store "Direct link to Step 2: Connect the ClickHouse store")
+
+In the platform, create a new **store** and select **ClickHouse**. Fill in the
+connection settings for the instance from Step 1. Remember that on ClickHouse
+**the database is the schema**, so set `database` directly.
+
+| Setting | Value |
+|---|---|
+| Host | `your-instance.clickhouse.cloud` |
+| Port | `8443` (secure) / `8123` (plain HTTP) |
+| Database | `meltano` |
+| Username | `import_runner` |
+| Password | *(your service password)* |
+| Secure (TLS) | on |
+
+See [Configuration](#configuration) above for the full settings reference
+(drivers, SSH tunnel, TLS verification).
+
+#### Choose a load method[​](#choose-a-load-method "Direct link to Choose a load method")
+
+- **Append-only** - writes every record. Best for immutable event /
+  time-series streams and for incremental syncs, and avoids the cost of post-load
+  `OPTIMIZE`. Recommended default.
+- **Upsert** (default) - deduplicates by primary key using `ReplacingMergeTree` +
+  `optimize_after`. Use only when you deliberately re-load overlapping keys. Set
+  the store's `engine_type` to `ReplacingMergeTree`, `load_method` to `upsert`,
+  and enable `optimize_after`.
+
+<details>
+  <summary>Running open-source Meltano yourself?</summary>
+
+Configure the loader directly in `meltano.yml`:
+
+```yaml
+loaders:
+  - name: target-clickhouse
+    variant: meltanolabs
+    config:
+      host: your-instance.clickhouse.cloud
+      port: 8443
+      database: meltano
+      username: import_runner
+      secure: true
+    # password supplied via TARGET_CLICKHOUSE_PASSWORD
+```
+
+For upsert, add `engine_type: ReplacingMergeTree`, `load_method: upsert`, and
+`optimize_after: true`.
+
+</details>
+
+### Step 3: State backend (handled automatically)[​](#step-3-state-backend-handled-automatically "Direct link to Step 3: State backend (handled automatically)")
+
+This is what makes ClickHouse a *full* data store: pipeline state - the
+incremental bookmarks and full-table markers that let a sync resume instead of
+restarting - lives in ClickHouse itself, at parity with Postgres, Snowflake,
+BigQuery, and MSSQL.
+
+**On the platform you don't configure this.** When you connect a ClickHouse
+store, the platform automatically derives the state backend from the same
+connection details and points Meltano at it - there's no separate URI, add-on,
+or credential to manage. State is written to `meltano.state` (a
+`ReplacingMergeTree(updated_at)` keyed by `state_id`, read with `FINAL` so the
+newest state always wins).
+
+<details>
+  <summary>Running open-source Meltano yourself?</summary>
+
+Only if you run Meltano standalone (not on the platform) do you wire the state
+backend by hand. Install the add-on and point Meltano at a `clickhouse://` URI:
+
+```bash
+pip install "meltano-state-backend-clickhouse @ git+https://github.com/meltano/meltano-state-backend-clickhouse.git"
+```
+
+```yaml
+state_backend:
+  uri: clickhouse://user:password@host:8443/meltano
+```
+
+State is stored in `<schema>.<table>` (default `meltano.state`). Optional
+overrides: `state_backend.clickhouse.{host,port,database,user,password,secure,schema,table}`.
+
+</details>
+
+### Step 4: (Optional) Add dbt transforms[​](#step-4-optional-add-dbt-transforms "Direct link to Step 4: (Optional) Add dbt transforms")
+
+To transform data in place, add **dbt** to your ClickHouse workspace. It uses
+`dbt-clickhouse` and pre-fills its connection from the store you connected in
+Step 2, so there's no separate profile to manage. (Standalone Meltano users add
+the `dbt-clickhouse` transformer and a profile pointing at the same instance and
+database.)
+
+### Step 5: Verify[​](#step-5-verify "Direct link to Step 5: Verify")
+
+Run a pipeline into your ClickHouse store from the workspace, then confirm data
+and state landed:
+
+```sql
+-- data
+SELECT count() FROM meltano.<your_stream>;
+
+-- state (written automatically by the state backend)
+SELECT state_id, updated_at FROM meltano.state FINAL ORDER BY updated_at DESC LIMIT 5;
+```
+
+A second run of the same pipeline should resume from saved state (incremental)
+rather than reloading from scratch.
+
+<details>
+  <summary>Running open-source Meltano yourself?</summary>
+
+```bash
+meltano run <your-extractor> target-clickhouse
+```
+
+
+</details>
+
+### Troubleshooting[​](#troubleshooting "Direct link to Troubleshooting")
+
+- **`Table X.Y does not exist. Maybe you meant Z.Y?`** - you set both `database`
+  and `default_target_schema` to different values. On ClickHouse the database is
+  the schema; set `database` and leave `default_target_schema` unset.
+- **Slow loads with `upsert`** - `optimize_after` runs `OPTIMIZE TABLE` (a full
+  partition rewrite) after every load. Switch to `append-only` unless you need
+  key-level dedup.
+- **Duplicate rows visible between runs** - expected with `ReplacingMergeTree`
+  until a merge/`OPTIMIZE` runs; enable `optimize_after` or query with `FINAL`.
+- **Connection refused / timeout** - confirm Meltano's egress IP
+  (`51.137.148.226`) is on your IP allow-list and that you're using the correct
+  port (`8443` secure, `8123` plain HTTP, `9000` native).
+
+---
+
+## Performance notes[​](#performance-notes "Direct link to Performance notes")
+
+- **Prefer `append-only` unless you re-load overlapping keys.** ClickHouse has no
+  native row-level update; `upsert` is emulated with `ReplacingMergeTree` +
+  `OPTIMIZE TABLE`, which rewrites whole partitions on every load. On large tables
+  that cost can dominate the load. Only enable `upsert` when you deliberately
+  re-ingest the same keys and want deduplication.
+- **`optimize_after` dedup is eventual.** Without `OPTIMIZE`/`FINAL`, queries may
+  briefly see duplicate rows between loads. `optimize_after: true` forces the
+  collapse at the end of each run.
+- **Use `async_insert` for high-frequency, small-batch streams** to reduce part
+  churn.
+- **Native driver (`port 9000`)** can be faster for very large loads; the HTTP
+  driver (`8123`/`8443`) is the safe, firewall-friendly default.
+
+---
+
+## Interested in Security?[​](#interested-in-security "Direct link to Interested in Security?")
+
+Following this guide mitigates the most common threats to an internet-reachable
+analytics store:
+
+- **Unauthorized network access** - closed by the IP allow-list.
+- **Credential compromise / lateral movement** - limited by a dedicated,
+  least-privilege service user scoped to a single database.
+- **Traffic interception** - prevented by TLS (`secure: true`, `verify: true`).
+
+At Meltano, we take security seriously and are always happy to discuss ways to
+improve the security posture of your data platform.

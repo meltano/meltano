@@ -15,7 +15,7 @@ const gettingStartedCategory = require('./docs/getting-started/_category_.json')
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
-  tutorialSidebar: [
+  platformSidebar: [
     {
       type: 'category',
       label: 'Getting Started',
@@ -34,10 +34,9 @@ const sidebars = {
       label: require('./docs/meltano-cloud/_category_.json').label,
       customProps: require('./docs/meltano-cloud/_category_.json').customProps,
       link: { type: 'doc', id: 'meltano-cloud/index' },
-      collapsed: false,
+      collapsed: true,
       items: [
         { type: 'doc', id: 'meltano-cloud/cloud-overview' },
-        { type: 'doc', id: 'meltano-cloud/cloud-quickstart' },
         { type: 'doc', id: 'meltano-cloud/creating-workspace' },
         { type: 'doc', id: 'meltano-cloud/managing-a-workspace' },
         {
@@ -47,6 +46,7 @@ const sidebars = {
           items: [
             { type: 'doc', id: 'meltano-cloud/connect-a-store/snowflake-guides' },
             { type: 'doc', id: 'meltano-cloud/connect-a-store/microsoft-sql-server-guides' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/clickhouse-store' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
@@ -68,7 +68,7 @@ const sidebars = {
       label: require('./docs/meltano-open/_category_.json').label,
       customProps: require('./docs/meltano-open/_category_.json').customProps,
       link: { type: 'doc', id: 'meltano-open/index' },
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: 'doc',

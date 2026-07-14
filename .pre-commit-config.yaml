@@ -6,6 +6,8 @@ ci:
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: monthly
+  skip:
+    - uv-audit
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -27,7 +29,7 @@ repos:
       - id: no-commit-to-branch
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.3
+    rev: 0.37.4
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -52,7 +54,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.5.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v10.6.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
@@ -64,7 +66,7 @@ repos:
           - "eslint-plugin-prettier@5.5.6"
           - "eslint-plugin-react@7.37.5"
           - "eslint-plugin-vue@10.9.2"
-          - "prettier@3.8.5"
+          - "prettier@3.9.4"
           - "globals@17.7.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -75,11 +77,13 @@ repos:
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.24
+    rev: 0.11.26
     hooks:
       - id: uv-lock
+      - id: uv-sync
+      - id: uv-audit
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.47.2
+    rev: v1.48.0
     hooks:
       - id: typos
