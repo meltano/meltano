@@ -18,7 +18,7 @@ const sidebars = {
   connectorsSidebar: [
     { type: 'doc', id: 'connectors/index', label: 'All connectors' },
     { type: 'doc', id: 'connectors/tap-spreadsheets-outlook', label: 'Outlook' },
-    { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'Sharepoint' },
+    { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'SharePoint' },
   ],
   platformSidebar: [
     {

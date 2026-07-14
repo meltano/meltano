@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 
 const CONNECTORS = [
   { label: 'Outlook', href: '/connectors/tap-spreadsheets-outlook' },
-  { label: 'Sharepoint', href: '/connectors/tap-spreadsheets-sharepoint' },
+  { label: 'SharePoint', href: '/connectors/tap-spreadsheets-sharepoint' },
 ];
 
 export default function ConnectorSearch() {
   const [query, setQuery] = useState('');
 
-  const filtered = query.trim()
-    ? CONNECTORS.filter(c => c.label.toLowerCase().includes(query.toLowerCase()))
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? CONNECTORS.filter(c => c.label.toLowerCase().includes(q))
     : CONNECTORS;
 
   return (
