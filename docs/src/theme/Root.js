@@ -16,8 +16,7 @@ export default function Root({ children }) {
     if (pathname.length > 1 && pathname.endsWith('/')) {
       history.replace({ pathname: pathname.replace(/\/+$/, ''), search, hash });
     }
-    // Run once on mount (first load); SPA navigation is already slashless.
-  }, []);
+  }, [pathname, search, hash, history]);
 
   return <>{children}</>;
 }
