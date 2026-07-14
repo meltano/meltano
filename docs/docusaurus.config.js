@@ -13,6 +13,7 @@ const config = {
   tagline: '',
   url: 'https://docs.meltano.com',
   baseUrl: '/',
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'warn',
   favicon: 'img/favicon.png',
