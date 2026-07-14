@@ -219,6 +219,22 @@ class TestJob:
         assert exc_info.value.code == 143
         assert sigterm_received()
 
+    @pytest.mark.asyncio
+    async def test_sigterm_flag_reset_on_new_run(
+        self,
+        session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """A stale SIGTERM flag from a previous run must not leak into the next."""
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", True)
+        subject = self.sample_job({"original_state": 1}).save(session)
+
+        async with subject.run(session):
+            pass
+
+        assert not sigterm_received()
+        assert subject.state is State.SUCCESS
+
     def test_run_id(self, session) -> None:
         job = Job()
         run_id = job.run_id

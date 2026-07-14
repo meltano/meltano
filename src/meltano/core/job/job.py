@@ -407,6 +407,11 @@ class Job(SystemModel):
 
     @contextmanager
     def _handling_sigterm(self, session: Session) -> Generator[None]:  # noqa: ARG002
+        # A new run should only report SIGTERMs delivered during that run, so
+        # clear any stale flag from a previous run in this process
+        global _sigterm_received
+        _sigterm_received = False
+
         def cancel_task() -> None:
             # Cancel the task running the job so termination flows through the
             # same cancellation path as SIGINT, giving plugin subprocesses the
