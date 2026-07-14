@@ -1,0 +1,72 @@
+---
+title: Spreadsheets (Outlook)
+description: Sync attachments and message data out of a mailbox using the same Microsoft sign-in your team already uses.
+---
+
+# Spreadsheets (Outlook)
+
+The Outlook connector reads mail and attachments directly out of a single Office 365 mailbox. It's built for teams whose working data — spreadsheets, exports, reports — lands as email attachments rather than in a shared drive. You sign in with the mailbox's own Microsoft account, point the connector at the folders you care about, and it syncs from there on a schedule.
+
+## At a glance
+
+| | |
+|---|---|
+| **Authentication** | OAuth login (Sign in with Microsoft) |
+| **Streams** | Configured per mailbox folder (not a fixed list) |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+The connector reads the mailbox over IMAP, scoped to whatever the signed-in account can already see.
+
+- Attachments (e.g. spreadsheet exports) from the folders you configure
+- Message content from those same folders
+- Only the signed-in user's own mailbox — never anyone else's
+
+## Prerequisites
+
+- **A Microsoft/Office 365 account for the mailbox you want to sync** — the connector acts as that account and reads only its own mail.
+- **IMAP enabled for that mailbox** — this is independent of everything else below. If IMAP is switched off organisation-wide or for this specific mailbox in Exchange Online, the sync will fail even after sign-in succeeds. Worth checking with IT before you start, not after.
+- **IT admin approval, in some organisations** — less often needed than for SharePoint, but possible. See below.
+
+## Setup
+
+### In Outlook / Office 365
+
+1. Confirm IMAP is enabled for the mailbox you want to sync (ask your IT admin if you're not sure — it's an Exchange Online setting, not something you toggle from your own inbox).
+2. Note the mailbox address and the folders you want synced.
+
+### In Meltano Cloud
+
+1. Add the Spreadsheets (Outlook) data source.
+2. Enter the mailbox email address and the folders/attachments to sync.
+3. Click **Login with Microsoft**. You'll be redirected to Microsoft's own sign-in page.
+4. Sign in with the mailbox's Microsoft/Office 365 account and review the consent screen.
+5. If you can self-consent, click **Accept** and you're redirected back — the connection completes automatically.
+6. If you see **"Approval required / Ask your admin"** instead, your IT administrator needs to approve the app first. See below.
+7. Once consent is granted, Meltano stores a refresh token securely so scheduled syncs keep running without repeated sign-ins.
+
+## If your IT team needs to approve first
+
+This comes up less often than it does for SharePoint, but it's worth knowing why, and what to do if it does.
+
+**Why it happens:** Outlook access uses a single scope, `IMAP.AccessAsUser.All`, which Microsoft classifies as low impact. That means most tenants let users self-consent to it. An admin prompt only appears if your organisation has tightened consent settings further than the default (for example, "do not allow user consent" at all).
+
+**What's actually being requested (nothing more than this):**
+
+| Permission | What it grants |
+|---|---|
+| `IMAP.AccessAsUser.All` | Read access to the signed-in user's own mailbox over IMAP — never another mailbox, never org-wide access |
+| `offline_access` | Lets scheduled syncs keep running without re-authenticating every time |
+
+There is no write access requested, no directory or user data access, and no tenant-wide permission.
+
+**What to hand your IT admin, if you do hit the prompt:** ask them to grant admin consent via `Entra admin centre → Enterprise applications → Consent and permissions`, or check `Enterprise applications → Admin consent requests` if your tenant routes it through a request queue. Once granted, other users in your organisation can connect without hitting the same prompt.
+
+## Available streams
+
+There's no fixed stream list — what you sync is the mail and attachment content from the folders you configure. Point the connector at different folders and you're syncing different content.
+
+## Need help?
+
+If IMAP is enabled and consent is granted but a sync still isn't pulling the attachments you expect, file it through the usual Meltano support channel with the mailbox and folder path involved.

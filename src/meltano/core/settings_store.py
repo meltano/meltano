@@ -326,14 +326,6 @@ class SettingsStoreManager(ABC):
                 instruction=instruction,
             )
 
-    def log(self, message: str) -> None:
-        """Log method.
-
-        Args:
-            message: message to log.
-        """
-        self.settings_service.log(message)
-
 
 class ConfigOverrideStoreManager(SettingsStoreManager):
     """Config override store manager."""
@@ -360,7 +352,6 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         """
         try:
             value = self.settings_service.config_override[name]
-            self.log(f"Read key '{name}' from config override: {value!r}")
             return value, {}  # noqa: TRY300
         except KeyError:
             return None, {}
@@ -449,32 +440,6 @@ class EnvStoreManager(BaseEnvStoreManager):
         """Values from the calling terminals environment."""
         return self.settings_service.env
 
-    @override
-    def get(
-        self,
-        name: str,
-        setting_def: SettingDefinition | None = None,
-        *,
-        cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
-        """Get value by name from the .env file.
-
-        Args:
-            name: Setting name.
-            setting_def: SettingDefinition instance.
-            cast_value: Whether to cast the value according to `setting_def`.
-
-        Returns:
-            A tuple the got value and a dictionary containing metadata.
-        """
-        value, metadata = super().get(name, setting_def, cast_value=cast_value)
-
-        if value is not None:
-            env_key = metadata["env_var"]
-            self.log(f"Read key '{env_key}' from the environment: {value!r}")
-
-        return value, metadata
-
 
 class DotEnvStoreManager(BaseEnvStoreManager):
     """.env file store manager."""
@@ -517,32 +482,6 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         return self._env
 
     @override
-    def get(
-        self,
-        name: str,
-        setting_def: SettingDefinition | None = None,
-        *,
-        cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
-        """Get value by name from the .env file.
-
-        Args:
-            name: Setting name.
-            setting_def: SettingDefinition instance.
-            cast_value: Whether to cast the value according to `setting_def`.
-
-        Returns:
-            A tuple the got value and a dictionary containing metadata.
-        """
-        value, metadata = super().get(name, setting_def, cast_value=cast_value)
-
-        if value is not None:
-            env_key = metadata["env_var"]
-            self.log(f"Read key '{env_key}' from `.env`: {value!r}")
-
-        return value, metadata
-
-    @override
     def set(self, name: str, path: list[str], value, setting_def=None):  # noqa: ANN001, ANN201
         """Set value by name in the .env file.
 
@@ -573,13 +512,11 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             if dotenv_file.exists():
                 for key in other_keys:
                     dotenv.unset_key(dotenv_file, key)
-                    self.log(f"Unset key '{key}' in `.env`")
             else:
                 dotenv_file.touch()
 
             dotenv.set_key(dotenv_file, primary_key, setting_def.stringify_value(value))
 
-        self.log(f"Set key '{primary_key}' in `.env`: {value!r}")
         return {"env_var": primary_key}
 
     @override
@@ -618,7 +555,6 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
             for key in env_keys:
                 dotenv.unset_key(dotenv_file, key)
-                self.log(f"Unset key '{key}' in `.env`")
 
         return {}
 
@@ -717,7 +653,6 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             except KeyError:
                 continue
 
-            self.log(f"Read key '{key}' from `meltano.yml`: {value!r}")
             vals_with_metadata.append((value, {"key": key, "expandable": True}))
 
         if len(vals_with_metadata) > 1 and not reduce(
@@ -769,14 +704,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         with self.update_config() as config:
             for key in keys_to_unset:
                 config.pop(key, None)
-                self.log(f"Popped key '{key}' in `meltano.yml`")
 
             for path_to_unset in paths_to_unset:
                 pop_at_path(config, path_to_unset, None)
-                self.log(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             set_at_path(config, path, value)
-            self.log(f"Set path '{path}' in `meltano.yml`: {value!r}")
 
         return {}
 
@@ -806,14 +738,11 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         with self.update_config() as config:
             for key in keys_to_unset:
                 config.pop(key, None)
-                self.log(f"Popped key '{key}' in `meltano.yml`")
 
             for path_to_unset in paths_to_unset:
                 pop_at_path(config, path_to_unset, None)
-                self.log(f"Popped path '{path_to_unset}' in `meltano.yml`")
 
             pop_at_path(config, path, None)
-            self.log(f"Popped path '{path}' in `meltano.yml`")
 
         return {}
 
@@ -1010,7 +939,6 @@ class DbStoreManager(SettingsStoreManager):
                     .value
                 )
 
-            self.log(f"Read key '{name}' from system database: {value!r}")
             return value, {}  # noqa: TRY300
         except (sqlalchemy.exc.NoResultFound, KeyError):
             return None, {}
@@ -1045,7 +973,6 @@ class DbStoreManager(SettingsStoreManager):
 
         self._all_settings = None
 
-        self.log(f"Set key '{name}' in system database: {value!r}")
         return {}
 
     @override
@@ -1073,7 +1000,6 @@ class DbStoreManager(SettingsStoreManager):
 
         self._all_settings = None
 
-        self.log(f"Deleted key '{name}' from system database")
         return {}
 
     @override
@@ -1161,7 +1087,6 @@ class InheritedStoreManager(SettingsStoreManager):
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:
             return None, {}
 
-        self.log(f"Read key '{name}' from inherited: {value!r}")
         return value, {
             "inherited_source": metadata["source"],
             "expandable": metadata.get("expandable", False),
@@ -1230,7 +1155,6 @@ class DefaultStoreManager(SettingsStoreManager):
         if setting_def:
             value = setting_def.value
             if value is not None:
-                self.log(f"Read key '{name}' from default: {value!r}")
                 return value, {"expandable": True}
         # As default is lowest in our order of precedence, we want it to always return
         # a value, even if it is None.

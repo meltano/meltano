@@ -26,9 +26,6 @@ export default function BlogLayout(props) {
         <h1 className="text-4xl md:text-6xl font-bold mb-10 lg:mt-10">
           Changelog
         </h1>
-        <a href="https://meltano.com/lp/meltastic-newsletter/" className="btn main-btn">
-          Subscribe to Updates
-        </a>
       </div>
       <div className={clsx(styles.changelog, 'container')}>
         <div className="row">

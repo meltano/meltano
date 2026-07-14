@@ -6,6 +6,8 @@ ci:
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: monthly
+  skip:
+    - uv-audit
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -64,7 +66,7 @@ repos:
           - "eslint-plugin-prettier@5.5.6"
           - "eslint-plugin-react@7.37.5"
           - "eslint-plugin-vue@10.9.2"
-          - "prettier@3.8.5"
+          - "prettier@3.9.4"
           - "globals@17.7.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -78,6 +80,8 @@ repos:
     rev: 0.11.26
     hooks:
       - id: uv-lock
+      - id: uv-sync
+      - id: uv-audit
 
   - repo: https://github.com/crate-ci/typos
     rev: v1.48.0
