@@ -1,0 +1,78 @@
+---
+title: Spreadsheets (SharePoint)
+description: Sync spreadsheet and document data straight out of your organisation's SharePoint sites, using the same Microsoft sign-in your team already uses.
+---
+
+# Spreadsheets (SharePoint)
+
+The SharePoint connector pulls spreadsheet and file data directly out of your organisation's SharePoint sites. It's built for teams who already keep their working data in Excel workbooks or CSVs on SharePoint, and want that data flowing into Meltano without exporting, re-uploading, or maintaining a separate copy anywhere. You sign in with the same Microsoft account you already use for SharePoint, point the connector at a site and folder path, and it takes it from there.
+
+## At a glance
+
+| | |
+|---|---|
+| **Authentication** | OAuth login (Sign in with Microsoft) |
+| **Streams** | Configured per site and folder path (not a fixed list) |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+The connector reads whatever spreadsheet or file content lives at the SharePoint site and path you point it to.
+
+- Excel workbooks and CSV files stored in a SharePoint site's document libraries
+- Content from any site and folder path the signed-in user already has access to
+- Nothing outside what that user could already open themselves in a browser
+
+## Prerequisites
+
+You only need one thing to get started: a Microsoft/Office 365 account with access to the SharePoint site you want to sync.
+
+- **Microsoft account access to the target site** — the account you sign in with must already be able to open the site and folder in a browser. The connector reads only what that account can already see; it doesn't grant any new access.
+- **IT admin approval, in most organisations** — see the callout below. This is the one step that catches people out, so plan for it before you promise a go-live date.
+
+## Setup
+
+### In SharePoint
+
+1. Confirm the site and folder path you want to sync (in the form `sharepoint://<site_name>/path/to/dir`), and confirm the signed-in account can already open that path in a browser.
+2. No further setup is needed on the SharePoint side — there's no app registration or token to generate yourself.
+
+### In Meltano Cloud
+
+1. Add the Spreadsheets (SharePoint) data source.
+2. Enter your Tables configuration — the site and directory path(s) to sync.
+3. Click **Login with Microsoft**. You'll be redirected to Microsoft's own sign-in page.
+4. Sign in with your Microsoft/Office 365 account and review the consent screen.
+5. If you can self-consent, click **Accept** and you're redirected back — the connection completes automatically.
+6. If instead you see **"Approval required / Ask your admin"**, you cannot proceed until your IT administrator approves the app in your Microsoft Entra ID (Azure AD) tenant. See below.
+7. Once consent is granted, Meltano stores a refresh token securely so scheduled syncs keep running without you having to sign in again.
+
+## If your IT team needs to approve first
+
+This is worth flagging early, because it's the single biggest reason a SharePoint connection stalls after everything else looks done.
+
+**Why it happens:** most organisations restrict which apps end users can approve on their own. SharePoint access uses Microsoft Graph's `Sites.Read.All` and `Files.Read.All` permissions. Because these carry the broader `.All` suffix, Microsoft doesn't classify them as "low impact" — so even in tenants that let people self-approve minor apps, SharePoint access almost always gets routed to an admin instead.
+
+**What's actually being requested (nothing more than this):**
+
+| Permission | What it grants |
+|---|---|
+| `Sites.Read.All` | Read access to SharePoint sites the signed-in user can already access — nothing beyond what they could already open |
+| `Files.Read.All` | Read access to files the signed-in user can already access — same limit |
+| `offline_access` | Lets scheduled syncs keep running without re-authenticating every time |
+
+There is no write access requested, no tenant-wide access, and no access to sites or files the signed-in user couldn't already open themselves.
+
+**What to hand your IT admin:** ask them to grant admin consent for the app (the most direct fix) via:
+
+`Entra admin centre → Enterprise applications → Consent and permissions`
+
+or, if your tenant has the request workflow turned on, they'll see it waiting in `Enterprise applications → Admin consent requests`. Once approved once, every user in your organisation can connect without hitting the prompt again. The app then shows up under Enterprise applications, where IT can review or revoke it any time.
+
+## Available streams
+
+There's no fixed stream list here in the way an API connector has one — what you sync is whatever spreadsheet or file content sits at the site and folder path you configure. Point the connector at a different path, and you're syncing different content; there's no schema to discover ahead of time beyond the files themselves.
+
+## Need help?
+
+If a file or folder isn't showing up the way you expect, or a sync fails after admin approval, file it through the usual Meltano support channel with your site path and the error message you're seeing.

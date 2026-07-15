@@ -15,6 +15,11 @@ const gettingStartedCategory = require('./docs/getting-started/_category_.json')
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
+  connectorsSidebar: [
+    { type: 'doc', id: 'connectors/index', label: 'All connectors' },
+    { type: 'doc', id: 'connectors/tap-spreadsheets-outlook', label: 'Outlook' },
+    { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'SharePoint' },
+  ],
   platformSidebar: [
     {
       type: 'category',
