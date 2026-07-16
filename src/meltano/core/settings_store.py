@@ -513,7 +513,8 @@ class DotEnvStoreManager(BaseEnvStoreManager):
                 for key in other_keys:
                     dotenv.unset_key(dotenv_file, key)
             else:
-                dotenv_file.touch()
+                # `.env` holds secrets; don't create it world-readable
+                dotenv_file.touch(mode=0o600)
 
             dotenv.set_key(dotenv_file, primary_key, setting_def.stringify_value(value))
 
