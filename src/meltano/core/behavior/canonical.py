@@ -332,10 +332,9 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
                 if key in self._verbatim:
                     if val is None:
                         continue
-                else:
-                    # bool values are valid and should be forwarded
-                    if val is not False:
-                        continue
+                # bool values are valid and should be forwarded
+                elif val is not False:
+                    continue
 
             # empty canonicals should be skipped
             if isinstance(val, Canonical) and not dict(val):
