@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.metadata
 import json
 import os
 import sys
@@ -17,6 +16,7 @@ import structlog.stdlib
 from packaging.version import parse
 
 from meltano.core._packaging import editable_installation
+from meltano.core.utils import get_meltano_version
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -129,7 +129,7 @@ class VersionCheckService:
         if not self.should_check_version():
             return None
 
-        current_version = importlib.metadata.version("meltano")
+        current_version = get_meltano_version()
 
         # Skip check for development versions
         if self._is_development_version(current_version):
