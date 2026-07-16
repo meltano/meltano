@@ -7,7 +7,7 @@ import sys
 import typing as t
 from functools import lru_cache
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
 
 if sys.version_info >= (3, 11):
