@@ -259,6 +259,7 @@ enable_error_code = [
   "exhaustive-match",
   "deprecated",
 ]
+explicit_package_bases = true
 incremental = true
 files = [
   "src/meltano/",
@@ -268,6 +269,7 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+mypy_path = ["src"]
 strict = false
 warn_redundant_casts = true
 warn_unreachable = true

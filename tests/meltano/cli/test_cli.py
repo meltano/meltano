@@ -20,7 +20,7 @@ import responses
 import yaml
 from structlog.stdlib import get_logger
 
-import meltano
+import meltano.cli
 from asserts import assert_cli_runner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
@@ -30,6 +30,7 @@ from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import get_meltano_version
 from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
@@ -193,7 +194,7 @@ class TestCli:
     def test_version(self, cli_runner) -> None:
         cli_version = cli_runner.invoke(cli, ["--version"])
 
-        assert cli_version.output == f"meltano, version {meltano.__version__}\n"
+        assert cli_version.output == f"meltano, version {get_meltano_version()}\n"
 
     @pytest.mark.usefixtures("deactivate_project")
     def test_default_environment_is_activated(
