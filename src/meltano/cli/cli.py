@@ -138,7 +138,7 @@ def cli(
         setup_logging(project)
         logger.debug(
             "Meltano %s, Python %s, %s (%s)",
-            get_meltano_version,
+            get_meltano_version(),
             platform.python_version(),
             platform.system(),
             platform.machine(),
