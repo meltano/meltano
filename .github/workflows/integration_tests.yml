@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - src/**
-      - integration/example-library/**
+      - integration/**
       - noxfile.py
       - pyproject.toml
       - uv.lock
@@ -16,7 +16,7 @@ on:
       - 'v*'
     paths:
       - src/**
-      - integration/example-library/**
+      - integration/**
       - noxfile.py
       - pyproject.toml
       - uv.lock
