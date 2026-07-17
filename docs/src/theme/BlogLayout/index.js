@@ -36,29 +36,45 @@ function ChangelogSwitcher() {
   );
 }
 
+function BackToChangelogsLink() {
+  const { pathname } = useLocation();
+  const backTo = pathname.startsWith('/changelog/cloud') ? '/changelog/cloud' : '/changelog';
+  return (
+    <Link to={backTo} className={clsx('changelog-back-link', styles.backLink)}>
+      &larr; Back to Changelogs
+    </Link>
+  );
+}
+
 export default function BlogLayout(props) {
   // eslint-disable-next-line react/prop-types
-  const { sidebar, toc, children, ...layoutProps } = props;
+  const { sidebar, toc, children, isPostPage, ...layoutProps } = props;
   // eslint-disable-next-line react/prop-types
   const hasSidebar = sidebar && sidebar.items.length > 0;
   return (
     <Layout {...layoutProps}>
-      <div
-        className={clsx(
-          styles.changelogHeader,
-          'relative w-full bg-black text-white flex flex-col items-center py-16 md:py-24'
-        )}
-      >
-        <img
-          src={Melty}
-          alt="Melty"
-          className={clsx(styles.melty, '-mb-16 hidden lg:block')}
-        />
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 lg:mt-10">
-          Changelog
-        </h1>
-        <ChangelogSwitcher />
-      </div>
+      {isPostPage ? (
+        <div className={clsx(styles.backLinkWrapper, 'container')}>
+          <BackToChangelogsLink />
+        </div>
+      ) : (
+        <div
+          className={clsx(
+            styles.changelogHeader,
+            'relative w-full bg-black text-white flex flex-col items-center py-16 md:py-24'
+          )}
+        >
+          <img
+            src={Melty}
+            alt="Melty"
+            className={clsx(styles.melty, '-mb-16 hidden lg:block')}
+          />
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 lg:mt-10">
+            Changelog
+          </h1>
+          <ChangelogSwitcher />
+        </div>
+      )}
       <div className={clsx(styles.changelog, 'container')}>
         <div className="row">
           <BlogSidebar sidebar={sidebar} />

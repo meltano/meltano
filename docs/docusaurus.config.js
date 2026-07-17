@@ -166,7 +166,7 @@ const config = {
                 href: 'https://meltano.com/blog',
               },
               {
-                label: 'Case studies',
+                label: 'Case Studies',
                 href: 'https://meltano.com/case-studies',
               },
               {

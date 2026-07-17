@@ -382,7 +382,7 @@ a {
   transition: all 0.2s ease;
 }
 
-a:hover:not(.btn):not(.connector-card):not(.wm-card):not(.gs-page-nav__card):not(.menu__link):not(.navbar__link):not(.navbar__brand):not(.changelog-tab):not(.changelog-title-link):not(.changelog-readmore-link) {
+a:hover:not(.btn):not(.connector-card):not(.wm-card):not(.gs-page-nav__card):not(.menu__link):not(.navbar__link):not(.navbar__brand):not(.changelog-tab):not(.changelog-title-link):not(.changelog-readmore-link):not(.changelog-back-link) {
   text-decoration: underline !important;
 }
 
@@ -1244,10 +1244,6 @@ main {
 .footer__copyright {
   font-size: 14px;
   font-family: 'IBM Plex Mono', Arial, sans-serif;
-}
-
-.footer__link-item {
-  text-transform: capitalize;
 }
 
 .menu__link,

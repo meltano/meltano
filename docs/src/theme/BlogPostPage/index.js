@@ -25,6 +25,7 @@ function BlogPostPageContent({ sidebar, children }) {
   return (
     <BlogLayout
       sidebar={sidebar}
+      isPostPage
       toc={
         !hideTableOfContents && toc.length > 0 ? (
           <TOC
