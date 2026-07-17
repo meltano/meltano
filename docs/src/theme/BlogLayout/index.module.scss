@@ -24,6 +24,26 @@
   top: calc(var(--ifm-navbar-height) + 4.7rem);
 }
 
+.backLinkWrapper {
+  padding-top: 2rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  text-decoration: none !important;
+}
+
+.backLink:hover {
+  color: var(--meltano-link-color);
+  text-decoration: none !important;
+}
+
 @keyframes changelogFadeIn {
   from {
     opacity: 0;
