@@ -1,0 +1,23 @@
+---
+slug: 2026-07-10-cloud-changelog
+title: 10 July 2026
+date: 2026-07-10
+---
+
+ClickHouse is now a fully supported data store, alongside new tap-zendesk and tap-surveymonkey connectors and better pipeline log visibility.
+
+{/* truncate */}
+
+## Features
+
+- **ClickHouse is now a fully supported Data Store:** Connect ClickHouse as a first-class warehouse with full load and incremental import runners, dbt transform support and a state backend, with a full connection guide now published at the [ClickHouse Guide](/meltano-cloud/connect-a-store/clickhouse-store).
+- **tap-zendesk:** Sync support tickets, agent performance and customer interactions into your warehouse with the new tap-zendesk, supporting both full and incremental syncs.
+- **tap-surveymonkey:** Sync survey responses and results into your warehouse with the new tap-surveymonkey connector, supporting both full and incremental syncs.
+- **Meaningful, visible workspace deploy logs:** Workspace deploy tasks now have a "View logs" button showing exactly what changed and why a workspace deployment failed, so you can fix issues without guesswork.
+- **Bumped tap-shopify to v0.4.0:** The latest Shopify extractor improvements are now available in the catalog.
+- **Download your full pipeline logs:** No more 10,000-line cutoff - the app now shows the last 1,000 lines for fast loading and lets you download the complete log file to debug long-running pipelines end to end.
+
+## Fixes
+
+- **Faster incident response:** We've added health monitoring of the platform's job queue so our team is alerted immediately if pipeline scheduling ever slows down, before it affects your runs.
+- **Bumped tap-mysql to v1.4.1:** Fixed handling of decimal values in high-speed BATCH extractions, and the BATCH capability is now fully documented for faster MySQL backfills.

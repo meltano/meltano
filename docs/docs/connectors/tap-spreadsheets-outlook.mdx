@@ -5,11 +5,11 @@ description: Sync attachments and message data out of a mailbox using the same M
 
 # Spreadsheets (Outlook)
 
-The Outlook connector reads mail and attachments directly out of a single Office 365 mailbox. It's built for teams whose working data — spreadsheets, exports, reports — lands as email attachments rather than in a shared drive. You sign in with the mailbox's own Microsoft account, point the connector at the folders you care about, and it syncs from there on a schedule.
+The Outlook connector reads mail and attachments directly out of a single Office 365 mailbox. It's built for teams whose working data (spreadsheets, exports, reports) lands as email attachments rather than in a shared drive. You sign in with the mailbox's own Microsoft account, point the connector at the folders you care about, and it syncs from there on a schedule.
 
 ## At a glance
 
-| | |
+| Property | Value |
 |---|---|
 | **Authentication** | OAuth login (Sign in with Microsoft) |
 | **Streams** | Configured per mailbox folder (not a fixed list) |
@@ -21,19 +21,19 @@ The connector reads the mailbox over IMAP, scoped to whatever the signed-in acco
 
 - Attachments (e.g. spreadsheet exports) from the folders you configure
 - Message content from those same folders
-- Only the signed-in user's own mailbox — never anyone else's
+- Only the signed-in user's own mailbox, never anyone else's
 
 ## Prerequisites
 
-- **A Microsoft/Office 365 account for the mailbox you want to sync** — the connector acts as that account and reads only its own mail.
-- **IMAP enabled for that mailbox** — this is independent of everything else below. If IMAP is switched off organisation-wide or for this specific mailbox in Exchange Online, the sync will fail even after sign-in succeeds. Worth checking with IT before you start, not after.
-- **IT admin approval, in some organisations** — less often needed than for SharePoint, but possible. See below.
+- **A Microsoft/Office 365 account for the mailbox you want to sync.** The connector acts as that account and reads only its own mail.
+- **IMAP enabled for that mailbox.** This is independent of everything else below. If IMAP is switched off organisation-wide or for this specific mailbox in Exchange Online, the sync will fail even after sign-in succeeds. Worth checking with IT before you start, not after.
+- **IT admin approval, in some organisations.** Less often needed than for SharePoint, but possible. See below.
 
 ## Setup
 
 ### In Outlook / Office 365
 
-1. Confirm IMAP is enabled for the mailbox you want to sync (ask your IT admin if you're not sure — it's an Exchange Online setting, not something you toggle from your own inbox).
+1. Confirm IMAP is enabled for the mailbox you want to sync (ask your IT admin if you're not sure; it's an Exchange Online setting, not something you toggle from your own inbox).
 2. Note the mailbox address and the folders you want synced.
 
 ### In Meltano Cloud
@@ -42,7 +42,7 @@ The connector reads the mailbox over IMAP, scoped to whatever the signed-in acco
 2. Enter the mailbox email address and the folders/attachments to sync.
 3. Click **Login with Microsoft**. You'll be redirected to Microsoft's own sign-in page.
 4. Sign in with the mailbox's Microsoft/Office 365 account and review the consent screen.
-5. If you can self-consent, click **Accept** and you're redirected back — the connection completes automatically.
+5. If you can self-consent, click **Accept** and you're redirected back; the connection completes automatically.
 6. If you see **"Approval required / Ask your admin"** instead, your IT administrator needs to approve the app first. See below.
 7. Once consent is granted, Meltano stores a refresh token securely so scheduled syncs keep running without repeated sign-ins.
 
@@ -56,16 +56,39 @@ This comes up less often than it does for SharePoint, but it's worth knowing why
 
 | Permission | What it grants |
 |---|---|
-| `IMAP.AccessAsUser.All` | Read access to the signed-in user's own mailbox over IMAP — never another mailbox, never org-wide access |
+| `IMAP.AccessAsUser.All` | Read access to the signed-in user's own mailbox over IMAP, never another mailbox, never org-wide access |
 | `offline_access` | Lets scheduled syncs keep running without re-authenticating every time |
 
 There is no write access requested, no directory or user data access, and no tenant-wide permission.
 
 **What to hand your IT admin, if you do hit the prompt:** ask them to grant admin consent via `Entra admin centre → Enterprise applications → Consent and permissions`, or check `Enterprise applications → Admin consent requests` if your tenant routes it through a request queue. Once granted, other users in your organisation can connect without hitting the same prompt.
 
+## Settings
+
+The `tables` setting is an array of table definition objects, each describing one stream to sync.
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| `name` | string | required | The name to assign to the stream |
+| `path` | string | required | A path to a folder or set of emails in the format `imap://imap.outlook.com/path/to/folder-or-emails`. Folders and emails are treated as directories and attachments as files. Supports glob pattern matching, e.g. `imap://imap.outlook.com/*/*/` (all emails in all top-level folders), `imap://imap.outlook.com/INBOX/*/` (all emails in the inbox), `imap://imap.outlook.com/INBOX/*/*` (all attachments for emails in the inbox), `imap://imap.outlook.com/INBOX/*/*.csv` (all CSV file attachments for emails in the inbox) |
+| `format` | string | required | The format of files to sync: one of `csv`, `json`, `jsonl`, `excel` or `detect` |
+| `pattern` | string | required | A regex pattern to filter resolved files on name by. Set to `""` if `path` already filters (e.g. via glob pattern matching) and no more granular filtering is required |
+| `start_date` | string | required | An ISO-8601 date-time to filter resolved files on last modified timestamp by |
+| `key_properties` | array of strings | required | The stream primary keys. For files where a primary key can't be clearly identified, reference meta-properties such as `_smart_source_bucket`, `_smart_source_file`, `_smart_source_lineno`, or use `[]` for append-only behaviour. If using the meta-property approach, be aware that changes to file locations or contents may cause unexpected duplicates or overwrites, so it's safest only for files that are, for all intents and purposes, immutable |
+| `encoding` | string | `utf-8` | The [encoding](https://docs.python.org/3/library/codecs.html#standard-encodings) to use when reading files |
+| `state_based_discovery` | boolean | `false` | Whether to use state-based discovery, i.e. sample files starting from the bookmark stored in state rather than the initial `start_date`. Recommended: `true`, to capture schema changes and optimise performance |
+| `skip_initial` | integer | `0` | The number of lines to skip over when reading a file. Mostly useful for `excel` format files |
+| `max_sampled_files` | integer | `50` | The number of files to sample during dynamic catalog discovery |
+| `max_sampling_read` | integer | `1000` | The number of lines to sample for each file during dynamic catalog discovery |
+| `sample_rate` | integer | `5` | Controls how frequently lines are sampled (every `n`th line) during dynamic catalog discovery |
+| `prefer_schema_as_string` | boolean | `false` | Whether to skip inferring property types during sampling. For CSV files, combine with `max_sampling_read: 1` to improve discovery performance (only the header row needs sampling once every value is treated as a string) |
+| `delimiter` <br/>*(`csv` format only)* | string | `,` | The value delimiter sequence used in the targeted files |
+| `quotechar` <br/>*(`csv` format only)* | string | `"` | The quotechar delimiter character used in the targeted files. Set to `detect` to auto-discover |
+| `worksheet_name` <br/>*(`excel` format only)* | string | — | The specific worksheet name to pull out. Defaults to the sheet with the most available data |
+
 ## Available streams
 
-There's no fixed stream list — what you sync is the mail and attachment content from the folders you configure. Point the connector at different folders and you're syncing different content.
+There's no fixed stream list. What you sync is the mail and attachment content from the folders you configure. Point the connector at different folders and you're syncing different content.
 
 ## Need help?
 

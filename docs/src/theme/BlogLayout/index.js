@@ -1,9 +1,40 @@
 import React from 'react';
 import clsx from 'clsx';
+import { useLocation } from '@docusaurus/router';
+import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import BlogSidebar from '@theme/BlogSidebar';
 import Melty from '@site/static/img/melty.png';
 import styles from './index.module.scss';
+
+const CHANGELOG_TABS = [
+  { label: 'Meltano Open', to: '/changelog' },
+  { label: 'Meltano Cloud', to: '/changelog/cloud' },
+];
+
+function ChangelogSwitcher() {
+  const { pathname } = useLocation();
+  const isCloud = pathname.startsWith('/changelog/cloud');
+  return (
+    <div className={styles.changelogTabs}>
+      {CHANGELOG_TABS.map((tab) => {
+        const active = tab.to === '/changelog/cloud' ? isCloud : !isCloud;
+        return (
+          <Link
+            key={tab.to}
+            to={tab.to}
+            className={clsx('changelog-tab', styles.changelogTab, {
+              [styles.changelogTabActive]: active,
+            })}
+            aria-current={active ? 'page' : undefined}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function BlogLayout(props) {
   // eslint-disable-next-line react/prop-types
@@ -23,15 +54,16 @@ export default function BlogLayout(props) {
           alt="Melty"
           className={clsx(styles.melty, '-mb-16 hidden lg:block')}
         />
-        <h1 className="text-4xl md:text-6xl font-bold mb-10 lg:mt-10">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 lg:mt-10">
           Changelog
         </h1>
+        <ChangelogSwitcher />
       </div>
       <div className={clsx(styles.changelog, 'container')}>
         <div className="row">
           <BlogSidebar sidebar={sidebar} />
           <main
-            className={clsx('col py-10 changelog-content', {
+            className={clsx('col py-10 changelog-content', styles.changelogMain, {
               'col--8': hasSidebar,
               'col--10 col--offset-1': !hasSidebar,
             })}

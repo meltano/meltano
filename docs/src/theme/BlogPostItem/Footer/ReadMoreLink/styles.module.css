@@ -1,0 +1,18 @@
+.readMoreButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--ifm-toc-border-color);
+  background: none;
+  color: var(--ifm-font-color-base);
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+}
+
+.readMoreButton:hover {
+  border-color: var(--meltano-link-color);
+  color: var(--meltano-link-color);
+  text-decoration: none !important;
+}

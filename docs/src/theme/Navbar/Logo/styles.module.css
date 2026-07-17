@@ -1,8 +1,8 @@
 .docsLink {
-  color: var(--meltano-blue);
+  color: var(--meltano-link-color);
   font-size: 1.3rem;
   font-weight: 600;
-  border-left: 2px solid var(--meltano-blue);
+  border-left: 2px solid var(--meltano-link-color);
   margin-left: 4px;
   padding-left: 3px;
   line-height: 1.5rem
