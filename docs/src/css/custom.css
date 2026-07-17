@@ -382,7 +382,7 @@ a {
   transition: all 0.2s ease;
 }
 
-a:hover:not(.btn):not(.connector-card):not(.wm-card):not(.gs-page-nav__card):not(.menu__link) {
+a:hover:not(.btn):not(.connector-card):not(.wm-card):not(.gs-page-nav__card):not(.menu__link):not(.navbar__link):not(.navbar__brand):not(.changelog-tab):not(.changelog-title-link):not(.changelog-readmore-link) {
   text-decoration: underline !important;
 }
 
@@ -997,10 +997,10 @@ main {
 }
 
 .connector-card:hover {
-  border-color: var(--meltano-blue-hover);
-  box-shadow: 0 2px 8px rgba(87, 42, 203, 0.12);
+  border-color: var(--meltano-link-color);
+  box-shadow: 0 2px 8px rgba(124, 86, 220, 0.12);
   text-decoration: none !important;
-  color: var(--meltano-blue-hover);
+  color: var(--meltano-link-color);
 }
 
 .connector-search-wrapper {
@@ -1018,6 +1018,11 @@ main {
   color: var(--ifm-font-color-base);
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.connector-search-input:hover {
+  border-color: var(--meltano-link-color);
+  box-shadow: 0 1px 4px rgba(124, 86, 220, 0.08);
 }
 
 .connector-search-input:focus {
@@ -1239,6 +1244,10 @@ main {
 .footer__copyright {
   font-size: 14px;
   font-family: 'IBM Plex Mono', Arial, sans-serif;
+}
+
+.footer__link-item {
+  text-transform: capitalize;
 }
 
 .menu__link,

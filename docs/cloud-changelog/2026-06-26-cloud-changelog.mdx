@@ -1,0 +1,25 @@
+---
+slug: 2026-06-26-cloud-changelog
+title: 26 June 2026
+date: 2026-06-26
+---
+
+Meltano V4 brings structured pipeline logs, alongside fixes for Snowflake syncs, plugin installs, and workspace invitations.
+
+{/* truncate */}
+
+## Features
+
+- **Meltano V4 brings cleaner logs and better visibility:** Pipeline logs are now structured, metrics are auto-extracted and every log line is neatly formatted so you can instantly see what's happening inside your pipelines, no more walls of raw text. Teams using Datadog or other monitoring tools benefit from structured, parseable logs straight out of the box. Meltano V4 is now available - enable it directly from your Workspace Settings page.
+- **Bumped tap-hubspot to v0.9.1:** Corrected the primary key for properties streams to prevent duplicate data appearing downstream.
+- **Bumped tap-mysql to v1.4.0 and target-snowflake to v0.17.8-2:** MySQL backfill performance improvements are now available, including opt-in BATCH message support for high-volume extractions, delivering faster and more reliable large-scale data syncs.
+
+## Fixes
+
+- **Custom schedule editor no longer breaks on switch:** Switching a pipeline from a predefined schedule (e.g. Daily, Weekly) to a custom cron expression no longer causes a save error, predefined macros are now resolved correctly before the custom editor opens.
+- **Snowflake sync no longer silently drops columns:** Fixed an issue where Snowflake destinations were writing all-NULL rows due to a field name casing mismatch.
+- **Plugin install page refresh interruption:** Fixed an intermittent issue where the page would refresh mid-flow when installing a plugin from the Plugins tab, preventing users from completing the installation.
+- **Microsoft AD user invitations:** Fixed an issue where users with uppercase characters in their Microsoft AD email address could not accept workspace invitations.
+- **Fixed available plugin search:** Plugin lookup now searches by label in addition to name, resolving cases where space-separated terms (e.g. "Meltano Cloud") failed to match hyphenated plugin names (e.g. `tap-meltano-cloud`).
+- **Fixed target-mssql:** target-mssql no longer requires Azure Blob storage configuration when it isn't needed.
+- **Bumped target-mssql to v0.1.5:** Fixed double-counted record metrics and removed noisy Azure HTTP log output, giving you cleaner pipeline logs and more accurate sync reporting.

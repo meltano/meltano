@@ -31,7 +31,24 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: ['docusaurus-plugin-sass'],
+  plugins: [
+    'docusaurus-plugin-sass',
+    [
+      '@docusaurus/plugin-content-blog',
+      /** @type {import('@docusaurus/plugin-content-blog').PluginOptions} */
+      ({
+        id: 'cloudChangelog',
+        routeBasePath: 'changelog/cloud',
+        path: './cloud-changelog',
+        blogTitle: 'Changelog',
+        blogSidebarTitle: 'All Releases',
+        blogDescription: '',
+        postsPerPage: 20,
+        blogSidebarCount: 'ALL',
+        showReadingTime: false,
+      }),
+    ],
+  ],
 
   presets: [
     [

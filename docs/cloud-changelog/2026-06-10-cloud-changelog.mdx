@@ -1,0 +1,24 @@
+---
+slug: 2026-06-10-cloud-changelog
+title: 10 June 2026
+date: 2026-06-10
+---
+
+Power BI OAuth support and Microsoft SSO enforcement headline this release, alongside improved memory stability.
+
+{/* truncate */}
+
+## Features
+
+- **Power BI OAuth support:** The Power BI utility now supports OAuth, enabling seamless semantic model refreshes directly from your pipelines.
+- **Microsoft SSO enforcement:** Users on SSO-enforced domains are now routed through Entra ID automatically at login and on workspace invitation, i.e. no password required.
+- **Sensitive settings masking:** Sensitive plugin settings and JDBC parameters are now redacted in the browser UI.
+- **tap-aptem:** tap-aptem is now a supported connector for the Aptem learning management platform.
+- **HubSpot tap v0.9.0:** Adds leads, teams, and custom CRM object streams for more complete pipeline coverage.
+- **Bumped target-mssql to v0.1.3:** Adds Azure Blob Storage settings and improves compatibility for MSSQL target users.
+
+## Fixes
+
+- **Improved memory stability:** Resolved multiple out-of-memory errors affecting workspace deployments and large sized file uploads.
+- **Fixed pipeline triggers stalling:** A slow SendGrid email send can no longer block downstream pipeline triggers.
+- **Updated documentation:** Snowflake store setup guides and the Meltano Cloud API reference are now published on docs.meltano.com.

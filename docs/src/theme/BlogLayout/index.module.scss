@@ -23,3 +23,68 @@
 .toc > div {
   top: calc(var(--ifm-navbar-height) + 4.7rem);
 }
+
+@keyframes changelogFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.changelogMain {
+  animation: changelogFadeIn 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .changelogMain {
+    animation: none;
+  }
+}
+
+.changelogTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  z-index: 1;
+}
+
+.changelogTab {
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--meltano-black);
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+
+  &:hover {
+    border-color: var(--meltano-link-color);
+    background-color: var(--meltano-white);
+    color: var(--meltano-black);
+    text-decoration: none !important;
+  }
+}
+
+:global([data-theme='dark']) .changelogTab:not(.changelogTabActive) {
+  background-color: transparent;
+  color: var(--meltano-white);
+}
+
+.changelogTabActive,
+.changelogTabActive:hover {
+  border-color: var(--meltano-link-color);
+  background-color: var(--meltano-link-color);
+  color: var(--meltano-white);
+}
+
+:global([data-theme='dark']) .changelogTabActive,
+:global([data-theme='dark']) .changelogTabActive:hover {
+  color: var(--meltano-black);
+}

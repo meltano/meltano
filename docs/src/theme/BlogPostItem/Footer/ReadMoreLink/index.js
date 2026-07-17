@@ -1,6 +1,8 @@
 import React from 'react';
+import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import Link from '@docusaurus/Link';
+import styles from './styles.module.css';
 function ReadMoreLabel() {
   return (
     <b>
@@ -14,7 +16,7 @@ function ReadMoreLabel() {
 }
 export default function BlogPostItemFooterReadMoreLink(props) {
   // eslint-disable-next-line react/prop-types
-  const {blogPostTitle, ...linkProps} = props;
+  const {blogPostTitle, className, ...linkProps} = props;
   return (
     <Link
       aria-label={translate(
@@ -26,6 +28,7 @@ export default function BlogPostItemFooterReadMoreLink(props) {
         },
         {title: blogPostTitle},
       )}
+      className={clsx('changelog-readmore-link', styles.readMoreButton, className)}
       {...linkProps}>
       <ReadMoreLabel />
     </Link>

@@ -1,0 +1,25 @@
+---
+slug: 2026-06-17-cloud-changelog
+title: 17 June 2026
+date: 2026-06-17
+---
+
+Sensitive settings are now redacted in the UI, with new pipeline jobs and metrics streams for tap-meltano-cloud.
+
+{/* truncate */}
+
+## Features
+
+- **Sensitive settings & JDBC masking:** Sensitive plugin settings and JDBC connection parameters are now fully redacted in the browser UI: credentials stay hidden while admins retain copy access.
+- **tap-meltano-cloud pipeline jobs & metrics streams:** The Meltano Cloud tap now includes pipeline jobs and pipeline metrics streams, giving customers deeper reporting on pipeline usage and performance.
+- **Renamed "External Logging" to "Advanced Settings":** Renamed on the Workspace Settings page for clearer configuration management.
+- **Bumped tap-bing-ads to v0.3.2** in the catalog.
+- **Bumped tap-mysql to v1.1.0** in the catalog.
+- **Defined required settings for tap-klaviyo.**
+
+## Fixes
+
+- **Invitation flow repaired:** Fixed invitations not auto-populating the email field on the accept invite flow.
+- **Re-invited admins no longer locked out:** Revoking and re-inviting a workspace admin now works correctly, i.e. the stale admin record is cleaned up so the new invitation can be accepted without issues.
+- **Project tab crash in Lab resolved:** Fixed a crash on the project tab caused by invalid JSON in plugin parameter fields.
+- **Updated documentation:** The legacy "Meltano UI and REST API Server (Deprecated)" page has been removed from the docs index and reference section.

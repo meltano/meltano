@@ -1,0 +1,25 @@
+---
+slug: 2026-06-04-cloud-changelog
+title: 4 June 2026
+date: 2026-06-04
+---
+
+Power BI semantic model refreshes and Microsoft Login arrive, alongside a batch of connector fixes and reliability improvements.
+
+{/* truncate */}
+
+## Features
+
+- **Power BI utility (powerbi--matatika):** Trigger Power BI semantic model refreshes directly from your pipelines, ensuring dashboards update automatically when new data is available.
+- **Microsoft Login:** Sign in to Meltano with the same Microsoft account you use every day - no extra passwords, no separate credentials, just seamless access through your organisation's existing Entra ID setup.
+
+## Fixes
+
+- Fixed tap-meltano-cloud to automatically set the appropriate `api_url` based on `$ENDPOINT_URL`.
+- Fixed tap-govuk-weekly-road-fuel-prices incorrectly parsing the header row as a data record.
+- Bumped tap-jira to v0.4.3, fixing `audit_records` stream pagination issues that could cause incomplete syncs.
+- Bumped tap-facebook to v0.5.0, adding support for configuring the API page size limit.
+- Bumped tap-spreadsheets-anywhere plugins to v0.5.3, resolving noisy Azure HTTP logs and unnecessary "Skipping processing" warnings.
+- Bumped target-mssql to v0.1.2 and added missing generic Singer SDK target settings.
+- Fixed out-of-memory errors during workspace deployments, improving reliability for workspaces with a large number of pipelines.
+- Improved handling of large workspace resource uploads, preventing memory-related failures when uploading larger files such as PDFs and images.

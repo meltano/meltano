@@ -1,0 +1,16 @@
+---
+slug: 2026-07-17-cloud-changelog
+title: 17 July 2026
+date: 2026-07-17
+---
+
+A cleaner connectors catalog and a refreshed docs site, plus fixes for tap-mysql and target-snowflake.
+
+{/* truncate */}
+
+## Fixes
+
+- **Bumped tap-mysql to v1.5.2:** MySQL TINYINT columns now come through as real boolean values instead of raw integers, and the extractor now uses native ADBC driver support to correctly handle MySQL's `0000-00-00` "zero date" values instead of erroring out.
+- **Bumped target-snowflake to v0.17.8-4:** Record-count metrics reported after a Snowflake load are now accurate, so you can trust the numbers in your run summaries.
+- **Cleaner connectors catalog:** The connectors page now shows only current, supported variants. Duplicate unsupported Zendesk and Rakuten Advertising listings are gone and supported MeltanoLabs variants now appear correctly under the Meltano Cloud tab.
+- **Documentation refresh:** docs.meltano.com now sports a dedicated Connectors section with a searchable index (including new guides for the Outlook and SharePoint spreadsheet connectors and others on the way) and expanded Cloud API reference docs.
