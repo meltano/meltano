@@ -21,8 +21,10 @@ from meltano.cli.utils import (
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.logging.utils import capture_subprocess_output
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
@@ -36,7 +38,6 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.cli.params import InstallPlugins
-    from meltano.core.plugin import PluginType
     from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -75,6 +76,11 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     is_flag=True,
     help="List the commands supported by the plugin.",
 )
+@click.option(
+    "--refresh-catalog",
+    is_flag=True,
+    help="Invalidates catalog cache and forces running discovery before this run.",
+)
 @click.argument("plugin_name", metavar="PLUGIN_NAME[:COMMAND_NAME]")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 @click.option(
@@ -95,6 +101,7 @@ async def invoke(
     plugin_type: PluginType | None,
     dump: str,
     list_commands: bool,
+    refresh_catalog: bool,
     plugin_name: str,
     plugin_args: tuple[str, ...],
     install_plugins: InstallPlugins,
@@ -138,7 +145,17 @@ async def invoke(
         reason=PluginInstallReason.AUTO,
     )
 
-    invoker = invoker_factory(project, plugin)
+    invoker_kwargs: dict[str, t.Any] = {}
+    if refresh_catalog and plugin.type is PluginType.EXTRACTORS:
+        invoker_kwargs["context"] = (
+            ELTContextBuilder(project)
+            .with_session(session)
+            .with_extractor(plugin.name)
+            .with_refresh_catalog(refresh_catalog=True)
+            .context()
+        )
+
+    invoker = invoker_factory(project, plugin, **invoker_kwargs)
     try:
         exit_code = await _invoke(
             invoker=invoker,

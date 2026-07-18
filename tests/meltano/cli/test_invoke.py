@@ -233,6 +233,28 @@ class TestCliInvoke:
             assert apply_catalog_rules.call_count == 2
             assert look_up_state.call_count == 2
 
+    def test_invoke_refresh_catalog_sets_extractor_context(
+        self,
+        cli_runner: CliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
+        with patch("meltano.cli.invoke._invoke", new_callable=AsyncMock) as invoke_mock:
+            invoke_mock.return_value = 0
+
+            result = cli_runner.invoke(
+                cli,
+                ["invoke", "--refresh-catalog", tap.name],
+            )
+
+        assert result.exit_code == 0, (
+            f"exit code: {result.exit_code} - {result.exception}"
+        )
+        invoke_mock.assert_awaited_once()
+
+        invoker = invoke_mock.await_args.kwargs["invoker"]
+        assert invoker.context is not None
+        assert invoker.context.should_refresh_catalog()
+
     def test_invoke_dump_config(
         self,
         cli_runner: CliRunner,
