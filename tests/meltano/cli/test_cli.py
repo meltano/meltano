@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import platform
 import re
@@ -7,6 +8,7 @@ import shutil
 import subprocess
 import typing as t
 import uuid
+import warnings
 from http import HTTPStatus
 from pathlib import Path
 from time import perf_counter_ns
@@ -18,7 +20,7 @@ import responses
 import yaml
 from structlog.stdlib import get_logger
 
-import meltano
+import meltano.cli
 from asserts import assert_cli_runner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
@@ -28,6 +30,7 @@ from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import get_meltano_version
 from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
@@ -191,7 +194,7 @@ class TestCli:
     def test_version(self, cli_runner) -> None:
         cli_version = cli_runner.invoke(cli, ["--version"])
 
-        assert cli_version.output == f"meltano, version {meltano.__version__}\n"
+        assert cli_version.output == f"meltano, version {get_meltano_version()}\n"
 
     @pytest.mark.usefixtures("deactivate_project")
     def test_default_environment_is_activated(
@@ -298,6 +301,66 @@ class TestCli:
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
+
+    def test_sigterm_cancellation_exits_143(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", True)
+
+        with (
+            mock.patch("meltano.cli.cli", side_effect=asyncio.CancelledError),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            meltano.cli._run_cli()
+
+        assert exc_info.value.code == 143
+
+    def test_cancellation_without_sigterm_propagates(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", False)
+
+        with (
+            mock.patch("meltano.cli.cli", side_effect=asyncio.CancelledError),
+            pytest.raises(asyncio.CancelledError),
+        ):
+            meltano.cli._run_cli()
+
+    @pytest.mark.parametrize(
+        ("raised", "expected_exit_code"),
+        (
+            pytest.param(None, 0, id="success"),
+            pytest.param(SystemExit(143), 143, id="sigterm"),
+            pytest.param(SystemExit(None), 0, id="none-code"),
+            pytest.param(SystemExit("boom"), 1, id="string-code"),
+            pytest.param(RuntimeError("boom"), 1, id="other-error"),
+        ),
+    )
+    def test_main_records_exit_code(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        raised: BaseException | None,
+        expected_exit_code: int,
+    ) -> None:
+        monkeypatch.setattr(
+            meltano.cli,
+            "_run_cli",
+            mock.Mock(side_effect=raised),
+        )
+        monkeypatch.setattr(meltano.cli, "exit_event_tracker", None)
+        # keep `main`'s global logging/warnings tweaks out of the test session
+        monkeypatch.setattr("logging.captureWarnings", mock.Mock())
+
+        with warnings.catch_warnings():
+            if raised is None:
+                meltano.cli.main()
+            else:
+                with pytest.raises(type(raised)):
+                    meltano.cli.main()
+
+        assert meltano.cli.exit_code == expected_exit_code
 
     @pytest.mark.usefixtures("pushd")
     def test_cwd_option(

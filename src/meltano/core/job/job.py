@@ -40,6 +40,15 @@ if t.TYPE_CHECKING:
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
 
+SIGTERM_EXIT_CODE = 143  # 128 + SIGTERM's signal number (15)
+
+_sigterm_received = False
+
+
+def sigterm_received() -> bool:
+    """Whether a SIGTERM was received while a job was running."""
+    return _sigterm_received
+
 
 class InconsistentStateError(Error):
     """Occur upon a wrong operation for the current state."""
@@ -398,19 +407,63 @@ class Job(SystemModel):
 
     @contextmanager
     def _handling_sigterm(self, session: Session) -> Generator[None]:  # noqa: ARG002
-        def handler(*_) -> t.NoReturn:
-            sigterm_status = 143
-            raise SystemExit(sigterm_status)
+        # A new run should only report SIGTERMs delivered during that run, so
+        # clear any stale flag from a previous run in this process
+        global _sigterm_received
+        _sigterm_received = False
 
-        original_termination_handler = signal.signal(signal.SIGTERM, handler)
+        def cancel_task() -> None:
+            # Cancel the task running the job so termination flows through the
+            # same cancellation path as SIGINT, giving plugin subprocesses the
+            # chance to finish their graceful shutdown before the process
+            # exits: https://github.com/meltano/meltano/issues/9981
+            global _sigterm_received
+            _sigterm_received = True
+            self._terminated_by_sigterm = True
+            if task is not None:  # pragma: no branch
+                task.cancel()
+
+        def handler(*_) -> t.NoReturn:
+            global _sigterm_received
+            _sigterm_received = True
+            self._terminated_by_sigterm = True
+            raise SystemExit(SIGTERM_EXIT_CODE)
+
+        loop: asyncio.AbstractEventLoop | None = None
+        task: asyncio.Task | None = None
+        with suppress(RuntimeError):
+            loop = asyncio.get_running_loop()
+            task = asyncio.current_task()
+
+        added_loop_handler = False
+        if loop is not None and task is not None:
+            # Not available on Windows, where we fall back to the
+            # `signal.signal` handler below
+            with suppress(NotImplementedError):
+                loop.add_signal_handler(signal.SIGTERM, cancel_task)
+                added_loop_handler = True
+
+        original_termination_handler = (
+            None if added_loop_handler else signal.signal(signal.SIGTERM, handler)
+        )
 
         try:
             yield
         finally:
-            signal.signal(signal.SIGTERM, original_termination_handler)
+            if added_loop_handler and loop is not None:
+                loop.remove_signal_handler(signal.SIGTERM)
+            else:
+                signal.signal(signal.SIGTERM, original_termination_handler)
 
     def _error_message(self, err: BaseException) -> str:
         if isinstance(err, SystemExit):
+            return "The process was terminated"
+
+        if isinstance(err, asyncio.CancelledError) and getattr(
+            self,
+            "_terminated_by_sigterm",
+            False,
+        ):
             return "The process was terminated"
 
         if isinstance(err, KeyboardInterrupt | asyncio.CancelledError):

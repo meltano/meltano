@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import sys
@@ -111,6 +112,13 @@ def _run_cli() -> None:
                 f"The requested action could not be completed: {err}",  # noqa: EM102
             ) from None
         except KeyboardInterrupt:
+            raise
+        except asyncio.CancelledError:
+            from meltano.core.job.job import SIGTERM_EXIT_CODE, sigterm_received
+
+            if sigterm_received():
+                msg = "The process was terminated"
+                raise CliError(msg, exit_code=SIGTERM_EXIT_CODE) from None
             raise
         except MeltanoError as err:
             handle_meltano_error(err)
