@@ -656,6 +656,7 @@ class TestCliColors:
         monkeypatch,
     ) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
+        monkeypatch.delenv("FORCE_COLOR", raising=False)
         styled_text = click.style(self.TEST_TEXT, fg="red")
 
         if log_config:

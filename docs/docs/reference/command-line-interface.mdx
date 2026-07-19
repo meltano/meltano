@@ -30,11 +30,20 @@ The following CLI options are available for the top-level `meltano` command:
 
 - `--env-file` - Path to a [`.env` file](/concepts/project#env) to load environment variables from. Can be an absolute path, or relative to the current working directory.
 
-### No Color
+### Color Output
 
-The no color configuration is available for all meltano subcommands via an environment variable:
+Color output configuration is available for all Meltano subcommands via environment variables:
 
 - `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
+- `FORCE_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to enable colored log output even when stderr is not attached to a TTY.
+
+If both `NO_COLOR` and `FORCE_COLOR` are set to truthy values, `NO_COLOR` takes precedence and colored output is disabled.
+
+:::tip
+
+`FORCE_COLOR` support was added in Meltano v4.3.0.
+
+:::
 
 ### UTC timestamps in logs
 
