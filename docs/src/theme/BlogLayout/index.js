@@ -8,8 +8,8 @@ import Melty from '@site/static/img/melty.png';
 import styles from './index.module.scss';
 
 const CHANGELOG_TABS = [
-  { label: 'Meltano Open', to: '/changelog' },
   { label: 'Meltano Cloud', to: '/changelog/cloud' },
+  { label: 'Meltano Open', to: '/changelog' },
 ];
 
 function ChangelogSwitcher() {
@@ -41,7 +41,7 @@ function BackToChangelogsLink() {
   const backTo = pathname.startsWith('/changelog/cloud') ? '/changelog/cloud' : '/changelog';
   return (
     <Link to={backTo} className={clsx('changelog-back-link', styles.backLink)}>
-      &larr; Back to Changelogs
+      &larr; Back to Changelog
     </Link>
   );
 }
