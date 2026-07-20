@@ -128,7 +128,7 @@ const config = {
             activeBasePath: '/connectors',
           },
           {
-            to: '/changelog',
+            to: '/changelog/cloud',
             label: 'Changelog',
             position: 'left',
             className: 'header-changelog-link',
