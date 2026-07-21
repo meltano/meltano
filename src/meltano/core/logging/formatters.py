@@ -74,7 +74,7 @@ class LoggingFeatures(t.TypedDict, total=False):
 def _processors_from_kwargs(
     **features: Unpack[LoggingFeatures],
 ) -> Generator[Processor]:
-    if features.get("callsite_parameters", False):
+    if features.get("callsite_parameters"):
         yield structlog.processors.CallsiteParameterAdder(
             parameters=(
                 structlog.processors.CallsiteParameter.PATHNAME,
@@ -84,7 +84,7 @@ def _processors_from_kwargs(
             ),
         )
 
-    if features.get("dict_tracebacks", False):
+    if features.get("dict_tracebacks"):
         show_locals = features.get("show_locals", False)
         yield structlog.processors.ExceptionRenderer(
             structlog.tracebacks.ExceptionDictTransformer(show_locals=show_locals),

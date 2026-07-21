@@ -345,7 +345,7 @@ class SettingsService(ABC):
             f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.STRICT_ENV_VAR_MODE}",
             cast_value=True,
         )
-        if expand_env_vars and metadata.get("expandable", False):
+        if expand_env_vars and metadata.get("expandable"):
             metadata["expandable"] = False
             expanded_value = do_expand_env_vars(
                 value,
@@ -394,7 +394,7 @@ class SettingsService(ABC):
 
             # Only cast if the setting is not expandable,
             # since we can't cast e.g. $PORT to an integer
-            if not metadata.get("expandable", False):
+            if not metadata.get("expandable"):
                 cast_value = setting_def.cast_value(value)
                 if cast_value != value:
                     metadata["uncast_value"] = value

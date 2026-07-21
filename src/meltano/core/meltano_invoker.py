@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import platform
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import typing as t
 from pathlib import Path

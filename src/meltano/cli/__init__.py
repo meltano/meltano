@@ -1,5 +1,7 @@
 """Main entry point for the meltano CLI."""
 
+# ruff: file-ignore[non-empty-init-module]
+
 from __future__ import annotations
 
 import asyncio

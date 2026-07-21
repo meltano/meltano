@@ -862,7 +862,7 @@ class TestLegacyCatalogSelectVisitor:
 
         metadatas = [
             (stream["tap_stream_id"], metadata)
-            for _, stream in streams.items()
+            for _, stream in streams.items()  # ruff:ignore[incorrect-dict-iterator]
             for metadata in stream["metadata"]
         ]
 
@@ -1402,14 +1402,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     def test_select_filter_preserves_existing_property_selections(self) -> None:
         """Test that select_filter operates at stream level and preserves property selections made by select."""  # noqa: E501
         # This conceptual test shows the intended behavior:
-        # 1. select: ["users.name", "users.email", "orders.*"] selects properties  # noqa: E501
+        # 1. select: ["users.name", "users.email", "orders.*"] selects properties
         # 2. select_filter: ["users"] then filters to only include the users stream
         # 3. Result should be users stream with only name,email properties (select chose)  # noqa: E501
 
         # This is demonstrated in the existing test_apply_catalog_rules_select_filter
         # where _select: ["one.one", "three.three", "five.*"] sets property selections
         # and _select_filter: ["three"] filters to only the three stream
-        # resulting in {"three": {"one", "three"}} - preserving original selection  # noqa: E501
+        # resulting in {"three": {"one", "three"}} - preserving original selection
 
         # The behavior is already tested in test_tap.py, this test documents the intent
         select_rules = select_metadata_rules(["users.name", "users.email"])

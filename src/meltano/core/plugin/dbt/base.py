@@ -50,7 +50,7 @@ class DbtPlugin(BasePlugin):
     invoker_class = DbtInvoker
 
 
-async def install_dbt_plugin(
+async def install_dbt_plugin(  # ruff:ignore[unused-async]
     *,
     project: Project,
     plugin: ProjectPlugin,

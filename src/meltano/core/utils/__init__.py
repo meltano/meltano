@@ -1,5 +1,7 @@
 """Defines helpers for the core codebase."""
 
+# ruff: file-ignore[non-empty-init-module]
+
 from __future__ import annotations
 
 import asyncio
@@ -440,7 +442,7 @@ def noop(*_args, **_kwargs) -> None:  # noqa: D103
     pass
 
 
-async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103
+async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103  # ruff:ignore[unused-async]
     return True
 
 
