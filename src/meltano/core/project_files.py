@@ -346,7 +346,7 @@ class ProjectFiles:
             file_dicts: The dictionary mapping included files to their contents.
 
         Returns:
-            The file contents mapping with order preserved from the original files.∫
+            The file contents mapping with order preserved from the original files.
         """
         sorted_file_dicts: FilesContent = {}
 
