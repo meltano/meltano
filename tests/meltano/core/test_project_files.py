@@ -155,7 +155,7 @@ class TestProjectFiles:
         project_files = ProjectFiles(root=root_yml.parent, meltano_file_path=root_yml)
 
         with pytest.raises(ruamel.yaml.parser.ParserError):
-            assert project_files.load()
+            project_files.load()
 
     def test_include_path_self(self, tmp_path: Path) -> None:
         root_yml = tmp_path / "meltano.yml"
