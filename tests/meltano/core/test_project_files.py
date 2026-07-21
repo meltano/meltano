@@ -147,6 +147,23 @@ class TestProjectFiles:
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
 
+    def test_meltano_file_path_outside_root_rejected(
+        self,
+        tmp_path_factory: pytest.TempPathFactory,
+    ) -> None:
+        base = tmp_path_factory.mktemp("meltano-file-path-outside-root")
+        root_dir = base / "root"
+        root_dir.mkdir()
+        outside_yml = base / "outside" / "meltano.yml"
+        outside_yml.parent.mkdir()
+        outside_yml.write_text("plugins: {}\n")
+
+        with pytest.raises(
+            InvalidIncludePathError,
+            match=r"is not within the project root",
+        ):
+            ProjectFiles(root=root_dir, meltano_file_path=outside_yml)
+
     def test_include_not_yaml(self, tmp_path: Path) -> None:
         include_yml = tmp_path / "inc.meltano.yml"
         include_yml.write_text("}{")
@@ -172,7 +189,7 @@ class TestProjectFiles:
 
         with pytest.raises(
             InvalidIncludePathError,
-            match=r"Included path '.*inc\.meltano\.yml' not found",
+            match=r"Included path '.*inc\.meltano\.yml' is not a file",
         ):
             _ = project_files.include_paths
 

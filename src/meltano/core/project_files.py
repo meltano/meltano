@@ -59,8 +59,20 @@ class ProjectFiles:
         """
         self.root = root.resolve()
         # Trusted by construction: this is the project's own entry point,
-        # not a path derived from an `include_paths` pattern.
-        self._meltano_file_path = t.cast("InProjectPath", meltano_file_path.resolve())
+        # not a path derived from an `include_paths` pattern. Still verified
+        # here (rather than only asserted by the `InProjectPath` cast) so a
+        # caller that constructs `ProjectFiles` with a `meltano_file_path`
+        # outside `root` fails loudly instead of silently trusting it.
+        resolved_meltano_file_path = meltano_file_path.resolve()
+        try:
+            resolved_meltano_file_path.relative_to(self.root)
+        except ValueError as err:
+            msg = (
+                f"meltano_file_path '{meltano_file_path}' is not within "
+                f"the project root '{self.root}'."
+            )
+            raise InvalidIncludePathError(msg) from err
+        self._meltano_file_path = t.cast("InProjectPath", resolved_meltano_file_path)
         self._plugin_file_map: dict[tuple[str, ...], InProjectPath] = {}
         self._raw_contents_map: FilesContent = {}
         self._cached_loaded: CommentedMap | None = None
@@ -142,8 +154,8 @@ class ProjectFiles:
             InvalidIncludePathError: If the included path is not a valid file, or
                 if it resolves to a location outside the project root.
         """
-        if not (file_path.is_file() and file_path.exists()):
-            msg = f"Included path '{file_path}' not found."
+        if not file_path.is_file():
+            msg = f"Included path '{file_path}' is not a file."
             raise InvalidIncludePathError(msg)
         try:
             file_path.resolve(strict=True).relative_to(self.root)
