@@ -15,7 +15,7 @@ from meltano.core import yaml
 from meltano.core.utils import deep_merge
 
 if t.TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Iterable, Mapping
     from pathlib import Path
 
     FilesContent: t.TypeAlias = dict[Path, CommentedMap]
@@ -270,7 +270,7 @@ class ProjectFiles:
         file_dicts: FilesContent,
         file: Path,
         key: str,
-        value: dict,
+        value: Mapping[str, t.Any],
     ) -> None:
         file_dict = file_dicts.setdefault(file, CommentedMap())
         entries = file_dict.setdefault(key, CommentedSeq())
@@ -281,7 +281,7 @@ class ProjectFiles:
         self,
         file_dicts: FilesContent,
         key: str,
-        elements: dict,
+        elements: Iterable[Mapping[str, t.Any]],
     ) -> None:
         for elem in elements:
             file_key = (key, elem["name"])
