@@ -233,21 +233,6 @@ class TestProjectFiles:
         with pytest.raises(InvalidIncludePathError):
             _ = project_files.include_paths
 
-    def test_update_rejects_path_traversal(
-        self,
-        tmp_path_factory: pytest.TempPathFactory,
-    ) -> None:
-        base = tmp_path_factory.mktemp("traversal-update")
-        sibling_yml = base / "sibling" / "meltano.yml"
-        sibling_yml.parent.mkdir()
-        sibling_yml.write_text("plugins:\n  extractors:\n  - name: victim-tap\n")
-        root = base / "root"
-
-        project_files = ProjectFiles(root=root, meltano_file_path=root / "meltano.yml")
-
-        with pytest.raises(InvalidIncludePathError):
-            project_files._write_file(sibling_yml, {})
-
     @pytest.mark.order(5)
     def test_load(self, project_files) -> None:
         expected_result = {

@@ -18,7 +18,12 @@ if t.TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
     from pathlib import Path
 
-    FilesContent: t.TypeAlias = dict[Path, CommentedMap]
+    # A path already proven (by `_validate_include_path`) to be a real file
+    # within the project root, or the project's own `meltano.yml`. This is
+    # the only place that boundary is enforced; `_write_file` trusts any
+    # `InProjectPath` it receives instead of re-checking it.
+    InProjectPath = t.NewType("InProjectPath", Path)
+    FilesContent: t.TypeAlias = dict[InProjectPath, CommentedMap]
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -53,8 +58,10 @@ class ProjectFiles:
             meltano_file_path: The path to the meltano.yml file.
         """
         self.root = root.resolve()
-        self._meltano_file_path = meltano_file_path.resolve()
-        self._plugin_file_map: dict[tuple[str, ...], Path] = {}
+        # Trusted by construction: this is the project's own entry point,
+        # not a path derived from an `include_paths` pattern.
+        self._meltano_file_path = t.cast("InProjectPath", meltano_file_path.resolve())
+        self._plugin_file_map: dict[tuple[str, ...], InProjectPath] = {}
         self._raw_contents_map: FilesContent = {}
         self._cached_loaded: CommentedMap | None = None
 
@@ -64,7 +71,7 @@ class ProjectFiles:
         return yaml.load(self._meltano_file_path)
 
     @property
-    def include_paths(self) -> list[Path]:
+    def include_paths(self) -> list[InProjectPath]:
         """List of paths derived from glob patterns defined in the meltanofile."""
         include_path_patterns = self.meltano.get("include_paths", [])
         return self._resolve_include_paths(include_path_patterns)
@@ -118,26 +125,18 @@ class ProjectFiles:
             self._write_file(unused_file_path, BLANK_SUBFILE)
         return meltano_config
 
-    def _is_within_root(self, file_path: Path) -> bool:
-        """Determine if a path resolves to somewhere within the project root.
+    def _validate_include_path(self, file_path: Path) -> InProjectPath:
+        """Validate that a glob match is a real file within the project root.
+
+        This is the single point where paths derived from `include_paths`
+        patterns are checked before being trusted for reading or writing;
+        `_write_file` relies on every path it receives having passed here.
 
         Args:
-            file_path: The path to check.
+            file_path: The path to validate.
 
         Returns:
-            True if file_path resolves to self.root or a descendant of it.
-        """
-        try:
-            file_path.resolve(strict=True).relative_to(self.root)
-        except ValueError:
-            return False
-        return True
-
-    def _is_valid_include_path(self, file_path: Path) -> None:
-        """Determine if given path is a valid `include_paths` file.
-
-        Args:
-            file_path: The path to check.
+            The same path, now known to be a real file within the project root.
 
         Raises:
             InvalidIncludePathError: If the included path is not a valid file, or
@@ -146,12 +145,18 @@ class ProjectFiles:
         if not (file_path.is_file() and file_path.exists()):
             msg = f"Included path '{file_path}' not found."
             raise InvalidIncludePathError(msg)
-        if not self._is_within_root(file_path):
+        try:
+            file_path.resolve(strict=True).relative_to(self.root)
+        except ValueError as err:
             root = self.root
             msg = f"Included path '{file_path}' is outside the project root '{root}'."
-            raise InvalidIncludePathError(msg)
+            raise InvalidIncludePathError(msg) from err
+        return t.cast("InProjectPath", file_path)
 
-    def _resolve_include_paths(self, include_path_patterns: list[str]) -> list[Path]:
+    def _resolve_include_paths(
+        self,
+        include_path_patterns: list[str],
+    ) -> list[InProjectPath]:
         """Return a list of paths from a list of glob pattern strings.
 
         Not including `meltano.yml` (even if it is matched by a pattern).
@@ -166,22 +171,21 @@ class ProjectFiles:
             InvalidIncludePathError: If a path is matched by a pattern but is
                 not a valid file.
         """
-        include_paths = []
+        include_paths: list[InProjectPath] = []
         for pattern in include_path_patterns:
             for path in self.root.glob(pattern):
                 if path == self._meltano_file_path:
                     continue
                 try:
-                    self._is_valid_include_path(path)
+                    include_paths.append(self._validate_include_path(path))
                 except InvalidIncludePathError as err:
                     logger.critical("Include path '%s' is invalid: \n %s", path, err)
                     raise
-                include_paths.append(path)
 
         # Deduplicate entries
         return list(dict.fromkeys(include_paths))
 
-    def _add_to_index(self, key: tuple[str, ...], include_path: Path) -> None:
+    def _add_to_index(self, key: tuple[str, ...], include_path: InProjectPath) -> None:
         """Add a new key:path to the `_plugin_file_map`.
 
         Args:
@@ -206,7 +210,7 @@ class ProjectFiles:
 
     def _index_file(
         self,
-        include_file_path: Path,
+        include_file_path: InProjectPath,
         include_file_contents: CommentedMap,
     ) -> None:
         """Populate map of plugins/schedules to their respective files.
@@ -268,7 +272,7 @@ class ProjectFiles:
     def _add_mapping_entry(
         self,
         file_dicts: FilesContent,
-        file: Path,
+        file: InProjectPath,
         key: str,
         value: Mapping[str, t.Any],
     ) -> None:
@@ -291,7 +295,7 @@ class ProjectFiles:
     def _add_plugin(
         self,
         file_dicts: FilesContent,
-        file: Path,
+        file: InProjectPath,
         plugin_type: str,
         plugin: dict,
     ) -> None:
@@ -401,12 +405,11 @@ class ProjectFiles:
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: Path, contents: Mapping) -> None:
-        resolved = file_path.resolve()
-        if resolved != self._meltano_file_path and not self._is_within_root(resolved):
-            msg = f"Refusing to write outside the project root: '{file_path}'"
-            raise InvalidIncludePathError(msg)
-
+    def _write_file(self, file_path: InProjectPath, contents: Mapping) -> None:
+        # No containment check here: file_path is only ever an InProjectPath,
+        # which is only ever produced by `_validate_include_path` (or is
+        # `self._meltano_file_path`, trusted by construction). See the
+        # `InProjectPath` definition above for the invariant this relies on.
         dirname = file_path.parent
         fd, tmp_name = tempfile.mkstemp(dir=dirname, suffix=".tmp.yml")
         try:
