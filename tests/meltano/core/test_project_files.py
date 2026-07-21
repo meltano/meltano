@@ -7,8 +7,10 @@ from pathlib import Path
 from textwrap import dedent
 
 import pytest
+import ruamel.yaml
 
 from fixtures.utils import cd
+from meltano.core.project_files import InvalidIncludePathError, ProjectFiles
 from meltano.core.utils import deep_merge
 
 
@@ -144,6 +146,86 @@ class TestProjectFiles:
             (project_files.root / "subconfig_2.yml"),
             (project_files.root / "subfolder" / "subconfig_1.yml"),
         ]
+
+    def test_include_not_yaml(self, tmp_path: Path) -> None:
+        include_yml = tmp_path / "inc.meltano.yml"
+        include_yml.write_text("}{")
+        root_yml = tmp_path / "meltano.yml"
+        root_yml.write_text("include_paths:\n  - ./**/*.meltano.yml\n")
+        project_files = ProjectFiles(root=root_yml.parent, meltano_file_path=root_yml)
+
+        with pytest.raises(ruamel.yaml.parser.ParserError):
+            assert project_files.load()
+
+    def test_include_path_self(self, tmp_path: Path) -> None:
+        root_yml = tmp_path / "meltano.yml"
+        root_yml.write_text("include_paths:\n  - ./**/meltano.yml\n")
+        project_files = ProjectFiles(root=root_yml.parent, meltano_file_path=root_yml)
+        assert not project_files.include_paths
+
+    def test_include_path_not_a_file(self, tmp_path: Path) -> None:
+        include_yml = tmp_path / "inc.meltano.yml"
+        include_yml.mkdir()
+        root_yml = tmp_path / "meltano.yml"
+        root_yml.write_text("include_paths:\n  - ./**/*.meltano.yml\n")
+        project_files = ProjectFiles(root=root_yml.parent, meltano_file_path=root_yml)
+
+        with pytest.raises(
+            InvalidIncludePathError,
+            match=r"Included path '.*inc\.meltano\.yml' not found",
+        ):
+            _ = project_files.include_paths
+
+    def test_include_paths_rejects_path_traversal(self, tmp_path_factory) -> None:
+        base = tmp_path_factory.mktemp("traversal-test")
+        sibling_yml = base / "sibling" / "meltano.yml"
+        sibling_yml.parent.mkdir()
+        sibling_yml.write_text("plugins:\n  extractors:\n  - name: victim-tap\n")
+        original = sibling_yml.read_bytes()
+
+        contributed_dir = base / "contributed"
+        contributed_dir.mkdir()
+        (contributed_dir / "meltano.yml").write_text(
+            "include_paths:\n  - ../sibling/meltano.yml\n",
+        )
+
+        project_files = ProjectFiles(
+            root=contributed_dir,
+            meltano_file_path=contributed_dir / "meltano.yml",
+        )
+
+        with pytest.raises(InvalidIncludePathError):
+            _ = project_files.include_paths
+
+        with pytest.raises(InvalidIncludePathError):
+            project_files.load()
+
+        assert sibling_yml.read_bytes() == original
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="symlinks require elevated privileges on Windows",
+    )
+    def test_include_paths_rejects_symlink_traversal(self, tmp_path_factory) -> None:
+        base = tmp_path_factory.mktemp("traversal-symlink-test")
+        sibling_yml = base / "sibling" / "meltano.yml"
+        sibling_yml.parent.mkdir()
+        sibling_yml.write_text("plugins: {}\n")
+
+        contributed_dir = base / "contributed"
+        contributed_dir.mkdir()
+        (contributed_dir / "meltano.yml").write_text(
+            "include_paths:\n  - ./escape.yml\n",
+        )
+        (contributed_dir / "escape.yml").symlink_to(sibling_yml)
+
+        project_files = ProjectFiles(
+            root=contributed_dir,
+            meltano_file_path=contributed_dir / "meltano.yml",
+        )
+
+        with pytest.raises(InvalidIncludePathError):
+            _ = project_files.include_paths
 
     @pytest.mark.order(5)
     def test_load(self, project_files) -> None:

@@ -18,6 +18,8 @@ if t.TYPE_CHECKING:
     from collections.abc import Mapping
     from pathlib import Path
 
+    FilesContent: t.TypeAlias = dict[Path, CommentedMap]
+
 logger = structlog.stdlib.get_logger(__name__)
 
 BLANK_SUBFILE = CommentedMap(
@@ -52,8 +54,8 @@ class ProjectFiles:
         """
         self.root = root.resolve()
         self._meltano_file_path = meltano_file_path.resolve()
-        self._plugin_file_map: dict[tuple[str, ...], str] = {}
-        self._raw_contents_map: dict[str, CommentedMap] = {}
+        self._plugin_file_map: dict[tuple[str, ...], Path] = {}
+        self._raw_contents_map: FilesContent = {}
         self._cached_loaded: CommentedMap | None = None
 
     @property
@@ -75,7 +77,7 @@ class ProjectFiles:
         """
         prev_raw_contents_map = self._raw_contents_map.copy()
         self._raw_contents_map.clear()
-        self._raw_contents_map[str(self._meltano_file_path)] = self.meltano
+        self._raw_contents_map[self._meltano_file_path] = self.meltano
         included_file_contents = self._load_included_files()
 
         # If the exact same objects are loaded again, use the cached result:
@@ -111,10 +113,25 @@ class ProjectFiles:
         for file_path, contents in file_dicts.items():
             self._write_file(file_path, contents)
 
-        unused_files = [fl for fl in self.include_paths if str(fl) not in file_dicts]
+        unused_files = [fl for fl in self.include_paths if fl not in file_dicts]
         for unused_file_path in unused_files:
             self._write_file(unused_file_path, BLANK_SUBFILE)
         return meltano_config
+
+    def _is_within_root(self, file_path: Path) -> bool:
+        """Determine if a path resolves to somewhere within the project root.
+
+        Args:
+            file_path: The path to check.
+
+        Returns:
+            True if file_path resolves to self.root or a descendant of it.
+        """
+        try:
+            file_path.resolve(strict=True).relative_to(self.root)
+        except ValueError:
+            return False
+        return True
 
     def _is_valid_include_path(self, file_path: Path) -> None:
         """Determine if given path is a valid `include_paths` file.
@@ -123,10 +140,16 @@ class ProjectFiles:
             file_path: The path to check.
 
         Raises:
-            InvalidIncludePathError: If the included path is not a valid file.
+            InvalidIncludePathError: If the included path is not a valid file, or
+                if it resolves to a location outside the project root.
         """
         if not (file_path.is_file() and file_path.exists()):
-            raise InvalidIncludePathError(f"Included path '{file_path}' not found.")  # noqa: EM102, TRY003
+            msg = f"Included path '{file_path}' not found."
+            raise InvalidIncludePathError(msg)
+        if not self._is_within_root(file_path):
+            root = self.root
+            msg = f"Included path '{file_path}' is outside the project root '{root}'."
+            raise InvalidIncludePathError(msg)
 
     def _resolve_include_paths(self, include_path_patterns: list[str]) -> list[Path]:
         """Return a list of paths from a list of glob pattern strings.
@@ -146,14 +169,14 @@ class ProjectFiles:
         include_paths = []
         for pattern in include_path_patterns:
             for path in self.root.glob(pattern):
+                if path == self._meltano_file_path:
+                    continue
                 try:
                     self._is_valid_include_path(path)
                 except InvalidIncludePathError as err:
-                    logger.critical(f"Include path '{path}' is invalid: \n {err}")  # noqa: G004
-                    raise err  # noqa: TRY201
+                    logger.critical("Include path '%s' is invalid: \n %s", path, err)
+                    raise
                 include_paths.append(path)
-            if self._meltano_file_path in include_paths:
-                include_paths.remove(self._meltano_file_path)
 
         # Deduplicate entries
         return list(dict.fromkeys(include_paths))
@@ -172,12 +195,14 @@ class ProjectFiles:
             key_path_string = ":".join(key)
             existing_key_file_path = self._plugin_file_map.get(key)
             logger.critical(
-                f'Plugin with path "{key_path_string}" already added in '  # noqa: G004
-                f"file {existing_key_file_path}.",
+                "Plugin with path '%s' already added in file %s.",
+                key_path_string,
+                existing_key_file_path,
             )
-            raise Exception("Duplicate plugin name found.")  # noqa: EM101, TRY002, TRY003
+            msg = "Duplicate plugin name found"
+            raise Exception(msg)  # noqa: TRY002
 
-        self._plugin_file_map[key] = str(include_path)
+        self._plugin_file_map[key] = include_path
 
     def _index_file(
         self,
@@ -230,45 +255,62 @@ class ProjectFiles:
             try:
                 contents: CommentedMap = yaml.load(path)
             except YAMLError as exc:  # noqa: PERF203
-                logger.critical(f"Error while parsing YAML file: {path} \n {exc}")  # noqa: G004
-                raise exc  # noqa: TRY201
+                logger.critical("Error while parsing YAML file: %s \n %s", path, exc)
+                raise
             else:
-                self._raw_contents_map[str(path)] = contents
+                self._raw_contents_map[path] = contents
                 # TODO: validate dict schema
                 # https://gitlab.com/meltano/meltano/-/issues/3029
                 self._index_file(include_file_path=path, include_file_contents=contents)
                 included_file_contents.append(contents)
         return included_file_contents
 
-    def _add_mapping_entry(self, file_dicts, file, key, value) -> None:  # noqa: ANN001
+    def _add_mapping_entry(
+        self,
+        file_dicts: FilesContent,
+        file: Path,
+        key: str,
+        value: dict,
+    ) -> None:
         file_dict = file_dicts.setdefault(file, CommentedMap())
         entries = file_dict.setdefault(key, CommentedSeq())
         if value["name"] not in {scd["name"] for scd in entries}:
             entries.append(value)
 
-    def _add_sequence_entry(self, file_dicts, key, elements) -> None:  # noqa: ANN001
+    def _add_sequence_entry(
+        self,
+        file_dicts: FilesContent,
+        key: str,
+        elements: dict,
+    ) -> None:
         for elem in elements:
             file_key = (key, elem["name"])
-            file = self._plugin_file_map.get(file_key, str(self._meltano_file_path))
+            file = self._plugin_file_map.get(file_key, self._meltano_file_path)
             self._add_mapping_entry(file_dicts, file, key, elem)
 
-    def _add_plugin(self, file_dicts, file, plugin_type, plugin) -> None:  # noqa: ANN001
+    def _add_plugin(
+        self,
+        file_dicts: FilesContent,
+        file: Path,
+        plugin_type: str,
+        plugin: dict,
+    ) -> None:
         file_dict = file_dicts.setdefault(file, CommentedMap())
         plugins_dict = file_dict.setdefault("plugins", CommentedMap())
         plugins = plugins_dict.setdefault(plugin_type, CommentedSeq())
         if plugin["name"] not in {plg["name"] for plg in plugins}:
             plugins.append(plugin)
 
-    def _add_plugins(self, file_dicts, all_plugins) -> None:  # noqa: ANN001
+    def _add_plugins(self, file_dicts: FilesContent, all_plugins: dict) -> None:
         for plugin_type, plugins in all_plugins.items():
             plugin_type = str(plugin_type)
             for plugin in plugins:
                 key = ("plugins", plugin_type, plugin.get("name"))
-                file = self._plugin_file_map.get(key, str(self._meltano_file_path))
+                file = self._plugin_file_map.get(key, self._meltano_file_path)
                 self._add_plugin(file_dicts, file, plugin_type, plugin)
 
-    def _split_config_dict(self, config: CommentedMap):  # noqa: ANN202
-        file_dicts: dict[str, CommentedMap] = {}
+    def _split_config_dict(self, config: CommentedMap) -> FilesContent:
+        file_dicts: FilesContent = {}
 
         # Fill in the top-level entries
         for key, value in config.items():
@@ -277,7 +319,7 @@ class ProjectFiles:
             elif key in MULTI_FILE_KEYS:
                 self._add_sequence_entry(file_dicts, key, value)
             else:
-                file = str(self._meltano_file_path)
+                file = self._meltano_file_path
                 file_dict = file_dicts.setdefault(file, CommentedMap())
                 file_dict[key] = value
 
@@ -285,16 +327,15 @@ class ProjectFiles:
         sorted_file_dicts = self._restore_file_key_order(file_dicts)
 
         # Ensure meltano.yml is always present, even if empty
-        meltano_file_path = str(self._meltano_file_path)
-        if meltano_file_path not in sorted_file_dicts:
-            sorted_file_dicts[meltano_file_path] = CommentedMap()
+        if self._meltano_file_path not in sorted_file_dicts:
+            sorted_file_dicts[self._meltano_file_path] = CommentedMap()
 
         # Copy comments from the original config to the new config
-        config.copy_attributes(sorted_file_dicts[meltano_file_path])
+        config.copy_attributes(sorted_file_dicts[self._meltano_file_path])
         self._copy_yaml_attributes(sorted_file_dicts)
         return sorted_file_dicts
 
-    def _restore_file_key_order(self, file_dicts: dict[str, CommentedMap]):  # noqa: ANN202
+    def _restore_file_key_order(self, file_dicts: FilesContent) -> FilesContent:
         """Restore the order of the keys in the meltano project files.
 
         Args:
@@ -303,7 +344,7 @@ class ProjectFiles:
         Returns:
             The file contents mapping with order preserved from the original files.∫
         """
-        sorted_file_dicts: dict[str, CommentedMap] = {}
+        sorted_file_dicts: FilesContent = {}
 
         for file, contents in self._raw_contents_map.items():
             if file not in file_dicts:
@@ -323,10 +364,7 @@ class ProjectFiles:
 
         return sorted_file_dicts
 
-    def _copy_yaml_attributes(
-        self,
-        file_dicts: dict[str, CommentedMap],
-    ) -> None:
+    def _copy_yaml_attributes(self, file_dicts: FilesContent) -> None:
         """Restore comments from top-level YAML entries in project files.
 
         For every file, use the top-level entries (e.g. "plugins") to copy the comments
@@ -363,8 +401,13 @@ class ProjectFiles:
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: str | os.PathLike[str], contents: Mapping) -> None:
-        dirname = os.path.dirname(file_path)  # noqa: PTH120
+    def _write_file(self, file_path: Path, contents: Mapping) -> None:
+        resolved = file_path.resolve()
+        if resolved != self._meltano_file_path and not self._is_within_root(resolved):
+            msg = f"Refusing to write outside the project root: '{file_path}'"
+            raise InvalidIncludePathError(msg)
+
+        dirname = file_path.parent
         fd, tmp_name = tempfile.mkstemp(dir=dirname, suffix=".tmp.yml")
         try:
             with os.fdopen(fd, "w") as tmp_file:
