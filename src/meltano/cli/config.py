@@ -38,7 +38,7 @@ from meltano.core.setting_definition import SettingValueJSONEncoder
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import run_async
+from meltano.core.utils import run_async, split_path
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -711,8 +711,12 @@ def set_(
         tracker=tracker,
     )
     settings = _get_settings(project=project, plugin=plugin)
+    # Segments stay escaped: the escaped name is what identifies the setting
+    # both in `meltano.yml` and in its `SettingDefinition`.
     setting_name = (
-        tuple(setting_name[0].split(".")) if len(setting_name) == 1 else setting_name
+        tuple(split_path(setting_name[0], unescape=False))
+        if len(setting_name) == 1
+        else setting_name
     )
 
     interaction = InteractiveConfig(

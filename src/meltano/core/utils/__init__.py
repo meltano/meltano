@@ -240,6 +240,72 @@ def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
+# A dot only separates path segments when it is not backslash-escaped, so `\.`
+# denotes a literal dot inside a single segment. This mirrors the escaping
+# already supported by `select` rules in `meltano.core.plugin.singer.catalog`.
+UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
+ESCAPED_DOT = r"\."
+
+
+def unescape_dots(segment: str) -> str:
+    r"""Replace escaped dots in a path segment with literal dots.
+
+    Args:
+        segment: a single (already split) path segment
+
+    Returns:
+        The segment with `\.` replaced by `.`
+
+    Examples:
+        >>> unescape_dots(r"s3\.endpoint_url")
+        's3.endpoint_url'
+    """
+    return segment.replace(ESCAPED_DOT, ".")
+
+
+def has_unescaped_dot(name: str) -> bool:
+    r"""Check whether a name contains a dot that acts as a path separator.
+
+    Args:
+        name: the name to check
+
+    Returns:
+        True if the name contains at least one unescaped dot.
+
+    Examples:
+        >>> has_unescaped_dot("foo.bar")
+        True
+        >>> has_unescaped_dot(r"foo\.bar")
+        False
+    """
+    return UNESCAPED_DOT.search(name) is not None
+
+
+def split_path(path: str, maxsplit: int = -1, *, unescape: bool = True) -> list[str]:
+    r"""Split a dot-delimited path, honouring backslash-escaped dots.
+
+    Args:
+        path: the dot-delimited path to split
+        maxsplit: maximum number of splits; negative means no limit
+        unescape: whether to turn `\.` into `.` in each resulting segment
+
+    Returns:
+        The list of path segments.
+
+    Examples:
+        >>> split_path("foo.bar.baz")
+        ['foo', 'bar', 'baz']
+        >>> split_path(r"s3\.endpoint_url")
+        ['s3.endpoint_url']
+        >>> split_path(r"aws.s3\.endpoint_url")
+        ['aws', 's3.endpoint_url']
+    """
+    # `str.split` treats a negative `maxsplit` as "no limit", whereas `re.split`
+    # spells that as 0 (and treats a negative value as "do not split at all").
+    segments = UNESCAPED_DOT.split(path, maxsplit=max(maxsplit, 0))
+    return [unescape_dots(segment) for segment in segments] if unescape else segments
+
+
 def nest(
     d: dict[str, t.Any],
     path: str,
@@ -247,8 +313,13 @@ def nest(
     maxsplit: int = -1,
     *,
     force: bool = False,
+    unescape: bool = True,
 ) -> dict[str, dict[str, t.Any]]:
-    """Create a hierarchical dictionary path and return the leaf dict.
+    r"""Create a hierarchical dictionary path and return the leaf dict.
+
+    A dot separates path segments unless it is backslash-escaped, so a path of
+    `s3\.endpoint_url` sets a single key literally named `s3.endpoint_url`
+    instead of nesting `endpoint_url` under `s3`.
 
     Args:
         d: the dictionary to operate on
@@ -256,6 +327,7 @@ def nest(
         value: the value to set at the given path
         maxsplit: maximum number of splits to split path by
         force: if true, write an empty dict
+        unescape: whether to turn `\.` into `.` in each path segment
 
     Returns:
         The leaf element of the dict
@@ -274,12 +346,16 @@ def nest(
         >>> alist.append("works")
         >>> d
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
+        >>> escaped = dict()
+        >>> _ = nest(escaped, r"s3\.endpoint_url", value="http://localhost")
+        >>> escaped
+        {'s3.endpoint_url': 'http://localhost'}
     """
     if value is None:
         value = {}
 
     if isinstance(path, str):
-        path = path.split(".", maxsplit=maxsplit)
+        path = split_path(path, maxsplit, unescape=unescape)
 
     *initial, tail = path
 
@@ -299,10 +375,14 @@ def nest(
     return cursor[tail]
 
 
-def nest_object(flat_object: dict[str, t.Any]):  # noqa: ANN201, D103
+def nest_object(  # noqa: ANN201, D103
+    flat_object: dict[str, t.Any],
+    *,
+    unescape: bool = True,
+):
     obj = {}
     for key, value in flat_object.items():
-        nest(obj, key, value)
+        nest(obj, key, value, unescape=unescape)
     return obj
 
 
@@ -511,7 +591,9 @@ def is_email_valid(value: str):  # noqa: ANN201, D103
 
 def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     if isinstance(path, str):
-        path = path.split(".")
+        # Keys are stored in `meltano.yml` in their escaped form, so segments
+        # must keep their escapes to index into the config.
+        path = split_path(path, unescape=False)
 
     *initial, tail = path
 
@@ -536,7 +618,8 @@ def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
 
 def set_at_path(d, path, value) -> None:  # noqa: ANN001, D103
     if isinstance(path, str):
-        path = path.split(".")
+        # As in `pop_at_path`, keep segments escaped to match the stored keys.
+        path = split_path(path, unescape=False)
 
     *initial, tail = path
 

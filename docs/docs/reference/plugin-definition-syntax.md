@@ -523,6 +523,34 @@ settings:
 - name: setting_name
 ```
 
+A period in a setting name separates levels of nesting, so `auth.username` is
+passed to the plugin as a nested object:
+
+```json
+{ "auth": { "username": "..." } }
+```
+
+If the plugin expects a key that literally contains a period, escape it with a
+backslash. This is the same escaping used by [`select` rules](/guide/integration#selecting-streams-and-properties-for-extraction):
+
+```yaml
+settings:
+- name: s3\.endpoint_url
+```
+
+That setting is passed through as a single, literal key:
+
+```json
+{ "s3.endpoint_url": "..." }
+```
+
+Use the escaped name wherever you refer to the setting, quoting it so your shell
+does not consume the backslash:
+
+```bash
+meltano config tap-example set 's3\.endpoint_url' http://localhost:9000
+```
+
 ### `settings[*].aliases`
 
 Optional. An array of aliases for the setting.
