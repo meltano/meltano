@@ -149,6 +149,8 @@ def test_unescape_dots() -> None:
 def test_has_unescaped_dot() -> None:
     assert has_unescaped_dot("a.b")
     assert has_unescaped_dot(r"a\.b.c")
+    assert has_unescaped_dot("a.b.c")
+    assert not has_unescaped_dot(r"a\.b\.c")
     assert not has_unescaped_dot(r"a\.b")
     assert not has_unescaped_dot("plain")
 
