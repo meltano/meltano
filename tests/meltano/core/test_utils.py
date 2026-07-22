@@ -116,6 +116,12 @@ def test_set_at_path() -> None:
         pytest.param(r"a\.b.c\.d", ["a.b", "c.d"], id="escaped-both-sides"),
         pytest.param("", [""], id="empty"),
         pytest.param("a", ["a"], id="single"),
+        pytest.param(".a", ["", "a"], id="leading-dot"),
+        pytest.param("a.", ["a", ""], id="trailing-dot"),
+        pytest.param("a..b", ["a", "", "b"], id="consecutive-dots"),
+        pytest.param(r"\.a", [".a"], id="escaped-leading-dot"),
+        pytest.param(r"a\.", ["a."], id="escaped-trailing-dot"),
+        pytest.param(r"a\.\.b", ["a..b"], id="escaped-consecutive-dots"),
     ),
 )
 def test_split_path(path: str, expected: list[str]) -> None:
