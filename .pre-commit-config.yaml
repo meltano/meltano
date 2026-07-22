@@ -27,7 +27,7 @@ repos:
       - id: no-commit-to-branch
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.1
+    rev: 0.37.4
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -52,7 +52,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.2.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v10.7.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
@@ -68,18 +68,18 @@ repos:
           - "globals@17.4.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.10
+    rev: v0.15.22
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.11.6
+    rev: 0.11.30
     hooks:
       - id: uv-lock
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.45.0
+    rev: v1.48.0
     hooks:
       - id: typos
