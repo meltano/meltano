@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.9.5 (2026-07-22)
+
+### 🐛 Fixes
+
+- [#10192](https://github.com/meltano/meltano/issues/10192) Prevent include_paths from escaping project root (#10182)
+
 ## v3.9.4 (2026-06-16)
 
 ### 🐛 Fixes
