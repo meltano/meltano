@@ -110,7 +110,6 @@ class Tapjsonplaceholder(Tap):
         """Return a list of discovered streams."""
 
         return [stream_class(tap=self) for stream_class in STREAM_TYPES]
-
 ```
 
 Then replace the content of `tap-jsonplaceholder/tap_jsonplaceholder/streams.py` with the content below:
@@ -118,14 +117,14 @@ Then replace the content of `tap-jsonplaceholder/tap_jsonplaceholder/streams.py`
 ```python
 """Stream type classes for tap-jsonplaceholder."""
 
-from singer_sdk import typing as th # JSON Schema typing helpers
+from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_jsonplaceholder.client import jsonplaceholderStream
 
 
 class CommentsStream(jsonplaceholderStream):
     primary_keys = ["id"]
-    path = '/comments'
+    path = "/comments"
     name = "comments"
     schema = th.PropertiesList(
         th.Property("postId", th.IntegerType),

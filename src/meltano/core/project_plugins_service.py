@@ -635,5 +635,5 @@ class ProjectPluginsService:  # (too many methods, attributes)
         """
         previous = self._prefer_source
         self._prefer_source = source
-        yield
+        yield  # ruff:ignore[fallible-context-manager]
         self._prefer_source = previous

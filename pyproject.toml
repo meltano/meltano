@@ -338,16 +338,18 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-required-version = ">=0.15.14"
+required-version = ">=0.16.0"
 
 [tool.ruff.lint]
 future-annotations = true
+preview = true
 ignore = [
-  "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
-  "S310",   # Allow `urllib.open`
-  "S603",   # Allow `subprocess.run(..., shell=False)`
-  "COM812", # Handled by the Ruff formatter
-  "ISC001", # Handled by the Ruff formatter
+  "error-suffix-on-exception-name",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
+  "suspicious-url-open-usage",   # Allow `urllib.open`
+  "subprocess-without-shell-equals-true",   # Allow `subprocess.run(..., shell=False)`
+  "missing-trailing-comma", # Handled by the Ruff formatter
+  "single-line-implicit-string-concatenation", # Handled by the Ruff formatter
+  "noqa-comments",
 ]
 select = [
   "A",     # flake8-builtins
@@ -399,23 +401,27 @@ select = [
   "YTT",   # flake8-2020
 ]
 unfixable = [
-  "ERA001", # Don't remove commented-out code
+  "commented-out-code", # Don't remove commented-out code
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "src/meltano/**/__init__.py" = [
-  "F401", # Permit unused imports in `__init__.py` files
+  "unused-import", # Permit unused imports in `__init__.py` files
 ]
 "tests/**" = [
   "ANN",
   "D1",
-  "S101",    # Allow 'assert' in tests
+  "assert",    # Allow 'assert' in tests
   "INP",     # Don't require __init__.py files in tests directories
-  "LOG015",  # Allow `logging.<level>` in tests
+  "root-logger-call",  # Allow `logging.<level>` in tests
+  "fallible-context-manager",
+  "suspicious-subprocess-import",
+  "unused-async",
+  "non-empty-init-module",
 ]
 "src/meltano/migrations/versions/*" = [
-  "D103",
-  "INP001",
+  "undocumented-public-function",
+  "implicit-namespace-package",
 ]
 
 [tool.ruff.lint.flake8-annotations]
