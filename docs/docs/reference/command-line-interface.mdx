@@ -1001,6 +1001,8 @@ Dumping the config and catalog of a plugin may reveal sensitive values in your t
 ```bash
 meltano invoke --dump=config <plugin>
 meltano invoke --dump=catalog <plugin>
+meltano invoke --refresh-catalog <plugin>
+meltano invoke --refresh-catalog --dump=catalog <plugin>
 ```
 
 By default, `meltano invoke` will attempt to install the plugin before invoking it. Use `--no-install` to skip this behavior:
@@ -1008,6 +1010,8 @@ By default, `meltano invoke` will attempt to install the plugin before invoking 
 ```bash
 meltano invoke --no-install <plugin>
 ```
+
+Use `--refresh-catalog` with Singer extractors to ignore any existing cached catalog and run discovery before invoking the tap in sync mode or dumping the catalog.
 
 Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
