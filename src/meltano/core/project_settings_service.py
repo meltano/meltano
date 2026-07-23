@@ -28,6 +28,9 @@ if t.TYPE_CHECKING:
 
 logger = structlog.get_logger(__name__)
 
+PYTHON_SETTING_NAME = "python"
+PYTHON_VERSION_FILENAME = ".python-version"
+
 
 class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
@@ -167,3 +170,58 @@ class ProjectSettingsService(SettingsService):
             Processed configuration dict for presentation in `meltano config meltano`.
         """
         return nest_object(config)
+
+    def python_version_file_value(self) -> str | None:
+        """Read the project-level `.python-version` file, if present.
+
+        Returns:
+            The first non-empty, non-comment line from `.python-version`, or None.
+        """
+        python_version_file = self.project.root / PYTHON_VERSION_FILENAME
+        try:
+            contents = python_version_file.read_text(encoding="utf-8")
+        except OSError:
+            return None
+
+        for line in contents.splitlines():
+            value = line.strip()
+            if value and not value.startswith("#"):
+                return value
+
+        return None
+
+    @override
+    def get_with_metadata(
+        self,
+        name: str,
+        **kwargs: t.Any,
+    ) -> tuple[t.Any, dict[str, t.Any]]:
+        """Get a project setting with `.python-version` fallback support.
+
+        Args:
+            name: Setting name.
+            kwargs: Keyword arguments forwarded to the base settings service.
+
+        Returns:
+            A tuple of setting value and metadata.
+        """
+        value, metadata = super().get_with_metadata(name, **kwargs)
+        setting_def = kwargs.get("setting_def") or self.find_setting(name)
+        setting_name = setting_def.name if setting_def else name
+
+        if (
+            setting_name == PYTHON_SETTING_NAME
+            and value is None
+            and metadata["source"] is SettingValueStore.DEFAULT
+        ):
+            python_version = self.python_version_file_value()
+            if python_version:
+                value = python_version
+                metadata = {
+                    **metadata,
+                    "python_version_file": str(
+                        self.project.root / PYTHON_VERSION_FILENAME,
+                    ),
+                }
+
+        return value, metadata

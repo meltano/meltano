@@ -238,3 +238,63 @@ class TestProjectSettingsService:
 
         subject.env_override["DB_MAX_RETRIES_TEST"] = "7"
         assert subject.get(name) == 7
+
+    def test_python_version_file_used_as_python_default(
+        self,
+        project_function,
+    ) -> None:
+        subject = ProjectSettingsService(project_function)
+        subject.project.root.joinpath(".python-version").write_text(
+            "3.11.8\n",
+            encoding="utf-8",
+        )
+
+        assert subject.get_with_source("python") == (
+            "3.11.8",
+            SettingValueStore.DEFAULT,
+        )
+
+    def test_python_version_file_ignores_empty_and_comment_lines(
+        self,
+        project_function,
+    ) -> None:
+        subject = ProjectSettingsService(project_function)
+        subject.project.root.joinpath(".python-version").write_text(
+            "\n# Managed by pyenv\n3.12\n",
+            encoding="utf-8",
+        )
+
+        assert subject.get("python") == "3.12"
+
+    def test_python_version_file_does_not_override_python_setting(
+        self,
+        project_function,
+    ) -> None:
+        subject = ProjectSettingsService(project_function)
+        subject.project.root.joinpath(".python-version").write_text(
+            "3.11\n",
+            encoding="utf-8",
+        )
+        subject.set("python", "3.12", store=SettingValueStore.MELTANO_YML)
+
+        assert subject.get_with_source("python") == (
+            "3.12",
+            SettingValueStore.MELTANO_YML,
+        )
+
+    def test_python_version_file_does_not_override_environment(
+        self,
+        project_function,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        subject = ProjectSettingsService(project_function)
+        subject.project.root.joinpath(".python-version").write_text(
+            "3.11\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("MELTANO_PYTHON", "3.10")
+
+        assert subject.get_with_source("python") == (
+            "3.10",
+            SettingValueStore.ENV,
+        )
