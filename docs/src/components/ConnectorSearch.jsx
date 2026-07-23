@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 const CONNECTORS = [
   { label: 'Outlook', href: '/connectors/tap-spreadsheets-outlook' },
   { label: 'SharePoint', href: '/connectors/tap-spreadsheets-sharepoint' },
+  { label: 'Zendesk', href: '/connectors/tap-zendesk' },
+  { label: 'SurveyMonkey', href: '/connectors/tap-surveymonkey' },
 ];
 
 export default function ConnectorSearch() {
