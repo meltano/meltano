@@ -565,7 +565,11 @@ ENV_VAR_PATTERN = re.compile(
     (?P<escape>\\)?  # escape
     \$  # starts with a '$'
     (?:
-        {(?P<curly>\w+)} # ${VAR}
+        {
+            (?P<curly>\w+) # ${VAR}
+            # ${VAR:-default} / ${VAR-default}
+            (?:(?P<default_operator>:-|-)(?P<default>[^}]*))?
+        }
         |
         (?P<normal>[A-Z][A-Z0-9_]*) # $VAR
     )
@@ -665,9 +669,30 @@ def expand_env_vars(
     def replacer(match: re.Match) -> str:
         # The variable can be in either group
         var = match["curly"] or match["normal"]
-        restored = f"${{{var}}}" if match["curly"] else f"${var}"
+        restored = match.group(0)
         if match["escape"]:
-            return restored
+            return restored[1:]
+
+        default_operator = match["default_operator"]
+        default = match["default"]
+        if default_operator:
+            if default_operator == ":-":
+                val = env.get(var)
+                if val is not None and val != "":
+                    return str(val)
+                logger.debug(
+                    f"Variable '${var}' is not set or empty. Using default value.",  # noqa: G004
+                )
+                return default or ""
+
+            if var in env:
+                return str(env[var])
+
+            logger.debug(
+                f"Variable '${var}' is not set. Using default value.",  # noqa: G004
+            )
+            return default or ""
+
         try:
             val = str(env[var])
         except KeyError as ex:

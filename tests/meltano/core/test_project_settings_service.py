@@ -141,6 +141,34 @@ class TestProjectSettingsService:
         )
         assert subject.get("stacked_env_var") == "@nonexistent_1"
 
+    @pytest.mark.filterwarnings(
+        "ignore:Unknown setting 'stacked_env_var':RuntimeWarning",
+    )
+    def test_strict_env_var_mode_on_default_value_no_raise(self, subject) -> None:
+        subject.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+            value=True,
+        )
+        subject.set(
+            "stacked_env_var",
+            "${NONEXISTENT_ENV_VAR:-fallback}@nonexistent",
+        )
+        assert subject.get("stacked_env_var") == "fallback@nonexistent"
+
+    @pytest.mark.filterwarnings(
+        "ignore:Unknown setting 'stacked_env_var':RuntimeWarning",
+    )
+    def test_strict_env_var_mode_off_default_value(self, subject) -> None:
+        subject.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+            value=False,
+        )
+        subject.set(
+            "stacked_env_var",
+            "${NONEXISTENT_ENV_VAR:-fallback}@nonexistent_1",
+        )
+        assert subject.get("stacked_env_var") == "fallback@nonexistent_1"
+
     def test_warn_if_default_setting_is_used(self, subject, monkeypatch) -> None:
         # Assert that warnings are not raised in the following cases:
         with warnings.catch_warnings():

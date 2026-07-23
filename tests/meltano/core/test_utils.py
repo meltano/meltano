@@ -194,6 +194,83 @@ def test_unflatten() -> None:
             id="no-curly-braces",
         ),
         pytest.param(
+            "${ENV_VAR:-fallback}",
+            {"ENV_VAR": "substituted"},
+            {},
+            "substituted",
+            id="default-colon-dash-non-empty",
+        ),
+        pytest.param(
+            "${ENV_VAR:-fallback}",
+            {"ENV_VAR": ""},
+            {},
+            "fallback",
+            id="default-colon-dash-empty",
+        ),
+        pytest.param(
+            "${ENV_VAR:-fallback}",
+            {"ENV_VAR": 0},
+            {},
+            "0",
+            id="default-colon-dash-falsy-non-empty",
+        ),
+        pytest.param(
+            "${ENV_VAR:-fallback}",
+            {},
+            {},
+            "fallback",
+            id="default-colon-dash-unset",
+        ),
+        pytest.param(
+            "${ENV_VAR-fallback}",
+            {"ENV_VAR": ""},
+            {},
+            "",
+            id="default-dash-empty-is-set",
+        ),
+        pytest.param(
+            "${ENV_VAR-fallback}",
+            {},
+            {},
+            "fallback",
+            id="default-dash-unset",
+        ),
+        pytest.param(
+            "prefix_${ENV_VAR:-fallback}_suffix",
+            {},
+            {},
+            "prefix_fallback_suffix",
+            id="default-prefix-and-suffix",
+        ),
+        pytest.param(
+            "${ENV_VAR:-fallback}",
+            {},
+            {"if_missing": EnvVarMissingBehavior.raise_exception},
+            "fallback",
+            id="default-with-raise-exception",
+        ),
+        pytest.param(
+            "${ENV_VAR:-fallback}",
+            {},
+            {"if_missing": EnvVarMissingBehavior.ignore},
+            "fallback",
+            id="default-with-ignore",
+        ),
+        pytest.param(
+            "\\${ENV_VAR:-fallback}",
+            {},
+            {},
+            "${ENV_VAR:-fallback}",
+            id="escape-default",
+        ),
+        pytest.param(
+            "${ENV_VAR:-$OTHER_VAR}",
+            {},
+            {},
+            "$OTHER_VAR",
+            id="default-is-literal",
+        ),
+        pytest.param(
             "$ENV_VAR",
             {},
             {},
@@ -238,6 +315,7 @@ def test_expand_env_vars_nested() -> None:
     input_dict = {
         "some_key": 12,
         "some_var": "${ENV_VAR_1}",
+        "fallback_var": "${ENV_VAR_3:-fallback_3}",
         "nested": {
             "${THIS_DOES_NOT_EXPAND}": "another_val",
             "another_layer": {"nested_var": "${ENV_VAR_2}"},
@@ -249,6 +327,7 @@ def test_expand_env_vars_nested() -> None:
     expected_output = {
         "some_key": 12,
         "some_var": "substituted_1",
+        "fallback_var": "fallback_3",
         "nested": {
             "${THIS_DOES_NOT_EXPAND}": "another_val",
             "another_layer": {"nested_var": "substituted_2"},
@@ -301,11 +380,13 @@ def test_expand_env_vars_nested() -> None:
         pytest.param(
             [
                 "${ENV_VAR_1}",
+                "${ENV_VAR_3:-fallback_3}",
                 "${ENV_VAR_2}",
             ],
             {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
             [
                 "substituted_1",
+                "fallback_3",
                 "substituted_2",
             ],
             id="flat-array",
