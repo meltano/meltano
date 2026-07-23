@@ -43,7 +43,6 @@ class SingerSDKLogParser(LogParser):
         "ts",
         "thread_name",
         "app_name",
-        "stream_name",
         "message",
     }
 
@@ -76,6 +75,7 @@ class SingerSDKLogParser(LogParser):
             level_name = data.pop("level")
             level = logging._nameToLevel.get(level_name.upper(), logging.INFO)
             logger_name = data.pop("logger_name")
+            stream_name = data.pop("stream_name", None)
             timestamp = data.pop("ts")
             message = data.pop("message")
             exception = data.pop("exception", None)
@@ -87,6 +87,7 @@ class SingerSDKLogParser(LogParser):
                 extra={**data, **extra},
                 timestamp=str(timestamp) if timestamp else None,
                 logger_name=logger_name,
+                stream_name=stream_name,
                 exception=PluginException.from_dict(exception) if exception else None,
             )
 
