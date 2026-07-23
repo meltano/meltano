@@ -1,0 +1,87 @@
+---
+title: SurveyMonkey
+description: Sync your SurveyMonkey surveys, distribution data, and responses into your warehouse, already flattened into relational tables.
+---
+
+# SurveyMonkey
+
+SurveyMonkey is an online survey platform for creating and distributing surveys and collecting and analysing responses. Research, CX, HR, and marketing teams use this connector to bring survey definitions, distribution data, and individual responses into their warehouse for reporting and analysis, already flattened into relational tables, so you don't need warehouse-specific SQL to unnest nested survey or response data.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | OAuth login (Connect with SurveyMonkey) |
+| **Sync type** | Mixed: some streams incremental, some full table |
+| **Streams** | Fixed list |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+This connector brings in your full survey program, both as raw nested objects and as pre-flattened relational tables:
+
+- Survey definitions (surveys, pages, questions, headings, answer choices, matrix sub-questions)
+- Distribution data (collectors and their recipients)
+- Responses, down to the individual answer
+- Address-book contacts and account survey categories
+
+## Prerequisites
+
+- **A SurveyMonkey account with access to the surveys you want to sync.** There's no manual credential to retrieve; you'll sign in directly in the setup step below. The authorising user must have access to the surveys you want to sync; connecting as a non-admin will only sync what that user can see.
+- **A paid SurveyMonkey plan, for full answer detail.** Full per-question answer detail (used by the `responses` and `response_answers` streams) requires a paid plan. On Basic plans, response answer detail is limited.
+
+## Setup
+
+### In SurveyMonkey
+
+1. No setup is needed in advance, just have an account (ideally an admin) with access to the surveys you want to sync.
+
+### In Meltano Cloud
+
+1. Add the SurveyMonkey data source.
+2. Click **Connect with SurveyMonkey** and sign in. You'll be redirected to SurveyMonkey's own authorisation page.
+3. Review and accept the requested permissions; you're redirected back and the connection completes automatically.
+4. Set a **Start Date**: the incremental bookmark for the `responses` stream (and its flattened `response_pages`/`response_answers` streams), so set it as far back as you need response history.
+5. If your account isn't hosted in the US, set **Region** to Europe (EU) or Canada (CA). Using the wrong region causes authentication or lookup failures; check with your SurveyMonkey account admin if you're not sure.
+
+## Settings
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| `start_date` | string | required | An ISO-8601 date-time. The earliest response date to sync; used as the incremental bookmark for the `responses` stream |
+| `api_url` | string (options) | `https://api.surveymonkey.com/v3` | The SurveyMonkey data-residency region your account belongs to: United States, Europe (EU), or Canada (CA). Selecting the wrong region causes authentication or lookup failures |
+
+Sign-in and token management (OAuth authorisation, access and refresh tokens) are handled automatically by the **Connect with SurveyMonkey** flow and don't require manual configuration.
+
+## Available streams
+
+| Stream | Description |
+|---|---|
+| `surveys` | All surveys in the account |
+| `survey_details` | Full definition of each survey, including pages and questions |
+| `collectors` | Distribution channels (web links, email invitations) per survey |
+| `recipients` | Recipients of each collector (email-invite collectors only) |
+| `responses` | Individual survey responses, with per-question answers |
+| `survey_pages` | One row per survey page (flattened from `survey_details`) |
+| `questions` | One row per question (flattened from `survey_details`) |
+| `question_headings` | One row per question heading (flattened from `survey_details`) |
+| `question_options` | One row per answer choice (flattened from `survey_details`) |
+| `sub_questions` | One row per matrix subquestion/row (flattened from `survey_details`) |
+| `response_pages` | One row per answered page of a response (flattened from `responses`) |
+| `response_answers` | One row per individual answer (flattened from `responses`) |
+| `contacts` | Address-book contacts (requires the `contacts_read` scope) |
+| `survey_categories` | Survey categories available to the account |
+
+`responses`, `response_pages`, and `response_answers` sync incrementally on `date_modified`, bookmarked against your Start Date. Every other stream is full-table and re-syncs completely on each run.
+
+## Advanced configuration
+
+- **Backfilling response history.** To re-sync historical responses, lower the **Start Date** or reset the connection's sync state; either restarts the `responses`/`response_pages`/`response_answers` streams from that date.
+
+## A note on history
+
+These streams always reflect the *current state* of each record; they are not slowly-changing-dimension (SCD type-2) history tables. If you're migrating from a tool that provided full change history (e.g. Fivetran's `_history` tables) and need valid-from/valid-to versioning, that needs to be layered in your warehouse, for example with dbt snapshots. This can't be backfilled from before your first snapshot run, and needs a scheduled job to accrue over time.
+
+## Need help?
+
+If a stream or field you need isn't listed here, file it through the usual Meltano support channel.

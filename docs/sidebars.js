@@ -19,6 +19,8 @@ const sidebars = {
     { type: 'doc', id: 'connectors/index', label: 'All connectors' },
     { type: 'doc', id: 'connectors/tap-spreadsheets-outlook', label: 'Outlook' },
     { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'SharePoint' },
+    { type: 'doc', id: 'connectors/tap-zendesk', label: 'Zendesk' },
+    { type: 'doc', id: 'connectors/tap-surveymonkey', label: 'SurveyMonkey' },
   ],
   platformSidebar: [
     {
