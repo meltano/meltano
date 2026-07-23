@@ -4,6 +4,7 @@ import json
 import logging
 import platform
 import typing as t
+from contextlib import asynccontextmanager
 from unittest import mock
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -11,7 +12,7 @@ import pytest
 import structlog
 
 from meltano.cli import cli
-from meltano.cli.invoke import _LogOutputHandler
+from meltano.cli.invoke import _invoke, _LogOutputHandler
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -194,6 +195,71 @@ class TestCliInvoke:
 
         basic = cli_runner.invoke(cli, ["invoke", "utility-mock"])
         assert basic.exit_code == 2
+
+    def test_invoke_refresh_catalog_option(
+        self,
+        cli_runner: CliRunner,
+        tap: ProjectPlugin,
+    ) -> None:
+        with patch(
+            "meltano.cli.invoke._invoke", new=AsyncMock(return_value=0)
+        ) as invoke:
+            result = cli_runner.invoke(cli, ["invoke", "--refresh-catalog", tap.name])
+
+        assert result.exit_code == 0, (
+            f"exit code: {result.exit_code} - {result.exception}"
+        )
+        invoke.assert_awaited_once()
+        assert invoke.call_args.kwargs["refresh_catalog"] is True
+
+    @pytest.mark.parametrize(
+        ("invoke_kwargs", "expected_config_override"),
+        (
+            pytest.param({"refresh_catalog": False}, {}, id="default"),
+            pytest.param(
+                {"refresh_catalog": True},
+                {"_use_cached_catalog": False},
+                id="refresh-catalog",
+            ),
+        ),
+    )
+    @pytest.mark.asyncio
+    async def test_invoke_refresh_catalog_cache_override(
+        self,
+        invoke_kwargs: dict[str, bool],
+        expected_config_override: dict[str, bool],
+    ) -> None:
+        session = Mock()
+        settings_service = Mock()
+        settings_service.config_override = {}
+
+        invoker = Mock()
+        invoker.settings_service = settings_service
+        invoker.dump = AsyncMock(return_value="{}")
+
+        @asynccontextmanager
+        async def prepared(session_arg: object) -> t.AsyncIterator[None]:
+            assert session_arg is session
+            assert settings_service.config_override == expected_config_override
+            yield
+
+        invoker.prepared = prepared
+
+        exit_code = await _invoke(
+            invoker=invoker,
+            plugin_args=(),
+            session=session,
+            dump="catalog",
+            refresh_catalog=invoke_kwargs["refresh_catalog"],
+            command_name=None,
+            containers=False,
+            print_var=(),
+        )
+
+        assert exit_code == 0
+        assert settings_service.config_override == expected_config_override
+        invoker.dump.assert_awaited_once_with("catalog")
+        session.close.assert_called_once()
 
     def test_invoke_triggers(
         self,
