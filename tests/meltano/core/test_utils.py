@@ -6,10 +6,14 @@ from meltano.core.utils import (
     EnvVarMissingBehavior,
     expand_env_vars,
     flatten,
+    has_unescaped_dot,
     makedirs,
     nest,
+    nest_object,
     pop_at_path,
     set_at_path,
+    split_path,
+    unescape_dots,
     uuid7,
 )
 
@@ -97,6 +101,100 @@ def test_set_at_path() -> None:
 
     set_at_path(subject, ["a", "d.e"], "value")
     assert subject == {"a": {"b": {"c": "value"}, "d.e": "value"}}
+
+
+@pytest.mark.parametrize(
+    ("path", "expected"),
+    (
+        pytest.param("a.b.c", ["a", "b", "c"], id="plain"),
+        pytest.param(r"s3\.endpoint_url", ["s3.endpoint_url"], id="fully-escaped"),
+        pytest.param(
+            r"aws.s3\.endpoint_url",
+            ["aws", "s3.endpoint_url"],
+            id="escaped-leaf",
+        ),
+        pytest.param(r"a\.b.c\.d", ["a.b", "c.d"], id="escaped-both-sides"),
+        pytest.param("", [""], id="empty"),
+        pytest.param("a", ["a"], id="single"),
+        pytest.param(".a", ["", "a"], id="leading-dot"),
+        pytest.param("a.", ["a", ""], id="trailing-dot"),
+        pytest.param("a..b", ["a", "", "b"], id="consecutive-dots"),
+        pytest.param(r"\.a", [".a"], id="escaped-leading-dot"),
+        pytest.param(r"a\.", ["a."], id="escaped-trailing-dot"),
+        pytest.param(r"a\.\.b", ["a..b"], id="escaped-consecutive-dots"),
+    ),
+)
+def test_split_path(path: str, expected: list[str]) -> None:
+    assert split_path(path) == expected
+
+
+def test_split_path_maxsplit() -> None:
+    assert split_path("a.b.c", 1) == ["a", "b.c"]
+    # A negative `maxsplit` means "no limit", matching `str.split`.
+    assert split_path("a.b.c", -1) == ["a", "b", "c"]
+
+
+def test_split_path_without_unescaping() -> None:
+    assert split_path(r"aws.s3\.endpoint_url", unescape=False) == [
+        "aws",
+        r"s3\.endpoint_url",
+    ]
+
+
+def test_unescape_dots() -> None:
+    assert unescape_dots(r"s3\.endpoint_url") == "s3.endpoint_url"
+    assert unescape_dots("plain") == "plain"
+
+
+def test_has_unescaped_dot() -> None:
+    assert has_unescaped_dot("a.b")
+    assert has_unescaped_dot(r"a\.b.c")
+    assert has_unescaped_dot("a.b.c")
+    assert not has_unescaped_dot(r"a\.b\.c")
+    assert not has_unescaped_dot(r"a\.b")
+    assert not has_unescaped_dot("plain")
+
+
+def test_nest_escaped_dot() -> None:
+    subject = {}
+    nest(subject, r"s3\.endpoint_url", "http://localhost:9000")
+    assert subject == {"s3.endpoint_url": "http://localhost:9000"}
+
+    nested = {}
+    nest(nested, r"aws.s3\.endpoint_url", "http://localhost:9000")
+    assert nested == {"aws": {"s3.endpoint_url": "http://localhost:9000"}}
+
+
+def test_nest_object_escaped_dot() -> None:
+    assert nest_object({r"s3\.endpoint_url": "value", "auth.user": "bob"}) == {
+        "s3.endpoint_url": "value",
+        "auth": {"user": "bob"},
+    }
+
+    # `unescape=False` leaves the escape in place for callers that need to tell
+    # a literal dot apart from a separator afterwards.
+    assert nest_object({r"s3\.endpoint_url": "value"}, unescape=False) == {
+        r"s3\.endpoint_url": "value",
+    }
+
+
+def test_set_and_pop_at_path_escaped_dot() -> None:
+    subject = {}
+    set_at_path(subject, r"s3\.endpoint_url", "value")
+    # Stored escaped, so it round-trips through `meltano.yml`.
+    assert subject == {r"s3\.endpoint_url": "value"}
+
+    set_at_path(subject, r"aws.s3\.endpoint_url", "other")
+    assert subject == {
+        r"s3\.endpoint_url": "value",
+        "aws": {r"s3\.endpoint_url": "other"},
+    }
+
+    assert pop_at_path(subject, r"aws.s3\.endpoint_url") == "other"
+    assert subject == {r"s3\.endpoint_url": "value"}
+
+    assert pop_at_path(subject, r"s3\.endpoint_url") == "value"
+    assert not subject
 
 
 def test_flatten() -> None:

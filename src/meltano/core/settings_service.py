@@ -12,7 +12,7 @@ from contextlib import contextmanager
 
 from meltano.core.setting_definition import SettingKind
 from meltano.core.settings_store import SettingValueStore
-from meltano.core.utils import EnvVarMissingBehavior, flatten
+from meltano.core.utils import EnvVarMissingBehavior, flatten, split_path
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 
 if sys.version_info >= (3, 11):
@@ -475,7 +475,9 @@ class SettingsService(ABC):
 
         setting_def = self.find_setting(name)
         if setting_def is None:
-            root_name, _, _ = name.partition(".")
+            # Only an unescaped dot starts a nested path, so `s3\.endpoint_url`
+            # is its own root rather than a setting nested under `s3\`.
+            root_name = split_path(name, 1, unescape=False)[0]
             if root_name == name or self.find_setting(root_name) is None:
                 warnings.warn(
                     f"Unknown setting {name!r}",

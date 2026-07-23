@@ -18,7 +18,13 @@ import structlog
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.setting import Setting
-from meltano.core.utils import flatten, pop_at_path, set_at_path
+from meltano.core.utils import (
+    flatten,
+    has_unescaped_dot,
+    pop_at_path,
+    set_at_path,
+    split_path,
+)
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -693,12 +699,12 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         keys_to_unset = (
             [setting_def.name, *setting_def.aliases] if setting_def else [name]
         )
-        paths_to_unset = [key for key in keys_to_unset if "." in key]
+        paths_to_unset = [key for key in keys_to_unset if has_unescaped_dot(key)]
 
         if len(path) == 1:
             # No need to unset `name`, since it will be overridden anyway
             keys_to_unset.remove(name)
-        elif name.split(".") == path:
+        elif split_path(name, unescape=False) == path:
             # No need to unset `name` as path, since it will be overridden anyway
             paths_to_unset.remove(name)
 
@@ -734,7 +740,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         if setting_def:
             keys_to_unset = [setting_def.name, *setting_def.aliases]
 
-        paths_to_unset = [key for key in keys_to_unset if "." in key]
+        paths_to_unset = [key for key in keys_to_unset if has_unescaped_dot(key)]
 
         with self.update_config() as config:
             for key in keys_to_unset:

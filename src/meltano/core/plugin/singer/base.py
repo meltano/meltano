@@ -13,7 +13,13 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.constants import LOG_PARSER_SINGER_SDK
 from meltano.core.plugin import BasePlugin
 from meltano.core.setting_definition import SettingDefinition, json_dumps
-from meltano.core.utils import nest_object, uuid7
+from meltano.core.utils import (
+    ESCAPED_DOT,
+    has_unescaped_dot,
+    nest_object,
+    unescape_dots,
+    uuid7,
+)
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -76,16 +82,25 @@ class SingerPlugin(BasePlugin):
     @override
     def process_config(self, config: dict) -> dict:
         non_null_config = {k: v for k, v in config.items() if v is not None}
-        processed_config = nest_object(non_null_config)
-        # Result at this point will contain duplicate entries for nested config
-        # options. We need to pop those redundant entries recursively.
+        # Leave `\.` escapes in place for now. Once they are resolved a literal
+        # dot is indistinguishable from a separator, and the pass below needs
+        # that distinction to decide what is redundant.
+        processed_config = nest_object(non_null_config, unescape=False)
 
+        # Result at this point will contain duplicate entries for nested config
+        # options. We need to pop those redundant entries recursively, and
+        # resolve escaped dots into the literal keys the plugin expects.
         def _pop_non_leaf_keys(nested_config: dict) -> None:
-            """Recursively pop dictionary entries with '.' in their keys."""
+            """Recursively pop redundant entries and unescape literal dots."""
             for key, val in list(nested_config.items()):
-                if "." in key:
+                if has_unescaped_dot(key):
                     nested_config.pop(key)
-                elif isinstance(val, dict):
+                    continue
+
+                if ESCAPED_DOT in key:
+                    nested_config[unescape_dots(key)] = nested_config.pop(key)
+
+                if isinstance(val, dict):
                     _pop_non_leaf_keys(val)
 
         _pop_non_leaf_keys(processed_config)

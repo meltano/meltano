@@ -889,6 +889,33 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")
+    def test_escaped_dot_in_setting_name(
+        self,
+        subject: PluginSettingsService,
+        project,
+        tap,
+    ) -> None:
+        r"""A `\.` in a setting name is a literal dot, not a nesting separator."""
+        subject.set(
+            r"s3\.endpoint_url",
+            "http://localhost:9000",
+            store=SettingValueStore.MELTANO_YML,
+        )
+
+        # Stored escaped, so reading `meltano.yml` back does not nest it.
+        stored = project.plugins.get_plugin(tap).config
+        assert stored[r"s3\.endpoint_url"] == "http://localhost:9000"
+        assert "s3" not in stored
+
+        # Addressable by the same escaped name it was set with.
+        assert subject.get(r"s3\.endpoint_url") == "http://localhost:9000"
+
+        # And handed to the plugin as a single literal key.
+        processed = subject.as_dict(process=True)
+        assert processed["s3.endpoint_url"] == "http://localhost:9000"
+        assert "s3" not in processed
+
     @pytest.mark.usefixtures("tap")
     def test_extra(self, subject, monkeypatch, env_var) -> None:
         subject._setting_defs = None
