@@ -60,7 +60,7 @@ repos:
         files: \.[jt]sx?$
         args: ['--fix', '--config=docs/eslint.config.js']
         additional_dependencies:
-          - "eslint@10.6.0" # Keep this in sync with the rev above!
+          - "eslint@10.7.0" # Keep this in sync with the rev above!
 
           - "eslint-config-prettier@10.1.8"
           - "eslint-plugin-prettier@5.5.6"
