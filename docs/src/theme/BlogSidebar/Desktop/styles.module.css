@@ -31,6 +31,10 @@
   text-decoration: none;
 }
 
+[data-theme="dark"] .sidebarItemLink:hover {
+  color: var(--meltano-link-color);
+}
+
 .sidebarItemLinkActive {
   font-weight: 700;
 }

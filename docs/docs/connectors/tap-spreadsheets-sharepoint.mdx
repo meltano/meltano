@@ -9,7 +9,7 @@ The SharePoint connector pulls spreadsheet and file data directly out of your or
 
 ## At a glance
 
-| | |
+| Property | Value |
 |---|---|
 | **Authentication** | OAuth login (Sign in with Microsoft) |
 | **Streams** | Configured per site and folder path (not a fixed list) |
@@ -27,23 +27,23 @@ The connector reads whatever spreadsheet or file content lives at the SharePoint
 
 You only need one thing to get started: a Microsoft/Office 365 account with access to the SharePoint site you want to sync.
 
-- **Microsoft account access to the target site** — the account you sign in with must already be able to open the site and folder in a browser. The connector reads only what that account can already see; it doesn't grant any new access.
-- **IT admin approval, in most organisations** — see the callout below. This is the one step that catches people out, so plan for it before you promise a go-live date.
+- **Microsoft account access to the target site.** The account you sign in with must already be able to open the site and folder in a browser. The connector reads only what that account can already see; it doesn't grant any new access.
+- **IT admin approval, in most organisations.** See the callout below. This is the one step that catches people out, so plan for it before you promise a go-live date.
 
 ## Setup
 
 ### In SharePoint
 
 1. Confirm the site and folder path you want to sync (in the form `sharepoint://<site_name>/path/to/dir`), and confirm the signed-in account can already open that path in a browser.
-2. No further setup is needed on the SharePoint side — there's no app registration or token to generate yourself.
+2. No further setup is needed on the SharePoint side; there's no app registration or token to generate yourself.
 
 ### In Meltano Cloud
 
 1. Add the Spreadsheets (SharePoint) data source.
-2. Enter your Tables configuration — the site and directory path(s) to sync.
+2. Enter your Tables configuration: the site and directory path(s) to sync.
 3. Click **Login with Microsoft**. You'll be redirected to Microsoft's own sign-in page.
 4. Sign in with your Microsoft/Office 365 account and review the consent screen.
-5. If you can self-consent, click **Accept** and you're redirected back — the connection completes automatically.
+5. If you can self-consent, click **Accept** and you're redirected back; the connection completes automatically.
 6. If instead you see **"Approval required / Ask your admin"**, you cannot proceed until your IT administrator approves the app in your Microsoft Entra ID (Azure AD) tenant. See below.
 7. Once consent is granted, Meltano stores a refresh token securely so scheduled syncs keep running without you having to sign in again.
 
@@ -51,14 +51,14 @@ You only need one thing to get started: a Microsoft/Office 365 account with acce
 
 This is worth flagging early, because it's the single biggest reason a SharePoint connection stalls after everything else looks done.
 
-**Why it happens:** most organisations restrict which apps end users can approve on their own. SharePoint access uses Microsoft Graph's `Sites.Read.All` and `Files.Read.All` permissions. Because these carry the broader `.All` suffix, Microsoft doesn't classify them as "low impact" — so even in tenants that let people self-approve minor apps, SharePoint access almost always gets routed to an admin instead.
+**Why it happens:** most organisations restrict which apps end users can approve on their own. SharePoint access uses Microsoft Graph's `Sites.Read.All` and `Files.Read.All` permissions. Because these carry the broader `.All` suffix, Microsoft doesn't classify them as "low impact," so even in tenants that let people self-approve minor apps, SharePoint access almost always gets routed to an admin instead.
 
 **What's actually being requested (nothing more than this):**
 
 | Permission | What it grants |
 |---|---|
-| `Sites.Read.All` | Read access to SharePoint sites the signed-in user can already access — nothing beyond what they could already open |
-| `Files.Read.All` | Read access to files the signed-in user can already access — same limit |
+| `Sites.Read.All` | Read access to SharePoint sites the signed-in user can already access, nothing beyond what they could already open |
+| `Files.Read.All` | Read access to files the signed-in user can already access, same limit |
 | `offline_access` | Lets scheduled syncs keep running without re-authenticating every time |
 
 There is no write access requested, no tenant-wide access, and no access to sites or files the signed-in user couldn't already open themselves.
@@ -69,9 +69,31 @@ There is no write access requested, no tenant-wide access, and no access to site
 
 or, if your tenant has the request workflow turned on, they'll see it waiting in `Enterprise applications → Admin consent requests`. Once approved once, every user in your organisation can connect without hitting the prompt again. The app then shows up under Enterprise applications, where IT can review or revoke it any time.
 
+## Settings
+
+The `tables` setting is an array of table definition objects, each describing one stream to sync.
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| `name` | string | required | The name to assign to the stream |
+| `path` | string | required | A path to a directory containing files in the format `sharepoint://<site_name>/path/to/dir` |
+| `format` | string | required | The format of files to sync: one of `csv`, `json`, `jsonl`, `excel` or `detect` |
+| `pattern` | string | required | A regex pattern to filter resolved files on name by. Set to `""` if `path` already filters (e.g. via glob pattern matching) and no more granular filtering is required |
+| `start_date` | string | required | An ISO-8601 date-time to filter resolved files on last modified timestamp by |
+| `key_properties` | array of strings | required | The stream primary keys. For files where a primary key can't be clearly identified, reference meta-properties such as `_smart_source_bucket`, `_smart_source_file`, `_smart_source_lineno`, or use `[]` for append-only behaviour. If using the meta-property approach, be aware that changes to file locations or contents may cause unexpected duplicates or overwrites, so it's safest only for files that are, for all intents and purposes, immutable |
+| `encoding` | string | `utf-8` | The [encoding](https://docs.python.org/3/library/codecs.html#standard-encodings) to use when reading files |
+| `skip_initial` | integer | `0` | The number of lines to skip over when reading a file. Mostly useful for `excel` format files |
+| `max_sampled_files` | integer | `50` | The number of files to sample during dynamic catalog discovery |
+| `max_sampling_read` | integer | `1000` | The number of lines to sample for each file during dynamic catalog discovery |
+| `sample_rate` | integer | `5` | Controls how frequently lines are sampled (every `n`th line) during dynamic catalog discovery |
+| `prefer_schema_as_string` | boolean | `false` | Whether to skip inferring property types during sampling. For CSV files, combine with `max_sampling_read: 1` to improve discovery performance (only the header row needs sampling once every value is treated as a string) |
+| `delimiter` <br/>*(`csv` format only)* | string | `,` | The value delimiter sequence used in the targeted files |
+| `quotechar` <br/>*(`csv` format only)* | string | `"` | The quotechar delimiter character used in the targeted files. Set to `detect` to auto-discover |
+| `worksheet_name` <br/>*(`excel` format only)* | string | — | The specific worksheet name to pull out. Defaults to the sheet with the most available data |
+
 ## Available streams
 
-There's no fixed stream list here in the way an API connector has one — what you sync is whatever spreadsheet or file content sits at the site and folder path you configure. Point the connector at a different path, and you're syncing different content; there's no schema to discover ahead of time beyond the files themselves.
+There's no fixed stream list here in the way an API connector has one. What you sync is whatever spreadsheet or file content sits at the site and folder path you configure. Point the connector at a different path, and you're syncing different content; there's no schema to discover ahead of time beyond the files themselves.
 
 ## Need help?
 

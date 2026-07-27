@@ -31,7 +31,24 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: ['docusaurus-plugin-sass'],
+  plugins: [
+    'docusaurus-plugin-sass',
+    [
+      '@docusaurus/plugin-content-blog',
+      /** @type {import('@docusaurus/plugin-content-blog').PluginOptions} */
+      ({
+        id: 'cloudChangelog',
+        routeBasePath: 'changelog/cloud',
+        path: './cloud-changelog',
+        blogTitle: 'Changelog',
+        blogSidebarTitle: 'All Releases',
+        blogDescription: '',
+        postsPerPage: 20,
+        blogSidebarCount: 'ALL',
+        showReadingTime: false,
+      }),
+    ],
+  ],
 
   presets: [
     [
@@ -111,7 +128,7 @@ const config = {
             activeBasePath: '/connectors',
           },
           {
-            to: '/changelog',
+            to: '/changelog/cloud',
             label: 'Changelog',
             position: 'left',
             className: 'header-changelog-link',
@@ -149,7 +166,7 @@ const config = {
                 href: 'https://meltano.com/blog',
               },
               {
-                label: 'Case studies',
+                label: 'Case Studies',
                 href: 'https://meltano.com/case-studies',
               },
               {
