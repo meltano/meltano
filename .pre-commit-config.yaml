@@ -31,7 +31,7 @@ repos:
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.37.4
     hooks:
-      - id: check-renovate
+      - id: check-metaschema
         name: validate JSON schemas against meta schemas
         files: ^src/meltano/schemas?/.*\.json$
       - id: check-jsonschema
@@ -39,7 +39,7 @@ repos:
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
       - id: check-compose-spec
-      - id: check-dependabot
+      - id: check-renovate
       - id: check-github-actions
       - id: check-github-issue-config
       - id: check-github-issue-forms
