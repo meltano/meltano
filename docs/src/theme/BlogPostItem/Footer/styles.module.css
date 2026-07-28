@@ -1,3 +1,12 @@
 .blogPostFooterDetailsFull {
   flex-direction: column;
 }
+
+.blogPostFooter,
+.blogPostFooter * {
+  background: none;
+}
+
+.blogPostFooter {
+  margin-top: 0.75rem !important;
+}

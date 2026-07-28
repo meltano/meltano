@@ -17,9 +17,14 @@ import psutil
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
-import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
-from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
+from meltano.core.utils import (
+    get_boolean_env_var,
+    get_meltano_version,
+    hash_sha256,
+    safe_hasattr,
+    strtobool,
+)
 
 from .base import new_context_uuid
 
@@ -91,7 +96,7 @@ class EnvironmentContext(SelfDescribingJson):
             {
                 "context_uuid": str(new_context_uuid()),
                 "parent_context_uuid": _get_parent_context_uuid_str(),
-                "meltano_version": meltano.__version__,
+                "meltano_version": get_meltano_version(),
                 "is_dev_build": not release_marker_path.is_file(),
                 "is_ci_environment": any(
                     get_boolean_env_var(marker) for marker in self.ci_markers

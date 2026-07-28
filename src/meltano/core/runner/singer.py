@@ -2,7 +2,7 @@ from __future__ import annotations  # noqa: D100
 
 import asyncio
 import asyncio.subprocess
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import typing as t
 

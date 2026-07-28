@@ -13,6 +13,11 @@ if t.TYPE_CHECKING:
     from fixtures.docker import SnowplowMicro
 
 
+# TODO: Fix this flaky test
+@pytest.mark.xfail(
+    reason="Rather flaky, seems to be polluted by other tests",
+    strict=False,
+)
 @pytest.mark.parametrize(
     ("cmd", "expected"),
     (

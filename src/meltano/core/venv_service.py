@@ -9,7 +9,7 @@ import json
 import platform
 import shlex
 import shutil
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -238,7 +238,7 @@ class VirtualEnv:
         return any(checks())
 
 
-async def _extract_stderr(_) -> None:
+async def _extract_stderr(_) -> None:  # ruff:ignore[unused-async]
     return None  # pragma: no cover
 
 
