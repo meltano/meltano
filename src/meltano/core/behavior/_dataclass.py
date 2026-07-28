@@ -88,15 +88,13 @@ class CanonicalDataclassMixin:
     - Support for extra kwargs not defined in dataclass fields
     """
 
-    def __post_init__(self, **extra_kwargs: t.Any) -> None:
-        """Initialize the YAML comment storage after dataclass __init__.
-
-        Args:
-            **extra_kwargs: Extra keyword arguments not defined in dataclass fields.
-        """
+    def __post_init__(self) -> None:
+        """Initialize the YAML comment storage after dataclass __init__."""
         # Store YAML comments and metadata
         self._dict = CommentedMap()
         self._annotations: Annotations | None = None
+        # Extra kwargs (not part of the dataclass fields) are populated by
+        # `CanonicalDataclassMeta.__call__` after `__init__` returns.
         self._extra_attrs: dict[str, t.Any] = {}
 
         # Copy field values to _dict for YAML comment preservation
@@ -104,11 +102,6 @@ class CanonicalDataclassMixin:
             value = getattr(self, field.name)
             if value is not None:
                 self._dict[field.name] = value
-
-        # Store any extra kwargs that weren't part of the dataclass
-        self._extra_attrs = extra_kwargs
-        for key, value in extra_kwargs.items():
-            self._dict[key] = value
 
     @classmethod
     def _canonize(cls, val: t.Any) -> t.Any:  # noqa: ANN401
@@ -158,9 +151,8 @@ class CanonicalDataclassMixin:
                     target._annotations.data,
                 )
 
-            # Copy YAML attributes (comments, etc.) if they exist
-            if hasattr(target, "_dict"):
-                target._dict.copy_attributes(result)
+            # Copy YAML attributes (comments, etc.)
+            target._dict.copy_attributes(result)
 
             return result
 
@@ -221,9 +213,12 @@ class CanonicalDataclassMixin:
         if isinstance(obj, cls):
             return obj
 
-        # Filter kwargs to only include fields defined on the dataclass
+        # Filter kwargs to only include fields defined on the dataclass, plus
+        # "annotations", which `CanonicalDataclassMeta` handles separately.
         field_names = {f.name for f in fields(cls)}  # type:ignore[arg-type] # ty:ignore[invalid-argument-type]
-        filtered_kwargs = {k: v for k, v in obj.items() if k in field_names}
+        filtered_kwargs = {
+            k: v for k, v in obj.items() if k in field_names or k == "annotations"
+        }
 
         instance = cls(**filtered_kwargs)
 
