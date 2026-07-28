@@ -60,7 +60,7 @@ repos:
         files: \.[jt]sx?$
         args: ['--fix', '--config=docs/eslint.config.js']
         additional_dependencies:
-          - "eslint@10.6.0" # Keep this in sync with the rev above!
+          - "eslint@10.7.0" # Keep this in sync with the rev above!
 
           - "eslint-config-prettier@10.1.8"
           - "eslint-plugin-prettier@5.5.6"
@@ -70,7 +70,7 @@ repos:
           - "globals@17.7.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.22
+    rev: v0.16.0
     hooks:
     - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]

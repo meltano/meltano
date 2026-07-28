@@ -343,7 +343,7 @@ class Project:
 
         with self._meltano_rw_lock.write_lock(), self._meltano_interprocess_lock:
             meltano_config = MeltanoFile.parse(self.project_files.load())
-            yield meltano_config
+            yield meltano_config  # ruff:ignore[fallible-context-manager]
             try:
                 self.project_files.update(meltano_config.canonical())  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
             except Exception as err:  # pragma: no cover
@@ -423,7 +423,7 @@ class Project:
         if self.readonly:
             raise ProjectReadonly
 
-        yield self.dotenv
+        yield self.dotenv  # ruff:ignore[fallible-context-manager]
         self.refresh()
 
     @deprecated(

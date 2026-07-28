@@ -1001,6 +1001,8 @@ Dumping the config and catalog of a plugin may reveal sensitive values in your t
 ```bash
 meltano invoke --dump=config <plugin>
 meltano invoke --dump=catalog <plugin>
+meltano invoke --refresh-catalog <plugin>
+meltano invoke --refresh-catalog --dump=catalog <plugin>
 ```
 
 By default, `meltano invoke` will attempt to install the plugin before invoking it. Use `--no-install` to skip this behavior:
@@ -1008,6 +1010,8 @@ By default, `meltano invoke` will attempt to install the plugin before invoking 
 ```bash
 meltano invoke --no-install <plugin>
 ```
+
+Use `--refresh-catalog` with Singer extractors to ignore any existing cached catalog and run discovery before invoking the tap in sync mode or dumping the catalog.
 
 Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
@@ -1268,6 +1272,9 @@ meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
 
 # run a pipeline with timeout set via environment variable
 MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
+
+# force a new run even if a pipeline with the same State ID is already running
+MELTANO_RUN_FORCE=1 meltano --environment=dev run tap-gitlab target-postgres
 
 # run a pipeline with state-id-suffix set via environment variable
 MELTANO_RUN_STATE_ID_SUFFIX=pipeline-alias meltano --environment=dev run tap-gitlab target-postgres

@@ -782,7 +782,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if the project is in read-only mode.
         """
         config = deepcopy(self.settings_service.meltano_yml_config)
-        yield config
+        yield config  # ruff:ignore[fallible-context-manager]
 
         try:
             self.settings_service.update_meltano_yml_config(config)
@@ -853,7 +853,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             StoreNotSupportedError: if the project is in read-only mode.
         """
         config = deepcopy(self.settings_service.environment_config)
-        yield config
+        yield config  # ruff:ignore[fallible-context-manager]
 
         try:
             self.settings_service.update_meltano_environment_config(config)

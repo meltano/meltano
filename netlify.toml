@@ -131,7 +131,7 @@
 
 [[redirects]]
   from = "*/getting-started/cloud-quickstart"
-  to = "/meltano-cloud/cloud-quickstart"
+  to = "/meltano-cloud/cloud-overview"
   status = 301
   force = true
 

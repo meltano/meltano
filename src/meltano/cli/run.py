@@ -84,6 +84,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
         "Force a new run even if a pipeline with the same State ID is already "
         "present. Applies to all pipelines."
     ),
+    envvar="MELTANO_RUN_FORCE",
     is_flag=True,
 )
 @click.option(

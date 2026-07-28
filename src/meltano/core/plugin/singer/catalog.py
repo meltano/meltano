@@ -793,8 +793,7 @@ class ListSelectedExecutor(CatalogExecutor):
         if metadata.get(INCLUSION_KEY) == SelectionType.UNSUPPORTED:
             return SelectionType.UNSUPPORTED
         if metadata.get(SELECTED_KEY) is True or (
-            metadata.get(SELECTED_KEY) is None
-            and metadata.get(SELECTED_BY_DEFAULT_KEY, False)
+            metadata.get(SELECTED_KEY) is None and metadata.get(SELECTED_BY_DEFAULT_KEY)
         ):
             return SelectionType.SELECTED
         return SelectionType.EXCLUDED

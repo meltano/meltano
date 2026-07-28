@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import configparser
 import os
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import typing as t
 from contextlib import suppress
 

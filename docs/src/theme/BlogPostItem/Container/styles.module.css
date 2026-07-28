@@ -1,9 +1,9 @@
 .date {
   color: var(--light-button-text-color);
-  font-family: IBM Plex Mono;
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
   font-style: normal;
   font-weight: 500;
-  line-height: 100%;
+  line-height: 150%;
   background: var(--date-background);
   border-radius: 5px;
   margin: 0 0 30px 0;
