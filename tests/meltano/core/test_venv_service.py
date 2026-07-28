@@ -170,6 +170,7 @@ class TestVirtualEnvService:
         # Pre-create a venv with a marker file to ensure `clean=True` clears it
         venv_dir = subject.venv.root
         venv_dir.mkdir()
+        venv_dir.joinpath("pyvenv.cfg").touch()
         marker_file = venv_dir / "pre_existing_marker.txt"
         marker_file.write_text("marker")
 

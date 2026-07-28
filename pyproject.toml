@@ -460,7 +460,7 @@ ignore = [
 
 [tool.uv]
 override-dependencies = [
-  "sqlalchemy>=2.0.0.dev0,<2.2",
+  "sqlalchemy>=2.1.0.dev0,<2.2",
 ]
-prerelease = "if-necessary-or-explicit"
+prerelease = "if-necessary"
 required-version = ">=0.9.17"
