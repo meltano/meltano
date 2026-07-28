@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import sys
 import typing as t
-from dataclasses import fields, is_dataclass
+from dataclasses import fields
 from functools import lru_cache
 
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
@@ -58,22 +58,19 @@ class CanonicalDataclassMeta(AnnotationsMeta):
         )
 
         # For dataclasses, filter out extra kwargs that aren't fields
-        if is_dataclass(cls):
-            field_names = {f.name for f in fields(cls)}  # type: ignore[unreachable]
-            extra_kwargs = {k: v for k, v in kwargs.items() if k not in field_names}
-            filtered_kwargs = {k: v for k, v in kwargs.items() if k in field_names}
+        field_names = {f.name for f in fields(cls)}  # type:ignore[arg-type] # ty:ignore[invalid-argument-type]
+        extra_kwargs = {k: v for k, v in kwargs.items() if k not in field_names}
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in field_names}
 
-            # Create instance with only valid field kwargs
-            instance = super(AnnotationsMeta, cls).__call__(*args, **filtered_kwargs)
+        # Create instance with only valid field kwargs
+        instance = super(AnnotationsMeta, cls).__call__(*args, **filtered_kwargs)
 
-            # Store extra kwargs for later access
-            if extra_kwargs and hasattr(instance, "_dict"):
-                for key, value in extra_kwargs.items():
-                    instance._dict[key] = value
-            if extra_kwargs and hasattr(instance, "_extra_attrs"):
-                instance._extra_attrs.update(extra_kwargs)
-        else:
-            instance = super(AnnotationsMeta, cls).__call__(*args, **kwargs)
+        # Store extra kwargs for later access
+        if extra_kwargs and hasattr(instance, "_dict"):
+            for key, value in extra_kwargs.items():
+                instance._dict[key] = value
+        if extra_kwargs and hasattr(instance, "_extra_attrs"):
+            instance._extra_attrs.update(extra_kwargs)
 
         # Store the annotations for later re-insertion during serialization
         instance._annotations = extracted_annotations
@@ -103,11 +100,10 @@ class CanonicalDataclassMixin:
         self._extra_attrs: dict[str, t.Any] = {}
 
         # Copy field values to _dict for YAML comment preservation
-        if is_dataclass(self):
-            for field in fields(self):  # type: ignore[unreachable]
-                value = getattr(self, field.name)
-                if value is not None:
-                    self._dict[field.name] = value
+        for field in fields(self):  # type:ignore[arg-type] # ty:ignore[invalid-argument-type]
+            value = getattr(self, field.name)
+            if value is not None:
+                self._dict[field.name] = value
 
         # Store any extra kwargs that weren't part of the dataclass
         self._extra_attrs = extra_kwargs
@@ -142,18 +138,17 @@ class CanonicalDataclassMixin:
         if isinstance(target, CanonicalDataclassMixin):
             # Build the canonical dict from dataclass fields
             result = CommentedMap()
-            if is_dataclass(target):
-                for field in fields(target):  # type: ignore[unreachable]
-                    val = getattr(target, field.name)
-                    # Skip None values and empty values (except False)
-                    if val is None or (not val and val is not False):
-                        continue
-                    # Skip empty dataclass instances
-                    if isinstance(val, CanonicalDataclassMixin) and not dict(
-                        cls.as_canonical(val),
-                    ):
-                        continue
-                    result[field.name] = cls._canonize(val)
+            for field in fields(target):  # type:ignore[arg-type]
+                val = getattr(target, field.name)
+                # Skip None values and empty values (except False)
+                if val is None or (not val and val is not False):
+                    continue
+                # Skip empty dataclass instances
+                if isinstance(val, CanonicalDataclassMixin) and not dict(
+                    cls.as_canonical(val),
+                ):
+                    continue
+                result[field.name] = cls._canonize(val)
 
             # Re-insert annotations if they exist
             if hasattr(target, "_annotations") and target._annotations is not None:
@@ -227,11 +222,8 @@ class CanonicalDataclassMixin:
             return obj
 
         # Filter kwargs to only include fields defined on the dataclass
-        if is_dataclass(cls):
-            field_names = {f.name for f in fields(cls)}  # type: ignore[unreachable]
-            filtered_kwargs = {k: v for k, v in obj.items() if k in field_names}
-        else:
-            filtered_kwargs = dict(obj)
+        field_names = {f.name for f in fields(cls)}  # type:ignore[arg-type] # ty:ignore[invalid-argument-type]
+        filtered_kwargs = {k: v for k, v in obj.items() if k in field_names}
 
         instance = cls(**filtered_kwargs)
 
