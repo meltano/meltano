@@ -39,11 +39,13 @@ reach it-
 - Your dbt/analytics runners
 - Meltano
 
-The Meltano platform is hosted in an Azure data center within the United
-Kingdom and connects to your store from a single static egress IP address:
+The Meltano platform has multi-cloud resilience within the United
+Kingdom and connects to your store from the following egress IP addresses:
 
 ```text
 51.137.148.226
+35.189.66.90
+35.177.0.220
 ```
 
 ### ClickHouse Cloud[​](#clickhouse-cloud "Direct link to ClickHouse Cloud")
@@ -53,6 +55,8 @@ In the ClickHouse Cloud console, open your service → **Settings** → **Securi
 
 ```text
 51.137.148.226/32   # Meltano
+35.189.66.90/32     # Meltano
+35.177.0.220/32     # Meltano
 ```
 
 Ensure there is no `0.0.0.0/0` (Anywhere) entry in the IP Access List: if one
