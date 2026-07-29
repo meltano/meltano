@@ -99,13 +99,15 @@ class TestVirtualEnvService:
         venv: VirtualEnv,
         log_path: Path,
     ) -> VirtualEnvService:
-        backend_name = request.param
-        backend_class = UvBackend if backend_name == "uv" else VirtualenvBackend
+        if request.param == "uv":
+            backend = UvBackend(venv=venv, log_path=log_path, preview=True)
+        else:
+            backend = VirtualenvBackend(venv=venv, log_path=log_path)
         return VirtualEnvService(
             project=project,
             namespace="namespace",
             name="name",
-            backend=backend_class(venv=venv, log_path=log_path),
+            backend=backend,
         )
 
     def test_clean_run_files(
