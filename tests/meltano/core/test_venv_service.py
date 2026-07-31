@@ -99,13 +99,15 @@ class TestVirtualEnvService:
         venv: VirtualEnv,
         log_path: Path,
     ) -> VirtualEnvService:
-        backend_name = request.param
-        backend_class = UvBackend if backend_name == "uv" else VirtualenvBackend
+        if request.param == "uv":
+            backend = UvBackend(venv=venv, log_path=log_path, preview=True)
+        else:
+            backend = VirtualenvBackend(venv=venv, log_path=log_path)
         return VirtualEnvService(
             project=project,
             namespace="namespace",
             name="name",
-            backend=backend_class(venv=venv, log_path=log_path),
+            backend=backend,
         )
 
     def test_clean_run_files(
@@ -170,6 +172,7 @@ class TestVirtualEnvService:
         # Pre-create a venv with a marker file to ensure `clean=True` clears it
         venv_dir = subject.venv.root
         venv_dir.mkdir()
+        venv_dir.joinpath("pyvenv.cfg").touch()
         marker_file = venv_dir / "pre_existing_marker.txt"
         marker_file.write_text("marker")
 

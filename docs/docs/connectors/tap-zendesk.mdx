@@ -1,0 +1,263 @@
+---
+title: Zendesk
+description: Sync your Zendesk Support tickets, agents, and Help Center content into your warehouse.
+---
+
+# Zendesk
+
+Zendesk Support is a customer service platform that helps businesses manage customer interactions across email, chat, phone, and social media, backed by a self-service Help Center for knowledge base articles and community discussions. Support, CX, and operations teams use this connector to bring ticket, agent, and customer data into their warehouse for reporting and analysis.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+| **Sync type** | Mixed: some streams incremental, some full table |
+| **Streams** | Fixed list |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+This connector brings in your full support operations dataset, plus your public-facing knowledge base:
+
+- Core ticketing data (tickets, users, organisations, and their relationships)
+- Support operations configuration (groups, macros, triggers, automations, SLA policies, custom roles and fields)
+- Customer experience signals (satisfaction ratings, ticket metrics)
+- Help Center content (articles, categories, sections, community posts and topics)
+
+## Prerequisites
+
+- **A Zendesk account with API token access.** The connector authenticates as one of your agents using an API token, not a full sign-in flow.
+- **Your Zendesk subdomain and agent email address.** These are needed alongside the API token to authenticate.
+- **An API token, generated in Zendesk.** See the setup steps below.
+
+## Setup
+
+### In Zendesk
+
+1. Go to **Admin Center → Apps and integrations → Zendesk API**.
+2. Enable API token access if it isn't already, and generate a new token.
+3. Note your subdomain (the `mycompany` in `mycompany.zendesk.com`) and the agent email address you'll authenticate with.
+
+### In Meltano Cloud
+
+1. Add the Zendesk data source.
+2. Enter your **Subdomain**, **Email**, and the **API Token** you generated above.
+3. Set a **Start Date** for how far back to sync ticket, user, and metric-event history.
+
+## Settings
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| `subdomain` | string | required | Your Zendesk subdomain. If your Zendesk URL is `https://mycompany.zendesk.com`, your subdomain is `mycompany` |
+| `email` | string | required when using API token auth | Zendesk agent email address, set together with `api_token` |
+| `api_token` | string | required when using API token auth | Zendesk API token, generated in **Admin Center → Apps and integrations → Zendesk API → API token** |
+| `start_date` | string | required | An ISO-8601 date-time. Earliest record date to sync |
+
+## Available streams
+
+**Incremental streams** (bookmark carried between syncs):
+
+| Stream | Replication key | Description |
+|---|---|---|
+| `tickets` | `updated_at` | Support tickets |
+| `users` | `updated_at` | Agents, admins, end-users |
+| `organizations` | `updated_at` | Organisations linked to users and tickets |
+| `ticket_metric_events` | `time` | Metric milestone events (reply time, wait time) |
+
+**Full-table streams** (re-synced completely on every run):
+
+| Stream | Description |
+|---|---|
+| `automations` | Time-based automation rules |
+| `brands` | Brand configurations (multi-brand setups) |
+| `custom_roles` | Custom agent roles |
+| `group_memberships` | Agent-to-group memberships |
+| `groups` | Agent groups |
+| `macros` | Macros for bulk-updating tickets |
+| `organization_fields` | Custom fields defined on organisations |
+| `organization_memberships` | User-to-organisation memberships |
+| `satisfaction_ratings` | CSAT ratings submitted by end-users |
+| `schedules` | Business hours schedules |
+| `sla_policies` | SLA policy definitions |
+| `tags` | Tag vocabulary with usage counts |
+| `ticket_fields` | Ticket field definitions (system and custom) |
+| `ticket_forms` | Ticket form definitions (Enterprise plans; skipped gracefully if unavailable) |
+| `ticket_metrics` | Per-ticket SLA and timing metrics |
+| `triggers` | Event-based automation triggers |
+| `user_fields` | Custom user field definitions |
+| `user_identities` | Email, phone, and social accounts per user (child of `users`) |
+| `views` | Shared and personal ticket views |
+
+**Help Center streams** (skipped gracefully if Guide isn't enabled on your account):
+
+| Stream | Description |
+|---|---|
+| `articles` | Knowledge base articles |
+| `categories` | Top-level Help Center categories |
+| `posts` | Community posts |
+| `sections` | Sections within categories |
+| `topics` | Community discussion topics |
+
+### Field reference (key streams)
+
+#### `tickets`
+
+| Field | Description |
+|---|---|
+| `id` | Unique ticket identifier |
+| `type` | Ticket type (problem, incident, question, task) |
+| `subject` | Ticket subject |
+| `description` | First comment body |
+| `priority` | Ticket priority (urgent, high, normal, low) |
+| `status` | Ticket status (new, open, pending, hold, solved, closed) |
+| `recipient` | Email address the ticket was sent to |
+| `requester_id` | ID of the requester |
+| `submitter_id` | ID of the submitter |
+| `assignee_id` | ID of the assigned agent |
+| `organization_id` | ID of the requester's organisation |
+| `group_id` | ID of the assigned group |
+| `collaborator_ids` | IDs of collaborators |
+| `follower_ids` | IDs of followers |
+| `has_incidents` | Whether this ticket has incident links |
+| `is_public` | Whether comments are public |
+| `due_at` | Due date for task tickets |
+| `tags` | Tags applied to the ticket |
+| `custom_fields` | Custom field values |
+| `satisfaction_rating` | CSAT rating (id, score, comment) |
+| `brand_id` | Brand the ticket belongs to |
+| `created_at` | Ticket creation timestamp |
+| `updated_at` | Last modification timestamp (replication key) |
+| `via` | Channel the ticket was created through |
+
+#### `users`
+
+| Field | Description |
+|---|---|
+| `id` | Unique user identifier |
+| `name` | Full name |
+| `email` | Primary email address |
+| `role` | Role (end-user, agent, admin) |
+| `organization_id` | Primary organisation ID |
+| `verified` | Whether the user is verified |
+| `active` | Whether the user is active |
+| `suspended` | Whether the user is suspended |
+| `tags` | Tags |
+| `last_login_at` | Last login timestamp |
+| `custom_role_id` | Custom role ID for agents |
+| `created_at` | Account creation timestamp |
+| `updated_at` | Last modification timestamp (replication key) |
+
+#### `organizations`
+
+| Field | Description |
+|---|---|
+| `id` | Unique organisation identifier |
+| `name` | Organisation name |
+| `shared_tickets` | Whether tickets are shared within the organisation |
+| `shared_comments` | Whether comments are shared within the organisation |
+| `domain_names` | Domains associated with the organisation |
+| `group_id` | Default group ID |
+| `tags` | Tags |
+| `custom_fields` | Custom field values |
+| `created_at` | Creation timestamp |
+| `updated_at` | Last modification timestamp (replication key) |
+
+#### `groups` / `group_memberships`
+
+| Field | Description |
+|---|---|
+| `id` | Unique identifier |
+| `name` | Group name (`groups` only) |
+| `user_id` | Agent user ID (`group_memberships` only) |
+| `group_id` | Group ID (`group_memberships` only) |
+| `default` | Whether this is the (agent's) default group |
+| `created_at` / `updated_at` | Timestamps |
+
+#### `macros` / `triggers`
+
+| Field | Description |
+|---|---|
+| `id` | Unique identifier |
+| `title` | Macro/trigger title |
+| `active` | Whether it's active |
+| `conditions` | Trigger only: conditions that activate it |
+| `actions` | Actions applied (field, value) |
+| `restriction` | Macro only: visibility restriction |
+| `created_at` / `updated_at` | Timestamps |
+
+#### `organization_fields` / `custom_roles`
+
+| Field | Description |
+|---|---|
+| `id` | Unique identifier |
+| `key` | Field key used in API calls (`organization_fields` only) |
+| `name` | Role name (`custom_roles` only) |
+| `type` | Field type (`organization_fields` only) |
+| `title` / `description` | Display text |
+| `configuration` | Permission configuration (`custom_roles` only) |
+| `team_member_count` | Number of agents with this role (`custom_roles` only) |
+| `created_at` / `updated_at` | Timestamps |
+
+#### `organization_memberships`
+
+| Field | Description |
+|---|---|
+| `id` | Unique membership identifier |
+| `user_id` | User ID |
+| `organization_id` | Organisation ID |
+| `default` | Whether this is the user's default organisation |
+| `created_at` / `updated_at` | Timestamps |
+
+#### `satisfaction_ratings`
+
+| Field | Description |
+|---|---|
+| `id` | Unique rating identifier |
+| `ticket_id` | Associated ticket ID |
+| `score` | Rating score (good, bad, offered) |
+| `reason` | Reason for the rating |
+| `comment` | Customer comment |
+| `created_at` / `updated_at` | Timestamps |
+
+#### `schedules` / `sla_policies`
+
+| Field | Description |
+|---|---|
+| `id` | Unique identifier |
+| `name` / `title` | Display name |
+| `intervals` | Business hour intervals (`schedules` only) |
+| `filter` | Conditions that activate the policy (`sla_policies` only) |
+| `policy_metrics` | Metric definitions: priority, metric, target (`sla_policies` only) |
+| `created_at` / `updated_at` | Timestamps |
+
+#### `user_identities`
+
+Child stream of `users`: each user's email addresses, phone numbers, and social accounts.
+
+| Field | Description |
+|---|---|
+| `id` | Unique identity identifier |
+| `user_id` | Parent user ID |
+| `type` | Identity type (email, twitter, facebook, google, phone_number, etc.) |
+| `value` | Identity value |
+| `verified` | Whether the identity is verified |
+| `primary` | Whether this is the primary identity |
+
+#### Help Center: `categories` / `sections` / `posts`
+
+| Field | Description |
+|---|---|
+| `id` | Unique identifier |
+| `name` / `title` | Display name |
+| `description` / `details` | Body text |
+| `position` | Display position |
+| `locale` | Current locale |
+| `parent_section_id` / `category_id` / `section_id` | Parent references |
+| `author_id` | Post author (`posts` only) |
+| `status` | Post status: planned, not_planned, completed, published (`posts` only) |
+| `created_at` / `updated_at` | Timestamps |
+
+## Need help?
+
+If a stream or field you need isn't listed here, file it through the usual Meltano support channel.
