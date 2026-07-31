@@ -114,7 +114,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@e0647621c2984b5ed2f768cb892365bf2a616ad1 # v4.37.2
+      uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -157,7 +157,7 @@ runs:
         INPUTS_TOKEN: ${{ inputs.token }}
 
     - name: Login to the registry
-      uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+      uses: docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1
       with:
         registry: ${{ inputs.registry }}
         username: ${{ inputs.username }}
