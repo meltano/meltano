@@ -1,0 +1,101 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "dependencyDashboard": false,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    {
+      "description": "Group minor and patch updates to Python dependencies",
+      "matchManagers": [
+        "pep621"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Minor and patch updates to Python dependencies",
+      "groupSlug": "python-minor-patch",
+      "automerge": true
+    },
+    {
+      "description": "Group minor and patch updates to docs dependencies",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Minor and patch updates to docs dependencies",
+      "groupSlug": "docs-minor-patch",
+      "automerge": true
+    },
+    {
+      "description": "Group minor and patch updates to pre-commit hooks",
+      "matchManagers": [
+        "pre-commit"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Minor and patch updates to pre-commit hooks",
+      "groupSlug": "pre-commit-minor-patch",
+      "automerge": true
+    },
+    {
+      "description": "Group minor and patch updates to docker-compose dependencies",
+      "matchManagers": [
+        "docker-compose"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Minor and patch updates to docker-compose dependencies",
+      "groupSlug": "docker-compose-minor-patch",
+      "automerge": true
+    },
+    {
+      "description": "Group other minor and patch updates to GitHub Actions",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Minor and patch updates to GitHub Actions",
+      "groupSlug": "github-actions-minor-patch",
+      "automerge": true
+    },
+    {
+      "description": "Group GitHub upload & download artifact actions",
+      "matchPackageNames": [
+        "actions/upload-artifact",
+        "actions/download-artifact"
+      ],
+      "groupName": "GitHub artifact actions"
+    },
+    {
+      "description": "Disable minimum release age checks for lock file maintenance",
+      "matchUpdateTypes": [
+        "lockFileMaintenance"
+      ],
+      "minimumReleaseAge": null
+    },
+    {
+      "matchUpdateTypes": [
+        "pin",
+        "digest"
+      ],
+      "automerge": true
+    }
+  ]
+}
