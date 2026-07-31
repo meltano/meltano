@@ -4,6 +4,7 @@
     "config:recommended"
   ],
   "dependencyDashboard": false,
+  "platformAutomerge": false,
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true
