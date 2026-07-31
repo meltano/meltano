@@ -92,20 +92,22 @@ REGEX_ISO8601 = (
 )
 
 
-class NotFound(Exception):
+class NotFound(MeltanoError):
     """An element is not found."""
 
-    def __init__(self, name, obj_type=None) -> None:  # noqa: ANN001
+    def __init__(self, name: str, *, obj_type: type | None = None) -> None:
         """Create a new exception.
 
         Args:
             name: the name of the element that is not found
             obj_type: the type of element
         """
-        if obj_type is None:
-            super().__init__(f"{name} was not found.")
-        else:
-            super().__init__(f"{obj_type.__name__} '{name}' was not found.")
+        msg = (
+            f"{name} was not found"
+            if obj_type is None
+            else f"{obj_type.__name__} '{name}' was not found"
+        )
+        super().__init__(msg)
 
 
 class IncompatibleMeltanoVersionError(Exception):
@@ -448,33 +450,6 @@ async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103  # ruff:ignore[un
 
 def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
-
-
-class _GetItemProtocol(t.Protocol):
-    def __getitem__(self, key: str) -> str: ...
-
-
-_G = t.TypeVar("_G", bound=_GetItemProtocol)
-
-
-def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
-    """Find an object by its 'name' key.
-
-    Args:
-        xs: Some iterable of objects against which that name should be matched.
-        name: Used to match against the input objects.
-        obj_type: Object type used for generating the exception message.
-
-    Returns:
-        The first item matched, if any. Otherwise raises an exception.
-
-    Raises:
-        NotFound: If an object with the given name was not found.
-    """
-    try:
-        return next(x for x in xs if x["name"] == name)
-    except StopIteration as stop:
-        raise NotFound(name, obj_type) from stop
 
 
 P = t.ParamSpec("P")

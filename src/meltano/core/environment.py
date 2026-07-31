@@ -213,8 +213,8 @@ class Environment(NameEq, Canonical):
                 for env in objects
                 if getattr(env, "name", env["name"]) == name
             )
-        except StopIteration as stop:
-            raise NotFound(name, cls) from stop
+        except StopIteration:
+            raise NotFound(name, obj_type=cls) from None
 
     def get_plugin_config(
         self,
