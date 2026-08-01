@@ -298,7 +298,6 @@ module = [
   "meltano.core.plugin.project_plugin",
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
-  "meltano.core.utils.*",
 ]
 
 [tool.ty.rules]
@@ -328,7 +327,6 @@ exclude = [
   "src/meltano/core/runner/singer.py",
   "src/meltano/core/sqlalchemy.py",
   "src/meltano/core/tracking/**",
-  "src/meltano/core/utils/**",
   "src/meltano/migrations/**",
 ]
 

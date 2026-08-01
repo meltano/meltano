@@ -246,7 +246,7 @@ def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
 
 def nest(
     d: dict[str, t.Any],
-    path: str,
+    path: str | list[str],
     value: t.Any = None,  # noqa: ANN401
     maxsplit: int = -1,
     *,
@@ -304,7 +304,7 @@ def nest(
 
 
 def nest_object(flat_object: dict[str, t.Any]):  # noqa: ANN201, D103
-    obj = {}
+    obj: dict[str, t.Any] = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
     return obj
@@ -345,7 +345,7 @@ def flatten(d: dict, reducer: t.Literal["tuple"]) -> dict[tuple[str, ...], str]:
 def flatten(
     d: dict,
     reducer: t.Literal["dot", "env_var", "tuple"] | Callable = "tuple",
-) -> dict[str, t.Any]:
+) -> dict[str, t.Any] | dict[tuple[str, ...], t.Any]:
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Args:
@@ -360,7 +360,7 @@ def flatten(
     if reducer == "env_var":
         reducer = to_env_var
 
-    def _flatten(obj: dict, parent_key: tuple = ()) -> dict:
+    def _flatten(obj: dict[str, t.Any], parent_key: tuple[str, ...] = ()) -> dict:
         """Recursively flatten a nested dictionary.
 
         Args:
@@ -370,7 +370,7 @@ def flatten(
         Returns:
             the flattened dictionary
         """
-        items = []
+        items: list[tuple[tuple[str, ...], t.Any]] = []
         for key, value in obj.items():
             new_key = (*parent_key, key)
             if isinstance(value, dict) and value:
@@ -402,11 +402,11 @@ def unflatten(
         the nested dict
     """
     if splitter == "tuple":
-        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # noqa: E731
+        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # type: ignore[redundant-expr,unreachable]  # noqa: E731
     elif splitter == "dot":
-        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # noqa: E731
+        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # type: ignore[redundant-expr]  # noqa: E731
 
-    result = {}
+    result = {}  # type: ignore[var-annotated]
     for key, value in d.items():
         key_parts = splitter(key)
         current = result
@@ -511,7 +511,7 @@ def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     return popped
 
 
-def set_at_path(d, path, value) -> None:  # noqa: ANN001, D103
+def set_at_path(d: dict, path: str | list[str], value: t.Any) -> None:  # noqa: D103  # ruff: ignore[any-type]
     if isinstance(path, str):
         path = path.split(".")
 
@@ -674,19 +674,19 @@ def _expand_env_vars(
 ) -> Expandable:
     if isinstance(raw_value, Mapping):
         if flat:
-            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type] # ty:ignore[invalid-return-type, no-matching-overload]
         return {
-            k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, str | Mapping | list)
+            k: _expand_env_vars(v, replacer, flat=flat)  # ty:ignore[invalid-argument-type]
+            if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for k, v in raw_value.items()
-        }
+        }  # ty:ignore[invalid-return-type]
     if isinstance(raw_value, list):
         # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, str | Mapping | list)
+            if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for v in raw_value
         ]
@@ -921,7 +921,7 @@ def deep_merge(
 
 
 def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
-    base: TMapping = copy(a)
+    base = copy(a)
     for key, value in b.items():
         for applicable_types, behavior in strategies:
             if (
