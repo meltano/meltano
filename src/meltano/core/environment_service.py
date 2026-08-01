@@ -5,7 +5,7 @@ from __future__ import annotations
 import typing as t
 
 from meltano.core.environment import Environment
-from meltano.core.utils import find_named
+from meltano.core.utils import NotFound
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -85,15 +85,16 @@ class EnvironmentService:
 
         Returns:
             The name of the removed Environment.
+
+        Raises:
+            NotFound: If no environment with the given name exists.
         """
         with self.project.meltano_update() as meltano:
-            environment = find_named(
-                self.list_environments(),
-                name,
-                obj_type=Environment,
-            )
+            env = Environment.find_by_name(meltano.environments, name)
+            if not env:
+                raise NotFound(name, obj_type=Environment) from None
 
             # find the schedules plugin config
-            meltano.environments.remove(environment)
+            meltano.environments.remove(env)
 
         return name

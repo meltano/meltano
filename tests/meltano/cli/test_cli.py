@@ -188,7 +188,7 @@ class TestCli:
             assert results[source].exit_code
             assert (
                 results[source].exception.args[0]
-                == f"Environment {name!r} was not found."
+                == f"Environment {name!r} was not found"
             )
 
     def test_version(self, cli_runner) -> None:

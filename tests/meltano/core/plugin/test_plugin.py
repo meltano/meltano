@@ -4,11 +4,16 @@ import typing as t
 
 import pytest
 
-from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
+from meltano.core.plugin import (
+    BasePlugin,
+    PluginDefinition,
+    PluginType,
+    Variant,
+    VariantNotFoundError,
+)
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind
-from meltano.core.utils import find_named
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -172,6 +177,9 @@ class TestPluginDefinition:
 
         assert plugin_def.find_variant(plugin_def.variants[1]).name == "singer-io"
 
+        with pytest.raises(VariantNotFoundError):
+            plugin_def.find_variant("foo")
+
     def test_variant_labels(self) -> None:
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["variants"])
 
@@ -240,21 +248,21 @@ class TestBasePlugin:
         settings = subject.extra_settings
 
         # Known, overwritten in plugin/variant definition
-        foo_setting = find_named(settings, "_foo")
+        foo_setting = SettingDefinition.find_by_name(settings, "_foo")
         assert foo_setting
         assert foo_setting.sensitive
         assert foo_setting.value == "bar"
         assert not foo_setting.is_custom
 
         # Known, not overwritten
-        bar_setting = find_named(settings, "_bar")
+        bar_setting = SettingDefinition.find_by_name(settings, "_bar")
         assert bar_setting
         assert bar_setting.kind == SettingKind.INTEGER
         assert bar_setting.value == 0
         assert not bar_setting.is_custom
 
         # Unknown, set in plugin/variant definition
-        baz_setting = find_named(settings, "_baz")
+        baz_setting = SettingDefinition.find_by_name(settings, "_baz")
         assert baz_setting
         assert baz_setting.kind is None
         assert baz_setting.value == "qux"
