@@ -58,7 +58,7 @@ jobs:
         uv sync --group testing
 
     - name: Run benchmarks
-      uses: CodSpeedHQ/action@f99becdce5e5d51fd556489ebef684f4ecfd6286 # v4.18.5
+      uses: CodSpeedHQ/action@9c498abf90f466ace8338cd5505d6ab277e1f9a3 # v4.19.0
       with:
         mode: walltime
         run: uv run python -m pytest tests/benchmarks/ --codspeed -p no:randomly
