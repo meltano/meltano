@@ -92,20 +92,22 @@ REGEX_ISO8601 = (
 )
 
 
-class NotFound(Exception):
+class NotFound(MeltanoError):
     """An element is not found."""
 
-    def __init__(self, name, obj_type=None) -> None:  # noqa: ANN001
+    def __init__(self, name: str, *, obj_type: type | None = None) -> None:
         """Create a new exception.
 
         Args:
             name: the name of the element that is not found
             obj_type: the type of element
         """
-        if obj_type is None:
-            super().__init__(f"{name} was not found.")
-        else:
-            super().__init__(f"{obj_type.__name__} '{name}' was not found.")
+        msg = (
+            f"{name} was not found"
+            if obj_type is None
+            else f"{obj_type.__name__} '{name}' was not found"
+        )
+        super().__init__(msg)
 
 
 class IncompatibleMeltanoVersionError(Exception):
@@ -310,7 +312,7 @@ def split_path(path: str, maxsplit: int = -1, *, unescape: bool = True) -> list[
 
 def nest(
     d: dict[str, t.Any],
-    path: str,
+    path: str | list[str],
     value: t.Any = None,  # noqa: ANN401
     maxsplit: int = -1,
     *,
@@ -382,7 +384,7 @@ def nest_object(  # noqa: ANN201, D103
     *,
     unescape: bool = True,
 ):
-    obj = {}
+    obj: dict[str, t.Any] = {}
     for key, value in flat_object.items():
         nest(obj, key, value, unescape=unescape)
     return obj
@@ -423,7 +425,7 @@ def flatten(d: dict, reducer: t.Literal["tuple"]) -> dict[tuple[str, ...], str]:
 def flatten(
     d: dict,
     reducer: t.Literal["dot", "env_var", "tuple"] | Callable = "tuple",
-) -> dict[str, t.Any]:
+) -> dict[str, t.Any] | dict[tuple[str, ...], t.Any]:
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Args:
@@ -438,7 +440,7 @@ def flatten(
     if reducer == "env_var":
         reducer = to_env_var
 
-    def _flatten(obj: dict, parent_key: tuple = ()) -> dict:
+    def _flatten(obj: dict[str, t.Any], parent_key: tuple[str, ...] = ()) -> dict:
         """Recursively flatten a nested dictionary.
 
         Args:
@@ -448,7 +450,7 @@ def flatten(
         Returns:
             the flattened dictionary
         """
-        items = []
+        items: list[tuple[tuple[str, ...], t.Any]] = []
         for key, value in obj.items():
             new_key = (*parent_key, key)
             if isinstance(value, dict) and value:
@@ -480,11 +482,11 @@ def unflatten(
         the nested dict
     """
     if splitter == "tuple":
-        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # noqa: E731
+        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # type: ignore[redundant-expr,unreachable]  # noqa: E731
     elif splitter == "dot":
-        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # noqa: E731
+        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # type: ignore[redundant-expr]  # noqa: E731
 
-    result = {}
+    result = {}  # type: ignore[var-annotated]
     for key, value in d.items():
         key_parts = splitter(key)
         current = result
@@ -528,33 +530,6 @@ async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103  # ruff:ignore[un
 
 def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
-
-
-class _GetItemProtocol(t.Protocol):
-    def __getitem__(self, key: str) -> str: ...
-
-
-_G = t.TypeVar("_G", bound=_GetItemProtocol)
-
-
-def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
-    """Find an object by its 'name' key.
-
-    Args:
-        xs: Some iterable of objects against which that name should be matched.
-        name: Used to match against the input objects.
-        obj_type: Object type used for generating the exception message.
-
-    Returns:
-        The first item matched, if any. Otherwise raises an exception.
-
-    Raises:
-        NotFound: If an object with the given name was not found.
-    """
-    try:
-        return next(x for x in xs if x["name"] == name)
-    except StopIteration as stop:
-        raise NotFound(name, obj_type) from stop
 
 
 P = t.ParamSpec("P")
@@ -618,7 +593,7 @@ def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     return popped
 
 
-def set_at_path(d, path, value) -> None:  # noqa: ANN001, D103
+def set_at_path(d: dict, path: str | list[str], value: t.Any) -> None:  # noqa: D103  # ruff: ignore[any-type]
     if isinstance(path, str):
         # As in `pop_at_path`, keep segments escaped to match the stored keys.
         path = split_path(path, unescape=False)
@@ -782,19 +757,19 @@ def _expand_env_vars(
 ) -> Expandable:
     if isinstance(raw_value, Mapping):
         if flat:
-            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type] # ty:ignore[invalid-return-type, no-matching-overload]
         return {
-            k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, str | Mapping | list)
+            k: _expand_env_vars(v, replacer, flat=flat)  # ty:ignore[invalid-argument-type]
+            if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for k, v in raw_value.items()
-        }
+        }  # ty:ignore[invalid-return-type]
     if isinstance(raw_value, list):
         # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, str | Mapping | list)
+            if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for v in raw_value
         ]
@@ -1029,7 +1004,7 @@ def deep_merge(
 
 
 def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
-    base: TMapping = copy(a)
+    base = copy(a)
     for key, value in b.items():
         for applicable_types, behavior in strategies:
             if (

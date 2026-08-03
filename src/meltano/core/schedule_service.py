@@ -18,7 +18,7 @@ from meltano.core.schedule import (
     is_valid_cron,
 )
 from meltano.core.task_sets_service import TaskSetsService
-from meltano.core.utils import NotFound, find_named
+from meltano.core.utils import NotFound
 
 if t.TYPE_CHECKING:
     import subprocess
@@ -39,40 +39,6 @@ class ScheduleAlreadyExistsError(MeltanoError):
         """
         self.schedule = schedule
         super().__init__(reason=f"Schedule '{self.schedule.name}' already exists")
-
-
-class ScheduleDoesNotExistError(MeltanoError):
-    """A schedule does not exist."""
-
-    def __init__(self, name: str):
-        """Initialize the exception.
-
-        Args:
-            name: The name of the schedule that does not exist.
-
-        """
-        self.name = name
-
-        super().__init__(
-            reason=f"Schedule '{name}' does not exist",
-            instruction="Use `meltano schedule add` to add a schedule",
-        )
-
-
-class ScheduleNotFoundError(MeltanoError):
-    """A schedule for a namespace cannot be found."""
-
-    def __init__(self, namespace: str):
-        """Initialize the exception.
-
-        Args:
-            namespace: The namespace that had no associated schedules.
-        """
-        self.namespace = namespace
-
-        reason = f"No schedule found for namespace {self.namespace}"
-        instruction = "Use `meltano schedule add` to add a schedule"
-        super().__init__(reason, instruction)
 
 
 class BadCronError(MeltanoError):
@@ -199,14 +165,12 @@ class ScheduleService:
             The name of the schedule.
 
         Raises:
-            ScheduleDoesNotExistError: If the schedule does not exist.
+            NotFound: If the schedule does not exist.
         """
         with self.project.meltano_update() as meltano:
-            try:
-                # guard if it doesn't exist
-                schedule = find_named(self.schedules(), name)
-            except NotFound as ex:
-                raise ScheduleDoesNotExistError(name) from ex
+            schedule = Schedule.find_by_name(meltano.schedules, name)
+            if not schedule:
+                raise NotFound(name, obj_type=Schedule) from None
 
             # find the schedules plugin config
             meltano.schedules.remove(schedule)
@@ -220,13 +184,13 @@ class ScheduleService:
             schedule: The schedule to update.
 
         Raises:
-            ScheduleDoesNotExistError: If the schedule doesn't exist.
+            NotFound: If the schedule doesn't exist.
         """
         with self.project.meltano_update() as meltano:
             try:
                 idx = meltano.schedules.index(schedule)
             except ValueError:
-                raise ScheduleDoesNotExistError(schedule.name) from None
+                raise NotFound(schedule.name, obj_type=Schedule) from None
             else:
                 meltano.schedules[idx] = schedule
 
@@ -244,7 +208,7 @@ class ScheduleService:
             The schedule
 
         Raises:
-            ScheduleNotFoundError: If no schedule is found.
+            NotFound: If no schedule is found.
         """
         try:
             extractor = self.project.plugins.find_plugin_by_namespace(
@@ -259,7 +223,7 @@ class ScheduleService:
                 and schedule.extractor == extractor.name
             )
         except (PluginNotFoundError, StopIteration) as err:
-            raise ScheduleNotFoundError(namespace) from err
+            raise NotFound(namespace, obj_type=Schedule) from err
 
     def schedules(self) -> list[Schedule]:
         """Return all schedules in the project.
@@ -279,9 +243,12 @@ class ScheduleService:
             Schedule: the schedule with the given name
 
         Raises:
-            ScheduleNotFoundError: if the schedule does not exist
+            NotFound: if the schedule does not exist
         """
-        return find_named(self.schedules(), name)
+        if schedule := Schedule.find_by_name(self.schedules(), name):
+            return schedule
+
+        raise NotFound(name, obj_type=Schedule)
 
     def run(
         self,

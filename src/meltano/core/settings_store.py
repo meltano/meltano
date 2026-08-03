@@ -112,7 +112,7 @@ class StoreNotSupportedError(MeltanoError):
         **kwds: t.Any,
     ) -> None:
         """Instantiate the error."""
-        return super().__init__(reason, **kwds)
+        super().__init__(reason, **kwds)
 
 
 def cast_setting_value(
