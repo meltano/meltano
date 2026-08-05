@@ -477,7 +477,7 @@ class SettingsService(ABC):
         if setting_def is None:
             # Only an unescaped dot starts a nested path, so `s3\.endpoint_url`
             # is its own root rather than a setting nested under `s3\`.
-            root_name = split_path(name, 1, unescape=False)[0]
+            root_name = split_path(name, maxsplit=1, unescape=False)[0]
             if root_name == name or self.find_setting(root_name) is None:
                 warnings.warn(
                     f"Unknown setting {name!r}",

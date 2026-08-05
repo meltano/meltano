@@ -129,9 +129,9 @@ def test_split_path(path: str, expected: list[str]) -> None:
 
 
 def test_split_path_maxsplit() -> None:
-    assert split_path("a.b.c", 1) == ["a", "b.c"]
+    assert split_path("a.b.c", maxsplit=1) == ["a", "b.c"]
     # A negative `maxsplit` means "no limit", matching `str.split`.
-    assert split_path("a.b.c", -1) == ["a", "b", "c"]
+    assert split_path("a.b.c", maxsplit=-1) == ["a", "b", "c"]
 
 
 def test_split_path_without_unescaping() -> None:

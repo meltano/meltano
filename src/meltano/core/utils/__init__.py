@@ -285,7 +285,7 @@ def has_unescaped_dot(name: str) -> bool:
     return UNESCAPED_DOT.search(name) is not None
 
 
-def split_path(path: str, maxsplit: int = -1, *, unescape: bool = True) -> list[str]:
+def split_path(path: str, *, maxsplit: int = -1, unescape: bool = True) -> list[str]:
     r"""Split a dot-delimited path, honouring backslash-escaped dots.
 
     Args:
@@ -359,7 +359,7 @@ def nest(
         value = {}
 
     if isinstance(path, str):
-        path = split_path(path, maxsplit, unescape=unescape)
+        path = split_path(path, maxsplit=maxsplit, unescape=unescape)
 
     *initial, tail = path
 
