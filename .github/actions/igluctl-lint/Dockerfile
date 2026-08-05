@@ -1,4 +1,4 @@
-FROM openjdk:19-jdk-alpine3.16
+FROM eclipse-temurin:19-jdk-alpine
 
 ARG IGLUCTL_VERSION=0.9.0
 

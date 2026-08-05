@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/lint_snowplow_schemas.yml
+      - '.github/actions/igluctl-lint/**'
       - 'src/meltano/core/tracking/iglu-client-embedded/**'
   push:
     branches:
@@ -11,6 +12,7 @@ on:
       - 'v*'
     paths:
       - .github/workflows/lint_snowplow_schemas.yml
+      - '.github/actions/igluctl-lint/**'
       - 'src/meltano/core/tracking/iglu-client-embedded/**'
   workflow_dispatch:
     inputs: {}
