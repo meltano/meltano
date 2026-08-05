@@ -1,4 +1,4 @@
-FROM eclipse-temurin:19-jdk-alpine
+FROM eclipse-temurin:25-jdk-alpine
 
 ARG IGLUCTL_VERSION=0.9.0
 
