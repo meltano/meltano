@@ -21,10 +21,12 @@ This approach blocks all internet traffic except approved IP addresses, such as:
 * Data ingestion services like Meltano
 * Other trusted applications
 
-The Meltano platform is hosted in an Azure data center within the United Kingdom and connects from the following IP address:
+The Meltano platform has multi cloud resilience within the United Kingdom and connects from the following IP addresses:
 
 ```text
 51.137.148.226
+35.189.66.90
+35.177.0.220
 ```
 
 ### Create Network Rules
@@ -38,7 +40,7 @@ CREATE NETWORK RULE block_all_public_access
 CREATE NETWORK RULE allow_meltano_access_rule
   MODE = INGRESS
   TYPE = IPV4
-  VALUE_LIST = ('51.137.148.226');
+  VALUE_LIST = ('51.137.148.226', '35.189.66.90', '35.177.0.220');
 
 CREATE NETWORK POLICY secure_data_policy
   ALLOWED_NETWORK_RULE_LIST = ('allow_meltano_access_rule')

@@ -1,0 +1,23 @@
+---
+slug: 2026-08-07-cloud-changelog
+title: MotherDuck Support & AI-Powered Pipeline Diagnosis
+date: 2026-08-07
+---
+
+MotherDuck joins as a fully supported data store, and AI-powered pipeline diagnosis gets you a plain-English explanation of a failure straight from the pipeline view. This release also adds scoped SharePoint access, SurveyMonkey private-app authentication, and a tap-mysql fix.
+
+{/* truncate */}
+
+## Features
+
+- **MotherDuck as a data store:** Target, state store, and full dbt transformer support are all in, so you can load and transform straight into MotherDuck without extra plumbing.
+- **SurveyMonkey authentication:** Now supports authenticating via a private app, so you can get your survey data flowing without workarounds.
+- **Scoped SharePoint access:** The SharePoint spreadsheets tap now connects using your own Azure AD App Registration, so you decide exactly which files and sites Meltano can reach instead of granting broad access.
+- **AI-powered pipeline diagnosis:** Hit "Diagnose" right from the pipeline view when a run fails and get a plain-English explanation of what went wrong, instead of digging through raw logs yourself - or grab the ready-made prompt if you'd rather hand the fix off to your own AI tool.
+- **Improved status reporting:** Runs that recovered on retry are now tagged as warnings instead of errors, so your logs only flag what actually needs your attention.
+
+## Fixes
+
+- **Invitations crash fixed:** Workspace admins can now invite new members without hitting an error on the invitations page.
+- **Bumped tap-mysql to v2.0.0:** Fixes a `LOG_BASED` column mapping issue that could surface after a schema change.
+- **Connector updates:** tap-bing-ads bumped to v0.4.0, and the Snowflake state backend updated in Meltano Cloud Enterprise.

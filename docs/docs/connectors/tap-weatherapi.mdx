@@ -1,0 +1,167 @@
+---
+title: Weather API
+description: Sync forecast and historical weather data for one or more locations into your warehouse.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Weather API
+
+<ConnectorTypeBadge type="extractor" block />
+
+`tap-weatherapi` (meltanolabs variant)
+
+WeatherAPI is a weather data provider offering current conditions, forecasts, and historical weather data for locations worldwide. It supports queries by city name, US ZIP code, UK postcode, latitude/longitude pairs, IP address, and more.
+
+The `tap-weatherapi` extractor connects to the WeatherAPI REST API to sync weather data for one or more configured locations into your data warehouse.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API Key |
+| **API** | WeatherAPI REST API |
+| **Streams** | `forecast`, `historical` |
+| **Replication** | Full-table refresh for forecast; incremental for historical |
+| **Forecast range** | 1-14 days |
+| **Historical replication key** | `date` |
+| **Location formats** | City name, US ZIP code, UK/Canada postcode, latitude/longitude, airport code, IP address, Search API ID |
+| **Multiple locations** | Supported |
+| **Locations file** | Supported |
+| **Bulk requests** | Supported with eligible WeatherAPI plans |
+| **Bulk request chunk size** | 5-50 locations |
+
+## What you can sync
+
+The WeatherAPI tap provides two streams:
+
+- `forecast`: daily forecast data for each configured location.
+- `historical`: historical daily weather data for each configured location.
+
+## Prerequisites
+
+To use the WeatherAPI tap, you need a WeatherAPI account and an API key. You can obtain a free or paid API key from the WeatherAPI dashboard. Set the API key as the **API Key** setting.
+
+## Setup
+
+### Obtain an API Key
+
+1. Create or log in to your WeatherAPI account.
+2. Obtain an API key from the WeatherAPI dashboard.
+3. Configure the key in Meltano Cloud as the **API Key** setting.
+
+## Settings
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| API Key | string | required | WeatherAPI API key. Sign up for a WeatherAPI account and get your key from the WeatherAPI dashboard. |
+| Locations | array | — | One or more locations to fetch weather data for. Supported formats include city names, US ZIP codes, UK/Canada postcodes, latitude/longitude pairs, airport codes, IP addresses, and Search API IDs. Use Locations File instead when syncing many locations. |
+| Locations File | string | — | Path to a JSON file containing the locations to sync (see below). The `location` value accepts the same formats as Locations. `custom_id` is optional and, when provided, is passed through to each record to correlate bulk-request responses with the original query. |
+| Start Date | string | — | Earliest date for historical data sync, in `YYYY-MM-DD` format. Used by the `historical` stream. |
+| End Date | string | yesterday | Latest date for historical data sync, in ISO format. Defaults to yesterday's date if not configured. |
+| Forecast Days | integer | — | Number of days to include in the `forecast` stream. Supported range: 1-14. |
+| Use Bulk Requests | boolean | `false` | Sends all configured locations in a single POST request instead of one GET request per location. Requires a WeatherAPI Pro+, Business, or Enterprise plan. Each location still counts as one API call. |
+| Bulk Request Chunk Size | integer | — | Maximum number of locations to include in each bulk POST request. Supported range: 5-50. Only applies when Use Bulk Requests is enabled. |
+
+**Locations File format:**
+
+```json
+[
+  {
+    "location": "90210",
+    "custom_id": "beverly-hills"
+  }
+]
+```
+
+## Available streams
+
+### `forecast`
+
+Full-table refresh, no replication key. Each record represents one forecast day per location.
+
+| Field | Description |
+|---|---|
+| `location` | The query string used, such as ZIP code, city, or latitude/longitude. Primary key. |
+| `date` | Calendar date (`YYYY-MM-DD`). Primary key. |
+| `custom_id` | Custom identifier for the location. |
+| `date_epoch` | Unix epoch timestamp for the date. |
+| `location_name` | Resolved location name. |
+| `location_region` | Region or state of the location. |
+| `location_country` | Country of the location. |
+| `location_lat` / `location_lon` | Latitude / longitude of the location. |
+| `location_tz_id` | Time zone identifier. |
+| `maxtemp_c` / `maxtemp_f` | Maximum temperature (Celsius / Fahrenheit). |
+| `mintemp_c` / `mintemp_f` | Minimum temperature (Celsius / Fahrenheit). |
+| `avgtemp_c` / `avgtemp_f` | Average temperature (Celsius / Fahrenheit). |
+| `maxwind_mph` / `maxwind_kph` | Maximum wind speed. |
+| `totalprecip_mm` / `totalprecip_in` | Total precipitation. |
+| `totalsnow_cm` | Total snowfall in cm. |
+| `avgvis_km` / `avgvis_miles` | Average visibility. |
+| `avghumidity` | Average humidity percentage. |
+| `daily_will_it_rain` / `daily_chance_of_rain` | Whether it will rain (1/0) and percentage chance. |
+| `daily_will_it_snow` / `daily_chance_of_snow` | Whether it will snow (1/0) and percentage chance. |
+| `condition` | Weather condition object (text description, icon URL, condition code). |
+| `uv` | UV index. |
+| `sunrise` / `sunset` | Sunrise / sunset time. |
+| `moonrise` / `moonset` | Moonrise / moonset time. |
+| `moon_phase` | Moon phase description. |
+| `moon_illumination` | Moon illumination percentage. |
+| `hour` | Array of hourly weather data objects (see below). |
+
+**Hourly fields** (each item in the `hour` array):
+
+| Field | Description |
+|---|---|
+| `time_epoch` / `time` | Unix epoch / local date-time for the hour. |
+| `temp_c` / `temp_f` | Temperature. |
+| `is_day` | Whether it is daytime (1/0). |
+| `condition` | Weather condition object (text, icon, code). |
+| `wind_mph` / `wind_kph` | Wind speed. |
+| `wind_degree` / `wind_dir` | Wind direction in degrees / compass bearing (e.g. `NNE`). |
+| `pressure_mb` / `pressure_in` | Atmospheric pressure. |
+| `precip_mm` / `precip_in` | Precipitation. |
+| `snow_cm` | Snowfall in cm. |
+| `humidity` | Humidity percentage. |
+| `cloud` | Cloud cover percentage. |
+| `feelslike_c` / `feelslike_f` | Feels-like temperature. |
+| `windchill_c` / `windchill_f` | Wind chill. |
+| `heatindex_c` / `heatindex_f` | Heat index. |
+| `dewpoint_c` / `dewpoint_f` | Dew point. |
+| `will_it_rain` / `chance_of_rain` | Whether it will rain this hour (1/0) and percentage chance. |
+| `will_it_snow` / `chance_of_snow` | Whether it will snow this hour (1/0) and percentage chance. |
+| `vis_km` / `vis_miles` | Visibility. |
+| `gust_mph` / `gust_kph` | Wind gust speed. |
+| `uv` | UV index. |
+
+### `historical`
+
+Incremental replication using `date` as the replication key, starting from `start_date`. Each record represents one day per location. Shares the same schema as the `forecast` stream. The End Date setting controls the latest date included; if not configured, it defaults to yesterday.
+
+## Configuring multiple locations
+
+You can configure locations directly using the **Locations** setting, or use **Locations File** when syncing many locations. A locations file can also include an optional `custom_id` for each location, passed through to records and usable to correlate bulk-request responses with their original location queries.
+
+## Bulk requests
+
+When **Use Bulk Requests** is enabled, the tap sends locations using POST requests instead of one GET request per location. The number of locations per request is controlled by **Bulk Request Chunk Size**. For example, configuring a chunk size of `20` with 45 locations splits them into consecutive chunks of up to 20 locations. Bulk requests require a WeatherAPI Pro+, Business, or Enterprise plan, and each location still counts as one API call.
+
+## Troubleshooting
+
+**API authentication fails.** Check that the API key is valid, configured in the API Key setting, and belongs to a WeatherAPI account with the required access.
+
+**No weather data is returned.** Check that at least one location is configured, the location uses a supported query format, the configured location value is valid, and (if using Locations File) that the JSON file uses the expected format.
+
+**Historical data does not start from the expected date.** Check the Start Date setting, using `YYYY-MM-DD` format. The `historical` stream uses `date` as its replication key and starts from the configured start date.
+
+**Historical data includes an unexpected end date.** Check the End Date setting. If not configured, the tap defaults to yesterday's date.
+
+**Forecast contains the wrong number of days.** Check the Forecast Days setting. The supported range is 1-14.
+
+**Bulk requests fail.** Check that Use Bulk Requests is enabled only when you have a WeatherAPI Pro+, Business, or Enterprise plan, that Bulk Request Chunk Size is between 5 and 50, and that the configured locations are valid. Remember that each location in a bulk request still counts as one API call.
+
+**Many locations are difficult to manage.** Use Locations File instead of configuring a large number of locations directly in the Locations setting.
+
+## Need help?
+
+If a location isn't resolving correctly or a sync isn't returning the data you expect, file it through the usual Meltano support channel with the location query and the error you're seeing.
