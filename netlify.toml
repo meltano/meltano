@@ -17,22 +17,8 @@
   status = 301
   force = true
 
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/how-to-guides/automate-actions/create-a-custom-pipeline"
-  to = "/meltano-cloud/automate-actions#create-a-custom-pipeline"
-  status = 301
-  force = true
-
 [[redirects]]
   from = "*/docs/dataml/workspaceml/invitations/"
-  to = "/reference/cloud/dataml/workspaceml/invitations"
-  status = 301
-  force = true
-
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/dataml/workspaceml/invitations/"
   to = "/reference/cloud/dataml/workspaceml/invitations"
   status = 301
   force = true
@@ -43,35 +29,14 @@
   status = 301
   force = true
 
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/how-to-guides/import-data/create-a-data-import-pipeline"
-  to = "/meltano-cloud/importing-data#create-a-data-import-pipeline"
-  status = 301
-  force = true
-
 [[redirects]]
   from = "*/docs/dataml/"
   to = "/reference/cloud/dataml"
   status = 301
   force = true
 
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/dataml/"
-  to = "/reference/cloud/dataml"
-  status = 301
-  force = true
-
 [[redirects]]
   from = "*/docs/dataml/pipelineml/custom-scripts"
-  to = "/reference/cloud/dataml/pipelineml/custom-scripts"
-  status = 301
-  force = true
-
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/dataml/pipelineml/custom-scripts"
   to = "/reference/cloud/dataml/pipelineml/custom-scripts"
   status = 301
   force = true
@@ -89,36 +54,14 @@
   force = true
   # no relevant content found on meltano
 
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/cli/fetch"
-  to = "https://docs.meltano.com"
-  status = 301
-  force = true
-  # no relevant content found on meltano
-
 [[redirects]]
   from = "*/docs/dataml/meltanoyml/"
   to = "/concepts/project#meltano-yml-project-file"
   status = 301
   force = true
 
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/dataml/meltanoyml/"
-  to = "/concepts/project#meltano-yml-project-file"
-  status = 301
-  force = true
-
 [[redirects]]
   from = "*/docs/how-to-guides/import-data/adding-a-custom-data-source"
-  to = "/meltano-cloud/importing-data#adding-a-custom-data-source"
-  status = 301
-  force = true
-
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
-[[redirects]]
-  from = "*/how-to-guides/import-data/adding-a-custom-data-source"
   to = "/meltano-cloud/importing-data#adding-a-custom-data-source"
   status = 301
   force = true
@@ -159,84 +102,607 @@
   status = 301
   force = true
 
-  # matatika.com's own routing strips the '/docs/' prefix before forwarding to docs.meltano.com, so the bare path (below) is what actually needs to match
+# --- Matatika -> Meltano marketing site redirects (matatika.com equivalents) ---
+
 [[redirects]]
-  from = "*/how-to-guides/use-the-matatika-api/making-your-first-api-call"
-  to = "/reference/cloud/api/postman-collection"
+  from = "*/help/"
+  to = "https://meltano.com"
   status = 301
   force = true
-
-# --- Companion fixes for pre-existing */docs/... rules broken by the same docs/-prefix-stripping issue above ---
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/how-to-guides/manage-workspaces/"
-  to = "/meltano-cloud/managing-a-workspace"
+  from = "*/data-details/dbt/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/how-to-guides/import-data/"
-  to = "/meltano-cloud/importing-data"
+  from = "*/intelligent-data-warehouse/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/how-to-guides/automate-actions/"
-  to = "/meltano-cloud/automate-actions"
+  from = "*/articles/product-update-may-2/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/how-to-guides/manage-data-stores/"
-  to = "/meltano-cloud/stores"
+  from = "*/etl-tools/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/how-to-guides/transform-data"
-  to = "/meltano-cloud/transform-data"
+  from = "*/cloud-intelligence/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/tutorials/*"
-  to = "/meltano-cloud/creating-workspace"
+  from = "*/visualisation/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/how-to-guides/*"
-  to = "/meltano-cloud/cloud-overview"
+  from = "*/technology-cloud/"
+  to = "https://meltano.com"
   status = 301
   force = true
+  # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/getting-started/matatika-cloud"
-  to = "https://docs.meltano.com/getting-started/which-meltano"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/getting-started/your-cloud"
-  to = "https://docs.meltano.com/getting-started/which-meltano"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/getting-started/meltano"
-  to = "https://docs.meltano.com/getting-started/which-meltano"
+  from = "*/contact-us/"
+  to = "https://meltano.com/contact"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/snowflake-developer-guides/whitelist-ip-policy/"
-  to = "/meltano-cloud/connect-a-store/snowflake-guides"
+  from = "*/data-observability/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/technology-open-source/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/dataops/"
+  to = "https://meltano.com/product"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/snowflake-developer-guides/key-pair-authentication/"
-  to = "/meltano-cloud/connect-a-store/snowflake-guides"
+  from = "*/automation/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/terms/"
+  to = "https://meltano.com/terms-of-service"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/privacy-policy/"
+  to = "https://meltano.com/privacy-policy"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/wp-content/uploads/2024/10/6-Strategies-to-Maximise-Company-Data-ROI_v9.pdf"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/etl-tools-ultimate-guide-towards-business-intelligence/"
+  to = "https://meltano.com/blog/etl-tools-ultimate-guide-towards-business-intelligence"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/podcasts/s3e5-building-data-platforms-that-actually-solve-business-problems/"
+  to = "https://meltano.com/podcasts/s3e5-building-data-platforms-that-actually-solve-business-problems"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/podcasts/"
+  to = "https://meltano.com/podcasts"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/blog/"
+  to = "https://meltano.com/blog"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/the-little-bike-company-boosts-monthly-productivity-by-20-with-matatikas-streamlined-solution/"
+  to = "https://meltano.com/case-studies/the-little-bike-company-boosts-monthly-productivity-by-20-with-matatikas-streamlined-solution"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-open-library/"
+  to = "https://meltano.com/connectors/tap-open-library"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/wp-content/uploads/2024/11/Matatika-Infographic_fivetran.pdf"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-openexchangerates/"
+  to = "https://meltano.com/connectors/tap-openexchangerates"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/stop-scaling-what-you-dont-understand/"
+  to = "https://meltano.com/blog/stop-scaling-what-you-dont-understand"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/how-to-optimise-olap-and-oltp-systems-for-better-performance/"
+  to = "https://meltano.com/blog/how-to-optimise-olap-and-oltp-systems-for-better-performance"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/case-studies/"
+  to = "https://meltano.com/case-studies"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/app-elementary/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/about-us/"
+  to = "https://meltano.com/about"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-invoiced/"
+  to = "https://meltano.com/connectors/tap-invoiced"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-google-sheets/"
+  to = "https://meltano.com/connectors/tap-google-sheets"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-autodesk-bim-360/"
+  to = "https://meltano.com/connectors/tap-autodesk-bim-360"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-bling-erp/"
+  to = "https://meltano.com/connectors/tap-bling-erp"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/news/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-rest-api-msdk/"
+  to = "https://meltano.com/connectors/tap-rest-api-msdk"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/wp-content/uploads/2023/10/The-Ultimate-Guide-to-Modern-DataOps.pdf"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-sharepointsites/"
+  to = "https://meltano.com/connectors/tap-sharepointsites"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/choosing-between-star-and-snowflake-schemas-for-your-data-warehouse/"
+  to = "https://meltano.com/blog/choosing-between-star-and-snowflake-schemas-for-your-data-warehouse"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-estoca/"
+  to = "https://meltano.com/connectors/tap-estoca"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-smoke-test/"
+  to = "https://meltano.com/connectors/tap-smoke-test"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-ilevel/"
+  to = "https://meltano.com/connectors/tap-ilevel"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-toast/"
+  to = "https://meltano.com/connectors/tap-toast"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-beautifulsoup/"
+  to = "https://meltano.com/connectors/tap-beautifulsoup"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-mssql/"
+  to = "https://meltano.com/connectors/tap-mssql"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-aconex/"
+  to = "https://meltano.com/connectors/tap-aconex"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-udemy-for-business/"
+  to = "https://meltano.com/connectors/tap-udemy-for-business"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-auth0/"
+  to = "https://meltano.com/connectors/tap-auth0"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-frontapp/"
+  to = "https://meltano.com/connectors/tap-frontapp"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-ms-graph/"
+  to = "https://meltano.com/connectors/tap-ms-graph"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-mambu/"
+  to = "https://meltano.com/connectors/tap-mambu"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-dotykacka/"
+  to = "https://meltano.com/connectors/tap-dotykacka"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/dbt-snowflake-monitoring/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-sleeper/"
+  to = "https://meltano.com/connectors/tap-sleeper"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-youtube-analytics/"
+  to = "https://meltano.com/connectors/tap-youtube-analytics"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-paypal/"
+  to = "https://meltano.com/connectors/tap-paypal"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/mvf-makes-etl-7x-cheaper-while-migrating-1b-rows-across-60-sources/"
+  to = "https://meltano.com/case-studies/mvf-makes-etl-7x-cheaper-while-migrating-1b-rows-across-60-sources"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-sklik/"
+  to = "https://meltano.com/connectors/tap-sklik"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-postgres/"
+  to = "https://meltano.com/connectors/tap-postgres"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-zendesk/"
+  to = "https://meltano.com/connectors/tap-zendesk"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-idealo-click-report/"
+  to = "https://meltano.com/connectors/tap-idealo-click-report"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-linkedin-ads/"
+  to = "https://meltano.com/connectors/tap-linkedin-ads"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/looking-for-arch/"
+  to = "https://meltano.com/blog/looking-for-arch"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/articles/the-data-leaders-digest-january-2026/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-dbt/"
+  to = "https://meltano.com/connectors/tap-dbt"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-meltano/"
+  to = "https://meltano.com/connectors/tap-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-purecloud/"
+  to = "https://meltano.com/connectors/tap-purecloud"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-twinfield/"
+  to = "https://meltano.com/connectors/tap-twinfield"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/how-resident-advisor-escaped-year-long-etl-firefighting/"
+  to = "https://meltano.com/case-studies/how-resident-advisor-escaped-year-long-etl-firefighting"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-procore/"
+  to = "https://meltano.com/connectors/tap-procore"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-spotify/"
+  to = "https://meltano.com/connectors/tap-spotify"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/how-dtn-automated-time-consuming-admin-tasks-to-grow-their-bespoke-talent-networks/"
+  to = "https://meltano.com/blog/how-dtn-automated-time-consuming-admin-tasks-to-grow-their-bespoke-talent-networks"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-hubspot/"
+  to = "https://meltano.com/connectors/tap-hubspot"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-gohighlevel/"
+  to = "https://meltano.com/connectors/tap-gohighlevel"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-openweathermap/"
+  to = "https://meltano.com/connectors/tap-openweathermap"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/bi-worst-roi-modern-data-stack-service-trap/"
+  to = "https://meltano.com/blog/bi-worst-roi-modern-data-stack-service-trap"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/sign-up/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-domo/"
+  to = "https://meltano.com/connectors/tap-domo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-intacct/"
+  to = "https://meltano.com/connectors/tap-intacct"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-rakuten/"
+  to = "https://meltano.com/connectors/tap-rakutenadvertising"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/dbt-artifacts/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-klaviyo/"
+  to = "https://meltano.com/connectors/tap-klaviyo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/analyze-dbt-models/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/dbt-postgres/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/analyze-meltano/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-mailshake/"
+  to = "https://meltano.com/connectors/tap-mailshake"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/target-duckdb/"
+  to = "https://meltano.com/connectors/target-duckdb"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/from-tool-mastery-to-systems-design-how-data-engineers-actually-grow/"
+  to = "https://meltano.com/blog/from-tool-mastery-to-systems-design-how-data-engineers-actually-grow"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/target-athena/"
+  to = "https://meltano.com/connectors/target-athena"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/target-snowflake/"
+  to = "https://meltano.com/connectors/target-snowflake"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/your-biggest-budget-line-isnt-tools-its-time-wasted/"
+  to = "https://meltano.com/blog/your-biggest-budget-line-isnt-tools-its-time-wasted"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-five9/"
+  to = "https://meltano.com/connectors/tap-five9"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/data-details/tap-rickandmorty/"
+  to = "https://meltano.com/connectors/tap-rickandmorty"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/articles/technology-using-gpt-3-large-language-model-to-extract-structured-information-documents/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/articles/product-update-may/"
+  to = "https://meltano.com"
+  status = 301
+  force = true
+  # no relevant content found on meltano
+
+[[redirects]]
+  from = "*/data-details/tap-dayforce/"
+  to = "https://meltano.com/connectors/tap-dayforce"
   status = 301
   force = true
 
@@ -399,6 +865,98 @@
 [[redirects]]
   from = "*/docs/snowflake-developer-guides/key-pair-authentication/"
   to = "/meltano-cloud/connect-a-store/snowflake-guides"
+  status = 301
+  force = true
+
+
+[[redirects]]
+  from = "*/overview"
+  to = "/meltano-cloud/cloud-overview"
+  status = 301
+  force = true
+
+
+[[redirects]]
+  from = "*/glossary"
+  to = "/reference/glossary"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/security"
+  to = "/meltano-cloud/profile-security"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/getting-started/community-edition"
+  to = "/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/dataml/pipelineml/environment"
+  to = "/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/library"
+  to = "/getting-started/which-meltano"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/instant-insights/*"
+  to = "/connectors"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "*/dataml/*"
+  to = "/getting-started/which-meltano"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/how-to-guides/analyze-data/fetch-data-into-a-jupyter-notebook"
+  to = "/tutorials/jupyter"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/how-to-guides/setup-your-development-environment"
+  to = "/meltano-cloud/setup-development-environment"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/developers"
+  to = "/getting-started/which-meltano"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/snowflake-developer-guides/"
+  to = "/meltano-cloud/connect-a-store/snowflake-guides"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/how-to-guides/use-the-matatika-api/integrate-with-the-matatika-api"
+  to = "/reference/cloud/api"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/human"
+  to = "/getting-started/which-meltano"
+  status = 301
+  force = true
+
+  [[redirects]]
+  from = "*/how-to-guides/automate-actions/run-a-jupyter-notebook-on-a-schedule"
+  to = "/tutorials/jupyter"
   status = 301
   force = true
 
