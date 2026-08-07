@@ -1,0 +1,35 @@
+---
+title: MotherDuck Store
+description: Prepare your MotherDuck catalog for use with Meltano
+layout: doc
+sidebar_position: 18
+---
+
+# MotherDuck Store
+
+## Create a new database
+
+To create a new database in MotherDuck, follow these steps:
+
+1. Go to https://app.motherduck.com/home and log in to your MotherDuck account if you're not already logged in.
+1. Look for the "Attached databases" section in the left sidebar.
+1. Click on the + ("Add database") button.
+1. Enter a name (e.g. `meltano`) for your database and click "Create database".
+1. Copy the name of your database.
+
+## Create an access token
+
+To create an access token for your MotherDuck database, follow these steps:
+
+1. Go to https://app.motherduck.com/settings/tokens and log in to your MotherDuck account if you're not already logged in.
+1. Click "Create token".
+1. Enter a name and optional expiration date for your token and click "Create".
+1. Copy the token and store it securely.
+
+## Configure Meltano
+
+To configure your Meltano Workspace to use your MotherDuck database, follow these steps:
+
+1. Add a new store to your Meltano Workspace using the `motherduck` store type.
+1. Use `md:<your-database>` as the connection string, replacing `<your-database>` with the name of your database.
+1. Paste in the access token you copied from the MotherDuck settings page.
