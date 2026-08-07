@@ -24,6 +24,7 @@ from meltano.core.environment_service import EnvironmentService
 from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent
+from meltano.core.utils import split_path
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -322,7 +323,7 @@ class InteractiveConfig:
                 try:
                     click.echo()
                     self.set_value(
-                        setting_name=tuple(name.split(".")),
+                        setting_name=tuple(split_path(name, unescape=False)),
                         value=new_value,
                         store=self.store,
                         interactive=True,

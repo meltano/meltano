@@ -202,7 +202,7 @@ jobs:
         STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version
-      uses: ./.github/actions/docker-build-scan-push
+      uses: $/.github/actions/docker-build-scan-push
       with:
         # Push to the container registry if
         # - The trigger is a push to the main branch
