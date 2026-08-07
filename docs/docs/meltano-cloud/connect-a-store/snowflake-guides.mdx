@@ -21,15 +21,14 @@ This approach blocks all internet traffic except approved IP addresses, such as:
 * Data ingestion services like Meltano
 * Other trusted applications
 
-The Meltano platform has multi cloud resilience within the United Kingdom and connects from the following IP addresses:
-
-```text
-51.137.148.226
-35.189.66.90
-35.177.0.220
-```
+The Meltano platform connects from a fixed set of static egress IP addresses,
+listed on [Meltano IP Addresses](/meltano-cloud/ip-addresses). Allow all of
+them - a pipeline run can originate from any one.
 
 ### Create Network Rules
+
+Replace `<meltano-ip-addresses>` with the quoted, comma-separated list from
+[Meltano IP Addresses](/meltano-cloud/ip-addresses).
 
 ```sql
 CREATE NETWORK RULE block_all_public_access
@@ -40,7 +39,7 @@ CREATE NETWORK RULE block_all_public_access
 CREATE NETWORK RULE allow_meltano_access_rule
   MODE = INGRESS
   TYPE = IPV4
-  VALUE_LIST = ('51.137.148.226', '35.189.66.90', '35.177.0.220');
+  VALUE_LIST = (<meltano-ip-addresses>);
 
 CREATE NETWORK POLICY secure_data_policy
   ALLOWED_NETWORK_RULE_LIST = ('allow_meltano_access_rule')
