@@ -1,0 +1,40 @@
+---
+title: BeautifulSoup
+description: Scrape and parse HTML and XML web content into structured data streams using BeautifulSoup.
+sidebar_position: 6
+---
+
+# BeautifulSoup
+
+## Overview
+
+BeautifulSoup is a Python library for pulling data out of HTML and XML files. This tap downloads and parses web content, enabling users to scrape websites and convert HTML/XML data into structured formats for data pipelines.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Site URL** | The site you'd like to scrape. The tap will download all pages recursively. | String |
+| **Source Name** | The name of the source you're scraping. This will be used as the stream name. | String |
+| **Output Folder** | The file path of where to write the intermediate downloaded HTML files to. | String |
+| **Parser** | The BeautifulSoup parser engine to use. | String |
+| **Download Recursively** | Attempt to download all pages recursively into the output directory prior to parsing files. | Boolean |
+| **Exclude Tags** | List of HTML tags to exclude before extracting text content from pages. | Array |
+| **Find All Kwargs** | Dictionary containing kwargs for the `find_all` call to extract text from pages. | Object |
+| **Flattening Enabled** | Enable schema flattening to automatically expand nested properties. | Boolean |
+| **Flattening Max Depth** | Maximum depth for flattening schemas. | Integer |
+| **Stream Maps** | Configuration object for stream maps capability. | Object |
+| **Stream Map Config** | User-defined configuration values for map expressions. | Object |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-beautifulsoup)

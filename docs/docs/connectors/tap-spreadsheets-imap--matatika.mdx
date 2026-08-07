@@ -1,0 +1,57 @@
+---
+title: Spreadsheets IMAP
+description: Sync spreadsheet data from an IMAP mailbox by extracting file attachments from email folders into structured data streams.
+sidebar_position: 50
+---
+
+# Spreadsheets IMAP
+
+## Overview
+
+The Spreadsheets IMAP connector enables syncing of spreadsheet data from an IMAP mailbox by extracting file attachments from email folders and converting them into structured data streams.
+
+## Prerequisites
+
+**In your email client:**
+1. Identify the file names and formats of the email attachments you want to sync
+
+**In Meltano Cloud:**
+1. Provide your username and password to connect to the mailbox
+2. Add the Tables configuration with respect to the identified files
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Email** | Mailbox email address | String |
+| **Password** | Mailbox password | Credential |
+| **Tables** | List of table definition objects describing which email attachments to extract | Array |
+| **Tables[].name** | Stream identifier | String |
+| **Tables[].path** | Path to a folder or set of emails in the format `imap://<host>/path/to/folder-or-emails` with glob pattern support | String |
+| **Tables[].format** | File type: csv, json, jsonl, excel, or detect | String |
+| **Tables[].pattern** | Regex filter for filenames | String |
+| **Tables[].start_date** | ISO-8601 timestamp for filtering by modification date | String |
+| **Tables[].key_properties** | Primary key columns or meta-properties for deduplication | Array |
+| **Tables[].encoding** | Character encoding standard (default: utf-8) | String |
+| **Tables[].state_based_discovery** | Whether to use stored bookmarks for sampling (default: false) | Boolean |
+| **Tables[].skip_initial** | Lines to skip when reading files (default: 0) | Integer |
+| **Tables[].max_sampled_files** | Files sampled during discovery (default: 50) | Integer |
+| **Tables[].max_sampling_read** | Lines sampled per file (default: 1000) | Integer |
+| **Tables[].sample_rate** | Sampling frequency interval (default: 5) | Integer |
+| **Tables[].prefer_schema_as_string** | Skip type inference during sampling (default: false) | Boolean |
+| **Tables[].delimiter** | CSV field separator (default: `,`) | String |
+| **Tables[].quotechar** | CSV quote character or "detect" for auto-discovery (default: `"`) | String |
+| **Tables[].worksheet_name** | Target Excel worksheet (defaults to sheet with most data) | String |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-spreadsheets-anywhere)

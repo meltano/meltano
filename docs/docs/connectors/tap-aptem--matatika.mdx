@@ -1,0 +1,41 @@
+---
+title: Aptem
+description: Extract learner records, assessments, compliance, and training data from the Aptem apprenticeship platform.
+sidebar_position: 3
+---
+
+# Aptem
+
+## Overview
+
+Aptem is an end-to-end apprenticeship and vocational training management platform used by training providers and employers to manage learner enrolment, programme delivery, progress tracking, compliance, and end-point assessment.
+
+The connector dynamically discovers streams from the Aptem OData service metadata, exposing 30+ available data streams including learner records, assessments, compliance documents, employment data, and organizational information. Streams with known replication keys sync incrementally; others perform full extractions on each run.
+
+## Prerequisites
+
+**API Access:**
+1. Obtain an API token for the Aptem OData API
+2. Note your Aptem tenant name, which is used to construct the API base URL
+3. Optionally determine a start date for data extraction
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **API Token** | API token for the Aptem OData API | String |
+| **Tenant Name** | Aptem tenant name used to build the base URL | String |
+| **Start Date** | The earliest record date to sync | Date |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-aptem)

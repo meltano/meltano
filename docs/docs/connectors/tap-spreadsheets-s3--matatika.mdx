@@ -1,0 +1,40 @@
+---
+title: Spreadsheets S3
+description: Sync data from spreadsheets stored in Amazon S3 into your chosen targets.
+sidebar_position: 52
+---
+
+# Spreadsheets S3
+
+## Overview
+
+Spreadsheets S3 allows users to sync data from spreadsheets stored in Amazon S3 into their chosen targets. The connector supports selecting specific tables and authenticates using AWS credentials.
+
+## Prerequisites
+
+To obtain the Tables required setting for connecting to Spreadsheets Anywhere, you need to have access to the spreadsheet that you want to connect to. Once you have access, you can identify the name of the table or tables that you want to connect to. The table name should be entered in the appropriate field when setting up the connection to Spreadsheets Anywhere.
+
+1. Ensure you have access to the spreadsheet you want to connect to
+2. Identify the name(s) of the tables you want to connect to
+3. Obtain your AWS Access Key ID and AWS Secret Access Key for authenticating with your S3 bucket
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Tables** | Select which tables to connect to and use in your pipeline | String |
+| **AWS Access Key ID** | AWS access key ID for authenticating with your S3 bucket | Credential |
+| **AWS Secret Access Key** | AWS secret access key for authenticating with your S3 bucket | Credential |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-spreadsheets-anywhere)

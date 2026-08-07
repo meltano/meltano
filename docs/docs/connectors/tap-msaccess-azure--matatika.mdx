@@ -1,0 +1,32 @@
+---
+title: Microsoft Access Azure
+description: Extract data from Microsoft Access database files stored in Azure Blob Storage using Azure account credentials.
+sidebar_position: 30
+---
+
+# Microsoft Access Azure
+
+## Overview
+
+Microsoft Access Azure enables extraction from Microsoft Access database files (`.mdb` or `.accdb`) stored in Azure Blob Storage. Microsoft Access is a database management system from Microsoft that combines the relational Access Database Engine with a graphical user interface and software-development tools. This connector is purpose-built for Azure-hosted Access databases and handles authentication via Azure storage account credentials.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Database File** | Local path or URL to a Microsoft Access database `.mdb` or `.accdb` file. | String |
+| **Account Name** | Azure storage account name. | String |
+| **Account Key** | Azure storage account access key. | String |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-msaccess)

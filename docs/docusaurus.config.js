@@ -117,7 +117,6 @@ const config = {
             position: 'left',
             className: 'header-platform-link',
             'aria-label': 'Platform',
-            activeBaseRegex: '^/(getting-started|meltano-cloud|meltano-open|guide|concepts|reference|tutorials|contribute)(/|$)',
           },
           {
             to: '/connectors',
@@ -125,10 +124,9 @@ const config = {
             position: 'left',
             className: 'header-connectors-link',
             'aria-label': 'Connectors',
-            activeBasePath: '/connectors',
           },
           {
-            to: '/changelog/cloud',
+            to: '/changelog',
             label: 'Changelog',
             position: 'left',
             className: 'header-changelog-link',

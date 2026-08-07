@@ -1,0 +1,42 @@
+---
+title: BigQuery
+description: Extract data from Google BigQuery datasets and tables into your Meltano data pipeline.
+sidebar_position: 7
+---
+
+# BigQuery
+
+## Overview
+
+BigQuery is Google's fully-managed, serverless data warehouse. This connector is a BigQuery data warehouse extractor that enables data extraction from Google BigQuery for use within Meltano's EL (Extract-Load) platform.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Google Application Credentials** | JSON content or path to service account credentials. | String |
+| **Project ID** | GCP Project identifier. | String |
+| **Filter Schemas** | Restrict processing to specified BigQuery schemas/datasets; processes all if blank. | Array |
+| **Filter Tables** | Restrict processing to specified tables; supports shell patterns. | Array |
+| **Google Storage Bucket** | Optional GCS bucket for file-based extraction. | String |
+| **Batch Config Storage Root** | Root path to use when writing batch files. | String |
+| **Batch Config Storage Prefix** | Prefix to use when writing batch files. | String |
+| **Batch Config Encoding Format** | Format to use for batch files. | String |
+| **Batch Config Compression** | Compression format to use for batch files. | String |
+| **Flattening Enabled** | Enable automatic schema expansion for nested properties. | Boolean |
+| **Flattening Max Depth** | Maximum nesting depth for flattened schemas. | Integer |
+| **Stream Maps** | Configuration for stream maps capability. | Object |
+| **Stream Map Config** | User-defined values for map expressions. | Object |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-bigquery)

@@ -1,0 +1,33 @@
+---
+title: Instagram
+description: Extract data from Instagram business accounts including media, comments, and insights via the Instagram Graph API.
+sidebar_position: 21
+---
+
+# Instagram
+
+## Overview
+
+Instagram is a social media platform for sharing photos and videos. This connector enables data extraction from Instagram business accounts, providing access to user profiles, media content, engagement metrics, and insights through the Instagram Graph API. Supported data streams include UsersStream, MediaStream, MediaCommentsStream, MediaInsightsStream, UserInsightsDailyStream, UserInsightsLifetimeStream, and CustomUserInsightReports.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **IG User IDs** | A unique identifier for an Instagram user account. | String |
+| **API Version** | The version of the Instagram Graph API to use. | String |
+| **Start Date** | The date from which to start retrieving data. | String |
+| **Custom User Insight Reports** | List of custom user insight reports. | Array |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-instagram)

@@ -1,0 +1,33 @@
+---
+title: Feefo
+description: Extract customer review and feedback data from Feefo, a platform for collecting and displaying verified customer reviews.
+sidebar_position: 15
+---
+
+# Feefo
+
+## Overview
+
+Feefo is a customer review and feedback management platform that enables businesses to collect, analyze, and display verified customer reviews.
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **Merchant ID** | Feefo merchant ID (e.g. `example-retail-merchant`). | String |
+| **Client ID** | Feefo app client ID. Used with `client_secret` to access authenticated endpoints, including enriched review data. | String |
+| **Client Secret** | Feefo app client secret. Used with `client_id` for authenticated API access with additional data. | Credential |
+| **Start Date** | ISO 8601 timestamp specifying the beginning point for data retrieval (inclusive). Defaults to January 1st of the current year. | String |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-feefo)

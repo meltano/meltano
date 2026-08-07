@@ -1,0 +1,41 @@
+---
+title: Iterable
+description: Extract data from Iterable, a growth marketing platform for cross-channel campaign execution and optimization.
+sidebar_position: 24
+---
+
+# Iterable
+
+## Overview
+
+Iterable is a growth marketing platform that enables companies to create, execute and optimize cross-channel campaigns. The platform facilitates personalized customer engagement through email, SMS, push notifications, in-app messaging, and social media, with advanced analytics capabilities for measuring campaign effectiveness and optimizing marketing strategies.
+
+## Prerequisites
+
+**API Key:**
+1. Log in to your Iterable account
+2. Generate a server-side read-only API key (see [Iterable API Keys documentation](https://support.iterable.com/hc/en-us/articles/360043464871-API-Keys#server-side-keys) for steps on [creating API keys](https://support.iterable.com/hc/en-us/articles/360043464871-API-Keys#creating-api-keys))
+
+**Region:**
+1. Determine your Iterable project region — either `US` or `EU` (see [Iterable's European Data Center documentation](https://support.iterable.com/hc/en-us/articles/17572750887444-Iterable-s-European-Data-Center-EDC#api-keys) for details)
+
+## Configuration
+
+| Setting | Description | Type |
+|---------|-------------|------|
+| **API Key** | Iterable server-side read-only API key. | String |
+| **Region** | Iterable project region (`US` or `EU`). | String |
+| **Start Date** | Timestamp in ISO 8601 format to get data from (inclusive). | String |
+
+## Why Meltano?
+
+This connector is built, maintained, supported, and tested by Meltano.
+
+- **Expert Support**: Direct team access with same-day responses during UK business hours and rapid issue resolution.
+- **Rigorously Tested**: Every connector goes through comprehensive testing and quality checks before production, with daily monitoring.
+- **No Maintenance Overhead**: Meltano handles API changes, connector updates, and schema drift so you can focus on analytics.
+- **Community Access**: Join 5,500+ data engineers and analytics practitioners in the [Meltano Slack community](https://meltano.com/slack).
+
+## Source Code
+
+[View source code on GitHub](https://github.com/Matatika/tap-iterable)
