@@ -17,17 +17,14 @@ The `meltano.core.error.MeltanoError` initializer takes in a `reason` argument, 
 from meltano.core.error import MeltanoError
 
 
-class ScheduleDoesNotExistError(MeltanoError):
-    """Occurs when a schedule does not exist."""
+class StoreNotSupportedError(MeltanoError):
+    """Error raised when write actions are performed on a Store that is not writable."""
 
-    def __init__(self, name: str):
-        """Initialize the exception.
-
-        Args:
-            name: The name of the schedule that does not exist.
-        """
-        super().__init__(
-            reason=f"Schedule '{name}' does not exist",
-            instruction="Use `meltano schedule add` to add a schedule",
-        )
+    def __init__(
+        self,
+        reason: str | Exception = "Store is not supported",
+        **kwds: t.Any,
+    ) -> None:
+        """Instantiate the error."""
+        super().__init__(reason, **kwds)
 ```

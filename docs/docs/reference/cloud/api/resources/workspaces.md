@@ -184,6 +184,7 @@ No response body provided.
 
 ##### See Also
 
+- [Transfer a workspace](accounts#transfer-a-workspace)
 - [Set a workspace as default](profiles#set-a-workspace-as-default)
 - [View all invitations to a workspace](invitations#view-all-invitations-to-a-workspace)
 - [Create an invitation to a workspace](invitations#create-an-invitation-to-a-workspace)

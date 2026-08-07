@@ -103,7 +103,6 @@ PG_PORT = os.getenv("PG_PORT", default=None)
 PG_DB = os.getenv("PG_DB", default=None)
 PG_USER = os.getenv("PG_USER", default=None)
 PG_PWD = os.getenv("PG_PWD", default=None)
-
 ```
 
 ### 4. Execute notebooks via nbconvert or papermill

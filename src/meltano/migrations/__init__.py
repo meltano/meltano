@@ -1,4 +1,6 @@
-from __future__ import annotations  # noqa: D104
+# ruff: file-ignore[non-empty-init-module]  # ruff:ignore[undocumented-public-package]
+
+from __future__ import annotations
 
 from pathlib import Path
 

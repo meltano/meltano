@@ -244,14 +244,14 @@ class ELTSchedule(Schedule):
 
     extractor: str
     loader: str
-    transform: str
+    transform: t.Literal["skip", "only", "run"]
 
     def __init__(
         self,
         *,
         extractor: str,
         loader: str,
-        transform: str,
+        transform: t.Literal["skip", "only", "run"],
         **kwargs: t.Any,
     ):
         """Initialize a Schedule.

@@ -1,5 +1,7 @@
 """Defines helpers for the core codebase."""
 
+# ruff: file-ignore[non-empty-init-module]
+
 from __future__ import annotations
 
 import asyncio
@@ -90,20 +92,22 @@ REGEX_ISO8601 = (
 )
 
 
-class NotFound(Exception):
+class NotFound(MeltanoError):
     """An element is not found."""
 
-    def __init__(self, name, obj_type=None) -> None:  # noqa: ANN001
+    def __init__(self, name: str, *, obj_type: type | None = None) -> None:
         """Create a new exception.
 
         Args:
             name: the name of the element that is not found
             obj_type: the type of element
         """
-        if obj_type is None:
-            super().__init__(f"{name} was not found.")
-        else:
-            super().__init__(f"{obj_type.__name__} '{name}' was not found.")
+        msg = (
+            f"{name} was not found"
+            if obj_type is None
+            else f"{obj_type.__name__} '{name}' was not found"
+        )
+        super().__init__(msg)
 
 
 class IncompatibleMeltanoVersionError(Exception):
@@ -240,15 +244,86 @@ def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
+# A dot only separates path segments when it is not backslash-escaped, so `\.`
+# denotes a literal dot inside a single segment. This mirrors the escaping
+# already supported by `select` rules in `meltano.core.plugin.singer.catalog`.
+UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
+ESCAPED_DOT = r"\."
+
+
+def unescape_dots(segment: str) -> str:
+    r"""Replace escaped dots in a path segment with literal dots.
+
+    Args:
+        segment: a single (already split) path segment
+
+    Returns:
+        The segment with `\.` replaced by `.`
+
+    Examples:
+        >>> unescape_dots(r"s3\.endpoint_url")
+        's3.endpoint_url'
+    """
+    return segment.replace(ESCAPED_DOT, ".")
+
+
+def has_unescaped_dot(name: str) -> bool:
+    r"""Check whether a name contains a dot that acts as a path separator.
+
+    Args:
+        name: the name to check
+
+    Returns:
+        True if the name contains at least one unescaped dot.
+
+    Examples:
+        >>> has_unescaped_dot("foo.bar")
+        True
+        >>> has_unescaped_dot(r"foo\.bar")
+        False
+    """
+    return UNESCAPED_DOT.search(name) is not None
+
+
+def split_path(path: str, *, maxsplit: int = -1, unescape: bool = True) -> list[str]:
+    r"""Split a dot-delimited path, honouring backslash-escaped dots.
+
+    Args:
+        path: the dot-delimited path to split
+        maxsplit: maximum number of splits; negative means no limit
+        unescape: whether to turn `\.` into `.` in each resulting segment
+
+    Returns:
+        The list of path segments.
+
+    Examples:
+        >>> split_path("foo.bar.baz")
+        ['foo', 'bar', 'baz']
+        >>> split_path(r"s3\.endpoint_url")
+        ['s3.endpoint_url']
+        >>> split_path(r"aws.s3\.endpoint_url")
+        ['aws', 's3.endpoint_url']
+    """
+    # `str.split` treats a negative `maxsplit` as "no limit", whereas `re.split`
+    # spells that as 0 (and treats a negative value as "do not split at all").
+    segments = UNESCAPED_DOT.split(path, maxsplit=max(maxsplit, 0))
+    return [unescape_dots(segment) for segment in segments] if unescape else segments
+
+
 def nest(
     d: dict[str, t.Any],
-    path: str,
+    path: str | list[str],
     value: t.Any = None,  # noqa: ANN401
     maxsplit: int = -1,
     *,
     force: bool = False,
+    unescape: bool = True,
 ) -> dict[str, dict[str, t.Any]]:
-    """Create a hierarchical dictionary path and return the leaf dict.
+    r"""Create a hierarchical dictionary path and return the leaf dict.
+
+    A dot separates path segments unless it is backslash-escaped, so a path of
+    `s3\.endpoint_url` sets a single key literally named `s3.endpoint_url`
+    instead of nesting `endpoint_url` under `s3`.
 
     Args:
         d: the dictionary to operate on
@@ -256,6 +331,7 @@ def nest(
         value: the value to set at the given path
         maxsplit: maximum number of splits to split path by
         force: if true, write an empty dict
+        unescape: whether to turn `\.` into `.` in each path segment
 
     Returns:
         The leaf element of the dict
@@ -274,12 +350,16 @@ def nest(
         >>> alist.append("works")
         >>> d
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
+        >>> escaped = dict()
+        >>> _ = nest(escaped, r"s3\.endpoint_url", value="http://localhost")
+        >>> escaped
+        {'s3.endpoint_url': 'http://localhost'}
     """
     if value is None:
         value = {}
 
     if isinstance(path, str):
-        path = path.split(".", maxsplit=maxsplit)
+        path = split_path(path, maxsplit=maxsplit, unescape=unescape)
 
     *initial, tail = path
 
@@ -299,10 +379,14 @@ def nest(
     return cursor[tail]
 
 
-def nest_object(flat_object: dict[str, t.Any]):  # noqa: ANN201, D103
-    obj = {}
+def nest_object(  # noqa: ANN201, D103
+    flat_object: dict[str, t.Any],
+    *,
+    unescape: bool = True,
+):
+    obj: dict[str, t.Any] = {}
     for key, value in flat_object.items():
-        nest(obj, key, value)
+        nest(obj, key, value, unescape=unescape)
     return obj
 
 
@@ -341,7 +425,7 @@ def flatten(d: dict, reducer: t.Literal["tuple"]) -> dict[tuple[str, ...], str]:
 def flatten(
     d: dict,
     reducer: t.Literal["dot", "env_var", "tuple"] | Callable = "tuple",
-) -> dict[str, t.Any]:
+) -> dict[str, t.Any] | dict[tuple[str, ...], t.Any]:
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Args:
@@ -356,7 +440,7 @@ def flatten(
     if reducer == "env_var":
         reducer = to_env_var
 
-    def _flatten(obj: dict, parent_key: tuple = ()) -> dict:
+    def _flatten(obj: dict[str, t.Any], parent_key: tuple[str, ...] = ()) -> dict:
         """Recursively flatten a nested dictionary.
 
         Args:
@@ -366,7 +450,7 @@ def flatten(
         Returns:
             the flattened dictionary
         """
-        items = []
+        items: list[tuple[tuple[str, ...], t.Any]] = []
         for key, value in obj.items():
             new_key = (*parent_key, key)
             if isinstance(value, dict) and value:
@@ -398,11 +482,11 @@ def unflatten(
         the nested dict
     """
     if splitter == "tuple":
-        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # noqa: E731
+        splitter = lambda x: x if isinstance(x, tuple) else (x,)  # type: ignore[redundant-expr,unreachable]  # noqa: E731
     elif splitter == "dot":
-        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # noqa: E731
+        splitter = lambda x: tuple(x.split(".")) if isinstance(x, str) else (x,)  # type: ignore[redundant-expr]  # noqa: E731
 
-    result = {}
+    result = {}  # type: ignore[var-annotated]
     for key, value in d.items():
         key_parts = splitter(key)
         current = result
@@ -440,39 +524,12 @@ def noop(*_args, **_kwargs) -> None:  # noqa: D103
     pass
 
 
-async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103
+async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103  # ruff:ignore[unused-async]
     return True
 
 
 def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
-
-
-class _GetItemProtocol(t.Protocol):
-    def __getitem__(self, key: str) -> str: ...
-
-
-_G = t.TypeVar("_G", bound=_GetItemProtocol)
-
-
-def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
-    """Find an object by its 'name' key.
-
-    Args:
-        xs: Some iterable of objects against which that name should be matched.
-        name: Used to match against the input objects.
-        obj_type: Object type used for generating the exception message.
-
-    Returns:
-        The first item matched, if any. Otherwise raises an exception.
-
-    Raises:
-        NotFound: If an object with the given name was not found.
-    """
-    try:
-        return next(x for x in xs if x["name"] == name)
-    except StopIteration as stop:
-        raise NotFound(name, obj_type) from stop
 
 
 P = t.ParamSpec("P")
@@ -511,7 +568,9 @@ def is_email_valid(value: str):  # noqa: ANN201, D103
 
 def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     if isinstance(path, str):
-        path = path.split(".")
+        # Keys are stored in `meltano.yml` in their escaped form, so segments
+        # must keep their escapes to index into the config.
+        path = split_path(path, unescape=False)
 
     *initial, tail = path
 
@@ -534,9 +593,10 @@ def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     return popped
 
 
-def set_at_path(d, path, value) -> None:  # noqa: ANN001, D103
+def set_at_path(d: dict, path: str | list[str], value: t.Any) -> None:  # noqa: D103  # ruff: ignore[any-type]
     if isinstance(path, str):
-        path = path.split(".")
+        # As in `pop_at_path`, keep segments escaped to match the stored keys.
+        path = split_path(path, unescape=False)
 
     *initial, tail = path
 
@@ -697,19 +757,19 @@ def _expand_env_vars(
 ) -> Expandable:
     if isinstance(raw_value, Mapping):
         if flat:
-            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type] # ty:ignore[invalid-return-type, no-matching-overload]
         return {
-            k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, str | Mapping | list)
+            k: _expand_env_vars(v, replacer, flat=flat)  # ty:ignore[invalid-argument-type]
+            if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for k, v in raw_value.items()
-        }
+        }  # ty:ignore[invalid-return-type]
     if isinstance(raw_value, list):
         # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, str | Mapping | list)
+            if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for v in raw_value
         ]
@@ -944,7 +1004,7 @@ def deep_merge(
 
 
 def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
-    base: TMapping = copy(a)
+    base = copy(a)
     for key, value in b.items():
         for applicable_types, behavior in strategies:
             if (

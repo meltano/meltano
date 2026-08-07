@@ -145,7 +145,7 @@ class TestVersionCheckService:
         responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
-            "meltano.core.version_check.importlib.metadata.version",
+            "meltano.core.version_check.get_meltano_version",
             return_value="3.7.0",
         ):
             result = version_service.check_version()
@@ -181,7 +181,7 @@ class TestVersionCheckService:
         responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
-            "meltano.core.version_check.importlib.metadata.version",
+            "meltano.core.version_check.get_meltano_version",
             return_value="invalid",
         ):
             result = version_service.check_version()
@@ -203,7 +203,7 @@ class TestVersionCheckService:
         responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
-            "meltano.core.version_check.importlib.metadata.version",
+            "meltano.core.version_check.get_meltano_version",
             return_value="3.9.0",
         ):
             result = version_service.check_version()
@@ -231,7 +231,7 @@ class TestVersionCheckService:
     ):
         """Test version check skips development versions."""
         with mock.patch(
-            "meltano.core.version_check.importlib.metadata.version",
+            "meltano.core.version_check.get_meltano_version",
             return_value="0.0.0",
         ):
             result = version_service.check_version()
@@ -304,7 +304,7 @@ class TestVersionCheckService:
         responses.add(responses.GET, PYPI_URL, json=pypi_response, status=HTTPStatus.OK)
 
         with mock.patch(
-            "meltano.core.version_check.importlib.metadata.version",
+            "meltano.core.version_check.get_meltano_version",
             return_value="3.7.0",
         ):
             result1 = version_service.check_version()
@@ -316,7 +316,7 @@ class TestVersionCheckService:
 
         # Second check - should use cache
         with mock.patch(
-            "meltano.core.version_check.importlib.metadata.version",
+            "meltano.core.version_check.get_meltano_version",
             return_value="3.7.0",
         ):
             result2 = version_service.check_version()

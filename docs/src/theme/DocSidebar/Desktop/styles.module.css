@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-top: 0;
+    padding-top: var(--ifm-navbar-height);
     width: var(--doc-sidebar-width);
   }
 

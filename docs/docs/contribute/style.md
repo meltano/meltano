@@ -131,8 +131,8 @@ For new, deprecated, or experimental features, the relevant code path can be wra
 from meltano.core.project import Project
 from meltano.core.settings_service import FeatureFlags
 
-class ExistingClass:
 
+class ExistingClass:
     def __init__(self):
         self.project = Project.find()
 
@@ -147,7 +147,10 @@ class ExistingClass:
     # The same pattern can be used to deprecate existing behavior
     # Notice the "raise_error=False" in the feature_flag method call
     def existing_method_with_new_behavior(self):
-        with self.project.settings.feature_flag(FeatureFlags.NEW_BEHAVIOR, raise_error=False) as new_behavior:
+        with self.project.settings.feature_flag(
+            FeatureFlags.NEW_BEHAVIOR,
+            raise_error=False,
+        ) as new_behavior:
             if new_behavior:
                 print("Doing the new behavior...")
             else:

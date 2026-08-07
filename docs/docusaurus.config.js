@@ -13,6 +13,7 @@ const config = {
   tagline: '',
   url: 'https://docs.meltano.com',
   baseUrl: '/',
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'warn',
   favicon: 'img/favicon.png',
@@ -30,7 +31,24 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: ['docusaurus-plugin-sass'],
+  plugins: [
+    'docusaurus-plugin-sass',
+    [
+      '@docusaurus/plugin-content-blog',
+      /** @type {import('@docusaurus/plugin-content-blog').PluginOptions} */
+      ({
+        id: 'cloudChangelog',
+        routeBasePath: 'changelog/cloud',
+        path: './cloud-changelog',
+        blogTitle: 'Changelog',
+        blogSidebarTitle: 'All Releases',
+        blogDescription: '',
+        postsPerPage: 20,
+        blogSidebarCount: 'ALL',
+        showReadingTime: false,
+      }),
+    ],
+  ],
 
   presets: [
     [
@@ -113,6 +131,7 @@ const config = {
             position: 'left',
             className: 'header-changelog-link',
             'aria-label': 'Changelog',
+            activeBasePath: '/changelog',
           },
           {
             href: 'https://github.com/meltano/meltano',
@@ -134,40 +153,23 @@ const config = {
         style: 'light',
         links: [
           {
-            title: 'The Project',
+            title: 'Meltano',
             items: [
               {
-                label: 'Our Mission',
-                to: 'https://handbook.meltano.com/company/#mission',
+                label: 'Overview',
+                href: 'https://meltano.com/product',
               },
               {
-                label: 'Our Vision',
-                to: 'https://handbook.meltano.com/company/#vision',
+                label: 'Blogs',
+                href: 'https://meltano.com/blog',
               },
               {
-                label: 'Roadmap',
-                to: 'https://handbook.meltano.com/product/roadmap',
+                label: 'Case Studies',
+                href: 'https://meltano.com/case-studies',
               },
               {
-                label: 'Strategy',
-                to: 'https://handbook.meltano.com/company/#strategy',
-              },
-            ],
-          },
-          {
-            title: 'Company',
-            items: [
-              {
-                label: 'Handbook',
-                href: 'https://handbook.meltano.com/',
-              },
-              {
-                label: 'Values',
-                href: 'https://handbook.meltano.com/company/values',
-              },
-              {
-                label: 'History',
-                href: 'https://handbook.meltano.com/timeline',
+                label: 'Data Matas Podcast',
+                href: 'https://meltano.com/podcasts',
               },
             ],
           },

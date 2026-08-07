@@ -9,7 +9,7 @@ import json
 import platform
 import shlex
 import shutil
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -22,6 +22,7 @@ import structlog
 from meltano.core.error import AsyncSubprocessError
 
 if t.TYPE_CHECKING:
+    import os
     from collections.abc import Iterable, Sequence
     from pathlib import Path
 
@@ -238,11 +239,15 @@ class VirtualEnv:
         return any(checks())
 
 
-async def _extract_stderr(_) -> None:
+async def _extract_stderr(_) -> None:  # ruff:ignore[unused-async]
     return None  # pragma: no cover
 
 
-async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:  # noqa: ANN001, ANN002, ANN003
+async def exec_async(
+    *args: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+    extract_stderr: StdErrExtractor = _extract_stderr,
+    **kwargs: t.Any,
+) -> Process:
     """Run an executable asynchronously in a subprocess.
 
     Args:
@@ -410,8 +415,8 @@ class PipPackageManager(PackageManager):
 class UvPackageManager(PackageManager):
     """Package manager using ``uv pip``."""
 
-    uv: str
-    """Path to the `uv` executable."""
+    cli: tuple[str, ...]
+    """Base uv CLI arguments, e.g. ``uv --quiet``."""
 
     @override
     async def install(
@@ -424,7 +429,7 @@ class UvPackageManager(PackageManager):
         env: dict[str, str | None] | None = None,
     ) -> Process:
         return await exec_async(
-            self.uv,
+            *self.cli,
             "pip",
             "install",
             f"--python={python}",
@@ -436,7 +441,7 @@ class UvPackageManager(PackageManager):
     @override
     async def uninstall(self, package: str, *, python: str) -> Process:
         return await exec_async(
-            self.uv,
+            *self.cli,
             "pip",
             "uninstall",
             f"--python={python}",
@@ -446,7 +451,7 @@ class UvPackageManager(PackageManager):
     @override
     async def list_installed(self, *args: str, python: str) -> list[dict[str, t.Any]]:
         proc = await exec_async(
-            self.uv,
+            *self.cli,
             "pip",
             "list",
             "--quiet",
@@ -559,7 +564,7 @@ class VirtualEnvService:
             self.name,
         )
 
-        async def extract_stderr(proc: Process):  # noqa: ANN202
+        async def extract_stderr(proc: Process) -> str:
             return (await t.cast("asyncio.StreamReader", proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",
@@ -872,21 +877,23 @@ class VirtualenvBackend(VenvBackend):
 class UvBackend(VenvBackend):
     """Manages virtual environments using `uv`."""
 
-    def __init__(self, *args: t.Any, **kwargs: t.Any):
+    def __init__(self, *args: t.Any, preview: bool = False, **kwargs: t.Any):
         """Initialize the `UvBackend`.
 
         Args:
             args: Positional arguments for the VenvBackend.
+            preview: Run uv with the ``--preview`` flag.
             kwargs: Keyword arguments for the VenvBackend.
         """
         super().__init__(*args, **kwargs)
         self.uv = find_uv()
+        self._cli = (self.uv, "--preview") if preview else (self.uv,)
         logger.debug("Using uv executable at %s", self.uv)
 
     @cached_property
     def package_manager(self) -> UvPackageManager:
         """The uv-based package manager for this virtual environment."""
-        return UvPackageManager(uv=self.uv)
+        return UvPackageManager(cli=self._cli)
 
     @override
     async def create_venv(
@@ -904,7 +911,7 @@ class UvBackend(VenvBackend):
             The Python process creating the virtual environment.
         """
         return await exec_async(
-            self.uv,
+            *self._cli,
             "venv",
             "--clear",
             f"--python={self.venv.python_path}",

@@ -7,7 +7,7 @@ import re
 import typing as t
 from collections import defaultdict
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior import NameEq
@@ -17,7 +17,6 @@ from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
-from meltano.core.utils import NotFound, find_named
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -417,10 +416,9 @@ class PluginDefinition(PluginRef):
         Raises:
             VariantNotFoundError: If the variant is not found.
         """
-        try:
-            return find_named(self.variants, variant_name)
-        except NotFound as err:
-            raise VariantNotFoundError(self, variant_name) from err
+        if variant := Variant.find_by_name(self.variants, variant_name):
+            return variant
+        raise VariantNotFoundError(self, variant_name)
 
     def find_variant(self, variant_or_name: str | Variant | None = None) -> Variant:
         """Find the variant with the given name or variant.

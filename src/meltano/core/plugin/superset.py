@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import typing as t
 from contextlib import suppress

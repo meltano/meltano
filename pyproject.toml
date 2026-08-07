@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.2.1"
+version = "4.2.2"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -145,8 +145,8 @@ typing = [
   "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
-  "mypy~=2.1.0",
-  "ty==0.0.54",
+  "mypy>=2.1,<2.4",
+  "ty==0.0.64",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -241,7 +241,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.2.1"
+version = "4.2.2"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
@@ -259,6 +259,7 @@ enable_error_code = [
   "exhaustive-match",
   "deprecated",
 ]
+explicit_package_bases = true
 incremental = true
 files = [
   "src/meltano/",
@@ -268,6 +269,7 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+mypy_path = ["src"]
 strict = false
 warn_redundant_casts = true
 warn_unreachable = true
@@ -296,7 +298,6 @@ module = [
   "meltano.core.plugin.project_plugin",
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
-  "meltano.core.utils.*",
 ]
 
 [tool.ty.rules]
@@ -326,26 +327,27 @@ exclude = [
   "src/meltano/core/runner/singer.py",
   "src/meltano/core/sqlalchemy.py",
   "src/meltano/core/tracking/**",
-  "src/meltano/core/utils/**",
   "src/meltano/migrations/**",
 ]
 
 [build-system]
-requires = ["hatchling==1.30.1"]
+requires = ["hatchling==1.31.0"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-required-version = ">=0.15.14"
+required-version = ">=0.16.0"
 
 [tool.ruff.lint]
 future-annotations = true
+preview = true
 ignore = [
-  "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
-  "S310",   # Allow `urllib.open`
-  "S603",   # Allow `subprocess.run(..., shell=False)`
-  "COM812", # Handled by the Ruff formatter
-  "ISC001", # Handled by the Ruff formatter
+  "error-suffix-on-exception-name",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
+  "suspicious-url-open-usage",   # Allow `urllib.open`
+  "subprocess-without-shell-equals-true",   # Allow `subprocess.run(..., shell=False)`
+  "missing-trailing-comma", # Handled by the Ruff formatter
+  "single-line-implicit-string-concatenation", # Handled by the Ruff formatter
+  "noqa-comments",
 ]
 select = [
   "A",     # flake8-builtins
@@ -397,23 +399,27 @@ select = [
   "YTT",   # flake8-2020
 ]
 unfixable = [
-  "ERA001", # Don't remove commented-out code
+  "commented-out-code", # Don't remove commented-out code
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "src/meltano/**/__init__.py" = [
-  "F401", # Permit unused imports in `__init__.py` files
+  "unused-import", # Permit unused imports in `__init__.py` files
 ]
 "tests/**" = [
   "ANN",
   "D1",
-  "S101",    # Allow 'assert' in tests
+  "assert",    # Allow 'assert' in tests
   "INP",     # Don't require __init__.py files in tests directories
-  "LOG015",  # Allow `logging.<level>` in tests
+  "root-logger-call",  # Allow `logging.<level>` in tests
+  "fallible-context-manager",
+  "suspicious-subprocess-import",
+  "unused-async",
+  "non-empty-init-module",
 ]
 "src/meltano/migrations/versions/*" = [
-  "D103",
-  "INP001",
+  "undocumented-public-function",
+  "implicit-namespace-package",
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -452,7 +458,7 @@ ignore = [
 
 [tool.uv]
 override-dependencies = [
-  "sqlalchemy>=2.0.0.dev0,<2.2",
+  "sqlalchemy>=2.1.0.dev0,<2.2",
 ]
-prerelease = "if-necessary-or-explicit"
+prerelease = "if-necessary"
 required-version = ">=0.9.17"
