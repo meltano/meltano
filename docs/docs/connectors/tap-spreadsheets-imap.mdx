@@ -1,0 +1,142 @@
+---
+title: Spreadsheets (IMAP)
+description: Sync spreadsheet data from attachments in an IMAP mailbox, with glob pattern matching and dynamic catalog discovery.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Spreadsheets (IMAP)
+
+<ConnectorTypeBadge type="extractor" block />
+
+`tap-spreadsheets-imap` (matatika variant)
+
+Spreadsheets IMAP syncs spreadsheet data from attachments in an IMAP mailbox. The tap connects to an IMAP mailbox, discovers email attachments based on the configured table definitions, and extracts data from supported spreadsheet and structured file formats.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | Mailbox email address and password |
+| **Connection** | IMAP |
+| **Supported formats** | CSV, JSON, JSONL, Excel, or automatic detection |
+| **File selection** | IMAP paths with glob pattern matching and regex filtering |
+| **Replication** | File-based discovery with configurable start date |
+| **State-based discovery** | Optional; recommended |
+| **CSV support** | Custom delimiter and quote character |
+| **Excel support** | Specific worksheet selection |
+| **Primary keys** | File metadata or custom stream keys |
+| **Append-only** | Supported |
+
+## What you can sync
+
+Spreadsheets IMAP syncs data from files attached to emails in an IMAP mailbox. Folders and emails are treated as directories, while attachments are treated as files. You can target specific folders, emails, or file types using IMAP paths and glob patterns.
+
+For example:
+
+- `imap://<host>/*/*/`: all emails in all top-level folders
+- `imap://<host>/INBOX/*/`: all emails in the inbox
+- `imap://<host>/INBOX/*/*`: all attachments for emails in the inbox
+- `imap://<host>/INBOX/*/*.csv`: all CSV file attachments for emails in the inbox
+
+Supported file formats are `csv`, `json`, `jsonl`, `excel`, or auto-detected format.
+
+## Prerequisites
+
+You need an email mailbox that can be accessed through IMAP. You will need:
+
+- The mailbox email address
+- The mailbox password
+- The IMAP host
+- The names and formats of the email attachments you want to sync
+
+You should identify the files or file formats you want to sync before configuring the tap.
+
+## Setup
+
+### In your email client
+
+Identify the file names and formats of the email attachments you want to sync. This information is used to configure the `tables` setting and determine the appropriate `path`, `format`, and filtering configuration.
+
+### In Meltano Cloud
+
+1. Provide your **Username** to connect to the mailbox.
+2. Provide your **Password** to connect to the mailbox.
+3. Add a **Tables** configuration based on the files you identified.
+
+## Settings
+
+### Tables
+
+A list of table definition objects. Each table definition specifies which files to discover and how to extract their data.
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| `name` | string | required | The name to assign to the stream. |
+| `path` | string | required | A path to a folder or set of emails in the format `imap://<host>/path/to/folder-or-emails`. Folders and emails are treated as directories, while attachments are treated as files. Supports glob pattern matching, e.g. `imap://<host>/*/*/` (all emails in all top-level folders), `imap://<host>/INBOX/*/` (all emails in the inbox), `imap://<host>/INBOX/*/*` (all attachments for emails in the inbox), `imap://<host>/INBOX/*/*.csv` (all CSV file attachments for emails in the inbox). |
+| `format` | string | required | The format of the files to sync: one of `csv`, `json`, `jsonl`, `excel`, or `detect`. |
+| `pattern` | string | required | A regular expression pattern used to filter resolved files by name. Set to `""` when the path already provides the required filtering (e.g. glob pattern matching) and no additional filtering is required. |
+| `start_date` | string | required | An ISO-8601 date-time used to filter resolved files based on their last modified timestamp. |
+| `key_properties` | array of strings | required | The stream primary keys. For files where a primary key can't be clearly identified, reference meta-properties such as `_smart_source_bucket`, `_smart_source_file`, `_smart_source_lineno`, or use `[]` for append-only behaviour. If using the meta-property approach, be aware that changes to file locations or contents may result in unexpected duplicates or overwrites, so this approach is safest when the targeted files are, for all intents and purposes, immutable. |
+| `encoding` | string | `utf-8` | The encoding to use when reading files. |
+| `state_based_discovery` | boolean | `false` | Whether state-based discovery is used. When enabled, files are sampled starting from the bookmark stored in state rather than from the initial `start_date`. Recommended: `true`, to capture file schema changes and optimise performance. |
+| `skip_initial` | integer | `0` | The number of lines to skip when reading a file. Mostly useful for Excel format files. |
+| `max_sampled_files` | integer | `50` | The number of files to sample during dynamic catalog discovery. |
+| `max_sampling_read` | integer | `1000` | The number of lines to sample for each file during dynamic catalog discovery. |
+| `sample_rate` | integer | `5` | Controls how frequently lines are sampled during dynamic catalog discovery. For example, a value of `5` samples every fifth line. |
+| `prefer_schema_as_string` | boolean | `false` | Controls whether property type inference is skipped during sampling. For CSV files, combine with `max_sampling_read: 1` to improve discovery performance, since only the header row needs sampling when all values are treated as strings. |
+| `delimiter` <br/>*(`csv` format only)* | string | `,` | The value delimiter sequence used in the targeted files. |
+| `quotechar` <br/>*(`csv` format only)* | string | `"` | The quote character delimiter used in the targeted files. Set to `detect` to automatically discover the quote character. |
+| `worksheet_name` <br/>*(`excel` format only)* | string | — | The specific worksheet name to pull data from. If not specified, the tap defaults to the sheet with the most available data. |
+
+### Email
+
+| Field | Description |
+|---|---|
+| **Mailbox email address** | The email address used to connect to the IMAP mailbox. |
+| **Password** | The password used to connect to the IMAP mailbox. |
+
+## Example table configuration
+
+A table definition can be configured with the mailbox path, file format, filtering, start date, and primary key properties. For example:
+
+```json
+{
+  "name": "connectors_split",
+  "path": "imap://imap.example.com/INBOX/*/*.csv",
+  "format": "csv",
+  "pattern": "",
+  "start_date": "2026-01-01T00:00:00Z",
+  "key_properties": [
+    "_smart_source_bucket",
+    "_smart_source_file",
+    "_smart_source_lineno"
+  ]
+}
+```
+
+The `path` targets CSV attachments from emails in the inbox, while the meta-properties are used as the stream primary keys. For append-only behaviour, set `"key_properties": []`.
+
+## Discovery
+
+Spreadsheets IMAP uses dynamic catalog discovery to determine the schema of the files being synced. The discovery process can be controlled using `state_based_discovery`, `max_sampled_files`, `max_sampling_read`, `sample_rate`, and `prefer_schema_as_string`.
+
+State-based discovery can be enabled to sample files starting from the bookmark stored in state. This is recommended to capture file schema changes and optimise performance.
+
+## Troubleshooting
+
+**No files are being synced.** Check that the mailbox email address is correct, the mailbox password is correct, the configured IMAP host is correct, the `path` points to the intended folder, emails, or attachments, the glob pattern matches the files you want to sync, and the `start_date` allows the intended files to be discovered.
+
+**Files are discovered but the wrong files are synced.** Check the `path` and `pattern` settings. The `path` supports glob pattern matching, and `pattern` applies a regular expression filter to the resolved file names. If the `path` already provides the required filtering, set `pattern = ""`.
+
+**The file format cannot be detected.** Set `format` explicitly to one of `csv`, `json`, `jsonl`, or `excel`. Use `detect` when you want the format to be automatically detected.
+
+**CSV data is parsed incorrectly.** Check the CSV-specific settings `delimiter` and `quotechar`. If the quote character is not known, set `quotechar = detect`.
+
+**Excel data is taken from the wrong worksheet.** Set `worksheet_name` to the name of the specific worksheet you want to sync. If `worksheet_name` is not specified, the sheet with the most available data is used.
+
+**Duplicate or overwritten records appear.** If you are using the meta-property approach (`_smart_source_bucket`, `_smart_source_file`, `_smart_source_lineno`) as `key_properties`, changes to file locations or contents may result in unexpected duplicates or overwrites. This approach is safest when the targeted files are effectively immutable.
+
+## Need help?
+
+If a file or folder isn't showing up the way you expect, or a sync fails after setup, file it through the usual Meltano support channel with the mailbox and folder path involved.

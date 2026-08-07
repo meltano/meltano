@@ -5,7 +5,7 @@ sidebar_position: 4
 ---
 # Manage Workspaces
 
-This section covers how to manage your Meltano workspace configuration across four key areas: syncing config from GitHub, using environments to separate settings by stage, promoting changes through a DataOps workflow, and speeding up pipelines with a custom Docker image.
+This section covers how to manage your Meltano workspace configuration across five key areas: syncing config from GitHub, using environments to separate settings by stage, promoting changes through a DataOps workflow, speeding up pipelines with a custom Docker image, and controlling the Lab landing page.
 
 ---
 
@@ -334,3 +334,33 @@ You can see how this is wired together in the `example-github-analytics` referen
 :::tip Automating image builds
 For teams running frequent deployments, consider adding a CI step (such as an Azure Pipelines or GitHub Actions workflow) that automatically builds and pushes a new image whenever the workspace repository changes. This keeps your custom image in sync with your configuration without manual intervention.
 :::
+
+---
+
+## Controlling the Lab Landing Page {#controlling-the-lab-landing-page}
+
+**Time required: 2 minutes**
+
+#### Overview
+
+`HOME_PAGE` is an `app_properties` key in `workspace.yml` that forces every member landing in the Lab to a specific app (e.g. `dashboard`) instead of the first item in the app's menu.
+
+```yaml
+app_properties:
+  HOME_PAGE: dashboard
+```
+
+#### When to remove it
+
+By default, Switch to App already lands members on the first menu item defined in `APP_MENU_ITEMS`, so `HOME_PAGE` is only needed when you want to override that default. If members are getting stuck on a single app (e.g. the Elementary dashboard) and can't navigate to the rest of the Lab, removing `HOME_PAGE` restores normal navigation.
+
+#### How to remove it
+
+1. Open `workspace.yml`.
+2. Delete the `HOME_PAGE` line from `app_properties`.
+3. Deploy the workspace.
+
+```yaml
+app_properties:
+  # HOME_PAGE removed, members now land on the first menu item
+```
