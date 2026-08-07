@@ -17,10 +17,14 @@ const gettingStartedCategory = require('./docs/getting-started/_category_.json')
 const sidebars = {
   connectorsSidebar: [
     { type: 'doc', id: 'connectors/index', label: 'All connectors' },
-    { type: 'doc', id: 'connectors/tap-spreadsheets-outlook', label: 'Outlook' },
-    { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'SharePoint' },
+    { type: 'doc', id: 'connectors/tap-spreadsheets-outlook', label: 'Spreadsheets (Outlook)' },
+    { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'Spreadsheets (SharePoint)' },
     { type: 'doc', id: 'connectors/tap-zendesk', label: 'Zendesk' },
     { type: 'doc', id: 'connectors/tap-surveymonkey', label: 'SurveyMonkey' },
+    { type: 'doc', id: 'connectors/tap-rakutenadvertising', label: 'Rakuten Advertising' },
+    { type: 'doc', id: 'connectors/tap-spreadsheets-imap', label: 'Spreadsheets (IMAP)' },
+    { type: 'doc', id: 'connectors/tap-weatherapi', label: 'Weather API' },
+    { type: 'doc', id: 'connectors/target-clickhouse', label: 'ClickHouse' },
   ],
   platformSidebar: [
     {
@@ -63,6 +67,7 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/importing-data' },
         { type: 'doc', id: 'meltano-cloud/transform-data' },
         { type: 'doc', id: 'meltano-cloud/workspace-settings' },
+        { type: 'doc', id: 'meltano-cloud/pipeline-diagnosis' },
         { type: 'doc', id: 'meltano-cloud/logging-monitoring' },
         { type: 'doc', id: 'meltano-cloud/profile-security' },
         { type: 'doc', id: 'meltano-cloud/invite' },

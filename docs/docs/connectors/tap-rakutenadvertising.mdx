@@ -1,0 +1,213 @@
+---
+title: Rakuten Advertising
+description: Sync advertisers, events, partnerships, payments, and custom reports from Rakuten Advertising's Core API, Advanced Reports API, and Reporting Platform.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Rakuten Advertising
+
+<ConnectorTypeBadge type="extractor" block />
+
+`tap-rakutenadvertising` (meltanolabs variant)
+
+Rakuten Advertising is an affiliate marketing platform that connects advertisers with publishers to drive sales through performance-based partnerships.
+
+This tap extracts data from multiple Rakuten Advertising APIs, organized into three groups:
+
+- **Core API**: advertisers, events, partnerships, offers, coupons, product search, link locator data, and more.
+- **Advanced Reports API**: payment history, advertiser payments, and payment details.
+- **Reporting Platform**: custom reports.
+
+Incremental replication is supported for transaction-based streams such as events and publisher contributed conversions, while reference data streams use full-table replication.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | Bearer Token, Security Token, Reporting Platform API Token |
+| **APIs** | Core API, Advanced Reports API, Reporting Platform |
+| **Replication** | Incremental and full-table |
+| **Incremental streams** | Events, publisher contributed conversions |
+| **Reference data** | Full-table replication |
+| **Custom reports** | Supported through Reporting Platform |
+| **Multiple reports** | Supported through comma-separated report keys |
+| **Reporting date types** | `transaction`, `process` |
+| **Reporting region** | `en` by default |
+
+## What you can sync
+
+The Rakuten Advertising tap extracts data from three API groups.
+
+### Core API
+
+The Core API provides access to the following streams:
+
+- Advertisers
+- Events
+- Advertiser search
+- Partnerships
+- Publisher contributed conversions
+- Offers
+- Commissioning lists
+- Coupons
+- Product search
+- Text links
+- Banner links
+- DRM links
+- Creative categories
+
+Incremental replication is supported for transaction-based streams, including events and publisher contributed conversions. Reference data streams use full-table replication.
+
+### Advanced Reports API
+
+The Advanced Reports API provides access to:
+
+- Payment history
+- Advertiser payments v1
+- Payment details v1
+- Advertiser payments v2
+- Payment details v2
+
+These streams require a separate Security Token.
+
+### Reporting Platform
+
+The Reporting Platform allows you to sync custom reports that you have built in Rakuten Advertising. Each report key you configure becomes a separate stream named `reporting_{report_key}`. For example:
+
+- `reporting_sales-and-activity-report`
+- `reporting_offer-report`
+- `reporting_product-success-report`
+
+## Prerequisites
+
+To connect Rakuten Advertising, you need a Rakuten Advertising account with API access. Depending on which streams you want to sync, you may need up to three separate credentials:
+
+- Bearer Token (`auth_token`)
+- Security Token (`security_token`)
+- Reporting Platform API Token (`reporting_api_token`) and Report Keys (`reporting_report_keys`)
+
+## Setup
+
+### Bearer Token (`auth_token`)
+
+The Bearer Token is the primary credential and is required for all Core API streams: `advertisers`, `events`, `advertiser_search`, `partnerships`, `publisher_contributed_conversions`, `offers`, `commissioning_lists`, `coupons`, `product_search`, `text_links`, `banner_links`, `drm_links`, `creative_categories`.
+
+**To obtain a Bearer Token:**
+
+1. Log in to your Rakuten Advertising account.
+2. Navigate to `developers.rakutenadvertising.com`.
+3. Go to **Manage > Applications**.
+4. Create a new application or use an existing application.
+5. Use the authorization flow to generate a Bearer Token.
+6. Copy the token and use it as your `auth_token`.
+
+You can optionally configure `start_date` using ISO 8601 format, for example `2024-01-01T00:00:00Z`. This controls how far back incremental streams sync. If `start_date` is not set, it defaults to 6 months ago.
+
+### Security Token (`security_token`)
+
+The Security Token is separate from the Bearer Token and is required only if you want to sync the Advanced Reports streams: `advanced_reports_payment_history`, `advanced_reports_advertiser_payments_v1`, `advanced_reports_payment_details_v1`, `advanced_reports_advertiser_payments_v2`, `advanced_reports_payment_details_v2`.
+
+**To obtain the Security Token:**
+
+1. Log in to the Rakuten Advertising publisher dashboard.
+2. Navigate to **Reports > Advanced Reports**.
+3. Find your Security Token on the Advanced Reports page.
+4. Alternatively, the Security Token can be found in the Advanced Reports API URL.
+5. Copy the token and use it as your `security_token`.
+
+**Additional Advanced Reports settings:**
+
+- `advanced_reports_pay_id`: Payment ID required for advertiser payment streams using report IDs 2 and 22. Retrieve it from the payment history summary report.
+- `advanced_reports_invoice_id`: Invoice ID required for payment details streams using report IDs 3 and 23. Retrieve it from the advertiser payments report.
+- `advanced_reports_network_id`: Optional network ID filter. Valid values: `1`, `3`, `5`, `41`.
+
+### Reporting Platform
+
+Both `reporting_api_token` and `reporting_report_keys` are required to enable Reporting Platform streams.
+
+**Step 1: Create a report**
+
+1. Log in to your Rakuten Advertising account.
+2. Go to **Reports > Reporting**.
+3. Click **Build a new report**.
+4. If you already have a report, select it from the **Choose Report** dropdown menu.
+5. Click **Add and Remove Columns** and select the columns you want to include in your report.
+6. In the **Convert Currency to...** dropdown menu, select **Do Not Convert**.
+7. Click **Save** to save the report.
+
+**Step 2: Find the report key and API token**
+
+1. Open the report you created in Step 1.
+2. Click the dropdown menu next to **View report**.
+3. Select **Get API**.
+4. Find the report key and API token in the API URL.
+
+The URL has the following format:
+
+```
+ran-reporting.rakutenmarketing.com/{region}/reports/{REPORT-KEY}/filters?date_range=this-month&include_summary=Y&tz=GMT&date_type=transaction&token={API-TOKEN}
+```
+
+Copy the following values:
+
+- `{REPORT-KEY}`: use this as your `reporting_report_keys` value.
+- `{API-TOKEN}`: use this as your `reporting_api_token` value.
+
+To sync multiple reports, enter the report keys as comma-separated values, for example: `revenue-report-by-day,sales-and-activity-report,product-success-report`. Each key becomes a separate stream named `reporting_{report_key}`.
+
+**Additional Reporting Platform settings:**
+
+- `reporting_region`: Region code for the Reporting Platform API. Default: `en`.
+- `reporting_date_type`: Date type for Reporting Platform reports. Supported values: `transaction`, `process`. Default: `transaction`.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `auth_token` | string | required | Bearer Token used to authenticate with the Rakuten Advertising Core API. Required for Core API streams. |
+| `security_token` | string | optional | Security Token used to authenticate with the Advanced Reports API. Required for Advanced Reports streams. |
+| `advanced_reports_pay_id` | string | optional | Payment ID required for advertiser payments streams using report IDs 2 and 22. |
+| `advanced_reports_invoice_id` | string | optional | Invoice ID required for payment details streams using report IDs 3 and 23. |
+| `advanced_reports_network_id` | integer | optional | Optional network ID filter. Valid values are `1`, `3`, `5`, and `41`. |
+| `reporting_api_token` | string | optional | API token for the Rakuten Reporting Platform. Required for `reporting_*` streams. |
+| `reporting_report_keys` | string | optional | Comma-separated report keys for the Reporting Platform. Each key becomes a separate stream. |
+| `start_date` | string | optional | Earliest date to sync data. ISO 8601 format, for example `2025-01-01T00:00:00Z`. Used as the custom date range start when set; otherwise defaults to 6 months ago. |
+| `reporting_region` | string | `en` | Region code for the Reporting Platform API. |
+| `reporting_date_type` | string | `transaction` | Date type for Reporting Platform reports. Supported values are `transaction` and `process`. |
+
+## Choosing the credentials
+
+The credentials you need depend on which API streams you want to sync.
+
+**Core API**: configure `auth_token`. This enables the Core API streams.
+
+**Advanced Reports**: configure `auth_token` and `security_token`. Depending on the streams you want to sync, you may also need `advanced_reports_pay_id`, `advanced_reports_invoice_id`, and `advanced_reports_network_id` (optional).
+
+**Reporting Platform**: configure `auth_token`, `reporting_api_token`, and `reporting_report_keys`. You can provide multiple report keys as a comma-separated list.
+
+## Replication
+
+The tap uses different replication methods depending on the type of data being synced.
+
+**Incremental replication** is supported for transaction-based streams, including Events and Publisher contributed conversions. The `start_date` setting controls how far back incremental streams sync; when not set, it defaults to 6 months ago.
+
+**Full-table replication** is used for reference data streams, including Advertisers, Partnerships, Offers, Coupons, Product search, Text links, Banner links, DRM links, and Creative categories.
+
+**Reporting Platform custom reports:** Each report key configured in `reporting_report_keys` becomes a separate stream. For example, configuring `revenue-report-by-day,sales-and-activity-report,product-success-report` creates `reporting_revenue-report-by-day`, `reporting_sales-and-activity-report`, and `reporting_product-success-report`. The columns included in each stream are determined by the corresponding report configuration in Rakuten Advertising. For Reporting Platform reports, `reporting_date_type` controls whether the report uses transaction or process dates; the default is `transaction`.
+
+## Troubleshooting
+
+**Core API authentication fails.** Check that `auth_token` contains a valid Rakuten Advertising Bearer Token, the token was generated through a Rakuten Advertising application, and the application has the required API access.
+
+**Advanced Reports streams do not sync.** Check that `security_token` is configured and was obtained from the Advanced Reports section, that `advanced_reports_pay_id` is configured when required for advertiser payment streams, that `advanced_reports_invoice_id` is configured when required for payment details streams, and that `advanced_reports_network_id`, if configured, uses a valid network ID (`1`, `3`, `5`, or `41`).
+
+**Reporting Platform streams do not appear.** Check that both `reporting_api_token` and `reporting_report_keys` are configured, and that the report keys exactly match the keys shown in the Reporting Platform API URL.
+
+**Reporting Platform report returns unexpected data.** Check the report configuration in Rakuten Advertising: verify the columns selected for the report, make sure **Convert Currency to...** is set to **Do Not Convert**, check the configured `reporting_date_type`, and verify that the report key points to the intended report.
+
+**Incremental sync does not start from the expected date.** Check the `start_date` setting. Use ISO 8601 format, for example `2025-01-01T00:00:00Z`. When `start_date` is not set, incremental streams default to syncing from 6 months ago.
+
+## Need help?
+
+If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.
