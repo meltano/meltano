@@ -21,21 +21,37 @@ This approach blocks all internet traffic except approved IP addresses, such as:
 * Data ingestion services like Meltano
 * Other trusted applications
 
-The Meltano platform is hosted in an Azure data center within the United Kingdom and connects from the following IP address:
+The Meltano platform is hosted in an Azure data center within the United Kingdom and connects from the following IP addresses:
 
 ```text
 51.137.148.226
+35.189.66.90
+35.177.0.220
 ```
 
 ### Create a Firewall Rule
 
-For **Azure SQL Database**, add a server-level firewall rule allowing this address:
+For **Azure SQL Database**, add a server-level firewall rule allowing these addresses:
 
 ```sql
 EXECUTE sp_set_firewall_rule
     @name = N'AllowMeltano',
     @start_ip_address = '51.137.148.226',
     @end_ip_address = '51.137.148.226';
+```
+
+```sql
+EXECUTE sp_set_firewall_rule
+    @name = N'AllowMeltano',
+    @start_ip_address = '35.189.66.90',
+    @end_ip_address = '35.189.66.90';
+```
+
+```sql
+EXECUTE sp_set_firewall_rule
+    @name = N'AllowMeltano',
+    @start_ip_address = '35.177.0.220',
+    @end_ip_address = '35.177.0.220';
 ```
 
 Or using the `az` CLI:
@@ -47,6 +63,24 @@ az sql server firewall-rule create \
   --name AllowMeltano \
   --start-ip-address 51.137.148.226 \
   --end-ip-address 51.137.148.226
+```
+
+```bash
+az sql server firewall-rule create \
+  --resource-group <rg> \
+  --server <server> \
+  --name AllowMeltano \
+  --start-ip-address 35.189.66.90 \
+  --end-ip-address 35.189.66.90
+```
+
+```bash
+az sql server firewall-rule create \
+  --resource-group <rg> \
+  --server <server> \
+  --name AllowMeltano \
+  --start-ip-address 35.177.0.220 \
+  --end-ip-address 35.177.0.220
 ```
 
 For complete details, see the [Azure SQL Database firewall documentation](https://learn.microsoft.com/en-us/azure/azure-sql/database/firewall-configure).
