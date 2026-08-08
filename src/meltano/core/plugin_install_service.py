@@ -366,11 +366,15 @@ class PluginInstallService:
                 return state
 
         except PluginInstallError as err:
+            docs = plugin.definition.find_variant(plugin.variant).docs
+            message = str(err)
+            if docs:
+                message += f" See documentation for more details: {docs}"
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=str(err),
+                message=message,
             )
             self.status_cb(state)
             return state
@@ -386,11 +390,15 @@ class PluginInstallService:
             return state
 
         except AsyncSubprocessError as err:
+            docs = plugin.definition.find_variant(plugin.variant).docs
+            message = str(err)
+            if docs:
+                message += f" See documentation for more details: {docs}"
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=str(err),
+                message=message,
                 details=await err.stderr,
             )
             self.status_cb(state)
