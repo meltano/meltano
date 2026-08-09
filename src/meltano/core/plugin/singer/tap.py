@@ -10,6 +10,7 @@ import sys
 import typing as t
 from contextlib import suppress
 from functools import lru_cache, reduce
+from glob import has_magic
 from hashlib import sha1
 from io import StringIO
 from itertools import takewhile
@@ -30,6 +31,7 @@ from .catalog import (
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
+    SelectPattern,
     property_breadcrumb,
     select_filter_metadata_rules,
     select_metadata_rules,
@@ -585,6 +587,8 @@ class SingerTap(SingerPlugin):
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
             if metadata_rules:
+                if not config["_catalog"]:
+                    self._validate_stream_selections(config["_select"], catalog)
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
@@ -596,6 +600,8 @@ class SingerTap(SingerPlugin):
             else:
                 with suppress(FileNotFoundError):
                     catalog_cache_key_path.unlink()
+        except PluginExecutionError:
+            raise
         except FileNotFoundError as err:
             msg = "Applying catalog rules failed: catalog file is missing."
             raise PluginExecutionError(msg) from err
@@ -642,6 +648,43 @@ class SingerTap(SingerPlugin):
         key_json = json_dumps(key_dict)
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S324
+
+    @staticmethod
+    def _validate_stream_selections(
+        patterns: list[str],
+        catalog: CatalogDict,
+    ) -> None:
+        """Raise when an explicitly selected stream is missing from the catalog.
+
+        Args:
+            patterns: Raw stream and property selection patterns.
+            catalog: Discovered source catalog.
+
+        Raises:
+            PluginExecutionError: If a full-stream selection names a missing stream.
+        """
+        stream_ids = {
+            stream.get("tap_stream_id")
+            for stream in catalog.get("streams", [])
+            if isinstance(stream, dict)  # type: ignore[redundant-expr]
+        }
+
+        for raw_pattern in patterns:
+            pattern = SelectPattern.parse(raw_pattern)
+            selects_full_stream = pattern.property_pattern in {None, "*"}
+            if (
+                pattern.negated
+                or has_magic(pattern.stream_pattern)
+                or not selects_full_stream
+                or pattern.stream_pattern in stream_ids
+            ):
+                continue
+
+            msg = (
+                f"Selection rule `{pattern.raw}` requires stream "
+                f"`{pattern.stream_pattern}`, but it was not found in the catalog"
+            )
+            raise PluginExecutionError(msg)
 
     @staticmethod
     @lru_cache
