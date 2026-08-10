@@ -1,0 +1,75 @@
+---
+title: Meltano IP Addresses
+description: The static egress IP addresses the Meltano platform connects from, for allow-listing on your data stores.
+layout: doc
+sidebar_position: 6
+---
+
+# Meltano IP Addresses
+
+Meltano connects to your data stores from a fixed set of static egress IP
+addresses. Allow-listing them lets you block all other inbound internet traffic
+to your database while still letting your pipelines run.
+
+This page is the single source of truth for those addresses. The store setup
+guides link here instead of repeating them, so use this page whenever you
+configure a firewall rule, network policy or IP access list.
+
+## Egress IP addresses
+
+The Meltano platform has multi-cloud resilience within the United Kingdom and
+connects to your store from the following addresses:
+
+| IP address | CIDR |
+| --- | --- |
+| `51.137.148.226` | `51.137.148.226/32` |
+| `35.189.66.90` | `35.189.66.90/32` |
+| `35.177.0.220` | `35.177.0.220/32` |
+
+Allow **all three** addresses. We may run a given pipeline from any one
+of them, so allow-listing only a subset may cause intermittent connection
+failures in the future.
+
+## Copy-paste formats
+
+Plain list:
+
+```text
+51.137.148.226
+35.189.66.90
+35.177.0.220
+```
+
+CIDR notation, for allow-lists that expect a network range (ClickHouse Cloud,
+security groups, `users.xml`):
+
+```text
+51.137.148.226/32
+35.189.66.90/32
+35.177.0.220/32
+```
+
+Quoted and comma-separated, for SQL statements such as a Snowflake
+`VALUE_LIST`:
+
+```text
+'51.137.148.226', '35.189.66.90', '35.177.0.220'
+```
+
+## Where these are used
+
+The following guides use these addresses. Each shows the syntax for its
+platform; substitute the values above where the snippets use a placeholder.
+
+- [Snowflake Store](/meltano-cloud/connect-a-store/snowflake-guides) - network
+  rules and network policies
+- [Microsoft SQL Server Store](/meltano-cloud/connect-a-store/microsoft-sql-server-guides) -
+  Azure SQL Database server-level firewall rules
+- [ClickHouse Store](/meltano-cloud/connect-a-store/clickhouse-store) -
+  ClickHouse Cloud IP access lists and self-managed `users.xml`
+
+## If a connection stops working
+
+These addresses change rarely, but if a pipeline that previously ran starts
+failing to connect, check this page first in case the list has changed, then
+confirm that every address above is present in your allow-list.
