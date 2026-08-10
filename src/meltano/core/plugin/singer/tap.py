@@ -600,10 +600,11 @@ class SingerTap(SingerPlugin):
             else:
                 with suppress(FileNotFoundError):
                     catalog_cache_key_path.unlink()
+        except PluginExecutionError:
+            raise
         except FileNotFoundError as err:
             msg = "Applying catalog rules failed: catalog file is missing."
             raise PluginExecutionError(msg) from err
-
         except Exception as err:
             catalog_path.unlink()
             msg = f"Applying catalog rules failed: catalog file is invalid: {err}"
