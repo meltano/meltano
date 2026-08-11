@@ -7,13 +7,14 @@ import sys
 import typing as t
 from functools import partial
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 import yaml
 
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -396,3 +397,52 @@ class TestPluginInstallService:
         else:
             assert state.message == error_message
         assert state.verb == "Installation failed"
+
+    def test_append_docs_to_messages_when_docs_exist(
+        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        mock_variant = Mock()
+        mock_variant.docs = "https://docs.meltano.com/target-tap"
+        monkeypatch.setattr(
+            tap.definition,
+            "find_variant",
+            Mock(return_value=mock_variant),
+        )
+
+        initial_message = "Installation failed."
+        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+
+        assert (
+            result
+            == "Installation failed. See documentation for more details: https://docs.meltano.com/target-tap"
+        )
+
+    def test_append_docs_to_messages_when_docs_is_none(
+        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        mock_variant = Mock()
+        mock_variant.docs = None
+        monkeypatch.setattr(
+            tap.definition,
+            "find_variant",
+            Mock(return_value=mock_variant),
+        )
+
+        initial_message = "Installation failed."
+        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+
+        assert result == initial_message
+
+    def test_append_docs_to_messages_when_variant_not_found(
+        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(
+            tap.definition,
+            "find_variant",
+            Mock(side_effect=VariantNotFoundError(tap, tap.variant)),
+        )
+
+        initial_message = "Installation failed."
+        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+
+        assert result == initial_message
