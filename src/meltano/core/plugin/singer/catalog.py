@@ -210,12 +210,24 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     Returns:
         A list of corresponding metadata rule objects.
     """
+    return metadata_rules_from_parsed_patterns(map(SelectPattern.parse, patterns))
+
+
+def metadata_rules_from_parsed_patterns(
+    parsed_patterns: Iterable[SelectPattern],
+) -> list[MetadataRule]:
+    """Create metadata rules from already-parsed `select` patterns.
+
+    Args:
+        parsed_patterns: Iterable of parsed `SelectPattern` instances.
+
+    Returns:
+        A list of corresponding metadata rule objects.
+    """
     include_rules: list[MetadataRule] = []
     exclude_rules: list[MetadataRule] = []
 
-    for pattern in patterns:
-        parsed_pattern = SelectPattern.parse(pattern)
-
+    for parsed_pattern in parsed_patterns:
         prop_pattern = parsed_pattern.property_pattern
         selected = not parsed_pattern.negated
         select = partial(MetadataRule.select, value=selected)

@@ -32,6 +32,7 @@ from .catalog import (
     SchemaExecutor,
     SchemaRule,
     SelectPattern,
+    metadata_rules_from_parsed_patterns,
     property_breadcrumb,
     select_filter_metadata_rules,
     select_metadata_rules,
@@ -561,13 +562,16 @@ class SingerTap(SingerPlugin):
 
         schema_rules = []
         metadata_rules = []
+        select_patterns: list[SelectPattern] = []
 
         # If a custom catalog is provided, don't apply catalog rules
         if not config["_catalog"]:
             schema_rules.extend(config_schema_rules(config["_schema"]))
 
+            select_patterns = list(map(SelectPattern.parse, config["_select"]))
+
             metadata_rules.extend(select_metadata_rules(["!*.*"]))
-            metadata_rules.extend(select_metadata_rules(config["_select"]))
+            metadata_rules.extend(metadata_rules_from_parsed_patterns(select_patterns))
             metadata_rules.extend(config_metadata_rules(config["_metadata"]))
 
         # Always apply select filters (`meltano el` `--select` and `--exclude` options)
@@ -588,7 +592,7 @@ class SingerTap(SingerPlugin):
 
             if metadata_rules:
                 if not config["_catalog"]:
-                    self._validate_stream_selections(config["_select"], catalog)
+                    self._validate_stream_selections(select_patterns, catalog)
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
@@ -651,13 +655,13 @@ class SingerTap(SingerPlugin):
 
     @staticmethod
     def _validate_stream_selections(
-        patterns: list[str],
+        patterns: list[SelectPattern],
         catalog: CatalogDict,
     ) -> None:
         """Raise when an explicitly selected stream is missing from the catalog.
 
         Args:
-            patterns: Raw stream and property selection patterns.
+            patterns: Parsed stream and property selection patterns.
             catalog: Discovered source catalog.
 
         Raises:
@@ -669,8 +673,7 @@ class SingerTap(SingerPlugin):
             if isinstance(stream, dict)  # type: ignore[redundant-expr]
         }
 
-        for raw_pattern in patterns:
-            pattern = SelectPattern.parse(raw_pattern)
+        for pattern in patterns:
             selects_full_stream = pattern.property_pattern in {None, "*"}
             if (
                 pattern.negated
