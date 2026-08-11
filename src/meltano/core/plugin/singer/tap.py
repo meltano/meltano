@@ -568,7 +568,7 @@ class SingerTap(SingerPlugin):
         if not config["_catalog"]:
             schema_rules.extend(config_schema_rules(config["_schema"]))
 
-            select_patterns = list(map(SelectPattern.parse, config["_select"]))
+            select_patterns.extend(map(SelectPattern.parse, config["_select"]))
 
             metadata_rules.extend(select_metadata_rules(["!*.*"]))
             metadata_rules.extend(metadata_rules_from_parsed_patterns(select_patterns))
@@ -591,8 +591,7 @@ class SingerTap(SingerPlugin):
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
             if metadata_rules:
-                if not config["_catalog"]:
-                    self._validate_stream_selections(select_patterns, catalog)
+                self._validate_stream_selections(select_patterns, catalog)
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
