@@ -387,7 +387,12 @@ class TestPluginInstallService:
             AsyncMock(side_effect=PluginInstallError(error_message)),
         )
         state = await subject.install_plugin_async(tap)
-
         assert state.status == PluginInstallStatus.ERROR
-        assert state.message == error_message
+        if docs := tap.definition.find_variant(tap.variant).docs:
+            assert (
+                state.message
+                == f"{error_message} See documentation for more details: {docs}"
+            )
+        else:
+            assert state.message == error_message
         assert state.verb == "Installation failed"
