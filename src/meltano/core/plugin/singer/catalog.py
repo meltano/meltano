@@ -304,7 +304,7 @@ def validate_selections(patterns: list[SelectPattern], catalog: CatalogDict) -> 
         catalog: Discovered source catalog.
 
     Raises:
-        PluginExecutionError: If a full-stream selection names a missing stream.
+        UnknownStreamError: If a full-stream selection names a missing stream.
     """
     stream_ids = {
         stream.get("tap_stream_id")

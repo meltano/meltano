@@ -709,6 +709,7 @@ class TestSingerTap:
             # If a custom catalog is provided, only selection filters are applied
             config_override = invoker.settings_service.config_override
             monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
+            monkeypatch.setitem(config_override, "_select", ["missing"])
 
             async with invoker.prepared(session):
                 await subject.apply_catalog_rules(invoker)
