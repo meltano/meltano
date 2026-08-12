@@ -10,7 +10,6 @@ import sys
 import typing as t
 from contextlib import suppress
 from functools import lru_cache, reduce
-from glob import has_magic
 from hashlib import sha1
 from io import StringIO
 from itertools import takewhile
@@ -20,22 +19,25 @@ import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.logging.output_logger import OutputLogger
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.setting_definition import SettingDefinition, SettingKind, json_dumps
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
-from . import PluginType, SingerPlugin
+from .base import SingerPlugin
 from .catalog import (
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
     SchemaRule,
     SelectPattern,
+    UnknownStreamError,
     metadata_rules_from_parsed_patterns,
     property_breadcrumb,
     select_filter_metadata_rules,
     select_metadata_rules,
+    validate_selections,
 )
 
 if sys.version_info >= (3, 12):
@@ -591,7 +593,7 @@ class SingerTap(SingerPlugin):
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
             if metadata_rules:
-                self._validate_stream_selections(select_patterns, catalog)
+                validate_selections(select_patterns, catalog)
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
 
@@ -603,8 +605,8 @@ class SingerTap(SingerPlugin):
             else:
                 with suppress(FileNotFoundError):
                     catalog_cache_key_path.unlink()
-        except PluginExecutionError:
-            raise
+        except UnknownStreamError as err:
+            raise PluginExecutionError(str(err)) from err
         except FileNotFoundError as err:
             msg = "Applying catalog rules failed: catalog file is missing."
             raise PluginExecutionError(msg) from err
@@ -651,42 +653,6 @@ class SingerTap(SingerPlugin):
         key_json = json_dumps(key_dict)
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S324
-
-    @staticmethod
-    def _validate_stream_selections(
-        patterns: list[SelectPattern],
-        catalog: CatalogDict,
-    ) -> None:
-        """Raise when an explicitly selected stream is missing from the catalog.
-
-        Args:
-            patterns: Parsed stream and property selection patterns.
-            catalog: Discovered source catalog.
-
-        Raises:
-            PluginExecutionError: If a full-stream selection names a missing stream.
-        """
-        stream_ids = {
-            stream.get("tap_stream_id")
-            for stream in catalog.get("streams", [])
-            if isinstance(stream, dict)  # type: ignore[redundant-expr]
-        }
-
-        for pattern in patterns:
-            selects_full_stream = pattern.property_pattern in {None, "*"}
-            if (
-                pattern.negated
-                or has_magic(pattern.stream_pattern)
-                or not selects_full_stream
-                or pattern.stream_pattern in stream_ids
-            ):
-                continue
-
-            msg = (
-                f"Selection rule `{pattern.raw}` requires stream "
-                f"`{pattern.stream_pattern}`, but it was not found in the catalog"
-            )
-            raise PluginExecutionError(msg)
 
     @staticmethod
     @lru_cache
