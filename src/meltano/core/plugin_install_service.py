@@ -252,11 +252,15 @@ class PluginInstallService:
                 "Could not find the variant for plugin '%s' when retrieving docs",
                 plugin.name,
             )
-            docs = None
-
+            return message
+        except Exception:
+            logger.exception(
+                "Unexpected error while finding variant for plugin '%s'",
+                plugin.name,
+            )
+            return message
         if docs:
             message += f" See documentation for more details: {docs}"
-
         return message
 
     async def install_all_plugins(

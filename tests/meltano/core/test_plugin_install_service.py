@@ -445,3 +445,19 @@ class TestPluginInstallService:
             "Could not find the variant for plugin '%s' when retrieving docs",
             tap.name,
         )
+
+    def test_append_docs_to_messages_when_variant_resolution_fails(
+        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setattr(
+            tap.definition,
+            "find_variant",
+            Mock(side_effect=RuntimeError("unexpected error")),
+        )
+        logger = Mock()
+        monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
+        initial_message = "Installation failed."
+        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+
+        assert result == initial_message
+        logger.exception.assert_called_once()
