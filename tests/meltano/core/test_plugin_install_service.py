@@ -435,8 +435,13 @@ class TestPluginInstallService:
             "find_variant",
             Mock(side_effect=VariantNotFoundError(tap, tap.variant)),
         )
-
+        logger = Mock()
+        monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
         initial_message = "Installation failed."
         result = PluginInstallService._append_docs_to_messages(initial_message, tap)
 
         assert result == initial_message
+        logger.debug.assert_called_once_with(
+            "Could not find the variant for plugin '%s' when retrieving docs",
+            tap.name,
+        )

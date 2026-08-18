@@ -248,6 +248,10 @@ class PluginInstallService:
         try:
             docs = plugin.definition.find_variant(plugin.variant).docs
         except VariantNotFoundError:
+            logger.debug(
+                "Could not find the variant for plugin '%s' when retrieving docs",
+                plugin.name,
+            )
             docs = None
 
         if docs:
