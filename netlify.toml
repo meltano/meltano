@@ -105,7 +105,13 @@
 # --- Matatika -> Meltano marketing site redirects (matatika.com equivalents) ---
 
 [[redirects]]
-  from = "/data-details/*"
+  from = "https://www.matatika.com/*"
+  to = "https://matatika.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://matatika.com/data-details/*"
   to = "/connectors/:splat"
   status = 301
   force = true
