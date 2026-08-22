@@ -135,7 +135,7 @@ def schedule_context(schedule_name: str) -> Generator[None]:
     try:
         schedule = next(x for x in schedules if x["name"] == schedule_name)
     except StopIteration:
-        raise ValueError(f"Schedule {schedule!r} not found in manifest") from None  # noqa: EM102, TRY003
+        raise ValueError(f"Schedule {schedule_name} not found in manifest") from None  # noqa: EM102, TRY003
 
     with _env_context(schedule["env"]):
         yield
@@ -163,7 +163,7 @@ def job_context(job_name: str) -> Generator[None]:
     try:
         job = next(x for x in jobs if x["name"] == job_name)
     except StopIteration:
-        raise ValueError(f"Job {job!r} not found in manifest") from None  # noqa: EM102, TRY003
+        raise ValueError(f"Job {job_name} not found in manifest") from None  # noqa: EM102, TRY003
 
     with _env_context(job["env"]):
         yield
