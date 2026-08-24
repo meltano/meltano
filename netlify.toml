@@ -386,12 +386,6 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/manage-workspaces/"
-  to = "/meltano-cloud/managing-a-workspace"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "*/docs/how-to-guides/import-data/"
   to = "/meltano-cloud/importing-data"
   status = 301
