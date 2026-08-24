@@ -129,13 +129,6 @@
   # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/visualisation/"
-  to = "https://meltano.com"
-  status = 301
-  force = true
-  # no relevant content found on meltano
-
-[[redirects]]
   from = "*/technology-cloud/"
   to = "https://meltano.com"
   status = 301
@@ -261,13 +254,6 @@
   to = "https://meltano.com/about"
   status = 301
   force = true
-
-[[redirects]]
-  from = "*/news/"
-  to = "https://meltano.com"
-  status = 301
-  force = true
-  # no relevant content found on meltano
 
 [[redirects]]
   from = "*/wp-content/uploads/2023/10/The-Ultimate-Guide-to-Modern-DataOps.pdf"
