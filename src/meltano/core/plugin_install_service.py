@@ -21,6 +21,7 @@ from meltano.core.error import (
     PluginInstallError,
     PluginInstallWarning,
 )
+from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import (
@@ -242,6 +243,18 @@ class PluginInstallService:
                 )
         return states, deduped_plugins
 
+    @staticmethod
+    def _append_docs_to_messages(message: str, plugin: ProjectPlugin) -> str:
+        try:
+            docs = plugin.definition.find_variant(plugin.variant).docs
+        except VariantNotFoundError:
+            docs = None
+
+        if docs:
+            message += f" See documentation for more details: {docs}"
+
+        return message
+
     async def install_all_plugins(
         self,
         reason: PluginInstallReason = PluginInstallReason.INSTALL,
@@ -366,11 +379,12 @@ class PluginInstallService:
                 return state
 
         except PluginInstallError as err:
+            message = self._append_docs_to_messages(str(err), plugin)
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=str(err),
+                message=message,
             )
             self.status_cb(state)
             return state
@@ -386,11 +400,12 @@ class PluginInstallService:
             return state
 
         except AsyncSubprocessError as err:
+            message = self._append_docs_to_messages(str(err), plugin)
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=str(err),
+                message=message,
                 details=await err.stderr,
             )
             self.status_cb(state)

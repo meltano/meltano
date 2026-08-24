@@ -625,7 +625,7 @@ ENV_VAR_PATTERN = re.compile(
     (?P<escape>\\)?  # escape
     \$  # starts with a '$'
     (?:
-        {(?P<curly>\w+)} # ${VAR}
+        {(?P<curly>\w+)(?:(?P<operator>:-|-)(?P<default>...))?} # ${VAR}
         |
         (?P<normal>[A-Z][A-Z0-9_]*) # $VAR
     )
