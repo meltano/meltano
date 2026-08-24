@@ -18,34 +18,15 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/dataml/workspaceml/invitations/"
-  to = "/reference/cloud/dataml/workspaceml/invitations"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "*/docs/how-to-guides/import-data/create-a-data-import-pipeline"
   to = "/meltano-cloud/importing-data#create-a-data-import-pipeline"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/docs/dataml/"
-  to = "/reference/cloud/dataml"
+  from = "/docs/api/*"
+  to = "/reference/cloud/api/:splat"
   status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/dataml/pipelineml/custom-scripts"
-  to = "/reference/cloud/dataml/pipelineml/custom-scripts"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/resources/members"
-  to = "/reference/cloud/api/resources/members"
-  status = 301
-  force = true
 
 [[redirects]]
   from = "*/docs/cli/fetch"
@@ -55,44 +36,8 @@
   # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/docs/dataml/meltanoyml/"
-  to = "/concepts/project#meltano-yml-project-file"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "*/docs/how-to-guides/import-data/adding-a-custom-data-source"
   to = "/meltano-cloud/importing-data#adding-a-custom-data-source"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/postman-collection"
-  to = "/reference/cloud/api/postman-collection"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/errors"
-  to = "/reference/cloud/api/errors"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/resources/deployments"
-  to = "/reference/cloud/api/resources/deployments"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/"
-  to = "/reference/cloud/api"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/resources/resources"
-  to = "/reference/cloud/api/resources/resources"
   status = 301
   force = true
 
@@ -147,13 +92,6 @@
 
 [[redirects]]
   from = "*/cloud-intelligence/"
-  to = "https://meltano.com"
-  status = 301
-  force = true
-  # no relevant content found on meltano
-
-[[redirects]]
-  from = "*/visualisation/"
   to = "https://meltano.com"
   status = 301
   force = true
@@ -285,13 +223,6 @@
   to = "https://meltano.com/about"
   status = 301
   force = true
-
-[[redirects]]
-  from = "*/news/"
-  to = "https://meltano.com"
-  status = 301
-  force = true
-  # no relevant content found on meltano
 
 [[redirects]]
   from = "*/wp-content/uploads/2023/10/The-Ultimate-Guide-to-Modern-DataOps.pdf"
@@ -449,16 +380,9 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/manage-workspaces/"
-  to = "/meltano-cloud/managing-a-workspace"
+  from = "/docs/how-to-guides/manage-workspaces/*"
+  to = "/meltano-cloud/managing-a-workspace#:splat"
   status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/how-to-guides/manage-workspaces/"
-  to = "/meltano-cloud/managing-a-workspace"
-  status = 301
-  force = true
 
 [[redirects]]
   from = "*/docs/how-to-guides/import-data/"
@@ -580,7 +504,6 @@
   status = 301
   force = true
 
-
 [[redirects]]
   from = "*/overview"
   to = "/meltano-cloud/cloud-overview"
@@ -607,12 +530,6 @@
   force = true
 
 [[redirects]]
-  from = "*/dataml/pipelineml/environment"
-  to = "/getting-started/which-meltano"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "*/library"
   to = "/getting-started/which-meltano"
   status = 301
@@ -625,10 +542,14 @@
   force = true
 
 [[redirects]]
-  from = "*/dataml/*"
-  to = "/getting-started/which-meltano"
+  from = "/docs/dataml/*"
+  to = "/reference/cloud/dataml/:splat"
   status = 301
-  force = true
+
+[[redirects]]
+  from = "/reference/cloud/dataml/meltanoyml"
+  to = "/concepts/project#meltano-yml-project-file"
+  status = 301
 
 [[redirects]]
   from = "*/how-to-guides/analyze-data/fetch-data-into-a-jupyter-notebook"
