@@ -380,10 +380,9 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/manage-workspaces/"
-  to = "/meltano-cloud/managing-a-workspace"
+  from = "/docs/how-to-guides/manage-workspaces/*"
+  to = "/meltano-cloud/managing-a-workspace#:splat"
   status = 301
-  force = true
 
 [[redirects]]
   from = "*/docs/how-to-guides/import-data/"
