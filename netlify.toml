@@ -24,10 +24,9 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/api/resources/members"
-  to = "/reference/cloud/api/resources/members"
+  from = "/docs/api/*"
+  to = "/reference/cloud/api/:splat"
   status = 301
-  force = true
 
 [[redirects]]
   from = "*/docs/cli/fetch"
@@ -39,36 +38,6 @@
 [[redirects]]
   from = "*/docs/how-to-guides/import-data/adding-a-custom-data-source"
   to = "/meltano-cloud/importing-data#adding-a-custom-data-source"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/postman-collection"
-  to = "/reference/cloud/api/postman-collection"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/errors"
-  to = "/reference/cloud/api/errors"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/resources/deployments"
-  to = "/reference/cloud/api/resources/deployments"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/"
-  to = "/reference/cloud/api"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/api/resources/resources"
-  to = "/reference/cloud/api/resources/resources"
   status = 301
   force = true
 
