@@ -392,7 +392,7 @@ class TestPluginInstallService:
         assert state.message.startswith(error_message)
         assert state.verb == "Installation failed"
 
-    def test_append_docs_to_messages_when_docs_exist(
+    def test_append_docs_to_message_when_docs_exist(
         self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         mock_variant = Mock()
@@ -404,14 +404,14 @@ class TestPluginInstallService:
         )
 
         initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+        result = PluginInstallService._append_docs_to_message(initial_message, tap)
 
         assert (
             result
             == "Installation failed. See documentation for more details: https://docs.meltano.com/target-tap"
         )
 
-    def test_append_docs_to_messages_when_docs_is_none(
+    def test_append_docs_to_message_when_docs_is_none(
         self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         mock_variant = Mock()
@@ -423,11 +423,11 @@ class TestPluginInstallService:
         )
 
         initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+        result = PluginInstallService._append_docs_to_message(initial_message, tap)
 
         assert result == initial_message
 
-    def test_append_docs_to_messages_when_variant_not_found(
+    def test_append_docs_to_message_when_variant_not_found(
         self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
@@ -438,7 +438,7 @@ class TestPluginInstallService:
         logger = Mock()
         monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
         initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+        result = PluginInstallService._append_docs_to_message(initial_message, tap)
 
         assert result == initial_message
         logger.debug.assert_called_once_with(
@@ -446,7 +446,7 @@ class TestPluginInstallService:
             tap.name,
         )
 
-    def test_append_docs_to_messages_when_variant_resolution_fails(
+    def test_append_docs_to_message_when_variant_resolution_fails(
         self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setattr(
@@ -457,7 +457,7 @@ class TestPluginInstallService:
         logger = Mock()
         monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
         initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_messages(initial_message, tap)
+        result = PluginInstallService._append_docs_to_message(initial_message, tap)
 
         assert result == initial_message
         logger.exception.assert_called_once()

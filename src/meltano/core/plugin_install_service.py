@@ -244,7 +244,7 @@ class PluginInstallService:
         return states, deduped_plugins
 
     @staticmethod
-    def _append_docs_to_messages(message: str, plugin: ProjectPlugin) -> str:
+    def _append_docs_to_message(message: str, plugin: ProjectPlugin) -> str:
         try:
             docs = plugin.definition.find_variant(plugin.variant).docs
         except VariantNotFoundError:
@@ -387,7 +387,7 @@ class PluginInstallService:
                 return state
 
         except PluginInstallError as err:
-            message = self._append_docs_to_messages(str(err), plugin)
+            message = self._append_docs_to_message(str(err), plugin)
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -408,7 +408,7 @@ class PluginInstallService:
             return state
 
         except AsyncSubprocessError as err:
-            message = self._append_docs_to_messages(str(err), plugin)
+            message = self._append_docs_to_message(str(err), plugin)
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
