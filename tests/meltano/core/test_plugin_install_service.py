@@ -462,5 +462,5 @@ class TestPluginInstallService:
         assert result == initial_message
         logger.exception.assert_called_once_with(
             "Unexpected error while looking up variant for plugin '%s'",
-            plugin.name,
+            tap.name,
         )
