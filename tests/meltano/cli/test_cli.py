@@ -15,6 +15,7 @@ from time import perf_counter_ns
 from unittest import mock
 
 import click
+import click.testing
 import pytest
 import responses
 import yaml
@@ -647,20 +648,22 @@ class TestCliColors:
     )
     def test_no_color(
         self,
-        cli_runner,
-        env,
-        log_config,
-        cli_colors_expected,
-        log_colors_expected,
-        tmp_path,
-        monkeypatch,
+        cli_runner: click.testing.CliRunner,
+        env: dict[str, str],
+        log_config: dict[str, t.Any],
+        cli_colors_expected: bool,  # ruff: ignore[boolean-type-hint-positional-argument]
+        log_colors_expected: bool,  # ruff: ignore[boolean-type-hint-positional-argument]
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
         monkeypatch.delenv("FORCE_COLOR", raising=False)
         styled_text = click.style(self.TEST_TEXT, fg="red")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
 
         if log_config:
-            log_config_path = tmp_path / "logging.yml"
+            log_config_path = project_path / "logging.yml"
             log_config_path.write_text(yaml.dump(log_config))
         else:
             log_config_path = None
@@ -676,12 +679,16 @@ class TestCliColors:
 
         expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
-        with cli_runner.isolated_filesystem():
-            result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
-            assert result.exit_code == 0, result.exception
-            assert result.stdout.strip() == expected_text
-            assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
-            assert result.exception is None
+        result = cli_runner.invoke(
+            cli,
+            ["--cwd", str(project_path), "dummy"],
+            color=True,
+            env=env,
+        )
+        assert result.exit_code == 0, result.exception
+        assert result.stdout.strip() == expected_text
+        assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
+        assert result.exception is None
 
 
 class TestLargeConfigProject:
