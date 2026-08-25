@@ -1,0 +1,298 @@
+---
+title: Google Analytics
+description: Sync Google Analytics 4 (GA4) website and app performance data into Meltano Cloud for reporting, modelling, and downstream analysis.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Google Analytics
+
+<ConnectorTypeBadge type="extractor" block />
+
+Meltano Tap Google Analytics is a Singer tap for extracting Google Analytics 4 (GA4) data into Meltano Cloud for reporting, modelling, and downstream analysis.
+
+It helps you collect website and app performance data from Google Analytics in a repeatable pipeline so you can analyse traffic, engagement, locations, devices, pages, and revenue-related activity alongside data from your other business systems.
+
+Use this connector when you want to:
+
+- centralise Google Analytics data in your warehouse
+- build dashboards and reports on website performance
+- track traffic sources, user behaviour, and engagement trends over time
+- combine analytics data with advertising, CRM, sales, or product data
+- customise the extracted reports using your own stream definitions
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | Google account, connected via Meltano Cloud login |
+| **API** | Google Analytics 4 (GA4) |
+| **Default streams** | 9 |
+| **Custom reports** | Supported, up to 7 dimensions and 10 metrics per report |
+
+## Setup
+
+In [Google Analytics](https://analytics.google.com/):
+
+1. Select the property you want to extract data for.
+2. Go to **Admin** > **Property** > **Property details**.
+3. Copy the **PROPERTY ID**.
+
+In Meltano Cloud:
+
+1. Login and connect with your Google account.
+2. Enter the property ID.
+3. Choose a start date for extraction.
+
+## What you can sync
+
+The tap provides the following default streams:
+
+### `website_overview`
+
+Overview of the website performance.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `activeUsers` | Metric. The number of active users. |
+| `newUsers` | Metric. The number of first-time users. |
+| `sessions` | Metric. The number of sessions recorded. |
+| `sessionsPerUser` | Metric. The average number of sessions per user. |
+| `averageSessionDuration` | Metric. The average duration of sessions. |
+| `screenPageViews` | Metric. The total number of page or screen views. |
+| `screenPageViewsPerSession` | Metric. The average number of page or screen views per session. |
+| `bounceRate` | Metric. The percentage of sessions that were not engaged. |
+| `engagementRate` | Metric. The percentage of engaged sessions. |
+
+### `traffic_sources`
+
+Where website traffic originates from.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `source` | Dimension. The source that sent traffic, such as a website or referrer. |
+| `medium` | Dimension. The marketing medium for the traffic source, such as organic, referral, or cpc. |
+| `sourcePlatform` | Dimension. The platform associated with the traffic source. |
+| `activeUsers` | Metric. The number of active users. |
+| `sessions` | Metric. The number of sessions recorded. |
+| `sessionsPerUser` | Metric. The average number of sessions per user. |
+| `bounceRate` | Metric. The percentage of sessions that were not engaged. |
+| `engagementRate` | Metric. The percentage of engaged sessions. |
+
+### `locations`
+
+Website activity by country, region, and city.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `country` | Dimension. The country where the activity originated. |
+| `countryId` | Dimension. The Google Analytics identifier for the country. |
+| `region` | Dimension. The region or state where the activity originated. |
+| `city` | Dimension. The city where the activity originated. |
+| `cityId` | Dimension. The Google Analytics identifier for the city. |
+| `activeUsers` | Metric. The number of active users. |
+| `newUsers` | Metric. The number of first-time users. |
+| `sessions` | Metric. The number of sessions recorded. |
+| `sessionsPerUser` | Metric. The average number of sessions per user. |
+| `averageSessionDuration` | Metric. The average duration of sessions. |
+| `screenPageViews` | Metric. The total number of page or screen views. |
+| `screenPageViewsPerSession` | Metric. The average number of page or screen views per session. |
+| `bounceRate` | Metric. The percentage of sessions that were not engaged. |
+| `engagementRate` | Metric. The percentage of engaged sessions. |
+
+### `four_weekly_active_users`
+
+Active users measured over a rolling 28 day period.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `active28DayUsers` | Metric. The number of active users over the last 28 days. |
+
+### `weekly_active_users`
+
+Active users measured over a rolling 7 day period.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `active7DayUsers` | Metric. The number of active users over the last 7 days. |
+
+### `daily_active_users`
+
+Active users measured over a rolling 1 day period.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `active1DayUsers` | Metric. The number of active users over the last 1 day. |
+
+### `devices`
+
+Website activity by device, operating system, and browser.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `deviceCategory` | Dimension. The type of device used, such as desktop, tablet, or mobile. |
+| `deviceModel` | Dimension. The model of device used by the visitor. |
+| `operatingSystem` | Dimension. The operating system used by the visitor. |
+| `browser` | Dimension. The browser used by the visitor. |
+| `activeUsers` | Metric. The number of active users. |
+| `newUsers` | Metric. The number of first-time users. |
+| `sessions` | Metric. The number of sessions recorded. |
+| `sessionsPerUser` | Metric. The average number of sessions per user. |
+| `averageSessionDuration` | Metric. The average duration of sessions. |
+| `screenPageViews` | Metric. The total number of page or screen views. |
+| `screenPageViewsPerSession` | Metric. The average number of page or screen views per session. |
+| `bounceRate` | Metric. The percentage of sessions that were not engaged. |
+| `engagementRate` | Metric. The percentage of engaged sessions. |
+
+### `transactions`
+
+Revenue and transaction performance overview.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `activeUsers` | Metric. The number of active users. |
+| `averageRevenuePerUser` | Metric. The average revenue generated per user. |
+| `newUsers` | Metric. The number of first-time users. |
+| `purchaseRevenue` | Metric. The revenue generated from purchases. |
+| `sessions` | Metric. The number of sessions recorded. |
+| `totalRevenue` | Metric. The total revenue attributed in the report. |
+| `transactions` | Metric. The number of completed transactions. |
+
+### `pages`
+
+Page-level traffic and engagement performance.
+
+| Field | Description |
+|---|---|
+| `date` | Dimension. The reporting date for the row. |
+| `hostName` | Dimension. The hostname where the page was viewed. |
+| `pagePath` | Dimension. The path portion of the viewed page URL. |
+| `sessionMedium` | Dimension. The session-level marketing medium. |
+| `sessionSource` | Dimension. The session-level traffic source. |
+| `activeUsers` | Metric. The number of active users. |
+| `bounceRate` | Metric. The percentage of sessions that were not engaged. |
+| `engagedSessions` | Metric. The number of engaged sessions. |
+| `engagementRate` | Metric. The percentage of engaged sessions. |
+| `eventCount` | Metric. The total number of tracked events. |
+| `screenPageViews` | Metric. The total number of page or screen views. |
+| `screenPageViewsPerUser` | Metric. The average number of page or screen views per user. |
+| `screenPageViewsPerSession` | Metric. The average number of page or screen views per session. |
+| `userEngagementDuration` | Metric. The amount of time users were actively engaged. |
+
+## Custom streams
+
+The tap also supports custom streams. When custom stream definitions are specified, they override all default streams.
+
+A custom report definition specifies the stream name along with the Google Analytics dimensions and metrics to request, up to 7 dimensions and 10 metrics per stream. See the [GA4 dimensions and metrics explorer](https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/) for valid values.
+
+You can define custom reports two ways:
+
+**As a project-relative JSON file** using `reports`:
+
+```json
+[
+  { "name" : "name of stream to be used",
+    "dimensions" :
+    [
+      "Google Analytics Dimension",
+      "Another Google Analytics Dimension"
+    ],
+    "metrics" :
+    [
+      "Google Analytics Metric",
+      "Another Google Analytics Metric"
+    ]
+  }
+]
+```
+
+For example, to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:
+
+```json
+[
+  { "name" : "users_per_day",
+    "dimensions" :
+    [
+      "date"
+    ],
+    "metrics" :
+    [
+      "newUsers",
+      "active1DayUsers"
+    ]
+  },
+  { "name" : "sessions_per_country_day",
+    "dimensions" :
+    [
+      "date",
+      "country"
+    ],
+    "metrics" :
+    [
+      "sessions",
+      "sessionsPerUser",
+      "avgSessionDuration"
+    ]
+  }
+]
+```
+
+**Or inline in your configuration** using `reports_list`:
+
+```json
+[
+  {
+    "name": "traffic_overview",
+    "dimensions": ["date", "country"],
+    "metrics": ["activeUsers", "sessions"]
+  },
+  {
+    "name": "device_analysis",
+    "dimensions": ["date", "deviceCategory"],
+    "metrics": ["activeUsers", "engagedSessions", "engagementRate"]
+  },
+  {
+    "name": "traffic_source_analysis",
+    "dimensions": ["date", "sessionSource", "sessionMedium"],
+    "metrics": ["activeUsers", "sessions", "eventCount"]
+  },
+  {
+    "name": "top_pages",
+    "dimensions": ["date", "pagePath"],
+    "metrics": ["screenPageViews", "activeUsers"]
+  },
+  {
+    "name": "engagement_report",
+    "dimensions": ["date"],
+    "metrics": ["engagedSessions", "engagementRate", "userEngagementDuration"]
+  }
+]
+```
+
+If `reports` is not provided, the tap uses its [default reports definition](https://github.com/MeltanoLabs/tap-google-analytics/blob/main/tap_google_analytics/defaults/default_report_definition.json).
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `property_id` | string | Google Analytics Property ID. Found in Google Analytics under **Admin** > **Property** > **Property details**. |
+| `start_date` | date | The earliest record date to sync. |
+| `end_date` | date | The last record date to sync. |
+| `reports` | string | A project-relative path to a JSON file with the definition of the reports to be generated. Uses the tap's default reports definition if not provided. |
+| `reports_list` | array | A list of report definitions to be generated directly in the config, as an alternative to `reports`. |
+| `flattening_enabled` | boolean | `True` to enable schema flattening and automatically expand nested properties. |
+| `flattening_max_depth` | integer | The max depth to flatten schemas. |
+| `stream_map_config` | object | User-defined config values to be used within map expressions. |
+| `stream_maps` | object | Config object for the stream maps capability. |
+
+## Need help?
+
+If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.

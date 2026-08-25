@@ -1,0 +1,50 @@
+---
+title: Baidu
+description: Sync campaign, account, and reporting data from Baidu's Mediago programmatic advertising platform.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Baidu
+
+<ConnectorTypeBadge type="extractor" block />
+
+Baidu is a leading Chinese technology company. Founded in 2000, Baidu delivers a broad portfolio of services spanning internet search, cloud computing, artificial intelligence, and digital advertising.
+
+Its Mediago platform empowers marketers to manage programmatic advertising campaigns with robust targeting, bidding, and reporting features across Baidu's media network. This tap is built on top of the Mediago API.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API Token |
+| **API** | Baidu Mediago API |
+| **Streams** | 6 |
+
+## What you can sync
+
+The Baidu tap provides access to the following streams:
+
+- **SummaryStream**: for high level campaign overviews.
+- **CampaignStream**: for a list of authorised campaigns.
+- **AccountsStream**: for a list of authorised accounts.
+- **CampaignDetails**: for in depth campaign insights.
+- **ReportInCampaignDimension**: a daily report in campaign dimension.
+- **ReportInSiteDimension**: a daily report in site dimension for a specific campaign.
+
+## Prerequisites
+
+To connect Baidu, you need an API token for the Mediago API, along with a start date, end date, and timezone for the streams you want to sync.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `api_token` | string | The token to use for authentication. |
+| `start_date` | string | The start date of the stream. |
+| `end_date` | string | The end date of the stream. |
+| `timezone` | string | The timezone of the stream. |
+
+## Need help?
+
+If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.
