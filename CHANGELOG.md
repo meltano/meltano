@@ -3,6 +3,87 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.3.0 (2026-08-25)
+
+### ✨ New
+
+- [#10243](https://github.com/meltano/meltano/issues/10243) Add plugin docs to installation errors -- _**Thanks @AbrhamYishak!**_
+- [#10191](https://github.com/meltano/meltano/issues/10191) Allow escaping dots in setting names -- _**Thanks @sravankumarkunadi!**_
+- [#10148](https://github.com/meltano/meltano/issues/10148) Allow `MELTANO_RUN_FORCE` environment variable to be used as an alternative `meltano run --force` flag -- _**Thanks @edgarrmondragon!**_
+- [#10181](https://github.com/meltano/meltano/issues/10181) Add --refresh-catalog option to `meltano invoke` -- _**Thanks @gbadedata!**_
+- [#10139](https://github.com/meltano/meltano/issues/10139) Honor `FORCE_COLOR` for logging -- _**Thanks @gbadedata!**_
+- [#10075](https://github.com/meltano/meltano/issues/10075) Process exception notes in Singer SDK structured logs -- _**Thanks @edgarrmondragon!**_
+- [#10058](https://github.com/meltano/meltano/issues/10058) Add Google Cloud Logging JSON formatter -- _**Thanks @DRACULA1729!**_
+- [#9994](https://github.com/meltano/meltano/issues/9994) Show a subset of settings in `meltano config list` by default -- _**Thanks @mahangu!**_
+- [#10020](https://github.com/meltano/meltano/issues/10020) Add `meltano state export` and `meltano state import` commands -- _**Thanks @edgarrmondragon!**_
+- [#9990](https://github.com/meltano/meltano/issues/9990) Add s3-compatible providers in docs and update user agent -- _**Thanks @goanpeca!**_
+- [#9929](https://github.com/meltano/meltano/issues/9929) Sort settings by section in `meltano config list` -- _**Thanks @mahangu!**_
+- [#9950](https://github.com/meltano/meltano/issues/9950) The `meltano run` options are now grouped by categories (state, installation, etc.) -- _**Thanks @AvinashYerra!**_
+
+### 🐛 Fixes
+
+- [#10264](https://github.com/meltano/meltano/issues/10264) Stop redirecting away from the DataML and Cloud API reference pages -- _**Thanks @ReubenFrankel!**_
+- [#10217](https://github.com/meltano/meltano/issues/10217) Update react monorepo to v19
+- [#10211](https://github.com/meltano/meltano/issues/10211) Update minor and patch updates to docs dependencies
+- [#10182](https://github.com/meltano/meltano/issues/10182) Prevent include_paths from escaping project root -- _**Thanks @edgarrmondragon!**_
+- [#10167](https://github.com/meltano/meltano/issues/10167) Ensure project `.env` files are created with 0600 permissions -- _**Thanks @edgarrmondragon!**_
+- [#10155](https://github.com/meltano/meltano/issues/10155) Correctly propagate SIGTERM to plugin subprocesses -- _**Thanks @edgarrmondragon!**_
+- [#10131](https://github.com/meltano/meltano/issues/10131) Allow smart-open 8.x -- _**Thanks @edgarrmondragon!**_
+- [#10118](https://github.com/meltano/meltano/issues/10118) Disable colors when stderr is not a TTY -- _**Thanks @gbadedata!**_
+- [#10104](https://github.com/meltano/meltano/issues/10104) Avoid swallowing Pipelinewise plugin logs by setting the level for the root logger -- _**Thanks @edgarrmondragon!**_
+- [#10103](https://github.com/meltano/meltano/issues/10103) Allow structlog to 26.x
+- [#10100](https://github.com/meltano/meltano/issues/10100) Ensure stdlib logging `extra` values are added to the object when the JSON log formatter is used -- _**Thanks @edgarrmondragon!**_
+- [#10089](https://github.com/meltano/meltano/issues/10089) Output more detailed errors when requests to the Hub API fail -- _**Thanks @edgarrmondragon!**_
+- [#10049](https://github.com/meltano/meltano/issues/10049) Inherit env_override variables from parent plugin settings service -- _**Thanks @ChidiebereNjoku!**_
+- [#10036](https://github.com/meltano/meltano/issues/10036) Make logging less noisy when listing state IDs from a filesystem-based state backend -- _**Thanks @edgarrmondragon!**_
+- [#10032](https://github.com/meltano/meltano/issues/10032) Allow Click 8.4.x -- _**Thanks @edgarrmondragon!**_
+- [#10029](https://github.com/meltano/meltano/issues/10029) Ensure custom dotenv file is preserved in project instance and `--env-file` is honored -- _**Thanks @edgarrmondragon!**_
+- [#10013](https://github.com/meltano/meltano/issues/10013) Check if the stdlib (and not structlog) logger is enabled for DEBUG to log Singer stdout -- _**Thanks @edgarrmondragon!**_
+- [#10006](https://github.com/meltano/meltano/issues/10006) Avoid displaying noisy traceback when passing a bad plugin type -- _**Thanks @edgarrmondragon!**_
+- [#10005](https://github.com/meltano/meltano/issues/10005) Avoid displaying noisy traceback when trying to modify a read-only project -- _**Thanks @edgarrmondragon!**_
+- [#9875](https://github.com/meltano/meltano/issues/9875) Handle non-unicode characters in plugin logs -- _**Thanks @toroleapinc!**_
+- [#9993](https://github.com/meltano/meltano/issues/9993) Add a trailing newline character to manifest files produced by `meltano compile` -- _**Thanks @edgarrmondragon!**_
+- [#9992](https://github.com/meltano/meltano/issues/9992) Parse strucuted logs coming from mapper plugins -- _**Thanks @edgarrmondragon!**_
+- [#9971](https://github.com/meltano/meltano/issues/9971) Improve `meltano config test` error message with helpful hint -- _**Thanks @Sharanjoo!**_
+- [#9958](https://github.com/meltano/meltano/issues/9958) Bump `rich` to 15.x -- _**Thanks @edgarrmondragon!**_
+
+### ⚙️ Under the Hood
+
+- [#10213](https://github.com/meltano/meltano/issues/10213) Raise more consistent errors when a schedule, environment or plugin variant is not found -- _**Thanks @edgarrmondragon!**_
+- [#10198](https://github.com/meltano/meltano/issues/10198) Bump Ruff to 0.16 and apply fixes -- _**Thanks @edgarrmondragon!**_
+- [#10166](https://github.com/meltano/meltano/issues/10166) Standardize ruamel.yaml imports -- _**Thanks @edgarrmondragon!**_
+- [#10165](https://github.com/meltano/meltano/issues/10165) Remove obsolete pidfile utility module -- _**Thanks @edgarrmondragon!**_
+- [#10163](https://github.com/meltano/meltano/issues/10163) Remove the `meltano.__version__` variable in favor of `meltano.core.utils.get_meltano_version` -- _**Thanks @edgarrmondragon!**_
+- [#10154](https://github.com/meltano/meltano/issues/10154) Remove dev-only setting resolution debug logs -- _**Thanks @edgarrmondragon!**_
+- Use `itertools.starmap` to construct plugin list -- _**Thanks @edgarrmondragon!**_
+- Use `set.update` instead of `set.add` in a loop -- _**Thanks @edgarrmondragon!**_
+- Avoid prefixing non-dummy variables with `_` -- _**Thanks @edgarrmondragon!**_
+- Replace lambda with `operator.itemgetter` -- _**Thanks @edgarrmondragon!**_
+- [#10121](https://github.com/meltano/meltano/issues/10121) Replace `metaclass=abc.ABCMeta` with `abc.ABC` -- _**Thanks @edgarrmondragon!**_
+- [#10120](https://github.com/meltano/meltano/issues/10120) Unify log configurations between formatters available in `logging.yaml` and the default preset configs (`colored`, `json`, etc.) -- _**Thanks @edgarrmondragon!**_
+- [#10069](https://github.com/meltano/meltano/issues/10069) Apply missing `@override` to the rest of the codebase -- _**Thanks @edgarrmondragon!**_
+- [#10068](https://github.com/meltano/meltano/issues/10068) Apply missing `@override` decorators to `meltano.core.plugin` -- _**Thanks @edgarrmondragon!**_
+- [#10066](https://github.com/meltano/meltano/issues/10066) Apply missing `@override` decorators to first-party state backend implementations -- _**Thanks @edgarrmondragon!**_
+- [#10012](https://github.com/meltano/meltano/issues/10012) Make `meltano.core.logging.utils.SafeStreamHandler` opt-in and document how to use it -- _**Thanks @edgarrmondragon!**_
+- [#10007](https://github.com/meltano/meltano/issues/10007) Decouple Hub error handling from Requests -- _**Thanks @edgarrmondragon!**_
+- [#10004](https://github.com/meltano/meltano/issues/10004) Use global constant for the state file name `state.json` -- _**Thanks @edgarrmondragon!**_
+- [#9974](https://github.com/meltano/meltano/issues/9974) Split virtualenv functionality into venv and package management components -- _**Thanks @edgarrmondragon!**_
+
+### 📚 Documentation Improvements
+
+- [#10261](https://github.com/meltano/meltano/issues/10261) Use a splat redirect to support all matatika.com connectors on meltano.com -- _**Thanks @aphethean1!**_
+- [#10133](https://github.com/meltano/meltano/issues/10133) Updated connector documentation -- _**Thanks @himanil-meltano!**_
+- [#10231](https://github.com/meltano/meltano/issues/10231) Add MotherDuck setup instructions -- _**Thanks @edgarrmondragon!**_
+- [#10122](https://github.com/meltano/meltano/issues/10122) Bump Docusaurus to 3.10.1 -- _**Thanks @edgarrmondragon!**_
+- [#10092](https://github.com/meltano/meltano/issues/10092)  release updated docs 11 06 2026 -- _**Thanks @aphethean1!**_
+- [#10088](https://github.com/meltano/meltano/issues/10088) Update snowflake guides -- _**Thanks @aphethean1!**_
+- [#10062](https://github.com/meltano/meltano/issues/10062) Add Postman collection -- _**Thanks @ReubenFrankel!**_
+- Update dbt-ext in examples -- _**Thanks @edgarrmondragon!**_
+- [#10053](https://github.com/meltano/meltano/issues/10053) Fix display of reference index admonition -- _**Thanks @ReubenFrankel!**_
+- [#10052](https://github.com/meltano/meltano/issues/10052) Add Cloud docs to reference index -- _**Thanks @ReubenFrankel!**_
+- [#10041](https://github.com/meltano/meltano/issues/10041) Meltano Cloud -- _**Thanks @ReubenFrankel!**_
+- [#10022](https://github.com/meltano/meltano/issues/10022) Document `meltano state export` and `meltano state import` -- _**Thanks @edgarrmondragon!**_
+
 ## v4.2.2 (2026-07-22)
 
 ### 🐛 Fixes
