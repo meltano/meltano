@@ -29,12 +29,16 @@ npm run build
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
+```sh
+npm run serve
+```
+
 ### Deployment
 
 Using SSH:
 
 ```sh
-USE_SSH=true npm deploy
+USE_SSH=true npm run deploy
 ```
 
 Not using SSH:

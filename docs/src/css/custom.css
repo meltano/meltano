@@ -1784,6 +1784,15 @@ article {
   background: rgba(153, 206, 85, 0.14);
 }
 
+.tier-banner--yellow {
+  border-left-color: var(--meltano-yellow);
+  background: rgba(251, 204, 84, 0.08);
+}
+
+[data-theme='dark'] .tier-banner--yellow {
+  background: rgba(251, 204, 84, 0.14);
+}
+
 /* Getting Started — card grid */
 .gs-card-grid {
   display: grid;
