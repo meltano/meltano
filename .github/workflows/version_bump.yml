@@ -71,6 +71,8 @@ jobs:
         github_token: ${{ steps.app-token.outputs.token }}
         extra_requirements: 'git+https://github.com/meltano/commitizen-version-bump@main'
         changelog_increment_filename: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}
+      env:
+        GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
     - name: Update uv.lock
       run: uv lock
