@@ -58,6 +58,7 @@ jobs:
         private-key: ${{ secrets.MELTYBOT_APP_PRIVATE_KEY }}
         permission-contents: write       # to push the metadata refresh branch
         permission-pull-requests: write  # to open the PR
+        permission-members: read         # to look up org membership for changelog thanks
 
     - name: Bump version
       id: cz-bump
