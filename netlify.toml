@@ -471,7 +471,7 @@
 
 [[redirects]]
   from = "/snowflake-developer-guides/*"
-  to = "/meltano-cloud/connect-a-store/snowflake-guides"
+  to = "/meltano-cloud/connect-a-store/snowflake-guides#:splat"
   status = 301
 
 [[redirects]]
