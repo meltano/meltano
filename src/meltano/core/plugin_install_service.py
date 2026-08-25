@@ -389,12 +389,11 @@ class PluginInstallService:
                 return state
 
         except PluginInstallError as err:
-            message = self._append_docs_to_message(str(err), plugin)
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=message,
+                message=self._append_docs_to_message(str(err), plugin),
             )
             self.status_cb(state)
             return state
@@ -410,12 +409,11 @@ class PluginInstallService:
             return state
 
         except AsyncSubprocessError as err:
-            message = self._append_docs_to_message(str(err), plugin)
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=message,
+                message=self._append_docs_to_message(str(err), plugin),
                 details=await err.stderr,
             )
             self.status_cb(state)
