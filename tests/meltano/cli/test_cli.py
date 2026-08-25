@@ -648,11 +648,12 @@ class TestCliColors:
     )
     def test_no_color(
         self,
+        *,
         cli_runner: click.testing.CliRunner,
         env: dict[str, str],
         log_config: dict[str, t.Any],
-        cli_colors_expected: bool,  # ruff: ignore[boolean-type-hint-positional-argument]
-        log_colors_expected: bool,  # ruff: ignore[boolean-type-hint-positional-argument]
+        cli_colors_expected: bool,
+        log_colors_expected: bool,
         tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -679,12 +680,8 @@ class TestCliColors:
 
         expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
-        result = cli_runner.invoke(
-            cli,
-            ["--cwd", str(project_path), "dummy"],
-            color=True,
-            env=env,
-        )
+        monkeypatch.chdir(project_path)
+        result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
         assert result.exit_code == 0, result.exception
         assert result.stdout.strip() == expected_text
         assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
