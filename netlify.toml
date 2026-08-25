@@ -12,40 +12,20 @@
 # --- Matatika -> Meltano documentation redirects (docs.matatika.com equivalents) ---
 
 [[redirects]]
-  from = "*/docs/how-to-guides/automate-actions/create-a-custom-pipeline"
-  to = "/meltano-cloud/automate-actions#create-a-custom-pipeline"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/how-to-guides/import-data/create-a-data-import-pipeline"
-  to = "/meltano-cloud/importing-data#create-a-data-import-pipeline"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/docs/api/*"
+  from = "/api/*"
   to = "/reference/cloud/api/:splat"
   status = 301
 
 [[redirects]]
-  from = "*/docs/cli/fetch"
+  from = "/cli/fetch"
   to = "https://docs.meltano.com"
   status = 301
-  force = true
   # no relevant content found on meltano
 
 [[redirects]]
-  from = "*/docs/how-to-guides/import-data/adding-a-custom-data-source"
-  to = "/meltano-cloud/importing-data#adding-a-custom-data-source"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/how-to-guides/use-the-matatika-api/making-your-first-api-call"
+  from = "/how-to-guides/use-the-matatika-api/making-your-first-api-call"
   to = "/reference/cloud/api/postman-collection"
   status = 301
-  force = true
 
 # --- Matatika -> Meltano marketing site redirects (matatika.com equivalents) ---
 
@@ -380,51 +360,54 @@
   force = true
 
 [[redirects]]
-  from = "/docs/how-to-guides/manage-workspaces/*"
+  from = "/how-to-guides/manage-workspaces/*"
   to = "/meltano-cloud/managing-a-workspace#:splat"
   status = 301
 
 [[redirects]]
-  from = "*/docs/how-to-guides/import-data/"
-  to = "/meltano-cloud/importing-data"
+  from = "/how-to-guides/import-data/*"
+  to = "/meltano-cloud/importing-data#:splat"
   status = 301
-  force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/automate-actions/"
-  to = "/meltano-cloud/automate-actions"
+  from = "/how-to-guides/automate-actions/*"
+  to = "/meltano-cloud/automate-actions#:splat"
   status = 301
-  force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/manage-data-stores/"
+  from = "/how-to-guides/manage-data-stores/"
   to = "/meltano-cloud/stores"
   status = 301
-  force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/setup-your-development-environment"
+  from = "/how-to-guides/setup-your-development-environment"
   to = "/meltano-cloud/setup-development-environment"
   status = 301
-  force = true
 
 [[redirects]]
-  from = "*/docs/how-to-guides/transform-data"
+  from = "/how-to-guides/use-the-matatika-api/integrate-with-the-matatika-api"
+  to = "/reference/cloud/api"
+  status = 301
+
+[[redirects]]
+  from = "/how-to-guides/analyze-data/fetch-data-into-a-jupyter-notebook"
+  to = "/tutorials/jupyter"
+  status = 301
+
+[[redirects]]
+  from = "/how-to-guides/transform-data"
   to = "/meltano-cloud/transform-data"
   status = 301
-  force = true
 
 [[redirects]]
-  from = "*/docs/tutorials/*"
-  to = "/meltano-cloud/creating-workspace"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/how-to-guides/*"
+  from = "/how-to-guides/*"
   to = "/meltano-cloud/cloud-overview"
   status = 301
-  force = true
+
+[[redirects]]
+  from = "/tutorials/*"
+  to = "/meltano-cloud/creating-workspace"
+  status = 301
 
 [[redirects]]
   from = "*/getting-started/installation"
@@ -433,25 +416,25 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/getting-started/matatika-cloud"
+  from = "/getting-started/matatika-cloud"
   to = "https://docs.meltano.com/getting-started/which-meltano"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/docs/getting-started/your-cloud"
+  from = "/getting-started/your-cloud"
   to = "https://docs.meltano.com/getting-started/which-meltano"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/docs/getting-started/community-edition"
+  from = "/getting-started/community-edition"
   to = "https://docs.meltano.com/getting-started/which-meltano"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/docs/getting-started/meltano"
+  from = "/getting-started/meltano"
   to = "https://docs.meltano.com/getting-started/which-meltano"
   status = 301
   force = true
@@ -487,22 +470,9 @@
   force = true
 
 [[redirects]]
-  from = "*/docs/snowflake-developer-guides"
+  from = "/snowflake-developer-guides/*"
   to = "/meltano-cloud/connect-a-store/snowflake-guides"
   status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/snowflake-developer-guides/whitelist-ip-policy/"
-  to = "/meltano-cloud/connect-a-store/snowflake-guides"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/docs/snowflake-developer-guides/key-pair-authentication/"
-  to = "/meltano-cloud/connect-a-store/snowflake-guides"
-  status = 301
-  force = true
 
 [[redirects]]
   from = "*/overview"
@@ -542,7 +512,7 @@
   force = true
 
 [[redirects]]
-  from = "/docs/dataml/*"
+  from = "/dataml/*"
   to = "/reference/cloud/dataml/:splat"
   status = 301
 
@@ -552,43 +522,13 @@
   status = 301
 
 [[redirects]]
-  from = "*/how-to-guides/analyze-data/fetch-data-into-a-jupyter-notebook"
-  to = "/tutorials/jupyter"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/how-to-guides/setup-your-development-environment"
-  to = "/meltano-cloud/setup-development-environment"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "*/developers"
   to = "/getting-started/which-meltano"
   status = 301
   force = true
 
 [[redirects]]
-  from = "*/snowflake-developer-guides/"
-  to = "/meltano-cloud/connect-a-store/snowflake-guides"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/how-to-guides/use-the-matatika-api/integrate-with-the-matatika-api"
-  to = "/reference/cloud/api"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "*/human"
   to = "/getting-started/which-meltano"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "*/how-to-guides/automate-actions/run-a-jupyter-notebook-on-a-schedule"
-  to = "/tutorials/jupyter"
   status = 301
   force = true
