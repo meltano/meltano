@@ -9,6 +9,8 @@ const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
+  organizationName: 'Meltano',
+  projectName: 'meltano',
   title: 'Meltano Documentation',
   tagline: '',
   url: 'https://docs.meltano.com',
