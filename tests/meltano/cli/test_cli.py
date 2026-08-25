@@ -651,7 +651,7 @@ class TestCliColors:
         *,
         cli_runner: click.testing.CliRunner,
         env: dict[str, str],
-        log_config: dict[str, t.Any],
+        log_config: dict[str, t.Any] | None,
         cli_colors_expected: bool,
         log_colors_expected: bool,
         tmp_path: Path,
