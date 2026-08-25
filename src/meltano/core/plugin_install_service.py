@@ -255,7 +255,7 @@ class PluginInstallService:
             return message
         except Exception:
             logger.exception(
-                "Unexpected error while finding variant for plugin '%s'",
+                "Unexpected error while looking up variant for plugin '%s'",
                 plugin.name,
             )
             return message

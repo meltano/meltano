@@ -460,4 +460,7 @@ class TestPluginInstallService:
         result = PluginInstallService._append_docs_to_message(initial_message, tap)
 
         assert result == initial_message
-        logger.exception.assert_called_once()
+        logger.exception.assert_called_once_with(
+            "Unexpected error while looking up variant for plugin '%s'",
+            plugin.name,
+        )
