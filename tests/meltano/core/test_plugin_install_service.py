@@ -14,12 +14,13 @@ import yaml
 
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallState,
     PluginInstallStatus,
     get_pip_install_args,
+    install_status_update,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.venv_service import VenvBackend, VirtualEnvService
@@ -388,79 +389,47 @@ class TestPluginInstallService:
             AsyncMock(side_effect=PluginInstallError(error_message)),
         )
         state = await subject.install_plugin_async(tap)
+
         assert state.status == PluginInstallStatus.ERROR
-        assert state.message.startswith(error_message)
+        assert state.message == error_message
         assert state.verb == "Installation failed"
 
-    def test_append_docs_to_message_when_docs_exist(
-        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
+    def test_install_status_update_error_logs_documentation(
+        self,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        mock_variant = Mock()
-        mock_variant.docs = "https://docs.meltano.com/target-tap"
-        monkeypatch.setattr(
-            tap.definition,
-            "find_variant",
-            Mock(return_value=mock_variant),
-        )
-
-        initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_message(initial_message, tap)
-
-        assert (
-            result
-            == "Installation failed. See documentation for more details: https://docs.meltano.com/target-tap"
-        )
-
-    def test_append_docs_to_message_when_docs_is_none(
-        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        mock_variant = Mock()
-        mock_variant.docs = None
-        monkeypatch.setattr(
-            tap.definition,
-            "find_variant",
-            Mock(return_value=mock_variant),
-        )
-
-        initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_message(initial_message, tap)
-
-        assert result == initial_message
-
-    def test_append_docs_to_message_when_variant_not_found(
-        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        monkeypatch.setattr(
-            tap.definition,
-            "find_variant",
-            Mock(side_effect=VariantNotFoundError(tap, tap.variant)),
-        )
         logger = Mock()
         monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
-        initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_message(initial_message, tap)
-
-        assert result == initial_message
-        logger.debug.assert_called_once_with(
-            "Could not find the variant for plugin '%s' when retrieving docs",
-            tap.name,
+        state = PluginInstallState(
+            plugin=tap,
+            reason=PluginInstallReason.INSTALL,
+            status=PluginInstallStatus.ERROR,
+            message="Failed to install plugin",
         )
 
-    def test_append_docs_to_message_when_variant_resolution_fails(
-        self, tap: ProjectPlugin, monkeypatch: pytest.MonkeyPatch
+        install_status_update(state)
+
+        logger.info.assert_called_once_with(
+            "Documentation: %s",
+            "https://docs.meltano.com/tap-mock",
+        )
+
+    def test_install_status_update_error_when_docs_is_none(
+        self,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        monkeypatch.setattr(
-            tap.definition,
-            "find_variant",
-            Mock(side_effect=RuntimeError("unexpected error")),
-        )
+        monkeypatch.setattr(tap._parent._variant, "docs", None)
         logger = Mock()
         monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
-        initial_message = "Installation failed."
-        result = PluginInstallService._append_docs_to_message(initial_message, tap)
-
-        assert result == initial_message
-        logger.exception.assert_called_once_with(
-            "Unexpected error while looking up variant for plugin '%s'",
-            tap.name,
+        state = PluginInstallState(
+            plugin=tap,
+            reason=PluginInstallReason.INSTALL,
+            status=PluginInstallStatus.ERROR,
+            message="Failed to install plugin",
         )
+
+        install_status_update(state)
+
+        logger.info.assert_not_called()

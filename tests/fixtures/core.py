@@ -1070,6 +1070,7 @@ def discovery():
                         "name": "meltano",
                         "pip_url": "tap-mock",
                         "executable": "tap-mock",
+                        "docs": "https://docs.meltano.com/tap-mock",
                         "capabilities": ["discover", "catalog", "state"],
                         # 3 groups to cover: all-groups (test), some-groups
                         # plural (secure in 1+3), single-group (port in 3,

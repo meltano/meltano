@@ -21,7 +21,6 @@ from meltano.core.error import (
     PluginInstallError,
     PluginInstallWarning,
 )
-from meltano.core.plugin.base import VariantNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import (
@@ -243,28 +242,6 @@ class PluginInstallService:
                 )
         return states, deduped_plugins
 
-    @staticmethod
-    def _append_docs_to_message(message: str, plugin: ProjectPlugin) -> str:
-        try:
-            docs = plugin.definition.find_variant(plugin.variant).docs
-        except VariantNotFoundError:
-            logger.debug(
-                "Could not find the variant for plugin '%s' when retrieving docs",
-                plugin.name,
-            )
-            return message
-        except Exception:
-            logger.exception(
-                "Unexpected error while looking up variant for plugin '%s'",
-                plugin.name,
-            )
-            return message
-        return (
-            message
-            if not docs
-            else f"{message} See documentation for more details: {docs}"
-        )
-
     async def install_all_plugins(
         self,
         reason: PluginInstallReason = PluginInstallReason.INSTALL,
@@ -393,7 +370,7 @@ class PluginInstallService:
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=self._append_docs_to_message(str(err), plugin),
+                message=str(err),
             )
             self.status_cb(state)
             return state
@@ -413,7 +390,7 @@ class PluginInstallService:
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
-                message=self._append_docs_to_message(str(err), plugin),
+                message=str(err),
                 details=await err.stderr,
             )
             self.status_cb(state)
@@ -590,6 +567,8 @@ def install_status_update(install_state: PluginInstallState) -> None:
                 install_state.message,
                 install_state=install_state,
             )
+            if docs := plugin.docs:
+                logger.info("Documentation: %s", docs)
         case PluginInstallStatus.WARNING:  # pragma: no cover
             logger.warning(install_state.message)
         case _:  # pragma: no cover
