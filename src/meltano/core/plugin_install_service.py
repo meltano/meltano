@@ -259,9 +259,11 @@ class PluginInstallService:
                 plugin.name,
             )
             return message
-        if docs:
-            message += f" See documentation for more details: {docs}"
-        return message
+        return (
+            message
+            if not docs
+            else f"{message} See documentation for more details: {docs}"
+        )
 
     async def install_all_plugins(
         self,
