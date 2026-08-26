@@ -1,0 +1,111 @@
+---
+title: Aptem
+description: Sync learner enrollment, program delivery, compliance, and assessment data from Aptem's OData API.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Aptem
+
+<ConnectorTypeBadge type="extractor" block />
+
+Aptem is an end-to-end apprenticeship and vocational training management platform used by training providers and employers to manage learner enrollment, programme delivery, progress tracking, compliance, and end-point assessment.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API Token |
+| **API** | Aptem OData API |
+| **Stream discovery** | Dynamic, from the Aptem OData service `$metadata` document |
+| **Replication** | Incremental for streams with a known replication key; full-table for the rest |
+
+## What you can sync
+
+This tap discovers streams dynamically from the Aptem OData service `$metadata` document, so the exact set of streams reflects the entities and related collections exposed by your tenant. Additional related collections embedded within these entities are also discovered and extracted as their own streams.
+
+The following streams are recognised by the tap:
+
+- `AimWorkPlacements`
+- `ApprenticeshipFinancialRecords`
+- `AptemCognitiveAssessments`
+- `AwardingBodyQualifications`
+- `AwardingBodyQualificationsAssessmentHistory`
+- `ComplianceDocuments`
+- `ComponentDueDateChanges`
+- `CrmActivities`
+- `DestinationProgressions`
+- `EmployerGroups`
+- `EPAErrors`
+- `Episodes`
+- `Groups`
+- `HoursRecords`
+- `IlrAims`
+- `IlrLearner`
+- `Jobs`
+- `LearnerEmployment`
+- `LearningPlanComponents`
+- `LearningPlanEvidences`
+- `LearningPlanEvidenceWithActivityData`
+- `MaximumProgrammeDataFields`
+- `Messages`
+- `Milestones`
+- `Notes`
+- `OnboardingResponses`
+- `OrganizationContacts`
+- `Organizations`
+- `ReviewResponses`
+- `Reviews`
+- `Tasks`
+- `Trackers`
+- `Users`
+- `UserGroups`
+- `WithdrawalReasons`
+
+## Prerequisites
+
+To connect to Aptem, you will need:
+
+- An **API token** for the Aptem OData API.
+- Your Aptem **tenant name**, which is used to build the API base URL.
+
+## Setup
+
+In Meltano Cloud:
+
+1. Enter your Aptem API token.
+2. Enter your Aptem tenant name.
+3. Optionally choose a start date for extraction.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `api_token` | string | API token for the Aptem OData API. |
+| `tenant_name` | string | Aptem tenant name used to build the base URL. |
+| `start_date` | date | The earliest record date to sync. |
+
+## Replication
+
+Streams with a known replication key are replicated incrementally; the rest are replicated in full on each run.
+
+If you find a stream is not behaving incrementally when it exposes a suitable date column, you can set a replication key configuration for the plugin under `metadata` in your `meltano.yml`:
+
+```yaml
+plugins:
+  extractors:
+  - name: tap-aptem
+    variant: matatika
+    pip_url: git+https://github.com/Matatika/tap-aptem.git@v0.1.0
+    config:
+    metadata:
+      <stream_name>: # Aptem stream name
+        replication-method: INCREMENTAL
+        replication-key: <field_name> # a date column exposed by the stream
+```
+
+You can also open an issue in the [tap-aptem repository](https://github.com/Matatika/tap-aptem/issues/new?title=feat:%20Register%20replication%20key%20for%20stream%20%60%3Cstream_name%3E%60&body=Replication%20key:%20%60%3Cfield_name%3E%60&labels=enhancement&type=feature) to register any missing configurations in the tap. Future version updates that include related changes would no longer require corresponding `metadata` entries, as above.
+
+## Need help?
+
+If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.

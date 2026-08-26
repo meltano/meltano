@@ -567,6 +567,8 @@ def install_status_update(install_state: PluginInstallState) -> None:
                 install_state.message,
                 install_state=install_state,
             )
+            if docs := plugin.docs:
+                logger.info("Documentation: %s", docs)
         case PluginInstallStatus.WARNING:  # pragma: no cover
             logger.warning(install_state.message)
         case _:  # pragma: no cover

@@ -7,7 +7,7 @@ import sys
 import typing as t
 from functools import partial
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 import yaml
@@ -17,8 +17,10 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallState,
     PluginInstallStatus,
     get_pip_install_args,
+    install_status_update,
 )
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.venv_service import VenvBackend, VirtualEnvService
@@ -391,3 +393,43 @@ class TestPluginInstallService:
         assert state.status == PluginInstallStatus.ERROR
         assert state.message == error_message
         assert state.verb == "Installation failed"
+
+    def test_install_status_update_error_logs_documentation(
+        self,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        logger = Mock()
+        monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
+        state = PluginInstallState(
+            plugin=tap,
+            reason=PluginInstallReason.INSTALL,
+            status=PluginInstallStatus.ERROR,
+            message="Failed to install plugin",
+        )
+
+        install_status_update(state)
+
+        logger.info.assert_called_once_with(
+            "Documentation: %s",
+            "https://docs.meltano.com/tap-mock",
+        )
+
+    def test_install_status_update_error_when_docs_is_none(
+        self,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(tap._parent._variant, "docs", None)
+        logger = Mock()
+        monkeypatch.setattr("meltano.core.plugin_install_service.logger", logger)
+        state = PluginInstallState(
+            plugin=tap,
+            reason=PluginInstallReason.INSTALL,
+            status=PluginInstallStatus.ERROR,
+            message="Failed to install plugin",
+        )
+
+        install_status_update(state)
+
+        logger.info.assert_not_called()

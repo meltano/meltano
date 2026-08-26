@@ -11,6 +11,10 @@ const CONNECTORS = [
   { label: 'Spreadsheets (IMAP)', href: '/connectors/tap-spreadsheets-imap', category: 'extractor' },
   { label: 'Weather API', href: '/connectors/tap-weatherapi', category: 'extractor' },
   { label: 'ClickHouse', href: '/connectors/target-clickhouse', category: 'loader' },
+  { label: 'Aptem', href: '/connectors/tap-aptem', category: 'extractor' },
+  { label: 'Baidu', href: '/connectors/tap-baidu', category: 'extractor' },
+  { label: 'DuckDB', href: '/connectors/target-duckdb', category: 'loader' },
+  { label: 'Google Analytics', href: '/connectors/tap-google-analytics', category: 'extractor' },
 ];
 
 function ConnectorCardTitle({ label }) {

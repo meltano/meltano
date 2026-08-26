@@ -25,6 +25,10 @@ const sidebars = {
     { type: 'doc', id: 'connectors/tap-spreadsheets-imap', label: 'Spreadsheets (IMAP)' },
     { type: 'doc', id: 'connectors/tap-weatherapi', label: 'Weather API' },
     { type: 'doc', id: 'connectors/target-clickhouse', label: 'ClickHouse' },
+    { type: 'doc', id: 'connectors/tap-aptem', label: 'Aptem' },
+    { type: 'doc', id: 'connectors/tap-baidu', label: 'Baidu' },
+    { type: 'doc', id: 'connectors/target-duckdb', label: 'DuckDB' },
+    { type: 'doc', id: 'connectors/tap-google-analytics', label: 'Google Analytics' },
   ],
   platformSidebar: [
     {
