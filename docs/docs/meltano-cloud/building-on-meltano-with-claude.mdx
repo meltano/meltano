@@ -1,0 +1,136 @@
+---
+title: Building on Meltano with Claude
+description: Your go-to reference for developing pipelines on Meltano Cloud from inside your workspace's git repository.
+sidebar_label: Building on Meltano with Claude
+sidebar_position: 11.6
+---
+
+# Building on Meltano with Claude
+
+Your go-to reference for developing pipelines on Meltano Cloud from inside your workspace's git repository. Work through it once end to end, then keep the pre-flight checklist for every change after that.
+
+## Before you start
+
+When your Meltano Cloud workspace was created, the platform provisioned a git repository for it and seeded it with the AI knowledge base. You develop *in that repository*: it's the source of truth, and pushing to it is what deploys your work. Make sure you have:
+
+* A **Meltano Cloud workspace**, and access to its git repo (created for you on workspace creation).
+* The repo **cloned locally** and opened in **Claude Code** (or another agent that reads `AGENTS.md`).
+* **Python and the Meltano CLI** available, so the agent can run `meltano` commands in your project.
+
+:::tip Good to know
+The AI knowledge kit is seeded when the workspace is created, so it's already in the repo the moment you clone it, with nothing for you to install or enable. Just open the repo in your agent and go.
+:::
+
+## How the knowledge base works
+
+The kit is a handful of files, not an app. It turns any AI agent opened in the repo into one that already understands Meltano.
+
+* `AGENTS.md`, the **router**. It tells the agent to consult the knowledge base first, and points it at the right doc for the task. `CLAUDE.md` is a one-line pointer to it so the convention works across editors.
+* `.claude/meltano_knowledge_base/`, the **shared KB**: how taps and targets work, how to configure sources and destinations, how to build and troubleshoot runs. Split into `meltano/` and `meltano_cloud/`, each fronted by an `index.md` topic map. The agent reads these directly, no setup, no tooling, just files.
+* `.claude/workspace_knowledge_base/`, **your** repo's notes. Created at runtime as you and the agent capture learnings (see [Capture what you learn](#capture-what-you-learn)). It is not part of the seeded kit and is never overwritten by it.
+
+:::tip One habit that pays off
+Let the agent lead from `AGENTS.md` rather than free-styling. If you ask it to do something and it hasn't consulted the KB, tell it to. The whole point is that the platform's conventions are already written down for it.
+:::
+
+## Build a pipeline
+
+Describe the outcome and let the agent do the mechanics. For example: *"load this CSV into Postgres."* Guided by the KB, it will:
+
+* Identify the right connectors from the knowledge base and MeltanoHub.
+* Add them with `meltano add`, which also writes the lockfiles you must commit (see [Commit your lockfiles](#commit-your-lockfiles)).
+* Write the pipeline config into `meltano.yml`.
+* Scaffold a `.env.example` naming exactly which settings are secret (see [Secrets and credentials](#secrets-and-credentials)).
+
+**Validate before you run**, confirm the config resolves:
+
+```
+meltano config <plugin> list   # check settings resolve
+meltano run <extractor> <loader>   # run it locally
+```
+
+:::tip Anchor to the golden path
+There's a known-good reference project under `reference/` in the repo. Point the agent at it when building something new, starting from a proven skeleton beats generating config from a blank page.
+:::
+
+## Secrets and credentials
+
+This is the one place the workflow deliberately steps outside the agent. **Real credentials never go into the agent's context and never get committed to git.** The agent only scaffolds placeholders; you supply the real values.
+
+For **local runs**, store secrets in `.env` (auto-loaded by Meltano, and gitignored):
+
+```
+meltano config <plugin> set <setting> --store=dotenv
+# or hand-edit .env directly, never commit it
+```
+
+Env-var names follow `<PLUGIN_NAME>_<SETTING>`, upper-cased, with non-alphanumerics converted to `_`, for example `TAP_GITHUB_AUTH_TOKEN`, `TARGET_POSTGRES_PASSWORD`.
+
+For **production and Cloud runs**, enter the secret values in the Meltano Cloud console. That's the deliberate, minimal bit of platform interaction: a brief one-time step per credential, in the one spot where keeping secrets off your machine and out of the repo is exactly what you want.
+
+:::caution Never commit secrets
+Keep real values in `.env` (local) or the Cloud console (prod). Commit `.env.example` with placeholders only. If a secret ever lands in git history, rotate it, don't just delete the line.
+:::
+
+### OAuth sources
+
+The plain Meltano CLI has no interactive "connect" browser flow. OAuth taps take `client_id`, `client_secret`, and `refresh_token` as config; obtain the refresh token out-of-band once and store it like any other secret. The interactive handshake is a Cloud UI capability, not something you do from the CLI.
+
+## Commit your lockfiles
+
+This is the single most common thing to miss, and it fails silently. When you `meltano add` a plugin, Meltano writes a lockfile at `plugins/<type>/<name>--<variant>.lock`. **Cloud reconciles your workspace from the committed lockfiles**, so a plugin whose lockfile isn't committed simply won't materialize when you deploy.
+
+```
+meltano lock            # regenerate if you hand-edited meltano.yml
+git add plugins/         # stage the *.lock files
+git add meltano.yml
+```
+
+:::info The rule
+Add plugins with `meltano add` (never by hand-editing `meltano.yml` alone). Run `meltano lock` if you did edit by hand. **Commit `plugins/*.lock` together with `meltano.yml`.** A missing lockfile is the usual reason a pipeline "deployed but the connector isn't there."
+:::
+
+## Deploy: push to run
+
+Your repo *is* the workspace. Deploying is just pushing config-as-code; the platform reconciles it and your pipelines materialize on hosted infrastructure.
+
+```
+git commit -m "add csv to postgres pipeline"
+git push
+```
+
+Reconciliation runs on the platform once your push lands. Watch the deploy and your pipelines appear in the Meltano Cloud console.
+
+:::caution Deploy is async, don't assume instant
+The push returns immediately, but reconciliation happens in the background on the platform. Give it a moment and confirm in the console that the deploy finished and the pipeline exists before expecting it to run.
+:::
+
+## Troubleshoot a failure
+
+When a run fails, stay in the editor. Run it locally and let the agent work from the output:
+
+```
+meltano run <extractor> <loader>   # reproduce locally
+```
+
+The agent reads the local `meltano run` output, explains what went wrong, and proposes a fix, no context switch to a log viewer. For runs that already executed on Cloud, view their status and logs in the Meltano Cloud console. See also [Pipeline Diagnosis](./pipeline-diagnosis.mdx) for diagnosing failures directly from the Pipelines view.
+
+Fix the config or the source file the diagnosis points to, re-run locally to confirm, then commit and push (see [Commit your lockfiles](#commit-your-lockfiles) and [Deploy: push to run](#deploy-push-to-run)).
+
+## Capture what you learn
+
+When you solve something non-obvious (a connector quirk, a config gotcha, a fix), write it into your repo's own notes and commit it. That's all "capture a learning" is: a file write plus a git commit, into `.claude/workspace_knowledge_base/`.
+
+Because it lives in *your* repo, the next session, yours or a teammate's, starts with that context already in hand. The workspace gets a little smarter every time someone works in it, and nothing is shared outside your repo.
+
+## Pre-flight checklist
+
+Before you call a change done and push it, run down this list. It catches the steps that fail quietly.
+
+1. **Plugins added via `meltano add`.** Not hand-edited into `meltano.yml` alone.
+2. **Lockfiles committed.** `plugins/*.lock` staged alongside `meltano.yml`, the #1 silent deploy failure.
+3. **Config validated.** `meltano config <plugin> list` resolves cleanly; a local `meltano run` succeeds.
+4. **Secrets kept out of git.** Real values in `.env` (local) or the Cloud console (prod); only `.env.example` committed.
+5. **Deploy confirmed.** Don't assume the push is live, confirm in the Cloud console that the deploy finished and the pipeline exists.
+6. **Failure reproduced, not guessed.** Reproduce locally with `meltano run` (or read the Cloud logs) before changing config.
+7. **Learnings captured.** Non-obvious fixes written into `.claude/workspace_knowledge_base/` and committed.

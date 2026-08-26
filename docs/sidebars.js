@@ -73,6 +73,7 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/transform-data' },
         { type: 'doc', id: 'meltano-cloud/workspace-settings' },
         { type: 'doc', id: 'meltano-cloud/pipeline-diagnosis' },
+        { type: 'doc', id: 'meltano-cloud/building-on-meltano-with-claude' },
         { type: 'doc', id: 'meltano-cloud/logging-monitoring' },
         { type: 'doc', id: 'meltano-cloud/profile-security' },
         { type: 'doc', id: 'meltano-cloud/invite' },
