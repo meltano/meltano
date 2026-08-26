@@ -82,7 +82,7 @@ This is the single most common thing to miss, and it fails silently. When you `m
 
 ```
 meltano lock            # regenerate if you hand-edited meltano.yml
-git add plugins/         # stage the *.lock files
+git add 'plugins/**/*.lock'
 git add meltano.yml
 ```
 
