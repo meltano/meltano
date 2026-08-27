@@ -1534,6 +1534,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "nanjeshramesh",
+      "name": "Nanjesh Ramesh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35960427?v=4",
+      "profile": "https://github.com/nanjeshramesh",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
