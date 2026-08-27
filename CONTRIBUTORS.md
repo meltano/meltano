@@ -211,6 +211,7 @@ Thanks go to these wonderful people ([emoji key](https://allcontributors.org/emo
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/gbadedata"><img src="https://avatars.githubusercontent.com/u/83440732?v=4?s=100" width="100px;" alt="Oluwagbade Odimayo"/><br /><sub><b>Oluwagbade Odimayo</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=gbadedata" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sravankumarkunadi"><img src="https://avatars.githubusercontent.com/u/96312788?v=4?s=100" width="100px;" alt="Sravan Kumar Kunadi"/><br /><sub><b>Sravan Kumar Kunadi</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=sravankumarkunadi" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AbrhamYishak"><img src="https://avatars.githubusercontent.com/u/136889996?v=4?s=100" width="100px;" alt="AbrhamYishak"/><br /><sub><b>AbrhamYishak</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=AbrhamYishak" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://br413.github.io"><img src="https://avatars.githubusercontent.com/u/296583723?v=4?s=100" width="100px;" alt="Senior Data Engineer"/><br /><sub><b>Senior Data Engineer</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=br413" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
