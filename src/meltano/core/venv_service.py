@@ -696,7 +696,11 @@ class VenvBackend(abc.ABC):
         log_path = project.dirs.logs("pip", namespace, name, "install.log").resolve()
         venv = VirtualEnv(
             venv_path,
-            python=plugin.python or project.settings.get("python"),
+            python=(
+                plugin.python
+                or project.settings.get("python")
+                or project.python_version
+            ),
         )
         return cls(venv=venv, log_path=log_path)
 

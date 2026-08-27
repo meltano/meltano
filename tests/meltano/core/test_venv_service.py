@@ -306,8 +306,21 @@ class TestVenvBackend:
         subject = cls.from_plugin(project, plugin)
         assert subject.venv.python_path == project_python
 
-        # After both the project-level and plugin-level are unset, the system Python
-        # should be used
+        # A `.python-version` file should have no effect while the project-level
+        # setting is still set, since the setting takes precedence.
+        project.python_version_file.write_text("test-python-version-from-file\n")
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == project_python
+
+        # The `.python-version` file should have an effect once both the
+        # plugin-level and project-level settings are unset.
         project.settings.unset("python")
+        subject = cls.from_plugin(project, plugin)
+        assert subject.venv.python_path == "test-python-version-from-file"
+
+        # After the `.python-version` file is also removed, the system Python
+        # should be used
+        project.python_version_file.unlink()
+        project.__dict__.pop("python_version", None)  # bust the cached_property
         subject = cls.from_plugin(project, plugin)
         assert subject.venv.python_path == sys.executable
