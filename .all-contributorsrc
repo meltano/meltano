@@ -1525,6 +1525,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "br413",
+      "name": "Senior Data Engineer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/296583723?v=4",
+      "profile": "https://br413.github.io",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
