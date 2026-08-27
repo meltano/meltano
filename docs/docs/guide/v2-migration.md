@@ -74,12 +74,12 @@ Meltano `model` and `dashboard` plugins have been removed in favour of existing 
 
 ### `transform` support in `meltano elt`
 
-Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`.
+Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`. See [Choose `meltano run` vs `meltano el`](/guide/complete_tutorial#choose-meltano-run-vs-meltano-el) in the complete tutorial for a decision table and examples.
 
 ### `transform` support in Meltano schedules
 
 Meltano 2.0 continues to support extract-load (EL) operations in schedules.
-However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule.
+However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule. See the [decision table](/guide/complete_tutorial#choose-meltano-run-vs-meltano-el) for when to use job-based schedules vs legacy EL schedules (historically called ELT, now representing EL-only behavior).
 
 ### `env_aliases` in Plugin config
 
