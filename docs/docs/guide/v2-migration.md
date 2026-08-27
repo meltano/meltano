@@ -79,7 +79,7 @@ Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`
 ### `transform` support in Meltano schedules
 
 Meltano 2.0 continues to support extract-load (EL) operations in schedules.
-However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule. See the [decision table](/guide/complete_tutorial#choose-meltano-run-vs-meltano-elt) for when to use job-based schedules vs legacy EL schedules (historically called ELT, now representing EL-only behavior).
+However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule. See the [decision table](/guide/complete_tutorial#choose-meltano-run-vs-meltano-el) for when to use job-based schedules vs legacy EL schedules (historically called ELT, now representing EL-only behavior).
 
 ### `env_aliases` in Plugin config
 
