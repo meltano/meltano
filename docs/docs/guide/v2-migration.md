@@ -13,49 +13,6 @@ The following list includes all recommended migration tasks as well as breaking 
 
 ## Recommended
 
-### Choose `meltano run` vs `meltano elt` for replication workloads
-
-Meltano 2.0 supports two ways to run extract-and-load (EL) replication. Both remain valid; the choice depends on how complex your pipeline is and whether you need transforms, mappers, or multi-step workflows.
-
-#### `meltano run` (recommended default)
-
-[`meltano run`](/reference/command-line-interface#run) runs one or more **command blocks** in sequence. Extractor and loader pairs are linked automatically, and you can chain mappers, utility plugins (such as adapter-specific `dbt`), and [named jobs](/reference/command-line-interface#job) in a single invocation.
-
-Use `meltano run` when you need:
-
-- **EL+T pipelines** — run extract, load, and transform steps together (for example `meltano run tap-gitlab target-postgres dbt-postgres:run`)
-- **Mappers** between a tap and target
-- **Multiple EL pairs or mixed steps** in one command
-- **Job-based schedules** — define tasks with [`meltano job add`](/reference/command-line-interface#job) and reference them from [`meltano schedule`](/reference/command-line-interface#schedule)
-
-When a [default environment](/concepts/environments#default-environment) is active, `meltano run` auto-generates a State ID for each extractor/loader pair and tracks [incremental replication state](/guide/integration#incremental-replication-state).
-
-#### `meltano elt` and `meltano el`
-
-[`meltano elt`](/reference/command-line-interface#elt) and [`meltano el`](/reference/command-line-interface#el) run a **single extractor and loader pair**. `meltano el` is equivalent to `meltano elt` with transforms skipped.
-
-In Meltano 2.0, these commands perform **extract and load only**. They do not run transforms as part of an EL+T pipeline — use `meltano run` for that instead (see [Removed: `transform` support in `meltano elt`](#transform-support-in-meltano-elt) below).
-
-`meltano elt` / `meltano el` are still a good fit when you:
-
-- Run a **simple, fixed tap → target pair** with no mappers or downstream utilities
-- Maintain **legacy ELT schedules** or orchestrator integrations that invoke `meltano el`
-- Need **`--dump`** output (state, catalog, or config) while debugging a single pair
-
-#### Decision table
-
-| Workload | Recommended command | Notes |
-| --- | --- | --- |
-| Simple replication (one tap, one target) | `meltano elt` or `meltano run` | Both work; `elt`/`el` match legacy workflows and tooling |
-| EL + transform (dbt, etc.) | `meltano run` | Chain loader and utility steps, e.g. `tap-x target-y dbt-snowflake:run` |
-| Tap → mapper → target | `meltano run` | Mappers are not supported by `elt`/`el` |
-| Multiple EL pairs or mixed steps in one run | `meltano run` | Command blocks run left-to-right; failures abort the run |
-| Scheduled EL+T pipeline | `meltano job add` + `meltano schedule` + `meltano run` | Job schedules replace transform flags on `meltano elt` |
-| Legacy scheduled EL (no transform) | `meltano elt` / `meltano el` | [ELT schedules](/reference/command-line-interface#schedule) remain supported |
-| Debug state, catalog, or config for one pair | `meltano el` | Use `--dump=state`, `--dump=catalog`, or `--dump=loader-config` |
-
-For full option lists and examples, see the CLI reference for [`run`](/reference/command-line-interface#run), [`elt`](/reference/command-line-interface#elt), and [`el`](/reference/command-line-interface#el).
-
 ### Migrate to an Adapter-Specific `dbt` Transformer
 
 If you previously used `dbt` or `dbt-<adapter>` ([available adapters documentation](https://docs.getdbt.com/docs/available-adapters)) Transformer, we recommend migrating to an adapter specific [utility plugin](https://hub.meltano.com/utilities/).
@@ -117,12 +74,12 @@ Meltano `model` and `dashboard` plugins have been removed in favour of existing 
 
 ### `transform` support in `meltano elt`
 
-Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`. See [Choose `meltano run` vs `meltano elt` for replication workloads](#choose-meltano-run-vs-meltano-elt-for-replication-workloads) for a decision table and examples.
+Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`. See [Choose `meltano run` vs `meltano elt`](/guide/complete_tutorial#choose-meltano-run-vs-meltano-elt) in the complete tutorial for a decision table and examples.
 
 ### `transform` support in Meltano schedules
 
 Meltano 2.0 continues to support extract-load (EL) operations in schedules.
-However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule. See the [decision table](#choose-meltano-run-vs-meltano-elt-for-replication-workloads) above for when to use job-based schedules vs legacy ELT schedules.
+However, for EL+T operations which also need to transform data, please use the new `meltano job add` [command](/reference/command-line-interface#job) to create a job definition and then specify the new job name in your schedule. See the [decision table](/guide/complete_tutorial#choose-meltano-run-vs-meltano-elt) for when to use job-based schedules vs legacy EL schedules (historically called ELT, now representing EL-only behavior).
 
 ### `env_aliases` in Plugin config
 
