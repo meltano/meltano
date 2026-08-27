@@ -74,7 +74,7 @@ Meltano `model` and `dashboard` plugins have been removed in favour of existing 
 
 ### `transform` support in `meltano elt`
 
-Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`. See [Choose `meltano run` vs `meltano elt`](/guide/complete_tutorial#choose-meltano-run-vs-meltano-elt) in the complete tutorial for a decision table and examples.
+Meltano 2.0 continues to support extract-load (EL) operations with `meltano elt`. However, for EL+T operations which also need to transform data, please use `meltano run`. See [Choose `meltano run` vs `meltano el`](/guide/complete_tutorial#choose-meltano-run-vs-meltano-el) in the complete tutorial for a decision table and examples.
 
 ### `transform` support in Meltano schedules
 

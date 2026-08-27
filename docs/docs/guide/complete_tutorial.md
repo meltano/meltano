@@ -952,7 +952,7 @@ meltano state get dev:tap-gitlab-to-target-postgres
 
 :::
 
-### Choose `meltano run` vs `meltano elt`
+### Choose `meltano run` vs `meltano el`
 
 Meltano supports two ways to run extract-and-load (EL) replication. Both remain valid; the choice depends on how complex your pipeline is and whether you need transforms, mappers, or multi-step workflows.
 
@@ -969,13 +969,13 @@ Use `meltano run` when you need:
 
 When a [default environment](/concepts/environments#default-environment) is active, `meltano run` auto-generates a State ID for each extractor/loader pair and tracks [incremental replication state](/guide/integration#incremental-replication-state).
 
-#### `meltano elt` and `meltano el`
+#### `meltano el` (and legacy `meltano elt`)
 
-[`meltano elt`](/reference/command-line-interface#elt) and [`meltano el`](/reference/command-line-interface#el) run a **single extractor and loader pair**. `meltano el` is equivalent to `meltano elt` with `--transform=skip`.
+[`meltano el`](/reference/command-line-interface#el) runs a **single extractor and loader pair** (extract and load only). Prefer it over [`meltano elt`](/reference/command-line-interface#elt), which is [deprecated](/reference/command-line-interface#elt) in favor of `meltano el`.
 
-By default these commands run **extract and load only**. They can still run transforms when you pass [`--transform=run`](/guide/transformation#transform-in-your-elt-pipeline) (legacy EL+T), but new pipelines should prefer [`meltano run`](/reference/command-line-interface#run) for EL+T, mappers, and multi-step workflows.
+`meltano elt` still accepts [`--transform=run`](/guide/transformation#transform-in-your-elt-pipeline) for legacy EL+T, but new pipelines should use [`meltano run`](/reference/command-line-interface#run) for transforms, mappers, and multi-step workflows.
 
-`meltano elt` / `meltano el` are still a good fit when you:
+`meltano el` is a good fit when you:
 
 - Run a **simple, fixed tap → target pair** with no mappers or downstream utilities
 - Maintain **legacy EL schedules** or orchestrator integrations that invoke `meltano el`
@@ -985,15 +985,15 @@ By default these commands run **extract and load only**. They can still run tran
 
 | Workload | Recommended command | Notes |
 | --- | --- | --- |
-| Simple replication (one tap, one target) | `meltano elt` or `meltano run` | Both work; `elt`/`el` match legacy workflows and tooling |
+| Simple replication (one tap, one target) | `meltano el` or `meltano run` | Prefer `el` for EL-only; `elt` remains as a deprecated alias |
 | EL + transform (dbt, etc.) | `meltano run` | Chain loader and utility steps, e.g. `tap-x target-y dbt-snowflake:run`; legacy `meltano elt --transform=run` still works |
-| Tap → mapper → target | `meltano run` | Mappers are not supported by `elt`/`el` |
+| Tap → mapper → target | `meltano run` | Mappers are not supported by `el`/`elt` |
 | Multiple EL pairs or mixed steps in one run | `meltano run` | Command blocks run left-to-right; failures abort the run |
-| Scheduled EL+T pipeline | `meltano job add` + `meltano schedule` + `meltano run` | Job schedules replace transform flags on `meltano elt` |
-| Legacy scheduled EL (no transform) | `meltano elt` / `meltano el` | [ELT schedules](/reference/command-line-interface#schedule) remain supported |
+| Scheduled EL+T pipeline | `meltano job add` + `meltano schedule` + `meltano run` | Job schedules replace transform flags on legacy `meltano elt` |
+| Legacy scheduled EL (no transform) | `meltano el` | [EL schedules](/reference/command-line-interface#schedule) remain supported |
 | Debug state, catalog, or config for one pair | `meltano el` | Use `--dump=state`, `--dump=catalog`, or `--dump=loader-config` |
 
-For full option lists and examples, see the CLI reference for [`run`](/reference/command-line-interface#run), [`elt`](/reference/command-line-interface#elt), and [`el`](/reference/command-line-interface#el).
+For full option lists and examples, see the CLI reference for [`run`](/reference/command-line-interface#run), [`el`](/reference/command-line-interface#el), and deprecated [`elt`](/reference/command-line-interface#elt).
 
 You can also use [`meltano invoke`](/reference/command-line-interface#invoke) to execute a single plugin at a time — useful for debugging a failing extractor or loader.
 
