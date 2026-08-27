@@ -289,6 +289,16 @@ We recommend a SAS token, scoped as narrowly as possible. The `az storage contai
 ---
 
 
+# Arrow BATCH Ingestion
+<br />
+
+Taps that emit Singer `BATCH` messages using Arrow (`encoding: {"format": "arrow"}`) are loaded natively by `target-mssql`, with no configuration required. These batches load faster than the default row-by-row insert or the Azure Blob Storage staging above, since data is bulk-copied directly into SQL Server instead of being converted record by record. Upsert and append behavior work the same as with any other stream.
+
+Requires `target-mssql` v0.2.0 or later.
+
+---
+
+
 ## Interested in Security?
 
 Restricting network access to your SQL Server and avoiding long-lived credentials (for example, by using a Managed Identity for blob staging) helps protect against attacks such as:

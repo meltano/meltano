@@ -349,6 +349,15 @@ meltano run <your-extractor> target-clickhouse
 
 ---
 
+## Arrow BATCH ingestion[​](#arrow-batch-ingestion "Direct link to Arrow BATCH ingestion")
+
+Taps that emit Singer `BATCH` messages using Arrow (`encoding: {"format": "arrow"}`) are
+loaded natively by `target-clickhouse`, with no configuration required - data is
+inserted directly instead of being converted row by row. Set `clean_up_batch_files` to
+`false` if you need to keep the batch files around for debugging (defaults to `true`).
+
+---
+
 ## Performance notes[​](#performance-notes "Direct link to Performance notes")
 
 - **Prefer `append-only` unless you re-load overlapping keys.** ClickHouse has no
@@ -363,6 +372,8 @@ meltano run <your-extractor> target-clickhouse
   churn.
 - **Native driver (`port 9000`)** can be faster for very large loads; the HTTP
   driver (`8123`/`8443`) is the safe, firewall-friendly default.
+- **Arrow BATCH ingestion** avoids per-row conversion entirely for taps that support
+  it - see [Arrow BATCH ingestion](#arrow-batch-ingestion) above.
 
 ---
 

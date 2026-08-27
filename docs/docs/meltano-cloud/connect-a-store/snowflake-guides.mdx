@@ -161,6 +161,14 @@ If both outputs match, the public key has been configured correctly.
 
 ---
 
+
+# Arrow BATCH Ingestion
+<br />
+
+Taps that emit Singer `BATCH` messages using Arrow (`encoding: {"format": "arrow"}`) are loaded natively by `target-snowflake`, with no configuration required, using the same high-throughput stage-loading path as large batch loads instead of inserting row by row. Set `clean_up_batch_files` to `false` if you need to keep the batch files around for debugging (defaults to `true`).
+
+---
+
 ## Interested in Security?
 
 Restricting access to your Snowflake account and reducing reliance on passwords helps protect against attacks such as:
