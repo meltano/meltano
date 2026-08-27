@@ -1,0 +1,18 @@
+---
+slug: 2026-08-27-cloud-changelog
+title: AI Diagnosis in Failure Alerts & AI-Ready Workspace Setup
+date: 2026-08-27
+---
+
+Pipeline failure alerts now come with an AI diagnosis and one-click fixes right from your inbox, and new workspaces provision an AI-ready knowledge base out of the box. Rounding it out is a fix for pipeline config sync after a deploy.
+
+{/* truncate */}
+
+## Features
+
+- **AI diagnosis in failure alert emails:** When a pipeline fails, the alert email can now include a plain-language diagnosis plus direct actions you can take right from your inbox: jump to the offending config file, open the pipeline settings, contact support, or pause the pipeline with one click. If your workspace doesn't have a Claude key configured, the email explains what the diagnosis would contain and links to the data-usage details instead of just leaving you guessing.
+- **AI-assisted workspace setup:** New Meltano workspaces now provision an agent-readable knowledge base in the repository, so tools like Claude Code can help you configure taps, connect targets, and build pipelines without leaving your own editor.
+
+## Fixes
+
+- **Pipeline config sync:** Changes to `pipeline.yml` (like adding a new stream) are now picked up automatically after a workspace deploy, no more manually refreshing to get the UI in sync with what you actually deployed.
