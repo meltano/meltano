@@ -956,7 +956,7 @@ meltano state get dev:tap-gitlab-to-target-postgres
 
 Meltano supports two ways to run extract-and-load (EL) replication. Both remain valid; the choice depends on how complex your pipeline is and whether you need transforms, mappers, or multi-step workflows.
 
-#### `meltano run` (recommended default)
+#### `meltano run` (recommended)
 
 [`meltano run`](/reference/command-line-interface#run) runs one or more **command blocks** in sequence. Extractor and loader pairs are linked automatically, and you can chain mappers, utility plugins (such as adapter-specific `dbt`), and [named jobs](/reference/command-line-interface#job) in a single invocation.
 
@@ -971,9 +971,9 @@ When a [default environment](/concepts/environments#default-environment) is acti
 
 #### `meltano elt` and `meltano el`
 
-[`meltano elt`](/reference/command-line-interface#elt) and [`meltano el`](/reference/command-line-interface#el) run a **single extractor and loader pair**. `meltano el` is equivalent to `meltano elt` with transforms skipped.
+[`meltano elt`](/reference/command-line-interface#elt) and [`meltano el`](/reference/command-line-interface#el) run a **single extractor and loader pair**. `meltano el` is equivalent to `meltano elt` with `--transform=skip`.
 
-In Meltano 2.0, these commands perform **extract and load only**. They do not run transforms as part of an EL+T pipeline — use `meltano run` for that instead.
+By default these commands run **extract and load only**. They can still run transforms when you pass [`--transform=run`](/guide/transformation#transform-in-your-elt-pipeline) (legacy EL+T), but new pipelines should prefer [`meltano run`](/reference/command-line-interface#run) for EL+T, mappers, and multi-step workflows.
 
 `meltano elt` / `meltano el` are still a good fit when you:
 
@@ -986,7 +986,7 @@ In Meltano 2.0, these commands perform **extract and load only**. They do not ru
 | Workload | Recommended command | Notes |
 | --- | --- | --- |
 | Simple replication (one tap, one target) | `meltano elt` or `meltano run` | Both work; `elt`/`el` match legacy workflows and tooling |
-| EL + transform (dbt, etc.) | `meltano run` | Chain loader and utility steps, e.g. `tap-x target-y dbt-snowflake:run` |
+| EL + transform (dbt, etc.) | `meltano run` | Chain loader and utility steps, e.g. `tap-x target-y dbt-snowflake:run`; legacy `meltano elt --transform=run` still works |
 | Tap → mapper → target | `meltano run` | Mappers are not supported by `elt`/`el` |
 | Multiple EL pairs or mixed steps in one run | `meltano run` | Command blocks run left-to-right; failures abort the run |
 | Scheduled EL+T pipeline | `meltano job add` + `meltano schedule` + `meltano run` | Job schedules replace transform flags on `meltano elt` |
