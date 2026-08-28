@@ -10,7 +10,7 @@ sidebar_position: 15
 Our team at Meltano regularly shares best practices for secure and efficient analytics engineering. Whether you're new to analytics or an experienced developer, these guides provide practical setup instructions for common Snowflake security configurations.
 
 
-# Whitelist IP Ranges
+## Whitelist IP Ranges
 <br />
 
 Whitelisting IP addresses adds an extra layer of security to your Snowflake data warehouse by only allowing trusted clients to connect.
@@ -66,7 +66,7 @@ ALTER USER joe SET NETWORK_POLICY = secure_data_policy;
 ---
 
 
-# Key Pair Authentication
+## Key Pair Authentication
 <br />
 
 Two-factor authentication (2FA) is one of the simplest ways to secure Snowflake accounts for human users.
@@ -158,6 +158,16 @@ Azk1Pq...
 ```
 
 If both outputs match, the public key has been configured correctly.
+
+---
+
+
+## Arrow BATCH Ingestion
+<br />
+
+Taps that emit Arrow-encoded Singer `BATCH` messages are loaded natively by `target-snowflake`, with no configuration required. Set `clean_up_batch_files` to `false` if you need to keep the batch files around for debugging (defaults to `true`).
+
+See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for supported extractors and how to enable Arrow output on the tap.
 
 ---
 

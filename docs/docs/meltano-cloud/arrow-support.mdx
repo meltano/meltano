@@ -1,0 +1,103 @@
+---
+title: Arrow BATCH Support
+description: Current and planned support for Arrow-encoded Singer BATCH messages, and how to enable it on an extractor
+layout: doc
+sidebar_position: 6
+---
+
+# Arrow BATCH Support
+
+By default, Singer taps and targets exchange data one `RECORD` message per row.
+For large tables this is the main bottleneck in a pipeline: the tap serializes
+each row to JSON, and the target converts each message back into a row before
+loading it.
+
+Taps and targets that support the [Singer `BATCH` message
+specification](https://sdk.meltano.com/en/latest/batch.html) can skip that
+row-by-row exchange. Instead, the tap writes a batch of rows directly to a
+file, and emits a `BATCH` message pointing at it. A target with native
+`BATCH` support then bulk-loads that file, avoiding row-by-row conversion on
+both sides.
+
+[Apache Arrow](https://arrow.apache.org/) is the fastest `BATCH` encoding
+Meltano supports: the tap writes an Arrow IPC file, and compatible targets
+read it into columnar memory and bulk-load it directly (often via native
+bulk-insert/`COPY` paths, or [ADBC](https://arrow.apache.org/adbc/) drivers),
+instead of converting row by row. In internal benchmarks across several
+tap/target pairs, Arrow `BATCH` ingestion has consistently outperformed
+row-by-row `RECORD` sync by roughly an order of magnitude.
+
+## Enabling Arrow output on a tap
+
+Arrow output is opt-in on the extractor side. Add a `batch_config` block to
+the tap's configuration:
+
+```json
+{
+  "batch_config": {
+    "encoding": {
+      "format": "arrow"
+    }
+  }
+}
+```
+
+No target-side configuration is required. Any target with Arrow `BATCH`
+support (see the [support matrix](#support-matrix) below) automatically loads
+Arrow batches as soon as it receives them, falling back to its normal
+row-by-row `RECORD` path for any tap that doesn't emit Arrow `BATCH`
+messages.
+
+Some taps expose additional `batch_config` settings, such as
+`batch_config.batch_size` (rows per batch file), that let you tune batch
+size for your workload. Check the tap's own settings reference.
+
+### Replication method caveats
+
+A tap that supports Arrow for one replication method doesn't necessarily
+support it for all of them. Log-based (CDC) replication streams row-level
+change events one at a time, which don't batch the same way a table scan
+does:
+
+| Tap | `FULL_TABLE` / `INCREMENTAL` | `LOG_BASED` |
+|---|---|---|
+| `tap-mysql` | Arrow | Arrow for the initial backfill, then `RECORD` once log-based streaming starts |
+| `tap-postgres` | Arrow | Always `RECORD` |
+
+If your target doesn't advertise the `batch` capability, leave
+`batch_config` unset (or set the tap's batch size to `0`, where supported) so
+it stays in `RECORD` mode.
+
+## Support matrix
+
+### Extractors (taps)
+
+| Tap | Status | Notes |
+|---|---|---|
+| [`tap-mysql`](https://github.com/Matatika/pipelinewise-tap-mysql) | ✅ Supported (v1.5.0+) | `FULL_TABLE`/`INCREMENTAL`: Arrow. `LOG_BASED`: Arrow backfill, then `RECORD` streaming. |
+| [`tap-postgres`](https://github.com/meltano/meltano-tap-postgres) | ⏳ Supports Arrow, not yet on Meltano Cloud | `FULL_TABLE`/`INCREMENTAL`: Arrow. `LOG_BASED`: always `RECORD`. Uses `adbc-driver-postgresql`. Not yet available as a Meltano Cloud extractor. |
+
+More extractors are added as they're prioritized. See the notes on each
+tap's settings page in the catalog for the latest status.
+
+### Loaders (targets)
+
+| Target | Status | Notes |
+|---|---|---|
+| [`target-snowflake`](/meltano-cloud/connect-a-store/snowflake-guides#arrow-batch-ingestion) | ✅ Supported (v0.17.8-3+) | Loads via the same high-throughput stage-loading path used for large batch loads. |
+| [`target-postgres`](https://github.com/meltano/meltano-target-postgres) | ⏳ Supports Arrow, not yet on Meltano Cloud | Uses `adbc-driver-postgresql`. Not yet available as a Meltano Cloud loader. |
+| [`target-clickhouse`](/meltano-cloud/connect-a-store/clickhouse-store#arrow-batch-ingestion) | ✅ Supported (v0.4.0+) | Uses `clickhouse-connect`'s native `insert_arrow()` over the `http` driver, or column-major conversion for `native`/`asynch`/an explicit `sqlalchemy_url`. |
+| [`target-mssql`](/meltano-cloud/connect-a-store/microsoft-sql-server-guides#batch-ingestion) | ✅ Supported (v0.2.0+) | Loads into a temp table via `mssql-python`'s Arrow bulk-copy support - bypasses Azure Blob Storage staging entirely. |
+| [`target-motherduck`](/meltano-cloud/connect-a-store/motherduck-store#batch-ingestion) / `target-duckdb` | ✅ Supported (v0.10.0+) | Loads via DuckDB's built-in Arrow-reading functions. Also accepts JSONL `BATCH` messages. |
+
+### What "supported" means
+
+Every target above follows the same contract, so enabling Arrow on a tap
+works the same way regardless of destination:
+
+- **Opt-in on the tap** via `batch_config.encoding.format: arrow`: see
+  [Enabling Arrow output on a tap](#enabling-arrow-output-on-a-tap) above.
+- **Automatic on the target** : no configuration is needed to receive and
+  load Arrow batches.
+- **Automatic fallback to `RECORD`** for replication methods (or taps) that
+  don't support Arrow, so a single pipeline can mix both.
