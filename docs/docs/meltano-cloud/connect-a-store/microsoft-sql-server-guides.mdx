@@ -292,11 +292,11 @@ We recommend a SAS token, scoped as narrowly as possible. The `az storage contai
 ## BATCH Ingestion
 <br />
 
-Taps that emit Singer `BATCH` messages using Arrow are loaded natively by `target-mssql`, with no configuration required. These batches load faster than the default row-by-row insert or the Azure Blob Storage staging above, since data is bulk-copied directly into SQL Server instead of being converted record by record. Upsert and append behavior work the same as with any other stream.
+Taps that emit Arrow-encoded Singer `BATCH` messages are loaded natively by `target-mssql`, with no configuration required. These batches load faster than the default row-by-row insert or the Azure Blob Storage staging above. Upsert and append behavior work the same as with any other stream.
 
 Requires `target-mssql` v0.2.0 or later.
 
-See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for the full list of extractors that can emit Arrow, and how to enable it on the tap.
+See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for supported extractors and how to enable Arrow output on the tap.
 
 ---
 
