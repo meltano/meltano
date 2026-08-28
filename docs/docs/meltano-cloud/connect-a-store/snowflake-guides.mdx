@@ -167,6 +167,8 @@ If both outputs match, the public key has been configured correctly.
 
 Taps that emit Singer `BATCH` messages using Arrow (`encoding: {"format": "arrow"}`) are loaded natively by `target-snowflake`, with no configuration required, using the same high-throughput stage-loading path as large batch loads instead of inserting row by row. Set `clean_up_batch_files` to `false` if you need to keep the batch files around for debugging (defaults to `true`).
 
+See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for the full list of extractors that can emit Arrow, and how to enable it on the tap.
+
 ---
 
 ## Interested in Security?

@@ -34,6 +34,8 @@ To configure your Meltano Workspace to use your MotherDuck database, follow thes
 1. Use `md:<your-database>` as the connection string, replacing `<your-database>` with the name of your database.
 1. Paste in the access token you copied from the MotherDuck settings page.
 
-## Arrow and JSONL BATCH ingestion
+## BATCH ingestion
 
 Taps that emit Singer `BATCH` messages using Arrow or JSONL are loaded natively by `target-motherduck`, with no configuration required, using DuckDB's built-in file-reading functions instead of inserting row by row. Metadata columns and hard delete aren't applied to BATCH-sourced records.
+
+See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for the full list of extractors that can emit Arrow, and how to enable it on the tap.

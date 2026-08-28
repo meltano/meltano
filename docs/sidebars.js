@@ -66,6 +66,7 @@ const sidebars = {
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
+        { type: 'doc', id: 'meltano-cloud/arrow-support' },
         { type: 'doc', id: 'meltano-cloud/setup-development-environment' },
         { type: 'doc', id: 'meltano-cloud/automate-actions' },
         { type: 'doc', id: 'meltano-cloud/plugins' },
