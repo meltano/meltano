@@ -709,6 +709,7 @@ class TestSingerTap:
             # If a custom catalog is provided, only selection filters are applied
             config_override = invoker.settings_service.config_override
             monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
+            monkeypatch.setitem(config_override, "_select", ["missing"])
 
             async with invoker.prepared(session):
                 await subject.apply_catalog_rules(invoker)
@@ -730,6 +731,49 @@ class TestSingerTap:
             # Doesn't store a cache key when a custom catalog is provided
             assert not catalog_cache_key_path.exists()
             assert cache_key is None
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("select_pattern", ("missing", "missing.*"))
+    async def test_apply_catalog_rules_errors_for_missing_explicit_stream(
+        self,
+        session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+        subject: SingerTap,
+        select_pattern: str,
+    ) -> None:
+        invoker = plugin_invoker_factory(subject)
+        invoker.settings_service.config_override["_select"] = [select_pattern]
+
+        async with invoker.prepared(session):
+            catalog_path = invoker.files["catalog"]
+            catalog_path.write_text(json.dumps(CatalogFixture.empty_stream))
+
+            with pytest.raises(
+                PluginExecutionError,
+                match=r"requires stream `missing`, but it was not found in the catalog",
+            ):
+                await subject.apply_catalog_rules(invoker)
+
+            assert catalog_path.exists()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "select_pattern",
+        ("missing.property", "missing*.*", "!missing.*"),
+    )
+    async def test_apply_catalog_rules_allows_non_explicit_missing_stream(
+        self,
+        session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+        subject: SingerTap,
+        select_pattern: str,
+    ) -> None:
+        invoker = plugin_invoker_factory(subject)
+        invoker.settings_service.config_override["_select"] = [select_pattern]
+
+        async with invoker.prepared(session):
+            invoker.files["catalog"].write_text(json.dumps(CatalogFixture.empty_stream))
+            await subject.apply_catalog_rules(invoker)
 
     @pytest.mark.asyncio
     async def test_apply_catalog_rules_select_filter(
