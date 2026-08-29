@@ -9,10 +9,18 @@ doc-verification flow:
 1. ``index.md`` is compiled to a shell script by ``integration/mdsh``.
 2. The script is executed from the test's directory.
 3. The resulting ``meltano.yml`` is diffed against ``ending-meltano.yml``.
+4. If the test directory ships its own ``validate.sh``, it is run as an
+   additional per-test behaviour assertion (mirrors the old shell flow).
 
 The shared steps from ``commons.sh`` (logging.yaml injection, mdsh
 compilation, the yaml diff assertion) are expressed as fixtures here, and
 pytest removes the generated files automatically via ``tmp_path``.
+
+Tests that require extra infrastructure (Postgres, S3) are skipped unless
+the corresponding opt-in environment variable is set:
+
+* ``MELTANO_TEST_POSTGRES=1`` — enable tests that need a Postgres warehouse
+* ``MELTANO_TEST_S3=1`` — enable tests that need an S3-compatible endpoint
 """
 
 from __future__ import annotations
@@ -28,6 +36,7 @@ INTEGRATION_BASE_DIR = Path(__file__).resolve().parents[3] / "integration"
 EXAMPLE_LIBRARY_DIR = INTEGRATION_BASE_DIR / "example-library"
 
 # Tests that need extra infrastructure not available on a plain runner.
+# Set the matching env var to opt in (see module docstring).
 NEEDS_POSTGRES = {"meltano-run"}
 NEEDS_S3 = {"meltano-state-s3"}
 
@@ -35,14 +44,22 @@ NEEDS_S3 = {"meltano-state-s3"}
 INDEX_MD = "index.md"
 EXPECTED_MELTANO_YML = "ending-meltano.yml"
 LOGGING_YAML = "logging.yaml"
+PER_TEST_VALIDATE_SH = "validate.sh"
 
 
 def _discover_example_library_tests() -> list[str]:
-    """Return the names of every example-library integration test."""
+    """Return the names of every complete example-library integration test.
+
+    A directory is only collected when it contains all three required
+    fixtures (``index.md``, ``meltano.yml``, ``ending-meltano.yml``), so a
+    half-finished example yields a clear collection-time skip instead of a
+    cryptic runtime failure.
+    """
+    required = (INDEX_MD, "meltano.yml", EXPECTED_MELTANO_YML)
     return sorted(
         entry.name
         for entry in EXAMPLE_LIBRARY_DIR.iterdir()
-        if entry.is_dir() and (entry / INDEX_MD).is_file()
+        if entry.is_dir() and all((entry / name).is_file() for name in required)
     )
 
 
@@ -56,8 +73,27 @@ def meltano_integration_base() -> Path:
 
 
 @pytest.fixture
+def bash_executable() -> str:
+    """The bash interpreter used to run mdsh and the compiled scripts.
+
+    Checked *before* mdsh because mdsh itself is a bash script — without
+    bash there is no point probing for mdsh.
+    """
+    bash = shutil.which("bash")
+    if bash is None:
+        pytest.skip("bash is not available on this platform")
+    return bash
+
+
+@pytest.fixture
 def mdsh_compiler(meltano_integration_base: Path) -> Path:
-    """The mdsh script used to compile ``index.md`` into a shell script."""
+    """The mdsh script used to compile ``index.md`` into a shell script.
+
+    bash is probed first because mdsh itself is a bash script — without
+    bash there is no point probing for mdsh.
+    """
+    if shutil.which("bash") is None:
+        pytest.skip("bash is not available on this platform")
     mdsh = meltano_integration_base / "mdsh"
     if not mdsh.is_file():
         pytest.skip("mdsh is not available in this checkout")
@@ -76,14 +112,15 @@ def logging_yaml(meltano_integration_base: Path) -> Path:
     return meltano_integration_base / "logging.yaml"
 
 
-def _compile_script(mdsh: Path, index_md: Path, output: Path) -> None:
+def _compile_script(bash: str, mdsh: Path, index_md: Path, output: Path) -> None:
     """Compile ``index.md`` into ``output`` using mdsh.
 
-    Mirrors ``commons.sh``'s ``compile_script``.
+    Mirrors ``commons.sh``'s ``compile_script``. mdsh is invoked through
+    bash explicitly so it works even when the file lacks the executable bit.
     """
     with output.open("w", encoding="utf-8") as fh:
         subprocess.run(
-            [str(mdsh), "-c", str(index_md)],
+            [bash, str(mdsh), "-c", str(index_md)],
             check=True,
             stdout=fh,
             text=True,
@@ -91,10 +128,27 @@ def _compile_script(mdsh: Path, index_md: Path, output: Path) -> None:
     output.chmod(0o755)
 
 
+def _run_per_test_validate(bash: str, workdir: Path) -> None:
+    """Run the test directory's own ``validate.sh`` if it ships one.
+
+    The old shell flow allowed per-test validation scripts (e.g. asserting on
+    run logs or persisted state); running them here preserves those behaviour
+    assertions instead of silently dropping them.
+    """
+    validate_sh = workdir / PER_TEST_VALIDATE_SH
+    if validate_sh.is_file():
+        subprocess.run(
+            [bash, "-xeuo", "pipefail", str(validate_sh)],
+            cwd=workdir,
+            check=True,
+        )
+
+
 @pytest.mark.parametrize("test_name", EXAMPLE_LIBRARY_TESTS)
 def test_example_library(
     test_name: str,
     tmp_path: Path,
+    bash_executable: str,
     mdsh_compiler: Path,
     example_library_dir: Path,
     logging_yaml: Path,
@@ -104,12 +158,18 @@ def test_example_library(
     Mirrors ``integration/validate.sh`` but runs inside ``tmp_path`` so
     pytest tears down all generated files automatically.
     """
+    # Skip tests that need infrastructure not opted into on this runner.
+    if test_name in NEEDS_POSTGRES and not os.environ.get("MELTANO_TEST_POSTGRES"):
+        pytest.skip("set MELTANO_TEST_POSTGRES=1 to run Postgres-backed tests")
+    if test_name in NEEDS_S3 and not os.environ.get("MELTANO_TEST_S3"):
+        pytest.skip("set MELTANO_TEST_S3=1 to run S3-backed tests")
+
     source_dir = example_library_dir / test_name
 
     # 1. Copy the test fixture files into the isolated working directory.
     #    This keeps the source checkout pristine (the old flow mutated
     #    the docs directory in place and required manual cleanup).
-    for name in ("meltano.yml", "plugins"):
+    for name in ("meltano.yml", "plugins", PER_TEST_VALIDATE_SH):
         src = source_dir / name
         if src.is_dir():
             shutil.copytree(src, tmp_path / name)
@@ -121,22 +181,23 @@ def test_example_library(
 
     # 3. Compile index.md into a shell script (commons.sh: compile_script).
     script = tmp_path / f"{test_name}.sh"
-    _compile_script(mdsh_compiler, source_dir / INDEX_MD, script)
+    _compile_script(bash_executable, mdsh_compiler, source_dir / INDEX_MD, script)
 
     # 4. Run the compiled script from the test directory.
-    bash = shutil.which("bash")
-    if bash is None:
-        pytest.skip("bash is not available on this platform")
     env = os.environ.copy()
     env["MELTANO_PROJECT_ROOT"] = str(tmp_path)
     subprocess.run(
-        [bash, "-xeuo", "pipefail", str(script)],
+        [bash_executable, "-xeuo", "pipefail", str(script)],
         cwd=tmp_path,
         env=env,
         check=True,
     )
 
-    # 5. Assert the resulting meltano.yml matches the expected one
+    # 5. Run per-test validation script if present (old flow: per-test
+    #    validate.sh assertions on run logs / persisted state).
+    _run_per_test_validate(bash_executable, tmp_path)
+
+    # 6. Assert the resulting meltano.yml matches the expected one
     #    (commons.sh: check_meltano_yaml).
     result = tmp_path / "meltano.yml"
     expected = source_dir / EXPECTED_MELTANO_YML
