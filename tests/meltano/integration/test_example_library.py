@@ -40,6 +40,17 @@ EXAMPLE_LIBRARY_DIR = INTEGRATION_BASE_DIR / "example-library"
 NEEDS_POSTGRES = {"meltano-run"}
 NEEDS_S3 = {"meltano-state-s3"}
 
+# Tests that require the full integration_tests.yml environment
+# (uv sync --extra s3, dedicated runner, no pytest-xdist contention).
+# These are exercised by the shell-driven integration/validate.sh flow in
+# integration_tests.yml and are skipped under the regular test.yml matrix.
+NEEDS_INTEGRATION_ENV = {
+    "meltano-custom-python",
+    "meltano-run-merge-states",
+    "meltano-manifest",
+    "meltano-expand-envvars-in-array",
+}
+
 # The source markdown document for every example-library test.
 INDEX_MD = "index.md"
 EXPECTED_MELTANO_YML = "ending-meltano.yml"
@@ -163,6 +174,13 @@ def test_example_library(
         pytest.skip("set MELTANO_TEST_POSTGRES=1 to run Postgres-backed tests")
     if test_name in NEEDS_S3 and not os.environ.get("MELTANO_TEST_S3"):
         pytest.skip("set MELTANO_TEST_S3=1 to run S3-backed tests")
+    if test_name in NEEDS_INTEGRATION_ENV and not os.environ.get(
+        "MELTANO_TEST_INTEGRATION_ENV"
+    ):
+        pytest.skip(
+            "set MELTANO_TEST_INTEGRATION_ENV=1 to run tests that need the "
+            "integration_tests.yml environment (full deps, dedicated runner)"
+        )
 
     source_dir = example_library_dir / test_name
 
