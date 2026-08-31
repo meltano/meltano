@@ -181,7 +181,7 @@ The agent reads this as an auth failure, not a config-shape problem, and points 
 psycopg2.errors.UndefinedColumn: column "discount_code" of relation "raw_orders" does not exist
 ```
 
-The agent traces this to `orders.csv` having a column `raw_orders` doesn't, and can propose either an `ALTER TABLE` or a narrower `tap-csv` column selection, your call which fits.
+The agent traces this to `orders.csv` having a column `discount_code` doesn't, and can propose either an `ALTER TABLE` or a narrower `tap-csv` column selection, your call which fits.
 
 For runs that already executed on Cloud, open the pipeline in the **Pipelines** view and read its logs directly, or use **Diagnose** for the same plain-language read the agent gives you locally, see [Pipeline Diagnosis](./pipeline-diagnosis.mdx).
 
