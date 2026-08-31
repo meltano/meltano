@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from pathlib import Path
 
 import click
@@ -51,9 +52,12 @@ def init(
     """  # noqa: D301
     if not project_directory:
         click.echo("We need a project name to get started!")
-        project_directory = click.prompt(
-            "Enter a name now to create a Meltano project",
-            type=path_type,
+        project_directory = t.cast(
+            "Path",
+            click.prompt(
+                "Enter a name now to create a Meltano project",
+                type=path_type,
+            ),
         )
 
     if ctx.obj["project"]:
