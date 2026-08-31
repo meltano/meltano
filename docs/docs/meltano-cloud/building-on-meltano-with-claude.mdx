@@ -106,7 +106,7 @@ There's a known-good reference project under `reference/` in the repo. Point the
 
 ## Secrets and credentials
 
-The agent never sees real credential values, it only scaffolds the placeholder names in `.env.example`. You supply the values, in one of two places depending on where the pipeline runs.
+Do not give the agent access to `.env`, and do not pass secret values through command output. If the workflow cannot enforce those restrictions, use a credential mechanism that keeps secrets outside the agent's accessible workspace. The agent scaffolds only placeholder names in `.env.example`; you supply the values, in one of two places depending on where the pipeline runs.
 
 **Local runs**, in `.env` (gitignored, auto-loaded by Meltano):
 
