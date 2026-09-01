@@ -234,7 +234,7 @@ def check_database_compatibility(engine: Engine) -> None:
     dialect = engine.dialect.name
     version = engine.dialect.server_version_info
 
-    if dialect == "sqlite" and version and version < (3, 25, 1):
+    if dialect == "sqlite" and version and version < (3, 25, 1):  # ty: ignore[unsupported-operator]
         version_string = ".".join(map(str, version))
         reason = (
             f"Detected SQLite {version_string}, but Meltano requires at least 3.25.1"
