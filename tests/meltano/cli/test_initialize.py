@@ -122,7 +122,10 @@ class TestCliInit:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.chdir(tmp_path)
-        result = cli_runner.invoke(cli, ["init"], input="my-project\n")
+        try:
+            result = cli_runner.invoke(cli, ["init"], input="my-project\n")
+        finally:
+            Project.deactivate()
         assert result.exit_code == 0
         assert "Creating project files..." in result.output
         assert tmp_path.joinpath("my-project").is_dir()
