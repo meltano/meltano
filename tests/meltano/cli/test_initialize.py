@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 
 from meltano.cli import cli
 from meltano.core.error import ProjectNotFound
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitServiceError
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from click.testing import CliRunner
 
 
 class TestCliInit:
@@ -107,3 +114,16 @@ class TestCliInit:
         assert "README.md (skipped)" in result.output
 
         Project.deactivate()
+
+    def test_init_prompt_for_project_name(
+        self,
+        cli_runner: CliRunner,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
+        result = cli_runner.invoke(cli, ["init"], input="my-project\n")
+        assert result.exit_code == 0
+        assert "Creating project files..." in result.output
+        assert tmp_path.joinpath("my-project").is_dir()
+        assert tmp_path.joinpath("my-project", "meltano.yml").is_file()
