@@ -27,8 +27,12 @@ const sidebars = {
     { type: 'doc', id: 'connectors/target-clickhouse', label: 'ClickHouse' },
     { type: 'doc', id: 'connectors/tap-aptem', label: 'Aptem' },
     { type: 'doc', id: 'connectors/tap-baidu', label: 'Baidu' },
-    { type: 'doc', id: 'connectors/target-duckdb', label: 'DuckDB' },
     { type: 'doc', id: 'connectors/tap-google-analytics', label: 'Google Analytics' },
+    { type: 'doc', id: 'connectors/tap-googleads', label: 'Google Ads' },
+    { type: 'doc', id: 'connectors/target-motherduck', label: 'MotherDuck' },
+    { type: 'doc', id: 'connectors/tap-nextdoor', label: 'Nextdoor' },
+    { type: 'doc', id: 'connectors/tap-postgres', label: 'PostgreSQL' },
+    { type: 'doc', id: 'connectors/tap-snowflake', label: 'Snowflake' },
   ],
   platformSidebar: [
     {
@@ -73,12 +77,22 @@ const sidebars = {
         { type: 'doc', id: 'meltano-cloud/importing-data' },
         { type: 'doc', id: 'meltano-cloud/transform-data' },
         { type: 'doc', id: 'meltano-cloud/workspace-settings' },
-        { type: 'doc', id: 'meltano-cloud/pipeline-diagnosis' },
-        { type: 'doc', id: 'meltano-cloud/building-on-meltano-with-claude' },
         { type: 'doc', id: 'meltano-cloud/logging-monitoring' },
         { type: 'doc', id: 'meltano-cloud/profile-security' },
         { type: 'doc', id: 'meltano-cloud/invite' },
         //{ type: 'doc', id: 'meltano-cloud/snowflake-guides' },
+      ],
+    },
+    {
+      type: 'category',
+      label: require('./docs/meltano-ai/_category_.json').label,
+      customProps: require('./docs/meltano-ai/_category_.json').customProps,
+      link: { type: 'doc', id: 'meltano-ai/index' },
+      collapsed: true,
+      items: [
+        { type: 'doc', id: 'meltano-ai/building-on-meltano-with-claude' },
+        { type: 'doc', id: 'meltano-ai/pipeline-diagnosis' },
+        { type: 'doc', id: 'meltano-ai/diagnose-and-act-alerts' },
       ],
     },
 

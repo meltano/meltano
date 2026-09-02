@@ -1,6 +1,6 @@
 ---
 title: Google Analytics
-description: Sync Google Analytics 4 (GA4) website and app performance data into Meltano Cloud for reporting, modelling, and downstream analysis.
+description: Sync website and app performance data from Google Analytics 4.
 ---
 
 import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
@@ -9,48 +9,54 @@ import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
 
 <ConnectorTypeBadge type="extractor" block />
 
-Meltano Tap Google Analytics is a Singer tap for extracting Google Analytics 4 (GA4) data into Meltano Cloud for reporting, modelling, and downstream analysis.
-
-It helps you collect website and app performance data from Google Analytics in a repeatable pipeline so you can analyse traffic, engagement, locations, devices, pages, and revenue-related activity alongside data from your other business systems.
-
-Use this connector when you want to:
-
-- centralise Google Analytics data in your warehouse
-- build dashboards and reports on website performance
-- track traffic sources, user behaviour, and engagement trends over time
-- combine analytics data with advertising, CRM, sales, or product data
-- customise the extracted reports using your own stream definitions
+Google Analytics 4 (GA4) tracks website and app performance: traffic, engagement, locations, devices, pages and revenue-related activity. Teams connect GA4 to bring that data into a repeatable pipeline, so it can be modelled, reported on, and combined with advertising, CRM, sales or product data from other sources.
 
 ## At a glance
 
 | Property | Value |
 |---|---|
-| **Authentication** | Google account, connected via Meltano Cloud login |
-| **API** | Google Analytics 4 (GA4) |
-| **Default streams** | 9 |
-| **Custom reports** | Supported, up to 7 dimensions and 10 metrics per report |
-
-## Setup
-
-In [Google Analytics](https://analytics.google.com/):
-
-1. Select the property you want to extract data for.
-2. Go to **Admin** > **Property** > **Property details**.
-3. Copy the **PROPERTY ID**.
-
-In Meltano Cloud:
-
-1. Login and connect with your Google account.
-2. Enter the property ID.
-3. Choose a start date for extraction.
+| **Authentication** | OAuth login |
+| **Sync type** | Incremental |
+| **Streams** | Fixed set of default reports, or your own custom report definitions in their place |
+| **Custom queries** | Supported (custom report definitions) |
 
 ## What you can sync
 
-The tap provides the following default streams:
+- Overall website performance and engagement
+- Traffic sources and locations
+- Device, OS and browser breakdowns
+- Active-user counts (daily, weekly and 28-day)
+- Page-level traffic and engagement
+- Revenue and transaction performance
+- Any custom report you define yourself, using GA4's own dimensions and metrics
+
+## Prerequisites
+
+- **A Google account with access to the GA4 property you want to sync**: used for the "Sign in with Google" flow in Meltano Cloud.
+- **Property ID**: the GA4 property identifier. Find it in the Analytics dashboard under **Admin** > **Property** > **Property details**.
+
+## Setup
+
+### In Google Analytics
+
+1. Select the property you want to extract data for.
+2. Go to **Admin** > **Property** > **Property details**.
+3. Copy the Property ID.
+
+### In Meltano Cloud
+
+1. Click "Sign in with Google" and authorize access to your GA4 property.
+2. Enter the Property ID.
+3. Choose a Start Date for extraction.
+4. Optionally set an End Date (leave unset to keep syncing up to today).
+
+## Available streams
+
+The tap provides these default streams. Every stream is keyed by `date`, and all replicate incrementally between your Start Date and (optional) End Date.
 
 ### `website_overview`
 
-Overview of the website performance.
+Overview of website performance.
 
 | Field | Description |
 |---|---|
@@ -105,7 +111,7 @@ Website activity by country, region, and city.
 
 ### `four_weekly_active_users`
 
-Active users measured over a rolling 28 day period.
+Active users measured over a rolling 28-day period.
 
 | Field | Description |
 |---|---|
@@ -114,7 +120,7 @@ Active users measured over a rolling 28 day period.
 
 ### `weekly_active_users`
 
-Active users measured over a rolling 7 day period.
+Active users measured over a rolling 7-day period.
 
 | Field | Description |
 |---|---|
@@ -123,7 +129,7 @@ Active users measured over a rolling 7 day period.
 
 ### `daily_active_users`
 
-Active users measured over a rolling 1 day period.
+Active users measured over a rolling 1-day period.
 
 | Field | Description |
 |---|---|
@@ -187,97 +193,30 @@ Page-level traffic and engagement performance.
 | `screenPageViewsPerSession` | Metric. The average number of page or screen views per session. |
 | `userEngagementDuration` | Metric. The amount of time users were actively engaged. |
 
-## Custom streams
+## Advanced configuration
 
-The tap also supports custom streams. When custom stream definitions are specified, they override all default streams.
+- **Custom report definitions**: define your own reports, and they replace *all* of the default streams above (not just add to them). Each report picks up to 7 dimensions and up to 10 metrics from [GA4's dimensions and metrics reference](https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/). Two ways to supply them:
+  - **Report definitions list** (`reports_list`): define reports inline:
 
-A custom report definition specifies the stream name along with the Google Analytics dimensions and metrics to request, up to 7 dimensions and 10 metrics per stream. See the [GA4 dimensions and metrics explorer](https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/) for valid values.
-
-You can define custom reports two ways:
-
-**As a project-relative JSON file** using `reports`:
-
-```json
-[
-  { "name" : "name of stream to be used",
-    "dimensions" :
+    ```json
     [
-      "Google Analytics Dimension",
-      "Another Google Analytics Dimension"
-    ],
-    "metrics" :
-    [
-      "Google Analytics Metric",
-      "Another Google Analytics Metric"
+      {
+        "name": "traffic_overview",
+        "dimensions": ["date", "country"],
+        "metrics": ["activeUsers", "sessions"]
+      },
+      {
+        "name": "device_analysis",
+        "dimensions": ["date", "deviceCategory"],
+        "metrics": ["activeUsers", "engagedSessions", "engagementRate"]
+      }
     ]
-  }
-]
-```
+    ```
+  - **Report definitions file** (`reports`): point at a project-relative JSON file with the same structure, if you'd rather keep the definitions out of your config.
+- **Schema flattening**: enable Flattening Enabled to automatically expand nested properties into flat columns, and set Flattening Max Depth to control how deep that goes.
+- **Stream maps**: use Stream Maps / Stream Map Config to rename, filter or transform records via config. See the [Meltano SDK stream maps docs](https://sdk.meltano.com/en/latest/stream_maps.html).
 
-For example, to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:
-
-```json
-[
-  { "name" : "users_per_day",
-    "dimensions" :
-    [
-      "date"
-    ],
-    "metrics" :
-    [
-      "newUsers",
-      "active1DayUsers"
-    ]
-  },
-  { "name" : "sessions_per_country_day",
-    "dimensions" :
-    [
-      "date",
-      "country"
-    ],
-    "metrics" :
-    [
-      "sessions",
-      "sessionsPerUser",
-      "averageSessionDuration"
-    ]
-  }
-]
-```
-
-**Or inline in your configuration** using `reports_list`:
-
-```json
-[
-  {
-    "name": "traffic_overview",
-    "dimensions": ["date", "country"],
-    "metrics": ["activeUsers", "sessions"]
-  },
-  {
-    "name": "device_analysis",
-    "dimensions": ["date", "deviceCategory"],
-    "metrics": ["activeUsers", "engagedSessions", "engagementRate"]
-  },
-  {
-    "name": "traffic_source_analysis",
-    "dimensions": ["date", "sessionSource", "sessionMedium"],
-    "metrics": ["activeUsers", "sessions", "eventCount"]
-  },
-  {
-    "name": "top_pages",
-    "dimensions": ["date", "pagePath"],
-    "metrics": ["screenPageViews", "activeUsers"]
-  },
-  {
-    "name": "engagement_report",
-    "dimensions": ["date"],
-    "metrics": ["engagedSessions", "engagementRate", "userEngagementDuration"]
-  }
-]
-```
-
-If `reports` is not provided, the tap uses its [default reports definition](https://github.com/MeltanoLabs/tap-google-analytics/blob/main/tap_google_analytics/defaults/default_report_definition.json).
+If `reports` / `reports_list` is not provided, the tap uses its [default reports definition](https://github.com/MeltanoLabs/tap-google-analytics/blob/main/tap_google_analytics/defaults/default_report_definition.json).
 
 ## Settings
 
@@ -295,4 +234,4 @@ If `reports` is not provided, the tap uses its [default reports definition](http
 
 ## Need help?
 
-If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.
+If a stream or field you need is missing, [open an issue on the tap-google-analytics repo](https://github.com/MeltanoLabs/tap-google-analytics/issues/new).

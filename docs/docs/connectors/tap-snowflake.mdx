@@ -1,0 +1,106 @@
+---
+title: Snowflake
+description: Sync tables and views from your Snowflake data warehouse.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Snowflake
+
+<ConnectorTypeBadge type="extractor" block />
+
+Snowflake is a cloud data platform providing a relational SQL data warehouse, where storage, compute and cloud services scale independently. Teams already running Snowflake connect it to Meltano to move some of that data elsewhere (blending it with other sources or feeding a downstream tool) without hand-writing extraction jobs.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | Username & password, key pair, or browser SSO |
+| **Sync type** | Full table by default; incremental if you set a replication key |
+| **Streams** | Discovered dynamically from your account |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+Any table or view in your configured Snowflake database that your connector's role has been granted `SELECT` on: reference data, transactional tables, and any views built on top of them.
+
+## Prerequisites
+
+- **A dedicated Snowflake role and user**, granted `USAGE` on the warehouse, the database and its schemas, and `SELECT` on the tables and views you want to sync (see Setup for the exact grants).
+- **One authentication method**: set exactly one of the following:
+  - **Password**: the password for your Snowflake user.
+  - **Key pair**: generate an RSA key pair, assign the public key to your Snowflake user, then supply the private key (base64-encoded) or a path to it, plus a passphrase if the key has one.
+  - **Browser SSO**: signs in through your identity provider via an external browser. This only works for an interactive local run. A hosted pipeline can't complete the browser prompt.
+- **Account identifier**: e.g. `myorg-account1` (without the `.snowflakecomputing.com` suffix).
+
+## Setup
+
+### In Snowflake
+
+1. Create a dedicated role and user for the connector, and grant it access:
+
+   ```sql
+   USE ROLE ACCOUNTADMIN;
+
+   CREATE ROLE tap_snowflake;
+   CREATE USER tap_snowflake
+     PASSWORD = '<password>'
+     DEFAULT_ROLE = tap_snowflake
+     DEFAULT_WAREHOUSE = <warehouse>;
+   GRANT ROLE tap_snowflake TO USER tap_snowflake;
+
+   GRANT USAGE ON WAREHOUSE <warehouse> TO ROLE tap_snowflake;
+   GRANT USAGE ON DATABASE <database> TO ROLE tap_snowflake;
+   GRANT USAGE ON ALL SCHEMAS IN DATABASE <database> TO ROLE tap_snowflake;
+   GRANT USAGE ON FUTURE SCHEMAS IN DATABASE <database> TO ROLE tap_snowflake;
+   GRANT SELECT ON ALL TABLES IN DATABASE <database> TO ROLE tap_snowflake;
+   GRANT SELECT ON FUTURE TABLES IN DATABASE <database> TO ROLE tap_snowflake;
+   GRANT SELECT ON ALL VIEWS IN DATABASE <database> TO ROLE tap_snowflake;
+   GRANT SELECT ON FUTURE VIEWS IN DATABASE <database> TO ROLE tap_snowflake;
+   ```
+
+   The `FUTURE` grants matter: without them, a table created after this point is discovered but returns a permission error when synced.
+2. Find your account identifier.
+3. If a network policy restricts which addresses can connect, add the address your pipeline runs from.
+4. If you're using key pair auth, generate the key pair and assign the public key to your Snowflake user.
+
+### In Meltano Cloud
+
+1. Enter Account, Database, Warehouse, Role and (optionally) Schema.
+2. Choose one authentication method and enter its credentials.
+3. Optionally set Tables to a list of fully-qualified `<schema>.<table>` entries to limit discovery. Otherwise every table and view in the database is discovered.
+
+## Available streams
+
+Streams are discovered at runtime: every table and view in your configured database becomes a stream named `<schema>-<table>` (the `information_schema` schema is excluded). If you set Tables, discovery is limited to just those objects, which keeps a large account from producing an unwieldy catalog.
+
+Every stream replicates in full by default. Snowflake doesn't enforce primary keys, so discovery can't identify a replication key on its own. Set one manually to replicate a stream incrementally instead (see Advanced configuration).
+
+## Advanced configuration
+
+- **Incremental replication overrides**: for a specific stream, set `replication-method: INCREMENTAL`, a `replication-key`, and `key-properties` in your project's metadata configuration. Use a key that never decreases, such as an updated timestamp.
+- **Batch loading**: for large tables, the tap can write batch files instead of one record per message. Set Batch Encoding Format, Batch Compression Format, and Batch Storage Root/Prefix. Only a target that supports batch messages will use this, and batch-loaded streams always replicate in full.
+- **Numeric precision**: enable Use Singer Decimal to preserve full precision on `NUMBER` columns (up to 38 digits) by emitting them as strings rather than native JSON numbers.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `account` | string | Snowflake account identifier, e.g. `myorg-account1`. |
+| `database` | string | Database to connect to. |
+| `warehouse` | string | Warehouse to use for queries. |
+| `role` | string | Role to assume for the connection. |
+| `schema` | string | Optional schema to restrict discovery to. |
+| `user` | string | Snowflake username. |
+| `password` | string | Password, if using password authentication. |
+| `private_key` | string | Base64-encoded RSA private key, if using key pair authentication. |
+| `private_key_path` | string | Path to an RSA private key file, as an alternative to `private_key`. |
+| `private_key_passphrase` | string | Passphrase for the private key, if it has one. |
+| `authenticator` | string | Set to use browser SSO instead of password or key pair authentication. |
+| `tables` | array | Fully-qualified `<schema>.<table>` entries to limit discovery to. Leave unset to discover every table and view. |
+| `batch_config` | object | Batch encoding, compression and storage settings, for targets that support batch messages. |
+| `use_singer_decimal` | boolean | Emit `NUMBER` columns as strings to preserve full precision instead of native JSON numbers. |
+
+## Need help?
+
+If a stream or field you need is missing, [open an issue on the tap-snowflake repo](https://github.com/MeltanoLabs/tap-snowflake/issues/new).

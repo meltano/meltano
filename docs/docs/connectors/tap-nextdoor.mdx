@@ -1,0 +1,283 @@
+---
+title: Nextdoor
+description: Sync ad campaign, creative and performance data from Nextdoor Ads Manager.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Nextdoor
+
+<ConnectorTypeBadge type="extractor" block />
+
+Nextdoor is a neighbourhood social network. Nextdoor Ads Manager (NAME) is its self-serve advertising platform, where businesses run campaigns targeted at specific neighbourhoods, postal codes or radii, and measure them with the Nextdoor conversion pixel. Advertisers connect this data source to bring their campaign structure and performance data into their own reporting.
+
+Some NAME actions remain UI-only and can't be extracted: initial sign-up, payment methods, adding or archiving custom audiences, and archiving media assets.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+| **Sync type** | Mixed: campaigns, ad groups, ads, creatives and custom audiences sync incrementally; everything else is full table |
+| **Streams** | Fixed list |
+| **Custom queries** | Supported (custom performance reports) |
+
+## What you can sync
+
+- Account and user info: who owns the token, and which advertisers they can reach
+- Campaign structure: campaigns, ad groups, ads and creatives
+- Custom audiences referenced by your ad groups
+- Performance data: aggregate ad stats, or a custom report you define yourself
+
+## Prerequisites
+
+- **Access Token**: the only credential needed. Generated in Nextdoor Ads Manager, and sent as a bearer token on every request.
+
+## Setup
+
+### In Nextdoor Ads Manager
+
+1. Sign in to [Nextdoor Ads Manager](https://ads.nextdoor.com/v2/manage/api) and generate an Ads API access token.
+
+### In Meltano Cloud
+
+1. Enter your Access Token.
+2. Optionally set Advertiser IDs to restrict extraction to specific advertiser accounts and their child campaigns, ad groups and ads (leave empty to sync every advertiser the token can reach).
+3. Optionally set Start Date and End Date to bound the `ad_stats` and `performance_report` streams (both default to today). Every other stream replicates on its own bookmark or in full, and ignores these two settings.
+4. Optionally define an Ad Performance Report to build a custom report (see Advanced configuration below).
+
+## Available streams
+
+| Stream | Replication | Replication key |
+|---|---|---|
+| `users` | Full table | N/A |
+| `profiles` | Full table | N/A |
+| `advertisers` | Full table | N/A |
+| `campaigns` | Incremental | `updated_at` |
+| `ad_groups` | Incremental | `updated_at` |
+| `ads` | Incremental | `updated_at` |
+| `creatives` | Incremental | `updated_at` |
+| `reports` | Full table | N/A |
+| `ad_stats` | Full table | N/A |
+| `performance_report` | Full table | N/A |
+| `custom_audiences` | Incremental | `updated_at` |
+
+### `users`
+
+The NAME user that owns the access token, and which advertisers they can reach.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | The user's ads ID |
+| `name` | string | User's display name |
+| `email` | string | User's email address |
+| `email_confirmed` | boolean | Whether the user has confirmed their email |
+| `advertisers_with_access` | array | Advertisers this user can access, with their role on each |
+
+### `profiles`
+
+The advertising profile behind the token, including its billing profile and whether it is an agency.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | The profile's ads ID |
+| `name` | string | Profile name |
+| `associated_user_ids` | array | Users attached to this profile |
+| `payment_profile_id` | string | Billing profile backing this advertising profile |
+| `is_ad_agency` | boolean | Whether the profile represents an agency |
+
+### `advertisers`
+
+Advertiser accounts the token can access.
+
+| Field | Type | Description |
+|---|---|---|
+| `advertiser_id` | string | Advertiser ID |
+| `role` | string | The token holder's role on this advertiser, e.g. `CLIENT_ADMIN` |
+
+### `campaigns`
+
+Campaigns, with objective, status and flight dates. Replicates incrementally on `updated_at`.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Campaign ID |
+| `advertiser_id` | string | ID of the advertiser that owns the campaign |
+| `name` | string | Campaign name |
+| `status` | string | Effective delivery status, e.g. `ACTIVE`, `PAUSED`, `ARCHIVED` |
+| `user_status` | string | Status explicitly set by the advertiser |
+| `objective` | string | Campaign objective, e.g. `CONVERSION`, `TRAFFIC` |
+| `sub_objective` | string | Objective refinement, e.g. `WEBSITE_CONVERSIONS` |
+| `special_ad_category` | boolean | Whether the campaign is in a regulated category (housing, credit, employment) |
+| `created_at` | datetime | When the campaign was created |
+| `updated_at` | datetime | When the campaign was last modified (replication key) |
+| `start_time` | datetime | Scheduled start of delivery |
+| `end_time` | datetime | Scheduled end of delivery; absent if open-ended |
+
+### `ad_groups`
+
+Ad groups, carrying the bid, budget, placements, frequency caps and all targeting. Replicates incrementally on `updated_at`.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Ad group ID |
+| `advertiser_id` | string | Owning advertiser ID |
+| `campaign_id` | string | Parent campaign ID |
+| `name` | string | Ad group name |
+| `status` | string | Effective delivery status |
+| `user_status` | string | Status explicitly set by the advertiser |
+| `placements` | array | Where ads may serve, e.g. `FEED`, `FSF`, `RHR` |
+| `audience_network_is_on` | boolean | Whether off-Nextdoor audience network delivery is enabled |
+| `bid` | object | Bid settings for the ad group |
+| `budget` | object | Budget settings for the ad group |
+| `start_time` | datetime | Scheduled start of delivery |
+| `end_time` | datetime | Scheduled end of delivery; absent if open-ended |
+| `frequency_caps` | array | Limits on how often one neighbour sees these ads |
+| `targeting` | object | Geographic, audience, interest and daypart targeting |
+| `custom_audience_ids` | array | Custom audience IDs referenced by this ad group |
+| `created_at` | datetime | When it was created |
+| `updated_at` | datetime | When it was last modified (replication key) |
+
+### `ads`
+
+Individual ads, linking an ad group to the creative it renders. Replicates incrementally on `updated_at`.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Ad ID |
+| `advertiser_id` | string | Owning advertiser ID |
+| `adgroup_id` | string | Parent ad group ID |
+| `creative_id` | string | Creative rendered by this ad; joins to the creatives stream |
+| `name` | string | Ad name |
+| `status` | string | Effective delivery status, e.g. `ACTIVE`, `INACTIVE`, `ARCHIVED`, `INELIGIBLE` |
+| `user_status` | string | Status explicitly set by the advertiser |
+| `created_at` | datetime | When the ad was created |
+| `updated_at` | datetime | When the ad was last modified (replication key) |
+
+### `creatives`
+
+Creative assets: headline, body, call to action, image and logo URLs, and click and impression trackers. Replicates incrementally on `updated_at`.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Creative ID |
+| `advertiser_id` | string | Owning advertiser ID |
+| `name` | string | Creative name |
+| `status` | string | Review status, e.g. `APPROVED` |
+| `placement` | string | Placement this creative targets |
+| `creative_type` | string | Creative format, e.g. `IMAGE_NATIVE_V3` |
+| `text_overlays` | array | Text rendered over the image |
+| `advertiser_name` | string | Advertiser name shown to neighbours |
+| `headline` | string | Headline text |
+| `body_text` | string | Body copy |
+| `offer_text` | string | Offer text, if any |
+| `price` | string | Displayed price, if any |
+| `cta` | string | Call to action, e.g. "Learn more" |
+| `canvas_image_url` | string | Main creative image |
+| `logo_image_url` | string | Advertiser logo |
+| `clickthrough_url` | string | Destination URL |
+| `impression_tracking_urls` | array | Third-party impression pixels |
+| `click_tracking_urls` | array | Third-party click trackers |
+| `created_at` | datetime | When it was created |
+| `updated_at` | datetime | When it was last modified (replication key) |
+
+### `reports`
+
+Saved and scheduled report definitions with their CSV download URLs. Definitions only. This stream carries no metrics.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Report ID |
+| `advertiser_id` | string | Owning advertiser ID |
+| `name` | string | Report name |
+| `download_url` | string | Presigned URL for the report CSV. Short-lived and credential-bearing: treat as a secret |
+
+### `ad_stats`
+
+Aggregate performance per ad over the configured window. One row per ad, not a daily time series.
+
+| Field | Type | Description |
+|---|---|---|
+| `ad_id` | string | Ad these metrics are for |
+| `advertiser_id` | string | Owning advertiser ID |
+| `start_time` | datetime | Start of the reporting window |
+| `end_time` | datetime | End of the reporting window, inclusive |
+| `billable_spend` | string | Billable spend, currency-prefixed, e.g. "GBP 12.50" |
+| `cpc` | string | Cost per click, currency-prefixed |
+| `cpm` | string | Cost per thousand impressions, currency-prefixed |
+| `cost_per_result` | string | Cost per result, currency-prefixed |
+| `impressions` | integer | Impressions served |
+| `clicks` | integer | Clicks received |
+| `ctr` | number | Click-through rate as a percentage value, e.g. `0.557` means 0.557% |
+| `result` | number | Results against the campaign objective |
+| `total_conversions` | integer | All conversions, summing the breakdown below |
+| `purchase_conversions` | integer | Purchase conversions |
+| `lead_conversions` | integer | Lead conversions |
+| `sign_up_conversions` | integer | Sign-up conversions |
+| `add_to_cart_conversions` | integer | Add-to-cart conversions |
+| `initiate_checkout_conversions` | integer | Checkout-initiated conversions |
+| `search_conversions` | integer | Search conversions |
+| `view_content_conversions` | integer | View-content conversions |
+| `add_to_wishlist_conversions` | integer | Add-to-wishlist conversions |
+| `subscribe_conversions` | integer | Subscribe conversions |
+| `other_conversions` | integer | Conversions not in the categories above |
+
+### `performance_report`
+
+A custom performance report, built entirely from the Ad Performance Report setting. Its fields are **not fixed**: the schema is generated from your config, with one column per requested dimension and metric, plus `advertiser_id`, `report_id` and `date`. See Advanced configuration below. Leave the setting unset to skip this stream and use `ad_stats` instead.
+
+### `custom_audiences`
+
+Custom audiences referenced by ad groups. Replicates incrementally on `updated_at`.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Custom audience ID |
+| `advertiser_id` | string | Owning advertiser ID |
+| `adgroup_id` | string | The ad group this audience was discovered from |
+| `name` | string | Audience name |
+| `description` | string | Advertiser's own notes |
+| `audience_type` | string | How the audience was built, e.g. `emails` |
+| `created_at` | datetime | When it was created |
+| `updated_at` | datetime | When it was last modified (replication key) |
+
+## Advanced configuration
+
+- **Custom performance reports**: define an Ad Performance Report to build your own daily/weekly/monthly report from the reporting API:
+
+  ```yml
+  report:
+    metrics: [IMPRESSIONS, CLICKS, CTR, SPEND, BILLABLE_SPEND, CPM, CPC, CONVERSIONS]
+    dimension_granularity: [AD]           # CAMPAIGN, AD_GROUP, AD, PLACEMENT
+    time_granularity: [DAY]               # DAY, WEEK, MONTH
+    name: tap-nextdoor performance report # report name in NAME
+    stream_name: performance_report       # rename the stream if you like
+    recipient_emails: []                  # every sync emails these
+    campaign_ids: []                      # optional filters
+    adgroup_ids: []
+    ad_ids: []
+  ```
+
+  Every key except the three granularity/metric lists is optional, and all enum values are validated up front. A typo fails immediately with the supported values listed.
+
+  **Caveats**: unlike every other stream, this one writes: each sync creates a report object in the advertiser's account (these accumulate, and are listed in the `reports` stream), and emails everyone in `recipient_emails` unless you leave it empty. Report rows carry no IDs (only `Campaign Name`, `Ad Group Name` and `Ad Name`), so they join to the `campaigns`, `ad_groups` and `ads` streams by name only; renaming an entity in NAME breaks that join. If you'd rather avoid the side effects, leave the setting unset and use `ad_stats` instead (side-effect free, but one aggregate row per ad rather than a daily series, at a cost of one request per ad).
+
+## Data notes
+
+- Money is always currency-prefixed (`"GBP 3.35"`) on bids, budgets and all stats spend fields, so these are typed as strings rather than parsed, and no currency information is lost.
+- CTR is a percentage value in both performance streams: `1.05` means 1.05%.
+- Campaign and ad group timestamps arrive with a bracketed zone ID (`2025-08-26T00:01:34+01:00[Europe/London]`), which isn't valid against the standard `date-time` format. The tap strips the zone ID and keeps the UTC offset, so the instant is unchanged.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `access_token` | string | Nextdoor Ads Manager API access token. |
+| `advertiser_ids` | array | Restrict extraction to specific advertiser accounts and their child campaigns, ad groups and ads. Leave empty to sync every advertiser the token can reach. |
+| `start_date` | date | Start of the window bounding `ad_stats` and `performance_report`. Defaults to today. |
+| `end_date` | date | End of the window bounding `ad_stats` and `performance_report`. Defaults to today. |
+| `report` | object | Ad Performance Report definition, building the `performance_report` stream. See Advanced configuration. |
+
+## Need help?
+
+If a stream or field you need is missing, [open an issue on the tap-nextdoor repo](https://github.com/MeltanoLabs/tap-nextdoor/issues/new).

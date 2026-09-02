@@ -59,6 +59,8 @@ jobs:
 
     - name: Run benchmarks
       uses: CodSpeedHQ/action@4296e51e7041e24dadb86d1d6e8b9320d223dbe8 # v5.0.3
+      env:
+        TMPDIR: /dev/shm
       with:
         mode: walltime
-        run: uv run python -m pytest tests/benchmarks/ --codspeed -p no:randomly
+        run: uv run python -m pytest tests/benchmarks/ --codspeed -p no:randomly --basetemp=/dev/shm/pytest
