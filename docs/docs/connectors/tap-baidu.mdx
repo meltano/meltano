@@ -1,6 +1,6 @@
 ---
 title: Baidu
-description: Sync campaign, account, and reporting data from Baidu's Mediago programmatic advertising platform.
+description: Sync programmatic advertising campaign and reporting data from Baidu's Mediago platform.
 ---
 
 import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
@@ -9,32 +9,52 @@ import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
 
 <ConnectorTypeBadge type="extractor" block />
 
-Baidu is a leading Chinese technology company. Founded in 2000, Baidu delivers a broad portfolio of services spanning internet search, cloud computing, artificial intelligence, and digital advertising.
-
-Its Mediago platform empowers marketers to manage programmatic advertising campaigns with robust targeting, bidding, and reporting features across Baidu's media network. This tap is built on top of the Mediago API.
+Baidu is a Chinese technology company spanning internet search, cloud computing, artificial intelligence and digital advertising. Its Mediago platform lets marketers run programmatic advertising campaigns with targeting, bidding and reporting across Baidu's media network. Advertisers connect Mediago to bring their campaign and reporting data into their own systems.
 
 ## At a glance
 
 | Property | Value |
 |---|---|
-| **Authentication** | API Token |
-| **API** | Baidu Mediago API |
-| **Streams** | 6 |
+| **Authentication** | API key / token |
+| **Sync type** | Not specified in the source material (see note below) |
+| **Streams** | Fixed list |
+| **Custom queries** | Not supported |
 
 ## What you can sync
 
-The Baidu tap provides access to the following streams:
-
-- **SummaryStream**: for high level campaign overviews.
-- **CampaignStream**: for a list of authorised campaigns.
-- **AccountsStream**: for a list of authorised accounts.
-- **CampaignDetails**: for in depth campaign insights.
-- **ReportInCampaignDimension**: a daily report in campaign dimension.
-- **ReportInSiteDimension**: a daily report in site dimension for a specific campaign.
+- High-level campaign overviews
+- Authorised campaigns and accounts
+- In-depth campaign insights
+- Daily performance reports, by campaign or by site
 
 ## Prerequisites
 
-To connect Baidu, you need an API token for the Mediago API, along with a start date, end date, and timezone for the streams you want to sync.
+- **API Token**: your Mediago API token. The only credential needed.
+
+## Setup
+
+### In Baidu Mediago
+
+1. Sign in to [Mediago](https://mediago.baidu.com/) and obtain an API token for your account.
+
+### In Meltano Cloud
+
+1. Enter your API Token.
+2. Optionally set Start Date and End Date to bound the reporting streams.
+3. Optionally set Timezone to control how dates are interpreted.
+
+## Available streams
+
+| Stream | Description |
+|---|---|
+| `SummaryStream` | High-level campaign overviews |
+| `CampaignStream` | List of authorised campaigns |
+| `AccountsStream` | List of authorised accounts |
+| `CampaignDetails` | In-depth campaign insights |
+| `ReportInCampaignDimension` | Daily report broken down by campaign |
+| `ReportInSiteDimension` | Daily report broken down by site, for a specific campaign |
+
+> **Note:** field-level schemas and which streams replicate incrementally vs. in full aren't documented upstream. The two "daily report" streams are bounded by Start Date / End Date, which suggests per-day reporting, but this isn't stated explicitly by the tap.
 
 ## Settings
 
@@ -47,4 +67,4 @@ To connect Baidu, you need an API token for the Mediago API, along with a start 
 
 ## Need help?
 
-If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.
+If a stream or field you need is missing, [open an issue on the tap-baidu repo](https://github.com/Matatika/tap-baidu/issues/new).

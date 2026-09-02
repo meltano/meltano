@@ -1,0 +1,76 @@
+---
+title: Google Ads
+description: Sync campaign, ad group and performance data from your Google Ads account.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Google Ads
+
+<ConnectorTypeBadge type="extractor" block />
+
+Google Ads is Google's pay-per-click advertising platform, where businesses bid on keywords and run search, display and other ad campaigns. Marketing and analytics teams connect Google Ads to pull campaign structure and performance data into their warehouse, so it can be blended with other sources and reported on outside the Google Ads UI.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | OAuth login |
+| **Sync type** | Incremental |
+| **Streams** | Standard reporting streams, plus any custom queries you define |
+| **Custom queries** | Supported (GAQL) |
+
+## What you can sync
+
+This connector brings in the data behind your Google Ads reporting hierarchy, plus anything you build yourself:
+
+- Campaign, ad group and ad structure and settings
+- Performance and spend metrics
+- Custom reports you define with your own GAQL queries
+
+## Prerequisites
+
+- **A Google account with access to the Ads account(s) you want to sync**: used for the "Sign in with Google" flow in Meltano Cloud.
+- **Customer ID**: the identifier for the Google Ads account you're syncing. Find it in the Google Ads UI (top right of the page) or via the Google Ads API. If you access your accounts through a manager (MCC) account, you'll also need that manager account's Customer ID.
+
+## Setup
+
+### In Google Ads
+
+1. Note your Customer ID from the Google Ads UI.
+2. If you access accounts through a manager account, note that account's Customer ID too.
+3. If you need click-level performance data (device, URL), request access to the Click View Report stream. It requires additional account permissions and is off by default.
+
+### In Meltano Cloud
+
+1. Click "Sign in with Google" and authorize access to your Ads account(s).
+2. Enter your Customer ID. If you're using a manager account, also set Login Customer ID.
+3. Optionally set Customer IDs to restrict the sync to specific accounts (leave empty to sync every account the authenticated user can reach).
+4. Optionally set Start Date and End Date to bound date-filtered streams (defaults to the 90 days before today through today).
+
+## Available streams
+
+This tap follows Google Ads' own campaign hierarchy, syncing the accounts, campaigns, ad groups and ads (and their performance metrics) your Customer ID can reach, plus any custom queries you define. Date-filtered streams replicate incrementally between your Start Date and End Date; custom queries default to incremental replication as well, unless you set them to replicate in full (see below).
+
+## Advanced configuration
+
+- **Custom queries (GAQL)**: define your own GAQL query, and it becomes its own stream. For each custom query you can set the stream name, primary key(s), replication method (incremental or full table) and replication key.
+- **Click View Report stream**: off by default; turn it on if your account has the required permissions.
+- **API version**: the tap targets a current Google Ads API version by default; this can be overridden if you need a specific one.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `customer_id` | string | Google Ads Customer ID to sync. |
+| `login_customer_id` | string | Manager (MCC) account Customer ID, if accessing accounts through one. |
+| `customer_ids` | array | Specific account Customer IDs to restrict the sync to. Leave empty to sync every reachable account. |
+| `start_date` | date | Start of the window for date-filtered streams. Defaults to 90 days before today. |
+| `end_date` | date | End of the window for date-filtered streams. Defaults to today. |
+| `custom_queries` | array | GAQL query definitions, each producing its own stream. |
+| `click_view_report_enabled` | boolean | Enables the Click View Report stream. Requires additional account permissions. Off by default. |
+| `api_version` | string | Overrides the Google Ads API version the tap targets. |
+
+## Need help?
+
+If a stream or field you need is missing, [open an issue on the tap-googleads repo](https://github.com/Matatika/tap-googleads/issues/new).

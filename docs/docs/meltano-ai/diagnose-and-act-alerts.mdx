@@ -1,0 +1,72 @@
+---
+title: Diagnose-and-Act Alerts
+description: When a pipeline fails, get a plain-language diagnosis and one-click fixes directly in the failure email, before anyone needs to log in and dig through logs.
+sidebar_label: Diagnose-and-Act Alerts
+layout: doc
+sidebar_position: 11.7
+---
+
+# Diagnose-and-Act Alerts
+
+When a pipeline fails, the email alone usually can't tell you what to do next. It says a run failed, but to find out why, someone has to stop what they're doing, log in, find the run, open the logs, read the stack trace, and form a theory, before they can even start on a fix. On a busy team that gap is measured in hours, and in the meantime your data is stale and it isn't always clear whose job it is to jump on it.
+
+Diagnose-and-act alerts close that gap. Every failure email now carries a plain-language diagnosis of what went wrong, plus a row of one-click actions matched to that specific failure, so you (or anyone you forward the email to) can act immediately, without opening Meltano first.
+
+---
+
+## What's in the alert
+
+A failure alert now has two parts: a diagnosis, and a set of actions built from it.
+
+```text
+Pipeline "daily_salesforce_sync" failed
+run #482 · exit 1 · 07:14 UTC
+
+What to do next
+The target rejected the load because the api_token setting is
+missing after a recent config change. Restore the token in the
+pipeline's settings, or edit the source file that references it,
+then re-run.
+
+[ Edit config file ]  [ Check pipeline settings ]
+[ Send to support ]   [ Stop this pipeline ]
+```
+
+The diagnosis is a short, plain-language explanation of what went wrong and what to do about it, written directly into the email. The actions underneath it aren't a fixed set of boilerplate links: they're chosen to match the specific failure, so the person reading the email can respond right away.
+
+## Available actions
+
+| Action | What it does |
+|---|---|
+| **Edit config file** | Appears when the diagnosis points to a specific configuration file. Links straight to that file so you can fix it without hunting for it. |
+| **Check pipeline settings** | Opens the pipeline's settings in Meltano, for failures traced to a setting rather than a file. |
+| **Send to support** | Opens a pre-filled note to support, so escalating a failure you can't resolve yourself doesn't mean writing up the context from scratch. |
+| **Stop this pipeline** | Pauses the pipeline in one click, so a failing job stops burning runs on its schedule while someone investigates. |
+
+:::info Stopping a pipeline is still gated
+The stop action is scoped to the one pipeline named in the alert, and clicking it still requires you to log in. It can't be used to pause or disable anything you aren't already permitted to.
+:::
+
+## Before you start
+
+The diagnosis in your failure emails runs on the same underlying feature as [Pipeline Diagnosis](./pipeline-diagnosis.mdx#diagnosing-pipelines-with-melty-ai), so it needs the same one-time setup:
+
+1. Go to **Settings > Advanced Settings > Claude**.
+2. Add your Claude API key.
+3. If you don't have one yet, generate one from the [Anthropic Console](https://console.anthropic.com).
+
+If no key is configured, you still get the failure alert, just without a diagnosis. Instead, the email explains plainly what a diagnosis would contain and exactly what data it would send, with a link to the privacy disclosure, so turning it on is an informed decision rather than something that happens by default.
+
+## How the diagnosis is generated
+
+Only a genuine, final failure is diagnosed, not every retry along the way. When one is, the result is cached and shared with the in-app diagnosis view, so opening the pipeline in Meltano after reading the email shows the same diagnosis instead of generating a new one. See [Diagnosis caching](./pipeline-diagnosis.mdx#diagnosis-caching) for how long that cache lasts and when a fresh diagnosis is generated instead.
+
+Diagnosing an email failure uses its own path through the system: it doesn't ride on, or affect the reliability of, the in-product Diagnose feature it borrows its intelligence from. A slow, failed, or unconfigured diagnosis never costs you the underlying failure alert, that part always sends.
+
+## Data handling and privacy
+
+The diagnosis in your failure emails goes through the same redaction as the in-product Diagnose feature: credentials are scrubbed from the context before anything is sent to Claude, and any embedded credentials are stripped from every link in the email itself. See [Data handling and privacy](./pipeline-diagnosis.mdx#data-handling-and-privacy) for the full breakdown of what's looked at, what's removed, and where the request goes.
+
+## Questions
+
+If you have questions about this feature or want to report something that looks wrong in a diagnosis, contact Meltano support or reach out through your usual support channel.
