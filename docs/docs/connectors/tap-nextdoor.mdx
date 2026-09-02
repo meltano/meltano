@@ -9,9 +9,9 @@ import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
 
 <ConnectorTypeBadge type="extractor" block />
 
-Nextdoor is a neighbourhood social network. Nextdoor Ads Manager (NAM) is its self-serve advertising platform, where businesses run campaigns targeted at specific neighbourhoods, postal codes or radii, and measure them with the Nextdoor conversion pixel. Advertisers connect this data source to bring their campaign structure and performance data into their own reporting.
+Nextdoor is a neighbourhood social network. Nextdoor Ads Manager (NAME) is its self-serve advertising platform, where businesses run campaigns targeted at specific neighbourhoods, postal codes or radii, and measure them with the Nextdoor conversion pixel. Advertisers connect this data source to bring their campaign structure and performance data into their own reporting.
 
-Some NAM actions remain UI-only and can't be extracted: initial sign-up, payment methods, adding or archiving custom audiences, and archiving media assets.
+Some NAME actions remain UI-only and can't be extracted: initial sign-up, payment methods, adding or archiving custom audiences, and archiving media assets.
 
 ## At a glance
 
@@ -64,7 +64,7 @@ Some NAM actions remain UI-only and can't be extracted: initial sign-up, payment
 
 ### `users`
 
-The NAM user that owns the access token, and which advertisers they can reach.
+The NAME user that owns the access token, and which advertisers they can reach.
 
 | Field | Type | Description |
 |---|---|---|
@@ -250,7 +250,7 @@ Custom audiences referenced by ad groups. Replicates incrementally on `updated_a
     metrics: [IMPRESSIONS, CLICKS, CTR, SPEND, BILLABLE_SPEND, CPM, CPC, CONVERSIONS]
     dimension_granularity: [AD]           # CAMPAIGN, AD_GROUP, AD, PLACEMENT
     time_granularity: [DAY]               # DAY, WEEK, MONTH
-    name: tap-nextdoor performance report # report name in NAM
+    name: tap-nextdoor performance report # report name in NAME
     stream_name: performance_report       # rename the stream if you like
     recipient_emails: []                  # every sync emails these
     campaign_ids: []                      # optional filters
@@ -260,7 +260,7 @@ Custom audiences referenced by ad groups. Replicates incrementally on `updated_a
 
   Every key except the three granularity/metric lists is optional, and all enum values are validated up front. A typo fails immediately with the supported values listed.
 
-  **Caveats**: unlike every other stream, this one writes: each sync creates a report object in the advertiser's account (these accumulate, and are listed in the `reports` stream), and emails everyone in `recipient_emails` unless you leave it empty. Report rows carry no IDs (only `Campaign Name`, `Ad Group Name` and `Ad Name`), so they join to the `campaigns`, `ad_groups` and `ads` streams by name only; renaming an entity in NAM breaks that join. If you'd rather avoid the side effects, leave the setting unset and use `ad_stats` instead (side-effect free, but one aggregate row per ad rather than a daily series, at a cost of one request per ad).
+  **Caveats**: unlike every other stream, this one writes: each sync creates a report object in the advertiser's account (these accumulate, and are listed in the `reports` stream), and emails everyone in `recipient_emails` unless you leave it empty. Report rows carry no IDs (only `Campaign Name`, `Ad Group Name` and `Ad Name`), so they join to the `campaigns`, `ad_groups` and `ads` streams by name only; renaming an entity in NAME breaks that join. If you'd rather avoid the side effects, leave the setting unset and use `ad_stats` instead (side-effect free, but one aggregate row per ad rather than a daily series, at a cost of one request per ad).
 
 ## Data notes
 
