@@ -1,6 +1,6 @@
 ---
 title: PostgreSQL
-description: Stream inserts, updates, and deletes from your PostgreSQL database as they happen, using log-based replication.
+description: Sync PostgreSQL tables via full-table, key-based incremental, or log-based (CDC) replication, choosing the method per stream.
 ---
 
 import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
@@ -9,27 +9,41 @@ import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
 
 <ConnectorTypeBadge type="extractor" block />
 
-PostgreSQL is one of the most widely used open-source relational databases, powering everything from application backends to internal tools. This connector reads row-level changes directly from Postgres's write-ahead log, so every insert, update, and delete is captured as it happens instead of waiting for a scheduled full-table pull. It's the right fit for teams who need their warehouse to stay closely in sync with a live operational database.
+PostgreSQL is one of the most widely used open-source relational databases, powering everything from application backends to internal tools. This connector syncs tables from your PostgreSQL database using whichever replication method fits each one: a full re-extract, an incremental pull based on a column you choose, or log-based (CDC) replication that reads row-level changes directly from Postgres's write-ahead log as they happen. That last mode is what makes this connector a fit for teams who need their warehouse to stay closely in sync with a live operational database, but it's one option among three, not the only way to use it.
+
+:::info Multiple variants available
+This page documents the default `tap-postgres` variant. Meltano also offers an alternate **`matatika`** variant, built on `pipelinewise-tap-postgres`, with its own settings and SSH tunnel support; see [Alternate variant: matatika](#alternate-variant-matatika) below.
+:::
 
 ## At a glance
 
 | Property | Value |
 |---|---|
-| **Authentication** | Database credentials (host, port, user, password, database name) plus a Postgres role with replication privileges |
-| **Sync type** | Log-based (CDC); not full-table or key-based incremental |
+| **Authentication** | Database credentials (host, port, user, password, database name); a role with replication privileges is only needed for log-based streams |
+| **Sync type** | Full table, key-based incremental, or log-based (CDC), set independently per stream |
 | **Streams** | Discovered dynamically from your database's schemas and tables |
 | **Custom queries** | Not supported |
-| **Estimated setup time** | ~10 minutes, varies by provider |
+| **Estimated setup time** | ~10 minutes for full-table or incremental; ~10 minutes more for log-based (CDC), varies by provider |
 | **Supported sources** | Self-hosted Postgres, AWS RDS / Aurora, Google Cloud SQL, Azure Database for Postgres, Neon |
 
 ## What you can sync
 
-Any table in your connected Postgres database can be synced as a stream. Once set up, this connector captures:
+Any table in your connected Postgres database can be synced as a stream, and each stream picks its own replication method. Once set up, this connector captures:
 
-- Row-level inserts, updates, and deletes as they occur
+- Full snapshots, incremental pulls, or row-level inserts, updates, and deletes, depending on the method a stream uses
 - Any schema or table pattern you select, across one or more schemas in the database
 
-## How this works
+## Choosing a sync type
+
+Each stream is assigned one of three replication methods, set independently, so a single pipeline can mix and match across tables:
+
+- **Full table.** Re-extracts the entire table on every run. No extra setup beyond a standard connection, and no dependency on a suitable key column. Best for small or reference tables where re-syncing everything each time is cheap.
+- **Key-based incremental.** Extracts only rows added or changed since the last run, using a column you designate as the replication key (for example `updated_at` or an auto-incrementing `id`). That column has to be monotonically increasing for this to work correctly, and hard deletes on the source aren't reflected downstream since a deleted row is never seen again.
+- **Log-based (CDC).** Reads changes directly from Postgres's write-ahead log, capturing inserts, updates, and deletes as they happen, including deletes, which the other two methods can't see. This is the mode most of this page is about, since it needs server-side setup that the other two don't.
+
+Full-table and incremental streams need nothing beyond the connection settings in [Settings](#settings). If none of your streams use log-based replication, you can skip ahead there and to [In Meltano Cloud](#in-meltano-cloud).
+
+## How log-based (CDC) replication works
 
 Every change made to a Postgres database (an insert, an update, a delete) gets written to an internal log called the write-ahead log (WAL) before it's applied, so the database can recover if it crashes mid-write. By default, that log only keeps enough detail for crash recovery, not enough to reconstruct exactly which rows changed and how. Logical replication switches the WAL into a more detailed mode so row-level changes become readable.
 
@@ -44,7 +58,9 @@ Once decoding is possible, Postgres still needs to know which changes to retain 
 
 ## Prerequisites
 
-Unlike connectors that authenticate with a token or an OAuth sign-in, this connector requires one-time server-side setup by a database administrator, in addition to a standard connection credential:
+If every stream you're setting up uses full-table or key-based incremental replication, all you need is a standard connection: host, port, user, password, and database name, with a role that can `SELECT` from the tables you're syncing.
+
+The items below are only needed if any stream uses log-based (CDC) replication. Unlike connectors that authenticate with a token or an OAuth sign-in, log-based replication requires one-time server-side setup by a database administrator, in addition to a standard connection credential:
 
 - **Database admin access**, needed to change WAL-related server settings and create a replication slot. This is a one-time setup step, not something the connecting pipeline needs on an ongoing basis.
 - **A Postgres role with `REPLICATION` privileges**, connecting to the primary instance. This is weaker than full superuser.
@@ -191,7 +207,30 @@ Once your database is prepped (previous sections), connecting to it is the same 
 
 1. Add a Postgres source and supply the connection settings the tap requires. All five are required (see [Troubleshooting](#troubleshooting)):
    - `host`, `port`, `user`, `password`, `dbname`
-2. Select the streams you want to replicate and set their replication method to `LOG_BASED`. As plain Meltano project config in `meltano.yml`, this is stream metadata plus a `select` entry:
+2. Select the streams you want to replicate and set each one's replication method. As plain Meltano project config in `meltano.yml`, this is stream metadata plus a `select` entry.
+
+   Full table needs nothing beyond the method itself:
+
+   ```yaml
+   metadata:
+     <schema>-<table_or_pattern>:
+       replication-method: FULL_TABLE
+   select:
+     - <schema>-<table_or_pattern>.*
+   ```
+
+   Key-based incremental also needs a `replication-key`:
+
+   ```yaml
+   metadata:
+     <schema>-<table_or_pattern>:
+       replication-method: INCREMENTAL
+       replication-key: updated_at
+   select:
+     - <schema>-<table_or_pattern>.*
+   ```
+
+   Log-based (CDC) requires the server-side setup in [Prerequisites](#prerequisites) to already be in place:
 
    ```yaml
    metadata:
@@ -205,7 +244,7 @@ Once your database is prepped (previous sections), connecting to it is the same 
 
 ## Available streams
 
-Streams are discovered dynamically from your database's schemas and tables; the exact set depends on what's in your connected database. All selected streams sync via log-based replication (CDC); this connector doesn't support full-table or standard key-based incremental sync.
+Streams are discovered dynamically from your database's schemas and tables; the exact set depends on what's in your connected database. Each stream syncs using whichever of the three replication methods you've assigned it; see [Choosing a sync type](#choosing-a-sync-type).
 
 ## Slot naming
 
@@ -224,7 +263,7 @@ Both are derived by lowercasing the input and replacing every character outside 
 |---|---|---|
 | `host` | string | Postgres server host. Required. |
 | `port` | integer | Postgres server port. Required. |
-| `user` | string | Connecting Postgres role. Must have `REPLICATION` privileges. Required. |
+| `user` | string | Connecting Postgres role. Needs `SELECT` on the tables you're syncing; also needs `REPLICATION` privileges if any stream uses log-based (CDC) replication. Required. |
 | `password` | string | Password for the connecting role. Required. |
 | `dbname` | string | Database name to connect to and replicate from. Required. |
 | `tap_id` | string | Optional pipeline identifier appended to the replication slot name, so multiple pipelines can replicate from the same database with distinct slots. |
@@ -238,6 +277,53 @@ Concrete failure modes surfaced by the connector itself:
 - **`Unable to start replication on slot <slot>: <driver error>`**: commonly means the slot is already in use by another consumer, or the connecting role lost its replication privilege after the slot was created. Confirm no other process is streaming from the same slot, and that `ALTER ROLE <user> WITH REPLICATION` is still in effect.
 - **`Missing required configuration keys: ...`**: one of `host`, `port`, `user`, `password`, `dbname` is missing from the tap config. Fill in the missing key(s).
 - **Sync silently does nothing**: if neither `--discover` nor a catalog is passed, the tap logs that nothing was selected and exits successfully (not an error, but easy to mistake for one). Confirm the catalog has streams selected.
+
+## Alternate variant: matatika
+
+Meltano also offers `tap-postgres` in a **`matatika`** variant, a fork of [`pipelinewise-tap-postgres`](https://github.com/Matatika/pipelinewise-tap-postgres) maintained separately from the default variant documented above. It's a different codebase with its own settings, most notably built-in SSH tunnel support for connecting to a Postgres server behind a bastion host, so reach for it if that's a requirement the default variant doesn't meet for your setup.
+
+To use it, add the tap with this variant instead of the default:
+
+```bash
+meltano add extractor tap-postgres --variant matatika
+```
+
+Or, as plain Meltano project config in `meltano.yml`:
+
+```yaml
+plugins:
+  extractors:
+    - name: tap-postgres
+      variant: matatika
+```
+
+### Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `host` | string | The hostname or IP address of the PostgreSQL server. Required. |
+| `port` | integer | The port number on which the PostgreSQL server is listening. Default `5432`. Required. |
+| `user` | string | The username to use when connecting to the PostgreSQL server. Required. |
+| `password` | string | The password to use when connecting to the PostgreSQL server. Required. |
+| `dbname` | string | The name of the PostgreSQL database to connect to. Required. |
+| `ssl` | boolean | Whether to use SSL encryption when connecting to the PostgreSQL server. Default `false`. |
+| `filter_schemas` | string | A comma-separated list of schemas to include or exclude when replicating data. |
+| `default_replication_method` | string | The default replication method to use when replicating data: `LOG_BASED`, `INCREMENTAL`, or `FULL_TABLE`. Default `FULL_TABLE`. |
+| `max_run_seconds` | integer | The maximum number of seconds to run the replication task before stopping. Default `43200`. |
+| `logical_poll_total_seconds` | integer | The total number of seconds to wait for new changes when using logical (log-based) replication. Default `60`. |
+| `break_at_end_lsn` | boolean | Whether to stop replication when the end LSN is reached. Default `true`. |
+| `ssh_tunnel.host` | string | Address of the bastion host to connect to via SSH. |
+| `ssh_tunnel.port` | integer | Port to connect to on the bastion host. Default `22`. |
+| `ssh_tunnel.username` | string | Username to connect to the bastion host. |
+| `ssh_tunnel.password` | string | Password to connect to the bastion host, for basic auth. |
+| `ssh_tunnel.private_key` | string | Base64-encoded private key for authenticating to the bastion host with key pair auth. |
+| `ssh_tunnel.private_key_password` | string | Passphrase for the private key. Leave unset if the key has no password. |
+
+`LOG_BASED` replication with this variant still depends on Postgres's write-ahead log being in logical mode; see [How log-based (CDC) replication works](#how-log-based-cdc-replication-works) and [Setup](#setup) above for what that requires on your server.
+
+### Troubleshooting
+
+- **`pg_config executable not found`** or **`libpq-fe.h: No such file or directory`**: this variant depends on [`libpq`](https://www.postgresql.org/docs/current/libpq.html), which isn't installed. On Debian/Ubuntu, install it with `apt-get install libpq-dev`; on macOS, `brew install postgresql`.
 
 ## Need help?
 
