@@ -109,13 +109,13 @@ If an Arrow BATCH message arrives for a sink that isn't denormalized, or the ADB
 
 ## Choosing an ingestion method
 
-### Storage Write API
-
-Uses gRPC and protocol buffers, supporting both streaming and batch patterns. Capable of just-in-time compilation of BigQuery schemas to protobuf, so it can support denormalized loads even when the destination structure is only known at runtime. Recommended as the default choice for most workloads.
-
 ### Batch Job
 
-Loads data using BigQuery load jobs with in-memory compression. Supports both fixed-schema and denormalized loading.
+Loads data using BigQuery load jobs with in-memory compression. Supports both fixed-schema and denormalized loading. This is the default method.
+
+### Storage Write API
+
+Uses gRPC and protocol buffers, supporting both streaming and batch patterns. Capable of just-in-time compilation of BigQuery schemas to protobuf, so it can support denormalized loads even when the destination structure is only known at runtime.
 
 ### GCS Stage
 
