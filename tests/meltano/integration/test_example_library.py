@@ -26,6 +26,7 @@ the corresponding opt-in environment variable is set:
 from __future__ import annotations
 
 import os
+import sys
 import shutil
 import subprocess
 from pathlib import Path
@@ -169,6 +170,13 @@ def test_example_library(
     Mirrors ``integration/validate.sh`` but runs inside ``tmp_path`` so
     pytest tears down all generated files automatically.
     """
+    # The shell-driven integration/validate.sh flow only runs on Linux
+    # (see integration_tests.yml: runs-on ubuntu-latest). mdsh compilation
+    # and the compiled scripts are not portable to Windows/macOS bash, so
+    # keep these doc-verification tests on the same platform boundary.
+    if sys.platform != "linux":
+        pytest.skip("example-library integration tests run on Linux only")
+
     # Skip tests that need infrastructure not opted into on this runner.
     if test_name in NEEDS_POSTGRES and not os.environ.get("MELTANO_TEST_POSTGRES"):
         pytest.skip("set MELTANO_TEST_POSTGRES=1 to run Postgres-backed tests")
