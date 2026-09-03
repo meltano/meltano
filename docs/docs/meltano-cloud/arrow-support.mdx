@@ -87,6 +87,7 @@ tap's settings page in the catalog for the latest status.
 | [`target-snowflake`](/meltano-cloud/connect-a-store/snowflake-guides#arrow-batch-ingestion) | ✅ Supported (v0.17.8-3+) | Loads via the same high-throughput stage-loading path used for large batch loads. |
 | [`target-postgres`](https://github.com/meltano/meltano-target-postgres) | ⏳ Supports Arrow, not yet on Meltano Cloud | Uses `adbc-driver-postgresql`. Not yet available as a Meltano Cloud loader. |
 | [`target-clickhouse`](/meltano-cloud/connect-a-store/clickhouse-store#batch-ingestion) | ✅ Supported (v0.4.0+) | Uses `clickhouse-connect`'s native `insert_arrow()` over the `http` driver, or column-major conversion for `native`/`asynch`/an explicit `sqlalchemy_url`. |
+| [`target-bigquery`](/meltano-cloud/connect-a-store/bigquery-store#arrow-batch-ingestion) | ✅ Supported (v1.1.0+) | Loads via the native BigQuery ADBC driver. Requires the store's `denormalized` setting to be enabled. |
 | [`target-mssql`](/meltano-cloud/connect-a-store/microsoft-sql-server-guides#batch-ingestion) | ✅ Supported (v0.2.0+) | Loads into a temp table via `mssql-python`'s Arrow bulk-copy support - bypasses Azure Blob Storage staging entirely. |
 | [`target-motherduck`](/meltano-cloud/connect-a-store/motherduck-store#batch-ingestion) / `target-duckdb` | ✅ Supported (v0.10.0+) | Loads via DuckDB's built-in Arrow-reading functions. Also accepts JSONL `BATCH` messages. |
 
