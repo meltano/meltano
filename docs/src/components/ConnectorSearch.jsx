@@ -13,6 +13,7 @@ const CONNECTORS = [
   { label: 'ClickHouse', href: '/connectors/target-clickhouse', category: 'loader' },
   { label: 'Aptem', href: '/connectors/tap-aptem', category: 'extractor' },
   { label: 'Baidu', href: '/connectors/tap-baidu', category: 'extractor' },
+  { label: 'Google BigQuery', href: '/connectors/target-bigquery', category: 'loader' },
   { label: 'Google Analytics', href: '/connectors/tap-google-analytics', category: 'extractor' },
   { label: 'Google Ads', href: '/connectors/tap-googleads', category: 'extractor' },
   { label: 'MotherDuck', href: '/connectors/target-motherduck', category: 'loader' },
