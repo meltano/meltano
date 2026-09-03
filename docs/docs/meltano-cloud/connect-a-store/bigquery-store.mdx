@@ -20,7 +20,7 @@ Meltano loads data into a BigQuery dataset that must already exist — it is not
 
 1. Go to [IAM & Admin → Service Accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) for your project.
 2. Click **Create service account**, give it a name (e.g. `meltano-loader`), and click **Create and continue**.
-3. Grant it `BigQuery Data Editor` and `BigQuery Job User` roles on the project (or dataset-level equivalents), then click **Done**.
+3. Grant it the `BigQuery Data Editor` role on the dataset and the `BigQuery Job User` role on the project (or an enclosing folder or organization), then click **Done**.
 4. Open the new service account, go to the **Keys** tab, click **Add key → Create new key**, and choose **JSON**.
 5. Download the key file and store it securely — its contents are pasted into Meltano as the **Service Account Key (json)** setting.
 
