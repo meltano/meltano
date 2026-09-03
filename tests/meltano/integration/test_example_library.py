@@ -26,9 +26,9 @@ the corresponding opt-in environment variable is set:
 from __future__ import annotations
 
 import os
-import sys
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
