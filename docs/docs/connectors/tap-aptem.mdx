@@ -1,6 +1,6 @@
 ---
 title: Aptem
-description: Sync learner enrollment, program delivery, compliance, and assessment data from Aptem's OData API.
+description: Sync learner, programme and compliance data from your Aptem tenant.
 ---
 
 import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
@@ -9,65 +9,28 @@ import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
 
 <ConnectorTypeBadge type="extractor" block />
 
-Aptem is an end-to-end apprenticeship and vocational training management platform used by training providers and employers to manage learner enrollment, programme delivery, progress tracking, compliance, and end-point assessment.
+Aptem is an end-to-end apprenticeship and vocational training management platform, used by training providers and employers to manage learner enrolment, programme delivery, progress tracking, compliance and end-point assessment. Training providers connect Aptem to bring that data into their own reporting, alongside other systems.
 
 ## At a glance
 
 | Property | Value |
 |---|---|
-| **Authentication** | API Token |
-| **API** | Aptem OData API |
-| **Stream discovery** | Dynamic, from the Aptem OData service `$metadata` document |
-| **Replication** | Incremental for streams with a known replication key; full-table for the rest |
+| **Authentication** | API key / token |
+| **Sync type** | Mixed: automatic for streams with a known replication key; full table for the rest |
+| **Streams** | Discovered dynamically from your tenant |
+| **Custom queries** | Not supported |
 
 ## What you can sync
 
-This tap discovers streams dynamically from the Aptem OData service `$metadata` document, so the exact set of streams reflects the entities and related collections exposed by your tenant. Additional related collections embedded within these entities are also discovered and extracted as their own streams.
-
-The following streams are recognised by the tap:
-
-- `AimWorkPlacements`
-- `ApprenticeshipFinancialRecords`
-- `AptemCognitiveAssessments`
-- `AwardingBodyQualifications`
-- `AwardingBodyQualificationsAssessmentHistory`
-- `ComplianceDocuments`
-- `ComponentDueDateChanges`
-- `CrmActivities`
-- `DestinationProgressions`
-- `EmployerGroups`
-- `EPAErrors`
-- `Episodes`
-- `Groups`
-- `HoursRecords`
-- `IlrAims`
-- `IlrLearner`
-- `Jobs`
-- `LearnerEmployment`
-- `LearningPlanComponents`
-- `LearningPlanEvidences`
-- `LearningPlanEvidenceWithActivityData`
-- `MaximumProgrammeDataFields`
-- `Messages`
-- `Milestones`
-- `Notes`
-- `OnboardingResponses`
-- `OrganizationContacts`
-- `Organizations`
-- `ReviewResponses`
-- `Reviews`
-- `Tasks`
-- `Trackers`
-- `Users`
-- `UserGroups`
-- `WithdrawalReasons`
+- Learner enrolment, programme and qualification records
+- Progress tracking: reviews, milestones, tasks and evidence
+- Compliance documents and end-point assessment data
+- Organisation, group and user administration data
 
 ## Prerequisites
 
-To connect to Aptem, you will need:
-
-- An **API token** for the Aptem OData API.
-- Your Aptem **tenant name**, which is used to build the API base URL.
+- **API token**: for the Aptem OData API. The only credential needed.
+- **Tenant name**: your Aptem tenant name, used to build the API base URL.
 
 ## Setup
 
@@ -77,6 +40,16 @@ In Meltano Cloud:
 2. Enter your Aptem tenant name.
 3. Optionally choose a start date for extraction.
 
+## Available streams
+
+This tap discovers streams dynamically from the Aptem OData service's `$metadata` document, so the exact set of streams reflects the entities and related collections exposed by your tenant. The following are recognised by the tap:
+
+`AimWorkPlacements`, `ApprenticeshipFinancialRecords`, `AptemCognitiveAssessments`, `AwardingBodyQualifications`, `AwardingBodyQualificationsAssessmentHistory`, `ComplianceDocuments`, `ComponentDueDateChanges`, `CrmActivities`, `DestinationProgressions`, `EmployerGroups`, `EPAErrors`, `Episodes`, `Groups`, `HoursRecords`, `IlrAims`, `IlrLearner`, `Jobs`, `LearnerEmployment`, `LearningPlanComponents`, `LearningPlanEvidences`, `LearningPlanEvidenceWithActivityData`, `MaximumProgrammeDataFields`, `Messages`, `Milestones`, `Notes`, `OnboardingResponses`, `OrganizationContacts`, `Organizations`, `ReviewResponses`, `Reviews`, `Tasks`, `Trackers`, `Users`, `UserGroups`, `WithdrawalReasons`
+
+Additional collections embedded within these entities are also discovered and extracted as their own streams, so the full list can be larger than what's above depending on your tenant.
+
+Streams with a known replication key replicate incrementally; the rest replicate in full on every run.
+
 ## Settings
 
 | Setting | Type | Description |
@@ -85,27 +58,25 @@ In Meltano Cloud:
 | `tenant_name` | string | Aptem tenant name used to build the base URL. |
 | `start_date` | date | The earliest record date to sync. |
 
-## Replication
+## Advanced configuration
 
-Streams with a known replication key are replicated incrementally; the rest are replicated in full on each run.
+- **Replication key overrides**: if a stream isn't replicating incrementally despite exposing a suitable date column, set `replication-method: INCREMENTAL` and a `replication-key` for that stream in your project's metadata configuration:
 
-If you find a stream is not behaving incrementally when it exposes a suitable date column, you can set a replication key configuration for the plugin under `metadata` in your `meltano.yml`:
+  ```yaml
+  plugins:
+    extractors:
+    - name: tap-aptem
+      variant: matatika
+      pip_url: git+https://github.com/Matatika/tap-aptem.git@v0.1.0
+      config:
+      metadata:
+        <stream_name>: # Aptem stream name
+          replication-method: INCREMENTAL
+          replication-key: <field_name> # a date column exposed by the stream
+  ```
 
-```yaml
-plugins:
-  extractors:
-  - name: tap-aptem
-    variant: matatika
-    pip_url: git+https://github.com/Matatika/tap-aptem.git@v0.1.0
-    config:
-    metadata:
-      <stream_name>: # Aptem stream name
-        replication-method: INCREMENTAL
-        replication-key: <field_name> # a date column exposed by the stream
-```
-
-You can also open an issue in the [tap-aptem repository](https://github.com/Matatika/tap-aptem/issues/new?title=feat:%20Register%20replication%20key%20for%20stream%20%60%3Cstream_name%3E%60&body=Replication%20key:%20%60%3Cfield_name%3E%60&labels=enhancement&type=feature) to register any missing configurations in the tap. Future version updates that include related changes would no longer require corresponding `metadata` entries, as above.
+If you register a replication key override for a stream, consider [opening an issue on the tap-aptem repo](https://github.com/Matatika/tap-aptem/issues/new?title=feat:%20Register%20replication%20key%20for%20stream%20%60%3Cstream_name%3E%60&body=Replication%20key:%20%60%3Cfield_name%3E%60&labels=enhancement&type=feature) so it can be added upstream for everyone. Future version updates that include related changes would no longer require corresponding `metadata` entries, as above.
 
 ## Need help?
 
-If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

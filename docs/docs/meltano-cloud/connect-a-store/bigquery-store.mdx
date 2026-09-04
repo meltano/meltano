@@ -1,0 +1,42 @@
+---
+title: BigQuery Store
+description: Set up a Google BigQuery data store for use with Meltano Cloud
+layout: doc
+sidebar_position: 19
+---
+
+# BigQuery Store
+
+## Create a dataset
+
+Meltano loads data into a BigQuery dataset that must already exist — it is not created automatically.
+
+1. Go to the [BigQuery console](https://console.cloud.google.com/bigquery) and select (or create) the Google Cloud project you want to load data into.
+2. In the Explorer panel, click the three-dot menu next to your project and select **Create dataset**.
+3. Enter a dataset ID (e.g. `meltano`) and choose a data location.
+4. Click **Create dataset**, then copy the project ID, dataset ID, and location.
+
+## Create a service account
+
+1. Go to [IAM & Admin → Service Accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) for your project.
+2. Click **Create service account**, give it a name (e.g. `meltano-loader`), and click **Create and continue**.
+3. Grant it the `BigQuery Data Editor` role on the dataset and the `BigQuery Job User` role on the project (or an enclosing folder or organization), then click **Done**.
+4. Open the new service account, go to the **Keys** tab, click **Add key → Create new key**, and choose **JSON**.
+5. Download the key file and store it securely — its contents are pasted into Meltano as the **Service Account Key (json)** setting.
+
+If you plan to use the `gcs_stage` ingestion method, also grant the service account write access to the Cloud Storage bucket you intend to stage through.
+
+## Configure Meltano
+
+To configure your Meltano Workspace to use your BigQuery dataset, follow these steps:
+
+1. Add a new store to your Meltano Workspace using the `bigquery` store type.
+2. Paste in the JSON contents of the service account key you downloaded.
+3. Enter the **Project** ID and **Dataset** ID you created, and the dataset's **Location** if it isn't in the default region.
+4. Choose a **Method** (defaults to `Batch Job`) and save.
+
+## Arrow BATCH ingestion
+
+Taps that emit Arrow-encoded Singer `BATCH` messages are loaded natively by `target-bigquery`, with no configuration required, as long as the store's **Denormalized** setting is enabled — Arrow BATCH files can't be loaded into the fixed-schema (`JSON` column) path.
+
+See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for supported extractors and how to enable Arrow output on the tap.

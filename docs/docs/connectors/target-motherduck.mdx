@@ -1,0 +1,79 @@
+---
+title: MotherDuck
+description: Load your Meltano pipeline data into a MotherDuck database.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# MotherDuck
+
+<ConnectorTypeBadge type="loader" block />
+
+MotherDuck is a cloud data warehouse built on DuckDB, aimed at teams who want fast, serverless SQL analytics without managing infrastructure. This connector loads data from any of your Meltano data sources into a MotherDuck database, so it lands somewhere you can query it directly or build on with other tools.
+
+> **Note:** MotherDuck is a loader, not a data source: it doesn't have its own streams, sync type or custom queries to sync from. The facts below reflect that.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+| **Loads via** | Standard Singer records, plus Arrow- or JSONL-encoded batch messages with no extra configuration |
+| **Target database** | Must already exist: this connector does not create it for you |
+
+## What it loads
+
+Whatever streams your connected data sources send it: one table per stream, created in the schema you configure.
+
+## Prerequisites
+
+- **A MotherDuck database that already exists.** This target won't create it for you.
+- **MotherDuck Token**: your MotherDuck access token.
+- **MotherDuck Connection String**: e.g. `md:my_database`, pointing at the database above.
+
+## Setup
+
+### In MotherDuck
+
+1. Create the database you want to load into, if it doesn't already exist.
+2. Generate a MotherDuck token.
+
+### In Meltano Cloud
+
+1. Enter your MotherDuck Connection String (e.g. `md:my_database`) and Token.
+2. Set Default Target Schema: the schema new tables are created in. Defaults to `analytics`.
+
+## Available streams
+
+This target doesn't discover streams itself: it loads whatever streams the connected extractor(s) send it, creating one table per stream in your configured target schema.
+
+## Advanced configuration
+
+- **Batch size**: Batch Size Rows controls how many rows load into DuckDB at a time (default 100,000).
+- **Flush behaviour**: Flush All Streams flushes every stream after each batch, rather than only the one currently loading.
+- **Schema flattening**: Data Flattening Max Level controls how deeply nested JSON is expanded into columns (`0` = no flattening, the default).
+- **Metadata columns**: Add Metadata Columns adds Singer's standard tracking columns to each loaded table.
+- **Deletes**: Hard Delete performs an actual row delete instead of a soft delete when a source sends delete records.
+- **Validation**: Validate Records validates each record against its schema before loading (off by default).
+- **Primary keys**: Primary Key Required (on by default) rejects a stream that doesn't declare a primary key, since the target needs one to know how to upsert rows.
+- **Temporary files**: Temporary Directory sets where temp files are written while loading.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `connection_string` | string | MotherDuck connection string, e.g. `md:my_database`. |
+| `token` | string | MotherDuck access token. |
+| `default_target_schema` | string | Schema new tables are created in. Defaults to `analytics`. |
+| `batch_size_rows` | integer | Number of rows to load at a time. Default `100000`. |
+| `flush_all_streams` | boolean | Flushes every stream after each batch, rather than only the one currently loading. |
+| `add_metadata_columns` | boolean | Adds Singer's standard tracking columns to each loaded table. |
+| `hard_delete` | boolean | Performs an actual row delete instead of a soft delete when a source sends delete records. |
+| `data_flattening_max_level` | integer | Maximum depth to flatten nested JSON into columns. `0` (default) disables flattening. |
+| `primary_key_required` | boolean | Rejects a stream that doesn't declare a primary key. Enabled by default. |
+| `validate_records` | boolean | Validates each record against its schema before loading. Off by default. |
+| `temp_dir` | string | Directory used for temporary files while loading. |
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

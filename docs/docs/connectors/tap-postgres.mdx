@@ -1,0 +1,330 @@
+---
+title: PostgreSQL
+description: Sync PostgreSQL tables via full-table, key-based incremental, or log-based (CDC) replication, choosing the method per stream.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# PostgreSQL
+
+<ConnectorTypeBadge type="extractor" block />
+
+PostgreSQL is one of the most widely used open-source relational databases, powering everything from application backends to internal tools. This connector syncs tables from your PostgreSQL database using whichever replication method fits each one: a full re-extract, an incremental pull based on a column you choose, or log-based (CDC) replication that reads row-level changes directly from Postgres's write-ahead log as they happen. That last mode is what makes this connector a fit for teams who need their warehouse to stay closely in sync with a live operational database, but it's one option among three, not the only way to use it.
+
+:::info Multiple variants available
+This page documents the default `tap-postgres` variant. Meltano also offers an alternate **`matatika`** variant, built on `pipelinewise-tap-postgres`, with its own settings and SSH tunnel support; see [Alternate variant: matatika](#alternate-variant-matatika) below.
+:::
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | Database credentials (host, port, user, password, database name); a role with replication privileges is only needed for log-based streams |
+| **Sync type** | Full table, key-based incremental, or log-based (CDC), set independently per stream |
+| **Streams** | Discovered dynamically from your database's schemas and tables |
+| **Custom queries** | Not supported |
+| **Estimated setup time** | ~10 minutes for full-table or incremental; ~10 minutes more for log-based (CDC), varies by provider |
+| **Supported sources** | Self-hosted Postgres, AWS RDS / Aurora, Google Cloud SQL, Azure Database for Postgres, Neon |
+
+## What you can sync
+
+Any table in your connected Postgres database can be synced as a stream, and each stream picks its own replication method. Once set up, this connector captures:
+
+- Full snapshots, incremental pulls, or row-level inserts, updates, and deletes, depending on the method a stream uses
+- Any schema or table pattern you select, across one or more schemas in the database
+
+## Choosing a sync type
+
+Each stream is assigned one of three replication methods, set independently, so a single pipeline can mix and match across tables:
+
+- **Full table.** Re-extracts the entire table on every run. No extra setup beyond a standard connection, and no dependency on a suitable key column. Best for small or reference tables where re-syncing everything each time is cheap.
+- **Key-based incremental.** Extracts only rows added or changed since the last run, using a column you designate as the replication key (for example `updated_at` or an auto-incrementing `id`). That column has to be monotonically increasing for this to work correctly, and hard deletes on the source aren't reflected downstream since a deleted row is never seen again.
+- **Log-based (CDC).** Reads changes directly from Postgres's write-ahead log, capturing inserts, updates, and deletes as they happen, including deletes, which the other two methods can't see. This is the mode most of this page is about, since it needs server-side setup that the other two don't.
+
+Full-table and incremental streams need nothing beyond the connection settings in [Settings](#settings). If none of your streams use log-based replication, you can skip ahead there and to [In Meltano Cloud](#in-meltano-cloud).
+
+## How log-based (CDC) replication works
+
+Every change made to a Postgres database (an insert, an update, a delete) gets written to an internal log called the write-ahead log (WAL) before it's applied, so the database can recover if it crashes mid-write. By default, that log only keeps enough detail for crash recovery, not enough to reconstruct exactly which rows changed and how. Logical replication switches the WAL into a more detailed mode so row-level changes become readable.
+
+A logical decoding plugin turns that raw, detailed WAL data into a structured format an external tool can consume. This connector relies on **wal2json**, which isn't bundled with Postgres by default. It has to be installed on the server (or already present, on a managed provider) before anything else here will work.
+
+Once decoding is possible, Postgres still needs to know which changes to retain for the connector to pick up. That's what a **replication slot** is: a named bookmark on the server that says "don't discard WAL data past this point until it's been read." The connector reads from the slot on each sync, and the slot's position advances as it goes, so restarts and scheduled runs pick up exactly where the last one left off, instead of missing changes or reprocessing everything.
+
+- **WAL level:** By default, Postgres's write-ahead log only contains enough detail for crash recovery. Logical replication requires switching it to a more detailed mode (`wal_level = logical`) so changes can be read row-by-row.
+- **Logical decoding plugin:** Translates the detailed log into a structured format this connector can read. It uses **wal2json (≥ 2.3), format version 2**, which must be installed on the server before a slot can be created with it. On self-hosted Debian/Ubuntu Postgres this is the `postgresql-<version>-wal2json` package; it's usually preloaded on RDS, Cloud SQL, and Azure Database for Postgres.
+- **Replication slot:** A bookmark that tells Postgres not to delete log entries until the connector has read them. This is what lets the connector pick up exactly where it left off between runs. The slot name isn't free-form; see [Slot naming](#slot-naming) below.
+- **Server version:** PostgreSQL 9.4 or newer is required, connecting to the primary. A few minor-version ranges shipped a WAL bug and are actively refused by the connector at sync time (fatal error); see [Server version requirements](#server-version-requirements) below.
+
+## Prerequisites
+
+If every stream you're setting up uses full-table or key-based incremental replication, all you need is a standard connection: host, port, user, password, and database name, with a role that can `SELECT` from the tables you're syncing.
+
+The items below are only needed if any stream uses log-based (CDC) replication. Unlike connectors that authenticate with a token or an OAuth sign-in, log-based replication requires one-time server-side setup by a database administrator, in addition to a standard connection credential:
+
+- **Database admin access**, needed to change WAL-related server settings and create a replication slot. This is a one-time setup step, not something the connecting pipeline needs on an ongoing basis.
+- **A Postgres role with `REPLICATION` privileges**, connecting to the primary instance. This is weaker than full superuser.
+  - How to get it: run `ALTER ROLE <user> WITH REPLICATION;` as a superuser (or the managed-provider equivalent, e.g. `GRANT rds_replication TO <user>;` on RDS).
+- **Connection details**: host, port, user, password, and database name. All five are required.
+- **PostgreSQL 9.4 or newer**, connecting to the primary. A few minor-version ranges shipped a WAL bug and are refused by the connector at sync time; see [Server version requirements](#server-version-requirements) below.
+- **wal2json (≥ 2.3), format version 2**, not bundled with Postgres by default. Usually preinstalled on managed providers, but must be installed manually on self-hosted instances.
+
+## Server version requirements
+
+| Version line | Minimum patch (WAL bug fix) |
+|---|---|
+| 9.4.x | 9.4.21 |
+| 9.5.x | 9.5.16 |
+| 9.6.x | 9.6.12 |
+| 10.x | 10.7 |
+| 11.x | 11.2 |
+| 12+ | No known issue |
+
+Anything below 9.4 is unsupported outright. If your server falls in an affected range, the connector refuses to run with a fatal error at sync time rather than silently under-replicating.
+
+## Setup
+
+Setup has two parts for every provider: preparing your database for replication, then connecting it in Meltano Cloud. Choose the section that matches where your database is hosted.
+
+### Self-hosted Postgres
+
+1. Edit `postgresql.conf`:
+
+   ```ini
+   wal_level = logical
+
+   # size to at least the number of slots you'll create; 5+ recommended
+   max_replication_slots = 5
+
+   # size to at least max_replication_slots; 5+ recommended
+   max_wal_senders = 5
+
+   # on versions 14.24, 15.19, 16.15, 17.11, 18.6 and newer,
+   # the following is required
+   output_plugin_libraries = 'pgoutput, test_decoding, wal2json'
+   ```
+
+2. Restart the Postgres server for the change to take effect.
+3. Install wal2json (≥ 2.3), since it is not built in. On Debian/Ubuntu:
+
+   ```sh
+   apt-get install postgresql-<your-major-version>-wal2json
+   ```
+
+4. Grant the connecting user replication privileges (skip if it's already a superuser):
+
+   ```sql
+   ALTER ROLE <user> WITH REPLICATION;
+   ```
+
+5. Create a replication slot:
+
+   ```sql
+   SELECT pg_create_logical_replication_slot('tap_postgres_<db_name>', 'wal2json');
+   ```
+
+   The name must match exactly what the connector looks up, or sync fails with `replication slot not found`; see [Slot naming](#slot-naming).
+
+### AWS RDS / Aurora Postgres
+
+RDS and Aurora share the same connecting-role and slot-creation steps, but the parameter group you edit is at a different level for each.
+
+**RDS:**
+
+1. Create or edit a DB (instance-level) parameter group and set `rds.logical_replication = 1`. As part of applying this parameter, also set `wal_level`, `max_wal_senders`, `max_replication_slots`, and `max_connections` (5+ recommended for the replication-related ones). AWS calls these out as a set.
+2. Apply the parameter group to your instance (this usually requires a reboot). See [AWS's guide on modifying parameter groups](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithParamGroups.Modifying.html).
+3. Make sure the connecting database user has both roles:
+
+   ```sql
+   GRANT rds_superuser TO <user>;   -- required to turn logical replication on
+   GRANT rds_replication TO <user>; -- required to manage/stream from logical slots
+   ```
+
+4. Create the replication slot via SQL, same command as self-hosted:
+
+   ```sql
+   SELECT pg_create_logical_replication_slot('tap_postgres_<db_name>', 'wal2json');
+   ```
+
+**Aurora PostgreSQL:**
+
+Aurora's logical replication setup differs from plain RDS in one important way: it's configured on a DB *cluster* parameter group, not the instance-level one, and the default DB cluster parameter group can't be edited. You need a custom one attached to the cluster.
+
+1. Attach a custom DB cluster parameter group to the Aurora PostgreSQL cluster, if it isn't using one already.
+2. In that cluster parameter group, set `rds.logical_replication = 1` (default is `0`). Also size:
+   - `max_replication_slots`: at least your planned total logical replication publications/subscriptions.
+   - `max_wal_senders` and `max_logical_replication_workers`: at least the number of logical slots you intend to keep active.
+   - `max_worker_processes`: at least `max_logical_replication_workers` + `autovacuum_max_workers` + `max_parallel_workers`. On small instance classes this can affect application workloads, so watch performance if you raise it above the default.
+3. Save the parameter group changes, then reboot the **writer** instance of the cluster. As with RDS, this is required for the static `rds.logical_replication` parameter to take effect. Rebooting the writer (not just any reader) is what applies the change cluster-wide.
+4. Same role requirements as RDS: the connecting user needs both `rds_superuser` and `rds_replication` (the cluster's master user has both by default).
+5. Create the replication slot via SQL, same command as self-hosted and RDS:
+
+   ```sql
+   SELECT pg_create_logical_replication_slot('tap_postgres_<dbname>', 'wal2json');
+   ```
+
+### Google Cloud SQL for Postgres
+
+1. Enable logical decoding via the `cloudsql.logical_decoding` flag (console or `gcloud sql instances patch`).
+2. Also size `max_replication_slots` and `max_wal_senders` as instance flags (5+ recommended for each).
+3. Confirm wal2json (≥ 2.3) is installed (usually preloaded on Cloud SQL).
+4. Grant replication privileges to the connecting user, if not already the instance's built-in admin:
+
+   ```sql
+   ALTER ROLE <user> WITH REPLICATION;
+   ```
+
+5. Create the replication slot via SQL:
+
+   ```sql
+   SELECT pg_create_logical_replication_slot('tap_postgres_<db_name>', 'wal2json');
+   ```
+
+### Azure Database for Postgres
+
+1. Enable logical replication via the `azure.replication_support` server parameter (Azure portal or CLI).
+2. Also size `max_replication_slots` and `max_wal_senders` as server parameters (5+ recommended for each).
+3. Confirm wal2json (≥ 2.3) is installed. It's usually preloaded on Azure Database for Postgres, but verify.
+4. Grant replication privileges to the connecting user:
+
+   ```sql
+   ALTER ROLE <user> WITH REPLICATION;
+   ```
+
+5. Create the replication slot via SQL:
+
+   ```sql
+   SELECT pg_create_logical_replication_slot('tap_postgres_<db_name>', 'wal2json');
+   ```
+
+### Neon
+
+See [Neon's official logical replication guide](https://neon.com/docs/guides/logical-replication-neon).
+
+### In Meltano Cloud
+
+Once your database is prepped (previous sections), connecting to it is the same regardless of provider.
+
+1. Add a Postgres source and supply the connection settings the tap requires. All five are required (see [Troubleshooting](#troubleshooting)):
+   - `host`, `port`, `user`, `password`, `dbname`
+2. Select the streams you want to replicate and set each one's replication method. As plain Meltano project config in `meltano.yml`, this is stream metadata plus a `select` entry.
+
+   Full table needs nothing beyond the method itself:
+
+   ```yaml
+   metadata:
+     <schema>-<table_or_pattern>:
+       replication-method: FULL_TABLE
+   select:
+     - <schema>-<table_or_pattern>.*
+   ```
+
+   Key-based incremental also needs a `replication-key`:
+
+   ```yaml
+   metadata:
+     <schema>-<table_or_pattern>:
+       replication-method: INCREMENTAL
+       replication-key: updated_at
+   select:
+     - <schema>-<table_or_pattern>.*
+   ```
+
+   Log-based (CDC) requires the server-side setup in [Prerequisites](#prerequisites) to already be in place:
+
+   ```yaml
+   metadata:
+     <schema>-<table_or_pattern>:
+       replication-method: LOG_BASED
+   select:
+     - <schema>-<table_or_pattern>.*
+   ```
+
+3. Commit and push your changes, and deploy your workspace from the settings page.
+
+## Available streams
+
+Streams are discovered dynamically from your database's schemas and tables; the exact set depends on what's in your connected database. Each stream syncs using whichever of the three replication methods you've assigned it; see [Choosing a sync type](#choosing-a-sync-type).
+
+## Slot naming
+
+Slot names aren't free-form. The connector looks up a fixed prefix, `tap_postgres`, and checks two candidate names in order: the un-suffixed one first (for backward compatibility), then the `tap_id`-suffixed one:
+
+1. `tap_postgres_<dbname>`
+2. `tap_postgres_<dbname>_<tap_id>` (only checked if `tap_id` is set in the tap's config)
+
+Both are derived by lowercasing the input and replacing every character outside `[a-z0-9_]` with `_`. If neither candidate exists as a replication slot when a sync starts, it will fail with a clear error message.
+
+`tap_id` is an optional config setting: a pipeline identifier appended to the slot name. It's useful when multiple pipelines replicate from the same database and need distinct slots.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `host` | string | Postgres server host. Required. |
+| `port` | integer | Postgres server port. Required. |
+| `user` | string | Connecting Postgres role. Needs `SELECT` on the tables you're syncing; also needs `REPLICATION` privileges if any stream uses log-based (CDC) replication. Required. |
+| `password` | string | Password for the connecting role. Required. |
+| `dbname` | string | Database name to connect to and replicate from. Required. |
+| `tap_id` | string | Optional pipeline identifier appended to the replication slot name, so multiple pipelines can replicate from the same database with distinct slots. |
+
+## Troubleshooting
+
+Concrete failure modes surfaced by the connector itself:
+
+- **`Unable to find replication slot ... with wal2json output plugin`**: the slot wasn't created, was created with the wrong name (see [Slot naming](#slot-naming)), or was dropped. Re-run the `pg_create_logical_replication_slot` command from the Setup section above with the exact expected name.
+- **`Logical replication requires PostgreSQL 9.4 or newer (server reports <version>)`**: the server is older than the minimum supported version. Upgrade Postgres.
+- **`Unable to start replication on slot <slot>: <driver error>`**: commonly means the slot is already in use by another consumer, or the connecting role lost its replication privilege after the slot was created. Confirm no other process is streaming from the same slot, and that `ALTER ROLE <user> WITH REPLICATION` is still in effect.
+- **`Missing required configuration keys: ...`**: one of `host`, `port`, `user`, `password`, `dbname` is missing from the tap config. Fill in the missing key(s).
+- **Sync silently does nothing**: if neither `--discover` nor a catalog is passed, the tap logs that nothing was selected and exits successfully (not an error, but easy to mistake for one). Confirm the catalog has streams selected.
+
+## Alternate variant: matatika
+
+Meltano also offers `tap-postgres` in a **`matatika`** variant, a fork of [`pipelinewise-tap-postgres`](https://github.com/Matatika/pipelinewise-tap-postgres) maintained separately from the default variant documented above. It's a different codebase with its own settings, most notably built-in SSH tunnel support for connecting to a Postgres server behind a bastion host, so reach for it if that's a requirement the default variant doesn't meet for your setup.
+
+To use it, add the tap with this variant instead of the default:
+
+```bash
+meltano add extractor tap-postgres --variant matatika
+```
+
+Or, as plain Meltano project config in `meltano.yml`:
+
+```yaml
+plugins:
+  extractors:
+    - name: tap-postgres
+      variant: matatika
+```
+
+### Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `host` | string | The hostname or IP address of the PostgreSQL server. Required. |
+| `port` | integer | The port number on which the PostgreSQL server is listening. Default `5432`. Required. |
+| `user` | string | The username to use when connecting to the PostgreSQL server. Required. |
+| `password` | string | The password to use when connecting to the PostgreSQL server. Required. |
+| `dbname` | string | The name of the PostgreSQL database to connect to. Required. |
+| `ssl` | boolean | Whether to use SSL encryption when connecting to the PostgreSQL server. Default `false`. |
+| `filter_schemas` | string | A comma-separated list of schemas to include or exclude when replicating data. |
+| `default_replication_method` | string | The default replication method to use when replicating data: `LOG_BASED`, `INCREMENTAL`, or `FULL_TABLE`. Default `FULL_TABLE`. |
+| `max_run_seconds` | integer | The maximum number of seconds to run the replication task before stopping. Default `43200`. |
+| `logical_poll_total_seconds` | integer | The total number of seconds to wait for new changes when using logical (log-based) replication. Default `60`. |
+| `break_at_end_lsn` | boolean | Whether to stop replication when the end LSN is reached. Default `true`. |
+| `ssh_tunnel.host` | string | Address of the bastion host to connect to via SSH. |
+| `ssh_tunnel.port` | integer | Port to connect to on the bastion host. Default `22`. |
+| `ssh_tunnel.username` | string | Username to connect to the bastion host. |
+| `ssh_tunnel.password` | string | Password to connect to the bastion host, for basic auth. |
+| `ssh_tunnel.private_key` | string | Base64-encoded private key for authenticating to the bastion host with key pair auth. |
+| `ssh_tunnel.private_key_password` | string | Passphrase for the private key. Leave unset if the key has no password. |
+
+`LOG_BASED` replication with this variant still depends on Postgres's write-ahead log being in logical mode; see [How log-based (CDC) replication works](#how-log-based-cdc-replication-works) and [Setup](#setup) above for what that requires on your server.
+
+### Troubleshooting
+
+- **`pg_config executable not found`** or **`libpq-fe.h: No such file or directory`**: this variant depends on [`libpq`](https://www.postgresql.org/docs/current/libpq.html), which isn't installed. On Debian/Ubuntu, install it with `apt-get install libpq-dev`; on macOS, `brew install postgresql`.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

@@ -27,7 +27,7 @@ The AI knowledge kit is seeded when the workspace is created, so it's already in
 
 Three files, no app to run:
 
-* **`AGENTS.md`** tells the agent to check the knowledge base before doing anything, and which doc in it applies to the task. `CLAUDE.md` just points to `AGENTS.md`, so the same convention works whichever editor you're in. A trimmed example of what it looks like:
+* **`AGENTS.md`** is the router: it tells the agent to check the knowledge base before doing anything, and which doc in it applies to the task. `CLAUDE.md` just points to `AGENTS.md`, so the same convention works whichever editor you're in. A trimmed example of what it looks like:
 
 ```markdown
 # AGENTS.md
@@ -38,12 +38,30 @@ Before making changes, check the knowledge base:
 - Project-specific notes -> .claude/workspace_knowledge_base/ (check this first, it overrides the above)
 ```
 
-* **`.claude/meltano_knowledge_base/`** is the shared reference: how taps and targets work, how to configure sources and destinations, how runs get built and debugged. Split into `meltano/` and `meltano_cloud/`, each fronted by an `index.md` topic map.
-* **`.claude/workspace_knowledge_base/`** is your repo's own notes: empty at first, filled in as you and the agent hit and solve things specific to this project (see [Capture what you learn](#capture-what-you-learn)). It's never touched by the seeded kit.
+* **`.claude/meltano_knowledge_base/`** is the shared reference: how taps and targets work, how to configure sources and destinations, how runs get built and debugged. Split into `meltano/` and `meltano_cloud/`, each fronted by an `index.md` topic map. The agent reads these directly: no setup, no tooling, just files.
+* **`.claude/workspace_knowledge_base/`** is your repo's own notes: empty at first, filled in as you and the agent hit and solve things specific to this project (see [Capture what you learn](#capture-what-you-learn)). It isn't part of the seeded kit, and it's never overwritten by it.
 
-If the agent skips straight to writing config without checking the KB, tell it to read `AGENTS.md` first, that's the usual reason it ends up guessing instead of following the platform's conventions.
+:::tip One habit that pays off
+Let the agent lead from `AGENTS.md` rather than free-styling. If you ask it to do something and it hasn't consulted the knowledge base, tell it to, the whole point is that the platform's conventions are already written down for it.
+:::
 
-## Walkthrough: CSV into Postgres
+## Build a pipeline
+
+Describe the outcome and let the agent handle the mechanics, for example "load this CSV into Postgres." Guided by the knowledge base, it will:
+
+* Identify the right connectors from the knowledge base and MeltanoHub.
+* Add them with `meltano add`, which also writes the lockfiles you must commit (see [Commit your lockfiles](#commit-your-lockfiles)).
+* Write the pipeline config into `meltano.yml`.
+* Scaffold a `.env.example` naming exactly which settings are secret (see [Secrets and credentials](#secrets-and-credentials)).
+
+Then validate before you run, to confirm the config resolves:
+
+```bash
+meltano config <plugin> list       # check settings resolve
+meltano run <extractor> <loader>   # run it locally
+```
+
+### Walkthrough: CSV into Postgres
 
 One example end to end, so you have a working run to compare your own against.
 
@@ -51,7 +69,7 @@ One example end to end, so you have a working run to compare your own against.
 
 > Load `orders.csv` into Postgres, table `raw_orders`.
 
-Guided by the KB, the agent:
+Guided by the knowledge base, the agent:
 
 * Picks `tap-csv` and `target-postgres` from MeltanoHub.
 * Runs `meltano add extractor tap-csv` and `meltano add loader target-postgres`, each of which writes a lockfile under `plugins/extractors/` or `plugins/loaders/` (see [Commit your lockfiles](#commit-your-lockfiles)).
@@ -155,7 +173,9 @@ Pushing to your repo *is* deploying. The platform reconciles the committed confi
 git push
 ```
 
-Reconciliation happens after the push lands, it isn't instant. A push that returns successfully only means git accepted it, not that reconciliation finished, check the **Pipelines** view in the Meltano app for the new pipeline before assuming it's live.
+:::tip Deploy is async, don't assume instant
+The push returns immediately, but reconciliation happens in the background on the platform. A push that returns successfully only means git accepted it, not that reconciliation finished. Give it a moment, then check the **Pipelines** view in the Meltano app for the new pipeline before assuming it's live.
+:::
 
 ## Troubleshoot a failure
 
@@ -200,7 +220,7 @@ It's local to your repo, not shared with other workspaces, but the next person, 
 
 ## Pre-flight checklist
 
-Before you call a change done and push it:
+Run down this list before you call a change done and push it. It catches the steps that fail quietly.
 
 1. **Plugins added via `meltano add`.** Not hand-edited into `meltano.yml` alone.
 2. **Lockfiles committed.** `plugins/*.lock` staged alongside `meltano.yml`, the #1 silent deploy failure.
