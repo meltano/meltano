@@ -84,6 +84,19 @@ def meltano_integration_base() -> Path:
     return INTEGRATION_BASE_DIR
 
 
+def _require_bash() -> str:
+    """Return the bash executable, skipping the test when it is unavailable.
+
+    Extracted from the ``bash_executable`` fixture so the "no bash" skip
+    branch is directly exercisable by a unit test (bash always exists on the
+    Linux CI matrix, so the branch would otherwise never be covered).
+    """
+    bash = shutil.which("bash")
+    if bash is None:
+        pytest.skip("bash is not available on this platform")
+    return bash
+
+
 @pytest.fixture
 def bash_executable() -> str:
     """The bash interpreter used to run mdsh and the compiled scripts.
@@ -91,10 +104,21 @@ def bash_executable() -> str:
     Checked *before* mdsh because mdsh itself is a bash script — without
     bash there is no point probing for mdsh.
     """
-    bash = shutil.which("bash")
-    if bash is None:
-        pytest.skip("bash is not available on this platform")
-    return bash
+    return _require_bash()
+
+
+def _require_mdsh(meltano_integration_base: Path) -> Path:
+    """Return the mdsh compiler, skipping the test when it is unavailable.
+
+    Extracted from the ``mdsh_compiler`` fixture so both skip branches (no
+    bash on PATH, no mdsh in the checkout) are directly exercisable by a
+    unit test instead of being dead code on the Linux CI matrix.
+    """
+    _require_bash()
+    mdsh = meltano_integration_base / "mdsh"
+    if not mdsh.is_file():
+        pytest.skip("mdsh is not available in this checkout")
+    return mdsh
 
 
 @pytest.fixture
@@ -104,12 +128,7 @@ def mdsh_compiler(meltano_integration_base: Path) -> Path:
     bash is probed first because mdsh itself is a bash script — without
     bash there is no point probing for mdsh.
     """
-    if shutil.which("bash") is None:
-        pytest.skip("bash is not available on this platform")
-    mdsh = meltano_integration_base / "mdsh"
-    if not mdsh.is_file():
-        pytest.skip("mdsh is not available in this checkout")
-    return mdsh
+    return _require_mdsh(meltano_integration_base)
 
 
 @pytest.fixture
@@ -287,4 +306,81 @@ def test_discover_example_library_tests_skips_incomplete_directories(
     discovered = _tl_mod._discover_example_library_tests()
     assert "complete" in discovered
     assert "broken" not in discovered
-    assert "broken" not in discovered
+
+
+def test_example_library_skip_guards_cover_env_dependent_branches(
+    tmp_path, monkeypatch
+):
+    """Drive the skip guards of ``test_example_library`` that a Linux CI run
+    cannot exercise on its own.
+
+    * The ``sys.platform != "linux"`` guard never fires on the ubuntu matrix,
+      so it has to be forced with a patched platform.
+    * The infrastructure guards only fire when the corresponding test name is
+      part of ``EXAMPLE_LIBRARY_TESTS`` *and* the opt-in env var is unset; the
+      real example-library tree may not contain those names, so drive each one
+      explicitly to keep ``codecov/patch`` at 100% regardless of the tree.
+    """
+    import tests.meltano.integration.test_example_library as _tl_mod
+
+    def call_test(test_name: str):
+        _tl_mod.test_example_library(
+            test_name,
+            tmp_path,
+            "bash",
+            tmp_path / "mdsh",
+            tmp_path,
+            tmp_path / "logging.yaml",
+        )
+
+    # Non-Linux guard: reachable only when the matrix runs on macOS/Windows.
+    monkeypatch.setattr(_tl_mod.sys, "platform", "win32")
+    with pytest.raises(pytest.skip.Exception):
+        call_test("demo")
+
+    # Infra guards: simulate a runner without the opt-in env vars.
+    monkeypatch.setattr(_tl_mod.sys, "platform", "linux")
+    for name, env_var in (
+        ("meltano-run", "MELTANO_TEST_POSTGRES"),
+        ("meltano-state-s3", "MELTANO_TEST_S3"),
+        ("meltano-custom-python", "MELTANO_TEST_INTEGRATION_ENV"),
+    ):
+        monkeypatch.delenv(env_var, raising=False)
+        with pytest.raises(pytest.skip.Exception):
+            call_test(name)
+
+
+def test_per_test_validate_and_bootstrap_guards(tmp_path, monkeypatch):
+    """Cover helper and fixture branches that never fire against the real
+    example-library tree or on Linux runners.
+
+    * No example-library directory ships a ``validate.sh`` today, so the
+      per-test assertion branch of ``_run_per_test_validate`` is dead in the
+      integration run and needs a synthetic fixture.
+    * ``bash`` and ``mdsh`` always exist on the ubuntu runners, so the
+      "not available" skip branches of the ``bash_executable`` and
+      ``mdsh_compiler`` fixtures are dead in CI and are forced here.
+    """
+    import tests.meltano.integration.test_example_library as _tl_mod
+
+    # _run_per_test_validate: directory with a validate.sh -> assertion runs.
+    validate_sh = tmp_path / "validate.sh"
+    validate_sh.write_text(
+        "#!/usr/bin/env bash\nset -e\necho per-test-validate-ok\n",
+        encoding="utf-8",
+    )
+    _tl_mod._run_per_test_validate("bash", tmp_path)
+
+    # _require_bash: no bash on PATH.
+    monkeypatch.setattr(_tl_mod.shutil, "which", lambda _name: None)
+    with pytest.raises(pytest.skip.Exception):
+        _tl_mod._require_bash()
+
+    # _require_mdsh: no bash on PATH.
+    with pytest.raises(pytest.skip.Exception):
+        _tl_mod._require_mdsh(tmp_path)
+
+    # _require_mdsh: bash present but mdsh missing from the checkout.
+    monkeypatch.setattr(_tl_mod.shutil, "which", lambda _name: "/usr/bin/bash")
+    with pytest.raises(pytest.skip.Exception):
+        _tl_mod._require_mdsh(tmp_path)
