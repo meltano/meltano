@@ -63,6 +63,7 @@ does:
 |---|---|---|
 | `tap-mysql` | Arrow | Arrow for the initial backfill, then `RECORD` once log-based streaming starts |
 | `tap-postgres` | Arrow | Always `RECORD` |
+| `tap-snowflake` | Arrow | N/A - tap doesn't support log-based replication |
 
 If your target doesn't advertise the `batch` capability, leave
 `batch_config` unset (or set the tap's batch size to `0`, where supported) so
@@ -76,6 +77,7 @@ it stays in `RECORD` mode.
 |---|---|---|
 | [`tap-mysql`](https://github.com/Matatika/pipelinewise-tap-mysql) | ✅ Supported (v1.5.0+) | `FULL_TABLE`/`INCREMENTAL`: Arrow. `LOG_BASED`: Arrow backfill, then `RECORD` streaming. |
 | [`tap-postgres`](https://github.com/meltano/meltano-tap-postgres) | ⏳ Supports Arrow, not yet on Meltano Cloud | `FULL_TABLE`/`INCREMENTAL`: Arrow. `LOG_BASED`: always `RECORD`. Uses `adbc-driver-postgresql`. Not yet available as a Meltano Cloud extractor. |
+| [`tap-snowflake`](https://github.com/MeltanoLabs/tap-snowflake) | ✅ Supported (v0.5.0+) | `FULL_TABLE`/`INCREMENTAL`: Arrow. No `LOG_BASED` support. Fetches Arrow natively via `snowflake-connector-python`'s own Arrow result format - no ADBC driver needed. |
 
 More extractors are added as they're prioritized. See the notes on each
 tap's settings page in the catalog for the latest status.
