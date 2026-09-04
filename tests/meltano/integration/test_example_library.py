@@ -231,3 +231,42 @@ def test_example_library(
         f"meltano.yml for '{test_name}' does not match "
         f"'{EXPECTED_MELTANO_YML}'. Run with -vv to see the diff."
     )
+
+
+@pytest.mark.parametrize(
+    "missing_fixture",
+    ["meltano_yml", "ending_meltano_yml"],
+)
+def test_discover_example_library_tests_skips_incomplete_directories(
+    tmp_path, missing_fixture, monkeypatch
+):
+    """Regression: a directory that has index.md but is missing one of the
+    other required fixtures must be skipped by the collector rather than
+    silently included.
+
+    Mirrors the original ``validate.sh`` behaviour, where the shell flow
+    rejected a directory if any of the three files (``index.md``,
+    ``meltano.yml``, ``ending-meltano.yml``) was missing. The pytest
+    migration dropped that branch, which is what codecov/patch is flagging.
+    """
+    # Build two fixture directories: one complete, one missing a fixture.
+    complete = tmp_path / "complete"
+    complete.mkdir()
+    for name in ("index.md", "meltano.yml", "ending-meltano.yml"):
+        (complete / name).write_text(name)
+
+    broken = tmp_path / "broken"
+    broken.mkdir()
+    for name in ("index.md", "meltano.yml", "ending-meltano.yml"):
+        if name != {"meltano_yml": "meltano.yml",
+                    "ending_meltano_yml": "ending-meltano.yml"}[missing_fixture]:
+            (broken / name).write_text(name)
+
+    # Point the module-level EXAMPLE_LIBRARY_DIR at our temp dir.
+    monkeypatch.setattr(
+        "tests.meltano.integration.test_example_library.EXAMPLE_LIBRARY_DIR", tmp_path
+    )
+
+    discovered = _discover_example_library_tests()
+    assert "complete" in discovered
+    assert "broken" not in discovered
