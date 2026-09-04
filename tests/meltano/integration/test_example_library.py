@@ -258,8 +258,13 @@ def test_discover_example_library_tests_skips_incomplete_directories(
     broken = tmp_path / "broken"
     broken.mkdir()
     for name in ("index.md", "meltano.yml", "ending-meltano.yml"):
-        if name != {"meltano_yml": "meltano.yml",
-                    "ending_meltano_yml": "ending-meltano.yml"}[missing_fixture]:
+        if (
+            name
+            != {
+                "meltano_yml": "meltano.yml",
+                "ending_meltano_yml": "ending-meltano.yml",
+            }[missing_fixture]
+        ):
             (broken / name).write_text(name)
 
     # Point the module-level EXAMPLE_LIBRARY_DIR at our temp dir.
