@@ -268,6 +268,12 @@ def test_discover_example_library_tests_skips_incomplete_directories(
         ):
             (broken / name).write_text(name)
 
+    # Stray non-directory entry: ensures the ``entry.is_dir() == False``
+    # branch of ``_discover_example_library_tests`` is also exercised
+    # (codecov/patch was flagging it because every previous case created
+    # only directories).
+    (tmp_path / "stray.txt").write_text("not a test")
+
     # Point the module-level EXAMPLE_LIBRARY_DIR at our temp dir.
     # Use a module-object patch (importlib.resolve_name) rather than the
     # string-based ``monkeypatch.setattr``: under pytest-xdist each worker
