@@ -68,6 +68,6 @@
   },
   "overrides": {
     "undici": "^8.0.0",
-    "webpack": "~5.109.0"
+    "webpack": "~5.110.0"
   }
 }
