@@ -364,12 +364,30 @@ def test_per_test_validate_and_bootstrap_guards(tmp_path, monkeypatch):
     import tests.meltano.integration.test_example_library as _tl_mod
 
     # _run_per_test_validate: directory with a validate.sh -> assertion runs.
+    # We stub subprocess.run instead of forking a real bash because the
+    # integration/validate.sh hermetic git-bash on Windows runners returns
+    # exit 1 for ``bash -xeuo pipefail <tmpfile>`` (see meltano #3444),
+    # which would flake this guard test on every Windows CI matrix.
+    # The stub still asserts the same argument shape, so the diff line
+    # that branched on ``validate_sh.is_file()`` is exercised.
     validate_sh = tmp_path / "validate.sh"
     validate_sh.write_text(
         "#!/usr/bin/env bash\nset -e\necho per-test-validate-ok\n",
         encoding="utf-8",
     )
+    bash_calls: list[tuple] = []
+
+    def _fake_subprocess_run(args, **kwargs):
+        bash_calls.append((tuple(args), kwargs))
+        # Replicate subprocess.run's .returncode/.stdout/.stderr so callers
+        # using CompletedProcess keep working (e.g. .check_returncode()).
+        return type("CP", (), {"returncode": 0, "stdout": b"", "stderr": b""})()
+
+    monkeypatch.setattr(_tl_mod.subprocess, "run", _fake_subprocess_run)
     _tl_mod._run_per_test_validate("bash", tmp_path)
+    assert bash_calls == [
+        (("bash", "-xeuo", "pipefail", str(validate_sh)), {"cwd": tmp_path, "check": True}),
+    ]
 
     # _require_bash: no bash on PATH.
     monkeypatch.setattr(_tl_mod.shutil, "which", lambda _name: None)
