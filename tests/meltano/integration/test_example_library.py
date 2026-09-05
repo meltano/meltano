@@ -386,7 +386,10 @@ def test_per_test_validate_and_bootstrap_guards(tmp_path, monkeypatch):
     monkeypatch.setattr(_tl_mod.subprocess, "run", _fake_subprocess_run)
     _tl_mod._run_per_test_validate("bash", tmp_path)
     assert bash_calls == [
-        (("bash", "-xeuo", "pipefail", str(validate_sh)), {"cwd": tmp_path, "check": True}),
+        (
+            ("bash", "-xeuo", "pipefail", str(validate_sh)),
+            {"cwd": tmp_path, "check": True},
+        ),
     ]
 
     # _require_bash: no bash on PATH.
