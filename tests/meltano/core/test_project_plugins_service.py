@@ -297,3 +297,24 @@ def test_find_locked_variants_ignores_empty_variant(project: Project):
     service = PluginLockService(project)
     variants = service.find_locked_variants(PluginType.EXTRACTORS, "tap-empty")
     assert variants == []
+
+
+def test_find_locked_variants_oserror(
+    project: Project, monkeypatch: pytest.MonkeyPatch
+):
+    from pathlib import Path
+
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin_lock_service import PluginLockService
+
+    plugin_dir = project.dirs.root_plugins(PluginType.EXTRACTORS)
+    plugin_dir.mkdir(parents=True, exist_ok=True)
+
+    def mock_iterdir(_self):
+        raise OSError
+
+    monkeypatch.setattr(Path, "iterdir", mock_iterdir)
+
+    service = PluginLockService(project)
+    variants = service.find_locked_variants(PluginType.EXTRACTORS, "tap-error")
+    assert variants == []
