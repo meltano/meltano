@@ -269,7 +269,10 @@ def test_plugin_definition_not_found_multiple_variants(project: Project):
         project.plugins.find_parent(plugin)
 
     assert "lockfiles exist for variant 'variant1', 'variant2'" in str(exc_info.value)
-    assert "Add 'variant: variant1' to your plugin definition in meltano.yml" in exc_info.value.instruction
+    assert (
+        "Add 'variant: variant1' to your plugin definition in meltano.yml"
+        in exc_info.value.instruction
+    )
 
 
 def test_find_locked_variants_no_dir(project: Project):
@@ -280,4 +283,3 @@ def test_find_locked_variants_no_dir(project: Project):
     # Testing when directory does not exist
     variants = service.find_locked_variants(PluginType.TRANSFORMERS, "dbt")
     assert variants == []
-

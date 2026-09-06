@@ -269,7 +269,11 @@ class PluginLockService:
 
         try:
             for p in plugin_dir.iterdir():
-                if p.is_file() and p.name.startswith(prefix) and p.name.endswith(suffix):
+                if (
+                    p.is_file()
+                    and p.name.startswith(prefix)
+                    and p.name.endswith(suffix)
+                ):
                     variant = p.name[len(prefix) : -len(suffix)]
                     if variant:
                         variants.append(variant)
