@@ -226,3 +226,29 @@ class TestProjectPluginsService:
         assert project.plugins.find_plugin("mock-mapping-0") == mapper
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin("non-existent-mapping")
+
+
+def test_plugin_definition_not_found_suggests_variant(
+    project: Project,
+):
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+
+    plugin_dir = project.dirs.root_plugins(PluginType.EXTRACTORS)
+    plugin_dir.mkdir(parents=True, exist_ok=True)
+    lock_file = plugin_dir / "tap-fleetio--fleetio.lock"
+    lock_file.write_text("{}")
+
+    plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-fleetio")
+
+    with pytest.raises(PluginDefinitionNotFoundError) as exc_info:
+        project.plugins.find_parent(plugin)
+
+    assert (
+        "Extractor 'tap-fleetio' is not known to Meltano, "
+        "but lockfile exists for variant 'fleetio'" in str(exc_info.value)
+    )
+    assert (
+        "Add 'variant: fleetio' to your plugin definition in meltano.yml"
+        in exc_info.value.instruction
+    )
