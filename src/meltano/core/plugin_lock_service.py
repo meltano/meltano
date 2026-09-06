@@ -255,7 +255,11 @@ class PluginLockService:
         plugin_name: str,
     ) -> list[str]:
         """Find existing locked variant names for a given plugin type and name."""
-        plugin_dir = self.project.dirs.root_plugins(plugin_type)
+        try:
+            plugin_dir = self.project.dirs.root_plugins(plugin_type, make_dirs=False)
+        except Exception:
+            return []
+
         if not plugin_dir.exists():
             return []
 
@@ -263,10 +267,13 @@ class PluginLockService:
         suffix = ".lock"
         variants: list[str] = []
 
-        for p in plugin_dir.iterdir():
-            if p.name.startswith(prefix) and p.name.endswith(suffix):
-                variant = p.name[len(prefix) : -len(suffix)]
-                if variant:
-                    variants.append(variant)
+        try:
+            for p in plugin_dir.iterdir():
+                if p.is_file() and p.name.startswith(prefix) and p.name.endswith(suffix):
+                    variant = p.name[len(prefix) : -len(suffix)]
+                    if variant:
+                        variants.append(variant)
+        except OSError:
+            return []
 
         return sorted(variants)

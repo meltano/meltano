@@ -252,3 +252,32 @@ def test_plugin_definition_not_found_suggests_variant(
         "Add 'variant: fleetio' to your plugin definition in meltano.yml"
         in exc_info.value.instruction
     )
+
+
+def test_plugin_definition_not_found_multiple_variants(project: Project):
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+
+    plugin_dir = project.dirs.root_plugins(PluginType.EXTRACTORS)
+    plugin_dir.mkdir(parents=True, exist_ok=True)
+    (plugin_dir / "tap-multi--variant1.lock").write_text("{}")
+    (plugin_dir / "tap-multi--variant2.lock").write_text("{}")
+
+    plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-multi")
+
+    with pytest.raises(PluginDefinitionNotFoundError) as exc_info:
+        project.plugins.find_parent(plugin)
+
+    assert "lockfiles exist for variant 'variant1', 'variant2'" in str(exc_info.value)
+    assert "Add 'variant: variant1' to your plugin definition in meltano.yml" in exc_info.value.instruction
+
+
+def test_find_locked_variants_no_dir(project: Project):
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin_lock_service import PluginLockService
+
+    service = PluginLockService(project)
+    # Testing when directory does not exist
+    variants = service.find_locked_variants(PluginType.TRANSFORMERS, "dbt")
+    assert variants == []
+
