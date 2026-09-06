@@ -257,7 +257,7 @@ class PluginLockService:
         """Find existing locked variant names for a given plugin type and name."""
         try:
             plugin_dir = self.project.dirs.root_plugins(plugin_type, make_dirs=False)
-        except Exception:
+        except OSError:
             return []
 
         if not plugin_dir.exists():
