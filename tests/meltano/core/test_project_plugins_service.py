@@ -283,3 +283,17 @@ def test_find_locked_variants_no_dir(project: Project):
     # Testing when directory does not exist
     variants = service.find_locked_variants(PluginType.TRANSFORMERS, "dbt")
     assert variants == []
+
+
+def test_find_locked_variants_ignores_empty_variant(project: Project):
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin_lock_service import PluginLockService
+
+    plugin_dir = project.dirs.root_plugins(PluginType.EXTRACTORS)
+    plugin_dir.mkdir(parents=True, exist_ok=True)
+    # File without variant name
+    (plugin_dir / "tap-empty--.lock").write_text("{}")
+
+    service = PluginLockService(project)
+    variants = service.find_locked_variants(PluginType.EXTRACTORS, "tap-empty")
+    assert variants == []
