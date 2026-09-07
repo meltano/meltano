@@ -458,7 +458,8 @@ ignore = [
 
 [tool.uv]
 override-dependencies = [
-  "sqlalchemy>=2.1.0.dev0,<2.2",
+  "sqlalchemy>=2.0.35,<2.1 ; python_version < '3.11'",
+  "sqlalchemy>=2.1.0rc1,<2.2 ; python_version >= '3.11'",
 ]
 prerelease = "if-necessary"
 required-version = ">=0.9.17"
