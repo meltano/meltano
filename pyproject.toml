@@ -74,11 +74,12 @@ psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
 s3 = ["boto3>=1.35,<2"]
 
 [project.urls]
-Homepage = "https://meltano.com"
-Repository = "https://github.com/meltano/meltano"
-Documentation = "https://docs.meltano.com"
 Changelog = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
+Documentation = "https://docs.meltano.com"
+Homepage = "https://meltano.com"
 "Issue Tracker" = "https://github.com/meltano/meltano/issues"
+Repository = "https://github.com/meltano/meltano"
+Security = "https://github.com/meltano/.github/blob/main/SECURITY.md"
 Slack = "https://meltano.com/slack"
 Twitter = "https://twitter.com/meltanodata/"
 Youtube = "https://www.youtube.com/meltano"
