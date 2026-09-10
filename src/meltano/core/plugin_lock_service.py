@@ -248,3 +248,32 @@ class PluginLockService:
             is_default_variant=variant_metadata.is_default,
             deprecated=variant_metadata.is_deprecated,
         )
+
+    def find_locked_variants(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+    ) -> list[str]:
+        """Find existing locked variant names for a given plugin type and name."""
+        plugin_dir = self.project.dirs.root_plugins(plugin_type, make_dirs=False)
+        if not plugin_dir.exists():
+            return []
+
+        prefix = f"{plugin_name}--"
+        suffix = ".lock"
+        variants: list[str] = []
+
+        try:
+            for p in plugin_dir.iterdir():
+                if (
+                    p.is_file()
+                    and p.name.startswith(prefix)
+                    and p.name.endswith(suffix)
+                ):
+                    variant = p.name[len(prefix) : -len(suffix)]
+                    if variant:
+                        variants.append(variant)
+        except OSError:
+            return []
+
+        return sorted(variants)
