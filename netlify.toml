@@ -532,3 +532,27 @@
   to = "/getting-started/which-meltano"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/changelog/cloud"
+  to = "/releases/cloud"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/changelog/cloud/*"
+  to = "/releases/cloud/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/changelog"
+  to = "/releases"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/changelog/*"
+  to = "/releases/:splat"
+  status = 301
+  force = true
