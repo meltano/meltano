@@ -90,10 +90,10 @@ const sidebars = {
       link: { type: 'doc', id: 'meltano-ai/index' },
       collapsed: true,
       items: [
+        { type: 'doc', id: 'meltano-ai/melty-mcp' },
         { type: 'doc', id: 'meltano-ai/building-on-meltano-with-claude' },
         { type: 'doc', id: 'meltano-ai/pipeline-diagnosis' },
         { type: 'doc', id: 'meltano-ai/diagnose-and-act-alerts' },
-        { type: 'doc', id: 'meltano-ai/melty-mcp' },
       ],
     },
 
