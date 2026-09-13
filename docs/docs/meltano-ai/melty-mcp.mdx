@@ -69,7 +69,7 @@ Everything below is something you can ask for in your own words. You never need 
 You'll need:
 
 * A **Meltano Cloud account** with access to at least one workspace.
-* **Claude** - the web app, the desktop app, or Claude Code. Any AI tool that supports remote MCP servers with sign-in will work; the steps below cover Claude.
+* **Claude**, on the web or the desktop app.
 
 That's it. There's nothing to install in your workspace, no API key to generate and no feature to switch on.
 
@@ -82,10 +82,8 @@ Melty MCP signs you in as *you*. If you can only read a workspace in the Meltano
 Melty MCP is a **Claude connector**. You add it to Claude once, and from then on it's available in any chat.
 
 :::info Availability
-Melty MCP is awaiting listing in Claude's connector directory, so the search step below won't find it yet. Claude Code and other MCP clients can connect today using the address in [Claude Code](#claude-code) below.
+Melty MCP is awaiting listing in Claude's connector directory, so the search step below won't find it yet. If you'd like access before it's listed, email [support@meltano.com](mailto:support@meltano.com).
 :::
-
-### Claude
 
 1. Open **Settings > Connectors**.
 2. Click **Browse connectors**.
@@ -94,26 +92,6 @@ Melty MCP is awaiting listing in Claude's connector directory, so the search ste
 5. Sign in with your usual Meltano Cloud account and approve access.
 
 Meltano then appears in your connectors list with its tools available. You may need to enable it for a given chat from the tools menu.
-
-### Claude Code
-
-Claude Code connects straight to the server address. Run this once, from anywhere:
-
-```bash
-claude mcp add --transport http meltano https://app.meltano.com/api/mcp
-```
-
-Then type `/mcp` inside Claude Code and choose to authenticate. Your browser opens, you sign in to Meltano Cloud, and you're done.
-
-### Other MCP clients
-
-Any tool that supports **remote MCP servers over HTTP with OAuth sign-in** can connect to the same address:
-
-```
-https://app.meltano.com/api/mcp
-```
-
-It will discover the sign-in step by itself - there's no token to copy and paste, and you should never be asked to create one.
 
 ## Your first conversation
 
@@ -192,8 +170,8 @@ Worth knowing before you connect it to a production workspace.
 | **A pipeline "isn't ready"** | A new or just-changed pipeline finishes saving its configuration before it can run. Wait a moment and ask again. |
 | **A pipeline is a "draft"** | It's missing something - almost always a secret. Ask Claude for the link to the pipeline and finish it in the app. |
 | **The workspace is "provisioning"** | A new workspace is still being set up. This can take several minutes. Wait for it to be ready before adding pipelines or handing out the clone command. |
-| **It's asking you to sign in again** | Sign-ins expire. Reconnect Meltano in Claude's connector settings, or run `/mcp` in Claude Code, and sign in again. |
-| **Claude says it can't see Meltano at all** | Check Meltano is switched on for that chat in the tools menu. In Claude Code or another client, check the address is exactly `https://app.meltano.com/api/mcp`. |
+| **It's asking you to sign in again** | Sign-ins expire. Reconnect Meltano from Claude's connector settings and sign in again. |
+| **Claude says it can't see Meltano at all** | Check Meltano is switched on for that chat in the tools menu, and that it's still connected under **Settings > Connectors**. |
 
 If a message mentions an internal error with a reference code, pass that code to Meltano support - it lets us find the exact failure in our logs.
 
@@ -203,4 +181,4 @@ If a message mentions an internal error with a reference code, pass that code to
 * [Pipeline Diagnosis](/meltano-ai/pipeline-diagnosis) - the same diagnosis, in the Meltano Cloud app.
 * [Diagnose-and-Act Alerts](/meltano-ai/diagnose-and-act-alerts) - getting the diagnosis before you've even logged in.
 
-Questions, or something in a reply that looks wrong? Contact Meltano support or reach out through your usual support channel.
+Questions, or something in a reply that looks wrong? Email [support@meltano.com](mailto:support@meltano.com) or reach out through your usual support channel.
