@@ -79,25 +79,25 @@ Melty MCP signs you in as *you*. If you can only read a workspace in the Meltano
 
 ## Connect it
 
-The address you'll need in every case is:
+Melty MCP is a **Claude connector**. You add it to Claude once, and from then on it's available in any chat.
 
-```
-https://app.meltano.com/api/mcp
-```
+:::info Availability
+Melty MCP is awaiting listing in Claude's connector directory, so the search step below won't find it yet. Claude Code and other MCP clients can connect today using the address in [Claude Code](#claude-code) below.
+:::
 
-### Claude web or desktop
+### Claude
 
 1. Open **Settings > Connectors**.
-2. Click **Add custom connector**.
-3. Give it a name - **Meltano Cloud** works well - and paste in `https://app.meltano.com/api/mcp`.
-4. Click **Add**, then **Connect**. A browser window opens asking you to sign in to Meltano Cloud.
+2. Click **Browse connectors**.
+3. Search for **Meltano** and select it.
+4. Click **Connect**. A browser window opens asking you to sign in to Meltano Cloud.
 5. Sign in with your usual Meltano Cloud account and approve access.
 
-You'll see Meltano Cloud listed in your connectors with its tools available. You may need to enable it in a given chat from the tools menu.
+Meltano then appears in your connectors list with its tools available. You may need to enable it for a given chat from the tools menu.
 
 ### Claude Code
 
-Run this once, from anywhere:
+Claude Code connects straight to the server address. Run this once, from anywhere:
 
 ```bash
 claude mcp add --transport http meltano https://app.meltano.com/api/mcp
@@ -105,9 +105,15 @@ claude mcp add --transport http meltano https://app.meltano.com/api/mcp
 
 Then type `/mcp` inside Claude Code and choose to authenticate. Your browser opens, you sign in to Meltano Cloud, and you're done.
 
-### Anything else
+### Other MCP clients
 
-Any MCP client that supports **remote servers over HTTP with OAuth sign-in** can connect to the same address. Point it at `https://app.meltano.com/api/mcp` and it will discover the sign-in step by itself - there's no token to copy and paste, and you should never be asked to create one.
+Any tool that supports **remote MCP servers over HTTP with OAuth sign-in** can connect to the same address:
+
+```
+https://app.meltano.com/api/mcp
+```
+
+It will discover the sign-in step by itself - there's no token to copy and paste, and you should never be asked to create one.
 
 ## Your first conversation
 
@@ -147,7 +153,7 @@ When a pipeline fails, ask it to diagnose first. It pulls the failure, the recen
 
 ### You still enter secrets yourself
 
-Passwords, API keys and tokens never travel through the assistant - not in either direction. When a new connector needs one, Claude will hand you a direct link into the Meltano Cloud app and ask you to enter it there. That's by design, and it's the one step that always stays in the browser.
+Passwords, API keys and tokens never travel through the assistant - not in either direction. When a new source or destination needs one, Claude will hand you a direct link into the Meltano Cloud app and ask you to enter it there. That's by design, and it's the one step that always stays in the browser.
 
 ### Expect some waiting
 
@@ -186,8 +192,8 @@ Worth knowing before you connect it to a production workspace.
 | **A pipeline "isn't ready"** | A new or just-changed pipeline finishes saving its configuration before it can run. Wait a moment and ask again. |
 | **A pipeline is a "draft"** | It's missing something - almost always a secret. Ask Claude for the link to the pipeline and finish it in the app. |
 | **The workspace is "provisioning"** | A new workspace is still being set up. This can take several minutes. Wait for it to be ready before adding pipelines or handing out the clone command. |
-| **It's asking you to sign in again** | Sign-ins expire. Reconnect the connector, or run `/mcp` in Claude Code, and sign in again. |
-| **Claude says it can't see Meltano at all** | Check the connector is enabled for that chat in the tools menu, and that the address is exactly `https://app.meltano.com/api/mcp`. |
+| **It's asking you to sign in again** | Sign-ins expire. Reconnect Meltano in Claude's connector settings, or run `/mcp` in Claude Code, and sign in again. |
+| **Claude says it can't see Meltano at all** | Check Meltano is switched on for that chat in the tools menu. In Claude Code or another client, check the address is exactly `https://app.meltano.com/api/mcp`. |
 
 If a message mentions an internal error with a reference code, pass that code to Meltano support - it lets us find the exact failure in our logs.
 
