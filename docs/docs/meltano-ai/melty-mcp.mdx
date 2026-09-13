@@ -1,0 +1,200 @@
+---
+title: Melty MCP
+description: Connect Meltano Cloud to Claude and manage your pipelines by just asking - check what ran, find out why something broke, and build new pipelines in plain language.
+sidebar_label: Melty MCP
+layout: doc
+sidebar_position: 11.8
+---
+
+# Melty MCP
+
+Melty MCP connects your Meltano Cloud workspaces to Claude, so you can ask about your data pipelines in plain language instead of clicking through the app.
+
+Once it's connected you can ask things like *"did last night's Salesforce load work?"*, *"why does the HubSpot pipeline keep failing?"* or *"build me a pipeline that pulls GitHub issues into the warehouse"* - and Claude can go and look, rather than guess.
+
+It's a one-time setup, it uses your normal Meltano Cloud login, and it respects exactly the same permissions you already have.
+
+---
+
+## What MCP actually is
+
+MCP stands for **Model Context Protocol**. It's an open standard that lets an AI assistant safely talk to a real system - in this case, Meltano Cloud.
+
+The short version: without it, Claude can only talk *about* Meltano. With it, Claude can look at *your* workspaces, *your* pipelines and *your* run history, and act on them when you ask.
+
+You don't need to understand the protocol to use it. You connect it once, and from then on Claude just knows about your Meltano Cloud.
+
+:::tip Melty AI vs Melty MCP
+**Melty AI** is the assistant built into Meltano Cloud - the one behind the **Diagnose** button and your [failure alert emails](/meltano-ai/diagnose-and-act-alerts). **Melty MCP** is the same knowledge and the same abilities, brought *to you* in Claude, so you can work with Meltano from wherever you already are.
+:::
+
+## What you can ask it to do
+
+Everything below is something you can ask for in your own words. You never need to name a command.
+
+### See what you've got
+
+* List your workspaces, and what's in them
+* List the pipelines in a workspace, with their schedules and status
+* See which connectors are set up, and how they're configured (passwords and keys are always hidden)
+* Find the git repository behind a workspace
+
+### Check how things are going
+
+* See recent runs for a workspace or a single pipeline, and whether they succeeded
+* Get a straight answer on whether a pipeline is **reliable** - a pipeline counts as unstable if any of its last five attempts failed
+* See how many rows each recent run actually loaded into your destination
+* Read the logs for a specific run
+
+### Work out why something broke
+
+* Ask why a pipeline failed, and get a plain-language explanation with suggested fixes
+* This is the same diagnosis engine as the **Diagnose** button in the app, so you get the same grounded answer - just in your chat
+
+### Build something new
+
+* Search the Meltano connector catalogue for a source or destination
+* Check what settings a connector actually needs, before anything is configured
+* Create a workspace
+* Create a pipeline, including installing the connectors it needs along the way
+* Trigger a pipeline run
+* Publish changes you've pushed to your workspace's git repository
+
+### Look things up
+
+* Search the Meltano knowledge base and read the docs behind the answer, so replies are grounded in how Meltano really works rather than invented
+
+## Before you start
+
+You'll need:
+
+* A **Meltano Cloud account** with access to at least one workspace.
+* **Claude** - the web app, the desktop app, or Claude Code. Any AI tool that supports remote MCP servers with sign-in will work; the steps below cover Claude.
+
+That's it. There's nothing to install in your workspace, no API key to generate and no feature to switch on.
+
+:::tip Your permissions come with you
+Melty MCP signs you in as *you*. If you can only read a workspace in the Meltano Cloud app, that's all Claude will be able to do with it either. If you're an administrator, it can make changes. Nothing you can't already do becomes possible because you connected it.
+:::
+
+## Connect it
+
+The address you'll need in every case is:
+
+```
+https://app.meltano.com/api/mcp
+```
+
+### Claude web or desktop
+
+1. Open **Settings > Connectors**.
+2. Click **Add custom connector**.
+3. Give it a name - **Meltano Cloud** works well - and paste in `https://app.meltano.com/api/mcp`.
+4. Click **Add**, then **Connect**. A browser window opens asking you to sign in to Meltano Cloud.
+5. Sign in with your usual Meltano Cloud account and approve access.
+
+You'll see Meltano Cloud listed in your connectors with its tools available. You may need to enable it in a given chat from the tools menu.
+
+### Claude Code
+
+Run this once, from anywhere:
+
+```bash
+claude mcp add --transport http meltano https://app.meltano.com/api/mcp
+```
+
+Then type `/mcp` inside Claude Code and choose to authenticate. Your browser opens, you sign in to Meltano Cloud, and you're done.
+
+### Anything else
+
+Any MCP client that supports **remote servers over HTTP with OAuth sign-in** can connect to the same address. Point it at `https://app.meltano.com/api/mcp` and it will discover the sign-in step by itself - there's no token to copy and paste, and you should never be asked to create one.
+
+## Your first conversation
+
+Start simple, so you can see it working:
+
+> What Meltano workspaces do I have?
+
+Then something more useful:
+
+> How has my production workspace been doing this week? Any pipelines I should worry about?
+
+And when something's wrong:
+
+> The Salesforce pipeline failed last night. What happened, and what do I need to change?
+
+Claude will fetch the failure, read the logs and the configuration, and come back with an explanation and a suggested fix - not a generic answer about Salesforce, but one based on what actually happened in your run.
+
+## Getting the most out of it
+
+A few habits make a big difference.
+
+### Say which workspace you mean
+
+If you have more than one workspace, say which one - *"in the production workspace"* - or ask it to list them first. Otherwise it has to guess or ask, and you'll spend a turn finding out.
+
+### Ask about reliability in those words
+
+If you want to know whether something can be trusted, ask *"is this pipeline reliable?"* or *"which pipelines are failing?"* rather than *"show me the runs"*. It changes what gets fetched: you get a verdict and a summary of the whole workspace, instead of a list of rows you then have to read yourself.
+
+### Ask for numbers when you want numbers
+
+*"How many rows did the last five runs load?"* gets you row counts straight from the destination. *"Show me the logs"* gets you raw log lines, which answer the same question far less well. Ask for the thing you actually want.
+
+### Let it diagnose before it fixes
+
+When a pipeline fails, ask it to diagnose first. It pulls the failure, the recent history, the configuration and the transform files into one grounded explanation. Jumping straight to *"fix it"* skips the part that tells you what's actually wrong.
+
+### You still enter secrets yourself
+
+Passwords, API keys and tokens never travel through the assistant - not in either direction. When a new connector needs one, Claude will hand you a direct link into the Meltano Cloud app and ask you to enter it there. That's by design, and it's the one step that always stays in the browser.
+
+### Expect some waiting
+
+Some things don't happen instantly. Creating a workspace provisions real infrastructure and can take a few minutes; publishing changes runs a job. Claude knows to keep checking, but if it says *"still provisioning"*, that's normal - give it a moment and ask again.
+
+### Two ways to build a pipeline
+
+You can build entirely in the chat, or you can ask Claude for the **clone command** for your workspace's git repository, edit the configuration locally with a coding agent, push, and then ask it to publish your changes.
+
+Conversation is faster for something small. The repository route is better for real development work, because your workspace repo comes pre-loaded with a Meltano knowledge base that grounds your agent - see [Building on Meltano with Claude](/meltano-ai/building-on-meltano-with-claude). The two mix freely: a pipeline you create in chat shows up in the repo afterwards.
+
+### Ask it to check the docs
+
+If you're unsure how something in Meltano works - incremental replication, a connector's settings, how state is handled - ask. It can search the Meltano knowledge base and answer from the real documentation rather than from memory.
+
+## What it can see, and what it can't
+
+Worth knowing before you connect it to a production workspace.
+
+**It sees what you see.** Every request runs as your Meltano Cloud user, against the same permission rules as the app. Other people's workspaces and other accounts aren't visible to it.
+
+**It never sees your secrets.** Connector settings come back with the *names* of settings and their non-sensitive values only. Passwords, tokens and keys are redacted, and logs are scrubbed before they're returned. There's no setting to turn that off.
+
+**Most of what it does only reads.** Of the tools it has, the large majority just look things up. Five can change something: creating a workspace, adding a connector, creating a pipeline, running a pipeline, and publishing changes.
+
+**The ones that change things are flagged as such,** so your AI tool can warn you or ask before they run. Two are worth particular care: **running a pipeline** can overwrite data in your destination, and **publishing changes** reconciles your platform configuration to whatever is in the repository. Read those confirmations rather than waving them through.
+
+**Creating a workspace is real.** It provisions infrastructure and uses up your account's workspace allowance, in whichever account you're currently working in. Deleting one afterwards is permanent. Claude will confirm with you first - and it can only create workspaces in the account selected in the Meltano Cloud app, never another one.
+
+## If something doesn't work
+
+| What you see | What it usually means |
+|---|---|
+| **"Access denied"** | You don't have the rights for that action on that workspace - typically a change to a workspace you can only read. Ask an administrator, or check you're working in the right account. |
+| **"Not found"** | The workspace or pipeline ID isn't one you have access to. Ask Claude to list your workspaces and try again. |
+| **A pipeline "isn't ready"** | A new or just-changed pipeline finishes saving its configuration before it can run. Wait a moment and ask again. |
+| **A pipeline is a "draft"** | It's missing something - almost always a secret. Ask Claude for the link to the pipeline and finish it in the app. |
+| **The workspace is "provisioning"** | A new workspace is still being set up. This can take several minutes. Wait for it to be ready before adding pipelines or handing out the clone command. |
+| **It's asking you to sign in again** | Sign-ins expire. Reconnect the connector, or run `/mcp` in Claude Code, and sign in again. |
+| **Claude says it can't see Meltano at all** | Check the connector is enabled for that chat in the tools menu, and that the address is exactly `https://app.meltano.com/api/mcp`. |
+
+If a message mentions an internal error with a reference code, pass that code to Meltano support - it lets us find the exact failure in our logs.
+
+## Where to go next
+
+* [Building on Meltano with Claude](/meltano-ai/building-on-meltano-with-claude) - developing pipelines in your workspace's git repository with a coding agent.
+* [Pipeline Diagnosis](/meltano-ai/pipeline-diagnosis) - the same diagnosis, in the Meltano Cloud app.
+* [Diagnose-and-Act Alerts](/meltano-ai/diagnose-and-act-alerts) - getting the diagnosis before you've even logged in.
+
+Questions, or something in a reply that looks wrong? Contact Meltano support or reach out through your usual support channel.
