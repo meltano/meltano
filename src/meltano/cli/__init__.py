@@ -15,6 +15,7 @@ import structlog
 
 from meltano.cli import (
     add,
+    cloud,
     config,
     docs,
     dragon,
@@ -47,6 +48,7 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 cli.add_command(add.add)
+cli.add_command(cloud.cloud)
 cli.add_command(compile_module.compile_command)
 cli.add_command(config.config)
 cli.add_command(docs.docs)
