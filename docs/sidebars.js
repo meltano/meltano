@@ -33,6 +33,7 @@ const sidebars = {
     { type: 'doc', id: 'connectors/tap-nextdoor', label: 'Nextdoor' },
     { type: 'doc', id: 'connectors/tap-postgres', label: 'PostgreSQL' },
     { type: 'doc', id: 'connectors/tap-snowflake', label: 'Snowflake' },
+    { type: 'doc', id: 'connectors/target-bigquery', label: 'Google BigQuery' },
   ],
   platformSidebar: [
     {
