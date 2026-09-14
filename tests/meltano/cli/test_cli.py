@@ -366,7 +366,7 @@ class TestCli:
     @pytest.mark.usefixtures("pushd")
     def test_cwd_option(
         self,
-        cli_runner,
+        cli_runner: MeltanoCliRunner,
         test_cli_project: Project,
         tmp_path: Path,
     ) -> t.NoReturn:
@@ -384,19 +384,15 @@ class TestCli:
         with cd(project.dirs.root):
             filepath = tmp_path / "file.txt"
             filepath.touch()
-            with pytest.raises(click.BadParameter, match="is a file"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(filepath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(filepath), "dragon"))
+            assert result.exit_code == 2
+            assert "is a file" in result.stderr
 
         with cd(project.dirs.root):
             dirpath = tmp_path / "subdir"
-            with pytest.raises(click.BadParameter, match="does not exist"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(dirpath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon"))
+            assert result.exit_code == 2
+            assert "does not exist" in result.stderr
 
         with cd(project.dirs.root):
             dirpath.mkdir()
