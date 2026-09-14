@@ -556,3 +556,11 @@
   to = "/releases/:splat"
   status = 301
   force = true
+
+# --- Meltano docs page renames ---
+
+[[redirects]]
+  from = "/meltano-ai/building-on-meltano-with-claude"
+  to = "/meltano-ai/agent-melty"
+  status = 301
+  force = true

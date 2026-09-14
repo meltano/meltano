@@ -92,7 +92,7 @@ const sidebars = {
       collapsed: true,
       items: [
         { type: 'doc', id: 'meltano-ai/melty-mcp' },
-        { type: 'doc', id: 'meltano-ai/building-on-meltano-with-claude' },
+        { type: 'doc', id: 'meltano-ai/agent-melty' },
         { type: 'doc', id: 'meltano-ai/pipeline-diagnosis' },
         { type: 'doc', id: 'meltano-ai/diagnose-and-act-alerts' },
       ],
