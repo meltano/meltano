@@ -33,6 +33,7 @@ const sidebars = {
     { type: 'doc', id: 'connectors/tap-nextdoor', label: 'Nextdoor' },
     { type: 'doc', id: 'connectors/tap-postgres', label: 'PostgreSQL' },
     { type: 'doc', id: 'connectors/tap-snowflake', label: 'Snowflake' },
+    { type: 'doc', id: 'connectors/target-bigquery', label: 'Google BigQuery' },
   ],
   platformSidebar: [
     {
@@ -90,6 +91,7 @@ const sidebars = {
       link: { type: 'doc', id: 'meltano-ai/index' },
       collapsed: true,
       items: [
+        { type: 'doc', id: 'meltano-ai/melty-mcp' },
         { type: 'doc', id: 'meltano-ai/building-on-meltano-with-claude' },
         { type: 'doc', id: 'meltano-ai/pipeline-diagnosis' },
         { type: 'doc', id: 'meltano-ai/diagnose-and-act-alerts' },

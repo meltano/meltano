@@ -78,6 +78,7 @@ it stays in `RECORD` mode.
 | [`tap-mysql`](https://github.com/Matatika/pipelinewise-tap-mysql) | ✅ Supported (v1.5.0+) | `FULL_TABLE`/`INCREMENTAL`: Arrow. `LOG_BASED`: Arrow backfill, then `RECORD` streaming. |
 | [`tap-postgres`](https://github.com/meltano/meltano-tap-postgres) | ⏳ Supports Arrow, not yet on Meltano Cloud | `FULL_TABLE`/`INCREMENTAL`: Arrow. `LOG_BASED`: always `RECORD`. Uses `adbc-driver-postgresql`. Not yet available as a Meltano Cloud extractor. |
 | [`tap-snowflake`](https://github.com/MeltanoLabs/tap-snowflake) | ✅ Supported (v0.5.0+) | `FULL_TABLE`/`INCREMENTAL`: Arrow. No `LOG_BASED` support. Fetches Arrow natively via `snowflake-connector-python`'s own Arrow result format - no ADBC driver needed. |
+| [`tap-spreadsheets-anywhere`](https://github.com/Matatika/tap-spreadsheets-anywhere) | ✅ Supported (v0.7.0+) | Reads CSV/Excel/JSON/JSONL files from cloud storage (S3, Azure, GCS, SFTP, SharePoint, IMAP, and more); no replication method distinction to speak of - every run re-scans files matching each stream's configured pattern. Buffers rows into an Arrow IPC file per `batch_config.batch_size`. |
 
 More extractors are added as they're prioritized. See the notes on each
 tap's settings page in the catalog for the latest status.
