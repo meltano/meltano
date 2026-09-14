@@ -1,13 +1,13 @@
 ---
-title: Building on Meltano with Claude
+title: Agent Melty
 description: Your go-to reference for developing pipelines on Meltano Cloud from inside your workspace's git repository.
-sidebar_label: Building on Meltano with Claude
+sidebar_label: Agent Melty
 sidebar_position: 11.6
 ---
 
-# Building on Meltano with Claude
+# Agent Melty
 
-Meltano Cloud used to mean a console: connector catalog, config wizard, docs in another tab. That's still there, but it's no longer where you build. Your workspace's git repo is the source of truth now, you build config with your agent, push it, and the platform reconciles it. The console's job shrinks to one thing it should own: secrets, which never pass through the agent or into git.
+At the core of any Meltano Cloud workspace is a git repository. With Agent Melty, we can help you to build in that source of truth with your agent, push it to Meltano Cloud, and the platform reconciles it. The UI's job shrinks to one thing it should own: secrets, which never pass through the agent or into git.
 
 Work through it once end to end, then keep the pre-flight checklist for every change after that.
 
@@ -21,6 +21,8 @@ When your Meltano Cloud workspace was created, the platform provisioned a git re
 
 :::tip Good to know
 The AI knowledge kit is seeded when the workspace is created, so it's already in the repo the moment you clone it, with nothing for you to install or enable. Just open the repo in your agent and go.
+
+If your workspace pre-dates Agent Melty, you can install it as a plugin - it's call "Agent Melty (the AI Knowledge Kit)"
 :::
 
 ## How the knowledge base works
