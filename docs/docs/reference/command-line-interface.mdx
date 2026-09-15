@@ -255,6 +255,115 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 
 The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
+## `cloud`
+
+Use the `cloud` command to interact with [Meltano Cloud](https://meltano.com/cloud) from your terminal.
+
+### `auth`
+
+The `auth` subcommand manages your Meltano Cloud session. Logging in opens the Meltano Cloud login page in your browser, and stores the resulting session on your machine so that other `meltano cloud` commands can use it.
+
+Meltano uses the OAuth 2.0 authorization code flow with [PKCE](https://datatracker.ietf.org/doc/html/rfc7636), as recommended for command line applications by [RFC 8252](https://datatracker.ietf.org/doc/html/rfc8252). No credentials are ever typed into, or read by, the CLI itself: Meltano starts a short-lived HTTP server on the loopback interface, and your browser hands the authorization code back to it once you have logged in.
+
+#### How to use
+
+```bash
+# Log in to Meltano Cloud
+meltano cloud auth login
+
+# Print the login URL instead of opening a browser,
+# which is useful over SSH or in a remote shell
+meltano cloud auth login --no-browser
+
+# Log in again, replacing an existing session
+meltano cloud auth login --force
+
+# Check whether you are logged in, and as whom
+meltano cloud auth status
+
+# Check the stored session without contacting Meltano Cloud
+meltano cloud auth status --offline
+
+# Log out, revoking the stored session
+meltano cloud auth logout
+
+# Log out, and also end the session in your browser
+meltano cloud auth logout --web
+```
+
+`meltano cloud auth status` exits with a non-zero exit code when you are not logged in, so it can be used to gate other commands in a script:
+
+```bash
+meltano cloud auth status --offline || meltano cloud auth login
+```
+
+#### Where the session is stored
+
+Your session is written to a `cloud/credentials.json` file in the Meltano user configuration directory, which is platform specific:
+
+- Linux: `~/.config/meltano/cloud/credentials.json`
+- macOS: `~/Library/Application Support/meltano/cloud/credentials.json`
+- Windows: `%LOCALAPPDATA%\meltano\meltano\cloud\credentials.json`
+
+The file is only readable and writable by your user account. It holds the tokens issued by Meltano Cloud, so treat it like any other credential: do not commit it, and do not copy it to a shared machine.
+
+Meltano renews an expired access token automatically using the stored refresh token, so you should only need to log in again after logging out, or after the refresh token itself expires.
+
+Set the `MELTANO_CLOUD_CREDENTIALS_PATH` environment variable to store the session somewhere else, for example to keep separate sessions side by side:
+
+```bash
+MELTANO_CLOUD_CREDENTIALS_PATH=~/.config/meltano/cloud/staging.json meltano cloud auth login
+```
+
+#### Configuring the login flow
+
+The defaults suit the hosted Meltano Cloud, but each value can be overridden with an environment variable, or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+
+| Environment variable                   | User configuration key         | Description                                                                       |
+| -------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------- |
+| `MELTANO_CLOUD_AUTH_DOMAIN`            | `cloud.auth.domain`            | The domain of the identity provider.                                              |
+| `MELTANO_CLOUD_AUTH_CLIENT_ID`         | `cloud.auth.client_id`         | The OAuth client ID of the Meltano CLI application.                               |
+| `MELTANO_CLOUD_AUTH_CLIENT_SECRET`     | `cloud.auth.client_secret`     | The OAuth client secret. Only needed for a confidential client, see below.        |
+| `MELTANO_CLOUD_AUTH_AUDIENCE`          | `cloud.auth.audience`          | The audience of the API the access token is issued for.                           |
+| `MELTANO_CLOUD_AUTH_SCOPES`            | `cloud.auth.scopes`            | The OAuth scopes to request.                                                      |
+| `MELTANO_CLOUD_AUTH_CALLBACK_HOST`     | `cloud.auth.callback_host`     | The host of the loopback callback URL. Defaults to `localhost`.                   |
+| `MELTANO_CLOUD_AUTH_CALLBACK_PORTS`    | `cloud.auth.callback_ports`    | Ports to try for the loopback callback server, in order.                          |
+| `MELTANO_CLOUD_AUTH_CALLBACK_PATH`     | `cloud.auth.callback_path`     | The path of the loopback callback URL. Defaults to `/callback`.                   |
+| `MELTANO_CLOUD_AUTH_TIMEOUT`           | `cloud.auth.timeout`           | How long to wait, in seconds, for you to complete the login. Defaults to `300`.   |
+
+```yaml
+# ~/.config/meltano/config.yml
+cloud:
+  auth:
+    callback_ports: [9999, 9998]
+```
+
+:::info
+
+Each port listed in `callback_ports` must be registered as an allowed callback URL for the Meltano CLI application, so the login flow uses a fixed port rather than an arbitrary free one. Meltano tries each configured port in turn, which lets the login succeed when the first one is already in use.
+
+:::
+
+#### Public and confidential clients
+
+The Meltano CLI is a *public* client: it runs on your machine, so it has no secret it can keep from you. PKCE is what secures the flow, and no client secret is sent.
+
+If you are pointing the CLI at an identity provider application that is registered as a *confidential* client, such as an Auth0 "Regular Web Application", the token endpoint will reject the login with an `Unauthorized or unknown client` error until a secret is supplied. Set `MELTANO_CLOUD_AUTH_CLIENT_SECRET` in that case:
+
+```bash
+MELTANO_CLOUD_AUTH_CLIENT_SECRET=... meltano cloud auth login
+```
+
+:::caution
+
+Prefer registering the application as a native or desktop client, which needs no secret. A secret distributed with a command line tool is not actually secret, so it should only be used for a private application, such as one you are testing against. Meltano never writes the client secret to the credentials file.
+
+:::
+
+### Using `cloud` with Environments
+
+The `cloud` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
 ## `compile`
 
 :::caution

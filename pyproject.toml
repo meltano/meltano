@@ -411,6 +411,8 @@ unfixable = [
   "ANN",
   "D1",
   "assert",    # Allow 'assert' in tests
+  "hardcoded-password-func-arg",  # Allow dummy credentials in test fixtures
+  "hardcoded-password-string",    # Allow dummy credentials in test fixtures
   "INP",     # Don't require __init__.py files in tests directories
   "root-logger-call",  # Allow `logging.<level>` in tests
   "fallible-context-manager",
