@@ -52,7 +52,8 @@ def _echo_authorize_url(login_url: str, opened: bool) -> None:  # noqa: FBT001
         click.echo("Visit the following link to log in to Meltano Cloud:")
 
     click.secho(login_url, fg="green")
-    click.echo("\nWaiting for you to complete the login...")
+    click.echo()
+    click.echo("Waiting for you to complete the login...")
 
 
 def _describe(credentials: Credentials) -> str:
