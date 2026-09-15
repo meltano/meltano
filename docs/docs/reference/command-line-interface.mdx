@@ -1165,6 +1165,67 @@ meltano logs list --format json
 - Large log files (>2MB) will prompt for confirmation before displaying
 - Logs are stored in `.meltano/logs/elt/<state_id>/<run_id>/elt.log`
 
+## `plugin`
+
+Use the `plugin` command to inspect the [plugins](/concepts/plugins) in your project.
+
+### `list`
+
+Lists the plugins in your project, along with the [variant](/concepts/plugins#variants) in use and the version that is installed.
+
+By default, only plugins that are actually installed are listed, meaning those with a virtual environment in the project's `.meltano` directory. Pass `--available` to also list the plugins your project defines that have not been installed yet.
+
+The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. It is shown as `-` when the plugin was installed from something the version cannot be read from.
+
+#### How to use
+
+```bash
+# List the installed plugins
+meltano plugin list
+
+# Also list plugins that are defined but not installed
+meltano plugin list --available
+
+# Emit JSON, for scripting
+meltano plugin list --format json
+```
+
+```
+ TYPE        NAME                     VARIANT     VERSION
+ ────────────────────────────────────────────────────────
+ extractor   tap-github               meltanolabs 1.0.3
+ extractor   tap-github--custom       meltanolabs 1.0.3
+ loader      target-jsonl             andyh1203   0.1.4
+```
+
+The JSON output includes the `pip_url` and `inherit_from` of each plugin as well:
+
+```json
+[
+  {
+    "name": "tap-github--custom",
+    "type": "extractor",
+    "variant": "meltanolabs",
+    "version": "1.0.3",
+    "installed": true,
+    "pip_url": "meltanolabs-tap-github",
+    "inherit_from": "tap-github"
+  }
+]
+```
+
+:::info
+
+A plugin that [inherits from another](/concepts/plugins#plugin-inheritance) shares its parent's virtual environment, unless it installs something different, so both are reported with the same version.
+
+[Mappings](/concepts/plugins#mappers) are configuration for a mapper rather than a separate installation, so the mapper is listed once and its mappings are not listed.
+
+:::
+
+### Using `plugin` with Environments
+
+The `plugin` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) from your Meltano [project](/concepts/project).
