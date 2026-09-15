@@ -1,0 +1,281 @@
+"""Plugin management CLI."""
+
+from __future__ import annotations
+
+import json
+import platform
+import re
+import typing as t
+from dataclasses import asdict, dataclass
+
+import click
+from rich.box import SIMPLE_HEAD
+from rich.console import Console
+from rich.table import Table
+
+from meltano.cli.params import pass_project
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    InstrumentedGroup,
+    PartialInstrumentedCmd,
+)
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+    from pathlib import Path
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+
+# Written by `meltano install` once a plugin's virtual environment is ready.
+FINGERPRINT_FILE = ".meltano_plugin_fingerprint"
+
+# Shown in place of a value that could not be determined.
+UNKNOWN = "-"
+
+_NAME_SEPARATORS = re.compile(r"[-_.]+")
+
+# The end of a distribution name in a `pip install` argument, e.g. the '=' of
+# 'tap-github==1.0.0' or the '[' of 'tap-github[dev]'.
+_REQUIREMENT_NAME_END = re.compile(r"[\[=<>~!;\s]")
+
+
+def _canonical(name: str) -> str:
+    """Normalize a distribution name for comparison, as described by PEP 503.
+
+    Args:
+        name: The name to normalize.
+
+    Returns:
+        The normalized name.
+    """
+    return _NAME_SEPARATORS.sub("-", name).lower()
+
+
+def _requirement_name(pip_url: str | None) -> str | None:
+    """Get the distribution name from a `pip install` argument.
+
+    Args:
+        pip_url: The `pip install` argument, if any.
+
+    Returns:
+        The distribution name, or `None` if the argument is not a plain
+        requirement, such as a VCS or local path install.
+    """
+    if not pip_url or pip_url.startswith("-"):
+        return None
+
+    if any(char in pip_url for char in "+/\\"):
+        return None
+
+    return _REQUIREMENT_NAME_END.split(pip_url.strip(), maxsplit=1)[0] or None
+
+
+def _site_packages_dir(venv_root: Path) -> Path | None:
+    """Find the site-packages directory of a virtual environment.
+
+    The directory is located by globbing rather than by asking the
+    environment's interpreter, so that listing plugins never starts a
+    subprocess.
+
+    Args:
+        venv_root: The root directory of the virtual environment.
+
+    Returns:
+        The site-packages directory, or `None` if there is not exactly one.
+    """
+    if platform.system() == "Windows":
+        path = venv_root / "Lib" / "site-packages"
+        return path if path.is_dir() else None
+
+    return next(iter(sorted(venv_root.glob("lib/python*/site-packages"))), None)
+
+
+def _installed_version(venv_root: Path, plugin: ProjectPlugin) -> str | None:
+    """Get the version of the distribution a plugin was installed from.
+
+    Args:
+        venv_root: The root directory of the plugin's virtual environment.
+        plugin: The plugin.
+
+    Returns:
+        The installed version, or `None` if it could not be determined.
+    """
+    if (site_packages := _site_packages_dir(venv_root)) is None:
+        return None
+
+    names = {plugin.name, plugin.plugin_dir_name, _requirement_name(plugin.pip_url)}
+    candidates = {_canonical(name) for name in names if name}
+
+    for dist_info in site_packages.glob("*.dist-info"):
+        dist_name, _, version = dist_info.stem.partition("-")
+        if _canonical(dist_name) in candidates:
+            return version or None
+
+    return None
+
+
+@dataclass(frozen=True)
+class PluginListing:
+    """A plugin in the project, and what is known about its installation."""
+
+    name: str
+    type: str
+    variant: str | None
+    version: str | None
+    installed: bool
+    pip_url: str | None
+    inherit_from: str | None
+
+    @classmethod
+    def from_plugin(cls, project: Project, plugin: ProjectPlugin) -> PluginListing:
+        """Describe a plugin of the project.
+
+        Args:
+            project: The Meltano project.
+            plugin: The plugin to describe.
+
+        Returns:
+            The plugin listing.
+        """
+        # Inheriting plugins share their parent's virtual environment unless
+        # they install something different, which `plugin_dir_name` accounts
+        # for. Mappings resolve to their mapper this way too.
+        venv_root = project.dirs.venvs(
+            plugin.type,
+            plugin.plugin_dir_name,
+            make_dirs=False,
+        )
+        installed = _is_installed(venv_root)
+        return cls(
+            name=plugin.name,
+            type=plugin.type.descriptor,
+            variant=plugin.variant,
+            version=_installed_version(venv_root, plugin) if installed else None,
+            installed=installed,
+            pip_url=plugin.pip_url,
+            inherit_from=plugin.inherit_from,
+        )
+
+
+def _is_installed(venv_root: Path) -> bool:
+    """Check whether a plugin's virtual environment has been installed.
+
+    Args:
+        venv_root: The root directory of the plugin's virtual environment.
+
+    Returns:
+        Whether the plugin is installed.
+    """
+    if (venv_root / FINGERPRINT_FILE).exists():
+        return True
+
+    # Fall back to looking for the interpreter, for environments created
+    # before the fingerprint file was written.
+    bin_dir = venv_root / ("Scripts" if platform.system() == "Windows" else "bin")
+    return any((bin_dir / name).exists() for name in ("python", "python.exe"))
+
+
+def _render_table(listings: Iterable[PluginListing], *, show_state: bool) -> None:
+    """Print the plugins as a table.
+
+    Args:
+        listings: The plugins to print.
+        show_state: Whether to include the installation state column.
+    """
+    table = Table(box=SIMPLE_HEAD, pad_edge=False)
+    table.add_column("TYPE", style="cyan", no_wrap=True)
+    table.add_column("NAME", style="bold", overflow="fold")
+    table.add_column("VARIANT", overflow="fold")
+    table.add_column("VERSION", overflow="fold")
+    if show_state:
+        table.add_column("STATE", no_wrap=True)
+
+    for listing in listings:
+        row = [
+            listing.type,
+            listing.name,
+            listing.variant or UNKNOWN,
+            listing.version or UNKNOWN,
+        ]
+        if show_state:
+            row.append(
+                "installed" if listing.installed else "[yellow]not installed[/yellow]",
+            )
+        table.add_row(*row)
+
+    Console().print(table)
+
+
+@click.group(
+    cls=InstrumentedGroup,
+    name="plugin",
+    short_help="Manage project plugins.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
+)
+def plugin() -> None:
+    """Manage the plugins in your Meltano project.
+
+    Read more at https://docs.meltano.com/reference/command-line-interface#plugin
+    """
+
+
+@plugin.command(
+    cls=PartialInstrumentedCmd,
+    name="list",
+    short_help="List the plugins in your project.",
+)
+@click.option(
+    "--format",
+    "list_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    help="Output format.",
+)
+@click.option(
+    "--available",
+    is_flag=True,
+    default=False,
+    help="Also list plugins that your project defines but has not installed.",
+)
+@pass_project()
+def list_plugins(project: Project, *, list_format: str, available: bool) -> None:
+    """List the plugins in your project.
+
+    By default only installed plugins are listed. Use `--available` to also
+    list the plugins your project defines that have not been installed yet.
+
+    Read more at https://docs.meltano.com/reference/command-line-interface#plugin
+    """
+    listings = sorted(
+        (
+            PluginListing.from_plugin(project, project_plugin)
+            for project_plugin in project.plugins.plugins()
+            # A mapping is configuration for its mapper, not a separate
+            # installation, and is yielded under the mapper's own name.
+            if not project_plugin.is_mapping()
+        ),
+        key=lambda listing: (listing.type, listing.name),
+    )
+    defined = len(listings)
+
+    if not available:
+        listings = [listing for listing in listings if listing.installed]
+
+    if list_format == "json":
+        click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
+        return
+
+    if listings:
+        _render_table(listings, show_state=available)
+        return
+
+    if not defined:
+        click.secho("No plugins are defined in this project.", fg="yellow")
+        click.echo("Add one with 'meltano add'.")
+    else:
+        click.secho("No plugins are installed.", fg="yellow")
+        click.echo(
+            f"This project defines {defined} plugin(s). Install them with "
+            "'meltano install', or list them with '--available'.",
+        )

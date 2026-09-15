@@ -27,6 +27,7 @@ from meltano.cli import (
     job,
     lock,
     logs,
+    plugin,
     remove,
     run,
     schedule,
@@ -60,6 +61,7 @@ cli.add_command(install.install)
 cli.add_command(invoke.invoke)
 cli.add_command(lock.lock)
 cli.add_command(logs.logs)
+cli.add_command(plugin.plugin)
 cli.add_command(remove.remove)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
