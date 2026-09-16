@@ -109,7 +109,7 @@ def project_engine(
         engine,
         max_retries=project.settings.get("database_max_retries"),
         retry_timeout=project.settings.get("database_retry_timeout"),
-    )
+    ).close()
 
     check_database_compatibility(engine)
     init_hook(engine)

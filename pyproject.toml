@@ -179,6 +179,7 @@ filterwarnings = [
   '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
   'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
   # Third-party warnings
+  'once::ResourceWarning',
 ]
 log_level = "INFO"
 markers = [
