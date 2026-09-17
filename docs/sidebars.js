@@ -16,7 +16,16 @@ const gettingStartedCategory = require('./docs/getting-started/_category_.json')
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   connectorsSidebar: [
-    { type: 'doc', id: 'connectors/meltano-hub', label: 'Meltano Hub' },
+    {
+      type: 'category',
+      label: 'Meltano Hub',
+      link: { type: 'doc', id: 'connectors/meltano-hub/index' },
+      collapsed: true,
+      items: [
+        { type: 'doc', id: 'connectors/meltano-hub/add-a-plugin', label: 'Add a plugin to the Hub' },
+        { type: 'doc', id: 'connectors/meltano-hub/maintaining-plugins', label: 'Maintaining taps and targets' },
+      ],
+    },
     {
       type: 'category',
       label: 'Connectors',

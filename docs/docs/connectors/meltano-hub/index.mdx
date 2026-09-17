@@ -183,7 +183,7 @@ meltano lock --update tap-github
 You'll want one of these approaches when:
 
 - You'd rather not register for a Meltano Cloud account.
-- The plugin isn't on the Hub yet - for example, a tap you're still developing.
+- The plugin isn't on the Hub yet - for example, a tap you're still developing. (When it's ready, you can [add it to the Hub](/connectors/meltano-hub/add-a-plugin).)
 - The connector is private or internal and you don't want to publish it.
 - Your build environment can't reach `hub.meltano.com`.
 
@@ -387,3 +387,5 @@ Every workspace is backed by a GitHub repository, so you can clone it and use th
 - [Create a custom extractor](/tutorials/custom-extractor) - build a tap from scratch and add it to your project
 - [`meltano add` reference](/reference/command-line-interface#add) - the complete list of options
 - [`meltano cloud auth` reference](/reference/command-line-interface) - login, session storage and login-flow configuration
+- [Add a plugin to Meltano Hub](/connectors/meltano-hub/add-a-plugin) - get your own connector listed
+- [Maintaining taps and targets](/connectors/meltano-hub/maintaining-plugins) - best practices, evaluating connectors, and adopting an unmaintained one
