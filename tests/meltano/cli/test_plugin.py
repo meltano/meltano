@@ -250,6 +250,37 @@ class TestPluginListFromRepository:
         assert listed(result)[repo_tap.name]["version"] == "v1.0.0"
 
 
+class TestPluginListOrder:
+    """A separate class, so no other test defines a plugin in this project."""
+
+    def test_keeps_the_order_of_the_project_file(
+        self,
+        project: Project,  # noqa: ARG002
+        project_add_service: ProjectAddService,
+        cli_runner: CliRunner,
+    ) -> None:
+        # Names chosen so that the order of definition is not the order of
+        # the names, and a loader defined first does not come out first.
+        for plugin_type, name in (
+            (PluginType.LOADERS, "target-zulu"),
+            (PluginType.EXTRACTORS, "tap-zulu"),
+            (PluginType.EXTRACTORS, "tap-alpha"),
+        ):
+            project_add_service.add(
+                plugin_type,
+                name,
+                namespace=name.replace("-", "_"),
+                pip_url=name,
+                executable=name,
+            )
+
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
+
+        assert_cli_runner(result)
+        names = [entry["name"] for entry in json.loads(result.stdout)]
+        assert names == ["tap-zulu", "tap-alpha", "target-zulu"]
+
+
 class TestPluginListWithoutPlugins:
     def test_reports_no_plugins_defined(
         self,

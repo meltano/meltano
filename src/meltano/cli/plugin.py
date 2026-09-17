@@ -300,16 +300,13 @@ def list_plugins(project: Project, *, list_format: str) -> None:
 
     Read more at https://docs.meltano.com/reference/command-line-interface#plugin
     """
-    listings = sorted(
-        (
-            PluginListing.from_plugin(project, project_plugin)
-            for project_plugin in project.plugins.plugins()
-            # A mapping is configuration for its mapper, not a separate
-            # installation, and is yielded under the mapper's own name.
-            if not project_plugin.is_mapping()
-        ),
-        key=lambda listing: (listing.type, listing.name),
-    )
+    listings = [
+        PluginListing.from_plugin(project, project_plugin)
+        for project_plugin in project.plugins.plugins()
+        # A mapping is configuration for its mapper, not a separate
+        # installation, and is yielded under the mapper's own name.
+        if not project_plugin.is_mapping()
+    ]
     if list_format == "json":
         click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
         return

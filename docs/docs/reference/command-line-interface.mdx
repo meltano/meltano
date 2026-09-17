@@ -1173,6 +1173,8 @@ Use the `plugin` command to inspect the [plugins](/concepts/plugins) in your pro
 
 Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use and the version that is installed. A plugin is installed when it has a virtual environment in the project's `.meltano` directory. Installing the plugin creates that environment. `meltano add` installs a plugin as it adds it, and `meltano install` installs one later.
 
+The plugins keep the order that `meltano.yml` defines them in, within each plugin type.
+
 The `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/).
 
 The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. A plugin with no virtual environment reports `(not installed)`.
