@@ -131,8 +131,7 @@ class TestPluginListNotInstalled:
         result = cli_runner.invoke(cli, ("plugin", "list"))
 
         assert_cli_runner(result)
-        assert "not installed" in result.stdout
-        assert "STATE" in result.stdout
+        assert "(not installed)" in result.stdout
 
     def test_mappings_are_not_listed(
         self,
@@ -230,7 +229,7 @@ class TestPluginListInstalled:
         assert tap.name in result.stdout
         assert "1.2.3" in result.stdout
         assert "extractor" in result.stdout
-        assert "installed" in result.stdout
+        assert "(not installed)" not in result.stdout
 
 
 class TestPluginListWithoutDistribution:

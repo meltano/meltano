@@ -33,6 +33,9 @@ FINGERPRINT_FILE = ".meltano_plugin_fingerprint"
 # Shown in place of a value that could not be determined.
 UNKNOWN = "-"
 
+# Shown in place of the version of a plugin that has no virtual environment.
+NOT_INSTALLED = "[yellow](not installed)[/yellow]"
+
 _NAME_SEPARATORS = re.compile(r"[-_.]+")
 
 # The end of a distribution name in a `pip install` argument, e.g. the '=' of
@@ -187,15 +190,13 @@ def _render_table(listings: Iterable[PluginListing]) -> None:
     table.add_column("NAME", style="bold", overflow="fold")
     table.add_column("VARIANT", overflow="fold")
     table.add_column("VERSION", overflow="fold")
-    table.add_column("STATE", no_wrap=True)
 
     for listing in listings:
         table.add_row(
             listing.type,
             listing.name,
             listing.variant or UNKNOWN,
-            listing.version or UNKNOWN,
-            "installed" if listing.installed else "[yellow]not installed[/yellow]",
+            (listing.version or UNKNOWN) if listing.installed else NOT_INSTALLED,
         )
 
     Console().print(table)

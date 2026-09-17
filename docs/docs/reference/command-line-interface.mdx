@@ -1171,9 +1171,9 @@ Use the `plugin` command to inspect the [plugins](/concepts/plugins) in your pro
 
 ### `list`
 
-Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use, the version that is installed, and whether the plugin is installed at all. A plugin is installed when it has a virtual environment in the project's `.meltano` directory. Installing the plugin creates that environment. `meltano add` installs a plugin as it adds it, and `meltano install` installs one later.
+Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use and the version that is installed. A plugin is installed when it has a virtual environment in the project's `.meltano` directory. Installing the plugin creates that environment. `meltano add` installs a plugin as it adds it, and `meltano install` installs one later.
 
-The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. It is shown as `-` when the plugin is not installed, or when it was installed from something the version cannot be read from.
+The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. A plugin with no virtual environment reports `(not installed)`. An installed plugin whose version cannot be read, such as one installed from a Git URL, reports `-`.
 
 #### How to use
 
@@ -1186,11 +1186,11 @@ meltano plugin list --format json
 ```
 
 ```
- TYPE        NAME                     VARIANT     VERSION STATE
- ──────────────────────────────────────────────────────────────
- extractor   tap-github               meltanolabs 1.0.3   installed
- extractor   tap-github--custom       meltanolabs 1.0.3   installed
- loader      target-jsonl             andyh1203   -       not installed
+ TYPE        NAME                     VARIANT     VERSION
+ ─────────────────────────────────────────────────────────────
+ extractor   tap-github               meltanolabs 1.0.3
+ extractor   tap-github--custom       meltanolabs 1.0.3
+ loader      target-jsonl             andyh1203   (not installed)
 ```
 
 The JSON output includes the `pip_url` and `inherit_from` of each plugin as well:
