@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-import binascii
 import json
 import tempfile
 import typing as t
@@ -42,7 +41,7 @@ def _decode_jwt_claims(token: str) -> dict[str, t.Any]:
         payload = token.split(".")[1]
         padded = payload + "=" * (-len(payload) % 4)
         return json.loads(base64.urlsafe_b64decode(padded))
-    except (IndexError, ValueError, binascii.Error, UnicodeDecodeError):
+    except (IndexError, ValueError):
         logger.debug("Unable to decode ID token claims")
         return {}
 
