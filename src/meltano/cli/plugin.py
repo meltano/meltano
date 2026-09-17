@@ -45,6 +45,10 @@ _NAME_SEPARATORS = re.compile(r"[-_.]+")
 # 'tap-github==1.0.0' or the '[' of 'tap-github[dev]'.
 _REQUIREMENT_NAME_END = re.compile(r"[\[=<>~!;\s]")
 
+# The tool prefix of a VCS `pip install` argument, e.g. the 'git+' of
+# 'git+https://github.com/MeltanoLabs/tap-github.git'.
+_VCS_PREFIX = re.compile(r"^(?:git|hg|svn|bzr)\+")
+
 
 def _canonical(name: str) -> str:
     """Normalize a distribution name for comparison, as described by PEP 503.
@@ -75,6 +79,57 @@ def _requirement_name(pip_url: str | None) -> str | None:
         return None
 
     return _REQUIREMENT_NAME_END.split(pip_url.strip(), maxsplit=1)[0] or None
+
+
+def _vcs_url(pip_url: str) -> str | None:
+    """Get the repository URL from a VCS `pip install` argument.
+
+    Args:
+        pip_url: The `pip install` argument.
+
+    Returns:
+        The URL without its tool prefix, revision, and fragment, or `None` if
+        the argument does not install from a version control system.
+    """
+    if not _VCS_PREFIX.match(pip_url):
+        return None
+
+    url = _VCS_PREFIX.sub("", pip_url.strip()).split("#", 1)[0]
+
+    # The revision follows the last '/', so an '@' before it belongs to
+    # credentials, as in 'https://user:token@github.com/org/repo.git'.
+    head, separator, tail = url.rpartition("/")
+    return head + separator + tail.split("@", 1)[0]
+
+
+def _direct_url_revision(site_packages: Path, pip_url: str) -> str | None:
+    """Get the revision that a plugin was installed from a repository at.
+
+    `pip` records the URL it installed from, and the revision it was asked
+    for, in a `direct_url.json` file, as described by PEP 610. The
+    distribution name cannot be read from a VCS `pip_url`, so the URL is what
+    identifies the distribution here.
+
+    Args:
+        site_packages: The site-packages directory to search.
+        pip_url: The `pip install` argument of the plugin.
+
+    Returns:
+        The requested revision, or `None` if there is none to report.
+    """
+    if (url := _vcs_url(pip_url)) is None:
+        return None
+
+    for dist_info in site_packages.glob("*.dist-info"):
+        try:
+            direct_url = json.loads((dist_info / "direct_url.json").read_bytes())
+        except (OSError, ValueError):
+            continue
+
+        if direct_url.get("url") == url:
+            return direct_url.get("vcs_info", {}).get("requested_revision")
+
+    return None
 
 
 def _site_packages_dir(venv_root: Path) -> Path | None:
@@ -109,6 +164,11 @@ def _installed_version(venv_root: Path, plugin: ProjectPlugin) -> str | None:
     """
     if (site_packages := _site_packages_dir(venv_root)) is None:
         return None
+
+    if plugin.pip_url and (
+        revision := _direct_url_revision(site_packages, plugin.pip_url)
+    ):
+        return revision
 
     names = {plugin.name, plugin.plugin_dir_name, _requirement_name(plugin.pip_url)}
     candidates = {_canonical(name) for name in names if name}

@@ -1175,7 +1175,9 @@ Lists every plugin that your project defines, along with the [variant](/concepts
 
 The `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/).
 
-The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. A plugin with no virtual environment reports `(not installed)`. An installed plugin whose version cannot be read, such as one installed from a Git URL, reports `-`.
+The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. A plugin with no virtual environment reports `(not installed)`.
+
+A plugin installed from a repository reports the revision that its `pip_url` asked for, such as a tag or a branch, rather than a version. A plugin whose `pip_url` names no revision, and one whose version cannot be read for any other reason, reports `-`.
 
 #### How to use
 
@@ -1191,7 +1193,7 @@ meltano plugin list --format json
  TYPE        NAME           VARIANT       VERSION           CUSTOM
  ─────────────────────────────────────────────────────────────────
  extractor   tap-github     meltanolabs   1.29.2
- extractor   tap-internal   default       0.2.0               ✓
+ extractor   tap-internal   default       v0.2.0              ✓
  loader      target-jsonl   andyh1203     (not installed)
 ```
 

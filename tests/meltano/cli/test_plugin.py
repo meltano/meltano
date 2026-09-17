@@ -12,7 +12,9 @@ from meltano.cli.plugin import (
     CUSTOM,
     FINGERPRINT_FILE,
     _canonical,
+    _direct_url_revision,
     _requirement_name,
+    _vcs_url,
 )
 from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
@@ -40,6 +42,7 @@ def fake_install(
     *,
     version: str | None = None,
     dist_name: str | None = None,
+    direct_url: dict[str, t.Any] | None = None,
 ) -> Path:
     """Make a plugin look installed, optionally with a distribution present."""
     venv_root = project.dirs.venvs(plugin.type, plugin.plugin_dir_name)
@@ -49,7 +52,11 @@ def fake_install(
         site_packages = site_packages_path(venv_root)
         site_packages.mkdir(parents=True, exist_ok=True)
         name = (dist_name or plugin.name).replace("-", "_")
-        (site_packages / f"{name}-{version}.dist-info").mkdir(exist_ok=True)
+        dist_info = site_packages / f"{name}-{version}.dist-info"
+        dist_info.mkdir(exist_ok=True)
+
+        if direct_url is not None:
+            (dist_info / "direct_url.json").write_text(json.dumps(direct_url))
 
     return venv_root
 
@@ -57,6 +64,21 @@ def fake_install(
 def listed(result: Result) -> dict[str, dict[str, t.Any]]:
     """Parse JSON output into a mapping of plugin name to its record."""
     return {entry["name"]: entry for entry in json.loads(result.stdout)}
+
+
+@pytest.fixture(scope="class")
+def repo_tap(project_add_service: ProjectAddService) -> ProjectPlugin:
+    """A plugin installed from a repository at a tag, rather than from PyPI."""
+    try:
+        return project_add_service.add(
+            PluginType.EXTRACTORS,
+            "tap-repo",
+            namespace="tap_repo",
+            pip_url="git+https://github.com/meltano/tap-repo.git@v1.0.0",
+            executable="tap-repo",
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
 
 
 @pytest.fixture(scope="class")
@@ -103,6 +125,129 @@ class TestRequirementName:
     )
     def test_canonical(self, name: str, expected: str) -> None:
         assert _canonical(name) == expected
+
+
+class TestVcsUrl:
+    @pytest.mark.parametrize(
+        ("pip_url", "expected"),
+        (
+            (
+                "git+https://github.com/meltano/tap-github.git@v1.0.0",
+                "https://github.com/meltano/tap-github.git",
+            ),
+            (
+                "git+https://github.com/meltano/tap-github.git",
+                "https://github.com/meltano/tap-github.git",
+            ),
+            (
+                "git+ssh://git@github.com/meltano/tap-github.git@main",
+                "ssh://git@github.com/meltano/tap-github.git",
+            ),
+            (
+                "git+https://user:token@github.com/meltano/tap-github.git@v1.0.0",
+                "https://user:token@github.com/meltano/tap-github.git",
+            ),
+            (
+                "git+https://github.com/meltano/tap-github.git@v1.0.0#egg=tap-github",
+                "https://github.com/meltano/tap-github.git",
+            ),
+            ("tap-github", None),
+            ("./extract/tap-github", None),
+        ),
+    )
+    def test_vcs_url(self, pip_url: str, expected: str | None) -> None:
+        assert _vcs_url(pip_url) == expected
+
+
+class TestDirectUrlRevision:
+    """The revision is found through the URL that `pip` recorded, not a name."""
+
+    PIP_URL = "git+https://github.com/meltano/tap-mock.git@v1.0.0"
+
+    @staticmethod
+    def write_dist_info(
+        site_packages: Path,
+        name: str,
+        direct_url: dict[str, t.Any] | None = None,
+    ) -> None:
+        dist_info = site_packages / f"{name}.dist-info"
+        dist_info.mkdir(parents=True)
+        if direct_url is not None:
+            (dist_info / "direct_url.json").write_text(json.dumps(direct_url))
+
+    @staticmethod
+    def vcs_info(url: str, revision: str | None) -> dict[str, t.Any]:
+        vcs_info: dict[str, t.Any] = {"vcs": "git", "commit_id": "a" * 40}
+        if revision is not None:
+            vcs_info["requested_revision"] = revision
+        return {"url": url, "vcs_info": vcs_info}
+
+    def test_reports_the_requested_revision(self, tmp_path: Path) -> None:
+        self.write_dist_info(
+            tmp_path,
+            "meltanolabs_tap_mock-0.0.0",
+            self.vcs_info("https://github.com/meltano/tap-mock.git", "v1.0.0"),
+        )
+
+        assert _direct_url_revision(tmp_path, self.PIP_URL) == "v1.0.0"
+
+    def test_ignores_another_distribution(self, tmp_path: Path) -> None:
+        # A dependency installed from its own repository must not be mistaken
+        # for the plugin.
+        self.write_dist_info(
+            tmp_path,
+            "requests-2.32.3",
+            self.vcs_info("https://github.com/psf/requests.git", "v2.32.3"),
+        )
+
+        assert _direct_url_revision(tmp_path, self.PIP_URL) is None
+
+    def test_reports_nothing_without_a_requested_revision(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        self.write_dist_info(
+            tmp_path,
+            "meltanolabs_tap_mock-0.0.0",
+            self.vcs_info("https://github.com/meltano/tap-mock.git", None),
+        )
+
+        assert _direct_url_revision(tmp_path, self.PIP_URL) is None
+
+    def test_reports_nothing_for_a_plain_requirement(self, tmp_path: Path) -> None:
+        self.write_dist_info(tmp_path, "tap_mock-1.0.0")
+
+        assert _direct_url_revision(tmp_path, "tap-mock") is None
+
+
+class TestPluginListFromRepository:
+    """A separate class, so the project has no distributions from other tests."""
+
+    def test_reports_the_revision_of_a_repository_install(
+        self,
+        project: Project,
+        repo_tap: ProjectPlugin,
+        cli_runner: CliRunner,
+    ) -> None:
+        fake_install(
+            project,
+            repo_tap,
+            version="0.0.0",
+            dist_name="meltanolabs_tap_repo",
+            direct_url={
+                "url": "https://github.com/meltano/tap-repo.git",
+                "vcs_info": {
+                    "vcs": "git",
+                    "commit_id": "a" * 40,
+                    "requested_revision": "v1.0.0",
+                },
+            },
+        )
+
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
+
+        assert_cli_runner(result)
+        assert listed(result)[repo_tap.name]["version"] == "v1.0.0"
 
 
 class TestPluginListWithoutPlugins:
