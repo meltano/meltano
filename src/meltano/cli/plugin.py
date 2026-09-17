@@ -106,13 +106,11 @@ def _direct_url_revision(site_packages: Path, pip_url: str) -> str | None:
         if (recorded := dist.read_text("direct_url.json")) is None:
             continue
 
-        try:
-            direct_url = json.loads(recorded)
-        except ValueError:
-            continue
-
-        if direct_url.get("url") == url:
-            return direct_url.get("vcs_info", {}).get("requested_revision")
+        direct_url = json.loads(recorded)
+        if direct_url["url"] == url:
+            # PEP 610 records exactly one of `vcs_info`, `archive_info`, and
+            # `dir_info`, and only a VCS install records the URL of one.
+            return direct_url["vcs_info"].get("requested_revision")
 
     return None
 
@@ -161,7 +159,7 @@ def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
     candidates = {canonicalize_name(name) for name in names if name}
 
     for dist in distributions(path=[str(site_packages)]):
-        if dist.name and canonicalize_name(dist.name) in candidates:
+        if canonicalize_name(dist.name) in candidates:
             return dist.version
 
     return None
