@@ -21,6 +21,7 @@ const sidebars = {
       label: 'Connectors',
       link: { type: 'doc', id: 'connectors/index' },
       items: [
+        { type: 'doc', id: 'connectors/meltano-hub', label: 'Install plugins with Meltano Hub' },
         { type: 'doc', id: 'connectors/tap-aptem', label: 'Aptem' },
         { type: 'doc', id: 'connectors/tap-baidu', label: 'Baidu' },
         { type: 'doc', id: 'connectors/target-clickhouse', label: 'ClickHouse' },

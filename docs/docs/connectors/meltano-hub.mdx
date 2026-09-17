@@ -1,0 +1,318 @@
+---
+title: Install plugins with Meltano Hub
+description: Learn how to find and install plugins from Meltano Hub, how to add plugins without the Hub, and how plugins are installed and registered in Meltano Cloud.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Meltano Hub
+
+[Meltano Hub](https://hub.meltano.com) is the central index of [plugins](/concepts/plugins) that Meltano can install and configure out of the box. When you run [`meltano add`](/reference/command-line-interface#add), Meltano looks the plugin up on the Hub, downloads its [plugin definition](/reference/plugin-definition-syntax), and writes it into your project.
+
+The Hub is a convenience, not a requirement. Everything it provides - a package to install, a namespace, an executable name, a list of settings and capabilities - can also be supplied by you directly. This guide covers all three paths:
+
+1. [Installing plugins via Meltano Hub](#installing-plugins-via-meltano-hub) - the default, and what you'll use most of the time.
+2. [Installing plugins without Meltano Hub](#installing-plugins-without-meltano-hub) - for plugins that aren't on the Hub yet, private connectors, or air-gapped environments.
+3. [Plugins in Meltano Cloud](#plugins-in-meltano-cloud) - how the same catalog is surfaced in the Meltano Cloud UI.
+
+This guide assumes you have a [Meltano project](/concepts/project) already. If you don't, run `meltano init my-project` first.
+
+:::info CLI syntax
+These examples target Meltano 4.2. The plugin type is detected automatically from the plugin name - `tap-` is an extractor, `target-` is a loader, and anything else is a utility - so you only need to name the plugin. Pass [`--plugin-type`](#disambiguating-the-plugin-type) when inference gets it wrong.
+
+Coming from Meltano 3.x? The positional plugin type argument was **removed in 4.0**: `meltano add extractor tap-github` no longer works, and becomes `meltano add tap-github` or `meltano add --plugin-type extractor tap-github`. The same applies to `meltano install`. See the [v4 migration guide](/guide/v4-migration) for the full list of breaking changes.
+:::
+
+## Installing Plugins via Meltano Hub
+
+### Find the plugin
+
+Browse or search [hub.meltano.com](https://hub.meltano.com) for the connector you need. Each plugin page lists:
+
+- The **plugin name** (e.g. `tap-github`), which is what you pass to `meltano add`.
+- The available [**variants**](/concepts/plugins#variants) - independent implementations of the same connector, maintained by different people or organisations. One is marked as the default.
+- The **settings** the plugin accepts, and which of them are required.
+- The **capabilities** it supports, such as incremental replication via `state` or stream selection via `catalog`.
+
+### Add it to your project
+
+Pass the name to `meltano add`:
+
+```bash
+meltano add tap-github
+meltano add target-postgres
+```
+
+#### Disambiguating the plugin type
+
+If automatic type detection picks the wrong type - or the plugin name doesn't follow the `tap-`/`target-` convention - name it explicitly with `--plugin-type`:
+
+```bash
+meltano add --plugin-type utility dbt-snowflake
+```
+
+To install a variant other than the default, use `--variant`:
+
+```bash
+meltano add target-postgres --variant transferwise
+```
+
+### What Meltano writes to your project
+
+Two things happen when the command succeeds.
+
+First, a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) is added to your [`meltano.yml`](/concepts/project#meltanoyml-project-file):
+
+```yaml title="meltano.yml"
+plugins:
+  extractors:
+  - name: tap-github
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
+  loaders:
+  - name: target-postgres
+    variant: meltanolabs
+    pip_url: meltanolabs-target-postgres
+```
+
+Second, the full definition fetched from the Hub is written to a **lock file** at `plugins/<plugin_type>/<plugin_name>--<variant_name>.lock`. Since Meltano 4.0 this happens automatically on every add and update, so you no longer need to run `meltano lock` by hand:
+
+```
+plugins/
+├── extractors/
+│   └── tap-github--meltanolabs.lock
+└── loaders/
+    └── target-postgres--meltanolabs.lock
+```
+
+The lock file is the important part for reproducibility. **Commit it to version control.** Once it exists, Meltano reads the plugin's settings and capabilities from the lock file rather than calling the Hub again, so your project builds identically on a colleague's laptop or in CI - even if the Hub definition changes later.
+
+By default `meltano add` also installs the plugin into [`.meltano/`](/concepts/project#meltano-directory) straight away. Use `--no-install` to skip that and install later with [`meltano install`](/reference/command-line-interface#install):
+
+```bash
+meltano add tap-github --no-install
+meltano install tap-github
+```
+
+### Check your connection to the Hub
+
+If `meltano add` fails and you suspect a network or proxy problem rather than a bad plugin name:
+
+```bash
+meltano hub ping
+```
+
+This tests connectivity to whichever Hub instance your project is configured to use.
+
+### Update a plugin definition
+
+Re-running `meltano add` for a plugin that is already in your project updates its lock file and `meltano.yml` entry with the latest Hub definition, without overwriting configuration you've set:
+
+```bash
+meltano add tap-github
+```
+
+Lock files are written automatically, but to deliberately refresh them against the Hub without touching `meltano.yml`, use [`meltano lock --update`](/reference/command-line-interface#lock):
+
+```bash
+# Refresh every plugin's lock file
+meltano lock --update
+
+# Refresh one plugin
+meltano lock --update tap-github
+```
+
+## Installing plugins without Meltano Hub
+
+You'll need one of these approaches when:
+
+- The plugin isn't on the Hub yet - for example, a tap you're still developing.
+- The connector is private or internal and you don't want to publish it.
+- Your build environment can't reach `hub.meltano.com`.
+
+### Option 1 - Add from a plugin definition file {#add-from-a-plugin-definition-file}
+
+`--from-ref` adds a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file, given either a local path or a URL. This is the closest thing to a Hub install without the Hub: you supply the same document the Hub would have served.
+
+Write the definition:
+
+```yaml title="tap-mysource.yml"
+name: tap-mysource
+namespace: tap_mysource
+variant: mycompany
+pip_url: git+https://github.com/mycompany/tap-mysource.git
+executable: tap-mysource
+capabilities:
+- state
+- catalog
+- discover
+settings:
+- name: api_url
+- name: api_key
+  sensitive: true
+settings_group_validation:
+- - api_url
+  - api_key
+```
+
+Then add it:
+
+```bash
+# Local path, relative or absolute
+meltano add tap-mysource --from-ref tap-mysource.yml
+
+# Any publicly reachable URL, such as a definition hosted in your own repo
+meltano add tap-mysource --from-ref https://raw.githubusercontent.com/mycompany/plugins/main/tap-mysource.yml
+```
+
+The name in the definition file wins - the name you type on the command line is a formality, and the same applies to `--variant`. Meltano validates the file against the [plugin definition syntax](/reference/plugin-definition-syntax) and errors if required properties are missing.
+
+Plugins added this way are recorded as [custom plugins](/concepts/plugins#custom-plugins): the full definition is inlined into `meltano.yml`, and no lock file is created, because there is no upstream definition to lock against.
+
+To pick up changes after editing the definition file, add it again with `--update`:
+
+```bash
+meltano add --update tap-mysource --from-ref tap-mysource.yml
+```
+
+### Option 2 - Add a custom plugin interactively
+
+If you'd rather answer prompts than write YAML, `--custom` walks you through the same metadata:
+
+```bash
+meltano add --custom tap-mysource
+```
+
+Meltano asks for the plugin's `namespace`, `pip_url`, `executable`, `capabilities` and `settings`, then writes the result into `meltano.yml`. If you're running Meltano in Docker, mount the project directory and keep STDIN open so the prompts work:
+
+```bash
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom tap-mysource
+```
+
+See the [custom extractor tutorial](/tutorials/custom-extractor) for a full worked example, including building the tap itself.
+
+### Option 3 - Write the definition straight into `meltano.yml`
+
+Nothing requires you to use `meltano add` at all. A [custom plugin definition](/concepts/project#custom-plugin-definitions) placed directly in `meltano.yml` is equivalent:
+
+```yaml title="meltano.yml"
+plugins:
+  extractors:
+  - name: tap-mysource
+    namespace: tap_mysource
+    pip_url: git+https://github.com/mycompany/tap-mysource.git
+    executable: tap-mysource
+    capabilities:
+    - state
+    - catalog
+    - discover
+    settings:
+    - name: api_url
+    - name: api_key
+      sensitive: true
+```
+
+Then install it:
+
+```bash
+meltano install tap-mysource
+```
+
+This is often the most convenient route when you're generating `meltano.yml` from a template, or vendoring a handful of internal connectors across several projects.
+
+### Option 4 - Point Meltano at a different Hub
+
+If you want Hub-style installs but not the public Hub - an internal mirror, a fork with your company's private connectors, or a local instance you're developing against - override the [`hub_url` setting](/reference/settings#hub_url):
+
+<Tabs
+  className="meltano-tabs"
+  queryString="meltano-tabs"
+  defaultValue="meltano config"
+  values={[
+    { label: 'meltano config', value: 'meltano config', },
+    { label: 'env', value: 'env', },
+  ]}
+>
+<TabItem className="meltano-tab-content" value="meltano config">
+
+```bash
+meltano config set meltano hub_url https://hub.internal.example.com
+```
+
+</TabItem>
+<TabItem className="meltano-tab-content" value="env">
+
+```bash
+export MELTANO_HUB_URL=https://hub.internal.example.com
+```
+
+</TabItem>
+</Tabs>
+
+If your mirror requires authentication, set [`hub_url_auth`](/reference/settings#hub_url_auth) to the value of the `Authorization` header to send:
+
+```bash
+meltano config set meltano hub_url_auth "Bearer $ACCESS_TOKEN"
+```
+
+To point only the API at a different root while leaving `hub_url` alone, use [`hub_api_root`](/reference/settings#hub_api_root), which takes precedence over `hub_url`:
+
+```bash
+meltano config set meltano hub_api_root "https://hub.internal.example.com/my-plugins"
+```
+
+### Running fully offline
+
+For an air-gapped or offline build, combine the above:
+
+1. Add every Hub-sourced plugin from a machine that has network access, and **commit the generated `.lock` files**. With lock files present, Meltano does not need to call the Hub to resolve a plugin's definition.
+2. Define anything not on the Hub as a custom plugin, using Option 1, 2 or 3 - those definitions live entirely in your project.
+3. Make sure each plugin's `pip_url` points somewhere your build can actually reach, such as an internal PyPI mirror or a vendored wheel, rather than a public Git URL.
+
+Note that installing a plugin still downloads the underlying package, so lock files remove the dependency on the Hub, not on your package index.
+
+## Plugins in Meltano Cloud
+
+[Meltano Cloud](/meltano-cloud/cloud-overview) is the hosted platform. Plugin installation works the same way conceptually - the same Hub catalog sits behind it - but you do it from the UI rather than the CLI, and there's no local `meltano.yml` to edit by hand.
+
+### Register for an account
+
+You need a Meltano account before you can create a workspace. If you don't have one, [book a call with the team at meltano.com](https://meltano.com) to get set up.
+
+Once you have an account:
+
+1. Sign in. The first time you do, you'll be prompted to create your first **workspace** - your isolated environment for pipelines, connectors and store connections, backed by its own Git repository.
+2. Give the workspace a **Name**.
+3. Optionally add **Approved Domains** to restrict membership to email addresses at your company's domain.
+4. Click **Continue**.
+
+If you already have a Meltano project in a GitHub repository, expand **Advanced** on the new workspace screen and paste the repository URL to scaffold the workspace from it. See [Creating a Workspace](/meltano-cloud/creating-workspace) for the full walkthrough, and [Invite & Manage Members](/meltano-cloud/invite) for adding colleagues.
+
+### Install a plugin from the catalog
+
+In the workspace, go to [**Workspace → Plugins**](/meltano-cloud/plugins) in the left navigation bar. The page has three tabs:
+
+- **Installed** - everything currently installed in the workspace. Each card shows the plugin name, type and variant. Use **Add to Pipeline** to wire a plugin into a pipeline without leaving the page, or the three-dot menu (**⋮**) to delete it.
+- **Available** - the full catalog of 550+ plugins. Search for the one you want and click **Install**; it then appears under **Installed**.
+- **Custom** - your own connectors. See below.
+
+This is the Cloud equivalent of `meltano add tap-github`: pick it from **Available**, click **Install**.
+
+### Register a custom plugin
+
+For a connector that isn't in the catalog, open the **Custom** tab and click **Add**. In the modal you can either upload a `discovery.yml` file describing your Singer taps, dbt transforms and Matatika datasets, or paste the YAML directly into the editor. **Reset** clears the editor; **Cancel** closes without saving.
+
+This is the Cloud counterpart to [Option 1](#add-from-a-plugin-definition-file) above - the same metadata, registered against the workspace instead of a local project.
+
+### Working locally against a Cloud workspace
+
+Every workspace is backed by a GitHub repository, so you can clone it and use the CLI workflow from the first half of this guide. Copy the repository URL from **Settings** in your profile menu, then follow [Setup your Dev Environment](/meltano-cloud/setup-development-environment).
+
+## Next steps
+
+- [Plugin management](/guide/plugin-management) - updating, removing, pinning and inheriting plugins
+- [Plugins concept guide](/concepts/plugins) - plugin types, variants, and discoverable vs. custom plugins
+- [Plugin definition syntax](/reference/plugin-definition-syntax) - every property you can set in a definition file
+- [Create a custom extractor](/tutorials/custom-extractor) - build a tap from scratch and add it to your project
+- [`meltano add` reference](/reference/command-line-interface#add) - the complete list of options
