@@ -33,6 +33,55 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
+def _rejection_detail(response: requests.Response) -> str | None:
+    """Read the Hub's own explanation out of a rejected response.
+
+    Letting the Hub supply the wording means it can be changed server side,
+    without waiting for users to upgrade Meltano.
+
+    Args:
+        response: The rejected response.
+
+    Returns:
+        The explanation, or `None` if the Hub did not give a useful one.
+    """
+    try:
+        message = response.json().get("message")
+    except ValueError:
+        return None
+
+    if not isinstance(message, str) or not message.strip():
+        return None
+
+    return message.strip()
+
+
+def _connection_cause(error: requests.exceptions.ConnectionError) -> str | None:
+    """Pull the underlying cause out of a `requests` connection error.
+
+    The error's own string form repeats the URL and buries the cause under two
+    layers of pool machinery, so read the cause that urllib3 recorded instead.
+
+    Args:
+        error: The connection error.
+
+    Returns:
+        The cause, or `None` if urllib3 did not record one.
+    """
+    retry_error = error.args[0] if error.args else None
+    reason = getattr(retry_error, "reason", None)
+    if reason is None:
+        return None
+
+    # urllib3 usually prefixes the cause with a repr of the connection it
+    # attempted. Strip that alone, so an unprefixed cause survives intact.
+    text = str(reason)
+    prefix, separator, rest = text.partition(": ")
+    if separator and prefix.endswith(")") and "Connection(" in prefix:
+        text = rest
+    return text.strip() or None
+
+
 class HubPluginTypeNotFoundError(MeltanoError):
     """Raised when a Hub plugin type is not found."""
 
@@ -64,14 +113,15 @@ class HubConnectionError(MeltanoError):
 class HubAuthenticationRequiredError(MeltanoError):
     """Raised when Meltano Hub rejects a request as unauthenticated."""
 
-    def __init__(self, status_code: int):
+    def __init__(self, status_code: int, detail: str | None = None):
         """Create a new HubAuthenticationRequiredError.
 
         Args:
             status_code: The status code returned by the Hub API.
+            detail: The Hub's own explanation, when it gave one.
         """
         super().__init__(
-            f"Meltano Hub rejected the request ({status_code})",
+            detail or f"Meltano Hub requires authentication ({status_code})",
             "Run 'meltano cloud auth login' to log in to Meltano Cloud",
         )
 
@@ -249,12 +299,18 @@ class MeltanoHubService(PluginRepository):
         try:
             response = self.session.send(prep, **settings)
         except requests.exceptions.ConnectionError as connection_err:
-            raise HubConnectionError from connection_err
+            reason = f"Could not connect to Meltano Hub at {url}"
+            if cause := _connection_cause(connection_err):
+                reason = f"{reason}: {cause}"
+            raise HubConnectionError(reason) from connection_err
 
         # A project that sets 'hub_url_auth' manages its own credentials, so
         # report the status instead of the Cloud login.
         if response.status_code == HTTPStatus.UNAUTHORIZED and not self.hub_url_auth:
-            raise HubAuthenticationRequiredError(response.status_code)
+            raise HubAuthenticationRequiredError(
+                response.status_code,
+                _rejection_detail(response),
+            )
 
         return response
 
