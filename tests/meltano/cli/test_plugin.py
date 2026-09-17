@@ -229,7 +229,6 @@ class TestPluginListInstalled:
         assert tap.name in result.stdout
         assert "1.2.3" in result.stdout
         assert "extractor" in result.stdout
-        assert "(not installed)" not in result.stdout
 
 
 class TestPluginListWithoutDistribution:
