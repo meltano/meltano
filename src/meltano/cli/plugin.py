@@ -38,13 +38,12 @@ INHERITED = "[dim](inherited)[/dim]"
 class PluginListing:
     """A plugin, as the project defines it."""
 
-    name: str
     type: str
+    name: str
     variant: str | None
-    inherited_variant: bool
+    inherit_from: str | None
     custom: bool
     pip_url: str | None
-    inherit_from: str | None
 
     @classmethod
     def from_plugin(cls, plugin: ProjectPlugin) -> PluginListing:
@@ -57,15 +56,12 @@ class PluginListing:
             The plugin listing.
         """
         return cls(
-            name=plugin.name,
             type=plugin.type.descriptor,
+            name=plugin.name,
             variant=plugin.variant,
-            # An inheriting plugin resolves its parent's variant unless it
-            # names one of its own.
-            inherited_variant=bool(plugin.inherit_from) and not plugin.is_variant_set,
+            inherit_from=plugin.inherit_from,
             custom=plugin.is_custom(),
             pip_url=plugin.pip_url,
-            inherit_from=plugin.inherit_from,
         )
 
 
@@ -79,14 +75,15 @@ def _render_table(listings: Iterable[PluginListing]) -> None:
     table.add_column("TYPE", style="cyan", no_wrap=True)
     table.add_column("NAME", style="bold", overflow="fold")
     table.add_column("VARIANT", overflow="fold")
-    table.add_column("INHERITS", overflow="fold")
+    table.add_column("INHERIT FROM", overflow="fold")
     table.add_column("CUSTOM", justify="center")
 
     for listing in listings:
         table.add_row(
             listing.type,
             listing.name,
-            INHERITED if listing.inherited_variant else (listing.variant or UNKNOWN),
+            # An inheriting plugin takes its parent's variant.
+            INHERITED if listing.inherit_from else (listing.variant or UNKNOWN),
             listing.inherit_from or "",
             CUSTOM if listing.custom else "",
         )
