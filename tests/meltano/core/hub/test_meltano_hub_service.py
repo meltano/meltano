@@ -20,6 +20,7 @@ from meltano.core.hub.client import (
     HubPluginTypeNotFoundError,
     HubPluginVariantNotFoundError,
     MeltanoHubService,
+    _connection_cause,
 )
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -69,21 +70,56 @@ def _stub_cloud_credentials(
     )
 
 
-def _stub_hub_status(monkeypatch: pytest.MonkeyPatch, status_code: HTTPStatus) -> None:
+def _stub_hub_status(
+    monkeypatch: pytest.MonkeyPatch,
+    status_code: HTTPStatus,
+    body: bytes = b"{}",
+) -> None:
     """Make every Hub request answer with the given status.
 
     Args:
         monkeypatch: The pytest monkeypatch fixture.
         status_code: The status to answer with.
+        body: The response body to answer with.
     """
 
     def _send(*args: t.Any, **kwargs: t.Any) -> Response:  # noqa: ARG001
         response = Response()
         response.status_code = status_code
-        response._content = b"{}"
+        response._content = body
         return response
 
     monkeypatch.setattr(MeltanoHubService.session, "send", _send)
+
+
+class TestConnectionCause:
+    @pytest.mark.parametrize(
+        ("reason", "expected"),
+        (
+            pytest.param(
+                "HTTPSConnection(host='h', port=443): Failed to resolve 'h' "
+                "([Errno -2] Name or service not known)",
+                "Failed to resolve 'h' ([Errno -2] Name or service not known)",
+                id="strips-the-connection-repr",
+            ),
+            pytest.param(
+                "Failed to establish a new connection: [Errno 111] refused",
+                "Failed to establish a new connection: [Errno 111] refused",
+                id="keeps-an-unprefixed-cause-intact",
+            ),
+            pytest.param("Bare message", "Bare message", id="unprefixed"),
+        ),
+    )
+    def test_reads_the_cause_urllib3_recorded(
+        self,
+        reason: str,
+        expected: str,
+    ) -> None:
+        error = requests.exceptions.ConnectionError(mock.Mock(reason=reason))
+        assert _connection_cause(error) == expected
+
+    def test_no_cause_recorded(self) -> None:
+        assert _connection_cause(requests.exceptions.ConnectionError()) is None
 
 
 class TestMeltanoHubService:
@@ -221,6 +257,49 @@ class TestMeltanoHubService:
         ):
             project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
 
+    def test_rejection_detail_from_hub_is_surfaced(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        _stub_hub_status(
+            monkeypatch,
+            HTTPStatus.UNAUTHORIZED,
+            b'{"message": "Meltano Hub requires a Meltano Cloud account."}',
+        )
+
+        with pytest.raises(
+            HubAuthenticationRequiredError,
+            match=r"requires a Meltano Cloud account",
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+    @pytest.mark.parametrize(
+        "body",
+        (
+            pytest.param(b"<html>gateway</html>", id="not-json"),
+            pytest.param(b'{"message": ""}', id="empty"),
+            pytest.param(b'{"message": 42}', id="not-a-string"),
+        ),
+    )
+    def test_unhelpful_rejection_bodies_fall_back(
+        self,
+        project: Project,
+        monkeypatch,
+        body: bytes,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        _stub_hub_status(monkeypatch, HTTPStatus.UNAUTHORIZED, body)
+
+        with pytest.raises(
+            HubAuthenticationRequiredError,
+            match=r"Meltano Hub requires authentication \(401\)",
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
     @pytest.mark.usefixtures("_restore_hub_session_headers")
     def test_unauthenticated_request_with_hub_auth_reports_status(
         self,
@@ -321,7 +400,7 @@ class TestMeltanoHubService:
             ),
             pytest.raises(
                 HubConnectionError,
-                match=r"Could not connect to Meltano Hub\.",
+                match=r"Could not connect to Meltano Hub at http",
             ) as exc_info,
         ):
             project.hub_service._get(project.hub_service.hub_api_url)
