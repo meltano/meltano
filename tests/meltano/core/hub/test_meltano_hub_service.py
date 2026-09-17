@@ -422,6 +422,20 @@ class TestMeltanoHubService:
 
         assert isinstance(exc_info.value.__cause__, requests.exceptions.ConnectionError)
 
+    def test_connection_error_names_the_cause(self, project: Project) -> None:
+        underlying = mock.Mock(
+            reason="Failed to resolve 'example.invalid' ([Errno -2] not known)",
+        )
+        with (
+            mock.patch.object(
+                project.hub_service.session,
+                "send",
+                side_effect=requests.exceptions.ConnectionError(underlying),
+            ),
+            pytest.raises(HubConnectionError, match=r"Failed to resolve"),
+        ):
+            project.hub_service._get(project.hub_service.hub_api_url)
+
     def test_plugin_type_not_found_error(self, project: Project) -> None:
         mock_response = Response()
         mock_response.status_code = HTTPStatus.NOT_FOUND

@@ -18,6 +18,7 @@ import requests_mock as requests_mock_module
 
 from meltano.core.cloud.auth import (
     CloudAuthService,
+    _CallbackHTTPServer,
     generate_code_challenge,
     generate_code_verifier,
 )
@@ -147,6 +148,29 @@ class TestPKCE:
         )
         assert generate_code_challenge(verifier) == expected.decode().rstrip("=")
         assert "=" not in generate_code_challenge(verifier)
+
+
+class TestCallbackServer:
+    def test_rejects_a_request_to_the_wrong_path(self) -> None:
+        server = _CallbackHTTPServer(("127.0.0.1", 0), "/callback")
+        try:
+            port = server.server_address[1]
+            thread = threading.Thread(target=server.handle_request)
+            thread.start()
+            with urllib.request.urlopen(
+                f"http://127.0.0.1:{port}/favicon.ico",
+                timeout=10,
+            ) as response:
+                status = response.status
+        except urllib.error.HTTPError as err:
+            status = err.code
+            err.close()
+        finally:
+            thread.join(timeout=10)
+            server.server_close()
+
+        assert status == 404
+        assert server.result is None
 
 
 class TestLogin:
@@ -373,6 +397,17 @@ class TestSession:
     ) -> None:
         with pytest.raises(CloudNotAuthenticatedError, match="not logged in"):
             service.require_credentials()
+
+    def test_require_credentials_when_logged_in(
+        self,
+        service: CloudAuthService,
+    ) -> None:
+        credentials = Credentials(
+            access_token="at",
+            expires_at=datetime.now(tz=tz.utc) + timedelta(hours=1),
+        )
+        service.store.set(credentials)
+        assert service.require_credentials() == credentials
 
     def test_get_credentials_returns_valid_session(
         self,

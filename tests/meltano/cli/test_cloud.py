@@ -13,6 +13,7 @@ from meltano.cli import cli
 from meltano.core.cloud.auth import CloudAuthService
 from meltano.core.cloud.config import CloudAuthConfig
 from meltano.core.cloud.credentials import Credentials
+from meltano.cli.cloud import _echo_authorize_url
 from meltano.core.cloud.error import CloudAuthenticationError
 
 if t.TYPE_CHECKING:
@@ -41,6 +42,20 @@ def credentials() -> Credentials:
         id_token=id_token({"email": "user@example.com"}),
         expires_at=datetime.now(tz=tz.utc) + timedelta(hours=1),
     )
+
+
+class TestEchoAuthorizeUrl:
+    def test_opened(self, capsys: pytest.CaptureFixture) -> None:
+        _echo_authorize_url("https://example.com/authorize", opened=True)
+        out = capsys.readouterr().out
+        assert "Opening your browser" in out
+        assert "https://example.com/authorize" in out
+
+    def test_not_opened(self, capsys: pytest.CaptureFixture) -> None:
+        _echo_authorize_url("https://example.com/authorize", opened=False)
+        out = capsys.readouterr().out
+        assert "Visit the following link" in out
+        assert "https://example.com/authorize" in out
 
 
 class TestCloudAuthLogin:
@@ -223,3 +238,18 @@ class TestCloudAuthStatus:
         # Falls back to the claims of the stored ID token.
         assert "Logged in to Meltano Cloud as user@example.com" in result.stdout
         user_info.assert_not_called()
+
+    def test_status_without_expiry(self, cli_runner: CliRunner) -> None:
+        credentials = Credentials(
+            access_token="at",
+            id_token=id_token({"email": "user@example.com"}),
+        )
+        with mock.patch.object(
+            CloudAuthService,
+            "get_credentials",
+            return_value=credentials,
+        ):
+            result = cli_runner.invoke(cli, ("cloud", "auth", "status", "--offline"))
+
+        assert result.exit_code == 0, result.output
+        assert "Session expires at" not in result.stdout

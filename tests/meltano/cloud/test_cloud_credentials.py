@@ -7,13 +7,11 @@ import stat
 import typing as t
 from datetime import datetime, timedelta
 from datetime import timezone as tz
+from pathlib import Path
 
 import pytest
 
 from meltano.core.cloud.credentials import Credentials, CredentialsStore
-
-if t.TYPE_CHECKING:
-    from pathlib import Path
 
 
 def make_id_token(claims: dict[str, t.Any]) -> str:
@@ -153,6 +151,21 @@ class TestCredentialsStore:
         store.set(Credentials(access_token="second"))
         assert CredentialsStore(store.path).get().access_token == "second"
 
+    def test_set_cleans_up_the_temporary_file_on_failure(
+        self,
+        store: CredentialsStore,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        def _fail_replace(self, target):  # noqa: ARG001
+            raise OSError
+
+        monkeypatch.setattr(Path, "replace", _fail_replace)
+
+        with pytest.raises(OSError):  # noqa: PT011
+            store.set(Credentials(access_token="at"))
+
+        assert list(store.path.parent.iterdir()) == []
+
     def test_clear(self, store: CredentialsStore) -> None:
         store.set(Credentials(access_token="at"))
         assert store.clear() is True
@@ -160,6 +173,20 @@ class TestCredentialsStore:
         assert store.get() is None
 
     def test_clear_when_missing(self, store: CredentialsStore) -> None:
+        assert store.clear() is False
+
+    def test_clear_reports_false_on_other_errors(
+        self,
+        store: CredentialsStore,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        store.set(Credentials(access_token="at"))
+
+        def _fail_unlink(self):  # noqa: ARG001
+            raise PermissionError
+
+        monkeypatch.setattr(Path, "unlink", _fail_unlink)
+
         assert store.clear() is False
 
     @pytest.mark.parametrize("content", ("{not json", "{}", '{"access_token": null}'))
