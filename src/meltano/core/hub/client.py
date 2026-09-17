@@ -44,18 +44,11 @@ def _rejection_detail(response: requests.Response) -> str | None:
         response: The rejected response.
 
     Returns:
-        The explanation, or `None` if the Hub did not give a useful one.
+        The explanation, or `None` if the Hub sent no JSON message.
     """
     try:
-        payload = response.json()
-    except ValueError:
-        return None
-
-    if not isinstance(payload, dict):
-        return None
-
-    message = payload.get("message")
-    if not isinstance(message, str) or not message.strip():
+        message = response.json()["message"]
+    except (ValueError, KeyError):
         return None
 
     # The error renders the reason with a full stop after it, so drop the
@@ -123,15 +116,14 @@ class HubAuthenticationRequiredError(MeltanoError):
     # Always set, unlike the base class, so a caller can add to it.
     instruction: str
 
-    def __init__(self, status_code: int, detail: str | None = None):
+    def __init__(self, detail: str | None = None):
         """Create a new HubAuthenticationRequiredError.
 
         Args:
-            status_code: The status code returned by the Hub API.
             detail: The Hub's own explanation, when it gave one.
         """
         super().__init__(
-            detail or f"Meltano Hub requires authentication ({status_code})",
+            detail or "Meltano Hub requires authentication",
             "Run 'meltano cloud auth login' to log in or register for Meltano Cloud",
         )
 
@@ -324,10 +316,7 @@ class MeltanoHubService(PluginRepository):
         # A project that sets 'hub_url_auth' manages its own credentials, so
         # report the status instead of the Cloud login.
         if response.status_code == HTTPStatus.UNAUTHORIZED and not self.hub_url_auth:
-            raise HubAuthenticationRequiredError(
-                response.status_code,
-                _rejection_detail(response),
-            )
+            raise HubAuthenticationRequiredError(_rejection_detail(response))
 
         return response
 

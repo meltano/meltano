@@ -155,7 +155,7 @@ class TestCliAdd:
         project: Project,  # noqa: ARG002
         cli_runner,
     ) -> None:
-        rejected = HubAuthenticationRequiredError(401)
+        rejected = HubAuthenticationRequiredError()
         with mock.patch(
             "meltano.cli.add.add_plugin",
             side_effect=rejected,
