@@ -272,7 +272,7 @@ class TestMeltanoHubService:
 
         with pytest.raises(
             HubAuthenticationRequiredError,
-            match=r"requires a Meltano Cloud account",
+            match=r"requires a Meltano Cloud account\. Run ",
         ):
             project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
 
