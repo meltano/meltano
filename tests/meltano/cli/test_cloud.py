@@ -10,10 +10,10 @@ from unittest import mock
 import pytest
 
 from meltano.cli import cli
+from meltano.cli.cloud import _echo_authorize_url
 from meltano.core.cloud.auth import CloudAuthService
 from meltano.core.cloud.config import CloudAuthConfig
 from meltano.core.cloud.credentials import Credentials
-from meltano.cli.cloud import _echo_authorize_url
 from meltano.core.cloud.error import CloudAuthenticationError
 
 if t.TYPE_CHECKING:
