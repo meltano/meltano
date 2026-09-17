@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 import typing as t
 from http import HTTPStatus
+from pathlib import Path
 from unittest import mock
 
 import click
@@ -24,6 +25,7 @@ from meltano.core.hub.client import (
 )
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.user_config import UserConfigReadError
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -241,6 +243,18 @@ class TestMeltanoHubService:
         _stub_cloud_credentials(monkeypatch, None)
         service = MeltanoHubService(project)
         assert "Authorization" not in service.session.headers
+
+    def test_unreadable_user_config_is_treated_as_logged_out(
+        self,
+        monkeypatch,
+    ) -> None:
+        monkeypatch.setattr(
+            "meltano.core.cloud.auth.CloudAuthService",
+            mock.Mock(
+                side_effect=UserConfigReadError(Path("config.yml"), ValueError()),
+            ),
+        )
+        assert MeltanoHubService._cloud_credentials() is None
 
     def test_unauthenticated_request_points_at_cloud_login(
         self,

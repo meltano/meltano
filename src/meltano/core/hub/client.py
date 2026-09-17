@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 import typing as t
+from contextlib import suppress
 from http import HTTPStatus
 
 import click
@@ -226,8 +227,14 @@ class MeltanoHubService(PluginRepository):
         # Imported here so that fetching a plugin definition does not pay for
         # the login flow's HTTP server and browser launcher.
         from meltano.core.cloud.auth import CloudAuthService
+        from meltano.core.user_config import UserConfigReadError
 
-        return CloudAuthService().get_credentials()
+        # A user configuration file that cannot be read must not stop a plugin
+        # being added, so treat it as being logged out.
+        with suppress(UserConfigReadError):
+            return CloudAuthService().get_credentials()
+
+        return None
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
