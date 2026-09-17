@@ -24,9 +24,6 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-# Shown in place of a value that could not be determined.
-UNKNOWN = "-"
-
 # Marks a plugin that carries its own definition in `meltano.yml`.
 CUSTOM = "\u2713"
 
@@ -83,7 +80,7 @@ def _render_table(listings: Iterable[PluginListing]) -> None:
             listing.type,
             listing.name,
             # An inheriting plugin takes its parent's variant.
-            INHERITED if listing.inherit_from else (listing.variant or UNKNOWN),
+            INHERITED if listing.inherit_from else listing.variant,
             listing.inherit_from or "",
             CUSTOM if listing.custom else "",
         )
