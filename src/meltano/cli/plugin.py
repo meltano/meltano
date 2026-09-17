@@ -30,6 +30,9 @@ UNKNOWN = "-"
 # Marks a plugin that carries its own definition in `meltano.yml`.
 CUSTOM = "\u2713"
 
+# Shown in place of a variant that the plugin takes from its parent.
+INHERITED = "[dim](inherited)[/dim]"
+
 
 @dataclass(frozen=True)
 class PluginListing:
@@ -38,6 +41,7 @@ class PluginListing:
     name: str
     type: str
     variant: str | None
+    inherited_variant: bool
     custom: bool
     pip_url: str | None
     inherit_from: str | None
@@ -56,6 +60,9 @@ class PluginListing:
             name=plugin.name,
             type=plugin.type.descriptor,
             variant=plugin.variant,
+            # An inheriting plugin resolves its parent's variant unless it
+            # names one of its own.
+            inherited_variant=bool(plugin.inherit_from) and not plugin.is_variant_set,
             custom=plugin.is_custom(),
             pip_url=plugin.pip_url,
             inherit_from=plugin.inherit_from,
@@ -72,13 +79,15 @@ def _render_table(listings: Iterable[PluginListing]) -> None:
     table.add_column("TYPE", style="cyan", no_wrap=True)
     table.add_column("NAME", style="bold", overflow="fold")
     table.add_column("VARIANT", overflow="fold")
+    table.add_column("INHERITS", overflow="fold")
     table.add_column("CUSTOM", justify="center")
 
     for listing in listings:
         table.add_row(
             listing.type,
             listing.name,
-            listing.variant or UNKNOWN,
+            INHERITED if listing.inherited_variant else (listing.variant or UNKNOWN),
+            listing.inherit_from or "",
             CUSTOM if listing.custom else "",
         )
 

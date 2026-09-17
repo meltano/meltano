@@ -1177,7 +1177,9 @@ The command reports what the project declares. It does not inspect what is insta
 
 The plugins keep the order that `meltano.yml` defines them in, within each plugin type.
 
-The `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/).
+The `INHERITS` column names the plugin that a plugin [inherits from](/concepts/plugins#plugin-inheritance), and the `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/). A plugin from Meltano Hub has neither.
+
+A plugin that inherits takes its parent's variant unless it names one of its own, and the `VARIANT` column shows `(inherited)` where it does. The JSON output reports the resolved variant, and an `inherited_variant` flag beside it.
 
 #### How to use
 
@@ -1190,11 +1192,12 @@ meltano plugin list --format json
 ```
 
 ```
- TYPE        NAME           VARIANT       CUSTOM
- ───────────────────────────────────────────────
- extractor   tap-github     meltanolabs
- extractor   tap-internal   default         ✓
- loader      target-jsonl   andyh1203
+ TYPE        NAME                  VARIANT       INHERITS     CUSTOM
+ ───────────────────────────────────────────────────────────────────
+ extractor   tap-github            meltanolabs
+ extractor   tap-github--sandbox   (inherited)   tap-github
+ extractor   tap-internal          default                      ✓
+ loader      target-jsonl          andyh1203
 ```
 
 The JSON output includes the `pip_url` and `inherit_from` of each plugin as well:
@@ -1205,6 +1208,7 @@ The JSON output includes the `pip_url` and `inherit_from` of each plugin as well
     "name": "tap-github--custom",
     "type": "extractor",
     "variant": "meltanolabs",
+    "inherited_variant": true,
     "custom": false,
     "pip_url": "meltanolabs-tap-github",
     "inherit_from": "tap-github"

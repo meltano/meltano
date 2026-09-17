@@ -7,7 +7,7 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.cli.plugin import CUSTOM
+from meltano.cli.plugin import CUSTOM, INHERITED
 from meltano.core.plugin import PluginType
 
 if t.TYPE_CHECKING:
@@ -117,8 +117,26 @@ class TestPluginListDeclaredPlugins:
         assert_cli_runner(result)
         entries = listed(result)
         assert entries[inherited_tap.name]["inherit_from"] == tap.name
-        # The variant is resolved through the parent.
+        # The variant is resolved through the parent, rather than declared.
         assert entries[inherited_tap.name]["variant"] == entries[tap.name]["variant"]
+        assert entries[inherited_tap.name]["inherited_variant"] is True
+        assert entries[tap.name]["inherited_variant"] is False
+
+    def test_text_output_marks_an_inherited_variant(
+        self,
+        project: Project,  # noqa: ARG002
+        tap: ProjectPlugin,
+        inherited_tap: ProjectPlugin,  # noqa: ARG002
+        cli_runner: CliRunner,
+    ) -> None:
+        result = cli_runner.invoke(cli, ("plugin", "list"))
+
+        assert_cli_runner(result)
+        # The parent is named in its own column, and the child declares no
+        # variant of its own.
+        assert "INHERITS" in result.stdout
+        assert tap.name in result.stdout
+        assert INHERITED.replace("[dim]", "").replace("[/dim]", "") in result.stdout
 
     def test_text_output_lists_the_plugin(
         self,
