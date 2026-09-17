@@ -218,6 +218,7 @@ class TestMeltanoHubService:
 
     @pytest.mark.usefixtures("_restore_hub_session_headers")
     def test_hub_auth_from_cloud_session(self, project: Project, monkeypatch) -> None:
+        project.settings.unset("hub_url_auth")
         _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
         service = MeltanoHubService(project)
         assert service.session.headers["Authorization"] == "Bearer s3cr3t"
