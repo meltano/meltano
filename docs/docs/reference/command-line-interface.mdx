@@ -63,6 +63,10 @@ If the flag is not provided, the behavior is determined by the boolean [`auto_in
 
 `meltano add` lets you add or update [plugins](/concepts/plugins#project-plugins) in your Meltano project. The command is idempotent - running it on an existing plugin will update the plugin instead of failing.
 
+:::info Meltano Cloud account required
+This command reads plugin definitions from [Meltano Hub](https://hub.meltano.com/), which requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first, or pass `--from-ref` to add a plugin without the Hub.
+:::
+
 When adding a new plugin, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
@@ -934,6 +938,12 @@ Use the `hub` command to interact with the instance of Meltano Hub your Meltano 
 
 Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
 
+:::info Meltano Cloud account required
+Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
+
+The commands that read from the Hub are [`add`](#add), [`lock`](#lock) and `hub ping`. A project that already has [lock artifacts](/concepts/plugins#lock-artifacts) is unaffected, because [`install`](#install) and [`run`](#run) do not contact the Hub.
+:::
+
 ### How to use
 
 ```bash
@@ -1175,6 +1185,10 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 ## `lock`
 
 `meltano lock` creates lock files for [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
+
+:::info Meltano Cloud account required
+This command reads plugin definitions from [Meltano Hub](https://hub.meltano.com/), which requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
+:::
 
 ### How to use
 
