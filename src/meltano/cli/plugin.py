@@ -22,7 +22,6 @@ from meltano.core.venv_service import VirtualEnv
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
-    from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -35,28 +34,6 @@ NOT_INSTALLED = "[yellow](not installed)[/yellow]"
 
 # Marks a plugin that carries its own definition in `meltano.yml`.
 CUSTOM = "\u2713"
-
-
-def _site_packages_dir(venv: VirtualEnv) -> Path | None:
-    """Find the site-packages directory of a virtual environment.
-
-    `VirtualEnv.site_packages_dir` names the directory after the interpreter
-    that Meltano itself runs on, so it is not used here.
-
-    Args:
-        venv: The virtual environment.
-
-    Returns:
-        The site-packages directory, or `None` if there is not exactly one.
-    """
-    # Windows puts the directory straight under the lib directory. Every other
-    # platform puts it under the name of the version that created the
-    # environment, which is not necessarily the one Meltano runs on.
-    for pattern in ("site-packages", "python*/site-packages"):
-        if found := sorted(venv.lib_dir.glob(pattern)):
-            return found[0]
-
-    return None
 
 
 def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
@@ -75,10 +52,17 @@ def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
     Returns:
         The installed version, or `None` if it could not be determined.
     """
-    if (site_packages := _site_packages_dir(venv)) is None:
-        return None
+    # Windows keeps site-packages straight under the lib directory. Every
+    # other platform keeps it under the name of the version that created the
+    # environment, which is not necessarily the one Meltano runs on, so
+    # `sysconfig` cannot name it. A search path that does not exist is
+    # ignored, so both are offered.
+    search = [
+        str(venv.lib_dir / "site-packages"),
+        *(str(path) for path in venv.lib_dir.glob("python*/site-packages")),
+    ]
 
-    for dist in distributions(path=[str(site_packages)]):
+    for dist in distributions(path=search):
         scripts = dist.entry_points.select(group="console_scripts")
         if plugin.executable not in scripts.names:
             continue
