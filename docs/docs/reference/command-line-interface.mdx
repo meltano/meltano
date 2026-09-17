@@ -321,25 +321,20 @@ MELTANO_CLOUD_CREDENTIALS_PATH=~/.config/meltano/cloud/staging.json meltano clou
 
 #### Configuring the login flow
 
-The identity provider is the one Meltano Cloud runs, so it is not configurable. Two values can be overridden with an environment variable, or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+The identity provider is the one Meltano Cloud runs, so it is not configurable. The login flow listens on port `9999`, falling back to `9998` when that one is in use; both are registered as callback URLs for the Meltano CLI application.
 
-| Environment variable                | User configuration key      | Description                                              |
-| ----------------------------------- | --------------------------- | -------------------------------------------------------- |
-| `MELTANO_CLOUD_AUTH_CALLBACK_PORTS` | `cloud.auth.callback_ports` | Ports to try for the loopback callback server, in order. |
-| `MELTANO_CLOUD_CREDENTIALS_PATH`    | `cloud.auth.credentials_path` | Where the session is stored.                           |
+Only where the session is stored can be changed, with an environment variable or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+
+| Environment variable             | User configuration key        | Description                  |
+| -------------------------------- | ----------------------------- | ---------------------------- |
+| `MELTANO_CLOUD_CREDENTIALS_PATH` | `cloud.auth.credentials_path` | Where the session is stored. |
 
 ```yaml
 # ~/.config/meltano/config.yml
 cloud:
   auth:
-    callback_ports: [9999, 9998]
+    credentials_path: ~/.config/meltano/cloud/staging.json
 ```
-
-:::info
-
-Each port listed in `callback_ports` must be registered as an allowed callback URL for the Meltano CLI application, so the login flow uses a fixed port rather than an arbitrary free one. Meltano tries each configured port in turn, which lets the login succeed when the first one is already in use.
-
-:::
 
 ### Using `cloud` with Environments
 

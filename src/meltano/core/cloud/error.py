@@ -46,10 +46,11 @@ class CallbackServerError(MeltanoCloudError):
             host: Host the callback server tried to bind to.
             ports: Ports the callback server tried to bind to.
         """
-        port_list = ", ".join(str(port) for port in ports)
+        port_list = " and ".join(str(port) for port in ports)
+        plural = "s" if len(ports) > 1 else ""
         super().__init__(
-            f"Unable to start the login callback server on {host} (tried port(s) "
-            f"{port_list})",
-            "Free up the port, or set 'MELTANO_CLOUD_AUTH_CALLBACK_PORTS' to a port "
-            "that is registered as a callback URL for the Meltano Cloud application",
+            f"Unable to start the login callback server on {host}, because port"
+            f"{plural} {port_list} {'are' if len(ports) > 1 else 'is'} in use",
+            f"Free up {'one of those ports' if len(ports) > 1 else 'the port'} "
+            "and run 'meltano cloud auth login' again",
         )
