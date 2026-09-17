@@ -10,7 +10,11 @@ import TabItem from '@theme/TabItem';
 
 [Meltano Hub](https://hub.meltano.com) is the central index of [plugins](/concepts/plugins) that Meltano can install and configure out of the box. When you run [`meltano add`](/reference/command-line-interface#add), Meltano looks the plugin up on the Hub, downloads its [plugin definition](/reference/plugin-definition-syntax), and writes it into your project.
 
-Reading plugin definitions from the Hub requires a Meltano Cloud account, and a signed-in CLI session. **This does not put Meltano behind a login.** The Hub is a convenience, not a requirement: everything it provides - a package to install, a namespace, an executable name, a list of settings and capabilities - can also be supplied by you directly, and those paths need no account at all.
+The Hub is a convenience, not a requirement: everything it provides - a package to install, a namespace, an executable name, a list of settings and capabilities - can also be supplied by you directly, and those paths need no account at all.
+
+<div className="tier-banner tier-banner--yellow">
+Reading plugin definitions from the Hub requires a Meltano Cloud account, and a signed-in CLI session. **This does not put Meltano behind a login.**
+</div>
 
 This guide covers all three paths:
 
