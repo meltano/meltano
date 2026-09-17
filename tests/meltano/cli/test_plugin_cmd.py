@@ -332,6 +332,23 @@ class TestPluginListNotInstalled:
         assert_cli_runner(result)
         assert "(not installed)" in result.stdout
 
+    def test_a_created_environment_is_not_an_install(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+        cli_runner: CliRunner,
+    ) -> None:
+        # An install that fails after the environment is created leaves an
+        # interpreter behind, and no fingerprint.
+        venv = VirtualEnv(project.dirs.venvs(tap.type, tap.plugin_dir_name))
+        venv.bin_dir.mkdir(parents=True, exist_ok=True)
+        (venv.bin_dir / "python").touch()
+
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
+
+        assert_cli_runner(result)
+        assert listed(result)[tap.name]["installed"] is False
+
     def test_custom_plugins_are_marked(
         self,
         project: Project,  # noqa: ARG002

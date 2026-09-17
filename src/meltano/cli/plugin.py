@@ -225,8 +225,9 @@ class PluginListing:
 def _is_installed(venv: VirtualEnv) -> bool:
     """Check whether a plugin's virtual environment has been installed.
 
-    These are the signals that `VirtualEnv.requires_install` reads, without
-    its fingerprint comparison, which needs the arguments of an install.
+    The fingerprint is written once `pip install` has returned, so an
+    environment that was created for an install that then failed has an
+    interpreter but no fingerprint.
 
     Args:
         venv: The plugin's virtual environment.
@@ -234,7 +235,7 @@ def _is_installed(venv: VirtualEnv) -> bool:
     Returns:
         Whether the plugin is installed.
     """
-    return venv.read_fingerprint() is not None or venv.exec_path("python").exists()
+    return venv.read_fingerprint() is not None
 
 
 def _render_table(listings: Iterable[PluginListing]) -> None:
