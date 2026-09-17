@@ -10,7 +10,6 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.cli.plugin import (
     CUSTOM,
-    _canonical,
     _direct_url_revision,
     _requirement_name,
     _vcs_url,
@@ -36,6 +35,25 @@ def site_packages_path(venv_root: Path) -> Path:
     return venv_root / "lib" / "python3.12" / "site-packages"
 
 
+def write_dist_info(
+    site_packages: Path,
+    name: str,
+    version: str,
+    direct_url: dict[str, t.Any] | None = None,
+) -> Path:
+    """Write the metadata that `pip` leaves behind for a distribution."""
+    dist_info = site_packages / f"{name.replace('-', '_')}-{version}.dist-info"
+    dist_info.mkdir(parents=True, exist_ok=True)
+    (dist_info / "METADATA").write_text(
+        f"Metadata-Version: 2.1\nName: {name}\nVersion: {version}\n",
+    )
+
+    if direct_url is not None:
+        (dist_info / "direct_url.json").write_text(json.dumps(direct_url))
+
+    return dist_info
+
+
 def fake_install(
     project: Project,
     plugin: ProjectPlugin,
@@ -49,14 +67,12 @@ def fake_install(
     VirtualEnv(venv_root).plugin_fingerprint_path.write_text("fingerprint")
 
     if version is not None:
-        site_packages = site_packages_path(venv_root)
-        site_packages.mkdir(parents=True, exist_ok=True)
-        name = (dist_name or plugin.name).replace("-", "_")
-        dist_info = site_packages / f"{name}-{version}.dist-info"
-        dist_info.mkdir(exist_ok=True)
-
-        if direct_url is not None:
-            (dist_info / "direct_url.json").write_text(json.dumps(direct_url))
+        write_dist_info(
+            site_packages_path(venv_root),
+            dist_name or plugin.name,
+            version,
+            direct_url,
+        )
 
     return venv_root
 
@@ -115,17 +131,6 @@ class TestRequirementName:
     def test_requirement_name(self, pip_url: str | None, expected: str | None) -> None:
         assert _requirement_name(pip_url) == expected
 
-    @pytest.mark.parametrize(
-        ("name", "expected"),
-        (
-            ("tap_github", "tap-github"),
-            ("Tap.GitHub", "tap-github"),
-            ("tap--github", "tap-github"),
-        ),
-    )
-    def test_canonical(self, name: str, expected: str) -> None:
-        assert _canonical(name) == expected
-
 
 class TestVcsUrl:
     @pytest.mark.parametrize(
@@ -165,17 +170,6 @@ class TestDirectUrlRevision:
     PIP_URL = "git+https://github.com/meltano/tap-mock.git@v1.0.0"
 
     @staticmethod
-    def write_dist_info(
-        site_packages: Path,
-        name: str,
-        direct_url: dict[str, t.Any] | None = None,
-    ) -> None:
-        dist_info = site_packages / f"{name}.dist-info"
-        dist_info.mkdir(parents=True)
-        if direct_url is not None:
-            (dist_info / "direct_url.json").write_text(json.dumps(direct_url))
-
-    @staticmethod
     def vcs_info(url: str, revision: str | None) -> dict[str, t.Any]:
         vcs_info: dict[str, t.Any] = {"vcs": "git", "commit_id": "a" * 40}
         if revision is not None:
@@ -183,9 +177,10 @@ class TestDirectUrlRevision:
         return {"url": url, "vcs_info": vcs_info}
 
     def test_reports_the_requested_revision(self, tmp_path: Path) -> None:
-        self.write_dist_info(
+        write_dist_info(
             tmp_path,
-            "meltanolabs_tap_mock-0.0.0",
+            "meltanolabs-tap-mock",
+            "0.0.0",
             self.vcs_info("https://github.com/meltano/tap-mock.git", "v1.0.0"),
         )
 
@@ -194,9 +189,10 @@ class TestDirectUrlRevision:
     def test_ignores_another_distribution(self, tmp_path: Path) -> None:
         # A dependency installed from its own repository must not be mistaken
         # for the plugin.
-        self.write_dist_info(
+        write_dist_info(
             tmp_path,
-            "requests-2.32.3",
+            "requests",
+            "2.32.3",
             self.vcs_info("https://github.com/psf/requests.git", "v2.32.3"),
         )
 
@@ -206,16 +202,17 @@ class TestDirectUrlRevision:
         self,
         tmp_path: Path,
     ) -> None:
-        self.write_dist_info(
+        write_dist_info(
             tmp_path,
-            "meltanolabs_tap_mock-0.0.0",
+            "meltanolabs-tap-mock",
+            "0.0.0",
             self.vcs_info("https://github.com/meltano/tap-mock.git", None),
         )
 
         assert _direct_url_revision(tmp_path, self.PIP_URL) is None
 
     def test_reports_nothing_for_a_plain_requirement(self, tmp_path: Path) -> None:
-        self.write_dist_info(tmp_path, "tap_mock-1.0.0")
+        write_dist_info(tmp_path, "tap-mock", "1.0.0")
 
         assert _direct_url_revision(tmp_path, "tap-mock") is None
 
@@ -429,7 +426,7 @@ class TestPluginListInstalled:
     ) -> None:
         venv_root = fake_install(project, tap, version="1.2.3")
         # Dependencies of the plugin must not be mistaken for the plugin.
-        (site_packages_path(venv_root) / "requests-2.32.3.dist-info").mkdir()
+        write_dist_info(site_packages_path(venv_root), "requests", "2.32.3")
 
         result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
 

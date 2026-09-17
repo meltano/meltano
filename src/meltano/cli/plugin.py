@@ -7,8 +7,11 @@ import platform
 import re
 import typing as t
 from dataclasses import asdict, dataclass
+from importlib.metadata import distributions
 
 import click
+from packaging.requirements import InvalidRequirement, Requirement
+from packaging.utils import canonicalize_name
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Table
@@ -37,27 +40,9 @@ NOT_INSTALLED = "[yellow](not installed)[/yellow]"
 # Marks a plugin that carries its own definition in `meltano.yml`.
 CUSTOM = "\u2713"
 
-_NAME_SEPARATORS = re.compile(r"[-_.]+")
-
-# The end of a distribution name in a `pip install` argument, e.g. the '=' of
-# 'tap-github==1.0.0' or the '[' of 'tap-github[dev]'.
-_REQUIREMENT_NAME_END = re.compile(r"[\[=<>~!;\s]")
-
 # The tool prefix of a VCS `pip install` argument, e.g. the 'git+' of
 # 'git+https://github.com/MeltanoLabs/tap-github.git'.
 _VCS_PREFIX = re.compile(r"^(?:git|hg|svn|bzr)\+")
-
-
-def _canonical(name: str) -> str:
-    """Normalize a distribution name for comparison, as described by PEP 503.
-
-    Args:
-        name: The name to normalize.
-
-    Returns:
-        The normalized name.
-    """
-    return _NAME_SEPARATORS.sub("-", name).lower()
 
 
 def _requirement_name(pip_url: str | None) -> str | None:
@@ -67,16 +52,16 @@ def _requirement_name(pip_url: str | None) -> str | None:
         pip_url: The `pip install` argument, if any.
 
     Returns:
-        The distribution name, or `None` if the argument is not a plain
-        requirement, such as a VCS or local path install.
+        The distribution name, or `None` if the argument names no
+        distribution, as a VCS URL and a local path do not.
     """
-    if not pip_url or pip_url.startswith("-"):
+    if not pip_url:
         return None
 
-    if any(char in pip_url for char in "+/\\"):
+    try:
+        return Requirement(pip_url).name
+    except InvalidRequirement:
         return None
-
-    return _REQUIREMENT_NAME_END.split(pip_url.strip(), maxsplit=1)[0] or None
 
 
 def _vcs_url(pip_url: str) -> str | None:
@@ -118,10 +103,13 @@ def _direct_url_revision(site_packages: Path, pip_url: str) -> str | None:
     if (url := _vcs_url(pip_url)) is None:
         return None
 
-    for dist_info in site_packages.glob("*.dist-info"):
+    for dist in distributions(path=[str(site_packages)]):
+        if (recorded := dist.read_text("direct_url.json")) is None:
+            continue
+
         try:
-            direct_url = json.loads((dist_info / "direct_url.json").read_bytes())
-        except (OSError, ValueError):
+            direct_url = json.loads(recorded)
+        except ValueError:
             continue
 
         if direct_url.get("url") == url:
@@ -169,12 +157,11 @@ def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
         return revision
 
     names = {plugin.name, plugin.plugin_dir_name, _requirement_name(plugin.pip_url)}
-    candidates = {_canonical(name) for name in names if name}
+    candidates = {canonicalize_name(name) for name in names if name}
 
-    for dist_info in site_packages.glob("*.dist-info"):
-        dist_name, _, version = dist_info.stem.partition("-")
-        if _canonical(dist_name) in candidates:
-            return version or None
+    for dist in distributions(path=[str(site_packages)]):
+        if dist.name and canonicalize_name(dist.name) in candidates:
+            return dist.version
 
     return None
 
