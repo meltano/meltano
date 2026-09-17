@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import json
+import platform
 import stat
 import typing as t
 from datetime import datetime, timedelta
@@ -135,6 +136,10 @@ class TestCredentialsStore:
         store.set(credentials)
         assert CredentialsStore(store.path).get() == credentials
 
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="Windows has no POSIX file mode; access is governed by ACLs.",
+    )
     def test_set_is_user_readable_only(self, store: CredentialsStore) -> None:
         store.set(Credentials(access_token="at"))
         assert stat.S_IMODE(store.path.stat().st_mode) == 0o600
