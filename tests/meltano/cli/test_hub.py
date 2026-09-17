@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 from unittest import mock
 
+import requests
 import requests_mock
 
 from asserts import assert_cli_runner
@@ -50,9 +51,48 @@ class TestCliHub:
     ) -> None:
         hub_api = project.hub_service.hub_api_url
         with requests_mock.Mocker(session=project.hub_service.session) as m:
-            m.get(hub_api, exc=ConnectionError("Connection refused"))
+            m.get(
+                f"{hub_api}/plugins/orchestrators/index",
+                exc=requests.exceptions.ConnectionError("Connection refused"),
+            )
+            result = cli_runner.invoke(cli, ("hub", "ping"))
+
+        assert result.exit_code == 1
+        assert "Could not connect to Meltano Hub at" in str(result.exception)
+        assert not hub_request_counter
+
+    def test_ping_unauthenticated(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        hub_request_counter: Counter,
+    ) -> None:
+        hub_api = project.hub_service.hub_api_url
+        with requests_mock.Mocker(session=project.hub_service.session) as m:
+            m.get(
+                f"{hub_api}/plugins/orchestrators/index",
+                status_code=401,
+                json={"message": "Meltano Hub requires a Meltano Cloud account."},
+            )
+            result = cli_runner.invoke(cli, ("hub", "ping"))
+
+        assert result.exit_code == 1
+        assert "Meltano Hub requires a Meltano Cloud account." in str(result.exception)
+        assert "meltano cloud auth login" in str(result.exception)
+        assert not hub_request_counter
+
+    def test_ping_other_failure_is_still_wrapped(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+    ) -> None:
+        hub_api = project.hub_service.hub_api_url
+        with requests_mock.Mocker(session=project.hub_service.session) as m:
+            m.get(
+                f"{hub_api}/plugins/orchestrators/index",
+                exc=ValueError("something else"),
+            )
             result = cli_runner.invoke(cli, ("hub", "ping"))
 
         assert result.exit_code == 1
         assert f"Error: Failed to connect to the Hub at {hub_api!r}" in result.stderr
-        assert not hub_request_counter
