@@ -100,7 +100,7 @@ class UserConfig:
     @classmethod
     def from_dict(cls, data: dict[str, t.Any]) -> UserConfig:
         """Create a UserConfig from a dictionary."""
-        kwargs = {}
+        kwargs: dict[str, t.Any] = {}
         if yaml := data.get("yaml"):
             kwargs["yaml"] = YamlSettings.from_dict(yaml)
         if cloud := data.get("cloud"):
