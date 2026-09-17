@@ -5,16 +5,14 @@ from __future__ import annotations
 import base64
 import binascii
 import json
-import os
+import tempfile
 import typing as t
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
 from datetime import timezone as tz
+from pathlib import Path
 
 import structlog
-
-if t.TYPE_CHECKING:
-    from pathlib import Path
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -22,8 +20,7 @@ logger = structlog.stdlib.get_logger(__name__)
 # rejected by the API between being read and being used.
 EXPIRY_LEEWAY = timedelta(seconds=60)
 
-# Only the current user may read or write the credentials file.
-CREDENTIALS_FILE_MODE = 0o600
+# Only the current user may read or write the credentials directory.
 CREDENTIALS_DIR_MODE = 0o700
 
 
@@ -230,14 +227,11 @@ class CredentialsStore:
         """
         self.path.parent.mkdir(parents=True, exist_ok=True, mode=CREDENTIALS_DIR_MODE)
 
-        # Write to a temporary file in the same directory and move it into
-        # place, so that a partial write can never clobber a valid session.
-        tmp_path = self.path.with_name(f"{self.path.name}.tmp")
-        fd = os.open(
-            tmp_path,
-            os.O_WRONLY | os.O_CREAT | os.O_TRUNC,
-            CREDENTIALS_FILE_MODE,
-        )
+        # Write beside the target and move it into place, so that a partial
+        # write can never clobber a valid session. `mkstemp` creates the file
+        # readable only by this user, under a name no concurrent write shares.
+        fd, tmp_name = tempfile.mkstemp(dir=self.path.parent)
+        tmp_path = Path(tmp_name)
         try:
             with open(fd, "w", closefd=True) as tmp_file:  # noqa: PTH123
                 json.dump(credentials.to_dict(), tmp_file, indent=2)
