@@ -53,7 +53,9 @@ def _rejection_detail(response: requests.Response) -> str | None:
     if not isinstance(message, str) or not message.strip():
         return None
 
-    return message.strip()
+    # The error renders the reason with a full stop after it, so drop the
+    # Hub's own, rather than requiring it to know how Meltano punctuates.
+    return message.strip().removesuffix(".") or None
 
 
 def _connection_cause(error: requests.exceptions.ConnectionError) -> str | None:
@@ -112,6 +114,9 @@ class HubConnectionError(MeltanoError):
 
 class HubAuthenticationRequiredError(MeltanoError):
     """Raised when Meltano Hub rejects a request as unauthenticated."""
+
+    # Always set, unlike the base class, so a caller can add to it.
+    instruction: str
 
     def __init__(self, status_code: int, detail: str | None = None):
         """Create a new HubAuthenticationRequiredError.

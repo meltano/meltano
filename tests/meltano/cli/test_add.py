@@ -15,6 +15,7 @@ from asserts import assert_cli_runner
 from fixtures.cli import plugins_dir
 from meltano.cli import cli
 from meltano.cli.utils import CliError
+from meltano.core.hub.client import HubAuthenticationRequiredError
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.base import PluginDefinition
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
@@ -149,6 +150,22 @@ class TestCliAdd:
                 install_plugin_mock.assert_called()
 
     @pytest.mark.order(1)
+    def test_add_offers_from_ref_when_the_hub_rejects_the_request(
+        self,
+        project: Project,  # noqa: ARG002
+        cli_runner,
+    ) -> None:
+        rejected = HubAuthenticationRequiredError(401)
+        with mock.patch(
+            "meltano.cli.add.add_plugin",
+            side_effect=rejected,
+        ):
+            result = cli_runner.invoke(cli, ["add", "tap-gitlab"])
+
+        assert result.exit_code == 1
+        assert "meltano cloud auth login" in str(result.exception)
+        assert "--from-ref" in str(result.exception)
+
     def test_add_multiple(self, project: Project, cli_runner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
