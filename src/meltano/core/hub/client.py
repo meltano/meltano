@@ -47,10 +47,14 @@ def _rejection_detail(response: requests.Response) -> str | None:
         The explanation, or `None` if the Hub did not give a useful one.
     """
     try:
-        message = response.json().get("message")
+        payload = response.json()
     except ValueError:
         return None
 
+    if not isinstance(payload, dict):
+        return None
+
+    message = payload.get("message")
     if not isinstance(message, str) or not message.strip():
         return None
 

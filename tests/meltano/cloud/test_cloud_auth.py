@@ -10,6 +10,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta
 from datetime import timezone as tz
+from http import HTTPStatus
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -153,23 +154,21 @@ class TestPKCE:
 class TestCallbackServer:
     def test_rejects_a_request_to_the_wrong_path(self) -> None:
         server = _CallbackHTTPServer(("127.0.0.1", 0), "/callback")
+        port = server.server_address[1]
+        thread = threading.Thread(target=server.handle_request)
+        thread.start()
         try:
-            port = server.server_address[1]
-            thread = threading.Thread(target=server.handle_request)
-            thread.start()
-            with urllib.request.urlopen(
-                f"http://127.0.0.1:{port}/favicon.ico",
-                timeout=10,
-            ) as response:
-                status = response.status
-        except urllib.error.HTTPError as err:
-            status = err.code
-            err.close()
+            with pytest.raises(urllib.error.HTTPError) as exc_info:
+                urllib.request.urlopen(
+                    f"http://127.0.0.1:{port}/favicon.ico",
+                    timeout=10,
+                )
         finally:
             thread.join(timeout=10)
             server.server_close()
 
-        assert status == 404
+        assert exc_info.value.code == HTTPStatus.NOT_FOUND
+        exc_info.value.close()
         assert server.result is None
 
 

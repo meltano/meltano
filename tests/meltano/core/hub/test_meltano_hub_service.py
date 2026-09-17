@@ -297,6 +297,9 @@ class TestMeltanoHubService:
             pytest.param(b"<html>gateway</html>", id="not-json"),
             pytest.param(b'{"message": ""}', id="empty"),
             pytest.param(b'{"message": 42}', id="not-a-string"),
+            # Valid JSON that is not an object has no message to read.
+            pytest.param(b"null", id="json-null"),
+            pytest.param(b'["nope"]', id="json-array"),
         ),
     )
     def test_unhelpful_rejection_bodies_fall_back(
