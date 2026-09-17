@@ -36,6 +36,9 @@ UNKNOWN = "-"
 # Shown in place of the version of a plugin that has no virtual environment.
 NOT_INSTALLED = "[yellow](not installed)[/yellow]"
 
+# Marks a plugin that carries its own definition in `meltano.yml`.
+CUSTOM = "\u2713"
+
 _NAME_SEPARATORS = re.compile(r"[-_.]+")
 
 # The end of a distribution name in a `pip install` argument, e.g. the '=' of
@@ -127,6 +130,7 @@ class PluginListing:
     variant: str | None
     version: str | None
     installed: bool
+    custom: bool
     pip_url: str | None
     inherit_from: str | None
 
@@ -156,6 +160,7 @@ class PluginListing:
             variant=plugin.variant,
             version=_installed_version(venv_root, plugin) if installed else None,
             installed=installed,
+            custom=plugin.is_custom(),
             pip_url=plugin.pip_url,
             inherit_from=plugin.inherit_from,
         )
@@ -190,6 +195,7 @@ def _render_table(listings: Iterable[PluginListing]) -> None:
     table.add_column("NAME", style="bold", overflow="fold")
     table.add_column("VARIANT", overflow="fold")
     table.add_column("VERSION", overflow="fold")
+    table.add_column("CUSTOM", justify="center")
 
     for listing in listings:
         table.add_row(
@@ -197,6 +203,7 @@ def _render_table(listings: Iterable[PluginListing]) -> None:
             listing.name,
             listing.variant or UNKNOWN,
             (listing.version or UNKNOWN) if listing.installed else NOT_INSTALLED,
+            CUSTOM if listing.custom else "",
         )
 
     Console().print(table)

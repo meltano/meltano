@@ -8,7 +8,14 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.cli.plugin import FINGERPRINT_FILE, _canonical, _requirement_name
+from meltano.cli.plugin import (
+    CUSTOM,
+    FINGERPRINT_FILE,
+    _canonical,
+    _requirement_name,
+)
+from meltano.core.plugin import PluginType
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -17,6 +24,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
 
 
 def site_packages_path(venv_root: Path) -> Path:
@@ -49,6 +57,21 @@ def fake_install(
 def listed(result: Result) -> dict[str, dict[str, t.Any]]:
     """Parse JSON output into a mapping of plugin name to its record."""
     return {entry["name"]: entry for entry in json.loads(result.stdout)}
+
+
+@pytest.fixture(scope="class")
+def custom_tap(project_add_service: ProjectAddService) -> ProjectPlugin:
+    """A plugin that carries its own definition, rather than one from the Hub."""
+    try:
+        return project_add_service.add(
+            PluginType.EXTRACTORS,
+            "tap-custom",
+            namespace="tap_custom",
+            pip_url="tap-custom",
+            executable="tap-custom",
+        )
+    except PluginAlreadyAddedException as err:
+        return err.plugin
 
 
 class TestRequirementName:
@@ -132,6 +155,32 @@ class TestPluginListNotInstalled:
 
         assert_cli_runner(result)
         assert "(not installed)" in result.stdout
+
+    def test_custom_plugins_are_marked(
+        self,
+        project: Project,  # noqa: ARG002
+        custom_tap: ProjectPlugin,
+        tap: ProjectPlugin,
+        cli_runner: CliRunner,
+    ) -> None:
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
+
+        assert_cli_runner(result)
+        entries = listed(result)
+        assert entries[custom_tap.name]["custom"] is True
+        assert entries[tap.name]["custom"] is False
+
+    def test_text_output_marks_custom_plugins(
+        self,
+        project: Project,  # noqa: ARG002
+        custom_tap: ProjectPlugin,  # noqa: ARG002
+        cli_runner: CliRunner,
+    ) -> None:
+        result = cli_runner.invoke(cli, ("plugin", "list"))
+
+        assert_cli_runner(result)
+        assert "CUSTOM" in result.stdout
+        assert CUSTOM in result.stdout
 
     def test_mappings_are_not_listed(
         self,
