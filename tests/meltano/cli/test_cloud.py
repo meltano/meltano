@@ -11,6 +11,7 @@ import pytest
 
 from meltano.cli import cli
 from meltano.core.cloud.auth import CloudAuthService
+from meltano.core.cloud.config import CloudAuthConfig
 from meltano.core.cloud.credentials import Credentials
 from meltano.core.cloud.error import CloudAuthenticationError
 
@@ -29,8 +30,6 @@ def id_token(claims: dict[str, t.Any]) -> str:
 def cloud_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Point the CLI at a throwaway session, away from the real one."""
     monkeypatch.setenv("MELTANO_CLOUD_CREDENTIALS_PATH", str(tmp_path / "creds.json"))
-    monkeypatch.setenv("MELTANO_CLOUD_AUTH_DOMAIN", "tenant.auth0.com")
-    monkeypatch.setenv("MELTANO_CLOUD_AUTH_CLIENT_ID", "test-client-id")
     monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
 
 
@@ -133,20 +132,6 @@ class TestCloudAuthLogin:
         assert result.exit_code == 1
         assert "Timed out waiting for you to log in" in str(result.exception)
 
-    def test_login_without_client_id(
-        self,
-        cli_runner: CliRunner,
-        monkeypatch: pytest.MonkeyPatch,
-    ) -> None:
-        # Empty, not absent: deleting it falls back to the built-in default,
-        # and the login then runs for real against the placeholder tenant.
-        monkeypatch.setenv("MELTANO_CLOUD_AUTH_CLIENT_ID", "")
-        result = cli_runner.invoke(cli, ("cloud", "auth", "login"))
-
-        assert result.exit_code == 1
-        assert "No Meltano Cloud client_id is configured" in str(result.exception)
-        assert "MELTANO_CLOUD_AUTH_CLIENT_ID" in str(result.exception)
-
 
 class TestCloudAuthLogout:
     def test_logout(self, cli_runner: CliRunner) -> None:
@@ -177,7 +162,7 @@ class TestCloudAuthLogout:
 
         assert result.exit_code == 0, result.output
         assert open_tab.call_args.args[0].startswith(
-            "https://tenant.auth0.com/v2/logout",
+            CloudAuthConfig().logout_url,
         )
 
     def test_logout_web_without_browser(self, cli_runner: CliRunner) -> None:
@@ -188,7 +173,7 @@ class TestCloudAuthLogout:
             result = cli_runner.invoke(cli, ("cloud", "auth", "logout", "--web"))
 
         assert result.exit_code == 0, result.output
-        assert "https://tenant.auth0.com/v2/logout" in result.stdout
+        assert CloudAuthConfig().logout_url in result.stdout
 
 
 class TestCloudAuthStatus:

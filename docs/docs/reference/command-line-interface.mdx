@@ -321,19 +321,12 @@ MELTANO_CLOUD_CREDENTIALS_PATH=~/.config/meltano/cloud/staging.json meltano clou
 
 #### Configuring the login flow
 
-The defaults suit the hosted Meltano Cloud, but each value can be overridden with an environment variable, or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+The identity provider is the one Meltano Cloud runs, so it is not configurable. Two values can be overridden with an environment variable, or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
 
-| Environment variable                   | User configuration key         | Description                                                                       |
-| -------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------- |
-| `MELTANO_CLOUD_AUTH_DOMAIN`            | `cloud.auth.domain`            | The domain of the identity provider.                                              |
-| `MELTANO_CLOUD_AUTH_CLIENT_ID`         | `cloud.auth.client_id`         | The OAuth client ID of the Meltano CLI application.                               |
-| `MELTANO_CLOUD_AUTH_CLIENT_SECRET`     | `cloud.auth.client_secret`     | The OAuth client secret. Only needed for a confidential client, see below.        |
-| `MELTANO_CLOUD_AUTH_AUDIENCE`          | `cloud.auth.audience`          | The audience of the API the access token is issued for.                           |
-| `MELTANO_CLOUD_AUTH_SCOPES`            | `cloud.auth.scopes`            | The OAuth scopes to request.                                                      |
-| `MELTANO_CLOUD_AUTH_CALLBACK_HOST`     | `cloud.auth.callback_host`     | The host of the loopback callback URL. Defaults to `localhost`.                   |
-| `MELTANO_CLOUD_AUTH_CALLBACK_PORTS`    | `cloud.auth.callback_ports`    | Ports to try for the loopback callback server, in order.                          |
-| `MELTANO_CLOUD_AUTH_CALLBACK_PATH`     | `cloud.auth.callback_path`     | The path of the loopback callback URL. Defaults to `/callback`.                   |
-| `MELTANO_CLOUD_AUTH_TIMEOUT`           | `cloud.auth.timeout`           | How long to wait, in seconds, for you to complete the login. Defaults to `300`.   |
+| Environment variable                | User configuration key      | Description                                              |
+| ----------------------------------- | --------------------------- | -------------------------------------------------------- |
+| `MELTANO_CLOUD_AUTH_CALLBACK_PORTS` | `cloud.auth.callback_ports` | Ports to try for the loopback callback server, in order. |
+| `MELTANO_CLOUD_CREDENTIALS_PATH`    | `cloud.auth.credentials_path` | Where the session is stored.                           |
 
 ```yaml
 # ~/.config/meltano/config.yml
@@ -345,22 +338,6 @@ cloud:
 :::info
 
 Each port listed in `callback_ports` must be registered as an allowed callback URL for the Meltano CLI application, so the login flow uses a fixed port rather than an arbitrary free one. Meltano tries each configured port in turn, which lets the login succeed when the first one is already in use.
-
-:::
-
-#### Public and confidential clients
-
-The Meltano CLI is a *public* client: it runs on your machine, so it has no secret it can keep from you. PKCE is what secures the flow, and no client secret is sent.
-
-If you are pointing the CLI at an identity provider application that is registered as a *confidential* client, such as an Auth0 "Regular Web Application", the token endpoint will reject the login with an `Unauthorized or unknown client` error until a secret is supplied. Set `MELTANO_CLOUD_AUTH_CLIENT_SECRET` in that case:
-
-```bash
-MELTANO_CLOUD_AUTH_CLIENT_SECRET=... meltano cloud auth login
-```
-
-:::caution
-
-Prefer registering the application as a native or desktop client, which needs no secret. A secret distributed with a command line tool is not actually secret, so it should only be used for a private application, such as one you are testing against. Meltano never writes the client secret to the credentials file.
 
 :::
 

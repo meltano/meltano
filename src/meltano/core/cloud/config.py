@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 
 import platformdirs
 
-from meltano.core.cloud.error import CloudAuthConfigurationError
 from meltano.core.user_config import get_user_config_service
 
 # The audience is the identifier of the Meltano API registered with the
@@ -69,18 +68,6 @@ def _parse_ports(value: str) -> tuple[int, ...]:
     return tuple(int(port.strip()) for port in value.split(",") if port.strip())
 
 
-def _parse_scopes(value: str) -> tuple[str, ...]:
-    """Parse a space- or comma-separated list of OAuth scopes.
-
-    Args:
-        value: The list of scopes.
-
-    Returns:
-        The scopes, in the order they were given.
-    """
-    return tuple(scope for scope in value.replace(",", " ").split() if scope)
-
-
 @dataclass(slots=True)
 class CloudAuthConfig:
     """Auth0 configuration for the Meltano Cloud login flow.
@@ -124,33 +111,10 @@ class CloudAuthConfig:
 
         kwargs: dict[str, t.Any] = {}
 
-        string_keys = (
-            "domain",
-            "client_id",
-            "client_secret",
-            "audience",
-            "callback_host",
-            "callback_path",
-        )
-        for key in string_keys:
-            value = _env(key)
-            if value is None:
-                value = data.get(key)
-            if value is not None:
-                kwargs[key] = str(value)
-
-        if scopes := _env("scopes") or data.get("scopes"):
-            kwargs["scopes"] = (
-                _parse_scopes(scopes) if isinstance(scopes, str) else tuple(scopes)
-            )
-
         if ports := _env("callback_ports") or data.get("callback_ports"):
             kwargs["callback_ports"] = (
                 _parse_ports(ports) if isinstance(ports, str) else tuple(ports)
             )
-
-        if timeout := _env("timeout") or data.get("timeout"):
-            kwargs["login_timeout_seconds"] = float(timeout)
 
         if path := os.environ.get("MELTANO_CLOUD_CREDENTIALS_PATH") or data.get(
             "credentials_path",
@@ -158,13 +122,6 @@ class CloudAuthConfig:
             kwargs["credentials_path"] = Path(path).expanduser().resolve()
 
         return cls(**kwargs)
-
-    def __post_init__(self) -> None:
-        """Normalize the configured values."""
-        self.domain = self.domain.removeprefix("https://").removeprefix("http://")
-        self.domain = self.domain.rstrip("/")
-        if not self.callback_path.startswith("/"):
-            self.callback_path = f"/{self.callback_path}"
 
     @property
     def base_url(self) -> str:
@@ -200,14 +157,3 @@ class CloudAuthConfig:
     def scope(self) -> str:
         """The requested OAuth scopes, as a space-separated string."""
         return " ".join(self.scopes)
-
-    def validate(self) -> None:
-        """Check that the configuration is complete.
-
-        Raises:
-            CloudAuthConfigurationError: If a required value is missing.
-        """
-        for setting in ("domain", "client_id"):
-            if not getattr(self, setting):
-                env_var = f"{ENV_VAR_PREFIX}{setting.upper()}"
-                raise CloudAuthConfigurationError(setting, env_var)

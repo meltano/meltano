@@ -331,18 +331,6 @@ class TestLogin:
             service.login()
         browser.join()
 
-    def test_login_requires_configuration(self, tmp_path: Path) -> None:
-        from meltano.core.cloud.error import CloudAuthConfigurationError
-
-        service = CloudAuthService(
-            config=CloudAuthConfig(
-                client_id="",
-                credentials_path=tmp_path / "credentials.json",
-            ),
-        )
-        with pytest.raises(CloudAuthConfigurationError, match="client_id"):
-            service.login()
-
     def test_login_fails_when_port_is_taken(
         self,
         service: CloudAuthService,

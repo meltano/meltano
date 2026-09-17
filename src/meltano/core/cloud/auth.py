@@ -226,8 +226,6 @@ class CloudAuthService:
         Raises:
             CloudAuthenticationError: If the login flow did not complete.
         """
-        self.config.validate()
-
         code_verifier = generate_code_verifier()
         state = secrets.token_urlsafe(32)
 
@@ -357,7 +355,6 @@ class CloudAuthService:
             reason = "The Meltano Cloud session cannot be renewed"
             raise CloudAuthenticationError(reason)
 
-        self.config.validate()
         data = self._token_request(
             {
                 "grant_type": "refresh_token",
