@@ -10,7 +10,6 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.cli.plugin import (
     CUSTOM,
-    FINGERPRINT_FILE,
     _canonical,
     _direct_url_revision,
     _requirement_name,
@@ -18,6 +17,7 @@ from meltano.cli.plugin import (
 )
 from meltano.core.plugin import PluginType
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.venv_service import VirtualEnv
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -46,7 +46,7 @@ def fake_install(
 ) -> Path:
     """Make a plugin look installed, optionally with a distribution present."""
     venv_root = project.dirs.venvs(plugin.type, plugin.plugin_dir_name)
-    (venv_root / FINGERPRINT_FILE).write_text("fingerprint")
+    VirtualEnv(venv_root).plugin_fingerprint_path.write_text("fingerprint")
 
     if version is not None:
         site_packages = site_packages_path(venv_root)

@@ -19,6 +19,7 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
+from meltano.core.venv_service import VirtualEnv
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -26,9 +27,6 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
-
-# Written into a plugin's virtual environment once its install completes.
-FINGERPRINT_FILE = ".meltano_plugin_fingerprint"
 
 # Shown in place of a value that could not be determined.
 UNKNOWN = "-"
@@ -132,37 +130,37 @@ def _direct_url_revision(site_packages: Path, pip_url: str) -> str | None:
     return None
 
 
-def _site_packages_dir(venv_root: Path) -> Path | None:
+def _site_packages_dir(venv: VirtualEnv) -> Path | None:
     """Find the site-packages directory of a virtual environment.
 
-    The directory is located by globbing rather than by asking the
-    environment's interpreter, so that listing plugins never starts a
-    subprocess.
+    `VirtualEnv.site_packages_dir` names the directory after the interpreter
+    that Meltano itself runs on. A plugin installed under another Python has
+    its packages elsewhere, so the directory is found by globbing instead.
 
     Args:
-        venv_root: The root directory of the virtual environment.
+        venv: The virtual environment.
 
     Returns:
         The site-packages directory, or `None` if there is not exactly one.
     """
     if platform.system() == "Windows":
-        path = venv_root / "Lib" / "site-packages"
+        path = venv.lib_dir / "site-packages"
         return path if path.is_dir() else None
 
-    return next(iter(sorted(venv_root.glob("lib/python*/site-packages"))), None)
+    return next(iter(sorted(venv.lib_dir.glob("python*/site-packages"))), None)
 
 
-def _installed_version(venv_root: Path, plugin: ProjectPlugin) -> str | None:
+def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
     """Get the version of the distribution a plugin was installed from.
 
     Args:
-        venv_root: The root directory of the plugin's virtual environment.
+        venv: The plugin's virtual environment.
         plugin: The plugin.
 
     Returns:
         The installed version, or `None` if it could not be determined.
     """
-    if (site_packages := _site_packages_dir(venv_root)) is None:
+    if (site_packages := _site_packages_dir(venv)) is None:
         return None
 
     if plugin.pip_url and (
@@ -208,17 +206,15 @@ class PluginListing:
         # Inheriting plugins share their parent's virtual environment unless
         # they install something different, which `plugin_dir_name` accounts
         # for. Mappings resolve to their mapper this way too.
-        venv_root = project.dirs.venvs(
-            plugin.type,
-            plugin.plugin_dir_name,
-            make_dirs=False,
+        venv = VirtualEnv(
+            project.dirs.venvs(plugin.type, plugin.plugin_dir_name, make_dirs=False),
         )
-        installed = _is_installed(venv_root)
+        installed = _is_installed(venv)
         return cls(
             name=plugin.name,
             type=plugin.type.descriptor,
             variant=plugin.variant,
-            version=_installed_version(venv_root, plugin) if installed else None,
+            version=_installed_version(venv, plugin) if installed else None,
             installed=installed,
             custom=plugin.is_custom(),
             pip_url=plugin.pip_url,
@@ -226,22 +222,19 @@ class PluginListing:
         )
 
 
-def _is_installed(venv_root: Path) -> bool:
+def _is_installed(venv: VirtualEnv) -> bool:
     """Check whether a plugin's virtual environment has been installed.
 
+    These are the signals that `VirtualEnv.requires_install` reads, without
+    its fingerprint comparison, which needs the arguments of an install.
+
     Args:
-        venv_root: The root directory of the plugin's virtual environment.
+        venv: The plugin's virtual environment.
 
     Returns:
         Whether the plugin is installed.
     """
-    if (venv_root / FINGERPRINT_FILE).exists():
-        return True
-
-    # Fall back to looking for the interpreter, for environments created
-    # before the fingerprint file was written.
-    bin_dir = venv_root / ("Scripts" if platform.system() == "Windows" else "bin")
-    return any((bin_dir / name).exists() for name in ("python", "python.exe"))
+    return venv.read_fingerprint() is not None or venv.exec_path("python").exists()
 
 
 def _render_table(listings: Iterable[PluginListing]) -> None:
