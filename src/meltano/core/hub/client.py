@@ -128,7 +128,7 @@ class HubAuthenticationRequiredError(MeltanoError):
         """
         super().__init__(
             detail or f"Meltano Hub requires authentication ({status_code})",
-            "Run 'meltano cloud auth login' to log in to Meltano Cloud",
+            "Run 'meltano cloud auth login' to log in or register for Meltano Cloud",
         )
 
 
