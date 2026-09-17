@@ -1,5 +1,5 @@
 ---
-title: Install plugins with Meltano Hub
+title: Meltano Hub
 description: Learn how to find and install plugins from Meltano Hub, how to add plugins without the Hub, and how plugins are installed and registered in Meltano Cloud.
 ---
 
@@ -10,13 +10,29 @@ import TabItem from '@theme/TabItem';
 
 [Meltano Hub](https://hub.meltano.com) is the central index of [plugins](/concepts/plugins) that Meltano can install and configure out of the box. When you run [`meltano add`](/reference/command-line-interface#add), Meltano looks the plugin up on the Hub, downloads its [plugin definition](/reference/plugin-definition-syntax), and writes it into your project.
 
-The Hub is a convenience, not a requirement. Everything it provides - a package to install, a namespace, an executable name, a list of settings and capabilities - can also be supplied by you directly. This guide covers all three paths:
+Reading plugin definitions from the Hub requires a Meltano Cloud account, and a signed-in CLI session. **This does not put Meltano behind a login.** The Hub is a convenience, not a requirement: everything it provides - a package to install, a namespace, an executable name, a list of settings and capabilities - can also be supplied by you directly, and those paths need no account at all.
 
-1. [Installing plugins via Meltano Hub](#installing-plugins-via-meltano-hub) - the default, and what you'll use most of the time.
-2. [Installing plugins without Meltano Hub](#installing-plugins-without-meltano-hub) - for plugins that aren't on the Hub yet, private connectors, or air-gapped environments.
+This guide covers all three paths:
+
+1. [Installing plugins via Meltano Hub](#installing-plugins-via-meltano-hub) - the default, and what you'll use most of the time. Requires a Meltano Cloud account.
+2. [Installing plugins without Meltano Hub](#installing-plugins-without-meltano-hub) - for plugins that aren't on the Hub yet, private connectors, air-gapped environments, or simply because you'd rather not sign in. No account required.
 3. [Plugins in Meltano Cloud](#plugins-in-meltano-cloud) - how the same catalog is surfaced in the Meltano Cloud UI.
 
 This guide assumes you have a [Meltano project](/concepts/project) already. If you don't, run `meltano init my-project` first.
+
+## What needs an account?
+
+| Task | Account needed? |
+| --- | --- |
+| `meltano add <name>` for a plugin on the Hub | Yes |
+| `meltano lock --update`, `meltano hub ping` | Yes |
+| `meltano install` in a project with committed `.lock` files | No |
+| `meltano run`, `meltano el`, and everything else at pipeline runtime | No |
+| `meltano add --from-ref`, `--custom`, or a definition written into `meltano.yml` | No |
+| Pointing `hub_url` at your own Hub mirror | No |
+
+The practical upshot: **you sign in once on the machine where you add a plugin.** The resulting lock file is committed to your repository, and CI, production and your colleagues install from that lock file without ever contacting the Hub or signing in. See [What Meltano writes to your project](#what-meltano-writes-to-your-project).
+
 
 :::info CLI syntax
 These examples target Meltano 4.2. The plugin type is detected automatically from the plugin name - `tap-` is an extractor, `target-` is a loader, and anything else is a utility - so you only need to name the plugin. Pass [`--plugin-type`](#disambiguating-the-plugin-type) when inference gets it wrong.
@@ -25,6 +41,37 @@ Coming from Meltano 3.x? The positional plugin type argument was **removed in 4.
 :::
 
 ## Installing Plugins via Meltano Hub
+
+### Sign in to Meltano Cloud
+
+Fetching plugin definitions from the Hub requires a signed-in session. If you don't have a Meltano Cloud account yet, see [Register for an account](#register-for-an-account) below.
+
+Log in from the CLI:
+
+```bash
+meltano cloud auth login
+```
+
+This opens the Meltano Cloud login page in your browser and stores the resulting session on your machine, so you only do it once per machine. On a remote shell or over SSH, print the URL instead of opening a browser:
+
+```bash
+meltano cloud auth login --no-browser
+```
+
+To check who you're signed in as, or to sign out:
+
+```bash
+meltano cloud auth status
+meltano cloud auth logout
+```
+
+See the [`meltano cloud auth` reference](/reference/command-line-interface) for where the session is stored and how to configure the login flow.
+
+:::tip
+**CI and production don't need to sign in.** The login is only needed to *fetch* a plugin definition. Once a plugin is added, its definition is committed to your repository as a lock file, and installing from that lock file needs no session - so build agents, containers and production deployments keep working exactly as before. Keep `meltano add` a developer-machine operation and commit the `.lock` files it produces.
+
+If you'd rather not sign in at all, every approach under [Installing plugins without Meltano Hub](#installing-plugins-without-meltano-hub) remains fully available.
+:::
 
 ### Find the plugin
 
@@ -86,7 +133,9 @@ plugins/
     └── target-postgres--meltanolabs.lock
 ```
 
-The lock file is the important part for reproducibility. **Commit it to version control.** Once it exists, Meltano reads the plugin's settings and capabilities from the lock file rather than calling the Hub again, so your project builds identically on a colleague's laptop or in CI - even if the Hub definition changes later.
+The lock file is the important part for reproducibility, and now also for access. **Commit it to version control.** Once it exists, Meltano reads the plugin's settings and capabilities from the lock file rather than calling the Hub again, so your project builds identically on a colleague's laptop or in CI - even if the Hub definition changes later, and whether or not that machine is signed in to Meltano Cloud.
+
+A project with its lock files committed is therefore fully self-contained: `meltano install` and every pipeline command work without a Meltano Cloud session. A session is only needed when you reach back out to the Hub, which is `meltano add` for a new plugin and `meltano lock --update`.
 
 By default `meltano add` also installs the plugin into [`.meltano/`](/concepts/project#meltano-directory) straight away. Use `--no-install` to skip that and install later with [`meltano install`](/reference/command-line-interface#install):
 
@@ -103,7 +152,7 @@ If `meltano add` fails and you suspect a network or proxy problem rather than a 
 meltano hub ping
 ```
 
-This tests connectivity to whichever Hub instance your project is configured to use.
+This tests connectivity to whichever Hub instance your project is configured to use. If it reports an authentication or authorization failure rather than a connection failure, your session has probably expired - check it with `meltano cloud auth status` and run `meltano cloud auth login` again.
 
 ### Update a plugin definition
 
@@ -113,7 +162,7 @@ Re-running `meltano add` for a plugin that is already in your project updates it
 meltano add tap-github
 ```
 
-Lock files are written automatically, but to deliberately refresh them against the Hub without touching `meltano.yml`, use [`meltano lock --update`](/reference/command-line-interface#lock):
+Lock files are written automatically, but to deliberately refresh them against the Hub without touching `meltano.yml`, use [`meltano lock --update`](/reference/command-line-interface#lock). Both of these commands read from the Hub, so both need a signed-in session:
 
 ```bash
 # Refresh every plugin's lock file
@@ -125,11 +174,24 @@ meltano lock --update tap-github
 
 ## Installing plugins without Meltano Hub
 
-You'll need one of these approaches when:
+**None of the approaches in this section require a Meltano Cloud account or a signed-in session.** They are the usual, long-standing ways of adding a plugin to a Meltano project, they are not a degraded fallback, and they are not going away. If you never intend to sign in, you can run Meltano entirely from this section: any Singer tap or target that you can `pip install` can be added and run without the Hub.
 
+You'll want one of these approaches when:
+
+- You'd rather not register for a Meltano Cloud account.
 - The plugin isn't on the Hub yet - for example, a tap you're still developing.
 - The connector is private or internal and you don't want to publish it.
 - Your build environment can't reach `hub.meltano.com`.
+
+What the Hub gives you is the *convenience* of not having to write the plugin definition yourself. Supply that definition by one of the means below and Meltano behaves identically from then on - same `meltano install`, same configuration, same `meltano run`.
+
+:::tip
+**Getting a definition without the Hub API.** Hub plugin definitions are also published as plain YAML in the [`meltano/hub` repository on GitHub](https://github.com/meltano/hub/tree/main/_data/meltano), which is public. You can point [`--from-ref`](#add-from-a-plugin-definition-file) straight at one of those files, or copy it into your project, without going through the Hub API:
+
+```bash
+meltano add tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
+```
+:::
 
 ### Option 1 - Add from a plugin definition file {#add-from-a-plugin-definition-file}
 
@@ -272,13 +334,15 @@ For an air-gapped or offline build, combine the above:
 
 Note that installing a plugin still downloads the underlying package, so lock files remove the dependency on the Hub, not on your package index.
 
+A build set up this way needs no Meltano Cloud session, because it never calls the Hub.
+
 ## Plugins in Meltano Cloud
 
 [Meltano Cloud](/meltano-cloud/cloud-overview) is the hosted platform. Plugin installation works the same way conceptually - the same Hub catalog sits behind it - but you do it from the UI rather than the CLI, and there's no local `meltano.yml` to edit by hand.
 
 ### Register for an account
 
-You need a Meltano account before you can create a workspace. If you don't have one, [book a call with the team at meltano.com](https://meltano.com) to get set up.
+A Meltano Cloud account is what unlocks both the hosted platform and Hub access from the CLI - the same account serves both. If you don't have one, [book a call with the team at meltano.com](https://meltano.com) to get set up.
 
 Once you have an account:
 
@@ -288,6 +352,8 @@ Once you have an account:
 4. Click **Continue**.
 
 If you already have a Meltano project in a GitHub repository, expand **Advanced** on the new workspace screen and paste the repository URL to scaffold the workspace from it. See [Creating a Workspace](/meltano-cloud/creating-workspace) for the full walkthrough, and [Invite & Manage Members](/meltano-cloud/invite) for adding colleagues.
+
+With the account in place, run [`meltano cloud auth login`](#sign-in-to-meltano-cloud) on your machine to use the Hub from the CLI.
 
 ### Install a plugin from the catalog
 
@@ -316,3 +382,4 @@ Every workspace is backed by a GitHub repository, so you can clone it and use th
 - [Plugin definition syntax](/reference/plugin-definition-syntax) - every property you can set in a definition file
 - [Create a custom extractor](/tutorials/custom-extractor) - build a tap from scratch and add it to your project
 - [`meltano add` reference](/reference/command-line-interface#add) - the complete list of options
+- [`meltano cloud auth` reference](/reference/command-line-interface) - login, session storage and login-flow configuration
