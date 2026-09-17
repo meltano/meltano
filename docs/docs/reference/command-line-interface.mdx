@@ -319,11 +319,11 @@ Set the `MELTANO_CLOUD_CREDENTIALS_PATH` environment variable to store the sessi
 MELTANO_CLOUD_CREDENTIALS_PATH=~/.config/meltano/cloud/staging.json meltano cloud auth login
 ```
 
-#### Configuring the login flow
+#### Storing the session elsewhere
 
-The identity provider is the one Meltano Cloud runs, so it is not configurable. The login flow listens on port `9999`, falling back to `9998` when that one is in use; both are registered as callback URLs for the Meltano CLI application.
+The login flow listens on port `9999`, falling back to `9998` when that one is in use.
 
-Only where the session is stored can be changed, with an environment variable or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+Where the session is stored can be changed, with an environment variable or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
 
 | Environment variable             | User configuration key        | Description                  |
 | -------------------------------- | ----------------------------- | ---------------------------- |
