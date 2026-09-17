@@ -182,6 +182,7 @@ class MeltanoHubService(PluginRepository):
 
             self.session.headers["X-Project-ID"] = project_id
 
+        self.session.headers.pop("Authorization", None)
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
         elif credentials := self._cloud_credentials():
