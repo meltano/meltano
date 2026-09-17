@@ -1179,7 +1179,9 @@ The `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-defi
 
 The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. A plugin with no virtual environment reports `(not installed)`.
 
-A plugin installed from a repository reports the revision that its `pip_url` asked for, such as a tag or a branch, rather than a version. A plugin whose `pip_url` names no revision, and one whose version cannot be read for any other reason, reports `-`.
+A plugin installed from a repository reports the revision that its `pip_url` asked for, such as a tag or a branch, rather than a version. A `pip_url` that names no revision falls back to the version.
+
+The distribution is found through the command that the plugin runs, so a plugin published under another name reports its version all the same. A plugin whose command is not installed by a Python distribution reports `-`.
 
 #### How to use
 

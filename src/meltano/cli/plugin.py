@@ -3,14 +3,11 @@
 from __future__ import annotations
 
 import json
-import re
 import typing as t
 from dataclasses import asdict, dataclass
 from importlib.metadata import distributions
 
 import click
-from packaging.requirements import InvalidRequirement, Requirement
-from packaging.utils import canonicalize_name
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Table
@@ -39,81 +36,6 @@ NOT_INSTALLED = "[yellow](not installed)[/yellow]"
 # Marks a plugin that carries its own definition in `meltano.yml`.
 CUSTOM = "\u2713"
 
-# The tool prefix of a VCS `pip install` argument, e.g. the 'git+' of
-# 'git+https://github.com/MeltanoLabs/tap-github.git'.
-_VCS_PREFIX = re.compile(r"^(?:git|hg|svn|bzr)\+")
-
-
-def _requirement_name(pip_url: str | None) -> str | None:
-    """Get the distribution name from a `pip install` argument.
-
-    Args:
-        pip_url: The `pip install` argument, if any.
-
-    Returns:
-        The distribution name, or `None` if the argument names no
-        distribution, as a VCS URL and a local path do not.
-    """
-    if not pip_url:
-        return None
-
-    try:
-        return Requirement(pip_url).name
-    except InvalidRequirement:
-        return None
-
-
-def _vcs_url(pip_url: str) -> str | None:
-    """Get the repository URL from a VCS `pip install` argument.
-
-    Args:
-        pip_url: The `pip install` argument.
-
-    Returns:
-        The URL without its tool prefix, revision, and fragment, or `None` if
-        the argument does not install from a version control system.
-    """
-    if not _VCS_PREFIX.match(pip_url):
-        return None
-
-    url = _VCS_PREFIX.sub("", pip_url.strip()).split("#", 1)[0]
-
-    # The revision follows the last '/', so an '@' before it belongs to
-    # credentials, as in 'https://user:token@github.com/org/repo.git'.
-    head, separator, tail = url.rpartition("/")
-    return head + separator + tail.split("@", 1)[0]
-
-
-def _direct_url_revision(site_packages: Path, pip_url: str) -> str | None:
-    """Get the revision that a plugin was installed from a repository at.
-
-    `pip` records the URL it installed from, and the revision it was asked
-    for, in a `direct_url.json` file, as described by PEP 610. The
-    distribution name cannot be read from a VCS `pip_url`, so the URL is what
-    identifies the distribution here.
-
-    Args:
-        site_packages: The site-packages directory to search.
-        pip_url: The `pip install` argument of the plugin.
-
-    Returns:
-        The requested revision, or `None` if there is none to report.
-    """
-    if (url := _vcs_url(pip_url)) is None:
-        return None
-
-    for dist in distributions(path=[str(site_packages)]):
-        if (recorded := dist.read_text("direct_url.json")) is None:
-            continue
-
-        direct_url = json.loads(recorded)
-        if direct_url["url"] == url:
-            # PEP 610 records exactly one of `vcs_info`, `archive_info`, and
-            # `dir_info`, and only a VCS install records the URL of one.
-            return direct_url["vcs_info"].get("requested_revision")
-
-    return None
-
 
 def _site_packages_dir(venv: VirtualEnv) -> Path | None:
     """Find the site-packages directory of a virtual environment.
@@ -138,7 +60,13 @@ def _site_packages_dir(venv: VirtualEnv) -> Path | None:
 
 
 def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
-    """Get the version of the distribution a plugin was installed from.
+    """Get the version of the distribution that provides a plugin.
+
+    The distribution is found through the executable that Meltano invokes,
+    which `pip` installs from a console script of that distribution. Neither
+    the plugin name nor its `pip_url` has to match the name the distribution
+    was published under, and a `pip_url` that installs from a repository
+    carries no name at all.
 
     Args:
         venv: The plugin's virtual environment.
@@ -150,17 +78,20 @@ def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
     if (site_packages := _site_packages_dir(venv)) is None:
         return None
 
-    if plugin.pip_url and (
-        revision := _direct_url_revision(site_packages, plugin.pip_url)
-    ):
-        return revision
-
-    names = {plugin.name, plugin.plugin_dir_name, _requirement_name(plugin.pip_url)}
-    candidates = {canonicalize_name(name) for name in names if name}
-
     for dist in distributions(path=[str(site_packages)]):
-        if canonicalize_name(dist.name) in candidates:
-            return dist.version
+        scripts = dist.entry_points.select(group="console_scripts")
+        if plugin.executable not in scripts.names:
+            continue
+
+        # An install from a repository reports the revision that was asked
+        # for, such as a tag. The version in the metadata is whatever the
+        # repository declared at that commit, which a tag does not have to
+        # agree with. PEP 610 records the revision for `pip`.
+        if recorded := dist.read_text("direct_url.json"):
+            vcs_info = json.loads(recorded).get("vcs_info", {})
+            return vcs_info.get("requested_revision") or dist.version
+
+        return dist.version
 
     return None
 
