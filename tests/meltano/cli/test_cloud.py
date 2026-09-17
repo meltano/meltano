@@ -138,7 +138,9 @@ class TestCloudAuthLogin:
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        monkeypatch.delenv("MELTANO_CLOUD_AUTH_CLIENT_ID")
+        # Empty, not absent: deleting it falls back to the built-in default,
+        # and the login then runs for real against the placeholder tenant.
+        monkeypatch.setenv("MELTANO_CLOUD_AUTH_CLIENT_ID", "")
         result = cli_runner.invoke(cli, ("cloud", "auth", "login"))
 
         assert result.exit_code == 1
