@@ -8,11 +8,13 @@ import typing as t
 from collections import Counter
 from copy import deepcopy
 from http import HTTPStatus
+from unittest import mock
 
 import pytest
 import requests
 from requests.adapters import BaseAdapter
 
+from meltano.core.hub.client import MeltanoHubService
 from meltano.core.plugin.base import PluginType
 from meltano.core.user_config import _reset_user_config_service
 
@@ -220,6 +222,29 @@ class MockAdapter(BaseAdapter):
         response.status_code = HTTPStatus.OK
         response._content = json.dumps(data).encode()
         return response
+
+
+@pytest.fixture(autouse=True)
+def _no_cloud_session() -> t.Iterator[None]:
+    """Keep the developer's own Meltano Cloud session out of the test suite.
+
+    `MeltanoHubService` reads the stored Cloud credentials to authenticate Hub
+    requests. On a machine that is logged in, a test run would otherwise send a
+    real access token, and could renew it over the network.
+
+    This patches directly rather than through `monkeypatch`: an autouse fixture
+    that depends on `monkeypatch` changes teardown order for every test in the
+    suite, which breaks `TestAutoStoreManager::test_set`.
+
+    Yields:
+        None.
+    """
+    with mock.patch.object(
+        MeltanoHubService,
+        "_cloud_credentials",
+        staticmethod(lambda: None),
+    ):
+        yield
 
 
 @pytest.fixture(scope="class")

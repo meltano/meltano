@@ -13,10 +13,13 @@ from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
+from meltano.core.cloud.credentials import Credentials
 from meltano.core.hub.client import (
+    HubAuthenticationRequiredError,
     HubConnectionError,
     HubPluginTypeNotFoundError,
     HubPluginVariantNotFoundError,
+    MeltanoHubService,
 )
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -30,6 +33,57 @@ if t.TYPE_CHECKING:
     from collections import Counter
 
     from meltano.core.project import Project
+
+
+@pytest.fixture
+def _restore_hub_session_headers() -> t.Iterator[None]:
+    """Stop Hub session headers from leaking between tests.
+
+    `MeltanoHubService.session` is a class attribute, so a header that one test
+    sets stays visible to every test that runs after it.
+
+    Yields:
+        None.
+    """
+    original = dict(MeltanoHubService.session.headers)
+    MeltanoHubService.session.headers.pop("Authorization", None)
+    yield
+    MeltanoHubService.session.headers.clear()
+    MeltanoHubService.session.headers.update(original)
+
+
+def _stub_cloud_credentials(
+    monkeypatch: pytest.MonkeyPatch,
+    credentials: Credentials | None,
+) -> None:
+    """Pretend the user does or does not have a Meltano Cloud session.
+
+    Args:
+        monkeypatch: The pytest monkeypatch fixture.
+        credentials: The session to report, or `None` when logged out.
+    """
+    monkeypatch.setattr(
+        MeltanoHubService,
+        "_cloud_credentials",
+        staticmethod(lambda: credentials),
+    )
+
+
+def _stub_hub_status(monkeypatch: pytest.MonkeyPatch, status_code: HTTPStatus) -> None:
+    """Make every Hub request answer with the given status.
+
+    Args:
+        monkeypatch: The pytest monkeypatch fixture.
+        status_code: The status to answer with.
+    """
+
+    def _send(*args: t.Any, **kwargs: t.Any) -> Response:  # noqa: ARG001
+        response = Response()
+        response.status_code = status_code
+        response._content = b"{}"
+        return response
+
+    monkeypatch.setattr(MeltanoHubService.session, "send", _send)
 
 
 class TestMeltanoHubService:
@@ -123,6 +177,61 @@ class TestMeltanoHubService:
     def test_hub_auth(self, project) -> None:
         project.settings.set("hub_url_auth", "Bearer s3cr3t")
         assert project.hub_service.session.headers["Authorization"] == "Bearer s3cr3t"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_from_cloud_session(self, project: Project, monkeypatch) -> None:
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.session.headers["Authorization"] == "Bearer s3cr3t"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_setting_wins_over_cloud_session(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.set("hub_url_auth", "Bearer from-setting")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="from-cloud"))
+        service = MeltanoHubService(project)
+        assert service.session.headers["Authorization"] == "Bearer from-setting"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_absent_when_logged_out(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        service = MeltanoHubService(project)
+        assert "Authorization" not in service.session.headers
+
+    def test_unauthenticated_request_points_at_cloud_login(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        _stub_hub_status(monkeypatch, HTTPStatus.UNAUTHORIZED)
+
+        with pytest.raises(
+            HubAuthenticationRequiredError,
+            match=r"meltano cloud auth login",
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_unauthenticated_request_with_hub_auth_reports_status(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.set("hub_url_auth", "Bearer s3cr3t")
+        _stub_hub_status(monkeypatch, HTTPStatus.UNAUTHORIZED)
+
+        with pytest.raises(HubConnectionError, match=r"\(401\)"):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
 
     def test_server_error(self, project: Project) -> None:
         with pytest.raises(

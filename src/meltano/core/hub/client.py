@@ -26,6 +26,7 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
+    from meltano.core.cloud.credentials import Credentials
     from meltano.core.plugin import BasePlugin
     from meltano.core.project import Project
 
@@ -58,6 +59,21 @@ class HubConnectionError(MeltanoError):
             reason: The reason for the error.
         """
         super().__init__(reason or "Could not connect to Meltano Hub")
+
+
+class HubAuthenticationRequiredError(MeltanoError):
+    """Raised when Meltano Hub rejects a request as unauthenticated."""
+
+    def __init__(self, status_code: int):
+        """Create a new HubAuthenticationRequiredError.
+
+        Args:
+            status_code: The status code returned by the Hub API.
+        """
+        super().__init__(
+            f"Meltano Hub rejected the request ({status_code})",
+            "Run 'meltano cloud auth login' to log in to Meltano Cloud",
+        )
 
 
 class HubPluginVariantNotFoundError(MeltanoError):
@@ -112,6 +128,8 @@ class MeltanoHubService(PluginRepository):
 
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
+        elif credentials := self._cloud_credentials():
+            self.session.headers.update(credentials.auth_header)
 
         adapter = HTTPAdapter(
             max_retries=Retry(
@@ -142,6 +160,19 @@ class MeltanoHubService(PluginRepository):
     def hub_url_auth(self) -> str | None:
         """The `hub_url_auth` setting."""
         return self.project.settings.get("hub_url_auth")
+
+    @staticmethod
+    def _cloud_credentials() -> Credentials | None:
+        """Get the stored Meltano Cloud session, renewing it if it has expired.
+
+        Returns:
+            The credentials, or `None` if the user is not logged in.
+        """
+        # Imported here so that fetching a plugin definition does not pay for
+        # the login flow's HTTP server and browser launcher.
+        from meltano.core.cloud.auth import CloudAuthService
+
+        return CloudAuthService().get_credentials()
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
@@ -203,6 +234,8 @@ class MeltanoHubService(PluginRepository):
 
         Raises:
             HubConnectionError: If the Hub API could not be reached.
+            HubAuthenticationRequiredError: If the Hub API rejected the request
+                because the user is not logged in to Meltano Cloud.
         """
         prep = self._build_request("GET", url)
         settings = self.session.merge_environment_settings(
@@ -214,9 +247,16 @@ class MeltanoHubService(PluginRepository):
         )
 
         try:
-            return self.session.send(prep, **settings)
+            response = self.session.send(prep, **settings)
         except requests.exceptions.ConnectionError as connection_err:
             raise HubConnectionError from connection_err
+
+        # A project that sets 'hub_url_auth' manages its own credentials, so
+        # report the status instead of the Cloud login.
+        if response.status_code == HTTPStatus.UNAUTHORIZED and not self.hub_url_auth:
+            raise HubAuthenticationRequiredError(response.status_code)
+
+        return response
 
     @override
     def find_definition(
