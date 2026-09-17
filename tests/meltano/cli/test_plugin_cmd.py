@@ -11,7 +11,6 @@ from meltano.cli import cli
 from meltano.cli.plugin import CUSTOM, _installed_version
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.venv_service import VirtualEnv
 
 if t.TYPE_CHECKING:
@@ -88,31 +87,25 @@ def listed(result: Result) -> dict[str, dict[str, t.Any]]:
 @pytest.fixture(scope="class")
 def repo_tap(project_add_service: ProjectAddService) -> ProjectPlugin:
     """A plugin installed from a repository at a tag, rather than from PyPI."""
-    try:
-        return project_add_service.add(
-            PluginType.EXTRACTORS,
-            "tap-repo",
-            namespace="tap_repo",
-            pip_url="git+https://github.com/meltano/tap-repo.git@v1.0.0",
-            executable="tap-repo",
-        )
-    except PluginAlreadyAddedException as err:
-        return err.plugin
+    return project_add_service.add(
+        PluginType.EXTRACTORS,
+        "tap-repo",
+        namespace="tap_repo",
+        pip_url="git+https://github.com/meltano/tap-repo.git@v1.0.0",
+        executable="tap-repo",
+    )
 
 
 @pytest.fixture(scope="class")
 def custom_tap(project_add_service: ProjectAddService) -> ProjectPlugin:
     """A plugin that carries its own definition, rather than one from the Hub."""
-    try:
-        return project_add_service.add(
-            PluginType.EXTRACTORS,
-            "tap-custom",
-            namespace="tap_custom",
-            pip_url="tap-custom",
-            executable="tap-custom",
-        )
-    except PluginAlreadyAddedException as err:
-        return err.plugin
+    return project_add_service.add(
+        PluginType.EXTRACTORS,
+        "tap-custom",
+        namespace="tap_custom",
+        pip_url="tap-custom",
+        executable="tap-custom",
+    )
 
 
 class TestInstalledVersion:
