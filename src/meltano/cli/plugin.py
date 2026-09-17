@@ -197,7 +197,10 @@ class PluginListing:
         venv = VirtualEnv(
             project.dirs.venvs(plugin.type, plugin.plugin_dir_name, make_dirs=False),
         )
-        installed = _is_installed(venv)
+        # The fingerprint is written once `pip install` has returned, so an
+        # environment created for an install that then failed has an
+        # interpreter but no fingerprint.
+        installed = venv.read_fingerprint() is not None
         return cls(
             name=plugin.name,
             type=plugin.type.descriptor,
@@ -208,22 +211,6 @@ class PluginListing:
             pip_url=plugin.pip_url,
             inherit_from=plugin.inherit_from,
         )
-
-
-def _is_installed(venv: VirtualEnv) -> bool:
-    """Check whether a plugin's virtual environment has been installed.
-
-    The fingerprint is written once `pip install` has returned, so an
-    environment that was created for an install that then failed has an
-    interpreter but no fingerprint.
-
-    Args:
-        venv: The plugin's virtual environment.
-
-    Returns:
-        Whether the plugin is installed.
-    """
-    return venv.read_fingerprint() is not None
 
 
 def _render_table(listings: Iterable[PluginListing]) -> None:
