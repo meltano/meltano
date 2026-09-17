@@ -1171,17 +1171,13 @@ Use the `plugin` command to inspect the [plugins](/concepts/plugins) in your pro
 
 ### `list`
 
-Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use and the version that is installed. A plugin is installed when it has a virtual environment in the project's `.meltano` directory. Installing the plugin creates that environment. `meltano add` installs a plugin as it adds it, and `meltano install` installs one later.
+Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use. A project can spread its plugins across `meltano.yml` and the [other YAML files it includes](/concepts/project#multiple-yaml-files), and this gathers them into one view.
+
+The command reports what the project declares. It does not inspect what is installed.
 
 The plugins keep the order that `meltano.yml` defines them in, within each plugin type.
 
 The `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/).
-
-The version reported is the version of the distribution that was installed into the plugin's virtual environment, which is not necessarily the version requested by the plugin's `pip_url`. A plugin with no virtual environment reports `(not installed)`.
-
-A plugin installed from a repository reports the revision that its `pip_url` asked for, such as a tag or a branch, rather than a version. A `pip_url` that names no revision falls back to the version.
-
-The distribution is found through the command that the plugin runs, so a plugin published under another name reports its version all the same. A plugin whose command is not installed by a Python distribution reports `-`.
 
 #### How to use
 
@@ -1194,11 +1190,11 @@ meltano plugin list --format json
 ```
 
 ```
- TYPE        NAME           VARIANT       VERSION           CUSTOM
- ─────────────────────────────────────────────────────────────────
- extractor   tap-github     meltanolabs   1.29.2
- extractor   tap-internal   default       v0.2.0              ✓
- loader      target-jsonl   andyh1203     (not installed)
+ TYPE        NAME           VARIANT       CUSTOM
+ ───────────────────────────────────────────────
+ extractor   tap-github     meltanolabs
+ extractor   tap-internal   default         ✓
+ loader      target-jsonl   andyh1203
 ```
 
 The JSON output includes the `pip_url` and `inherit_from` of each plugin as well:
@@ -1209,8 +1205,6 @@ The JSON output includes the `pip_url` and `inherit_from` of each plugin as well
     "name": "tap-github--custom",
     "type": "extractor",
     "variant": "meltanolabs",
-    "version": "1.0.3",
-    "installed": true,
     "custom": false,
     "pip_url": "meltanolabs-tap-github",
     "inherit_from": "tap-github"
@@ -1220,9 +1214,7 @@ The JSON output includes the `pip_url` and `inherit_from` of each plugin as well
 
 :::info
 
-A plugin that [inherits from another](/concepts/plugins#plugin-inheritance) shares its parent's virtual environment, unless it installs something different, so both are reported with the same version.
-
-[Mappings](/concepts/plugins#mappers) are configuration for a mapper rather than a separate installation, so the mapper is listed once and its mappings are not listed.
+[Mappings](/concepts/plugins#mappers) are configuration for a mapper rather than a separate plugin, so the mapper is listed once and its mappings are not listed.
 
 :::
 
