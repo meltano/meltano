@@ -49,7 +49,7 @@ class CloudNotAuthenticatedError(MeltanoCloudError):
         """Create a new exception."""
         super().__init__(
             "You are not logged in to Meltano Cloud",
-            "Run 'meltano cloud auth login' to log in",
+            "Run 'meltano cloud auth login' to log in or register for Meltano Cloud",
         )
 
 
