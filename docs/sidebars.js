@@ -16,12 +16,12 @@ const gettingStartedCategory = require('./docs/getting-started/_category_.json')
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   connectorsSidebar: [
+    { type: 'doc', id: 'connectors/meltano-hub', label: 'Meltano Hub' },
     {
       type: 'category',
       label: 'Connectors',
       link: { type: 'doc', id: 'connectors/index' },
       items: [
-        { type: 'doc', id: 'connectors/meltano-hub', label: 'Install plugins with Meltano Hub' },
         { type: 'doc', id: 'connectors/tap-aptem', label: 'Aptem' },
         { type: 'doc', id: 'connectors/tap-baidu', label: 'Baidu' },
         { type: 'doc', id: 'connectors/target-clickhouse', label: 'ClickHouse' },
