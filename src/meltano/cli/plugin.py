@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import platform
 import re
 import typing as t
 from dataclasses import asdict, dataclass
@@ -122,8 +121,7 @@ def _site_packages_dir(venv: VirtualEnv) -> Path | None:
     """Find the site-packages directory of a virtual environment.
 
     `VirtualEnv.site_packages_dir` names the directory after the interpreter
-    that Meltano itself runs on. A plugin installed under another Python has
-    its packages elsewhere, so the directory is found by globbing instead.
+    that Meltano itself runs on, so it is not used here.
 
     Args:
         venv: The virtual environment.
@@ -131,11 +129,14 @@ def _site_packages_dir(venv: VirtualEnv) -> Path | None:
     Returns:
         The site-packages directory, or `None` if there is not exactly one.
     """
-    if platform.system() == "Windows":
-        path = venv.lib_dir / "site-packages"
-        return path if path.is_dir() else None
+    # Windows puts the directory straight under the lib directory. Every other
+    # platform puts it under the name of the version that created the
+    # environment, which is not necessarily the one Meltano runs on.
+    for pattern in ("site-packages", "python*/site-packages"):
+        if found := sorted(venv.lib_dir.glob(pattern)):
+            return found[0]
 
-    return next(iter(sorted(venv.lib_dir.glob("python*/site-packages"))), None)
+    return None
 
 
 def _installed_version(venv: VirtualEnv, plugin: ProjectPlugin) -> str | None:
