@@ -106,32 +106,14 @@ class TestPluginListWithoutPlugins:
 
 
 class TestPluginListNotInstalled:
-    def test_default_reports_nothing_installed(
-        self,
-        project: Project,  # noqa: ARG002
-        tap: ProjectPlugin,  # noqa: ARG002
-        target: ProjectPlugin,  # noqa: ARG002
-        cli_runner: CliRunner,
-    ) -> None:
-        result = cli_runner.invoke(cli, ("plugin", "list"))
-
-        assert_cli_runner(result)
-        assert "No plugins are installed." in result.stdout
-        # The plugins are defined, so the hint points at installing them.
-        assert "meltano install" in result.stdout
-        assert "--available" in result.stdout
-
-    def test_available_lists_declared_plugins(
+    def test_lists_declared_plugins(
         self,
         project: Project,  # noqa: ARG002
         tap: ProjectPlugin,
         target: ProjectPlugin,
         cli_runner: CliRunner,
     ) -> None:
-        result = cli_runner.invoke(
-            cli,
-            ("plugin", "list", "--available", "--format", "json"),
-        )
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
 
         assert_cli_runner(result)
         entries = listed(result)
@@ -140,13 +122,13 @@ class TestPluginListNotInstalled:
         assert entries[tap.name]["type"] == "extractor"
         assert entries[target.name]["type"] == "loader"
 
-    def test_available_text_output_marks_state(
+    def test_text_output_marks_state(
         self,
         project: Project,  # noqa: ARG002
         tap: ProjectPlugin,  # noqa: ARG002
         cli_runner: CliRunner,
     ) -> None:
-        result = cli_runner.invoke(cli, ("plugin", "list", "--available"))
+        result = cli_runner.invoke(cli, ("plugin", "list"))
 
         assert_cli_runner(result)
         assert "not installed" in result.stdout
@@ -158,10 +140,7 @@ class TestPluginListNotInstalled:
         mapper: ProjectPlugin,
         cli_runner: CliRunner,
     ) -> None:
-        result = cli_runner.invoke(
-            cli,
-            ("plugin", "list", "--available", "--format", "json"),
-        )
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
 
         assert_cli_runner(result)
         entries = json.loads(result.stdout)
@@ -172,7 +151,7 @@ class TestPluginListNotInstalled:
 
 
 class TestPluginListInstalled:
-    def test_lists_only_installed_plugins(
+    def test_marks_which_plugins_are_installed(
         self,
         project: Project,
         tap: ProjectPlugin,
@@ -185,9 +164,8 @@ class TestPluginListInstalled:
 
         assert_cli_runner(result)
         entries = listed(result)
-        assert tap.name in entries
-        assert target.name not in entries
         assert entries[tap.name]["installed"] is True
+        assert entries[target.name]["installed"] is False
 
     def test_reports_the_installed_version(
         self,
@@ -252,8 +230,7 @@ class TestPluginListInstalled:
         assert tap.name in result.stdout
         assert "1.2.3" in result.stdout
         assert "extractor" in result.stdout
-        # The state column is only shown when listing non-installed plugins.
-        assert "STATE" not in result.stdout
+        assert "installed" in result.stdout
 
 
 class TestPluginListWithoutDistribution:

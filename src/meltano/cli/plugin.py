@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-# Written by `meltano install` once a plugin's virtual environment is ready.
+# Written into a plugin's virtual environment once its install completes.
 FINGERPRINT_FILE = ".meltano_plugin_fingerprint"
 
 # Shown in place of a value that could not be determined.
@@ -176,33 +176,27 @@ def _is_installed(venv_root: Path) -> bool:
     return any((bin_dir / name).exists() for name in ("python", "python.exe"))
 
 
-def _render_table(listings: Iterable[PluginListing], *, show_state: bool) -> None:
+def _render_table(listings: Iterable[PluginListing]) -> None:
     """Print the plugins as a table.
 
     Args:
         listings: The plugins to print.
-        show_state: Whether to include the installation state column.
     """
     table = Table(box=SIMPLE_HEAD, pad_edge=False)
     table.add_column("TYPE", style="cyan", no_wrap=True)
     table.add_column("NAME", style="bold", overflow="fold")
     table.add_column("VARIANT", overflow="fold")
     table.add_column("VERSION", overflow="fold")
-    if show_state:
-        table.add_column("STATE", no_wrap=True)
+    table.add_column("STATE", no_wrap=True)
 
     for listing in listings:
-        row = [
+        table.add_row(
             listing.type,
             listing.name,
             listing.variant or UNKNOWN,
             listing.version or UNKNOWN,
-        ]
-        if show_state:
-            row.append(
-                "installed" if listing.installed else "[yellow]not installed[/yellow]",
-            )
-        table.add_row(*row)
+            "installed" if listing.installed else "[yellow]not installed[/yellow]",
+        )
 
     Console().print(table)
 
@@ -232,18 +226,9 @@ def plugin() -> None:
     default="text",
     help="Output format.",
 )
-@click.option(
-    "--available",
-    is_flag=True,
-    default=False,
-    help="Also list plugins that your project defines but has not installed.",
-)
 @pass_project()
-def list_plugins(project: Project, *, list_format: str, available: bool) -> None:
+def list_plugins(project: Project, *, list_format: str) -> None:
     """List the plugins in your project.
-
-    By default only installed plugins are listed. Use `--available` to also
-    list the plugins your project defines that have not been installed yet.
 
     Read more at https://docs.meltano.com/reference/command-line-interface#plugin
     """
@@ -257,25 +242,13 @@ def list_plugins(project: Project, *, list_format: str, available: bool) -> None
         ),
         key=lambda listing: (listing.type, listing.name),
     )
-    defined = len(listings)
-
-    if not available:
-        listings = [listing for listing in listings if listing.installed]
-
     if list_format == "json":
         click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
         return
 
     if listings:
-        _render_table(listings, show_state=available)
+        _render_table(listings)
         return
 
-    if not defined:
-        click.secho("No plugins are defined in this project.", fg="yellow")
-        click.echo("Add one with 'meltano add'.")
-    else:
-        click.secho("No plugins are installed.", fg="yellow")
-        click.echo(
-            f"This project defines {defined} plugin(s). Install them with "
-            "'meltano install', or list them with '--available'.",
-        )
+    click.secho("No plugins are defined in this project.", fg="yellow")
+    click.echo("Add one with 'meltano add'.")
