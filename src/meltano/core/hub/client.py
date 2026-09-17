@@ -60,7 +60,7 @@ def _connection_cause(error: requests.exceptions.ConnectionError) -> str | None:
     """Pull the underlying cause out of a `requests` connection error.
 
     The error's own string form repeats the URL and buries the cause under two
-    layers of pool machinery, so read the cause that urllib3 recorded instead.
+    layers of pool machinery, so read the error that urllib3 chained instead.
 
     Args:
         error: The connection error.
@@ -68,18 +68,12 @@ def _connection_cause(error: requests.exceptions.ConnectionError) -> str | None:
     Returns:
         The cause, or `None` if urllib3 did not record one.
     """
-    retry_error = error.args[0] if error.args else None
-    reason = getattr(retry_error, "reason", None)
+    reason = getattr(error.args[0] if error.args else None, "reason", None)
     if reason is None:
         return None
 
-    # urllib3 usually prefixes the cause with a repr of the connection it
-    # attempted. Strip that alone, so an unprefixed cause survives intact.
-    text = str(reason)
-    prefix, separator, rest = text.partition(": ")
-    if separator and prefix.endswith(")") and "Connection(" in prefix:
-        text = rest
-    return text.strip() or None
+    # A TLS failure carries its own message rather than chaining an OSError.
+    return str(reason.__cause__ or reason)
 
 
 class HubPluginTypeNotFoundError(MeltanoError):

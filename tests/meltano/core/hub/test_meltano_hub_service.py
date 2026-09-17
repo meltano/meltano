@@ -9,6 +9,7 @@ from unittest import mock
 import click
 import pytest
 import requests.exceptions
+import urllib3.exceptions
 from requests import Response
 from requests.adapters import BaseAdapter
 
@@ -94,31 +95,25 @@ def _stub_hub_status(
     monkeypatch.setattr(MeltanoHubService.session, "send", _send)
 
 
+def _connection_error(reason: Exception) -> requests.exceptions.ConnectionError:
+    """Wrap a urllib3 reason the way `requests` does."""
+    return requests.exceptions.ConnectionError(mock.Mock(reason=reason))
+
+
 class TestConnectionCause:
-    @pytest.mark.parametrize(
-        ("reason", "expected"),
-        (
-            pytest.param(
-                "HTTPSConnection(host='h', port=443): Failed to resolve 'h' "
-                "([Errno -2] Name or service not known)",
-                "Failed to resolve 'h' ([Errno -2] Name or service not known)",
-                id="strips-the-connection-repr",
-            ),
-            pytest.param(
-                "Failed to establish a new connection: [Errno 111] refused",
-                "Failed to establish a new connection: [Errno 111] refused",
-                id="keeps-an-unprefixed-cause-intact",
-            ),
-            pytest.param("Bare message", "Bare message", id="unprefixed"),
-        ),
-    )
-    def test_reads_the_cause_urllib3_recorded(
-        self,
-        reason: str,
-        expected: str,
-    ) -> None:
-        error = requests.exceptions.ConnectionError(mock.Mock(reason=reason))
-        assert _connection_cause(error) == expected
+    def test_reads_the_error_urllib3_chained(self) -> None:
+        reason = urllib3.exceptions.NewConnectionError(mock.Mock(), "unused")
+        reason.__cause__ = ConnectionRefusedError(111, "Connection refused")
+        assert _connection_cause(_connection_error(reason)) == (
+            "[Errno 111] Connection refused"
+        )
+
+    def test_falls_back_to_the_reason_itself(self) -> None:
+        # A TLS failure chains nothing, so its own message is the cause.
+        reason = urllib3.exceptions.SSLError("certificate verify failed")
+        assert _connection_cause(_connection_error(reason)) == (
+            "certificate verify failed"
+        )
 
     def test_no_cause_recorded(self) -> None:
         assert _connection_cause(requests.exceptions.ConnectionError()) is None
@@ -423,16 +418,15 @@ class TestMeltanoHubService:
         assert isinstance(exc_info.value.__cause__, requests.exceptions.ConnectionError)
 
     def test_connection_error_names_the_cause(self, project: Project) -> None:
-        underlying = mock.Mock(
-            reason="Failed to resolve 'example.invalid' ([Errno -2] not known)",
-        )
+        reason = urllib3.exceptions.NewConnectionError(mock.Mock(), "unused")
+        reason.__cause__ = ConnectionRefusedError(111, "Connection refused")
         with (
             mock.patch.object(
                 project.hub_service.session,
                 "send",
-                side_effect=requests.exceptions.ConnectionError(underlying),
+                side_effect=_connection_error(reason),
             ),
-            pytest.raises(HubConnectionError, match=r"Failed to resolve"),
+            pytest.raises(HubConnectionError, match=r"Connection refused"),
         ):
             project.hub_service._get(project.hub_service.hub_api_url)
 
