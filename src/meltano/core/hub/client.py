@@ -397,7 +397,7 @@ class MeltanoHubService(PluginRepository):
             None if refresh else _read_index_cache(cache_path)
         )
 
-        if not plugins:
+        if plugins is None:
             response = self._get(url)
 
             if response.status_code == HTTPStatus.NOT_FOUND:
