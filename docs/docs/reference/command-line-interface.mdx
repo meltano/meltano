@@ -1368,6 +1368,10 @@ meltano plugin list
 meltano plugin list --format json
 ```
 
+```bash
+meltano plugin list
+```
+
 ```
  TYPE        NAME                  VARIANT       INHERIT FROM   CUSTOM
  ─────────────────────────────────────────────────────────────────────
@@ -1377,10 +1381,20 @@ meltano plugin list --format json
  loader      target-jsonl          andyh1203
 ```
 
-The JSON output carries the same fields in the same order, and the `pip_url` as well:
+```bash
+meltano plugin list --format json
+```
 
 ```json
 [
+  {
+    "type": "extractor",
+    "name": "tap-github",
+    "variant": "meltanolabs",
+    "inherit_from": null,
+    "custom": false,
+    "pip_url": "meltanolabs-tap-github"
+  },
   {
     "type": "extractor",
     "name": "tap-github--sandbox",
@@ -1388,6 +1402,22 @@ The JSON output carries the same fields in the same order, and the `pip_url` as 
     "inherit_from": "tap-github",
     "custom": false,
     "pip_url": "meltanolabs-tap-github"
+  },
+  {
+    "type": "extractor",
+    "name": "tap-internal",
+    "variant": "default",
+    "inherit_from": null,
+    "custom": true,
+    "pip_url": "git+https://github.com/acme/tap-internal.git"
+  },
+  {
+    "type": "loader",
+    "name": "target-jsonl",
+    "variant": "andyh1203",
+    "inherit_from": null,
+    "custom": false,
+    "pip_url": "target-jsonl"
   }
 ]
 ```
