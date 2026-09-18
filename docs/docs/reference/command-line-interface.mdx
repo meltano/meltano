@@ -953,8 +953,11 @@ meltano hub list --format json
 meltano hub list --refresh
 ```
 
+```bash
+meltano hub list
 ```
-$ meltano hub list
+
+```
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────
  extractor   tap-google-analytics   meltanolabs
@@ -962,14 +965,21 @@ $ meltano hub list
  loader      target-jsonl           andyh1203
 ```
 
+```bash
+meltano hub list --all
 ```
-$ meltano hub list --all
+
+```
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────────────
  extractor   tap-google-analytics   meltanolabs (default)
                                     meltano
  extractor   tap-carbon-intensity   meltano
  loader      target-jsonl           andyh1203
+```
+
+```bash
+meltano hub list --format json
 ```
 
 ```json
