@@ -1787,6 +1787,7 @@ article {
 .tier-banner--yellow {
   border-left-color: var(--meltano-yellow);
   background: rgba(251, 204, 84, 0.08);
+  font-size: 15.5px;
 }
 
 [data-theme='dark'] .tier-banner--yellow {
