@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import typing as t
+from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
@@ -33,6 +34,7 @@ else:
 if t.TYPE_CHECKING:
     from pathlib import Path
 
+    from meltano.core.cloud.credentials import Credentials
     from meltano.core.plugin import BasePlugin
     from meltano.core.project import Project
 
@@ -94,6 +96,48 @@ def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
     os.replace(partial, path)  # noqa: PTH105
 
 
+def _rejection_detail(response: requests.Response) -> str | None:
+    """Read the Hub's own explanation out of a rejected response.
+
+    Letting the Hub supply the wording means it can be changed server side,
+    without waiting for users to upgrade Meltano.
+
+    Args:
+        response: The rejected response.
+
+    Returns:
+        The explanation, or `None` if the Hub sent no JSON message.
+    """
+    try:
+        message = response.json()["message"]
+    except (ValueError, KeyError):
+        return None
+
+    # The error renders the reason with a full stop after it, so drop the
+    # Hub's own, rather than requiring it to know how Meltano punctuates.
+    return message.strip().removesuffix(".") or None
+
+
+def _connection_cause(error: requests.exceptions.ConnectionError) -> str | None:
+    """Pull the underlying cause out of a `requests` connection error.
+
+    The error's own string form repeats the URL and buries the cause under two
+    layers of pool machinery, so read the error that urllib3 chained instead.
+
+    Args:
+        error: The connection error.
+
+    Returns:
+        The cause, or `None` if urllib3 did not record one.
+    """
+    reason = getattr(error.args[0] if error.args else None, "reason", None)
+    if reason is None:
+        return None
+
+    # A TLS failure carries its own message rather than chaining an OSError.
+    return str(reason.__cause__ or reason)
+
+
 class HubPluginTypeNotFoundError(MeltanoError):
     """Raised when a Hub plugin type is not found."""
 
@@ -120,6 +164,24 @@ class HubConnectionError(MeltanoError):
             reason: The reason for the error.
         """
         super().__init__(reason or "Could not connect to Meltano Hub")
+
+
+class HubAuthenticationRequiredError(MeltanoError):
+    """Raised when Meltano Hub rejects a request as unauthenticated."""
+
+    # Always set, unlike the base class, so a caller can add to it.
+    instruction: str
+
+    def __init__(self, detail: str | None = None):
+        """Create a new HubAuthenticationRequiredError.
+
+        Args:
+            detail: The Hub's own explanation, when it gave one.
+        """
+        super().__init__(
+            detail or "Meltano Hub requires authentication",
+            "Run 'meltano cloud auth login' to log in or register for Meltano Cloud",
+        )
 
 
 class HubPluginVariantNotFoundError(MeltanoError):
@@ -172,8 +234,11 @@ class MeltanoHubService(PluginRepository):
 
             self.session.headers["X-Project-ID"] = project_id
 
+        self.session.headers.pop("Authorization", None)
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
+        elif credentials := self._cloud_credentials():
+            self.session.headers.update(credentials.auth_header)
 
         adapter = HTTPAdapter(
             max_retries=Retry(
@@ -204,6 +269,25 @@ class MeltanoHubService(PluginRepository):
     def hub_url_auth(self) -> str | None:
         """The `hub_url_auth` setting."""
         return self.project.settings.get("hub_url_auth")
+
+    @staticmethod
+    def _cloud_credentials() -> Credentials | None:
+        """Get the stored Meltano Cloud session, renewing it if it has expired.
+
+        Returns:
+            The credentials, or `None` if the user is not logged in.
+        """
+        # Imported here so that fetching a plugin definition does not pay for
+        # the login flow's HTTP server and browser launcher.
+        from meltano.core.cloud.auth import CloudAuthService
+        from meltano.core.user_config import UserConfigReadError
+
+        # A user configuration file that cannot be read must not stop a plugin
+        # being added, so treat it as being logged out.
+        with suppress(UserConfigReadError):
+            return CloudAuthService().get_credentials()
+
+        return None
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
@@ -265,6 +349,8 @@ class MeltanoHubService(PluginRepository):
 
         Raises:
             HubConnectionError: If the Hub API could not be reached.
+            HubAuthenticationRequiredError: If the Hub API rejected the request
+                because the user is not logged in to Meltano Cloud.
         """
         prep = self._build_request("GET", url)
         settings = self.session.merge_environment_settings(
@@ -276,9 +362,19 @@ class MeltanoHubService(PluginRepository):
         )
 
         try:
-            return self.session.send(prep, **settings)
+            response = self.session.send(prep, **settings)
         except requests.exceptions.ConnectionError as connection_err:
-            raise HubConnectionError from connection_err
+            reason = f"Could not connect to Meltano Hub at {url}"
+            if cause := _connection_cause(connection_err):
+                reason = f"{reason}: {cause}"
+            raise HubConnectionError(reason) from connection_err
+
+        # A project that sets 'hub_url_auth' manages its own credentials, so
+        # report the status instead of the Cloud login.
+        if response.status_code == HTTPStatus.UNAUTHORIZED and not self.hub_url_auth:
+            raise HubAuthenticationRequiredError(_rejection_detail(response))
+
+        return response
 
     @override
     def find_definition(

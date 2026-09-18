@@ -18,6 +18,7 @@ from meltano.cli.utils import (
     check_dependencies_met,
     infer_plugin_type,
 )
+from meltano.core.hub.client import HubAuthenticationRequiredError
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
@@ -190,7 +191,11 @@ async def add(
                     plugin_yaml=plugin_yaml,
                 ),
             )
-        except Exception:
+        except Exception as err:
+            if isinstance(err, HubAuthenticationRequiredError):
+                err.instruction += (
+                    ". Alternatively, pass '--from-ref' to add a plugin without the Hub"
+                )
             # if the plugin is not known to meltano send what information we do have
             tracker.add_contexts(
                 PluginsTrackingContext([(plugin, None) for plugin in plugins]),
