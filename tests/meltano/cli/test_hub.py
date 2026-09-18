@@ -268,6 +268,51 @@ class TestCliHubList:
         assert len(json.loads(default_only.stdout)) < len(json.loads(every.stdout))
         assert all(entry["default"] for entry in json.loads(default_only.stdout))
 
+    def test_a_search_says_how_many_variants_it_left_out(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        result = self.invoke(project, cli_runner, "singer-io")
+
+        assert_cli_runner(result)
+        # Two plugins are listed on this variant, and two more offer it
+        # without defaulting to it.
+        assert result.stdout.startswith(
+            "2 plugins matching 'singer-io' (2 variants hidden, show with '--all')",
+        )
+
+    def test_one_variant_left_out_reads_as_one(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        result = self.invoke(project, cli_runner, "gitlab")
+
+        assert_cli_runner(result)
+        assert "(1 variant hidden, show with '--all')" in result.stdout
+
+    def test_nothing_is_left_out_when_every_variant_is_listed(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        every = self.invoke(project, cli_runner, "singer-io", "--all")
+        no_pattern = self.invoke(project, cli_runner)
+
+        assert_cli_runner(every)
+        assert_cli_runner(no_pattern)
+        # Nothing is left out of --all, and a listing with no pattern leaves
+        # out variants by design rather than by filtering.
+        assert "hidden" not in every.stdout
+        assert "hidden" not in no_pattern.stdout
+
     def test_a_pattern_that_matches_nothing(
         self,
         project: Project,

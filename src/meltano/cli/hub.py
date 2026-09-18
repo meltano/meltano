@@ -74,31 +74,26 @@ class HubPluginListing:
 DEFAULT = "[green](default)[/green]"
 
 
-def _variants(plugin: IndexedPlugin, *, all_variants: bool) -> list[str]:
-    """Order the variants of a plugin to list.
+def _variants(plugin: IndexedPlugin) -> list[str]:
+    """Order the variants of a plugin.
 
     Args:
         plugin: The indexed plugin.
-        all_variants: Whether to list every variant rather than the default.
 
     Returns:
         The variant names, the default one first.
     """
-    if not all_variants:
-        return [plugin.default_variant]
-
     others = sorted(set(plugin.variants) - {plugin.default_variant})
     return [plugin.default_variant, *others]
 
 
-def _render_table(listings: Sequence[HubPluginListing], title: str) -> None:
+def _render_table(listings: Sequence[HubPluginListing]) -> None:
     """Print the plugins as a table.
 
     Args:
         listings: The plugins to print.
-        title: The line to print above the table.
     """
-    table = Table(box=SIMPLE_HEAD, pad_edge=False, title=title, title_justify="left")
+    table = Table(box=SIMPLE_HEAD, pad_edge=False)
     table.add_column("TYPE", style="cyan", no_wrap=True)
     table.add_column("NAME", style="bold", overflow="fold")
     table.add_column("VARIANT", overflow="fold")
@@ -191,7 +186,7 @@ def list_plugins(
             ).values(),
             key=lambda plugin: plugin.name,
         )
-        for variant in _variants(plugin, all_variants=all_variants)
+        for variant in _variants(plugin)
     ]
 
     if pattern:
@@ -202,6 +197,13 @@ def list_plugins(
             for listing in listings
             if needle in listing.name.casefold() or needle in listing.variant.casefold()
         ]
+
+    # Every variant was gathered so that the ones left out can be counted.
+    hidden = 0
+    if not all_variants:
+        defaults = [listing for listing in listings if listing.default]
+        hidden = len(listings) - len(defaults)
+        listings = defaults
 
     if list_format == "json":
         click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
@@ -217,8 +219,18 @@ def list_plugins(
     if pattern:
         summary += f" matching {pattern!r}"
 
+    # A search reports what it left out, because a variant that matches is
+    # invisible until every variant is listed.
+    if pattern and hidden:
+        summary += (
+            f" ({hidden} variant{'' if hidden == 1 else 's'} hidden, show with '--all')"
+        )
+
     if not listings:
         click.secho(summary, fg="yellow")
         return
 
-    _render_table(listings, summary)
+    # The count is printed rather than given to the table as a title, because
+    # a title is wrapped to the width of the table rather than the terminal.
+    click.echo(summary)
+    _render_table(listings)
