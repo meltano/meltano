@@ -19,12 +19,14 @@ from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry
 
+from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.error import MeltanoError
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
+from meltano.core.settings_store import SettingValueStore
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -235,10 +237,12 @@ class MeltanoHubService(PluginRepository):
             self.session.headers["X-Project-ID"] = project_id
 
         self.session.headers.pop("Authorization", None)
+        self.cloud_authenticated = False
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
         elif credentials := self._cloud_credentials():
             self.session.headers.update(credentials.auth_header)
+            self.cloud_authenticated = True
 
         adapter = HTTPAdapter(
             max_retries=Retry(
@@ -260,10 +264,18 @@ class MeltanoHubService(PluginRepository):
     @property
     def hub_api_url(self) -> str:
         """The URL of the Hub API."""
-        hub_api_root = self.project.settings.get("hub_api_root")
-        hub_url = self.project.settings.get("hub_url")
+        if hub_api_root := self.project.settings.get("hub_api_root"):
+            return hub_api_root
 
-        return hub_api_root or f"{hub_url}/meltano/api/v1"
+        hub_url, source = self.project.settings.get_with_source("hub_url")
+
+        # A logged in user reads the index that Meltano Cloud serves, which
+        # lists the plugins that Meltano supports, maintains and tests. A
+        # project that points 'hub_url' at a Hub of its own keeps that one.
+        if self.cloud_authenticated and source is SettingValueStore.DEFAULT:
+            return CLOUD_API_ROOT
+
+        return f"{hub_url}/meltano/api/v1"
 
     @property
     def hub_url_auth(self) -> str | None:
