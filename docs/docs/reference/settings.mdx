@@ -553,6 +553,8 @@ Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/p
 
 The Hub is primarily used by [`meltano add`](/reference/command-line-interface#add) and [`meltano lock`](/reference/command-line-interface#lock). It is also used in cases where the full plugin definition is needed but no lock artifact is found.
 
+Once you log in with [`meltano cloud auth login`](/reference/command-line-interface#auth), Meltano reads the Hub that Meltano Cloud serves at `https://app.meltano.com/api`, which lists the plugins that Meltano supports, maintains and tests. Set `hub_url` to keep reading a Hub of your own instead.
+
 #### How to use
 
 <Tabs className="meltano-tabs" queryString="meltano-tabs">

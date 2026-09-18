@@ -15,6 +15,7 @@ from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
+from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.cloud.credentials import Credentials
 from meltano.core.hub.client import (
     HubAuthenticationRequiredError,
@@ -239,6 +240,61 @@ class TestMeltanoHubService:
         _stub_cloud_credentials(monkeypatch, None)
         service = MeltanoHubService(project)
         assert "Authorization" not in service.session.headers
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_api_url_default(self, project: Project, monkeypatch) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "https://hub.meltano.com/meltano/api/v1"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_api_url_is_cloud_when_logged_in(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == CLOUD_API_ROOT
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_configured_hub_url_wins_over_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        project.settings.set("hub_url", "http://localhost:4000")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "http://localhost:4000/meltano/api/v1"
+        project.settings.unset("hub_url")
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_api_root_wins_over_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        project.settings.set("hub_api_root", "https://mysite.com/my-plugins")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "https://mysite.com/my-plugins"
+        project.settings.unset("hub_api_root")
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_setting_keeps_the_default_hub(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.set("hub_url_auth", "Bearer from-setting")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="from-cloud"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "https://hub.meltano.com/meltano/api/v1"
 
     def test_unreadable_user_config_is_treated_as_logged_out(
         self,

@@ -12,10 +12,15 @@ import platformdirs
 
 from meltano.core.user_config import get_user_config_service
 
+# The Meltano Cloud API. It serves an index of the plugins that Meltano
+# supports, maintains and tests, and the login asks Auth0 for a token that this
+# same API accepts, which is why the audience names it.
+CLOUD_API_ROOT = "https://app.meltano.com/api"
+
 # The identity provider is the one Meltano Cloud runs, so none of these are
 # configurable: pointing the CLI elsewhere only makes a login that cannot
 # succeed.
-AUTH_AUDIENCE = "https://app.meltano.com/api"
+AUTH_AUDIENCE = CLOUD_API_ROOT
 AUTH_DOMAIN = "identity.matatika.com"
 AUTH_CLIENT_ID = "OxWCH8ianlswOoKQ8i9X1cBg6cZ4NuwG"
 
