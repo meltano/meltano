@@ -239,13 +239,18 @@ def hub_index_cache_dir(tmp_path_factory):
         yield path
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def _no_cloud_session() -> t.Iterator[None]:
     """Keep the developer's own Meltano Cloud session out of the test suite.
 
     `MeltanoHubService` reads the stored Cloud credentials to authenticate Hub
-    requests. On a machine that is logged in, a test run would otherwise send a
-    real access token, and could renew it over the network.
+    requests and to choose the Hub to read. On a machine that is logged in, a
+    test run would otherwise send a real access token, could renew it over the
+    network, and would read a Hub that the test double does not serve.
+
+    The scope is the session, because the `project` fixture builds a
+    `MeltanoHubService` for a whole class, before any function scoped fixture
+    of the first test in it has run.
 
     This patches directly rather than through `monkeypatch`: an autouse fixture
     that depends on `monkeypatch` changes teardown order for every test in the
