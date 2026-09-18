@@ -224,6 +224,21 @@ class MockAdapter(BaseAdapter):
         return response
 
 
+@pytest.fixture(scope="session", autouse=True)
+def hub_index_cache_dir(tmp_path_factory):
+    """Keep the Hub index cache out of the cache directory of whoever runs this.
+
+    The Hub is mocked here, so a test that reaches it would otherwise leave a
+    mock response where a real `meltano hub list` would read it for an hour.
+    The scope is the session, because a fixture that adds a plugin resolves it
+    against the Hub before a narrower fixture could redirect the cache.
+    """
+    path = tmp_path_factory.mktemp("hub-index-cache")
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr("meltano.core.hub.client.index_cache_dir", lambda: path)
+        yield path
+
+
 @pytest.fixture(autouse=True)
 def _no_cloud_session() -> t.Iterator[None]:
     """Keep the developer's own Meltano Cloud session out of the test suite.

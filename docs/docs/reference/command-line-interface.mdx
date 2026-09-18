@@ -909,14 +909,100 @@ Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://h
 :::info Meltano Cloud account required
 Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
 
-The commands that read from the Hub are [`add`](#add), [`lock`](#lock) and `hub ping`. A project that already has [lock artifacts](/concepts/plugins#lock-artifacts) is unaffected, because [`install`](#install) and [`run`](#run) do not contact the Hub.
+The commands that read from the Hub are [`add`](#add), [`lock`](#lock), `hub list` and `hub ping`. A project that already has [lock artifacts](/concepts/plugins#lock-artifacts) is unaffected, because [`install`](#install) and [`run`](#run) do not contact the Hub.
 :::
+
+### `list`
+
+Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when no variant is specified. Pass `--all` to list every variant of every plugin, and `--plugin-type` to list one type only.
+
+Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants. A count of what matched, and of any matching variant that was hidden, is logged rather than printed, so it reaches you whichever format the rows are in and `--format json` stays parseable.
+
+An index that has been fetched is reused for an hour. Pass `--refresh` to explicitly refresh the index, such as after a plugin has just been published. The cache holds only the index that this command reads. Every other command that reads Meltano Hub, including `meltano add`, always fetches.
+
+Use `meltano plugin list` to see the plugins that your own project defines.
 
 ### How to use
 
 ```bash
 # Check if a connection with Meltano Hub can be established
 meltano hub ping
+
+# List every plugin that Meltano Hub offers
+meltano hub list
+
+# List only the extractors
+meltano hub list --plugin-type extractor
+
+# List the plugins whose name contains 'gitlab'
+meltano hub list gitlab
+
+# Find every plugin that offers the 'singer-io' variant
+meltano hub list singer-io --all
+
+# List the extractors whose name contains 'google'
+meltano hub list google --plugin-type extractor
+
+# List every variant, rather than each plugin's default
+meltano hub list --all
+
+# Emit JSON, for scripting
+meltano hub list --format json
+
+# Fetch a fresh index, rather than reusing the one from the last hour
+meltano hub list --refresh
+```
+
+```bash
+meltano hub list
+```
+
+```
+ TYPE        NAME                   VARIANT
+ ─────────────────────────────────────────────────
+ extractor   tap-carbon-intensity   meltano
+ extractor   tap-google-analytics   meltanolabs
+ loader      target-jsonl           andyh1203
+```
+
+```bash
+meltano hub list --all
+```
+
+```
+ TYPE        NAME                   VARIANT
+ ─────────────────────────────────────────────────────────
+ extractor   tap-carbon-intensity   meltano
+ extractor   tap-google-analytics   meltanolabs (default)
+                                    meltano
+ loader      target-jsonl           andyh1203
+```
+
+```bash
+meltano hub list --format json
+```
+
+```json
+[
+  {
+    "type": "extractor",
+    "name": "tap-carbon-intensity",
+    "variant": "meltano",
+    "default": true
+  },
+  {
+    "type": "extractor",
+    "name": "tap-google-analytics",
+    "variant": "meltanolabs",
+    "default": true
+  },
+  {
+    "type": "loader",
+    "name": "target-jsonl",
+    "variant": "andyh1203",
+    "default": true
+  }
+]
 ```
 
 ### Using `environment` with Environments
@@ -1282,6 +1368,10 @@ meltano plugin list
 meltano plugin list --format json
 ```
 
+```bash
+meltano plugin list
+```
+
 ```
  TYPE        NAME                  VARIANT       INHERIT FROM   CUSTOM
  ─────────────────────────────────────────────────────────────────────
@@ -1291,10 +1381,20 @@ meltano plugin list --format json
  loader      target-jsonl          andyh1203
 ```
 
-The JSON output carries the same fields in the same order, and the `pip_url` as well:
+```bash
+meltano plugin list --format json
+```
 
 ```json
 [
+  {
+    "type": "extractor",
+    "name": "tap-github",
+    "variant": "meltanolabs",
+    "inherit_from": null,
+    "custom": false,
+    "pip_url": "meltanolabs-tap-github"
+  },
   {
     "type": "extractor",
     "name": "tap-github--sandbox",
@@ -1302,6 +1402,22 @@ The JSON output carries the same fields in the same order, and the `pip_url` as 
     "inherit_from": "tap-github",
     "custom": false,
     "pip_url": "meltanolabs-tap-github"
+  },
+  {
+    "type": "extractor",
+    "name": "tap-internal",
+    "variant": "default",
+    "inherit_from": null,
+    "custom": true,
+    "pip_url": "git+https://github.com/acme/tap-internal.git"
+  },
+  {
+    "type": "loader",
+    "name": "target-jsonl",
+    "variant": "andyh1203",
+    "inherit_from": null,
+    "custom": false,
+    "pip_url": "target-jsonl"
   }
 ]
 ```

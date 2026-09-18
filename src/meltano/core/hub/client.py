@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+import os
 import sys
 import typing as t
 from contextlib import suppress
+from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
 import click
+import platformdirs
 import requests
 import requests.exceptions
 from requests.adapters import HTTPAdapter
@@ -27,11 +32,68 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.cloud.credentials import Credentials
     from meltano.core.plugin import BasePlugin
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
+
+# How long an index of a plugin type is reused before it is fetched again.
+INDEX_CACHE_DURATION = timedelta(hours=1)
+
+
+def index_cache_dir() -> Path:
+    """Get the directory that caches an index of a plugin type."""
+    return platformdirs.user_cache_path("meltano") / "hub"
+
+
+def _index_cache_path(url: str) -> Path:
+    """Get the file that caches the index at a URL.
+
+    Args:
+        url: The index URL, which a project can point elsewhere.
+
+    Returns:
+        The path of the cache file.
+    """
+    return index_cache_dir() / f"{hashlib.sha256(url.encode()).hexdigest()}.json"
+
+
+def _read_index_cache(path: Path) -> dict[str, t.Any] | None:
+    """Read an index that was cached, if it is still fresh.
+
+    Args:
+        path: The path of the cache file.
+
+    Returns:
+        The index, or `None` if it was never cached or has expired.
+    """
+    if not path.exists():
+        return None
+
+    written = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+    if datetime.now(tz=timezone.utc) - written > INDEX_CACHE_DURATION:
+        return None
+
+    return json.loads(path.read_text())
+
+
+def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
+    """Cache an index.
+
+    The file is renamed into place, so that a run which is interrupted part way
+    through writing it leaves no half-written file for the next one to read.
+
+    Args:
+        path: The path of the cache file.
+        index: The index to cache.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    partial = path.with_suffix(f".{os.getpid()}.partial")
+    partial.write_text(json.dumps(index))
+    os.replace(partial, path)  # noqa: PTH105
 
 
 def _rejection_detail(response: requests.Response) -> str | None:
@@ -402,11 +464,18 @@ class MeltanoHubService(PluginRepository):
     def get_plugins_of_type(
         self,
         plugin_type: PluginType,
+        *,
+        refresh: bool = True,
     ) -> dict[str, IndexedPlugin]:
         """Get all plugins of a given type.
 
         Args:
             plugin_type: The plugin type.
+            refresh: Whether to fetch the index rather than reuse one cached
+                in the last `INDEX_CACHE_DURATION`. Fetching is the default,
+                because a caller that resolves a plugin must see one added to
+                the Hub moments ago. Either way the index that is fetched is
+                cached, for a caller that does opt out.
 
         Returns:
             The plugin definitions.
@@ -419,19 +488,27 @@ class MeltanoHubService(PluginRepository):
             return {}
 
         url = self.plugin_type_endpoint(plugin_type)
-        response = self._get(url)
+        cache_path = _index_cache_path(url)
+        plugins: dict[str, dict[str, t.Any]] | None = (
+            None if refresh else _read_index_cache(cache_path)
+        )
 
-        if response.status_code == HTTPStatus.NOT_FOUND:
-            raise HubPluginTypeNotFoundError(plugin_type)
+        if plugins is None:
+            response = self._get(url)
 
-        if response.status_code >= HTTPStatus.BAD_REQUEST:
-            reason = (
-                f"{response.reason or 'Unknown reason'} ({response.status_code}): "
-                f"can not retrieve plugins of type '{plugin_type.singular}'"
-            )
-            raise HubConnectionError(reason)
+            if response.status_code == HTTPStatus.NOT_FOUND:
+                raise HubPluginTypeNotFoundError(plugin_type)
 
-        plugins: dict[str, dict[str, t.Any]] = response.json()
+            if response.status_code >= HTTPStatus.BAD_REQUEST:
+                reason = (
+                    f"{response.reason or 'Unknown reason'} ({response.status_code}): "
+                    f"can not retrieve plugins of type '{plugin_type.singular}'"
+                )
+                raise HubConnectionError(reason)
+
+            plugins = response.json()
+            _write_index_cache(cache_path, plugins)
+
         return {
             name: IndexedPlugin(
                 name,
