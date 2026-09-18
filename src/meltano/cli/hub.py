@@ -191,9 +191,17 @@ def list_plugins(
             ).values(),
             key=lambda plugin: plugin.name,
         )
-        if pattern is None or pattern.casefold() in plugin.name.casefold()
         for variant in _variants(plugin, all_variants=all_variants)
     ]
+
+    if pattern:
+        # A row is kept where the reader can see what they searched for in it.
+        needle = pattern.casefold()
+        listings = [
+            listing
+            for listing in listings
+            if needle in listing.name.casefold() or needle in listing.variant.casefold()
+        ]
 
     if list_format == "json":
         click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))

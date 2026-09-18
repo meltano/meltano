@@ -829,7 +829,7 @@ Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://h
 
 Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when you ask for none. Pass `--all` to list every variant of every plugin, one on each row, with the default named first and marked. A plugin that offers a single variant is never marked, because there is nothing to choose between.
 
-Pass a pattern to narrow the list to the plugins whose name contains it, ignoring case. `gitlab` finds `tap-gitlab`.
+Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. A row is kept only where the pattern is visible in it, so pair a variant with `--all` to find every plugin that offers it, rather than only those that default to it.
 
 Meltano Hub offers no search of its own, so the pattern is applied here, after the plugins are fetched.
 
@@ -853,6 +853,9 @@ meltano hub list --plugin-type extractor
 
 # List the plugins whose name contains 'gitlab'
 meltano hub list gitlab
+
+# Find every plugin that offers the 'singer-io' variant
+meltano hub list singer-io --all
 
 # List the extractors whose name contains 'google'
 meltano hub list google --plugin-type extractor

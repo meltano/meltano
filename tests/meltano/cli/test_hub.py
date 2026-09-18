@@ -232,6 +232,42 @@ class TestCliHubList:
         # Filtering happens here, so it still costs a request for each type.
         assert hub_request_counter["/extractors/index"] == 1
 
+    def test_a_pattern_matches_a_variant_name(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        result = self.invoke(
+            project, cli_runner, "singer-io", "--all", "--format", "json"
+        )
+
+        assert_cli_runner(result)
+        entries = json.loads(result.stdout)
+        # None of these plugins is named for the variant they share.
+        assert {entry["variant"] for entry in entries} == {"singer-io"}
+        assert "tap-mock" in {entry["name"] for entry in entries}
+
+    def test_a_variant_matches_only_where_it_is_listed(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        default_only = self.invoke(project, cli_runner, "singer-io", "--format", "json")
+        every = self.invoke(
+            project, cli_runner, "singer-io", "--all", "--format", "json"
+        )
+
+        assert_cli_runner(default_only)
+        assert_cli_runner(every)
+        # Without --all a plugin is listed on its default variant only, so a
+        # plugin that merely offers this one is not among them.
+        assert len(json.loads(default_only.stdout)) < len(json.loads(every.stdout))
+        assert all(entry["default"] for entry in json.loads(default_only.stdout))
+
     def test_a_pattern_that_matches_nothing(
         self,
         project: Project,
