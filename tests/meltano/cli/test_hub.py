@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import json
+import os
+import time
 import typing as t
 from unittest import mock
 
+import pytest
 import requests_mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.hub.client import INDEX_CACHE_DURATION
 from meltano.core.plugin import PluginType
 
 if t.TYPE_CHECKING:
     from collections import Counter
+    from pathlib import Path
 
-    import pytest
     from click.testing import CliRunner
 
     from meltano.core.project import Project
@@ -61,6 +65,13 @@ class TestCliHub:
 
 
 class TestCliHubList:
+    @pytest.fixture(autouse=True)
+    def cache_dir(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+        """Give each test its own cache, so one cannot serve another."""
+        path = tmp_path / "hub-index-cache"
+        monkeypatch.setattr("meltano.core.hub.client.index_cache_dir", lambda: path)
+        return path
+
     @staticmethod
     def invoke(project: Project, cli_runner: CliRunner, *args: str):
         with mock.patch(
@@ -314,3 +325,89 @@ class TestCliHubList:
         assert_cli_runner(result)
         names = [entry["name"] for entry in json.loads(result.stdout)]
         assert names == sorted(names)
+
+    def test_caches_the_index(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        cache_dir: Path,
+        hub_request_counter: Counter,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+        assert hub_request_counter["/extractors/index"] == 1
+
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+        # The second run reads what the first one wrote.
+        assert hub_request_counter["/extractors/index"] == 1
+        assert len(list(cache_dir.glob("*.json"))) == 1
+
+    def test_refresh_fetches_and_replaces_what_was_cached(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        cache_dir: Path,
+        hub_request_counter: Counter,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+        assert hub_request_counter["/extractors/index"] == 1
+
+        result = self.invoke(
+            project, cli_runner, "--plugin-type", "extractor", "--refresh"
+        )
+        assert_cli_runner(result)
+        assert hub_request_counter["/extractors/index"] == 2
+
+        # What was fetched takes the place of what was cached, so the next run
+        # is served the fresh copy rather than the one it replaced.
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+        assert hub_request_counter["/extractors/index"] == 2
+        assert len(list(cache_dir.glob("*.json"))) == 1
+
+    def test_an_expired_index_is_fetched_again(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        cache_dir: Path,
+        hub_request_counter: Counter,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+
+        cached = next(iter(cache_dir.glob("*.json")))
+        stale = time.time() - INDEX_CACHE_DURATION.total_seconds() - 1
+        os.utime(cached, (stale, stale))
+
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+        assert hub_request_counter["/extractors/index"] == 2
+
+    def test_the_cache_is_keyed_by_plugin_type(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        cache_dir: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        assert_cli_runner(
+            self.invoke(project, cli_runner, "--plugin-type", "extractor")
+        )
+        assert_cli_runner(self.invoke(project, cli_runner, "--plugin-type", "loader"))
+
+        assert len(list(cache_dir.glob("*.json"))) == 2

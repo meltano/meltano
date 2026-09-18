@@ -149,6 +149,11 @@ def _render_table(listings: Sequence[HubPluginListing], title: str) -> None:
     default="text",
     help="Output format.",
 )
+@click.option(
+    "--refresh",
+    is_flag=True,
+    help="Fetch a fresh index rather than a cached one.",
+)
 @pass_project()
 def list_plugins(
     project: Project,
@@ -157,6 +162,7 @@ def list_plugins(
     plugin_type: PluginType | None,
     all_variants: bool,
     list_format: str,
+    refresh: bool,
 ) -> None:
     """List the plugins that Meltano Hub offers, or those matching PATTERN.
 
@@ -179,7 +185,10 @@ def list_plugins(
         )
         for candidate in plugin_types
         for plugin in sorted(
-            project.hub_service.get_plugins_of_type(candidate).values(),
+            project.hub_service.get_plugins_of_type(
+                candidate,
+                refresh=refresh,
+            ).values(),
             key=lambda plugin: plugin.name,
         )
         if pattern is None or pattern.casefold() in plugin.name.casefold()

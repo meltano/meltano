@@ -833,6 +833,8 @@ Pass a pattern to narrow the list to the plugins whose name contains it, ignorin
 
 Meltano Hub offers no search of its own, so the pattern is applied here, after the plugins are fetched.
 
+An index that has been fetched is reused for an hour, so a second listing costs no request at all. Pass `--refresh` to fetch one now, such as after a plugin has just been published; the fresh index takes the place of the one it replaces, so later listings see it too. The cache holds only the index that this command reads. Every other command that reads Meltano Hub, including `meltano add`, always fetches.
+
 A count of what matched is printed above the table, and on its own when nothing did. It names the plugin type where you asked for one, so `--plugin-type loader` reports `1 loader matching 'postgres'`.
 
 Use `meltano plugin list` to see the plugins that your own project defines.
@@ -860,6 +862,9 @@ meltano hub list --all
 
 # Emit JSON, for scripting
 meltano hub list --format json
+
+# Fetch a fresh index, rather than reusing the one from the last hour
+meltano hub list --refresh
 ```
 
 ```
