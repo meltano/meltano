@@ -829,7 +829,7 @@ Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://h
 
 Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when no variant is specified. Pass `--all` to list every variant of every plugin.
 
-Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants. A search that hides a matching variant says how many it hid.
+Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants.
 
 An index that has been fetched is reused for an hour. Pass `--refresh` to explicitly refresh the index, such as after a plugin has just been published. The cache holds only the index that this command reads. Every other command that reads Meltano Hub, including `meltano add`, always fetches.
 
