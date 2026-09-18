@@ -960,8 +960,8 @@ meltano hub list
 ```
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────
- extractor   tap-google-analytics   meltanolabs
  extractor   tap-carbon-intensity   meltano
+ extractor   tap-google-analytics   meltanolabs
  loader      target-jsonl           andyh1203
 ```
 
@@ -972,9 +972,9 @@ meltano hub list --all
 ```
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────────────
+ extractor   tap-carbon-intensity   meltano
  extractor   tap-google-analytics   meltanolabs (default)
                                     meltano
- extractor   tap-carbon-intensity   meltano
  loader      target-jsonl           andyh1203
 ```
 
@@ -986,8 +986,20 @@ meltano hub list --format json
 [
   {
     "type": "extractor",
+    "name": "tap-carbon-intensity",
+    "variant": "meltano",
+    "default": true
+  },
+  {
+    "type": "extractor",
     "name": "tap-google-analytics",
     "variant": "meltanolabs",
+    "default": true
+  },
+  {
+    "type": "loader",
+    "name": "target-jsonl",
+    "variant": "andyh1203",
     "default": true
   }
 ]
