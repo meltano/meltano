@@ -825,12 +825,84 @@ Use the `hub` command to interact with the instance of Meltano Hub your Meltano 
 
 Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
 
+### `list`
+
+Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when you ask for none. Pass `--all` to list every variant of every plugin, one on each row, with the default named first and marked. A plugin that offers a single variant is never marked, because there is nothing to choose between.
+
+Pass a pattern to narrow the list to the plugins whose name contains it, ignoring case. `gitlab` finds `tap-gitlab`.
+
+Meltano Hub offers no search of its own, so the pattern is applied here, after the plugins are fetched.
+
+A count of what matched is printed above the table, and on its own when nothing did. It names the plugin type where you asked for one, so `--plugin-type loader` reports `1 loader matching 'postgres'`.
+
+Use `meltano plugin list` to see the plugins that your own project defines.
+
 ### How to use
 
 ```bash
 # Check if a connection with Meltano Hub can be established
 meltano hub ping
+
+# List every plugin that Meltano Hub offers
+meltano hub list
+
+# List only the extractors
+meltano hub list --plugin-type extractor
+
+# List the plugins whose name contains 'gitlab'
+meltano hub list gitlab
+
+# List the extractors whose name contains 'google'
+meltano hub list google --plugin-type extractor
+
+# List every variant, rather than each plugin's default
+meltano hub list --all
+
+# Emit JSON, for scripting
+meltano hub list --format json
 ```
+
+```
+3 plugins
+ TYPE        NAME                   VARIANT
+ ─────────────────────────────────────────────────
+ extractor   tap-google-analytics   meltanolabs
+ extractor   tap-carbon-intensity   meltano
+ loader      target-jsonl           andyh1203
+```
+
+With `--all`, a plugin takes one row for each variant it offers:
+
+```
+4 plugin variants
+ TYPE        NAME                   VARIANT
+ ─────────────────────────────────────────────────────────
+ extractor   tap-google-analytics   meltanolabs (default)
+                                    meltano
+ extractor   tap-carbon-intensity   meltano
+ loader      target-jsonl           andyh1203
+```
+
+A plugin is named once, however many variants follow it. The JSON output repeats the type and the name on every record.
+
+The JSON output carries the same fields in the same order:
+
+```json
+[
+  {
+    "type": "extractor",
+    "name": "tap-google-analytics",
+    "variant": "meltanolabs",
+    "default": true
+  }
+]
+```
+
+:::info
+
+Meltano Hub indexes one plugin type at a time, so listing every type makes a request for each of them. Pass `--plugin-type` to make a single request.
+
+:::
 
 ### Using `environment` with Environments
 
