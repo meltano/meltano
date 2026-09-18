@@ -222,7 +222,7 @@ def list_plugins(
 
     summary = f"{len(listings)} {noun}{'' if len(listings) == 1 else 's'}"
     if pattern:
-        summary += f" matching {pattern!r}"
+        summary += f" {'matches' if len(listings) == 1 else 'match'} {pattern!r}"
 
     # A search reports what it left out, because a variant that matches is
     # invisible until every variant is listed.

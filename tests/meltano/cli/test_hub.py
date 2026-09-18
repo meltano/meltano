@@ -342,7 +342,7 @@ class TestCliHubList:
         # Two plugins are listed on this variant, and two more offer it
         # without defaulting to it.
         assert (
-            "2 plugins matching 'singer-io' (2 variants hidden, show with '--all')"
+            "2 plugins match 'singer-io' (2 variants hidden, show with '--all')"
             in result.stderr
         )
 
@@ -372,7 +372,7 @@ class TestCliHubList:
         # the log reports it without spoiling what a reader parses.
         assert json.loads(result.stdout)
         assert (
-            "2 plugins matching 'singer-io' (2 variants hidden, show with '--all')"
+            "2 plugins match 'singer-io' (2 variants hidden, show with '--all')"
             in result.stderr
         )
 
@@ -418,7 +418,7 @@ class TestCliHubList:
         assert_cli_runner(one)
         assert_cli_runner(every)
         # The count is singular where it should be, and names what a row is.
-        assert "1 plugin matching 'gitlab'" in one.stderr
+        assert "1 plugin matches 'gitlab'" in one.stderr
         assert "14 extractor variants" in every.stderr
 
     def test_a_plugin_is_named_once_however_many_variants_it_has(
@@ -455,8 +455,8 @@ class TestCliHubList:
         assert_cli_runner(one)
         assert_cli_runner(bundles)
         assert not none.stdout.strip()
-        assert "0 extractors matching 'f1'" in none.stderr
-        assert "1 loader matching 'mock'" in one.stderr
+        assert "0 extractors match 'f1'" in none.stderr
+        assert "1 loader matches 'mock'" in one.stderr
         # A file bundle is two words, and pluralises on the second.
         assert "3 file bundles" in bundles.stderr
 
@@ -473,7 +473,7 @@ class TestCliHubList:
         # There is no table and no count, so the warning is the only report.
         assert not result.stdout.strip()
         assert "warning" in result.stderr
-        assert "0 plugins matching 'no-such-plugin'" in result.stderr
+        assert "0 plugins match 'no-such-plugin'" in result.stderr
 
     def test_names_are_sorted(
         self,
