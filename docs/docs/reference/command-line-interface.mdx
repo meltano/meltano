@@ -1165,6 +1165,62 @@ meltano logs list --format json
 - Large log files (>2MB) will prompt for confirmation before displaying
 - Logs are stored in `.meltano/logs/elt/<state_id>/<run_id>/elt.log`
 
+## `plugin`
+
+Use the `plugin` command to inspect the [plugins](/concepts/plugins) in your project.
+
+### `list`
+
+Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use. A project can spread its plugins across `meltano.yml` and the [other YAML files it includes](/concepts/project#multiple-yaml-files), and this gathers them into one view.
+
+The command reports what the project declares. It does not inspect what is installed.
+
+The plugins keep the order that `meltano.yml` defines them in, within each plugin type.
+
+The `INHERIT FROM` column names the plugin that a plugin [inherits from](/concepts/plugins#plugin-inheritance), and the `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/). A plugin from Meltano Hub has neither.
+
+An inheriting plugin takes its parent's variant, so the `VARIANT` column shows `(inherited)`. The JSON output reports the resolved variant.
+
+#### How to use
+
+```bash
+# List the plugins in the project
+meltano plugin list
+
+# Emit JSON, for scripting
+meltano plugin list --format json
+```
+
+```
+ TYPE        NAME                  VARIANT       INHERIT FROM   CUSTOM
+ ─────────────────────────────────────────────────────────────────────
+ extractor   tap-github            meltanolabs
+ extractor   tap-github--sandbox   (inherited)   tap-github
+ extractor   tap-internal          default                        ✓
+ loader      target-jsonl          andyh1203
+```
+
+The JSON output carries the same fields in the same order, and the `pip_url` as well:
+
+```json
+[
+  {
+    "type": "extractor",
+    "name": "tap-github--sandbox",
+    "variant": "meltanolabs",
+    "inherit_from": "tap-github",
+    "custom": false,
+    "pip_url": "meltanolabs-tap-github"
+  }
+]
+```
+
+:::info
+
+[Mappings](/concepts/plugins#mappers) are configuration for a mapper rather than a separate plugin, so the mapper is listed once and its mappings are not listed.
+
+:::
+
 ## `remove`
 
 `meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) from your Meltano [project](/concepts/project).
