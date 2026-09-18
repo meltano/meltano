@@ -916,7 +916,7 @@ The commands that read from the Hub are [`add`](#add), [`lock`](#lock), `hub lis
 
 Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when no variant is specified. Pass `--all` to list every variant of every plugin.
 
-Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants.
+Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants. A count of what matched, and of any matching variant that was hidden, is logged rather than printed, so it reaches you whichever format the rows are in and `--format json` stays parseable.
 
 An index that has been fetched is reused for an hour. Pass `--refresh` to explicitly refresh the index, such as after a plugin has just been published. The cache holds only the index that this command reads. Every other command that reads Meltano Hub, including `meltano add`, always fetches.
 
@@ -954,7 +954,6 @@ meltano hub list --refresh
 ```
 
 ```
-3 plugins
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────
  extractor   tap-google-analytics   meltanolabs
@@ -965,7 +964,6 @@ meltano hub list --refresh
 With `--all`, a plugin takes one row for each variant it offers:
 
 ```
-4 plugin variants
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────────────
  extractor   tap-google-analytics   meltanolabs (default)

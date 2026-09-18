@@ -11,11 +11,15 @@ import click
 from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Table
+from structlog.stdlib import get_logger
 
 from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.error import MeltanoError
 from meltano.core.plugin import PluginType
+
+logger = get_logger(__name__)
+
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
@@ -210,10 +214,6 @@ def list_plugins(
         hidden = len(listings) - len(defaults)
         listings = defaults
 
-    if list_format == "json":
-        click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
-        return
-
     # Name what a row is: the type where one was asked for, and a variant
     # rather than a plugin where every variant is listed.
     noun = plugin_type.descriptor if plugin_type else "plugin"
@@ -231,11 +231,16 @@ def list_plugins(
             f" ({hidden} variant{'' if hidden == 1 else 's'} hidden, show with '--all')"
         )
 
-    if not listings:
-        click.secho(summary, fg="yellow")
+    # The count is logged rather than printed, so that it reaches a reader
+    # whichever format the rows themselves are in.
+    if listings:
+        logger.info(summary)
+    else:
+        logger.warning(summary)
+
+    if list_format == "json":
+        click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
         return
 
-    # The count is printed rather than given to the table as a title, because
-    # a title is wrapped to the width of the table rather than the terminal.
-    click.echo(summary)
-    _render_table(listings)
+    if listings:
+        _render_table(listings)

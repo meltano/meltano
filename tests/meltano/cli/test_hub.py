@@ -329,7 +329,7 @@ class TestCliHubList:
         assert len(json.loads(default_only.stdout)) < len(json.loads(every.stdout))
         assert all(entry["default"] for entry in json.loads(default_only.stdout))
 
-    def test_a_search_says_how_many_variants_it_left_out(
+    def test_a_search_logs_how_many_variants_it_left_out(
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -341,11 +341,12 @@ class TestCliHubList:
         assert_cli_runner(result)
         # Two plugins are listed on this variant, and two more offer it
         # without defaulting to it.
-        assert result.stdout.startswith(
-            "2 plugins matching 'singer-io' (2 variants hidden, show with '--all')",
+        assert (
+            "2 plugins matching 'singer-io' (2 variants hidden, show with '--all')"
+            in result.stderr
         )
 
-    def test_one_variant_left_out_reads_as_one(
+    def test_the_count_of_hidden_variants_reads_as_one(
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -355,7 +356,25 @@ class TestCliHubList:
         result = self.invoke(project, cli_runner, "gitlab")
 
         assert_cli_runner(result)
-        assert "(1 variant hidden, show with '--all')" in result.stdout
+        assert "1 variant hidden, show with '--all'" in result.stderr
+
+    def test_hidden_variants_are_reported_in_either_format(
+        self,
+        project: Project,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", "[]")
+        result = self.invoke(project, cli_runner, "singer-io", "--format", "json")
+
+        assert_cli_runner(result)
+        # The rows are JSON, so the count cannot be printed among them, and
+        # the log reports it without spoiling what a reader parses.
+        assert json.loads(result.stdout)
+        assert (
+            "2 plugins matching 'singer-io' (2 variants hidden, show with '--all')"
+            in result.stderr
+        )
 
     def test_nothing_is_left_out_when_every_variant_is_listed(
         self,
@@ -371,8 +390,8 @@ class TestCliHubList:
         assert_cli_runner(no_pattern)
         # Nothing is left out of --all, and a listing with no pattern leaves
         # out variants by design rather than by filtering.
-        assert "hidden" not in every.stdout
-        assert "hidden" not in no_pattern.stdout
+        assert "hidden" not in every.stderr
+        assert "hidden" not in no_pattern.stderr
 
     def test_a_pattern_that_matches_nothing(
         self,
@@ -386,7 +405,7 @@ class TestCliHubList:
         assert_cli_runner(result)
         assert json.loads(result.stdout) == []
 
-    def test_counts_the_results_above_the_table(
+    def test_counts_the_results(
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -399,8 +418,8 @@ class TestCliHubList:
         assert_cli_runner(one)
         assert_cli_runner(every)
         # The count is singular where it should be, and names what a row is.
-        assert one.stdout.startswith("1 plugin matching 'gitlab'")
-        assert every.stdout.startswith("14 extractor variants")
+        assert "1 plugin matching 'gitlab'" in one.stderr
+        assert "14 extractor variants" in every.stderr
 
     def test_a_plugin_is_named_once_however_many_variants_it_has(
         self,
@@ -435,12 +454,13 @@ class TestCliHubList:
         assert_cli_runner(none)
         assert_cli_runner(one)
         assert_cli_runner(bundles)
-        assert none.stdout.strip() == "0 extractors matching 'f1'"
-        assert one.stdout.startswith("1 loader matching 'mock'")
+        assert not none.stdout.strip()
+        assert "0 extractors matching 'f1'" in none.stderr
+        assert "1 loader matching 'mock'" in one.stderr
         # A file bundle is two words, and pluralises on the second.
-        assert bundles.stdout.startswith("3 file bundles")
+        assert "3 file bundles" in bundles.stderr
 
-    def test_no_table_when_nothing_matches(
+    def test_nothing_matching_is_a_warning(
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -450,8 +470,10 @@ class TestCliHubList:
         result = self.invoke(project, cli_runner, "no-such-plugin")
 
         assert_cli_runner(result)
-        assert result.stdout.strip() == "0 plugins matching 'no-such-plugin'"
-        assert "NAME" not in result.stdout
+        # There is no table and no count, so the warning is the only report.
+        assert not result.stdout.strip()
+        assert "warning" in result.stderr
+        assert "0 plugins matching 'no-such-plugin'" in result.stderr
 
     def test_names_are_sorted(
         self,
