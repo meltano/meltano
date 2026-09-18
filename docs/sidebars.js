@@ -22,8 +22,8 @@ const sidebars = {
       link: { type: 'doc', id: 'connectors/meltano-hub/index' },
       collapsed: true,
       items: [
-        { type: 'doc', id: 'connectors/meltano-hub/add-a-plugin', label: 'Add a plugin to the Hub' },
-        { type: 'doc', id: 'connectors/meltano-hub/maintaining-plugins', label: 'Maintaining taps and targets' },
+        { type: 'doc', id: 'connectors/meltano-hub/add-a-plugin', label: 'Listing on the Hub' },
+        { type: 'doc', id: 'connectors/meltano-hub/maintaining-plugins', label: 'Maintaining Taps & Targets' },
       ],
     },
     {
