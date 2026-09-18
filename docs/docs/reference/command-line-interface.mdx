@@ -63,6 +63,10 @@ If the flag is not provided, the behavior is determined by the boolean [`auto_in
 
 `meltano add` lets you add or update [plugins](/concepts/plugins#project-plugins) in your Meltano project. The command is idempotent - running it on an existing plugin will update the plugin instead of failing.
 
+:::info Meltano Cloud account required
+This command reads plugin definitions from [Meltano Hub](https://hub.meltano.com/), which requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first, or pass `--from-ref` to add a plugin without the Hub.
+:::
+
 When adding a new plugin, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
@@ -254,6 +258,83 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 ### Using `add` with Environments
 
 The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
+## `cloud`
+
+Use the `cloud` command to interact with [Meltano Cloud](https://meltano.com/cloud) from your terminal.
+
+### `auth`
+
+The `auth` subcommand manages your Meltano Cloud session. Logging in opens the Meltano Cloud login page in your browser, and stores the resulting session on your machine so that other `meltano cloud` commands can use it.
+
+Meltano uses the OAuth 2.0 authorization code flow with [PKCE](https://datatracker.ietf.org/doc/html/rfc7636), as recommended for command line applications by [RFC 8252](https://datatracker.ietf.org/doc/html/rfc8252). No credentials are ever typed into, or read by, the CLI itself: Meltano starts a short-lived HTTP server on the loopback interface, and your browser hands the authorization code back to it once you have logged in.
+
+#### How to use
+
+```bash
+# Log in to Meltano Cloud
+meltano cloud auth login
+
+# Print the login URL instead of opening a browser,
+# which is useful over SSH or in a remote shell
+meltano cloud auth login --no-browser
+
+# Log in again, replacing an existing session
+meltano cloud auth login --force
+
+# Check whether you are logged in, and as whom
+meltano cloud auth status
+
+# Check the stored session without contacting Meltano Cloud
+meltano cloud auth status --offline
+
+# Log out, revoking the stored session
+meltano cloud auth logout
+
+# Log out, and also end the session in your browser
+meltano cloud auth logout --web
+```
+
+`meltano cloud auth status` exits with a non-zero exit code when you are not logged in, so it can be used to gate other commands in a script:
+
+```bash
+meltano cloud auth status --offline || meltano cloud auth login
+```
+
+#### Where the session is stored
+
+Your session is written to a `cloud/credentials.json` file in the Meltano user configuration directory, which is platform specific:
+
+- Linux: `~/.config/meltano/cloud/credentials.json`
+- macOS: `~/Library/Application Support/meltano/cloud/credentials.json`
+- Windows: `%LOCALAPPDATA%\meltano\meltano\cloud\credentials.json`
+
+The file is only readable and writable by your user account. It holds the tokens issued by Meltano Cloud, so treat it like any other credential: do not commit it, and do not copy it to a shared machine.
+
+Meltano renews an expired access token automatically using the stored refresh token, so you should only need to log in again after logging out, or after the refresh token itself expires.
+
+Set the `MELTANO_CLOUD_CREDENTIALS_PATH` environment variable to store the session somewhere else, for example to keep separate sessions side by side:
+
+```bash
+MELTANO_CLOUD_CREDENTIALS_PATH=~/.config/meltano/cloud/staging.json meltano cloud auth login
+```
+
+#### Storing the session elsewhere
+
+The login flow listens on port `9999`, falling back to `9998` when that one is in use.
+
+Where the session is stored can be changed, with an environment variable or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+
+| Environment variable             | User configuration key        | Description                  |
+| -------------------------------- | ----------------------------- | ---------------------------- |
+| `MELTANO_CLOUD_CREDENTIALS_PATH` | `cloud.auth.credentials_path` | Where the session is stored. |
+
+```yaml
+# ~/.config/meltano/config.yml
+cloud:
+  auth:
+    credentials_path: ~/.config/meltano/cloud/staging.json
+```
 
 ## `compile`
 
@@ -825,6 +906,12 @@ Use the `hub` command to interact with the instance of Meltano Hub your Meltano 
 
 Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
 
+:::info Meltano Cloud account required
+Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
+
+The commands that read from the Hub are [`add`](#add), [`lock`](#lock) and `hub ping`. A project that already has [lock artifacts](/concepts/plugins#lock-artifacts) is unaffected, because [`install`](#install) and [`run`](#run) do not contact the Hub.
+:::
+
 ### How to use
 
 ```bash
@@ -1066,6 +1153,10 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 ## `lock`
 
 `meltano lock` creates lock files for [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
+
+:::info Meltano Cloud account required
+This command reads plugin definitions from [Meltano Hub](https://hub.meltano.com/), which requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
+:::
 
 ### How to use
 

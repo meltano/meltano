@@ -8,6 +8,7 @@ import click
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
+from meltano.core.error import MeltanoError
 from meltano.core.plugin import PluginType
 
 if t.TYPE_CHECKING:
@@ -40,6 +41,10 @@ def ping(project: Project) -> None:
         # want to waste bandwidth, so we request the list of orchestrators,
         # which is currently very small.
         project.hub_service.get_plugins_of_type(PluginType.ORCHESTRATORS)
+    except MeltanoError:
+        # A Hub error already names the URL, the cause, and what to do next,
+        # so replacing it here would throw that away.
+        raise
     except Exception as ex:
         raise click.ClickException(  # noqa: TRY003
             f"Failed to connect to the Hub at {project.hub_service.hub_api_url!r}",  # noqa: EM102
