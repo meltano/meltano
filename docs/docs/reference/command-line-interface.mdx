@@ -914,7 +914,7 @@ The commands that read from the Hub are [`add`](#add), [`lock`](#lock), `hub lis
 
 ### `list`
 
-Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when no variant is specified. Pass `--all` to list every variant of every plugin.
+Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when no variant is specified. Pass `--all` to list every variant of every plugin, and `--plugin-type` to list one type only.
 
 Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants. A count of what matched, and of any matching variant that was hidden, is logged rather than printed, so it reaches you whichever format the rows are in and `--format json` stays parseable.
 
@@ -954,6 +954,7 @@ meltano hub list --refresh
 ```
 
 ```
+$ meltano hub list
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────
  extractor   tap-google-analytics   meltanolabs
@@ -961,9 +962,8 @@ meltano hub list --refresh
  loader      target-jsonl           andyh1203
 ```
 
-With `--all`, a plugin takes one row for each variant it offers:
-
 ```
+$ meltano hub list --all
  TYPE        NAME                   VARIANT
  ─────────────────────────────────────────────────────────
  extractor   tap-google-analytics   meltanolabs (default)
@@ -971,10 +971,6 @@ With `--all`, a plugin takes one row for each variant it offers:
  extractor   tap-carbon-intensity   meltano
  loader      target-jsonl           andyh1203
 ```
-
-A plugin is named once, however many variants follow it. The JSON output repeats the type and the name on every record.
-
-The JSON output carries the same fields in the same order:
 
 ```json
 [
@@ -986,12 +982,6 @@ The JSON output carries the same fields in the same order:
   }
 ]
 ```
-
-:::info
-
-Meltano Hub indexes one plugin type at a time, so listing every type makes a request for each of them. Pass `--plugin-type` to make a single request.
-
-:::
 
 ### Using `environment` with Environments
 
