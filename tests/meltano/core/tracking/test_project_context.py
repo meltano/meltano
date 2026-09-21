@@ -12,9 +12,10 @@ from meltano.core.utils import hash_sha256
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
     from fixtures.docker import SnowplowMicro
+    from meltano.core.tracking import Tracker
 
 
-def _flush_tracker(obj: dict) -> None:
+def _flush_tracker(obj: dict) -> None:  # pragma: no cover
     """Flush the `Tracker` used for a CLI invocation, if any.
 
     Outside of tests, telemetry events are flushed when the process exits
@@ -23,7 +24,7 @@ def _flush_tracker(obj: dict) -> None:
     it's replicated here to ensure events reach the Snowplow collector
     before this test asserts on them.
     """
-    tracker = obj.get("tracker")
+    tracker: Tracker | None = obj.get("tracker")
     if tracker is not None and tracker.snowplow_tracker is not None:
         tracker.snowplow_tracker.flush()
 
