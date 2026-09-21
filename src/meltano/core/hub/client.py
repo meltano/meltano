@@ -244,6 +244,14 @@ class MeltanoHubService(PluginRepository):
             self.session.headers.update(credentials.auth_header)
             self.cloud_authenticated = True
 
+        if not self.cloud_authenticated and not self.has_configured_hub:
+            logger.info(
+                "Meltano Cloud offers an alternate Hub of first-party "
+                "supported plugins that are actively maintained and tested. "
+                "Log in or sign up to get access by running 'meltano cloud "
+                "auth login'.",
+            )
+
         adapter = HTTPAdapter(
             max_retries=Retry(
                 total=3,
@@ -262,19 +270,27 @@ class MeltanoHubService(PluginRepository):
         self.session.mount("https://", adapter)
 
     @property
+    def has_configured_hub(self) -> bool:
+        """Whether the project points Meltano at a Hub of its own."""
+        if self.project.settings.get("hub_api_root") or self.hub_url_auth:
+            return True
+
+        _, source = self.project.settings.get_with_source("hub_url")
+        return source is not SettingValueStore.DEFAULT
+
+    @property
     def hub_api_url(self) -> str:
         """The URL of the Hub API."""
         if hub_api_root := self.project.settings.get("hub_api_root"):
             return hub_api_root
 
-        hub_url, source = self.project.settings.get_with_source("hub_url")
-
         # A logged in user reads the index that Meltano Cloud serves, which
         # lists the plugins that Meltano supports, maintains and tests. A
         # project that points 'hub_url' at a Hub of its own keeps that one.
-        if self.cloud_authenticated and source is SettingValueStore.DEFAULT:
+        if self.cloud_authenticated and not self.has_configured_hub:
             return CLOUD_API_ROOT
 
+        hub_url = self.project.settings.get("hub_url")
         return f"{hub_url}/meltano/api/v1"
 
     @property
