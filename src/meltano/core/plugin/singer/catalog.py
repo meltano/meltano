@@ -15,11 +15,9 @@ import re
 import sys
 import typing as t
 from enum import Enum, auto
-from functools import partial, singledispatch
+from functools import partial, singledispatchmethod
 
 import structlog
-
-from meltano.core.behavior.visitor import visit_with
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -383,48 +381,6 @@ class SelectionType(StrEnum):
         return SelectionType.SELECTED
 
 
-@singledispatch
-def visit(
-    node: t.Any,  # noqa: ANN401, ARG001
-    executor: CatalogExecutor,  # noqa: ARG001
-    path: str = "",
-) -> None:
-    """Visit a node in the catalog."""
-    logger.debug("Skipping node at '%s'", path)
-
-
-@visit.register(dict)
-def _(node: dict, executor, path: str = "") -> None:  # noqa: ANN001
-    node_type = None
-
-    if re.search(r"streams\[\d+\]$", path):
-        node_type = CatalogNode.STREAM
-
-    if re.search(r"schema(\.properties\.\w*)+$", path):
-        node_type = CatalogNode.PROPERTY
-
-    if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
-        node_type = CatalogNode.METADATA
-
-    if node_type:
-        logger.debug("Visiting %s at '%s'.", node_type, path)
-        executor(node_type, node, path)
-
-    for child_path, child_node in node.items():
-        if node_type is CatalogNode.PROPERTY and child_path in {"anyOf", "type"}:
-            continue
-
-        # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
-        executor.visit(child_node, path=f"{path}.{child_path}")
-
-
-@visit.register(list)
-def _(node: list, executor, path: str = "") -> None:  # noqa: ANN001
-    for index, child_node in enumerate(node):
-        executor.visit(child_node, path=f"{path}[{index}]")
-
-
-@visit_with(visit)
 class CatalogExecutor:
     """Base executor class for traversing and processing Singer catalog nodes.
 
@@ -441,6 +397,44 @@ class CatalogExecutor:
     Subclasses should override the specific node processing methods to implement
     their custom catalog manipulation logic.
     """
+
+    @singledispatchmethod
+    def visit(
+        self,
+        node: t.Any,  # noqa: ANN401  # ruff: ignore[unused-method-argument]
+        path: str = "",
+    ) -> None:
+        """Visit a node in the catalog."""
+        logger.debug("Skipping node at '%s'", path)
+
+    @visit.register(dict)
+    def _(self, node: dict, path: str = "") -> None:
+        node_type = None
+
+        if re.search(r"streams\[\d+\]$", path):
+            node_type = CatalogNode.STREAM
+
+        if re.search(r"schema(\.properties\.\w*)+$", path):
+            node_type = CatalogNode.PROPERTY
+
+        if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
+            node_type = CatalogNode.METADATA
+
+        if node_type:
+            logger.debug("Visiting %s at '%s'.", node_type, path)
+            self.execute(node_type, node, path)
+
+        for child_path, child_node in node.items():
+            if node_type is CatalogNode.PROPERTY and child_path in {"anyOf", "type"}:
+                continue
+
+            # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
+            self.visit(child_node, path=f"{path}.{child_path}")
+
+    @visit.register(list)
+    def _(self, node: list, path: str = "") -> None:
+        for index, child_node in enumerate(node):
+            self.visit(child_node, path=f"{path}[{index}]")
 
     def execute(self, node_type: CatalogNode, node: Node, path: str) -> None:
         """Dispatch all node methods."""
@@ -473,10 +467,6 @@ class CatalogExecutor:
 
     def property_metadata_node(self, node: Node, path: str) -> None:
         """Process property metadata node."""
-
-    def __call__(self, node_type: CatalogNode, node: Node, path: str) -> None:
-        """Call this instance as a function."""
-        return self.execute(node_type, node, path)
 
 
 class MetadataExecutor(CatalogExecutor):
