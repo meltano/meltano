@@ -110,7 +110,7 @@ jobs:
         uv run bash integration/validate.sh "$INTEGRATION_TEST_NAME"
 
   ci:
-    name: CI required checks
+    name: CI required checks (integration tests)
     if: always()
     needs:
     - files-changed

@@ -241,7 +241,7 @@ jobs:
         nox -rs typing
 
   ci:
-    name: CI required checks
+    name: CI required checks (unit tests)
     if: always()
     needs:
     - files-changed
