@@ -110,7 +110,7 @@ class NotFound(MeltanoError):
         super().__init__(msg)
 
 
-class IncompatibleMeltanoVersionError(Exception):
+class IncompatibleMeltanoVersionError(MeltanoError):
     """A component is incompatible with the Meltano version."""
 
     def __init__(self, message: str, required_version: str, current_version: str):

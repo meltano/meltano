@@ -241,7 +241,7 @@ class TestPluginCompatibility:
         error = exc_info.value
         current_version = get_meltano_version()
         expected_message = (
-            f"Project requires Meltano ==999.0.0, but {current_version} is installed"
+            f"Project requires Meltano ==999.0.0, but {current_version} is installed."
         )
         assert str(error) == expected_message
         assert isinstance(error, IncompatibleMeltanoVersionError)
