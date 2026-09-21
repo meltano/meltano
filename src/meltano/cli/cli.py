@@ -136,7 +136,7 @@ def cli(
     try:
         project = Project.find(dotenv_file=env_file)
         setup_logging(project)
-        logger.debug(
+        logger.info(
             "Meltano %s, Python %s, %s (%s)",
             get_meltano_version(),
             platform.python_version(),
