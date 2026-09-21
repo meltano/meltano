@@ -909,6 +909,8 @@ Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://h
 :::info Meltano Cloud account required
 Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
 
+A logged in user reads the Hub that Meltano Cloud serves, which lists the plugins that Meltano supports, maintains and tests. A project that sets [`hub_url`](/reference/settings/#hub_url) or [`hub_api_root`](/reference/settings/#hub_api_root) keeps the Hub it names.
+
 The commands that read from the Hub are [`add`](#add), [`lock`](#lock), `hub list` and `hub ping`. A project that already has [lock artifacts](/concepts/plugins#lock-artifacts) is unaffected, because [`install`](#install) and [`run`](#run) do not contact the Hub.
 :::
 
