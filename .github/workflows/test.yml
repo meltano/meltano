@@ -68,16 +68,17 @@ jobs:
         - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py312-ubuntu-psycopg3' }
         - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py313-ubuntu-psycopg3' }
         - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py314-ubuntu-psycopg3' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
-        - { python-version: '3.14', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
+        - { python-version: '3.15', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py315-ubuntu-psycopg3' }
+        - { python-version: '3.15', os: ubuntu-24.04-arm, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
+        - { python-version: '3.15', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
         # Additional tests for supported platforms and backends
         - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py310-ubuntu-psycopg2' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py314-ubuntu-psycopg2' }
+        - { python-version: '3.15', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py315-ubuntu-psycopg2' }
         - { python-version: '3.10', os: ubuntu-latest, backend-db: mssql, id: 'py310-ubuntu-mssql' }
-        - { python-version: '3.14', os: ubuntu-latest, backend-db: mssql, id: 'py314-ubuntu-mssql' }
+        - { python-version: '3.15', os: ubuntu-latest, backend-db: mssql, id: 'py315-ubuntu-mssql' }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         - { python-version: '3.10', os: windows-2025,  backend-db: sqlite, id: 'py310-windows-sqlite' }
-        - { python-version: '3.14', os: windows-2025,  backend-db: sqlite, id: 'py314-windows-sqlite' }
+        - { python-version: '3.15', os: windows-2025,  backend-db: sqlite, id: 'py315-windows-sqlite' }
 
       fail-fast: false
 
