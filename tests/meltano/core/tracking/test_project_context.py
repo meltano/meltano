@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+from time import monotonic, sleep
 
 import pytest
 
@@ -13,11 +14,21 @@ if t.TYPE_CHECKING:
     from fixtures.docker import SnowplowMicro
 
 
-# TODO: Fix this flaky test
-@pytest.mark.xfail(
-    reason="Rather flaky, seems to be polluted by other tests",
-    strict=False,
-)
+def _good_events(snowplow: SnowplowMicro, *, timeout: float = 10.0) -> list[dict]:
+    """Poll Snowplow Micro for good events, allowing for its async processing.
+
+    Snowplow Micro returns HTTP 200 for a submitted event before it has
+    finished validating and storing it, so querying `good()` immediately
+    after sending events is prone to a race condition.
+    """
+    deadline = monotonic() + timeout
+    events = snowplow.good()
+    while not events and monotonic() < deadline:  # pragma: no cover
+        sleep(0.1)
+        events = snowplow.good()
+    return events
+
+
 @pytest.mark.parametrize(
     ("cmd", "expected"),
     (
@@ -44,7 +55,9 @@ def test_environment_name_hash(
 ) -> None:
     results = cli_runner.invoke(cli, cmd.split())
     assert_cli_runner(results)
-    for event in snowplow.good():
+    good_events = _good_events(snowplow)
+    assert good_events
+    for event in good_events:
         project_context = next(
             ctx
             for ctx in event["event"]["contexts"]["data"]
