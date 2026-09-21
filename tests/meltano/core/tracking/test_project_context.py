@@ -14,6 +14,20 @@ if t.TYPE_CHECKING:
     from fixtures.docker import SnowplowMicro
 
 
+def _flush_tracker(obj: dict) -> None:
+    """Flush the `Tracker` used for a CLI invocation, if any.
+
+    Outside of tests, telemetry events are flushed when the process exits
+    (see `meltano.cli.main`). Since `CliRunner.invoke` runs the CLI
+    in-process without going through `main`, that flush never happens, so
+    it's replicated here to ensure events reach the Snowplow collector
+    before this test asserts on them.
+    """
+    tracker = obj.get("tracker")
+    if tracker is not None and tracker.snowplow_tracker is not None:
+        tracker.snowplow_tracker.flush()
+
+
 def _good_events(snowplow: SnowplowMicro, *, timeout: float = 10.0) -> list[dict]:
     """Poll Snowplow Micro for good events, allowing for its async processing.
 
@@ -53,8 +67,13 @@ def test_environment_name_hash(
     snowplow: SnowplowMicro,
     cli_runner: MeltanoCliRunner,
 ) -> None:
-    results = cli_runner.invoke(cli, cmd.split())
+    # `ctx.obj` is populated by the `cli` group callback, e.g. with the
+    # `Tracker` used for this invocation. Passing our own dict lets us
+    # inspect it after `invoke` returns, since it's mutated in place.
+    obj: dict = {}
+    results = cli_runner.invoke(cli, cmd.split(), obj=obj)
     assert_cli_runner(results)
+    _flush_tracker(obj)
     good_events = _good_events(snowplow)
     assert good_events
     for event in good_events:
