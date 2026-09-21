@@ -50,7 +50,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#10005](https://github.com/meltano/meltano/issues/10005) Avoid displaying noisy traceback when trying to modify a read-only project
 - [#9875](https://github.com/meltano/meltano/issues/9875) Handle non-unicode characters in plugin logs -- _**Thanks @toroleapinc!**_
 - [#9993](https://github.com/meltano/meltano/issues/9993) Add a trailing newline character to manifest files produced by `meltano compile`
-- [#9992](https://github.com/meltano/meltano/issues/9992) Parse strucuted logs coming from mapper plugins
+- [#9992](https://github.com/meltano/meltano/issues/9992) Parse structured logs coming from mapper plugins
 - [#9971](https://github.com/meltano/meltano/issues/9971) Improve `meltano config test` error message with helpful hint -- _**Thanks @Sharanjoo!**_
 - [#9958](https://github.com/meltano/meltano/issues/9958) Bump `rich` to 15.x
 
