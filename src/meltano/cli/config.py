@@ -46,6 +46,8 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     from meltano.cli.params import InstallPlugins
     from meltano.core.plugin import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -310,6 +312,13 @@ def get_label(metadata, source) -> str:  # noqa: ANN001
         return f"from {source.label}"
 
 
+def _cli_db_session(project: Project, *, ctx: click.Context) -> Session:
+    _, make_session = project_engine(project)
+    session = make_session()
+    ctx.with_resource(session)
+    return session
+
+
 class StoreArg(click.Choice):
     """A click.Choice for the --store flag."""
 
@@ -378,11 +387,7 @@ def print_config(
 ) -> None:
     """Print a plugin's configuration."""
     safe: bool = ctx.obj["safe"]
-
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
-    ctx.obj["session"] = session
-    ctx.with_resource(session)
+    session = _cli_db_session(project, ctx=ctx)
 
     plugin = _get_plugin(
         project=project,
@@ -474,10 +479,7 @@ def list_settings(
     if filter_pattern is not None:
         filter_pattern = filter_pattern.strip() or None
 
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
-    ctx.obj["session"] = session
-    ctx.with_resource(session)
+    session = _cli_db_session(project, ctx=ctx)
 
     plugin = _get_plugin(
         project=project,
@@ -642,11 +644,7 @@ def reset(
 ) -> None:
     """Clear the configuration (back to defaults)."""
     tracker: Tracker = ctx.obj["tracker"]
-
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
-    ctx.obj["session"] = session
-    ctx.with_resource(session)
+    session = _cli_db_session(project, ctx=ctx)
 
     plugin = _get_plugin(
         project=project,
@@ -699,10 +697,7 @@ def set_(
 
     plugin_name = plugin_name or click.prompt("Plugin name", type=str)
 
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
-    ctx.obj["session"] = session
-    ctx.with_resource(session)
+    session = _cli_db_session(project, ctx=ctx)
 
     plugin = _get_plugin(
         project=project,
@@ -759,11 +754,7 @@ async def test(
 ) -> None:
     """Test the configuration of a plugin."""
     tracker: Tracker = ctx.obj["tracker"]
-
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
-    ctx.obj["session"] = session
-    ctx.with_resource(session)
+    session = _cli_db_session(project, ctx=ctx)
 
     plugin = _get_plugin(
         project=project,
@@ -833,11 +824,7 @@ def unset(
     """Unset the configurations' setting called `<name>`."""
     safe: bool = ctx.obj["safe"]
     tracker: Tracker = ctx.obj["tracker"]
-
-    _, Session = project_engine(project)  # noqa: N806
-    session = Session()
-    ctx.obj["session"] = session
-    ctx.with_resource(session)
+    session = _cli_db_session(project, ctx=ctx)
 
     plugin = _get_plugin(
         project=project,

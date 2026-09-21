@@ -176,7 +176,7 @@ def cli(
             "For more details, visit "
             "https://docs.meltano.com/guide/installation#upgrading-meltano-version",
         )
-        sys.exit(3)
+        ctx.exit(3)
 
 
 def detect_selected_environment(  # noqa: D417

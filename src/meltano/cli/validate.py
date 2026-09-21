@@ -96,11 +96,13 @@ class CommandLineRunner(ValidationsRunner):
 @install
 @no_install
 @only_install
+@click.pass_context
 @pass_project(migrate=True)
 @run_async
 async def test(
     project: Project,
     *,
+    ctx: click.Context,
     all_tests: bool,
     install_plugins: InstallPlugins,
     plugin_tests: tuple[str, ...],
@@ -112,6 +114,7 @@ async def test(
     """  # noqa: D301
     _, session_maker = project_engine(project)
     session = session_maker()
+    ctx.with_resource(session)
 
     collected = CommandLineRunner.collect(project, select_all=all_tests)
 
@@ -134,7 +137,7 @@ async def test(
 
     exit_codes = await _run_plugin_tests(session, collected.values())
     click.echo()
-    _report_and_exit(exit_codes)
+    _report_and_exit(exit_codes, ctx=ctx)
 
 
 async def _run_plugin_tests(
@@ -144,7 +147,7 @@ async def _run_plugin_tests(
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
 
-def _report_and_exit(results: dict[str, dict[str, int]]) -> None:
+def _report_and_exit(results: dict[str, dict[str, int]], ctx: click.Context) -> None:
     exit_code = 0
     failed_count = 0
     passed_count = 0
@@ -169,4 +172,4 @@ def _report_and_exit(results: dict[str, dict[str, int]]) -> None:
 
     write_sep_line(message, "=", fg=("red" if exit_code else "green"))
 
-    sys.exit(exit_code)
+    ctx.exit(exit_code)

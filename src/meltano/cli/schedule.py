@@ -315,7 +315,7 @@ def run(ctx: click.Context, name: str, elt_options: tuple[str]) -> None:
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     process = schedule_service.run(schedule_service.find_schedule(name), *elt_options)
     if process.returncode:
-        sys.exit(process.returncode)
+        ctx.exit(process.returncode)
 
 
 @schedule.command(

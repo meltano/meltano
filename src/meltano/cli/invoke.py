@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import sys
 import typing as t
 
 import click
@@ -164,7 +163,7 @@ async def invoke(
         tracker.track_command_event(CliEvent.completed)
     else:
         tracker.track_command_event(CliEvent.failed)
-    sys.exit(exit_code)
+    ctx.exit(exit_code)
 
 
 class _LogOutputHandler:

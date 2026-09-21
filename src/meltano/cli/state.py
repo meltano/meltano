@@ -126,6 +126,7 @@ def meltano_state(project: Project, ctx: click.Context) -> None:
     """  # noqa: D301
     _, sessionmaker = project_engine(project)
     session = sessionmaker(future=True)
+    ctx.with_resource(session)
     ctx.obj[STATE_SERVICE_KEY] = ctx.with_resource(StateService(project, session))
 
 
