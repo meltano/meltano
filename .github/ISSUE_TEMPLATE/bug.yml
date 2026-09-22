@@ -6,8 +6,6 @@ labels:
   - flow::triage
   - valuestream/Meltano
 type: Fix
-assignees:
-  - edgarrmondragon
 
 body:
   - type: markdown
@@ -28,6 +26,8 @@ body:
       label: Python Version
       description: Version of Python you are using
       options:
+        - "3.15"
+        - "3.14"
         - "3.13"
         - "3.12"
         - "3.11"
