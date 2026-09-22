@@ -207,7 +207,7 @@ class SettingValueStore(StrEnum):
         """Whether this store is writable."""
         return self.manager.writable
 
-    def overrides(self, source: SettingValueStore) -> bool:
+    def overrides(self, source: Self) -> bool:
         """Check if given source overrides this instance.
 
         Args:
@@ -216,10 +216,10 @@ class SettingValueStore(StrEnum):
         Returns:
             True if given source takes precedence over this store.
         """
-        stores_list = list(self.__class__)
+        stores_list: list[SettingValueStore] = list(self.__class__)
         return stores_list.index(self) < stores_list.index(source)
 
-    def can_overwrite(self, source: SettingValueStore) -> bool:
+    def can_overwrite(self, source: Self) -> bool:
         """Check if source can overwrite.
 
         Args:

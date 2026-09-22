@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.2.2"
+version = "4.3.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -30,7 +30,7 @@ dependencies = [
   "alembic>=1.14.0,<2",
   "anyio>=4.4.0,<5",
   "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
-  "click>=8.2,<8.5,!=8.2.2",
+  "click>=8.2,<8.6,!=8.2.2",
   "click-default-group>=1.2.4,<2",
   "dateparser>=1.2.1",
   "fasteners>=0.19,<0.21",
@@ -74,11 +74,12 @@ psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
 s3 = ["boto3>=1.35,<2"]
 
 [project.urls]
-Homepage = "https://meltano.com"
-Repository = "https://github.com/meltano/meltano"
-Documentation = "https://docs.meltano.com"
 Changelog = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
+Documentation = "https://docs.meltano.com"
+Homepage = "https://meltano.com"
 "Issue Tracker" = "https://github.com/meltano/meltano/issues"
+Repository = "https://github.com/meltano/meltano"
+Security = "https://github.com/meltano/.github/blob/main/SECURITY.md"
 Slack = "https://meltano.com/slack"
 Twitter = "https://twitter.com/meltanodata/"
 Youtube = "https://www.youtube.com/meltano"
@@ -132,12 +133,11 @@ testing = [
   "pytest-codspeed>=4.2.0",
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
-  "pytest-randomly>=3.16,<5.0",
+  "pytest-randomly>=5,<5.1",
   "pytest-structlog~=1.1",
   "pytest-timeout>=2.4.0",
   "pytest-xdist~=3.6",
   "requests-mock>=1.12.1,<2",
-  "setproctitle~=1.3", # Used by pytest-xdist to aid with handling resource intensive processes.
   "time-machine>=3",
 ]
 typing = [
@@ -146,7 +146,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=2.1,<2.4",
-  "ty==0.0.69",
+  "ty==0.0.81",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -178,6 +178,7 @@ filterwarnings = [
   '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
   'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
   # Third-party warnings
+  'once::ResourceWarning',
 ]
 log_level = "INFO"
 markers = [
@@ -241,7 +242,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.2.2"
+version = "4.3.0"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
@@ -331,7 +332,7 @@ exclude = [
 ]
 
 [build-system]
-requires = ["hatchling==1.31.0"]
+requires = ["hatchling==1.32.0"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
@@ -410,6 +411,8 @@ unfixable = [
   "ANN",
   "D1",
   "assert",    # Allow 'assert' in tests
+  "hardcoded-password-func-arg",  # Allow dummy credentials in test fixtures
+  "hardcoded-password-string",    # Allow dummy credentials in test fixtures
   "INP",     # Don't require __init__.py files in tests directories
   "root-logger-call",  # Allow `logging.<level>` in tests
   "fallible-context-manager",
@@ -458,7 +461,8 @@ ignore = [
 
 [tool.uv]
 override-dependencies = [
-  "sqlalchemy>=2.1.0.dev0,<2.2",
+  "sqlalchemy>=2.0.35,<2.1 ; python_version < '3.11'",
+  "sqlalchemy>=2.1.0rc1,<2.2 ; python_version >= '3.11'",
 ]
 prerelease = "if-necessary"
 required-version = ">=0.9.17"

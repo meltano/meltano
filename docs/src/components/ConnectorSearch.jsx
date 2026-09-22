@@ -11,6 +11,15 @@ const CONNECTORS = [
   { label: 'Spreadsheets (IMAP)', href: '/connectors/tap-spreadsheets-imap', category: 'extractor' },
   { label: 'Weather API', href: '/connectors/tap-weatherapi', category: 'extractor' },
   { label: 'ClickHouse', href: '/connectors/target-clickhouse', category: 'loader' },
+  { label: 'Aptem', href: '/connectors/tap-aptem', category: 'extractor' },
+  { label: 'Baidu', href: '/connectors/tap-baidu', category: 'extractor' },
+  { label: 'Google BigQuery', href: '/connectors/target-bigquery', category: 'loader' },
+  { label: 'Google Analytics', href: '/connectors/tap-google-analytics', category: 'extractor' },
+  { label: 'Google Ads', href: '/connectors/tap-googleads', category: 'extractor' },
+  { label: 'MotherDuck', href: '/connectors/target-motherduck', category: 'loader' },
+  { label: 'Nextdoor', href: '/connectors/tap-nextdoor', category: 'extractor' },
+  { label: 'PostgreSQL', href: '/connectors/tap-postgres', category: 'extractor' },
+  { label: 'Snowflake', href: '/connectors/tap-snowflake', category: 'extractor' },
 ];
 
 function ConnectorCardTitle({ label }) {

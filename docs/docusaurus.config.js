@@ -9,6 +9,8 @@ const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
+  organizationName: 'Meltano',
+  projectName: 'meltano',
   title: 'Meltano Documentation',
   tagline: '',
   url: 'https://docs.meltano.com',
@@ -38,9 +40,9 @@ const config = {
       /** @type {import('@docusaurus/plugin-content-blog').PluginOptions} */
       ({
         id: 'cloudChangelog',
-        routeBasePath: 'changelog/cloud',
+        routeBasePath: 'releases/cloud',
         path: './cloud-changelog',
-        blogTitle: 'Changelog',
+        blogTitle: 'Releases',
         blogSidebarTitle: 'All Releases',
         blogDescription: '',
         postsPerPage: 20,
@@ -63,8 +65,8 @@ const config = {
           editUrl: 'https://github.com/meltano/meltano/blob/main/docs',
         },
         blog: {
-          routeBasePath: '/changelog',
-          blogTitle: 'Changelog',
+          routeBasePath: '/releases',
+          blogTitle: 'Releases',
           blogSidebarTitle: 'All Releases',
           blogDescription: '',
           postsPerPage: 20,
@@ -128,12 +130,12 @@ const config = {
             activeBasePath: '/connectors',
           },
           {
-            to: '/changelog/cloud',
-            label: 'Changelog',
+            to: '/releases/cloud',
+            label: 'Releases',
             position: 'left',
             className: 'header-changelog-link',
-            'aria-label': 'Changelog',
-            activeBasePath: '/changelog',
+            'aria-label': 'Releases',
+            activeBasePath: '/releases',
           },
           {
             href: 'https://github.com/meltano/meltano',
