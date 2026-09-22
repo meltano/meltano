@@ -112,6 +112,13 @@ def cli(
     Read more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D301, D415
     ctx.ensure_object(dict)
+    logger.info(
+        "Meltano %s, Python %s, %s (%s)",
+        get_meltano_version(),
+        platform.python_version(),
+        platform.system(),
+        platform.machine(),
+    )
 
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
@@ -136,13 +143,6 @@ def cli(
     try:
         project = Project.find(dotenv_file=env_file)
         setup_logging(project)
-        logger.info(
-            "Meltano %s, Python %s, %s (%s)",
-            get_meltano_version(),
-            platform.python_version(),
-            platform.system(),
-            platform.machine(),
-        )
         if project.readonly:
             logger.debug("Project is read-only.")
 
