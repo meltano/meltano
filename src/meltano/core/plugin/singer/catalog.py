@@ -15,7 +15,7 @@ import re
 import sys
 import typing as t
 from enum import Enum, auto
-from functools import partial, singledispatchmethod
+from functools import partial
 
 import structlog
 
@@ -394,47 +394,50 @@ class CatalogExecutor:
     - Property nodes: Schema property definitions within streams
     - Metadata nodes: Selection and inclusion metadata for streams and properties
 
+    Rather than sniffing every dict in the tree with regexes to guess what kind
+    of node it is, traversal follows the known shape of a catalog: a stream has
+    a `schema.properties` tree and a `metadata` list, and a property may have
+    its own nested `properties` tree. Each node type is visited by the method
+    that knows what its children mean, so no other keys are ever traversed.
+
     Subclasses should override the specific node processing methods to implement
     their custom catalog manipulation logic.
     """
 
-    @singledispatchmethod
-    def visit(
-        self,
-        node: t.Any,  # noqa: ANN401  # ruff: ignore[unused-method-argument]
-        path: str = "",
-    ) -> None:
-        """Visit a node in the catalog."""
-        logger.debug("Skipping node at '%s'", path)
+    def visit(self, catalog: CatalogDict) -> None:
+        """Visit every stream in a catalog."""
+        for index, stream in enumerate(catalog.get("streams", [])):
+            self.visit_stream(stream, path=f"streams[{index}]")
 
-    @visit.register(dict)
-    def _(self, node: dict, path: str = "") -> None:
-        node_type = None
+    def visit_stream(self, node: Node, path: str) -> None:
+        """Visit a stream node, then its properties and metadata."""
+        logger.debug("Visiting %s at '%s'.", CatalogNode.STREAM, path)
+        self.execute(CatalogNode.STREAM, node, path)
 
-        if re.search(r"streams\[\d+\]$", path):
-            node_type = CatalogNode.STREAM
+        schema = node.get(SCHEMA_KEY) or {}
+        self.visit_properties(schema.get(PROPERTIES_KEY) or {}, path=f"{path}.schema")
+        self.visit_metadata(node.get("metadata") or [], path=path)
 
-        if re.search(r"schema(\.properties\.\w*)+$", path):
-            node_type = CatalogNode.PROPERTY
+    def visit_properties(self, properties: Node, path: str) -> None:
+        """Visit each property node, recursing into nested properties."""
+        for name, prop_node in properties.items():
+            prop_path = f"{path}.{PROPERTIES_KEY}.{name}"
+            logger.debug("Visiting %s at '%s'.", CatalogNode.PROPERTY, prop_path)
+            self.execute(CatalogNode.PROPERTY, prop_node, prop_path)
 
-        if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
-            node_type = CatalogNode.METADATA
+            nested_properties = prop_node.get(PROPERTIES_KEY)
+            if isinstance(nested_properties, dict):
+                self.visit_properties(nested_properties, path=prop_path)
 
-        if node_type:
-            logger.debug("Visiting %s at '%s'.", node_type, path)
-            self.execute(node_type, node, path)
-
-        for child_path, child_node in node.items():
-            if node_type is CatalogNode.PROPERTY and child_path in {"anyOf", "type"}:
+    def visit_metadata(self, metadata_list: list[Node], path: str) -> None:
+        """Visit each metadata entry in a stream's metadata list."""
+        for index, metadata_node in enumerate(metadata_list):
+            if "breadcrumb" not in metadata_node:
                 continue
 
-            # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
-            self.visit(child_node, path=f"{path}.{child_path}")
-
-    @visit.register(list)
-    def _(self, node: list, path: str = "") -> None:
-        for index, child_node in enumerate(node):
-            self.visit(child_node, path=f"{path}[{index}]")
+            metadata_path = f"{path}.metadata[{index}]"
+            logger.debug("Visiting %s at '%s'.", CatalogNode.METADATA, metadata_path)
+            self.execute(CatalogNode.METADATA, metadata_node, metadata_path)
 
     def execute(self, node_type: CatalogNode, node: Node, path: str) -> None:
         """Dispatch all node methods."""
