@@ -12,6 +12,7 @@ from unittest import mock
 
 import pytest
 import requests
+import structlog
 from requests.adapters import BaseAdapter
 
 from meltano.core.hub.client import MeltanoHubService
@@ -25,6 +26,14 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logging.basicConfig(level=logging.INFO)
+
+# Without this, structlog falls back to its library default: a non-filtering
+# `BoundLogger` over `PrintLogger`, which prints every event (including
+# `debug`) straight to stdout regardless of the `logging` module's levels
+# set above. Real `meltano` CLI invocations never hit that default because
+# importing `meltano.cli` eagerly calls `setup_logging()`, which wires
+# structlog through stdlib `logging` at the `info` level.
+structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.INFO))
 
 PYTEST_BACKEND = os.getenv("PYTEST_BACKEND", "sqlite")
 
