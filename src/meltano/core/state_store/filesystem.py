@@ -370,7 +370,6 @@ class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     def label(self) -> str:
         return "Local Filesystem"  # pragma: no cover
 
-    @override
     def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
