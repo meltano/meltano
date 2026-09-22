@@ -51,13 +51,15 @@ meltano hub list --all
 meltano hub list --format json
 meltano hub list --all --format json
 meltano hub list --refresh
+```
 
-When authenticated with Meltano Cloud, Meltano uses the Meltano Cloud Hub plugin catalog to resolve plugin definitions and their default variants. For example:
-meltano add --plugin-type extractor tap-github
 When authenticated with Meltano Cloud, Meltano uses the Meltano Cloud Hub plugin catalog to resolve plugin definitions and their default variants. For example:
 
 ```bash
 meltano add tap-github
+```
+
+Note: Some plugin variants are only available on Meltano Cloud Hub and not Meltano Hub, and vice versa.
 
 ### Existing Hub Configurations Continue to Work
 
