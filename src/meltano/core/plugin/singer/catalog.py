@@ -385,12 +385,11 @@ class SelectionType(StrEnum):
 
 @singledispatch
 def visit(
-    node: t.Any,  # noqa: ANN401, ARG001
-    executor: CatalogExecutor,  # noqa: ARG001
+    node: t.Any,  # noqa: ANN401
+    executor: CatalogExecutor,
     path: str = "",
 ) -> None:
     """Visit a node in the catalog."""
-    logger.debug("Skipping node at '%s'", path)
 
 
 @visit.register(dict)
@@ -407,7 +406,6 @@ def _(node: dict, executor, path: str = "") -> None:  # noqa: ANN001
         node_type = CatalogNode.METADATA
 
     if node_type:
-        logger.debug("Visiting %s at '%s'.", node_type, path)
         executor(node_type, node, path)
 
     for child_path, child_node in node.items():
@@ -558,12 +556,6 @@ class MetadataExecutor(CatalogExecutor):
         """Process metadata node."""
         tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]  # ty:ignore[not-subscriptable]
         breadcrumb = node["breadcrumb"]
-
-        logger.debug(
-            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",
-            tap_stream_id,
-            breadcrumb,
-        )
 
         for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_metadata(
