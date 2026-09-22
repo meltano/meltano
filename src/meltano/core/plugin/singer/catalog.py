@@ -48,6 +48,9 @@ SCHEMA_KEY = "schema"
 INCLUSION_KEY = "inclusion"
 SELECTED_KEY = "selected"
 SELECTED_BY_DEFAULT_KEY = "selected-by-default"
+STREAM_PATH_PATTERN = re.compile(r"streams\[\d+\]$")
+PROPERTY_PATH_PATTERN = re.compile(r"schema(\.properties\.\w*)+$")
+METADATA_PATH_PATTERN = re.compile(r"metadata\[\d+\]$")
 
 
 class CatalogDict(t.TypedDict):
@@ -397,13 +400,13 @@ def visit(
 def _(node: dict, executor, path: str = "") -> None:  # noqa: ANN001
     node_type = None
 
-    if re.search(r"streams\[\d+\]$", path):
+    if STREAM_PATH_PATTERN.search(path):
         node_type = CatalogNode.STREAM
 
-    if re.search(r"schema(\.properties\.\w*)+$", path):
+    if PROPERTY_PATH_PATTERN.search(path):
         node_type = CatalogNode.PROPERTY
 
-    if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
+    if METADATA_PATH_PATTERN.search(path) and "breadcrumb" in node:
         node_type = CatalogNode.METADATA
 
     if node_type:
