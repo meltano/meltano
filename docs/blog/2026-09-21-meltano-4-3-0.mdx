@@ -45,7 +45,7 @@ Meltano Hub remains available when you're logged out, so you can continue to exp
 
 ### Discover and Add Plugins
 
-The Meltano Cloud Hub plugin catalog can be searched and inspected directly from the CLI:
+The configured Hub plugin catalog can be searched and inspected directly from the CLI:
 
 ```bash
 meltano hub list tap-github
@@ -54,8 +54,7 @@ meltano hub list --format json
 meltano hub list --all --format json
 meltano hub list --refresh
 ```
-
-When adding a plugin while authenticated, Meltano uses the Meltano Cloud Hub plugin catalog to resolve the plugin definition and its default variant. For example:
+When authenticated, Meltano uses the Meltano Cloud Hub plugin catalog to resolve plugin definitions and their default variants. For example:
 
 ```bash
 meltano add --plugin-type extractor tap-github
