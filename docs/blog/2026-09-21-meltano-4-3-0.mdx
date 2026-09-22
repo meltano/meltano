@@ -1,0 +1,97 @@
+---
+slug: meltano-4-3-0
+title: Meltano 4.3.0
+date: 2026-09-21
+---
+
+Meltano 4.3.0 introduces authenticated access to a curated Meltano Cloud plugin catalog, giving Meltano Cloud users a simpler way to discover and add first-party plugins supported, maintained, and tested by Meltano.
+
+{/* truncate */}
+
+## Meltano
+
+We're excited to announce the release of Meltano 4.3.0! This release introduces Meltano Cloud authentication and a curated plugin catalog directly from the Meltano CLI.
+
+### Meltano Cloud Authentication
+
+Meltano Cloud accounts are now used to authenticate access to the curated Cloud plugin catalog. Meltano Cloud accounts are free, and you don't need a subscription to use the catalog.
+
+To sign in, run:
+
+```bash
+meltano cloud auth login
+```
+
+This opens your browser, where you can sign in with an existing Meltano Cloud account or create a new one. You can check your authentication status or log out using:
+
+```bash
+meltano cloud auth status
+meltano cloud auth logout
+```
+
+### Curated Cloud Plugin Catalog
+
+When you're authenticated with Meltano Cloud, `meltano hub list` uses the Cloud plugin catalog instead of the public Hub catalog.
+
+The Cloud catalog contains plugins that Meltano supports, maintains, and tests. This gives users a curated starting point when choosing plugins for their projects.
+
+For example:
+
+```bash
+meltano hub list
+```
+
+When logged in, this returns the curated Cloud catalog rather than the complete public Hub catalog.
+
+The public Hub remains available when you're logged out, so you can continue to explore the full set of plugins available in the Hub.
+
+### Discover and Add Plugins
+
+The Cloud catalog can be searched and inspected directly from the CLI:
+
+```bash
+meltano hub list tap-github
+meltano hub list --all
+meltano hub list --format json
+meltano hub list --all --format json
+meltano hub list --refresh
+```
+
+When adding a plugin while authenticated, Meltano uses the Cloud catalog to resolve the plugin definition and its default variant. For example:
+
+```bash
+meltano add --plugin-type extractor tap-github
+```
+
+The Cloud catalog can specify a different default variant from the public Hub while still allowing users to select another variant when needed.
+
+### Existing Hub Configurations Continue to Work
+
+The Cloud catalog is only used when the user is authenticated and no other Hub configuration takes precedence.
+
+Existing projects using a custom Hub or Hub authentication continue to work as before. The Hub configuration precedence is:
+
+1. `hub_api_root`
+2. `hub_url_auth`
+3. Explicit `hub_url`
+4. Meltano Cloud authentication
+5. Public Meltano Hub
+
+This means logging in to Meltano Cloud does not override an explicitly configured Hub.
+
+### Plugin List
+
+Meltano 4.3.0 also provides `meltano plugin list` for viewing the plugins currently configured in a project:
+
+```bash
+meltano plugin list
+meltano plugin list --format json
+```
+
+The default text output is intended for interactive use, while JSON output can be used for scripting and automation.
+
+### Thank You
+
+Thank you to all the contributors who made this release possible!
+
+For the complete list of changes, see the [Meltano 4.3.0 release notes](https://github.com/meltano/meltano/releases/tag/v4.3.0).
