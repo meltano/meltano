@@ -14,7 +14,7 @@ We're excited to announce the release of Meltano 4.3.0! This release introduces 
 
 ### Meltano Cloud Authentication
 
-Meltano Cloud accounts are now used to authenticate access to the curated Meltano Cloud hub plugin catalog. Meltano Cloud accounts are free, and you don't need a subscription to use the catalog.
+Meltano Cloud accounts are now used to authenticate access to the curated Meltano Cloud Hub plugin catalog. Meltano Cloud accounts are free, and you don't need a subscription to use the catalog.
 
 To sign in, run:
 
@@ -41,13 +41,13 @@ For example:
 meltano hub list
 ```
 
-When logged in, this returns the curated Meltano Cloud hub plugin catalog rather than the complete public Hub catalog.
+When logged in, this returns the curated Meltano Cloud Hub plugin catalog rather than the complete public Hub catalog.
 
 The public Hub remains available when you're logged out, so you can continue to explore the full set of plugins available in the Hub.
 
 ### Discover and Add Plugins
 
-The Meltano Cloud hub plugin catalog can be searched and inspected directly from the CLI:
+The Meltano Cloud Hub plugin catalog can be searched and inspected directly from the CLI:
 
 ```bash
 meltano hub list tap-github
@@ -57,17 +57,17 @@ meltano hub list --all --format json
 meltano hub list --refresh
 ```
 
-When adding a plugin while authenticated, Meltano uses the Meltano Cloud hub plugin catalog to resolve the plugin definition and its default variant. For example:
+When adding a plugin while authenticated, Meltano uses the Meltano Cloud Hub plugin catalog to resolve the plugin definition and its default variant. For example:
 
 ```bash
 meltano add --plugin-type extractor tap-github
 ```
 
-The Meltano Cloud hub plugin catalog can specify a different default variant from the public Hub while still allowing users to select another variant when needed.
+The Meltano Cloud Hub plugin catalog can specify a different default variant from the public Hub while still allowing users to select another variant when needed.
 
 ### Existing Hub Configurations Continue to Work
 
-The Meltano Cloud hub plugin catalog is only used when the user is authenticated and no other Hub configuration takes precedence.
+The Meltano Cloud Hub plugin catalog is only used when the user is authenticated and no other Hub configuration takes precedence.
 
 Existing projects using a custom Hub or Hub authentication continue to work as before. The Hub configuration precedence is:
 
