@@ -31,19 +31,12 @@ meltano cloud auth logout
 
 ### Curated Meltano Cloud Hub Plugin Catalog
 
-When you're authenticated with Meltano Cloud, `meltano hub list` uses the Meltano Cloud Hub plugin catalog instead of the public Hub catalog.
+When you're authenticated with Meltano Cloud, `meltano hub list` references Meltano Cloud Hub instead of Meltano Hub.
 
 The Meltano Cloud Hub plugin catalog contains plugins that Meltano supports, maintains, and tests. This gives users a curated starting point when choosing plugins for their projects.
 
-For example:
 
-```bash
-meltano hub list
-```
-
-When logged in, this returns the curated Meltano Cloud Hub plugin catalog rather than the complete public Hub catalog.
-
-The public Hub remains available when you're logged out, so you can continue to explore the full set of plugins available in the Hub.
+Meltano Hub remains available when you're logged out, so you can continue to explore the full set of publicly available plugins.
 
 ### Discover and Add Plugins
 
