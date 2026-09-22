@@ -411,7 +411,6 @@ class CatalogExecutor:
 
     def visit_stream(self, node: Node, path: str) -> None:
         """Visit a stream node, then its properties and metadata."""
-        logger.debug("Visiting %s at '%s'.", CatalogNode.STREAM, path)
         self.execute(CatalogNode.STREAM, node, path)
 
         schema = node.get(SCHEMA_KEY) or {}
@@ -422,7 +421,6 @@ class CatalogExecutor:
         """Visit each property node, recursing into nested properties."""
         for name, prop_node in properties.items():
             prop_path = f"{path}.{PROPERTIES_KEY}.{name}"
-            logger.debug("Visiting %s at '%s'.", CatalogNode.PROPERTY, prop_path)
             self.execute(CatalogNode.PROPERTY, prop_node, prop_path)
 
             nested_properties = prop_node.get(PROPERTIES_KEY)
@@ -436,7 +434,6 @@ class CatalogExecutor:
                 continue
 
             metadata_path = f"{path}.metadata[{index}]"
-            logger.debug("Visiting %s at '%s'.", CatalogNode.METADATA, metadata_path)
             self.execute(CatalogNode.METADATA, metadata_node, metadata_path)
 
     def execute(self, node_type: CatalogNode, node: Node, path: str) -> None:
@@ -551,12 +548,6 @@ class MetadataExecutor(CatalogExecutor):
         """Process metadata node."""
         tap_stream_id = self._stream["tap_stream_id"]  # type: ignore[index]  # ty:ignore[not-subscriptable]
         breadcrumb = node["breadcrumb"]
-
-        logger.debug(
-            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",
-            tap_stream_id,
-            breadcrumb,
-        )
 
         for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_metadata(
