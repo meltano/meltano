@@ -1771,6 +1771,32 @@ class TestMetadataExecutor:
             hash_property_metadata_node["metadata"]["custom-metadata"] == "custom-value"
         )
 
+    def test_visit_no_breadcrumbs(self) -> None:
+        """Test that metadata entries without breadcrumbs are skipped."""
+        executor = MetadataExecutor(
+            [
+                MetadataRule("*", [], "replication-method", value="INCREMENTAL"),
+            ],
+        )
+        catalog = {
+            "streams": [
+                {
+                    "tap_stream_id": "foo",
+                    "metadata": [{"selected": False}],
+                },
+                {
+                    "tap_stream_id": "bar",
+                    "metadata": [{"breadcrumb": [], "metadata": {}}],
+                },
+            ],
+        }
+        executor.visit(catalog)
+        assert "replication_method" not in catalog["streams"][0]["metadata"][0]
+        assert catalog["streams"][1]["metadata"][0] == {
+            "breadcrumb": [],
+            "metadata": {"replication-method": "INCREMENTAL"},
+        }
+
 
 class TestSchemaExecutor:
     @pytest.fixture
