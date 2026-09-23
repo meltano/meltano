@@ -33,3 +33,9 @@ To configure your Meltano Workspace to use your MotherDuck database, follow thes
 1. Add a new store to your Meltano Workspace using the `motherduck` store type.
 1. Use `md:<your-database>` as the connection string, replacing `<your-database>` with the name of your database.
 1. Paste in the access token you copied from the MotherDuck settings page.
+
+## BATCH ingestion
+
+Taps that emit Arrow- or JSONL-encoded Singer `BATCH` messages are loaded natively by `target-motherduck`, with no configuration required. Metadata columns and hard delete aren't applied to BATCH-sourced records.
+
+See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for supported extractors and how to enable Arrow output on the tap.

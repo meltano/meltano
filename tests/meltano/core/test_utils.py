@@ -414,6 +414,19 @@ def test_expand_env_vars_array_nested(input_array, env, expected_output) -> None
     assert expand_env_vars(input_array, env) == expected_output
 
 
+def test_expand_env_vars_empty() -> None:
+    input_value = {"value": "${ENV_VAR_1}"}
+    env = {"ENV_VAR_1": ""}
+    assert expand_env_vars(input_value, env, flat=True) == {"value": ""}
+
+
+def test_expand_env_vars_flat() -> None:
+    input_value = {"value": "${ENV_VAR_1}"}
+    env = {"ENV_VAR_1": "substituted_1"}
+    expected_output = {"value": "substituted_1"}
+    assert expand_env_vars(input_value, env, flat=True) == expected_output
+
+
 def test_makedirs_decorator(tmp_path) -> None:
     def root(*paths):
         return tmp_path.joinpath(*paths)

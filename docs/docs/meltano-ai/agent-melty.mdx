@@ -1,0 +1,234 @@
+---
+title: Agent Melty
+description: Your go-to reference for developing pipelines on Meltano Cloud from inside your workspace's git repository.
+sidebar_label: Agent Melty
+sidebar_position: 11.6
+---
+
+# Agent Melty
+
+At the core of any Meltano Cloud workspace is a git repository. With Agent Melty, we can help you to build in that source of truth with your agent, push it to Meltano Cloud, and the platform reconciles it. The UI's job shrinks to one thing it should own: secrets, which never pass through the agent or into git.
+
+Work through it once end to end, then keep the pre-flight checklist for every change after that.
+
+## Before you start
+
+When your Meltano Cloud workspace was created, the platform provisioned a git repository for it and seeded it with the AI knowledge base. You develop *in that repository*: it's the source of truth, and pushing to it is what deploys your work. Make sure you have:
+
+* A **Meltano Cloud workspace**, and access to its git repo (created for you on workspace creation).
+* The repo **cloned locally** and opened in **Claude Code** (or another agent that reads `AGENTS.md`).
+* **Python and the Meltano CLI** available, so the agent can run `meltano` commands in your project.
+
+:::tip Good to know
+The AI knowledge kit is seeded when the workspace is created, so it's already in the repo the moment you clone it, with nothing for you to install or enable. Just open the repo in your agent and go.
+
+
+If your workspace pre-dates Agent Melty, you can install it as a plugin - it's called "Agent Melty (the AI Knowledge Kit)"
+:::
+
+## How the knowledge base works
+
+Three files, no app to run:
+
+* **`AGENTS.md`** is the router: it tells the agent to check the knowledge base before doing anything, and which doc in it applies to the task. `CLAUDE.md` just points to `AGENTS.md`, so the same convention works whichever editor you're in. A trimmed example of what it looks like:
+
+```markdown
+# AGENTS.md
+
+Before making changes, check the knowledge base:
+- Adding or configuring a plugin -> .claude/meltano_knowledge_base/meltano/plugins.md
+- Deploying or troubleshooting on Cloud -> .claude/meltano_knowledge_base/meltano_cloud/index.md
+- Project-specific notes -> .claude/workspace_knowledge_base/ (check this first, it overrides the above)
+```
+
+* **`.claude/meltano_knowledge_base/`** is the shared reference: how taps and targets work, how to configure sources and destinations, how runs get built and debugged. Split into `meltano/` and `meltano_cloud/`, each fronted by an `index.md` topic map. The agent reads these directly: no setup, no tooling, just files.
+* **`.claude/workspace_knowledge_base/`** is your repo's own notes: empty at first, filled in as you and the agent hit and solve things specific to this project (see [Capture what you learn](#capture-what-you-learn)). It isn't part of the seeded kit, and it's never overwritten by it.
+
+:::tip One habit that pays off
+Let the agent lead from `AGENTS.md` rather than free-styling. If you ask it to do something and it hasn't consulted the knowledge base, tell it to, the whole point is that the platform's conventions are already written down for it.
+:::
+
+## Build a pipeline
+
+Describe the outcome and let the agent handle the mechanics, for example "load this CSV into Postgres." Guided by the knowledge base, it will:
+
+* Identify the right connectors from the knowledge base and MeltanoHub.
+* Add them with `meltano add`, which also writes the lockfiles you must commit (see [Commit your lockfiles](#commit-your-lockfiles)).
+* Write the pipeline config into `meltano.yml`.
+* Scaffold a `.env.example` naming exactly which settings are secret (see [Secrets and credentials](#secrets-and-credentials)).
+
+Then validate before you run, to confirm the config resolves:
+
+```bash
+meltano config <plugin> list       # check settings resolve
+meltano run <extractor> <loader>   # run it locally
+```
+
+### Walkthrough: CSV into Postgres
+
+One example end to end, so you have a working run to compare your own against.
+
+**1. Ask for the pipeline.** In Claude Code, in your cloned repo:
+
+> Load `orders.csv` into Postgres, table `raw_orders`.
+
+Guided by the knowledge base, the agent:
+
+* Picks `tap-csv` and `target-postgres` from MeltanoHub.
+* Runs `meltano add extractor tap-csv` and `meltano add loader target-postgres`, each of which writes a lockfile under `plugins/extractors/` or `plugins/loaders/` (see [Commit your lockfiles](#commit-your-lockfiles)).
+* Adds both to `meltano.yml`, with `tap-csv` pointed at `orders.csv` and `target-postgres` writing to `raw_orders`.
+* Scaffolds `.env.example` with the settings it can't fill in for you:
+
+```bash
+# .env.example
+TARGET_POSTGRES_HOST=
+TARGET_POSTGRES_PORT=
+TARGET_POSTGRES_USER=
+TARGET_POSTGRES_PASSWORD=
+TARGET_POSTGRES_DBNAME=
+```
+
+**2. Fill in your local secrets** in `.env` (see [Secrets and credentials](#secrets-and-credentials)), then check the config resolves:
+
+```bash
+meltano config target-postgres list
+```
+
+This prints every setting `target-postgres` sees and where it's reading each one from, `.env`, `meltano.yml`, or a default. A setting you expect to be set but shows up blank means your `.env`, not the pipeline, is the problem.
+
+**3. Run it locally:**
+
+```bash
+meltano run tap-csv target-postgres
+```
+
+A clean run ends with something like:
+
+```
+2026-08-27T10:02:14 Incremental state has been updated at 2026-08-27T10:02:14.000000Z.
+2026-08-27T10:02:14 Block run completed.
+```
+
+If it doesn't, see [Troubleshoot a failure](#troubleshoot-a-failure), don't push a pipeline you haven't run once.
+
+**4. Commit and push:**
+
+```bash
+git add meltano.yml plugins/ .env.example
+git commit -m "add csv to postgres pipeline"
+git push
+```
+
+See [Deploy: push to run](#deploy-push-to-run) for what happens after the push lands.
+
+:::tip Anchor to the golden path
+There's a known-good reference project under `reference/` in the repo. Point the agent at it when building something new, adapting a proven skeleton beats generating config from a blank page.
+:::
+
+## Secrets and credentials
+
+Do not give the agent access to `.env`, and do not pass secret values through command output. If the workflow cannot enforce those restrictions, use a credential mechanism that keeps secrets outside the agent's accessible workspace. The agent scaffolds only placeholder names in `.env.example`; you supply the values, in one of two places depending on where the pipeline runs.
+
+**Local runs**, in `.env` (gitignored, auto-loaded by Meltano):
+
+```bash
+meltano config target-postgres set password --store=dotenv
+# or hand-edit .env directly
+```
+
+Setting names follow `<PLUGIN_NAME>_<SETTING>` (upper-cased, non-alphanumerics become `_`), for example `TAP_GITHUB_AUTH_TOKEN` or `TARGET_POSTGRES_PASSWORD`. `meltano config <plugin> list` shows you the exact names to use.
+
+**Cloud runs**, in the Meltano app:
+
+1. Open the **Pipelines** view and expand the pipeline.
+2. Open its **Environment** tab.
+3. Enter each value that's blank in your `.env.example`. Settings already resolved from `meltano.yml` don't need to be re-entered here.
+
+Cloud reads these at deploy time. If you add a new required setting later, `git push` won't fail, the pipeline will just error on its next run with a missing-config message until you add the value here too.
+
+:::caution Never commit secrets
+Real values live in `.env` (local) or the Environment tab (Cloud). Only `.env.example`, with empty placeholders, goes into git. If a real value ever lands in git history, rotate it, don't just delete the line, it's already in the history.
+:::
+
+### OAuth sources
+
+Meltano CLI has no interactive "connect" flow. OAuth taps take `client_id`, `client_secret`, and `refresh_token` as plain config, so get the refresh token out-of-band once through the provider's own OAuth flow, then store it like any other secret above. An interactive "Connect with X" button, if the tap you're using offers one, is a Cloud UI feature, not something the CLI does.
+
+## Commit your lockfiles
+
+The single most common thing to miss, and it fails silently. `meltano add` writes a lockfile at `plugins/<type>/<name>--<variant>.lock`. Cloud reconciles your workspace from the *committed* lockfiles, not from `meltano.yml` alone, so a plugin whose lockfile isn't in git simply doesn't materialize when you deploy. No error, no warning, it's just not there.
+
+```bash
+meltano lock              # regenerate if you hand-edited meltano.yml
+git status                # plugins/*.lock should show as staged or modified
+git add plugins/ meltano.yml
+```
+
+:::info The rule
+Add plugins with `meltano add`, never by hand-editing `meltano.yml` alone. If you did hand-edit it, run `meltano lock` before committing. Always commit `plugins/*.lock` in the same commit as `meltano.yml`.
+:::
+
+## Deploy: push to run
+
+Pushing to your repo *is* deploying. The platform reconciles the committed config and plugins materialize on hosted infrastructure, no separate deploy command.
+
+```bash
+git push
+```
+
+:::tip Deploy is async, don't assume instant
+The push returns immediately, but reconciliation happens in the background on the platform. A push that returns successfully only means git accepted it, not that reconciliation finished. Give it a moment, then check the **Pipelines** view in the Meltano app for the new pipeline before assuming it's live.
+:::
+
+## Troubleshoot a failure
+
+Reproduce locally before touching config:
+
+```bash
+meltano run tap-csv target-postgres
+```
+
+Two examples of what that gives the agent to work with:
+
+**Auth error.** Credentials are wrong or expired:
+
+```
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://api.github.com/...
+```
+
+The agent reads this as an auth failure, not a config-shape problem, and points you at the credential to rotate, here `TAP_GITHUB_AUTH_TOKEN` in your `.env`.
+
+**Schema mismatch.** The source has a column the target table doesn't:
+
+```
+psycopg2.errors.UndefinedColumn: column "discount_code" of relation "raw_orders" does not exist
+```
+
+The agent traces this to `orders.csv` having a column `discount_code` doesn't, and can propose either an `ALTER TABLE` or a narrower `tap-csv` column selection, your call which fits.
+
+For runs that already executed on Cloud, open the pipeline in the **Pipelines** view and read its logs directly, or use **Diagnose** for the same plain-language read the agent gives you locally, see [AI Diagnostics](./ai-diagnostics.mdx).
+
+Once you have a fix, re-run locally to confirm, then commit and push (see [Commit your lockfiles](#commit-your-lockfiles) and [Deploy: push to run](#deploy-push-to-run)).
+
+## Capture what you learn
+
+Found a connector quirk or a config gotcha that wasn't obvious? Have the agent write it to `.claude/workspace_knowledge_base/` and commit it:
+
+```bash
+git add .claude/workspace_knowledge_base/
+git commit -m "note: tap-csv needs explicit encoding for this source"
+```
+
+It's local to your repo, not shared with other workspaces, but the next person, or your next session, who opens this repo starts with that context already there instead of re-discovering it.
+
+## Pre-flight checklist
+
+Run down this list before you call a change done and push it. It catches the steps that fail quietly.
+
+1. **Plugins added via `meltano add`.** Not hand-edited into `meltano.yml` alone.
+2. **Lockfiles committed.** `plugins/*.lock` staged alongside `meltano.yml`, the #1 silent deploy failure.
+3. **Config validated.** `meltano config <plugin> list` resolves cleanly; a local `meltano run` succeeds.
+4. **Secrets kept out of git.** Real values in `.env` (local) or the Environment tab (Cloud); only `.env.example` committed.
+5. **Deploy confirmed.** Check the Pipelines view, don't assume the push is live.
+6. **Failure reproduced, not guessed.** Reproduce locally with `meltano run` (or read the Cloud logs/Diagnose) before changing config.
+7. **Learnings captured.** Non-obvious fixes written into `.claude/workspace_knowledge_base/` and committed.

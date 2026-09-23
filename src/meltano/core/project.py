@@ -383,6 +383,23 @@ class Project:
             )
         return self.root.joinpath(".env")
 
+    @property
+    def python_version_file(self) -> Path:
+        """Path to this project's .python-version file."""
+        return self.root.joinpath(".python-version")
+
+    @cached_property
+    def python_version(self) -> str | None:
+        """The Python version pinned in this project's .python-version file, if any.
+
+        Follows the same first-line convention as pyenv and uv:
+        https://docs.astral.sh/uv/guides/projects/#python-version
+        """
+        if not self.python_version_file.is_file():
+            return None
+        lines = self.python_version_file.read_text().splitlines()
+        return lines[0].strip() or None if lines else None
+
     @cached_property
     def dotenv_env(self) -> dict[str, str]:
         """Values from this project's .env file.

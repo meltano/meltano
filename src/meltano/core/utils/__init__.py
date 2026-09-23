@@ -757,13 +757,13 @@ def _expand_env_vars(
 ) -> Expandable:
     if isinstance(raw_value, Mapping):
         if flat:
-            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type] # ty:ignore[invalid-return-type, no-matching-overload]
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type]
         return {
-            k: _expand_env_vars(v, replacer, flat=flat)  # ty:ignore[invalid-argument-type]
+            k: _expand_env_vars(v, replacer, flat=flat)
             if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]
             else v
             for k, v in raw_value.items()
-        }  # ty:ignore[invalid-return-type]
+        }
     if isinstance(raw_value, list):
         # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
         # for lists anyway, so we don't support it here.

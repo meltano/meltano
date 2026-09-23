@@ -6,12 +6,19 @@ slug: /connectors
 
 import ConnectorSearch from '@site/src/components/ConnectorSearch';
 
-# All connectors
+# Connectors - Technical Documentation
 
-Explore Meltano Cloud's growing library of managed connectors for building your data pipelines.
+Meltano Cloud connectors fall into one of five categories:
 
-Meltano Cloud connectors move data in one of two directions: extractors pull data out of a source, and loaders push it into a destination. Search or filter below to find the one you need, then click through for setup instructions, configuration options, streams, and more.
+- Extractors and Loaders (also know as Taps / Targets) move data from and to sources and destinations respectively.
+- Mappers allow you to transform data between extractors and loaders.
+- Utilities allow virtually any open source data tool to be integrated with your project.
+- Files allow you to easily add new file-based resources to your data project.
 
-Looking for a community connector? Browse the full catalog on [Meltano Hub](https://hub.meltano.com/).
+Here you will find in-depth documentation for our more popular connectors, including configuration and setup guides. Search or filter below to find the connector you need.
+
+<div className="tier-banner tier-banner--yellow">
+  Don't see one you need? This technical documentation doesn't cover our full catalog of connectors - <a href="https://hub.meltano.com/">that's available here</a>.
+</div>
 
 <ConnectorSearch />

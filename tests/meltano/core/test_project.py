@@ -146,6 +146,33 @@ class TestProject:
         project.refresh()
         assert project.dotenv_file == env_file
 
+    def test_python_version_file(self, project: Project) -> None:
+        assert project.python_version_file == project.root / ".python-version"
+
+        # no file: no pinned version
+        assert project.python_version is None
+
+    def test_python_version(self, project: Project) -> None:
+        # a plain version pin
+        project.python_version_file.write_text("3.11\n")
+        project.__dict__.pop("python_version", None)
+        assert project.python_version == "3.11"
+
+        # extra whitespace and trailing content on later lines are ignored,
+        # matching pyenv/uv's one-version-per-first-line convention
+        project.python_version_file.write_text("  3.12  \nsome-other-line\n")
+        project.__dict__.pop("python_version", None)
+        assert project.python_version == "3.12"
+
+        # an empty file has no pinned version
+        project.python_version_file.write_text("")
+        project.__dict__.pop("python_version", None)
+        assert project.python_version is None
+
+        project.python_version_file.unlink()
+        project.__dict__.pop("python_version", None)
+        assert project.python_version is None
+
 
 class TestIncompatibleProject:
     @pytest.fixture

@@ -15,6 +15,7 @@ from time import perf_counter_ns
 from unittest import mock
 
 import click
+import click.testing
 import pytest
 import responses
 import yaml
@@ -365,7 +366,7 @@ class TestCli:
     @pytest.mark.usefixtures("pushd")
     def test_cwd_option(
         self,
-        cli_runner,
+        cli_runner: MeltanoCliRunner,
         test_cli_project: Project,
         tmp_path: Path,
     ) -> t.NoReturn:
@@ -383,19 +384,15 @@ class TestCli:
         with cd(project.dirs.root):
             filepath = tmp_path / "file.txt"
             filepath.touch()
-            with pytest.raises(click.BadParameter, match="is a file"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(filepath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(filepath), "dragon"))
+            assert result.exit_code == 2
+            assert "is a file" in result.stderr
 
         with cd(project.dirs.root):
             dirpath = tmp_path / "subdir"
-            with pytest.raises(click.BadParameter, match="does not exist"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(dirpath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon"))
+            assert result.exit_code == 2
+            assert "does not exist" in result.stderr
 
         with cd(project.dirs.root):
             dirpath.mkdir()
@@ -647,20 +644,23 @@ class TestCliColors:
     )
     def test_no_color(
         self,
-        cli_runner,
-        env,
-        log_config,
-        cli_colors_expected,
-        log_colors_expected,
-        tmp_path,
-        monkeypatch,
+        *,
+        cli_runner: click.testing.CliRunner,
+        env: dict[str, str],
+        log_config: dict[str, t.Any] | None,
+        cli_colors_expected: bool,
+        log_colors_expected: bool,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
         monkeypatch.delenv("FORCE_COLOR", raising=False)
         styled_text = click.style(self.TEST_TEXT, fg="red")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
 
         if log_config:
-            log_config_path = tmp_path / "logging.yml"
+            log_config_path = project_path / "logging.yml"
             log_config_path.write_text(yaml.dump(log_config))
         else:
             log_config_path = None
@@ -676,12 +676,12 @@ class TestCliColors:
 
         expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
-        with cli_runner.isolated_filesystem():
-            result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
-            assert result.exit_code == 0, result.exception
-            assert result.stdout.strip() == expected_text
-            assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
-            assert result.exception is None
+        monkeypatch.chdir(project_path)
+        result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
+        assert result.exit_code == 0, result.exception
+        assert result.stdout.strip() == expected_text
+        assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
+        assert result.exception is None
 
 
 class TestLargeConfigProject:
