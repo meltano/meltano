@@ -80,6 +80,23 @@ class ProjectAddService:
             **attrs,
             default_variant=Variant.DEFAULT_NAME,
         )
+        # The lockfile of an existing plugin would otherwise supply the parent,
+        # and the plugin would be "updated" to the definition it already has.
+        if (
+            update
+            and not plugin.inherit_from
+            and not plugin.is_custom()
+            and plugin
+            in self.project.plugins.get_plugins_of_type(
+                plugin_type,
+                ensure_parent=False,
+            )
+        ):
+            plugin.parent = self.project.hub_service.find_base_plugin(
+                plugin_type,
+                plugin_name,
+                variant=plugin.variant,
+            )
         self.project.plugins.ensure_parent(plugin)
 
         # If we are inheriting from a base plugin definition,
