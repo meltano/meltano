@@ -95,13 +95,16 @@ class UserConfig:
 
     _: KW_ONLY
     yaml: YamlSettings = field(default_factory=YamlSettings)
+    cloud: dict[str, t.Any] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, t.Any]) -> UserConfig:
         """Create a UserConfig from a dictionary."""
-        kwargs = {}
+        kwargs: dict[str, t.Any] = {}
         if yaml := data.get("yaml"):
             kwargs["yaml"] = YamlSettings.from_dict(yaml)
+        if cloud := data.get("cloud"):
+            kwargs["cloud"] = dict(cloud)
         return cls(**kwargs)
 
 
@@ -158,6 +161,11 @@ class UserConfigService:
     def yaml(self) -> YamlSettings:
         """YAML formatting settings as a YamlSettings object."""
         return self.config.yaml
+
+    @property
+    def cloud(self) -> dict[str, t.Any]:
+        """Meltano Cloud settings."""
+        return self.config.cloud
 
 
 _user_config_service: UserConfigService | None = None

@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - src/**
+      - tests/conftest.py
       - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
@@ -13,6 +14,7 @@ on:
       - 'v*'
     paths:
       - src/**
+      - tests/conftest.py
       - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
@@ -48,7 +50,7 @@ jobs:
       id: setup-python
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
       with:
         cache-suffix: bench
         python-version: ${{ steps.setup-python.outputs.python-version }}
