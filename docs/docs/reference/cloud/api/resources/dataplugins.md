@@ -203,6 +203,30 @@ Path | JSON Type | Format | Description | Constraints
 
 ---
 
+### Update an installed dataplugin to latest
+
+:::info
+**PUT** `/api/workspaces/{workspace-id}/dataplugins/{dataplugin-id}/updated`
+:::
+
+Updates the dataplugin `{dataplugin-id}` installed in the workspace `{workspace-id}` to the definition Meltano Cloud supports now. A dataplugin is copied into a workspace when it is installed, and the copy does not follow later changes to the supported definition.
+
+The dataplugin carries the `update dataplugin to latest` link only while it is behind the supported definition, and only for a user who may apply the update.
+
+#### Prerequisites
+- Workspace `{workspace-id}` must exist
+- Dataplugin `{dataplugin-id}` must be installed in workspace `{workspace-id}`
+
+<Examples path="dataplugins/update-an-installed-dataplugin-to-latest" />
+
+#### Response
+`200 OK`
+
+[Dataplugin](#dataplugin) with HAL links.
+<Snippet path="dataplugins/update-an-installed-dataplugin-to-latest/response-body.md" />
+
+---
+
 ### Delete a dataplugin
 
 :::info
