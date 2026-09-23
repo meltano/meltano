@@ -220,8 +220,7 @@ def _cloud_login_hint() -> t.Iterator[None]:
     """
     yield  # noqa: RUF075
     click.secho(
-        "Get supported plugins by logging in to Meltano Cloud: "
-        "meltano cloud auth login",
+        "Run 'meltano cloud auth login' to get supported plugins from Meltano Cloud",
         fg="bright_yellow",
         err=True,
     )
