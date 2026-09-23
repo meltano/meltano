@@ -138,7 +138,7 @@ def read_config(config_file: Path | None = None) -> dict | None:
 def default_config(
     log_level: str,
     *,
-    log_format: LogFormat = LogFormat.colored,
+    log_format: LogFormat | None = None,
 ) -> dict:
     """Generate a default logging config.
 
@@ -152,6 +152,7 @@ def default_config(
     # Convert log level to numeric value for disabled level
     numeric_level = parse_log_level(log_level.lower())
     log_level = log_level.upper()
+    log_format = log_format or LogFormat.colored
     max_frames = _FRAMES_DEBUG if log_level == "DEBUG" else _FRAMES_DEFAULT
     formatter_config: dict[str, t.Any]
 
@@ -233,9 +234,9 @@ def default_config(
 
 def setup_logging(
     project: Project | None = None,
-    log_level: str = DEFAULT_LEVEL,
+    log_level: str | None = DEFAULT_LEVEL,
     log_config: os.PathLike[str] | str | None = None,
-    log_format: LogFormat = LogFormat.colored,
+    log_format: LogFormat | None = None,
 ) -> None:
     """Configure logging for a meltano project.
 
@@ -246,6 +247,8 @@ def setup_logging(
         log_format: set log format to provided format.
     """
     logging.basicConfig(force=True)
+    log_level = log_level or DEFAULT_LEVEL
+    log_format = log_format or LogFormat.colored
 
     if project:
         log_config = log_config or project.settings.get("cli.log_config")
