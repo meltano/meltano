@@ -21,7 +21,6 @@ from meltano.core.plugin_invoker import PluginInvoker
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
-    from meltano.core.plugin.singer import SingerTap
     from meltano.core.project_add_service import ProjectAddService
 
 
@@ -83,19 +82,22 @@ class TestTapBenchmarks:
     """Benchmarks for SingerTap catalog operations."""
 
     @pytest.fixture(scope="class")
-    def tap_plugin(self, project_add_service: ProjectAddService) -> SingerTap:
+    @classmethod
+    def tap_plugin(cls, project_add_service: ProjectAddService) -> ProjectPlugin:
         """Create tap plugin once per test class."""
         from meltano.core.plugin import PluginType
 
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.fixture(scope="class")
-    def catalog(self) -> dict:
+    @classmethod
+    def catalog(cls) -> dict:
         """Pre-generate catalog once per test class."""
         return generate_catalog()
 
     @pytest.fixture(scope="class")
-    def catalog_lines(self, catalog: dict) -> list[bytes]:
+    @classmethod
+    def catalog_lines(cls, catalog: dict) -> list[bytes]:
         """Pre-compute catalog lines once per test class."""
         catalog_json = json.dumps(catalog, indent=2)
         return [line.encode() + b"\n" for line in catalog_json.split("\n")]
@@ -104,7 +106,7 @@ class TestTapBenchmarks:
     def test_discover_catalog(
         self,
         session,
-        tap_plugin: SingerTap,
+        tap_plugin: ProjectPlugin,
         catalog_lines: list[bytes],
         plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
         benchmark,
@@ -150,7 +152,7 @@ class TestTapBenchmarks:
     def test_apply_catalog_rules(
         self,
         session,
-        tap_plugin: SingerTap,
+        tap_plugin: ProjectPlugin,
         catalog: dict,
         plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
         benchmark,

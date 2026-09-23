@@ -14,10 +14,16 @@ from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.setting_definition import SettingDefinition
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from meltano.core.meltano_file import MeltanoFile
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -37,11 +43,7 @@ class ConfigService:
 
     @cached_property
     def settings(self) -> list[SettingDefinition]:
-        """Return the project settings.
-
-        Returns:
-            The project settings.
-        """
+        """Project settings."""
         with bundle.root.joinpath("settings.yml").open() as settings_yaml:
             content = yaml.safe_load(settings_yaml)
 
@@ -51,15 +53,11 @@ class ConfigService:
 
     @cached_property
     def current_meltano_yml(self) -> MeltanoFile:
-        """Return the current `meltano.yml` contents.
-
-        Returns:
-            The contents of `meltano.yml`.
-        """
+        """Current `meltano.yml` contents."""
         return self.project.meltano
 
     @contextmanager
-    def update_meltano_yml(self) -> Generator[MeltanoFile, None, None]:
+    def update_meltano_yml(self) -> Generator[MeltanoFile]:
         """Update meltano.yml.
 
         This method is a context manager that will update meltano.yml with the
@@ -89,11 +87,7 @@ class ConfigService:
 
     @property
     def current_config(self):  # noqa: ANN201
-        """Return the current configuration.
-
-        Returns:
-            The current configuration.
-        """
+        """Current configuration."""
         return self.current_meltano_yml.extras
 
     def update_config(self, config: dict[str, t.Any]) -> None:
@@ -107,9 +101,5 @@ class ConfigService:
 
     @property
     def env(self) -> dict[str, str]:
-        """Return the top-level env vars from meltano.yml.
-
-        Returns:
-            A dictionary of (unexpanded) environment variables.
-        """
+        """Top-level (unexpanded) env vars from meltano.yml."""
         return self.current_meltano_yml.env

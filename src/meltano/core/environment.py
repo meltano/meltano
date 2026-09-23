@@ -73,7 +73,7 @@ class EnvironmentPluginConfig(PluginRef):
 
     @property
     def extra_config(self):  # noqa: ANN201
-        """Get extra config from the Meltano environment, like `select` and `schema`.
+        """Extra config from the Meltano environment, like `select` and `schema`.
 
         Returns:
             Extra config.
@@ -82,7 +82,7 @@ class EnvironmentPluginConfig(PluginRef):
 
     @property
     def config_with_extras(self) -> dict[str, t.Any]:
-        """Get plugin configuration values from the Meltano environment.
+        """Plugin configuration values from the Meltano environment.
 
         Returns:
             Plugin configuration with extra values.
@@ -213,8 +213,8 @@ class Environment(NameEq, Canonical):
                 for env in objects
                 if getattr(env, "name", env["name"]) == name
             )
-        except StopIteration as stop:
-            raise NotFound(name, cls) from stop
+        except StopIteration:
+            raise NotFound(name, obj_type=cls) from None
 
     def get_plugin_config(
         self,

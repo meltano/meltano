@@ -22,10 +22,15 @@ from meltano.core.state_store.filesystem import (
 )
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
     from pathlib import Path
 
     from pytest_codspeed import BenchmarkFixture
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def on_windows() -> bool:

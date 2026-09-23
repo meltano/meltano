@@ -36,9 +36,14 @@ from meltano.core.state_store.google.backend import GCSStateStoreManager
 from meltano.core.state_store.s3.backend import S3StateStoreManager
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    import sys
 
     import faker
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def on_windows() -> bool:
@@ -473,11 +478,17 @@ class TestAZStorageStateStoreManager:
 class TestS3StateStoreManager:
     @pytest.fixture(autouse=True)
     def clean_env(self, monkeypatch: pytest.MonkeyPatch):
-        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.setenv("AWS_SHARED_CREDENTIALS_FILE", "/dev/null")
+        monkeypatch.setenv("AWS_CONFIG_FILE", "/dev/null")
+        monkeypatch.setenv("AWS_DEFAULT_REGION", "us-east-1")
+        monkeypatch.setenv("AWS_ACCESS_KEY_ID", "testing")
+        monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "testing")
+        monkeypatch.setenv("AWS_SECURITY_TOKEN", "testing")
+        monkeypatch.setenv("AWS_SESSION_TOKEN", "testing")
         monkeypatch.delenv("AWS_PROFILE", raising=False)
 
     @contextmanager
-    def stubber(self) -> Iterator[Stubber]:
+    def stubber(self) -> Generator[Stubber]:
         with patch(
             "meltano.core.state_store.s3.backend.S3StateStoreManager.client",
             new_callable=PropertyMock,

@@ -206,7 +206,7 @@ class SingerTap(SingerPlugin):
     @property
     @override
     def config_files(self):  # noqa: ANN201
-        """Get the configuration files for this tap."""
+        """Configuration files for this tap."""
         return {
             "config": f"tap.{self.instance_uuid}.config.json",
             "catalog": "tap.properties.json",
@@ -219,7 +219,7 @@ class SingerTap(SingerPlugin):
     @property
     @override
     def output_files(self):  # noqa: ANN201
-        """Get the output files for this tap."""
+        """Output files for this tap."""
         return {"output": "tap.out"}
 
     @hook("before_invoke")

@@ -36,7 +36,7 @@ def exc_info() -> OptExcInfo:
 
 
 @pytest.fixture
-def deep_exc_info() -> OptExcInfo:
+def deep_exc_info() -> OptExcInfo | None:
     """Create a deeper call stack for testing max_frames."""
 
     def level_5():

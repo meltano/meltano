@@ -15,7 +15,43 @@ const gettingStartedCategory = require('./docs/getting-started/_category_.json')
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
-  tutorialSidebar: [
+  connectorsSidebar: [
+    {
+      type: 'category',
+      label: 'Meltano Hub',
+      link: { type: 'doc', id: 'connectors/meltano-hub/index' },
+      collapsed: true,
+      items: [
+        { type: 'doc', id: 'connectors/meltano-hub/add-a-plugin', label: 'Listing on the Hub' },
+        { type: 'doc', id: 'connectors/meltano-hub/maintaining-plugins', label: 'Maintaining Taps & Targets' },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Connectors',
+      link: { type: 'doc', id: 'connectors/index' },
+      items: [
+        { type: 'doc', id: 'connectors/tap-aptem', label: 'Aptem' },
+        { type: 'doc', id: 'connectors/tap-baidu', label: 'Baidu' },
+        { type: 'doc', id: 'connectors/target-clickhouse', label: 'ClickHouse' },
+        { type: 'doc', id: 'connectors/tap-googleads', label: 'Google Ads' },
+        { type: 'doc', id: 'connectors/tap-google-analytics', label: 'Google Analytics' },
+        { type: 'doc', id: 'connectors/target-bigquery', label: 'Google BigQuery' },
+        { type: 'doc', id: 'connectors/target-motherduck', label: 'MotherDuck' },
+        { type: 'doc', id: 'connectors/tap-nextdoor', label: 'Nextdoor' },
+        { type: 'doc', id: 'connectors/tap-postgres', label: 'PostgreSQL' },
+        { type: 'doc', id: 'connectors/tap-rakutenadvertising', label: 'Rakuten Advertising' },
+        { type: 'doc', id: 'connectors/tap-snowflake', label: 'Snowflake' },
+        { type: 'doc', id: 'connectors/tap-spreadsheets-imap', label: 'Spreadsheets (IMAP)' },
+        { type: 'doc', id: 'connectors/tap-spreadsheets-outlook', label: 'Spreadsheets (Outlook)' },
+        { type: 'doc', id: 'connectors/tap-spreadsheets-sharepoint', label: 'Spreadsheets (SharePoint)' },
+        { type: 'doc', id: 'connectors/tap-surveymonkey', label: 'SurveyMonkey' },
+        { type: 'doc', id: 'connectors/tap-weatherapi', label: 'Weather API' },
+        { type: 'doc', id: 'connectors/tap-zendesk', label: 'Zendesk' },
+      ],
+    },
+  ],
+  platformSidebar: [
     {
       type: 'category',
       label: 'Getting Started',
@@ -34,10 +70,9 @@ const sidebars = {
       label: require('./docs/meltano-cloud/_category_.json').label,
       customProps: require('./docs/meltano-cloud/_category_.json').customProps,
       link: { type: 'doc', id: 'meltano-cloud/index' },
-      collapsed: false,
+      collapsed: true,
       items: [
         { type: 'doc', id: 'meltano-cloud/cloud-overview' },
-        { type: 'doc', id: 'meltano-cloud/cloud-quickstart' },
         { type: 'doc', id: 'meltano-cloud/creating-workspace' },
         { type: 'doc', id: 'meltano-cloud/managing-a-workspace' },
         {
@@ -46,19 +81,37 @@ const sidebars = {
           link: { type: 'doc', id: 'meltano-cloud/connect-a-store/index' },
           items: [
             { type: 'doc', id: 'meltano-cloud/connect-a-store/snowflake-guides' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/microsoft-sql-server-guides' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/clickhouse-store' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/motherduck-store' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
+        { type: 'doc', id: 'meltano-cloud/ip-addresses' },
+        { type: 'doc', id: 'meltano-cloud/arrow-support' },
         { type: 'doc', id: 'meltano-cloud/setup-development-environment' },
         { type: 'doc', id: 'meltano-cloud/automate-actions' },
         { type: 'doc', id: 'meltano-cloud/plugins' },
         { type: 'doc', id: 'meltano-cloud/importing-data' },
         { type: 'doc', id: 'meltano-cloud/transform-data' },
         { type: 'doc', id: 'meltano-cloud/workspace-settings' },
+        { type: 'doc', id: 'meltano-cloud/pipeline-diagnosis' },
         { type: 'doc', id: 'meltano-cloud/logging-monitoring' },
         { type: 'doc', id: 'meltano-cloud/profile-security' },
         { type: 'doc', id: 'meltano-cloud/invite' },
         //{ type: 'doc', id: 'meltano-cloud/snowflake-guides' },
+      ],
+    },
+    {
+      type: 'category',
+      label: require('./docs/meltano-ai/_category_.json').label,
+      customProps: require('./docs/meltano-ai/_category_.json').customProps,
+      link: { type: 'doc', id: 'meltano-ai/index' },
+      collapsed: true,
+      items: [
+        { type: 'doc', id: 'meltano-ai/melty-mcp' },
+        { type: 'doc', id: 'meltano-ai/agent-melty' },
+        { type: 'doc', id: 'meltano-ai/ai-diagnostics' },
       ],
     },
 
@@ -67,7 +120,7 @@ const sidebars = {
       label: require('./docs/meltano-open/_category_.json').label,
       customProps: require('./docs/meltano-open/_category_.json').customProps,
       link: { type: 'doc', id: 'meltano-open/index' },
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           type: 'doc',
@@ -121,7 +174,13 @@ const sidebars = {
       label: require('./docs/tutorials/_category_.json').label,
       customProps: require('./docs/tutorials/_category_.json').customProps,
       link: { type: 'doc', id: 'tutorials/index' },
-      items: [{ type: 'autogenerated', dirName: 'tutorials' }],
+      items: [
+        { type: 'doc', id: 'tutorials/example-projects' },
+        { type: 'doc', id: 'tutorials/custom-extractor', label: 'How To - Create a Custom Extractor' },
+        { type: 'doc', id: 'tutorials/datahub', label: 'How To - DataHub with Meltano' },
+        { type: 'doc', id: 'tutorials/jupyter', label: 'How To - Jupyter with Meltano' },
+        { type: 'doc', id: 'tutorials/video-tutorials' },
+      ],
     },
     {
       type: 'category',

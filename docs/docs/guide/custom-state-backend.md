@@ -75,7 +75,6 @@ class MyStateManager(StateStoreManager):
         if not self.password:
             raise MyStateManagerError("Password is required")
 
-
     def set(self, state: MeltanoState) -> None:
         # Implement the logic to store the state in your custom backend
         ...

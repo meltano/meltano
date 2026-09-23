@@ -84,6 +84,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
         "Force a new run even if a pipeline with the same State ID is already "
         "present. Applies to all pipelines."
     ),
+    envvar="MELTANO_RUN_FORCE",
     is_flag=True,
 )
 @click.option(
@@ -183,7 +184,7 @@ async def run(
 
     tracker: Tracker = ctx.obj["tracker"]
 
-    _state_strategy = StateStrategy.from_cli_args(
+    state_strategy_ = StateStrategy.from_cli_args(
         merge_state=merge_state,
         state_strategy=state_strategy,
     )
@@ -198,7 +199,7 @@ async def run(
             no_state_update=no_state_update,
             force=force,
             state_id_suffix=state_id_suffix,
-            state_strategy=_state_strategy,
+            state_strategy=state_strategy_,
             run_id=run_id,
         )
         parsed_blocks = list(parser.find_blocks(0))

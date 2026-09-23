@@ -7,7 +7,7 @@ import sys
 import typing as t
 from functools import lru_cache
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
 
 if sys.version_info >= (3, 11):
@@ -238,11 +238,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
     @property
     def attrs(self) -> CommentedMap:
-        """Return the attributes of the current instance.
-
-        Returns:
-            Attributes of the current instance.
-        """
+        """The attributes of the current instance."""
         return self._dict
 
     def is_attr_set(self, attr):  # noqa: ANN001, ANN201
@@ -336,10 +332,9 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
                 if key in self._verbatim:
                     if val is None:
                         continue
-                else:
-                    # bool values are valid and should be forwarded
-                    if val is not False:
-                        continue
+                # bool values are valid and should be forwarded
+                elif val is not False:
+                    continue
 
             # empty canonicals should be skipped
             if isinstance(val, Canonical) and not dict(val):

@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.2.0"
+version = "4.3.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -30,7 +30,7 @@ dependencies = [
   "alembic>=1.14.0,<2",
   "anyio>=4.4.0,<5",
   "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
-  "click>=8.2,<8.5,!=8.2.2",
+  "click>=8.3,<8.6",
   "click-default-group>=1.2.4,<2",
   "dateparser>=1.2.1",
   "fasteners>=0.19,<0.21",
@@ -46,7 +46,7 @@ dependencies = [
   "requests>=2.32.3,<3",
   "rich>=15,<16",
   "ruamel.yaml>=0.18.6,<0.20",
-  "smart-open>=7.0.5,<8",
+  "smart-open>=7.0.5,<9",
   "snowplow-tracker>=1.0.4,<2",
   "sqlalchemy>=2.0.35,<2.1",
   "structlog>=25.5.0,<27",
@@ -74,11 +74,12 @@ psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
 s3 = ["boto3>=1.35,<2"]
 
 [project.urls]
-Homepage = "https://meltano.com"
-Repository = "https://github.com/meltano/meltano"
-Documentation = "https://docs.meltano.com"
 Changelog = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
+Documentation = "https://docs.meltano.com"
+Homepage = "https://meltano.com"
 "Issue Tracker" = "https://github.com/meltano/meltano/issues"
+Repository = "https://github.com/meltano/meltano"
+Security = "https://github.com/meltano/.github/blob/main/SECURITY.md"
 Slack = "https://meltano.com/slack"
 Twitter = "https://twitter.com/meltanodata/"
 Youtube = "https://www.youtube.com/meltano"
@@ -132,12 +133,11 @@ testing = [
   "pytest-codspeed>=4.2.0",
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
-  "pytest-randomly>=3.16,<5.0",
+  "pytest-randomly>=5,<5.1",
   "pytest-structlog~=1.1",
   "pytest-timeout>=2.4.0",
   "pytest-xdist~=3.6",
   "requests-mock>=1.12.1,<2",
-  "setproctitle~=1.3", # Used by pytest-xdist to aid with handling resource intensive processes.
   "time-machine>=3",
 ]
 typing = [
@@ -145,8 +145,8 @@ typing = [
   "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
-  "mypy~=2.1.0",
-  "ty==0.0.47",
+  "mypy>=2.1,<2.4",
+  "ty==0.0.81",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -174,12 +174,11 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
   'error',
-  # pytest warnings
-  'once:Class-scoped fixture defined as instance method is deprecated:pytest.PytestRemovedIn10Warning',
   # First-party warnings
   '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
   'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
   # Third-party warnings
+  'once::ResourceWarning',
 ]
 log_level = "INFO"
 markers = [
@@ -243,7 +242,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.2.0"
+version = "4.3.0"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
@@ -261,6 +260,7 @@ enable_error_code = [
   "exhaustive-match",
   "deprecated",
 ]
+explicit_package_bases = true
 incremental = true
 files = [
   "src/meltano/",
@@ -270,6 +270,7 @@ exclude = [
   "src/meltano/migrations/",
 ]
 local_partial_types = true
+mypy_path = ["src"]
 strict = false
 warn_redundant_casts = true
 warn_unreachable = true
@@ -298,7 +299,6 @@ module = [
   "meltano.core.plugin.project_plugin",
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
-  "meltano.core.utils.*",
 ]
 
 [tool.ty.rules]
@@ -328,26 +328,27 @@ exclude = [
   "src/meltano/core/runner/singer.py",
   "src/meltano/core/sqlalchemy.py",
   "src/meltano/core/tracking/**",
-  "src/meltano/core/utils/**",
   "src/meltano/migrations/**",
 ]
 
 [build-system]
-requires = ["hatchling==1.30.1"]
+requires = ["hatchling==1.32.0"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-required-version = ">=0.15.14"
+required-version = ">=0.16.0"
 
 [tool.ruff.lint]
 future-annotations = true
+preview = true
 ignore = [
-  "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
-  "S310",   # Allow `urllib.open`
-  "S603",   # Allow `subprocess.run(..., shell=False)`
-  "COM812", # Handled by the Ruff formatter
-  "ISC001", # Handled by the Ruff formatter
+  "error-suffix-on-exception-name",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
+  "suspicious-url-open-usage",   # Allow `urllib.open`
+  "subprocess-without-shell-equals-true",   # Allow `subprocess.run(..., shell=False)`
+  "missing-trailing-comma", # Handled by the Ruff formatter
+  "single-line-implicit-string-concatenation", # Handled by the Ruff formatter
+  "noqa-comments",
 ]
 select = [
   "A",     # flake8-builtins
@@ -399,23 +400,29 @@ select = [
   "YTT",   # flake8-2020
 ]
 unfixable = [
-  "ERA001", # Don't remove commented-out code
+  "commented-out-code", # Don't remove commented-out code
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "src/meltano/**/__init__.py" = [
-  "F401", # Permit unused imports in `__init__.py` files
+  "unused-import", # Permit unused imports in `__init__.py` files
 ]
 "tests/**" = [
   "ANN",
   "D1",
-  "S101",    # Allow 'assert' in tests
+  "assert",    # Allow 'assert' in tests
+  "hardcoded-password-func-arg",  # Allow dummy credentials in test fixtures
+  "hardcoded-password-string",    # Allow dummy credentials in test fixtures
   "INP",     # Don't require __init__.py files in tests directories
-  "LOG015",  # Allow `logging.<level>` in tests
+  "root-logger-call",  # Allow `logging.<level>` in tests
+  "fallible-context-manager",
+  "suspicious-subprocess-import",
+  "unused-async",
+  "non-empty-init-module",
 ]
 "src/meltano/migrations/versions/*" = [
-  "D103",
-  "INP001",
+  "undocumented-public-function",
+  "implicit-namespace-package",
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -454,7 +461,8 @@ ignore = [
 
 [tool.uv]
 override-dependencies = [
-  "sqlalchemy>=2.0.0.dev0,<2.2",
+  "sqlalchemy>=2.0.35,<2.1 ; python_version < '3.11'",
+  "sqlalchemy>=2.1.0rc1,<2.2 ; python_version >= '3.11'",
 ]
-prerelease = "if-necessary-or-explicit"
+prerelease = "if-necessary"
 required-version = ">=0.9.17"

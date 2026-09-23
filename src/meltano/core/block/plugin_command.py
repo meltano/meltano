@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 import structlog
 
@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-class PluginCommandBlock(metaclass=ABCMeta):
+class PluginCommandBlock(ABC):
     """Basic PluginCommand interface specification."""
 
     string_id: str
@@ -45,7 +45,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def command(self) -> str | None:
-        """Get the plugin command to use when invoking the plugin (if any)."""
+        """The plugin command to use when invoking the plugin (if any)."""
         raise NotImplementedError
 
     @abstractmethod
@@ -109,11 +109,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 
     @property
     def command_args(self) -> str | None:
-        """Get the command args to use when invoking the plugin.
-
-        Returns:
-            The command args if any.
-        """
+        """The command args to use when invoking the plugin."""
         return self._command_args
 
     async def _start(self) -> None:

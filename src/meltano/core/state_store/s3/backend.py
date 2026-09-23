@@ -20,11 +20,16 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable
+    from collections.abc import Iterable
 
     from mypy_boto3_s3 import S3Client
 
     from meltano.core.state_store.base import MeltanoState
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 class S3StateStoreManager(CloudStateStoreManager):
@@ -94,10 +99,7 @@ class S3StateStoreManager(CloudStateStoreManager):
     @cached_property
     @override
     def client(self) -> S3Client:
-        """Get an authenticated boto3.Client.
-
-        Returns:
-            A boto3.Client.
+        """An authenticated boto3.Client.
 
         Raises:
             InvalidStateBackendConfigurationException: when configured AWS
@@ -156,7 +158,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         )
 
     @override
-    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str]:
         """List all files in the backend.
 
         Args:

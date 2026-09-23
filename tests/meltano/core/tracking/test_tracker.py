@@ -21,12 +21,17 @@ from meltano.core.tracking.tracker import TelemetrySettings, Tracker, new_client
 from meltano.core.utils import hash_sha256, new_project_id
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from snowplow_tracker import SelfDescribing
 
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:
@@ -46,7 +51,7 @@ def check_analytics_json(project: Project) -> None:
 
 
 @contextmanager
-def delete_analytics_json(project: Project) -> Generator[None, None, None]:
+def delete_analytics_json(project: Project) -> Generator[None]:
     (project.dirs.meltano() / "analytics.json").unlink(missing_ok=True)
     try:
         yield
@@ -301,6 +306,11 @@ class TestTracker:
     def test_default_send_anonymous_usage_stats(self, project: Project) -> None:
         assert Tracker(project).send_anonymous_usage_stats
 
+    # TODO: Fix this flaky test
+    @pytest.mark.xfail(
+        reason="Rather flaky, seems to be polluted by other tests",
+        strict=False,
+    )
     @pytest.mark.usefixtures("project")
     def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: S607

@@ -92,7 +92,7 @@ class HookObject(metaclass=Hookable):
             self._triggering_hooks.add(hook_name)
             await self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
 
-        yield
+        yield  # ruff:ignore[fallible-context-manager]
 
         if not already_triggering:
             await self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)

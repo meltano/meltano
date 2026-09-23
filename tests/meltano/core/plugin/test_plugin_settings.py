@@ -26,13 +26,18 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from sqlalchemy.orm import Session
 
     from meltano.core.environment import Environment
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
     class PluginSettingsServiceFactory(t.Protocol):
         def __call__(
@@ -88,7 +93,7 @@ def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
 
 
 @pytest.fixture
-def environment(project: Project) -> Generator[Environment | None, None, None]:
+def environment(project: Project) -> Generator[Environment | None]:
     project.activate_environment("dev")
     try:
         yield project.environment
@@ -346,7 +351,7 @@ class TestPluginSettingsService:
 
         config = subject.as_dict(process=True)
         assert config["auth"]["username"] == "nested_username"
-        assert config["auth"]["password"] == "nested_password"  # noqa: S105
+        assert config["auth"]["password"] == "nested_password"
         assert "auth.username" not in config
         assert "auth.password" not in config
 
@@ -883,6 +888,33 @@ class TestPluginSettingsService:
             {"foo": "from_env"},
             SettingValueStore.ENV,
         )
+
+    @pytest.mark.filterwarnings("ignore::RuntimeWarning")
+    def test_escaped_dot_in_setting_name(
+        self,
+        subject: PluginSettingsService,
+        project,
+        tap,
+    ) -> None:
+        r"""A `\.` in a setting name is a literal dot, not a nesting separator."""
+        subject.set(
+            r"s3\.endpoint_url",
+            "http://localhost:9000",
+            store=SettingValueStore.MELTANO_YML,
+        )
+
+        # Stored escaped, so reading `meltano.yml` back does not nest it.
+        stored = project.plugins.get_plugin(tap).config
+        assert stored[r"s3\.endpoint_url"] == "http://localhost:9000"
+        assert "s3" not in stored
+
+        # Addressable by the same escaped name it was set with.
+        assert subject.get(r"s3\.endpoint_url") == "http://localhost:9000"
+
+        # And handed to the plugin as a single literal key.
+        processed = subject.as_dict(process=True)
+        assert processed["s3.endpoint_url"] == "http://localhost:9000"
+        assert "s3" not in processed
 
     @pytest.mark.usefixtures("tap")
     def test_extra(self, subject, monkeypatch, env_var) -> None:

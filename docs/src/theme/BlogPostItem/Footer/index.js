@@ -19,6 +19,7 @@ export default function BlogPostItemFooter() {
     <footer
       className={clsx(
         'row docusaurus-mt-lg',
+        styles.blogPostFooter,
         isBlogPostPage && styles.blogPostFooterDetailsFull,
       )}>
       {tagsExists && (
@@ -35,7 +36,7 @@ export default function BlogPostItemFooter() {
 
       {truncatedPost && (
         <div
-          className={clsx('col text--right', {
+          className={clsx('col text--left', {
             'col--3': tagsExists,
           })}>
           <ReadMoreLink blogPostTitle={title} to={metadata.permalink} />

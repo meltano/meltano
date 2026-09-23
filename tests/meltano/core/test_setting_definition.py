@@ -118,19 +118,19 @@ class TestSettingDefinition:
             name="test_setting", kind=SettingKind.DECIMAL
         )
 
-        decimal_val = Decimal("3.14")
+        decimal_val = Decimal("1.618")
         assert setting_definition.cast_value(decimal_val) == decimal_val
         assert setting_definition.cast_value(None) is None
 
     def test_from_key_value_decimal_inference(self) -> None:
         """Test automatic decimal type inference from Decimal and float values."""
         decimal_setting = SettingDefinition.from_key_value(
-            "decimal_key", Decimal("3.14")
+            "decimal_key", Decimal("1.618")
         )
         assert decimal_setting.kind == SettingKind.DECIMAL
         assert decimal_setting.name == "decimal_key"
 
-        float_setting = SettingDefinition.from_key_value("float_key", 3.14)
+        float_setting = SettingDefinition.from_key_value("float_key", 1.618)
         assert float_setting.kind == SettingKind.DECIMAL
         assert float_setting.name == "float_key"
 

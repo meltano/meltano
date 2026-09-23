@@ -20,7 +20,8 @@ if t.TYPE_CHECKING:
 
 class TestSingerMapper:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service: ProjectAddService) -> ProjectPlugin:
+    @classmethod
+    def subject(cls, project_add_service: ProjectAddService) -> ProjectPlugin:
         return project_add_service.add(
             PluginType.MAPPERS,
             "mapper-mock",

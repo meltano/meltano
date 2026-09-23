@@ -137,11 +137,7 @@ class SingerTarget(SingerPlugin):
     @property
     @override
     def config_files(self) -> dict[str, str]:
-        """Get config files for this target.
-
-        Returns:
-            The config_files for this target.
-        """
+        """Config files for this target."""
         return {
             "config": f"target.{self.instance_uuid}.config.json",
             "singer_sdk_logging": "target.singer_sdk_logging.json",
@@ -151,11 +147,7 @@ class SingerTarget(SingerPlugin):
     @property
     @override
     def output_files(self) -> dict[str, str]:
-        """Get output files for this target.
-
-        Returns:
-            The output files for this target.
-        """
+        """Output files for this target."""
         return {"state": "new_state.json"}
 
     @hook("before_invoke")

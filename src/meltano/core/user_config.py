@@ -46,7 +46,7 @@ class YamlSettings:
 
     @property
     def indent(self) -> int:
-        """Get the indentation level."""
+        """Indentation level."""
         if self._indent < 1:
             logger.warning(
                 "Invalid YAML indentation level, using default",
@@ -57,7 +57,7 @@ class YamlSettings:
 
     @property
     def block_seq_indent(self) -> int:
-        """Get the block sequence indentation level."""
+        """Block sequence indentation level."""
         if self._block_seq_indent < 0:
             logger.warning(
                 "Invalid YAML block sequence indentation level, using default",
@@ -68,7 +68,7 @@ class YamlSettings:
 
     @property
     def sequence_dash_offset(self) -> int:
-        """Get the sequence dash offset."""
+        """Sequence dash offset."""
         if self._sequence_dash_offset is None:
             self._sequence_dash_offset = max(0, self.indent - 2)
         return self._sequence_dash_offset
@@ -95,13 +95,16 @@ class UserConfig:
 
     _: KW_ONLY
     yaml: YamlSettings = field(default_factory=YamlSettings)
+    cloud: dict[str, t.Any] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, t.Any]) -> UserConfig:
         """Create a UserConfig from a dictionary."""
-        kwargs = {}
+        kwargs: dict[str, t.Any] = {}
         if yaml := data.get("yaml"):
             kwargs["yaml"] = YamlSettings.from_dict(yaml)
+        if cloud := data.get("cloud"):
+            kwargs["cloud"] = dict(cloud)
         return cls(**kwargs)
 
 
@@ -120,7 +123,7 @@ class UserConfigService:
 
     @property
     def config_path(self) -> Path:
-        """Get the path to the configuration file."""
+        """Path to the configuration file."""
         if self._config_path is None:
             config_dir = platformdirs.user_config_path("meltano")
             self._config_path = config_dir / "config.yml"
@@ -128,7 +131,7 @@ class UserConfigService:
 
     @property
     def config(self) -> UserConfig:
-        """Get the configuration data.
+        """Configuration data.
 
         Returns:
             The configuration data as a dictionary.
@@ -156,12 +159,13 @@ class UserConfigService:
 
     @property
     def yaml(self) -> YamlSettings:
-        """Get all YAML formatting settings.
-
-        Returns:
-            A dictionary of YAML formatting settings.
-        """
+        """YAML formatting settings as a YamlSettings object."""
         return self.config.yaml
+
+    @property
+    def cloud(self) -> dict[str, t.Any]:
+        """Meltano Cloud settings."""
+        return self.config.cloud
 
 
 _user_config_service: UserConfigService | None = None

@@ -74,11 +74,7 @@ class InvokerBase:
 
     @property
     def process_handle(self) -> Process:
-        """Get the process handle for the underlying plugin.
-
-        Returns:
-            The process handle for the underlying plugin.
-        """
+        """The process handle for the underlying plugin."""
         if self._process_handle is None:
             msg = f"Process is not running for {self.string_id}"
             raise ProcessNotRunningError(msg)
@@ -87,20 +83,12 @@ class InvokerBase:
 
     @property
     def command(self) -> str | None:
-        """Get the command to use when invoking the plugin.
-
-        Returns:
-            The command to use when invoking the plugin.
-        """
+        """The command to use when invoking the plugin."""
         return self._command
 
     @property
     def string_id(self) -> str:
-        """Return a string identifier for this block.
-
-        Returns:
-            A string identifier for this block.
-        """
+        """A string identifier for this block."""
         return self.invoker.plugin.name
 
     @property
@@ -189,22 +177,14 @@ class InvokerBase:
 
     @property
     def process_future(self) -> asyncio.Task:
-        """Return the future of the underlying process wait() call.
-
-        Returns:
-            The future of the underlying process wait() calls.
-        """
+        """The future of the underlying process wait() call."""
         if self._process_future is None:
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
 
     @property
     def stdin(self) -> asyncio.StreamWriter | None:
-        """Return stdin of the underlying process.
-
-        Returns:
-            The stdin of the underlying process.
-        """
+        """Stream: stdin of the underlying process."""
         return self.process_handle.stdin
 
     async def close_stdin(self) -> None:

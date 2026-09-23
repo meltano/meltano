@@ -30,11 +30,20 @@ The following CLI options are available for the top-level `meltano` command:
 
 - `--env-file` - Path to a [`.env` file](/concepts/project#env) to load environment variables from. Can be an absolute path, or relative to the current working directory.
 
-### No Color
+### Color Output
 
-The no color configuration is available for all meltano subcommands via an environment variable:
+Color output configuration is available for all Meltano subcommands via environment variables:
 
 - `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
+- `FORCE_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to enable colored log output even when stderr is not attached to a TTY.
+
+If both `NO_COLOR` and `FORCE_COLOR` are set to truthy values, `NO_COLOR` takes precedence and colored output is disabled.
+
+:::tip
+
+`FORCE_COLOR` support was added in Meltano v4.3.0.
+
+:::
 
 ### UTC timestamps in logs
 
@@ -53,6 +62,10 @@ If the flag is not provided, the behavior is determined by the boolean [`auto_in
 ## `add`
 
 `meltano add` lets you add or update [plugins](/concepts/plugins#project-plugins) in your Meltano project. The command is idempotent - running it on an existing plugin will update the plugin instead of failing.
+
+:::info Meltano Cloud account required
+This command reads plugin definitions from [Meltano Hub](https://hub.meltano.com/), which requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first, or pass `--from-ref` to add a plugin without the Hub.
+:::
 
 When adding a new plugin, it will:
 
@@ -245,6 +258,83 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 ### Using `add` with Environments
 
 The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+
+## `cloud`
+
+Use the `cloud` command to interact with [Meltano Cloud](https://meltano.com/cloud) from your terminal.
+
+### `auth`
+
+The `auth` subcommand manages your Meltano Cloud session. Logging in opens the Meltano Cloud login page in your browser, and stores the resulting session on your machine so that other `meltano cloud` commands can use it.
+
+Meltano uses the OAuth 2.0 authorization code flow with [PKCE](https://datatracker.ietf.org/doc/html/rfc7636), as recommended for command line applications by [RFC 8252](https://datatracker.ietf.org/doc/html/rfc8252). No credentials are ever typed into, or read by, the CLI itself: Meltano starts a short-lived HTTP server on the loopback interface, and your browser hands the authorization code back to it once you have logged in.
+
+#### How to use
+
+```bash
+# Log in to Meltano Cloud
+meltano cloud auth login
+
+# Print the login URL instead of opening a browser,
+# which is useful over SSH or in a remote shell
+meltano cloud auth login --no-browser
+
+# Log in again, replacing an existing session
+meltano cloud auth login --force
+
+# Check whether you are logged in, and as whom
+meltano cloud auth status
+
+# Check the stored session without contacting Meltano Cloud
+meltano cloud auth status --offline
+
+# Log out, revoking the stored session
+meltano cloud auth logout
+
+# Log out, and also end the session in your browser
+meltano cloud auth logout --web
+```
+
+`meltano cloud auth status` exits with a non-zero exit code when you are not logged in, so it can be used to gate other commands in a script:
+
+```bash
+meltano cloud auth status --offline || meltano cloud auth login
+```
+
+#### Where the session is stored
+
+Your session is written to a `cloud/credentials.json` file in the Meltano user configuration directory, which is platform specific:
+
+- Linux: `~/.config/meltano/cloud/credentials.json`
+- macOS: `~/Library/Application Support/meltano/cloud/credentials.json`
+- Windows: `%LOCALAPPDATA%\meltano\meltano\cloud\credentials.json`
+
+The file is only readable and writable by your user account. It holds the tokens issued by Meltano Cloud, so treat it like any other credential: do not commit it, and do not copy it to a shared machine.
+
+Meltano renews an expired access token automatically using the stored refresh token, so you should only need to log in again after logging out, or after the refresh token itself expires.
+
+Set the `MELTANO_CLOUD_CREDENTIALS_PATH` environment variable to store the session somewhere else, for example to keep separate sessions side by side:
+
+```bash
+MELTANO_CLOUD_CREDENTIALS_PATH=~/.config/meltano/cloud/staging.json meltano cloud auth login
+```
+
+#### Storing the session elsewhere
+
+The login flow listens on port `9999`, falling back to `9998` when that one is in use.
+
+Where the session is stored can be changed, with an environment variable or with a key under `cloud.auth` in your [Meltano user configuration file](/guide/configuration):
+
+| Environment variable             | User configuration key        | Description                  |
+| -------------------------------- | ----------------------------- | ---------------------------- |
+| `MELTANO_CLOUD_CREDENTIALS_PATH` | `cloud.auth.credentials_path` | Where the session is stored. |
+
+```yaml
+# ~/.config/meltano/config.yml
+cloud:
+  auth:
+    credentials_path: ~/.config/meltano/cloud/staging.json
+```
 
 ## `compile`
 
@@ -816,11 +906,105 @@ Use the `hub` command to interact with the instance of Meltano Hub your Meltano 
 
 Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
 
+:::info Meltano Cloud account required
+Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
+
+A logged in user reads the Hub that Meltano Cloud serves, which lists the plugins that Meltano supports, maintains and tests. A project that sets [`hub_url`](/reference/settings/#hub_url) or [`hub_api_root`](/reference/settings/#hub_api_root) keeps the Hub it names.
+
+The commands that read from the Hub are [`add`](#add), [`lock`](#lock), `hub list` and `hub ping`. A project that already has [lock artifacts](/concepts/plugins#lock-artifacts) is unaffected, because [`install`](#install) and [`run`](#run) do not contact the Hub.
+:::
+
+### `list`
+
+Lists the plugins that Meltano Hub offers. Each plugin is listed once, on the [variant](/concepts/plugins#variants) that Meltano installs when no variant is specified. Pass `--all` to list every variant of every plugin, and `--plugin-type` to list one type only.
+
+Pass a pattern to narrow the list to the rows whose plugin name or variant contains it, ignoring case. `gitlab` finds `tap-gitlab`, and `meltanolabs` finds every plugin listed on that variant. Pair a pattern with `--all` to find matching plugins across all variants. A count of what matched, and of any matching variant that was hidden, is logged rather than printed, so it reaches you whichever format the rows are in and `--format json` stays parseable.
+
+An index that has been fetched is reused for an hour. Pass `--refresh` to explicitly refresh the index, such as after a plugin has just been published. The cache holds only the index that this command reads. Every other command that reads Meltano Hub, including `meltano add`, always fetches.
+
+Use `meltano plugin list` to see the plugins that your own project defines.
+
 ### How to use
 
 ```bash
 # Check if a connection with Meltano Hub can be established
 meltano hub ping
+
+# List every plugin that Meltano Hub offers
+meltano hub list
+
+# List only the extractors
+meltano hub list --plugin-type extractor
+
+# List the plugins whose name contains 'gitlab'
+meltano hub list gitlab
+
+# Find every plugin that offers the 'singer-io' variant
+meltano hub list singer-io --all
+
+# List the extractors whose name contains 'google'
+meltano hub list google --plugin-type extractor
+
+# List every variant, rather than each plugin's default
+meltano hub list --all
+
+# Emit JSON, for scripting
+meltano hub list --format json
+
+# Fetch a fresh index, rather than reusing the one from the last hour
+meltano hub list --refresh
+```
+
+```bash
+meltano hub list
+```
+
+```
+ TYPE        NAME                   VARIANT
+ ─────────────────────────────────────────────────
+ extractor   tap-carbon-intensity   meltano
+ extractor   tap-google-analytics   meltanolabs
+ loader      target-jsonl           andyh1203
+```
+
+```bash
+meltano hub list --all
+```
+
+```
+ TYPE        NAME                   VARIANT
+ ─────────────────────────────────────────────────────────
+ extractor   tap-carbon-intensity   meltano
+ extractor   tap-google-analytics   meltanolabs (default)
+                                    meltano
+ loader      target-jsonl           andyh1203
+```
+
+```bash
+meltano hub list --format json
+```
+
+```json
+[
+  {
+    "type": "extractor",
+    "name": "tap-carbon-intensity",
+    "variant": "meltano",
+    "default": true
+  },
+  {
+    "type": "extractor",
+    "name": "tap-google-analytics",
+    "variant": "meltanolabs",
+    "default": true
+  },
+  {
+    "type": "loader",
+    "name": "target-jsonl",
+    "variant": "andyh1203",
+    "default": true
+  }
+]
 ```
 
 ### Using `environment` with Environments
@@ -992,6 +1176,8 @@ Dumping the config and catalog of a plugin may reveal sensitive values in your t
 ```bash
 meltano invoke --dump=config <plugin>
 meltano invoke --dump=catalog <plugin>
+meltano invoke --refresh-catalog <plugin>
+meltano invoke --refresh-catalog --dump=catalog <plugin>
 ```
 
 By default, `meltano invoke` will attempt to install the plugin before invoking it. Use `--no-install` to skip this behavior:
@@ -999,6 +1185,8 @@ By default, `meltano invoke` will attempt to install the plugin before invoking 
 ```bash
 meltano invoke --no-install <plugin>
 ```
+
+Use `--refresh-catalog` with Singer extractors to ignore any existing cached catalog and run discovery before invoking the tap in sync mode or dumping the catalog.
 
 Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
@@ -1053,6 +1241,10 @@ meltano invoke --print-var <PLUGIN_ENVIRONMENT_VARIABLE_1> --print-var <PLUGIN_E
 ## `lock`
 
 `meltano lock` creates lock files for [non-custom](/concepts/plugins#custom-plugins) plugins in the project.
+
+:::info Meltano Cloud account required
+This command reads plugin definitions from [Meltano Hub](https://hub.meltano.com/), which requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
+:::
 
 ### How to use
 
@@ -1151,6 +1343,92 @@ meltano logs list --format json
 - Status indicators: ✓ PASS (success), ✗ FAIL (failed), → RUN (running)
 - Large log files (>2MB) will prompt for confirmation before displaying
 - Logs are stored in `.meltano/logs/elt/<state_id>/<run_id>/elt.log`
+
+## `plugin`
+
+Use the `plugin` command to inspect the [plugins](/concepts/plugins) in your project.
+
+### `list`
+
+Lists every plugin that your project defines, along with the [variant](/concepts/plugins#variants) in use. A project can spread its plugins across `meltano.yml` and the [other YAML files it includes](/concepts/project#multiple-yaml-files), and this gathers them into one view.
+
+The command reports what the project declares. It does not inspect what is installed.
+
+The plugins keep the order that `meltano.yml` defines them in, within each plugin type.
+
+The `INHERIT FROM` column names the plugin that a plugin [inherits from](/concepts/plugins#plugin-inheritance), and the `CUSTOM` column marks a [custom plugin](/concepts/project#custom-plugin-definitions), meaning one that carries its own definition in `meltano.yml` rather than taking one from [Meltano Hub](https://hub.meltano.com/). A plugin from Meltano Hub has neither.
+
+An inheriting plugin takes its parent's variant, so the `VARIANT` column shows `(inherited)`. The JSON output reports the resolved variant.
+
+#### How to use
+
+```bash
+# List the plugins in the project
+meltano plugin list
+
+# Emit JSON, for scripting
+meltano plugin list --format json
+```
+
+```bash
+meltano plugin list
+```
+
+```
+ TYPE        NAME                  VARIANT       INHERIT FROM   CUSTOM
+ ─────────────────────────────────────────────────────────────────────
+ extractor   tap-github            meltanolabs
+ extractor   tap-github--sandbox   (inherited)   tap-github
+ extractor   tap-internal          default                        ✓
+ loader      target-jsonl          andyh1203
+```
+
+```bash
+meltano plugin list --format json
+```
+
+```json
+[
+  {
+    "type": "extractor",
+    "name": "tap-github",
+    "variant": "meltanolabs",
+    "inherit_from": null,
+    "custom": false,
+    "pip_url": "meltanolabs-tap-github"
+  },
+  {
+    "type": "extractor",
+    "name": "tap-github--sandbox",
+    "variant": "meltanolabs",
+    "inherit_from": "tap-github",
+    "custom": false,
+    "pip_url": "meltanolabs-tap-github"
+  },
+  {
+    "type": "extractor",
+    "name": "tap-internal",
+    "variant": "default",
+    "inherit_from": null,
+    "custom": true,
+    "pip_url": "git+https://github.com/acme/tap-internal.git"
+  },
+  {
+    "type": "loader",
+    "name": "target-jsonl",
+    "variant": "andyh1203",
+    "inherit_from": null,
+    "custom": false,
+    "pip_url": "target-jsonl"
+  }
+]
+```
+
+:::info
+
+[Mappings](/concepts/plugins#mappers) are configuration for a mapper rather than a separate plugin, so the mapper is listed once and its mappings are not listed.
+
+:::
 
 ## `remove`
 
@@ -1259,6 +1537,9 @@ meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
 
 # run a pipeline with timeout set via environment variable
 MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
+
+# force a new run even if a pipeline with the same State ID is already running
+MELTANO_RUN_FORCE=1 meltano --environment=dev run tap-gitlab target-postgres
 
 # run a pipeline with state-id-suffix set via environment variable
 MELTANO_RUN_STATE_ID_SUFFIX=pipeline-alias meltano --environment=dev run tap-gitlab target-postgres

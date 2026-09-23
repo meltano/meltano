@@ -17,6 +17,11 @@ if t.TYPE_CHECKING:
     else:
         from importlib_metadata import EntryPoints
 
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 T = t.TypeVar("T")
 
 
@@ -40,7 +45,7 @@ class MeltanoAddon(t.Generic[T]):
         """
         return entry_points(group=self.entry_point_group)
 
-    def get_all(self) -> t.Generator[T, None, None]:
+    def get_all(self) -> Generator[T]:
         """Get all add-ons.
 
         Returns:

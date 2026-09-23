@@ -39,7 +39,7 @@ Path | JSON Type | Description
 `version`         | `string`   | The version identifies this artifact type.
 `data_components` | `string[]` | The meltano.yml data component name.
 `actions`         | `string[]` | The Meltano tasks that will be run as defined in your meltano.yml or Plugins.
-`inline_script`   | `string`   | Custom [Bash](https://www.gnu.org/software/bash/) script.  Overrides actions if supplied.
+`script`          | `string`   | Custom [Bash](https://www.gnu.org/software/bash/) script.  Overrides actions if supplied.
 `timeout`         | `number`   | A timeout value in seconds that prevents pipelines from running for too long. A pipeline running longer that the timeout setting is automatically stopped.
 `max_retries`      | `number`  | The maximum number of retries to attempt for a job ending with `ERROR`
 `properties`      | `object`      | A map of properties, with Data Component name and setting as the key and the value e.g. `data-component-name.setting=value`, that configures the pipeline environment.

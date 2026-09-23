@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import platform
 import re
@@ -7,18 +8,20 @@ import shutil
 import subprocess
 import typing as t
 import uuid
+import warnings
 from http import HTTPStatus
 from pathlib import Path
 from time import perf_counter_ns
 from unittest import mock
 
 import click
+import click.testing
 import pytest
 import responses
 import yaml
 from structlog.stdlib import get_logger
 
-import meltano
+import meltano.cli
 from asserts import assert_cli_runner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
@@ -28,11 +31,19 @@ from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import get_meltano_version
 from meltano.core.version_check import PYPI_URL, VersionCheckResult
 
 if t.TYPE_CHECKING:
+    import sys
+
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.project_init_service import ProjectInitService
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
@@ -75,7 +86,7 @@ class TestCli:
         self,
         tmp_path: Path,
         project_init_service: ProjectInitService,
-    ) -> t.Generator[Project, None, None]:
+    ) -> Generator[Project]:
         os.chdir(tmp_path)
         project = project_init_service.init(activate=False)
         Project._default = None
@@ -115,7 +126,7 @@ class TestCli:
         pushd(incompatible_version_project.root)
         result = cli_runner.invoke(cli, ["config"])
         assert result.exit_code == 3
-        assert re.match("You're using .* but this project requires .*", result.output)
+        assert re.search(r"You're using .* but this project requires .*", result.output)
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
@@ -178,13 +189,13 @@ class TestCli:
             assert results[source].exit_code
             assert (
                 results[source].exception.args[0]
-                == f"Environment {name!r} was not found."
+                == f"Environment {name!r} was not found"
             )
 
     def test_version(self, cli_runner) -> None:
         cli_version = cli_runner.invoke(cli, ["--version"])
 
-        assert cli_version.output == f"meltano, version {meltano.__version__}\n"
+        assert cli_version.output == f"meltano, version {get_meltano_version()}\n"
 
     @pytest.mark.usefixtures("deactivate_project")
     def test_default_environment_is_activated(
@@ -292,10 +303,70 @@ class TestCli:
         with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
 
+    def test_sigterm_cancellation_exits_143(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", True)
+
+        with (
+            mock.patch("meltano.cli.cli", side_effect=asyncio.CancelledError),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            meltano.cli._run_cli()
+
+        assert exc_info.value.code == 143
+
+    def test_cancellation_without_sigterm_propagates(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.job.job._sigterm_received", False)
+
+        with (
+            mock.patch("meltano.cli.cli", side_effect=asyncio.CancelledError),
+            pytest.raises(asyncio.CancelledError),
+        ):
+            meltano.cli._run_cli()
+
+    @pytest.mark.parametrize(
+        ("raised", "expected_exit_code"),
+        (
+            pytest.param(None, 0, id="success"),
+            pytest.param(SystemExit(143), 143, id="sigterm"),
+            pytest.param(SystemExit(None), 0, id="none-code"),
+            pytest.param(SystemExit("boom"), 1, id="string-code"),
+            pytest.param(RuntimeError("boom"), 1, id="other-error"),
+        ),
+    )
+    def test_main_records_exit_code(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        raised: BaseException | None,
+        expected_exit_code: int,
+    ) -> None:
+        monkeypatch.setattr(
+            meltano.cli,
+            "_run_cli",
+            mock.Mock(side_effect=raised),
+        )
+        monkeypatch.setattr(meltano.cli, "exit_event_tracker", None)
+        # keep `main`'s global logging/warnings tweaks out of the test session
+        monkeypatch.setattr("logging.captureWarnings", mock.Mock())
+
+        with warnings.catch_warnings():
+            if raised is None:
+                meltano.cli.main()
+            else:
+                with pytest.raises(type(raised)):
+                    meltano.cli.main()
+
+        assert meltano.cli.exit_code == expected_exit_code
+
     @pytest.mark.usefixtures("pushd")
     def test_cwd_option(
         self,
-        cli_runner,
+        cli_runner: MeltanoCliRunner,
         test_cli_project: Project,
         tmp_path: Path,
     ) -> t.NoReturn:
@@ -313,19 +384,15 @@ class TestCli:
         with cd(project.dirs.root):
             filepath = tmp_path / "file.txt"
             filepath.touch()
-            with pytest.raises(click.BadParameter, match="is a file"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(filepath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(filepath), "dragon"))
+            assert result.exit_code == 2
+            assert "is a file" in result.stderr
 
         with cd(project.dirs.root):
             dirpath = tmp_path / "subdir"
-            with pytest.raises(click.BadParameter, match="does not exist"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(dirpath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon"))
+            assert result.exit_code == 2
+            assert "does not exist" in result.stderr
 
         with cd(project.dirs.root):
             dirpath.mkdir()
@@ -493,8 +560,15 @@ class TestCliColors:
                 {},
                 None,
                 True,
+                False,
+                id="log-colors-disabled-by-default-when-stderr-is-not-tty",
+            ),
+            pytest.param(
+                {},
+                _get_dummy_logging_config(colors=True),
                 True,
-                id="colors-enabled-by-default",
+                True,
+                id="custom-log-config-colors-still-enabled",
             ),
             pytest.param(
                 {
@@ -545,8 +619,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-f-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-no-color-f",
             ),
             pytest.param(
                 {
@@ -554,8 +628,8 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-FALSE-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-no-color-FALSE",
             ),
             pytest.param(
                 {
@@ -563,26 +637,30 @@ class TestCliColors:
                 },
                 None,
                 True,
-                True,
-                id="colors-not-disabled-by-invalid-no-color-env",
+                False,
+                id="log-colors-disabled-by-non-tty-stderr-invalid-no-color",
             ),
         ),
     )
     def test_no_color(
         self,
-        cli_runner,
-        env,
-        log_config,
-        cli_colors_expected,
-        log_colors_expected,
-        tmp_path,
-        monkeypatch,
+        *,
+        cli_runner: click.testing.CliRunner,
+        env: dict[str, str],
+        log_config: dict[str, t.Any] | None,
+        cli_colors_expected: bool,
+        log_colors_expected: bool,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
+        monkeypatch.delenv("FORCE_COLOR", raising=False)
         styled_text = click.style(self.TEST_TEXT, fg="red")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
 
         if log_config:
-            log_config_path = tmp_path / "logging.yml"
+            log_config_path = project_path / "logging.yml"
             log_config_path.write_text(yaml.dump(log_config))
         else:
             log_config_path = None
@@ -598,12 +676,12 @@ class TestCliColors:
 
         expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
-        with cli_runner.isolated_filesystem():
-            result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
-            assert result.exit_code == 0, result.exception
-            assert result.stdout.strip() == expected_text
-            assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
-            assert result.exception is None
+        monkeypatch.chdir(project_path)
+        result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
+        assert result.exit_code == 0, result.exception
+        assert result.stdout.strip() == expected_text
+        assert bool(ANSI_RE.findall(result.stderr)) is log_colors_expected
+        assert result.exception is None
 
 
 class TestLargeConfigProject:

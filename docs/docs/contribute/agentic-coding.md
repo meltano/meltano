@@ -41,7 +41,7 @@ Before opening a pull request, whether the code was written by you, an agent, or
 2. **Run the relevant tests**
 
    ```bash
-   uv run pytest tests/path/to/test.py
+   uv run python -m pytest tests/path/to/test.py
    ```
 
 3. **Review the diff yourself** - agents can introduce subtle issues such as

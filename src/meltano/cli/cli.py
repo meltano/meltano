@@ -11,7 +11,6 @@ from pathlib import Path
 import click
 import structlog
 
-from meltano import __version__
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, LogFormat, setup_logging
@@ -19,7 +18,11 @@ from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
-from meltano.core.utils import IncompatibleMeltanoVersionError, get_no_color_flag
+from meltano.core.utils import (
+    IncompatibleMeltanoVersionError,
+    get_meltano_version,
+    get_no_color_flag,
+)
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -96,7 +99,7 @@ def cli(
     ctx: click.Context,
     *,
     log_level: str | None,
-    log_format: str | None,
+    log_format: LogFormat | None,
     log_config: str | None,
     environment: str,
     no_environment: bool,
@@ -119,6 +122,15 @@ def cli(
     if log_format:
         ProjectSettingsService.config_override["cli.log_format"] = log_format
 
+    setup_logging(log_level=log_level, log_config=log_config, log_format=log_format)
+    logger.info(
+        "Meltano %s, Python %s, %s (%s)",
+        get_meltano_version(),
+        platform.python_version(),
+        platform.system(),
+        platform.machine(),
+    )
+
     ctx.obj["explicit_no_environment"] = no_environment
     no_color = get_no_color_flag()
     if no_color:
@@ -133,13 +145,6 @@ def cli(
     try:
         project = Project.find(dotenv_file=env_file)
         setup_logging(project)
-        logger.debug(
-            "Meltano %s, Python %s, %s (%s)",
-            __version__,
-            platform.python_version(),
-            platform.system(),
-            platform.machine(),
-        )
         if project.readonly:
             logger.debug("Project is read-only.")
 

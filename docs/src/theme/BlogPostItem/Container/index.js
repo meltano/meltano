@@ -10,7 +10,7 @@ export default function BlogPostItemContainer({ children, className }) {
   const { frontMatter, assets, metadata } = useBlogPost();
   const { withBaseUrl } = useBaseUrlUtils();
   const image = assets.image ?? frontMatter.image;
-  const monthFormat = useDateTimeFormat({ month: 'long', timeZone: 'UTC' });
+  const monthFormat = useDateTimeFormat({ month: 'short', timeZone: 'UTC' });
   const yearFormat = useDateTimeFormat({ year: 'numeric', timeZone: 'UTC' });
   const dateObj = new Date(metadata.date);
   const month = monthFormat.format(dateObj);

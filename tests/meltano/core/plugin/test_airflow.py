@@ -23,7 +23,8 @@ AIRFLOW_CONFIG = """
 
 class TestAirflow:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    @classmethod
+    def subject(cls, project_add_service):
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 

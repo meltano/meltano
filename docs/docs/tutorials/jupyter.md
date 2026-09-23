@@ -2,7 +2,6 @@
 title: How to use Jupyter with Meltano
 description: Using jupyter Python notebook as transformation tooling or to run analyses across your meltano maintained data.
 layout: doc
-sidebar_position: 4
 ---
 
 As of _Sep-2022_, jupyter is not yet available as utility on [Meltano Hub](https://hub.meltano.com/), so you need to add it to your Meltano project as (local) custom plugin. Even if it is available as plugin on the Hub, you will probably want to do some customization, so it will make sense to create your own version.
@@ -103,7 +102,6 @@ PG_PORT = os.getenv("PG_PORT", default=None)
 PG_DB = os.getenv("PG_DB", default=None)
 PG_USER = os.getenv("PG_USER", default=None)
 PG_PWD = os.getenv("PG_PWD", default=None)
-
 ```
 
 ### 4. Execute notebooks via nbconvert or papermill

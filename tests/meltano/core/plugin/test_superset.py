@@ -44,7 +44,8 @@ def load_module_from_path(name: str, path: Path) -> ModuleType:
 
 class TestSuperset:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service: ProjectAddService) -> ProjectPlugin:
+    @classmethod
+    def subject(cls, project_add_service: ProjectAddService) -> ProjectPlugin:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 

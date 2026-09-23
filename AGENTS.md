@@ -20,7 +20,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ### Testing
 
-- Run specific test: `uv run pytest tests/path/to/test.py::test_function`
+- Run specific test: `uv run python -m pytest tests/path/to/test.py::test_function`
 - Run all tests: `nox -t test` or `nox -s pytest`
 - Run a subset of tests on a single Python version: `nox -p 3.14 -s pytest -- tests/meltano/core/state_store`
 - Run with specific backend: `PYTEST_BACKEND=postgresql nox -s pytest`

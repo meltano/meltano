@@ -8,7 +8,7 @@ LOG_FILE="./integration/example-library/meltano-run/integration-test.log"
 
 # test that meltano run saw dbt:test (set=1) as successfully completed
 grep "Block run completed" $LOG_FILE
-grep "\[info     \] dbt-postgres .* Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=1" $LOG_FILE
+grep "\[info     \] dbt-postgres .* Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1" $LOG_FILE
 
 # we could also run psql statements
 # check for the existence of files

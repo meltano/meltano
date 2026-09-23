@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - src/**
+      - tests/conftest.py
       - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
@@ -13,6 +14,7 @@ on:
       - 'v*'
     paths:
       - src/**
+      - tests/conftest.py
       - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
@@ -39,16 +41,16 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
 
     - name: Setup Python
-      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       id: setup-python
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+      uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
       with:
         cache-suffix: bench
         python-version: ${{ steps.setup-python.outputs.python-version }}
@@ -58,7 +60,9 @@ jobs:
         uv sync --group testing
 
     - name: Run benchmarks
-      uses: CodSpeedHQ/action@9d332c4d90b43981c3e55ae8e38e68709996240f # v4.17.0
+      uses: CodSpeedHQ/action@373d6868929f444bc08d901fd0eb0ad52a8875ea # v5.2.1
+      env:
+        TMPDIR: /dev/shm
       with:
         mode: walltime
-        run: uv run pytest tests/benchmarks/ --codspeed -p no:randomly
+        run: uv run python -m pytest tests/benchmarks/ --codspeed -p no:randomly --basetemp=/dev/shm/pytest

@@ -12,7 +12,6 @@ from functools import cached_property, reduce
 from importlib import resources
 from operator import getitem
 
-import jsonschema
 import jsonschema.protocols
 import jsonschema.validators
 import structlog
@@ -152,7 +151,7 @@ class Manifest:
 
     @cached_property
     def _schema_validator(self) -> jsonschema.protocols.Validator:
-        """Return a cached validator for the manifest schema.
+        """A cached validator for the manifest schema.
 
         The validator class is automatically determined from the schema's
         $schema field using jsonschema.validators.validator_for().

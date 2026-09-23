@@ -9,12 +9,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.schedule import ELTSchedule, JobSchedule, is_valid_cron
-from meltano.core.schedule_service import (
-    BadCronError,
-    ScheduleAlreadyExistsError,
-    ScheduleDoesNotExistError,
-    ScheduleNotFoundError,
-)
+from meltano.core.schedule_service import BadCronError, ScheduleAlreadyExistsError
 from meltano.core.utils import NotFound
 
 if t.TYPE_CHECKING:
@@ -165,7 +160,7 @@ class TestScheduleService:
         assert excinfo.value.reason == "Invalid Cron expression or alias: 'bad_cron'"
         assert excinfo.value.instruction == "Please use a valid cron expression"
 
-    def test_remove_schedule(self, subject) -> None:
+    def test_remove_schedule(self, subject: ScheduleService) -> None:
         schedules = list(subject.schedules())
         schedules_count = len(schedules)
 
@@ -181,10 +176,10 @@ class TestScheduleService:
         assert target_schedule not in schedules
 
         # schedule name must exist to be removed
-        with pytest.raises(ScheduleDoesNotExistError):
+        with pytest.raises(NotFound):
             subject.remove_schedule(target_name)
 
-    def test_schedule_update(self, subject) -> None:
+    def test_schedule_update(self, subject: ScheduleService) -> None:
         schedule = subject.schedules()[0]
 
         yearly_intervals = sum(sbj.interval == "@yearly" for sbj in subject.schedules())
@@ -206,7 +201,7 @@ class TestScheduleService:
 
         # it must exists
         schedule.name = "llamasareverynice"
-        with pytest.raises(ScheduleDoesNotExistError):
+        with pytest.raises(NotFound):
             subject.update_schedule(schedule)
 
     def test_run_elt_schedule(self, subject, tap, target) -> None:
@@ -307,10 +302,10 @@ class TestScheduleService:
         assert isinstance(found_schedule, ELTSchedule)
         assert found_schedule.extractor == custom_tap.name
 
-    def test_find_namespace_schedule_not_found(self, subject) -> None:
-        with pytest.raises(ScheduleNotFoundError):
+    def test_find_namespace_schedule_not_found(self, subject: ScheduleService) -> None:
+        with pytest.raises(NotFound):
             subject.find_namespace_schedule("no-such-namespace")
 
-    def test_find_schedule_not_found(self, subject) -> None:
+    def test_find_schedule_not_found(self, subject: ScheduleService) -> None:
         with pytest.raises(NotFound):
             subject.find_schedule("no-such-schedule")

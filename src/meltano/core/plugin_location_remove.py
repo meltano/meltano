@@ -8,7 +8,6 @@ import typing as t
 from abc import ABC, abstractmethod
 from enum import Enum
 
-import sqlalchemy
 import sqlalchemy.exc
 
 from meltano.core.db import project_engine

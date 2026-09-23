@@ -15,7 +15,13 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 logger = structlog.getLogger(__name__)
 
@@ -50,7 +56,7 @@ class InvalidTasksError(Exception):
         super().__init__(f"Job '{name}' has invalid tasks. {message}")
 
 
-def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
+def _flat_split(items: Iterable | str) -> Generator[str]:
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 import sys
 import typing as t
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory
@@ -35,11 +35,7 @@ class ValidationOutcome(StrEnum):
 
     @property
     def color(self) -> str:
-        """Return terminal color for this outcome.
-
-        Returns:
-            The string name of a color for this outcome.
-        """
+        """Terminal color for this outcome."""
         return "green" if self == ValidationOutcome.SUCCESS else "red"
 
     @classmethod
@@ -55,7 +51,7 @@ class ValidationOutcome(StrEnum):
         return cls.SUCCESS if exit_code == EXIT_CODE_OK else cls.FAILURE
 
 
-class ValidationsRunner(metaclass=ABCMeta):
+class ValidationsRunner(ABC):
     """Class to collect all validations defined for a plugin."""
 
     def __init__(
@@ -74,11 +70,7 @@ class ValidationsRunner(metaclass=ABCMeta):
 
     @property
     def plugin_name(self) -> str:
-        """Get underlying plugin name.
-
-        Returns:
-            The name of the plugin to run.
-        """
+        """Underlying plugin name to run."""
         return self.invoker.plugin.name
 
     def select_test(self, name: str) -> None:

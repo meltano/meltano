@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import enum
 import json
+import operator
 import sys
 import tempfile
 import typing as t
@@ -37,7 +38,7 @@ from meltano.core.setting_definition import SettingValueJSONEncoder
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import run_async
+from meltano.core.utils import run_async, split_path
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -548,7 +549,7 @@ def list_settings(
             buckets[_Bucket.OPTIONAL].append((name, config_metadata))
 
     for bucket in buckets.values():
-        bucket.sort(key=lambda item: item[0])
+        bucket.sort(key=operator.itemgetter(0))
 
     # When filtering, the user is searching, so optional-at-defaults are not
     # hidden; the filter result is the narrowed view.
@@ -571,13 +572,13 @@ def list_settings(
         # Optional bucket (adding an `Optional:` header in that case would be
         # a gratuitous output change for `--all --extras` callers).
         optional_label = "Optional:" if buckets[_Bucket.CONFIGURED] else None
-        _section_defs: list[tuple[str | None, _SettingBucket]] = [
+        section_defs: list[tuple[str | None, _SettingBucket]] = [
             ("Configured:", buckets[_Bucket.CONFIGURED]),
             (optional_label, buckets[_Bucket.OPTIONAL]),
             ("Custom:", buckets[_Bucket.CUSTOM]),
         ]
     else:
-        _section_defs = [
+        section_defs = [
             ("Required:", buckets[_Bucket.REQUIRED]),
             ("Configured:", buckets[_Bucket.CONFIGURED]),
             ("Optional:", buckets[_Bucket.OPTIONAL]),
@@ -587,7 +588,7 @@ def list_settings(
                 buckets[_Bucket.CUSTOM_EXTRAS],
             ),
         ]
-    sections = [(h, b) for h, b in _section_defs if b]
+    sections = [(h, b) for h, b in section_defs if b]
 
     for i, (header, bucket) in enumerate(sections):
         if i > 0:
@@ -710,8 +711,12 @@ def set_(
         tracker=tracker,
     )
     settings = _get_settings(project=project, plugin=plugin)
+    # Segments stay escaped: the escaped name is what identifies the setting
+    # both in `meltano.yml` and in its `SettingDefinition`.
     setting_name = (
-        tuple(setting_name[0].split(".")) if len(setting_name) == 1 else setting_name
+        tuple(split_path(setting_name[0], unescape=False))
+        if len(setting_name) == 1
+        else setting_name
     )
 
     interaction = InteractiveConfig(

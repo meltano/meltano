@@ -108,31 +108,19 @@ class PluginSettingsService(SettingsService):
     @property
     @override
     def project_settings_service(self) -> SettingsService:
-        """Get the settings service for the active project.
-
-        Returns:
-            A project settings service for the active project.
-        """
+        """Settings service for the active project."""
         return self.project.settings
 
     @property
     @override
     def label(self) -> str:
-        """Get the label for this plugin.
-
-        Returns:
-            The label for this plugin.
-        """
+        """Label for this plugin."""
         return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
 
     @property
     @override
     def docs_url(self) -> str:
-        """Get the documentation URL for this plugin.
-
-        Returns:
-            The documentation URL for this plugin.
-        """
+        """Documentation URL for this plugin."""
         return self.plugin.docs
 
     @override
@@ -160,22 +148,14 @@ class PluginSettingsService(SettingsService):
     @property
     @override
     def db_namespace(self):  # noqa: ANN201
-        """Return namespace for setting value records in system database.
-
-        Returns:
-            Namespace for setting value records in system database.
-        """
+        """Namespace for setting value records in system database."""
         # "default" is included for legacy reasons
         return f"{self.plugin.type}.{self.plugin.name}.default"
 
     @property
     @override
     def setting_definitions(self) -> list[SettingDefinition]:
-        """Return definitions of supported settings.
-
-        Returns:
-            A list of setting definitions.
-        """
+        """Definitions of supported settings."""
         settings = self.plugin.settings_with_extras
 
         if self.environment_plugin_config is not None:
@@ -188,20 +168,12 @@ class PluginSettingsService(SettingsService):
     @property
     @override
     def meltano_yml_config(self):  # noqa: ANN201
-        """Return current configuration in `meltano.yml`.
-
-        Returns:
-            Current configuration in `meltano.yml`.
-        """
+        """Current configuration in `meltano.yml`."""
         return self.plugin.config_with_extras
 
     @property
     def environment_config(self):  # noqa: ANN201
-        """Return current environment configuration in `meltano.yml`.
-
-        Returns:
-            Current environment configuration in `meltano.yml`.
-        """
+        """Current environment configuration in `meltano.yml`."""
         if self.environment_plugin_config:
             return self.environment_plugin_config.config_with_extras
         return {}
@@ -230,12 +202,9 @@ class PluginSettingsService(SettingsService):
         self.project.plugins.update_environment_plugin(self.environment_plugin_config)
 
     @cached_property
+    @override
     def inherited_settings_service(self) -> PluginSettingsService | None:
-        """Return settings service to inherit configuration from.
-
-        Returns:
-            Settings service to inherit configuration from.
-        """
+        """Settings service to inherit configuration from."""
         return (
             type(self)(
                 self.project,

@@ -18,9 +18,14 @@ else:
     from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Iterator
+    from collections.abc import Iterable, Iterator
 
     from sqlalchemy.orm import Session
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 class DBStateStoreManager(StateStoreManager):
@@ -194,7 +199,7 @@ class DBStateStoreManager(StateStoreManager):
         state_id: str,
         *,
         retry_seconds: float = 1,
-    ) -> Generator[None, None, None]:
+    ) -> Generator[None]:
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.

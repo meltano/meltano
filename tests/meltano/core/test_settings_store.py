@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import platform
+import stat
 import typing as t
 from contextlib import contextmanager
 from unittest import mock
@@ -675,6 +677,22 @@ class TestDotEnvStoreManager:
     def test_unset_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
         with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
             subject.unset("undefined", [], setting_def=None)
+
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="File modes are not enforced on Windows",
+    )
+    def test_dotenv_created_with_owner_only_permissions(
+        self,
+        subject: DotEnvStoreManager,
+        project,
+    ) -> None:
+        project.dotenv.unlink(missing_ok=True)
+        setting_def = subject.settings_service.find_setting("password")
+
+        subject.set("password", ["password"], "s3cret-value", setting_def)
+
+        assert stat.S_IMODE(project.dotenv.stat().st_mode) == 0o600
 
     def test_reset_readonly_project_failure(
         self,

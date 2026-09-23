@@ -24,6 +24,7 @@ from meltano.core.environment_service import EnvironmentService
 from meltano.core.settings_service import REDACTED_VALUE, SettingKind, SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent
+from meltano.core.utils import split_path
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -92,7 +93,7 @@ class InteractiveConfig:
 
     @property
     def configurable_settings(self):  # noqa: ANN201
-        """Return settings available for interactive configuration."""
+        """Settings available for interactive configuration."""
         return self.settings.config_with_metadata(
             session=self.session,
             extras=self.extras,
@@ -101,7 +102,7 @@ class InteractiveConfig:
 
     @property
     def setting_choices(self) -> list[tuple[str, str, str]]:
-        """Return simplified setting choices, for easy printing."""
+        """Simplified setting choices, for easy printing."""
         setting_choices: list[tuple[str, str, str]] = []
         for index, (name, config_metadata) in enumerate(
             self.configurable_settings.items(),
@@ -322,7 +323,7 @@ class InteractiveConfig:
                 try:
                     click.echo()
                     self.set_value(
-                        setting_name=tuple(name.split(".")),
+                        setting_name=tuple(split_path(name, unescape=False)),
                         value=new_value,
                         store=self.store,
                         interactive=True,

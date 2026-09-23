@@ -142,6 +142,12 @@ class PluginErrorFormatter:
             )
             yield self.render_exception(exc.context)
 
+        # Add exception notes
+        if exc.notes:
+            yield ""
+            for note in exc.notes:
+                yield Text(note)
+
     def format(
         self,
         sio: t.TextIO,

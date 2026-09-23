@@ -9,7 +9,7 @@ import json
 import platform
 import shlex
 import shutil
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -22,11 +22,17 @@ import structlog
 from meltano.core.error import AsyncSubprocessError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Sequence
+    import os
+    from collections.abc import Iterable, Sequence
     from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 if sys.version_info >= (3, 11):
     from typing import Self  # noqa: ICN003
@@ -105,13 +111,10 @@ class VirtualEnv:
 
     @cached_property
     def lib_dir(self) -> Path:
-        """Return the lib directory of the virtual environment.
+        """The lib directory of the virtual environment.
 
         Raises:
             MeltanoError: The current system is not supported.
-
-        Returns:
-            The lib directory of the virtual environment.
         """
         if self._system == "Windows":
             return self.root / "Lib"
@@ -120,13 +123,10 @@ class VirtualEnv:
 
     @cached_property
     def bin_dir(self) -> Path:
-        """Return the bin directory of the virtual environment.
+        """The bin directory of the virtual environment.
 
         Raises:
             MeltanoError: The current system is not supported.
-
-        Returns:
-            The bin directory of the virtual environment.
         """
         if self._system == "Windows":
             return self.root / "Scripts"
@@ -135,13 +135,10 @@ class VirtualEnv:
 
     @cached_property
     def site_packages_dir(self) -> Path:
-        """Return the site-packages directory of the virtual environment.
+        """The site-packages directory of the virtual environment.
 
         Raises:
             MeltanoError: The current system is not supported.
-
-        Returns:
-            The site-packages directory of the virtual environment.
         """
         if self._system == "Windows":
             return self.lib_dir / "site-packages"
@@ -154,11 +151,7 @@ class VirtualEnv:
 
     @cached_property
     def python_version_tuple(self) -> tuple[int, int, int]:
-        """Return the Python version tuple of the virtual environment.
-
-        Returns:
-            The Python version tuple of the virtual environment.
-        """
+        """The Python version tuple of the virtual environment."""
         if self.python_path == sys.executable:
             return sys.version_info[:3]
 
@@ -235,7 +228,7 @@ class VirtualEnv:
         """
 
         # A generator is used to perform the checks lazily
-        def checks() -> Generator[bool, None, None]:
+        def checks() -> Generator[bool]:
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args
@@ -246,11 +239,15 @@ class VirtualEnv:
         return any(checks())
 
 
-async def _extract_stderr(_) -> None:
+async def _extract_stderr(_) -> None:  # ruff:ignore[unused-async]
     return None  # pragma: no cover
 
 
-async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:  # noqa: ANN001, ANN002, ANN003
+async def exec_async(
+    *args: str | bytes | os.PathLike[str] | os.PathLike[bytes],
+    extract_stderr: StdErrExtractor = _extract_stderr,
+    **kwargs: t.Any,
+) -> Process:
     """Run an executable asynchronously in a subprocess.
 
     Args:
@@ -259,11 +256,11 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
             and returns its error string or `None`.
         kwargs: Keyword arguments for `asyncio.create_subprocess_exec`.
 
-    Raises:
-        AsyncSubprocessError: The command failed.
-
     Returns:
         The subprocess.
+
+    Raises:
+        AsyncSubprocessError: The command failed.
     """
     run = await asyncio.create_subprocess_exec(
         *args,
@@ -418,8 +415,8 @@ class PipPackageManager(PackageManager):
 class UvPackageManager(PackageManager):
     """Package manager using ``uv pip``."""
 
-    uv: str
-    """Path to the `uv` executable."""
+    cli: tuple[str, ...]
+    """Base uv CLI arguments, e.g. ``uv --quiet``."""
 
     @override
     async def install(
@@ -432,7 +429,7 @@ class UvPackageManager(PackageManager):
         env: dict[str, str | None] | None = None,
     ) -> Process:
         return await exec_async(
-            self.uv,
+            *self.cli,
             "pip",
             "install",
             f"--python={python}",
@@ -444,7 +441,7 @@ class UvPackageManager(PackageManager):
     @override
     async def uninstall(self, package: str, *, python: str) -> Process:
         return await exec_async(
-            self.uv,
+            *self.cli,
             "pip",
             "uninstall",
             f"--python={python}",
@@ -454,7 +451,7 @@ class UvPackageManager(PackageManager):
     @override
     async def list_installed(self, *args: str, python: str) -> list[dict[str, t.Any]]:
         proc = await exec_async(
-            self.uv,
+            *self.cli,
             "pip",
             "list",
             "--quiet",
@@ -555,11 +552,11 @@ class VirtualEnvService:
     async def create(self) -> Process:
         """Create a new virtual environment.
 
-        Raises:
-            AsyncSubprocessError: The virtual environment could not be created.
-
         Returns:
             The Python process creating the virtual environment.
+
+        Raises:
+            AsyncSubprocessError: The virtual environment could not be created.
         """
         logger.debug(
             "Creating virtual environment for '%s/%s'",
@@ -567,7 +564,7 @@ class VirtualEnvService:
             self.name,
         )
 
-        async def extract_stderr(proc: Process):  # noqa: ANN202
+        async def extract_stderr(proc: Process) -> str:
             return (await t.cast("asyncio.StreamReader", proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",
@@ -598,11 +595,11 @@ class VirtualEnvService:
             force: Whether to ignore the Python version required by plugins.
             env: Environment variables to pass to the subprocess.
 
-        Raises:
-            AsyncSubprocessError: The command failed.
-
         Returns:
             The process running `pip install` with the provided args.
+
+        Raises:
+            AsyncSubprocessError: The command failed.
         """
         if clean:
             await self.create()
@@ -699,7 +696,11 @@ class VenvBackend(abc.ABC):
         log_path = project.dirs.logs("pip", namespace, name, "install.log").resolve()
         venv = VirtualEnv(
             venv_path,
-            python=plugin.python or project.settings.get("python"),
+            python=(
+                plugin.python
+                or project.settings.get("python")
+                or project.python_version
+            ),
         )
         return cls(venv=venv, log_path=log_path)
 
@@ -816,11 +817,11 @@ class VirtualenvBackend(VenvBackend):
         Args:
             env: Environment variables to pass to the subprocess.
 
-        Raises:
-            AsyncSubprocessError: Failed to upgrade pip to the latest version.
-
         Returns:
             The process running `pip install --upgrade ...`.
+
+        Raises:
+            AsyncSubprocessError: Failed to upgrade pip to the latest version.
         """
         return await self.install_pip_args(("--upgrade", "pip"), env=env)
 
@@ -880,21 +881,23 @@ class VirtualenvBackend(VenvBackend):
 class UvBackend(VenvBackend):
     """Manages virtual environments using `uv`."""
 
-    def __init__(self, *args: t.Any, **kwargs: t.Any):
+    def __init__(self, *args: t.Any, preview: bool = False, **kwargs: t.Any):
         """Initialize the `UvBackend`.
 
         Args:
             args: Positional arguments for the VenvBackend.
+            preview: Run uv with the ``--preview`` flag.
             kwargs: Keyword arguments for the VenvBackend.
         """
         super().__init__(*args, **kwargs)
         self.uv = find_uv()
+        self._cli = (self.uv, "--preview") if preview else (self.uv,)
         logger.debug("Using uv executable at %s", self.uv)
 
     @cached_property
     def package_manager(self) -> UvPackageManager:
         """The uv-based package manager for this virtual environment."""
-        return UvPackageManager(uv=self.uv)
+        return UvPackageManager(cli=self._cli)
 
     @override
     async def create_venv(
@@ -912,7 +915,7 @@ class UvBackend(VenvBackend):
             The Python process creating the virtual environment.
         """
         return await exec_async(
-            self.uv,
+            *self._cli,
             "venv",
             "--clear",
             f"--python={self.venv.python_path}",

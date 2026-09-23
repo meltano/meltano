@@ -9,14 +9,21 @@ const isProd = process.env.NODE_ENV === 'production';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
+  organizationName: 'Meltano',
+  projectName: 'meltano',
   title: 'Meltano Documentation',
   tagline: '',
   url: 'https://docs.meltano.com',
   baseUrl: '/',
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'warn',
-  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.png',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -26,7 +33,24 @@ const config = {
     locales: ['en'],
   },
 
-  plugins: ['docusaurus-plugin-sass'],
+  plugins: [
+    'docusaurus-plugin-sass',
+    [
+      '@docusaurus/plugin-content-blog',
+      /** @type {import('@docusaurus/plugin-content-blog').PluginOptions} */
+      ({
+        id: 'cloudChangelog',
+        routeBasePath: 'releases/cloud',
+        path: './cloud-changelog',
+        blogTitle: 'Releases',
+        blogSidebarTitle: 'All Releases',
+        blogDescription: '',
+        postsPerPage: 20,
+        blogSidebarCount: 'ALL',
+        showReadingTime: false,
+      }),
+    ],
+  ],
 
   presets: [
     [
@@ -41,8 +65,8 @@ const config = {
           editUrl: 'https://github.com/meltano/meltano/blob/main/docs',
         },
         blog: {
-          routeBasePath: '/changelog',
-          blogTitle: 'Changelog',
+          routeBasePath: '/releases',
+          blogTitle: 'Releases',
           blogSidebarTitle: 'All Releases',
           blogDescription: '',
           postsPerPage: 20,
@@ -90,32 +114,28 @@ const config = {
             position: 'right',
           },
           {
-            to: '/getting-started/which-meltano/',
-            label: 'Get Started',
+            to: '/getting-started/which-meltano',
+            label: 'Platform',
             position: 'left',
-            className: 'header-get-started-link',
-            'aria-label': 'Get Started',
+            className: 'header-platform-link',
+            'aria-label': 'Platform',
+            activeBaseRegex: '^/(getting-started|meltano-cloud|meltano-open|guide|concepts|reference|tutorials|contribute)(/|$)',
           },
           {
-            to: '/tutorials',
-            label: 'Tutorials',
+            to: '/connectors',
+            label: 'Connectors',
             position: 'left',
-            className: 'header-tutorials-link',
-            'aria-label': 'Tutorials',
+            className: 'header-connectors-link',
+            'aria-label': 'Connectors',
+            activeBasePath: '/connectors',
           },
           {
-            to: '/reference',
-            label: 'Reference',
-            position: 'left',
-            className: 'header-reference-link',
-            'aria-label': 'Reference',
-          },
-          {
-            to: '/changelog',
-            label: 'Changelog',
+            to: '/releases/cloud',
+            label: 'Releases',
             position: 'left',
             className: 'header-changelog-link',
-            'aria-label': 'Changelog',
+            'aria-label': 'Releases',
+            activeBasePath: '/releases',
           },
           {
             href: 'https://github.com/meltano/meltano',
@@ -137,40 +157,23 @@ const config = {
         style: 'light',
         links: [
           {
-            title: 'The Project',
+            title: 'Meltano',
             items: [
               {
-                label: 'Our Mission',
-                to: 'https://handbook.meltano.com/company/#mission',
+                label: 'Overview',
+                href: 'https://meltano.com/product',
               },
               {
-                label: 'Our Vision',
-                to: 'https://handbook.meltano.com/company/#vision',
+                label: 'Blogs',
+                href: 'https://meltano.com/blog',
               },
               {
-                label: 'Roadmap',
-                to: 'https://handbook.meltano.com/product/roadmap',
+                label: 'Case Studies',
+                href: 'https://meltano.com/case-studies',
               },
               {
-                label: 'Strategy',
-                to: 'https://handbook.meltano.com/company/#strategy',
-              },
-            ],
-          },
-          {
-            title: 'Company',
-            items: [
-              {
-                label: 'Handbook',
-                href: 'https://handbook.meltano.com/',
-              },
-              {
-                label: 'Values',
-                href: 'https://handbook.meltano.com/company/values',
-              },
-              {
-                label: 'History',
-                href: 'https://handbook.meltano.com/timeline',
+                label: 'Data Matas Podcast',
+                href: 'https://meltano.com/podcasts',
               },
             ],
           },

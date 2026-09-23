@@ -17,11 +17,7 @@ class IndexedPlugin:
 
     @property
     def variant_labels(self) -> list[str]:
-        """Return a list of variant labels.
-
-        Returns:
-            A list of variant labels.
-        """
+        """List of variant labels."""
         variants = deepcopy(self.variants)
         default_variant = variants.pop(self.default_variant)
         return [

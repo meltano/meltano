@@ -3,24 +3,31 @@ from __future__ import annotations
 import sys
 import typing as t
 from http import HTTPStatus
+from pathlib import Path
 from unittest import mock
 
 import click
 import pytest
-import requests
 import requests.exceptions
+import urllib3.exceptions
 from requests import Response
 from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
 from meltano.cli.hub import hub
+from meltano.core.cloud.config import CLOUD_API_ROOT
+from meltano.core.cloud.credentials import Credentials
 from meltano.core.hub.client import (
+    HubAuthenticationRequiredError,
     HubConnectionError,
     HubPluginTypeNotFoundError,
     HubPluginVariantNotFoundError,
+    MeltanoHubService,
+    _connection_cause,
 )
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.user_config import UserConfigReadError
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -31,6 +38,86 @@ if t.TYPE_CHECKING:
     from collections import Counter
 
     from meltano.core.project import Project
+
+
+@pytest.fixture
+def _restore_hub_session_headers() -> t.Iterator[None]:
+    """Stop Hub session headers from leaking between tests.
+
+    `MeltanoHubService.session` is a class attribute, so a header that one test
+    sets stays visible to every test that runs after it.
+
+    Yields:
+        None.
+    """
+    original = dict(MeltanoHubService.session.headers)
+    MeltanoHubService.session.headers.pop("Authorization", None)
+    yield
+    MeltanoHubService.session.headers.clear()
+    MeltanoHubService.session.headers.update(original)
+
+
+def _stub_cloud_credentials(
+    monkeypatch: pytest.MonkeyPatch,
+    credentials: Credentials | None,
+) -> None:
+    """Pretend the user does or does not have a Meltano Cloud session.
+
+    Args:
+        monkeypatch: The pytest monkeypatch fixture.
+        credentials: The session to report, or `None` when logged out.
+    """
+    monkeypatch.setattr(
+        MeltanoHubService,
+        "_cloud_credentials",
+        staticmethod(lambda: credentials),
+    )
+
+
+def _stub_hub_status(
+    monkeypatch: pytest.MonkeyPatch,
+    status_code: HTTPStatus,
+    body: bytes = b"{}",
+) -> None:
+    """Make every Hub request answer with the given status.
+
+    Args:
+        monkeypatch: The pytest monkeypatch fixture.
+        status_code: The status to answer with.
+        body: The response body to answer with.
+    """
+
+    def _send(*args: t.Any, **kwargs: t.Any) -> Response:  # noqa: ARG001
+        response = Response()
+        response.status_code = status_code
+        response._content = body
+        return response
+
+    monkeypatch.setattr(MeltanoHubService.session, "send", _send)
+
+
+def _connection_error(reason: Exception) -> requests.exceptions.ConnectionError:
+    """Wrap a urllib3 reason the way `requests` does."""
+    return requests.exceptions.ConnectionError(mock.Mock(reason=reason))
+
+
+class TestConnectionCause:
+    def test_reads_the_error_urllib3_chained(self) -> None:
+        reason = urllib3.exceptions.NewConnectionError(mock.Mock(), "unused")
+        reason.__cause__ = ConnectionRefusedError(111, "Connection refused")
+        assert _connection_cause(_connection_error(reason)) == (
+            "[Errno 111] Connection refused"
+        )
+
+    def test_falls_back_to_the_reason_itself(self) -> None:
+        # A TLS failure chains nothing, so its own message is the cause.
+        reason = urllib3.exceptions.SSLError("certificate verify failed")
+        assert _connection_cause(_connection_error(reason)) == (
+            "certificate verify failed"
+        )
+
+    def test_no_cause_recorded(self) -> None:
+        assert _connection_cause(requests.exceptions.ConnectionError()) is None
 
 
 class TestMeltanoHubService:
@@ -125,6 +212,239 @@ class TestMeltanoHubService:
         project.settings.set("hub_url_auth", "Bearer s3cr3t")
         assert project.hub_service.session.headers["Authorization"] == "Bearer s3cr3t"
 
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_from_cloud_session(self, project: Project, monkeypatch) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.session.headers["Authorization"] == "Bearer s3cr3t"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_setting_wins_over_cloud_session(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.set("hub_url_auth", "Bearer from-setting")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="from-cloud"))
+        service = MeltanoHubService(project)
+        assert service.session.headers["Authorization"] == "Bearer from-setting"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_absent_when_logged_out(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        service = MeltanoHubService(project)
+        assert "Authorization" not in service.session.headers
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_logged_out_user_is_told_about_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+        capsys,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        with click.Context(cli):
+            MeltanoHubService(project)
+            assert "meltano cloud auth login" not in capsys.readouterr().err
+        assert "meltano cloud auth login" in capsys.readouterr().err
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_failed_command_is_not_told_about_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+        capsys,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        error = PluginNotFoundError("tap-x")
+        with pytest.raises(PluginNotFoundError), click.Context(cli):  # noqa: PT012
+            MeltanoHubService(project)
+            raise error
+        assert "meltano cloud auth login" not in capsys.readouterr().err
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_logged_in_user_is_not_told_about_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+        capsys,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        with click.Context(cli):
+            MeltanoHubService(project)
+        assert "meltano cloud auth login" not in capsys.readouterr().err
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    @pytest.mark.parametrize(
+        ("setting", "value"),
+        (
+            ("hub_url", "http://localhost:4000"),
+            ("hub_api_root", "https://mysite.com/my-plugins"),
+            ("hub_url_auth", "Bearer s3cr3t"),
+        ),
+    )
+    def test_own_hub_is_not_told_about_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+        capsys,
+        setting: str,
+        value: str,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        project.settings.set(setting, value)
+        _stub_cloud_credentials(monkeypatch, None)
+        with click.Context(cli):
+            MeltanoHubService(project)
+        project.settings.unset(setting)
+        assert "meltano cloud auth login" not in capsys.readouterr().err
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_api_url_default(self, project: Project, monkeypatch) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "https://hub.meltano.com/meltano/api/v1"
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_api_url_is_cloud_when_logged_in(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == CLOUD_API_ROOT
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_configured_hub_url_wins_over_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        project.settings.set("hub_url", "http://localhost:4000")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "http://localhost:4000/meltano/api/v1"
+        project.settings.unset("hub_url")
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_api_root_wins_over_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        project.settings.set("hub_api_root", "https://mysite.com/my-plugins")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "https://mysite.com/my-plugins"
+        project.settings.unset("hub_api_root")
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_hub_auth_setting_keeps_the_default_hub(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.set("hub_url_auth", "Bearer from-setting")
+        _stub_cloud_credentials(monkeypatch, Credentials(access_token="from-cloud"))
+        service = MeltanoHubService(project)
+        assert service.hub_api_url == "https://hub.meltano.com/meltano/api/v1"
+
+    def test_unreadable_user_config_is_treated_as_logged_out(
+        self,
+        monkeypatch,
+    ) -> None:
+        monkeypatch.setattr(
+            "meltano.core.cloud.auth.CloudAuthService",
+            mock.Mock(
+                side_effect=UserConfigReadError(Path("config.yml"), ValueError()),
+            ),
+        )
+        assert MeltanoHubService._cloud_credentials() is None
+
+    def test_unauthenticated_request_points_at_cloud_login(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        _stub_hub_status(monkeypatch, HTTPStatus.UNAUTHORIZED)
+
+        with pytest.raises(
+            HubAuthenticationRequiredError,
+            match=r"meltano cloud auth login",
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+    def test_rejection_detail_from_hub_is_surfaced(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        _stub_hub_status(
+            monkeypatch,
+            HTTPStatus.UNAUTHORIZED,
+            b'{"message": "Meltano Hub requires a Meltano Cloud account."}',
+        )
+
+        with pytest.raises(
+            HubAuthenticationRequiredError,
+            match=r"requires a Meltano Cloud account\. Run ",
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+    @pytest.mark.parametrize(
+        "body",
+        (
+            pytest.param(b"<html>gateway</html>", id="not-json"),
+            pytest.param(b"{}", id="no-message"),
+            pytest.param(b'{"message": ""}', id="empty"),
+        ),
+    )
+    def test_unhelpful_rejection_bodies_fall_back(
+        self,
+        project: Project,
+        monkeypatch,
+        body: bytes,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        _stub_hub_status(monkeypatch, HTTPStatus.UNAUTHORIZED, body)
+
+        with pytest.raises(
+            HubAuthenticationRequiredError,
+            match=r"Meltano Hub requires authentication",
+        ):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_unauthenticated_request_with_hub_auth_reports_status(
+        self,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        project.settings.set("hub_url_auth", "Bearer s3cr3t")
+        _stub_hub_status(monkeypatch, HTTPStatus.UNAUTHORIZED)
+
+        with pytest.raises(HubConnectionError, match=r"\(401\)"):
+            project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
+
     def test_server_error(self, project: Project) -> None:
         with pytest.raises(
             HubConnectionError,
@@ -213,12 +533,25 @@ class TestMeltanoHubService:
             ),
             pytest.raises(
                 HubConnectionError,
-                match=r"Could not connect to Meltano Hub\.",
+                match=r"Could not connect to Meltano Hub at http",
             ) as exc_info,
         ):
             project.hub_service._get(project.hub_service.hub_api_url)
 
         assert isinstance(exc_info.value.__cause__, requests.exceptions.ConnectionError)
+
+    def test_connection_error_names_the_cause(self, project: Project) -> None:
+        reason = urllib3.exceptions.NewConnectionError(mock.Mock(), "unused")
+        reason.__cause__ = ConnectionRefusedError(111, "Connection refused")
+        with (
+            mock.patch.object(
+                project.hub_service.session,
+                "send",
+                side_effect=_connection_error(reason),
+            ),
+            pytest.raises(HubConnectionError, match=r"Connection refused"),
+        ):
+            project.hub_service._get(project.hub_service.hub_api_url)
 
     def test_plugin_type_not_found_error(self, project: Project) -> None:
         mock_response = Response()

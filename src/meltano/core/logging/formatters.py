@@ -26,6 +26,11 @@ if t.TYPE_CHECKING:
 
     from structlog.types import Processor
 
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 install(suppress=[click])
 
 
@@ -68,8 +73,8 @@ class LoggingFeatures(t.TypedDict, total=False):
 # Convert boolean kwargs to LoggingFeatures enum.
 def _processors_from_kwargs(
     **features: Unpack[LoggingFeatures],
-) -> t.Generator[Processor, None, None]:
-    if features.get("callsite_parameters", False):
+) -> Generator[Processor]:
+    if features.get("callsite_parameters"):
         yield structlog.processors.CallsiteParameterAdder(
             parameters=(
                 structlog.processors.CallsiteParameter.PATHNAME,
@@ -79,7 +84,7 @@ def _processors_from_kwargs(
             ),
         )
 
-    if features.get("dict_tracebacks", False):
+    if features.get("dict_tracebacks"):
         show_locals = features.get("show_locals", False)
         yield structlog.processors.ExceptionRenderer(
             structlog.tracebacks.ExceptionDictTransformer(show_locals=show_locals),

@@ -1,0 +1,21 @@
+---
+slug: 2026-07-31-cloud-changelog
+title: Workspace Secrets Hidden From Non-Admins & Pipeline Reliability Fixes
+date: 2026-07-31
+---
+
+Pipeline-level secrets are now hidden from non-admin workspace members. This release also fixes pipelines getting stuck in running status, along with reliability fixes for tap-mysql, target-postgres, tap-auth0, target-snowflake and target-clickhouse.
+
+{/* truncate */}
+
+## Features
+
+- **Workspace secrets are now properly hidden from members:** Pipeline-level secrets (like tap credentials) are encrypted and redacted for non-admin workspace members, so only admins can see the real values.
+
+## Fixes
+
+- **Bumped target-snowflake to v0.17.8-5:** Resolved flakiness that could affect pipeline runs, so your Snowflake syncs are more reliable.
+- **Bumped tap-auth0 to v0.6.1:** Corrected the schema types for latitude/longitude fields so they come through properly instead of being miscast.
+- **Bumped tap-mysql to v1.5.3 and target-postgres to v0.2.2:** Date-typed columns are now handled more reliably.
+- **Bumped target-clickhouse to v0.4.0:** Enables processing of Arrow-formatted data.
+- **Fixed pipelines getting stuck in running status:** Runs no longer hang indefinitely and now complete as expected.

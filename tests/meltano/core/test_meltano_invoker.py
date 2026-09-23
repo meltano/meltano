@@ -10,9 +10,9 @@ from unittest import mock
 
 import pytest
 
-import meltano
 from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
 from meltano.core.tracking.contexts import environment_context
+from meltano.core.utils import get_meltano_version
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -26,7 +26,7 @@ class TestMeltanoInvoker:
     def test_invoke(self, subject: MeltanoInvoker) -> None:
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
-        assert meltano.__version__ in str(process.stdout)
+        assert get_meltano_version() in str(process.stdout)
 
     def test_env(
         self,

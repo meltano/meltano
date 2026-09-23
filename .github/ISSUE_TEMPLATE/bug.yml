@@ -6,8 +6,6 @@ labels:
   - flow::triage
   - valuestream/Meltano
 type: Fix
-assignees:
-  - edgarrmondragon
 
 body:
   - type: markdown
@@ -19,7 +17,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "4.2.0"
+      placeholder: "4.3.0"
     validations:
       required: false
   - type: dropdown
@@ -28,6 +26,8 @@ body:
       label: Python Version
       description: Version of Python you are using
       options:
+        - "3.15"
+        - "3.14"
         - "3.13"
         - "3.12"
         - "3.11"

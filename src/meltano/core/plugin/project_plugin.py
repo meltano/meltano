@@ -227,11 +227,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def parent(self) -> ProjectPlugin | BasePlugin | None:
-        """Plugins parent.
-
-        Returns:
-            Parent ProjectPlugin instance, or None if no parent.
-        """
+        """Plugins parent or None if no parent."""
         return self._parent
 
     @parent.setter
@@ -248,49 +244,33 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def is_variant_set(self) -> bool:
-        """Check if variant is set explicitly.
-
-        Returns:
-            'True' if variant is set explicitly.
-        """
+        """Whether variant is set explicitly."""
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
     def info(self) -> PluginInfo:
-        """Plugin info dict.
-
-        Returns:
-            Dictionary of plugin info (name, namespace and variant)
-        """
+        """Dictionary of plugin info (name, namespace and variant)."""
         return {"name": self.name, "namespace": self.namespace, "variant": self.variant}
 
     @property
     def info_env(self) -> dict[str, str]:
-        """Plugin environment info.
-
-        Returns:
-            Dictionary of plugin info formatted as Meltano environment variables.
-        """
+        """Dictionary of plugin info formatted as Meltano environment variables."""
         # MELTANO_EXTRACTOR_...
         return flatten({"meltano": {self.type.singular: self.info}}, "env_var")
 
     @property
     def all_commands(self) -> dict[str, Command]:
-        """Return all commands for this plugin.
+        """Dictionary of supported commands.
 
-        Returns:
-            Dictionary of supported commands, including those inherited from
-            the parent plugin.
+        Includes commands inherited from the parent plugin.
         """
         return {**(self._parent.all_commands if self._parent else {}), **self.commands}
 
     @property
     def test_commands(self) -> dict[str, Command]:
-        """Return the test commands for this plugin.
+        """Dictionary of supported test commands.
 
-        Returns:
-            Dictionary of supported test commands, including those inherited
-            from the parent plugin.
+        Includes commands inherited from the parent plugin.
         """
         return {
             name: command
@@ -300,11 +280,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def supported_commands(self) -> list[str]:
-        """Return supported command names.
-
-        Returns:
-            All defined command names for the plugin.
-        """
+        """All defined command names for the plugin."""
         return list(self.all_commands.keys())
 
     def env_prefixes(self, *, for_writing: bool = False) -> list[str]:
@@ -327,20 +303,12 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def extra_config(self) -> dict[str, t.Any]:
-        """Return plugin extra config.
-
-        Returns:
-            Dictionary of extra config.
-        """
+        """Dictionary of extra config."""
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
     def config_with_extras(self) -> dict[str, t.Any]:
-        """Return config with extras.
-
-        Returns:
-            Complete config dictionary, including config extras.
-        """
+        """Complete config dictionary, including config extras."""
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
@@ -356,11 +324,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def all_settings(self) -> list[SettingDefinition]:
-        """Return all settings for this plugin.
-
-        Returns:
-            List of settings, including those inherited from the parent plugin.
-        """
+        """List of settings, including those inherited from the parent plugin."""
         # New setting definitions override old ones
         new_setting_names = {setting.name for setting in self.settings}
         existing_settings = (
@@ -381,10 +345,9 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def extra_settings(self) -> list[SettingDefinition]:
-        """Return extra settings.
+        """A list of extra `SettingDefinition` objects.
 
-        Returns:
-            A list of extra SettingDefinitions, including those defined by the parent.
+        Includes settings defined by the parent.
         """
         existing_settings = self._parent.extra_settings if self._parent else []
         return [
@@ -394,11 +357,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def settings_with_extras(self) -> list[SettingDefinition]:
-        """Return all settings.
-
-        Returns:
-            A complete list of SettingDefinitions, including extras.
-        """
+        """A complete list of `SettingDefinition` objects, including extras."""
         return [*self.all_settings, *self.extra_settings]
 
     def is_custom(self) -> bool:
@@ -411,23 +370,15 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def is_shadowing(self) -> bool:
-        """Return whether this plugin is shadowing a base plugin with the same name.
-
-        Returns:
-            'True' if this plugin is shadowing a base plugin with the same name.
-        """
+        """Whether this plugin is shadowing a base plugin with the same name."""
         return not self.inherit_from
 
     @property
     def plugin_dir_name(self) -> str:
-        """Return the plugin directory name this plugin should use.
+        """Plugin directory name this plugin should use.
 
         This directory is where the plugin's Python virtual environment will be
         created, among other things.
-
-        Returns:
-            The name of this plugins parent if both pip urls are the same, else
-            this plugins name.
         """
         if not self.inherit_from:
             return self.name
@@ -465,21 +416,12 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     @property
     def all_requires(self) -> dict[PluginType, list]:
-        """Return all requires for this plugin.
-
-        Returns:
-            List of supported requires, including those inherited from the
-            parent plugin.
-        """
+        """All transitive requirements for this plugin."""
         return self.get_requirements(plugin_types=None)
 
     @property
     def requirements(self) -> list[ProjectPlugin]:
-        """Return the requirements for this plugin.
-
-        Returns:
-            A list of requirements for this plugin.
-        """
+        """Requirements for this plugin."""
         return [
             ProjectPlugin(plugin_type=plugin_type, name=dep.name, variant=dep.variant)
             for plugin_type, deps in self.all_requires.items()

@@ -1,7 +1,10 @@
 """Main entry point for the meltano CLI."""
 
+# ruff: file-ignore[non-empty-init-module]
+
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import sys
@@ -12,6 +15,7 @@ import structlog
 
 from meltano.cli import (
     add,
+    cloud,
     config,
     docs,
     dragon,
@@ -24,6 +28,7 @@ from meltano.cli import (
     job,
     lock,
     logs,
+    plugin,
     remove,
     run,
     schedule,
@@ -44,6 +49,7 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 cli.add_command(add.add)
+cli.add_command(cloud.cloud)
 cli.add_command(compile_module.compile_command)
 cli.add_command(config.config)
 cli.add_command(docs.docs)
@@ -57,6 +63,7 @@ cli.add_command(install.install)
 cli.add_command(invoke.invoke)
 cli.add_command(lock.lock)
 cli.add_command(logs.logs)
+cli.add_command(plugin.plugin)
 cli.add_command(remove.remove)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
@@ -111,6 +118,13 @@ def _run_cli() -> None:
                 f"The requested action could not be completed: {err}",  # noqa: EM102
             ) from None
         except KeyboardInterrupt:
+            raise
+        except asyncio.CancelledError:
+            from meltano.core.job.job import SIGTERM_EXIT_CODE, sigterm_received
+
+            if sigterm_received():
+                msg = "The process was terminated"
+                raise CliError(msg, exit_code=SIGTERM_EXIT_CODE) from None
             raise
         except MeltanoError as err:
             handle_meltano_error(err)

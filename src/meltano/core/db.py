@@ -109,7 +109,7 @@ def project_engine(
         engine,
         max_retries=project.settings.get("database_max_retries"),
         retry_timeout=project.settings.get("database_retry_timeout"),
-    )
+    ).close()
 
     check_database_compatibility(engine)
     init_hook(engine)
@@ -135,11 +135,11 @@ def connect(
         max_retries: The maximum number of retries that will be attempted.
         retry_timeout: The number of seconds to wait between retries.
 
-    Raises:
-        OperationalError: Error during DB connection - max retries exceeded.
-
     Returns:
         A connection to the database.
+
+    Raises:
+        OperationalError: Error during DB connection - max retries exceeded.
     """
     attempt = 0
     while True:
@@ -234,7 +234,7 @@ def check_database_compatibility(engine: Engine) -> None:
     dialect = engine.dialect.name
     version = engine.dialect.server_version_info
 
-    if dialect == "sqlite" and version and version < (3, 25, 1):
+    if dialect == "sqlite" and version and version < (3, 25, 1):  # ty: ignore[unsupported-operator]
         version_string = ".".join(map(str, version))
         reason = (
             f"Detected SQLite {version_string}, but Meltano requires at least 3.25.1"

@@ -12,9 +12,14 @@ from urllib3.util.retry import Retry
 from meltano.core.project_settings_service import ProjectSettingsService
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from pytest_docker.plugin import Services
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 logger = logging.getLogger(__name__)  # noqa: TID251
 
@@ -64,9 +69,7 @@ class SnowplowMicro:
 
 
 @pytest.fixture(scope="session")
-def snowplow_session(
-    request: pytest.FixtureRequest,
-) -> Generator[SnowplowMicro | None, None, None]:
+def snowplow_session(request: pytest.FixtureRequest) -> Generator[SnowplowMicro | None]:
     """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance.
 
     The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to
@@ -102,7 +105,7 @@ def snowplow_session(
 def snowplow_optional(
     snowplow_session: SnowplowMicro | None,
     monkeypatch,
-) -> Generator[SnowplowMicro | None, None, None]:
+) -> Generator[SnowplowMicro | None]:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the

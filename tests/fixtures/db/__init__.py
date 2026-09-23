@@ -12,9 +12,14 @@ from sqlalchemy.orm import close_all_sessions, sessionmaker
 from sqlalchemy.pool import NullPool
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
 
     from meltano.core.project import Project
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
 
 
 @pytest.fixture(scope="session", autouse=True)

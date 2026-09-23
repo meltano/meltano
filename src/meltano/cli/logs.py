@@ -7,6 +7,7 @@ import typing as t
 
 import click
 import structlog
+from rich.box import SIMPLE_HEAD
 from rich.console import Console
 from rich.table import Column, Table
 
@@ -122,12 +123,14 @@ def list_logs(
             click.echo(json.dumps({"runs": runs, "total": len(runs)}, indent=2))
         else:
             table = Table(
-                Column("STATUS", style="bold"),
+                Column("STATUS", style="cyan", no_wrap=True),
                 Column("LOG ID", style="bold", min_width=36),
-                Column("JOB NAME", style="bold", max_width=50),
-                Column("STARTED", style="bold"),
-                Column("DURATION", style="bold"),
-                Column("TRIGGER", style="bold"),
+                Column("JOB NAME", overflow="fold", max_width=50),
+                Column("STARTED", overflow="fold"),
+                Column("DURATION", overflow="fold"),
+                Column("TRIGGER", overflow="fold"),
+                box=SIMPLE_HEAD,
+                pad_edge=False,
                 title=f"Recent job runs (showing {len(jobs)} of last {limit})",
             )
 

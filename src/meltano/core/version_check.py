@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.metadata
 import json
 import os
 import sys
@@ -17,6 +16,7 @@ import structlog.stdlib
 from packaging.version import parse
 
 from meltano.core._packaging import editable_installation
+from meltano.core.utils import get_meltano_version
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -120,7 +120,7 @@ class VersionCheckService:
             response.raise_for_status()
             data = response.json()
             return data["info"]["version"]
-        except Exception:  # noqa: BLE001
+        except Exception:
             logger.debug("Failed to fetch latest version from PyPI", exc_info=True)
             return None
 
@@ -129,7 +129,7 @@ class VersionCheckService:
         if not self.should_check_version():
             return None
 
-        current_version = importlib.metadata.version("meltano")
+        current_version = get_meltano_version()
 
         # Skip check for development versions
         if self._is_development_version(current_version):
@@ -184,6 +184,6 @@ class VersionCheckService:
         """Check if a newer version of Meltano is available."""
         try:
             return self._check_version()
-        except Exception:  # noqa: BLE001
+        except Exception:
             logger.debug("Failed to check version", exc_info=True)
             return None

@@ -10,10 +10,16 @@ from sqlalchemy import create_engine
 from meltano.core.migration_service import MigrationError, MigrationService
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
     from pathlib import Path
 
     from sqlalchemy import Engine
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 MIGRATION_TEMPLATE = """
 revision = {revision}
@@ -61,7 +67,7 @@ def _generate_migrations(
 
 class TestMigrationService:
     @pytest.fixture
-    def engine(self) -> Generator[Engine, None, None]:
+    def engine(self) -> Generator[Engine]:
         engine = create_engine("sqlite:///:memory:")
         try:
             yield engine

@@ -71,6 +71,11 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     help="Dump content of specified file to disk.",
 )
 @click.option(
+    "--refresh-catalog",
+    is_flag=True,
+    help="Invalidates catalog cache and forces running discovery before invoke.",
+)
+@click.option(
     "--list-commands",
     is_flag=True,
     help="List the commands supported by the plugin.",
@@ -94,6 +99,7 @@ async def invoke(
     *,
     plugin_type: PluginType | None,
     dump: str,
+    refresh_catalog: bool,
     list_commands: bool,
     plugin_name: str,
     plugin_args: tuple[str, ...],
@@ -145,6 +151,7 @@ async def invoke(
             plugin_args=plugin_args,
             session=session,
             dump=dump,
+            refresh_catalog=refresh_catalog,
             command_name=command_name,
             containers=containers,
             print_var=print_var,
@@ -215,12 +222,16 @@ async def _invoke(  # noqa: ANN202
     plugin_args: tuple[str, ...],
     session: Session,
     dump: str,
+    refresh_catalog: bool,
     command_name: str | None,
     containers: bool,
     print_var: tuple[str, ...],
 ):
     if command_name is not None:
         command = invoker.find_command(command_name)
+
+    if refresh_catalog:
+        invoker.settings_service.config_override["_use_cached_catalog"] = False
 
     try:
         async with invoker.prepared(session):

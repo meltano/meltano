@@ -123,7 +123,7 @@ settings:
 
     # Verify content
     assert "decimal_setting" in data1["settings"]
-    assert data1["settings"]["decimal_setting"] == 123.45
+    assert data1["settings"]["decimal_setting"] == 123.45  # ruff:ignore[float-equality-comparison]
 
 
 def test_decimal_representer_function() -> None:

@@ -63,11 +63,13 @@ class CatalogFixture:
 
 class TestSingerTap:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service: ProjectAddService) -> SingerTap:
+    @classmethod
+    def subject(cls, project_add_service: ProjectAddService) -> SingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.fixture(scope="class", autouse=True)
-    def fixture_configure_structlog(self) -> None:
+    @classmethod
+    def fixture_configure_structlog(cls) -> None:
         structlog.stdlib.recreate_defaults(log_level=logging.INFO)
 
     @pytest.mark.order(0)

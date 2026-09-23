@@ -467,22 +467,25 @@ def activate_environment(  # noqa: D417
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
+    # Update the project context being used for telemetry:
+    project_ctx = next(
+        ctx for ctx in ctx.obj["tracker"].contexts if isinstance(ctx, ProjectContext)
+    )
     if env := ctx.obj.get("selected_environment"):
         project.activate_environment(env)
-        # Update the project context being used for telemetry:
-        project_ctx = next(
-            ctx
-            for ctx in ctx.obj["tracker"].contexts
-            if isinstance(ctx, ProjectContext)
-        )
-        project_ctx.environment_name = ctx.obj["selected_environment"]
-
+        project_ctx.environment_name = env
     elif required:
         raise MeltanoConfigurationError(
             reason="A Meltano environment must be specified",
             instruction="Set the `default_environment` option in "
             "`meltano.yml`, or the `--environment` CLI option",
         )
+    else:
+        # No environment was selected: ensure no environment carried over
+        # from a prior activation stays active (e.g. `Project` instances
+        # can be reused across multiple CLI invocations in tests).
+        project.deactivate_environment()
+        project_ctx.environment_name = None
 
 
 def activate_explicitly_provided_environment(
@@ -506,6 +509,13 @@ def activate_explicitly_provided_environment(
             "environment, please use the option `--environment=<environment name>`.",
         )
         project.deactivate_environment()
+        # Update the project context being used for telemetry:
+        project_ctx = next(
+            ctx
+            for ctx in ctx.obj["tracker"].contexts
+            if isinstance(ctx, ProjectContext)
+        )
+        project_ctx.environment_name = None
     else:
         activate_environment(ctx, project)
 

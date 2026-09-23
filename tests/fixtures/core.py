@@ -39,11 +39,18 @@ from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    import sys
+    from collections.abc import Callable
 
     from requests.adapters import BaseAdapter
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+
+    if sys.version_info >= (3, 13):
+        from collections.abc import Generator
+    else:
+        from typing_extensions import Generator
+
 
 current_dir = Path(__file__).parent
 
@@ -1063,6 +1070,7 @@ def discovery():
                         "name": "meltano",
                         "pip_url": "tap-mock",
                         "executable": "tap-mock",
+                        "docs": "https://docs.meltano.com/tap-mock",
                         "capabilities": ["discover", "catalog", "state"],
                         # 3 groups to cover: all-groups (test), some-groups
                         # plural (secure in 1+3), single-group (port in 3,
@@ -2090,7 +2098,7 @@ def job_logging_service(project):
 
 
 @contextmanager
-def project_directory(project_init_service) -> Generator[Project, None, None]:
+def project_directory(project_init_service) -> Generator[Project]:
     project = project_init_service.init()
     logging.debug(f"Created new project at {project.root}")  # noqa: G004
 
@@ -2275,7 +2283,7 @@ def state_ids_with_jobs(
     state_ids: StateIds,
     job_args: JobArgs,
     payloads: Payloads,
-    mock_time: t.Generator[datetime.datetime, None, None],
+    mock_time: Generator[datetime.datetime],
 ) -> dict[str, list[Job]]:
     jobs = {
         state_ids.single_incomplete_state_id: [

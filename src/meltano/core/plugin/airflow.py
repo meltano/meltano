@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import configparser
 import os
-import subprocess
+import subprocess  # ruff:ignore[suspicious-subprocess-import]
 import typing as t
 from contextlib import suppress
 
@@ -49,11 +49,7 @@ class Airflow(BasePlugin):
 
     @property
     def config_files(self) -> dict[str, str]:
-        """Return the configuration files required by the plugin.
-
-        Returns:
-            Dictionary of config file identifiers and filenames
-        """
+        """Configuration files required by the plugin."""
         return {"config": "airflow.cfg"}
 
     def process_config(self, flat_config: dict[str, str]) -> dict[str, dict[str, str]]:
