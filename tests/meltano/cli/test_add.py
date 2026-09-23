@@ -1121,7 +1121,7 @@ class TestCliAdd:
         mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
 
         with mock.patch(
-            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+            "meltano.core.hub.client.MeltanoHubService.find_base_plugin",
         ) as mock_get_base:
             mock_get_base.return_value = mock_base_plugin
 
@@ -1174,7 +1174,7 @@ class TestCliAdd:
         mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
 
         with mock.patch(
-            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+            "meltano.core.hub.client.MeltanoHubService.find_base_plugin",
         ) as mock_get_base:
             mock_get_base.return_value = mock_base_plugin
 
@@ -1225,7 +1225,7 @@ class TestCliAdd:
         mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
 
         with mock.patch(
-            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+            "meltano.core.hub.client.MeltanoHubService.find_base_plugin",
         ) as mock_get_base:
             mock_get_base.return_value = mock_base_plugin
 
@@ -1275,7 +1275,7 @@ class TestCliAdd:
         mock_base_plugin = base_plugin_factory(mock_definition, "meltano")
 
         with mock.patch(
-            "meltano.core.locked_definition_service.LockedDefinitionService.get_base_plugin",
+            "meltano.core.hub.client.MeltanoHubService.find_base_plugin",
         ) as mock_get_base:
             mock_get_base.return_value = mock_base_plugin
 
