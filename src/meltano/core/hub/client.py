@@ -7,7 +7,7 @@ import json
 import os
 import sys
 import typing as t
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
@@ -212,19 +212,18 @@ class HubPluginVariantNotFoundError(MeltanoError):
         )
 
 
-def _print_cloud_login_hint() -> None:
+@contextmanager
+def _cloud_login_hint() -> t.Iterator[None]:
     """Print the hint after the command output, where a long output cannot bury it.
 
     A failed command skips the hint, so that the error stays the last line.
     """
-    # The context of a failed command closes while its error is still raised.
-    if sys.exc_info()[0] is None:
-        click.secho(
-            "Run 'meltano cloud auth login' to get supported plugins from "
-            "Meltano Cloud",
-            fg="bright_yellow",
-            err=True,
-        )
+    yield  # noqa: RUF075
+    click.secho(
+        "Run 'meltano cloud auth login' to get supported plugins from Meltano Cloud",
+        fg="bright_yellow",
+        err=True,
+    )
 
 
 class MeltanoHubService(PluginRepository):
@@ -264,7 +263,7 @@ class MeltanoHubService(PluginRepository):
             and not self.has_configured_hub
             and (click_context := click.get_current_context(silent=True))
         ):
-            click_context.call_on_close(_print_cloud_login_hint)
+            click_context.with_resource(_cloud_login_hint())
 
         adapter = HTTPAdapter(
             max_retries=Retry(
