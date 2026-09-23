@@ -2,7 +2,6 @@
 title: Create a Custom Extractor
 description: Learn how to use Meltano to create a custom data extractor.
 layout: doc
-sidebar_position: 2
 ---
 
 ```mdx-code-block

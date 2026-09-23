@@ -1,0 +1,170 @@
+---
+title: "Maintaining Taps & Targets"
+description: Best practices, common patterns and FAQs for maintaining Singer taps and targets, evaluating a connector, and taking over one that has been abandoned.
+---
+
+# Maintaining Taps & Targets
+
+Thanks for your interest in maintaining a tap or target. This page collects the best practices and frequently asked questions that have built up around contributing to and maintaining these projects.
+
+The Singer community started in 2017, and many of the conventions it runs on have never been written down, which can make it intimidating to join. This page tries to make those conventions explicit so that contributing is easier.
+
+## Best practices
+
+### Avoid creating a new variant when possible
+
+It's common in the Singer community, and in open source generally, to fork a repository to add a single feature or bug fix and never get it merged upstream. That solves the short-term problem, but it leaves you maintaining a fork indefinitely.
+
+Contributing the change back to the upstream project benefits everyone and frees you from carrying a [variant](/concepts/plugins#variants) of your own. If the community concentrates its effort on the same connectors, we all get less work and better quality.
+
+### Favour generally useful logic over hardcoded logic
+
+It's tempting to build a connector around your exact needs - only the streams you use, your organisation's account names, your way of sourcing credentials. A little extra effort makes it useful enough to attract other people who will then help maintain it:
+
+- Cover as many streams as you can.
+- Route all configuration through the `config.json` input file.
+- Avoid hardcoded values and logic, or at least don't make them the default.
+
+### Document settings well
+
+Configuring a community-maintained connector is the hardest part of using one, so document your settings thoroughly.
+
+Connectors built on the SDK expose an [`--about` option](https://sdk.meltano.com/en/latest/implementation/cli.html#about) that prints the documented settings and descriptions from `tap.py`. Meltano Hub derives its plugin pages from that output, so keeping it current makes the listing useful for everyone.
+
+Non-SDK connectors usually ship an example `config.json` in the repository instead. The community has invested in documenting those on the Hub as well.
+
+### List it on Meltano Hub
+
+Once your connector works, [get it listed on Meltano Hub](/connectors/meltano-hub/add-a-plugin) so other people can find it. More users means more contributors and maintainers for your code.
+
+### Use the Meltano Singer SDK
+
+The [Meltano Singer SDK](https://sdk.meltano.com/) reduces the amount of code you write, keeps you compliant with the Singer spec, and hands you new features on version upgrades. It's maintained by Meltano and updated regularly.
+
+It also ships a large body of [pre-written tests](https://sdk.meltano.com/en/latest/testing.html) that you can adopt in a few lines, which makes maintaining and upgrading a connector far less manual.
+
+## Common patterns
+
+Singer is primarily a specification for formatting and transferring data (see the [Singer spec](https://hub.meltano.com/singer/docs#singer-spec)), so a number of distinct tools, SDKs and house styles have grown up around it. Recognising which one a connector follows tells you a lot about how to work on it.
+
+### [singer-io](https://github.com/singer-io)
+
+The original style, largely written from scratch on top of the [`singer-python`](https://github.com/singer-io/singer-python) library:
+
+- Most of the code tends to live in the module's `__init__.py`, behind a `main` method.
+- CLI parsing is written per connector with `argparse`.
+- A `REQUIRED_CONFIG_KEYS` list validates required configuration.
+- Dependencies usually live in `setup.py` rather than `requirements.txt`.
+- There are few target examples, because targets were originally expected to send data to [Stitch](https://www.stitchdata.com/) via [`target-stitch`](https://github.com/singer-io/target-stitch).
+- Unit tests are usually limited.
+- The developer is expected to know internal rules, such as when it's safe to emit state messages, or how to handle `ACTIVATE_VERSION`.
+- The `catalog` input was originally called `properties`, so some connectors accept either.
+- Reference: the [getting started guide](https://github.com/singer-io/getting-started) and the [tap template](https://github.com/singer-io/singer-tap-template).
+
+### [Meltano Singer SDK](https://sdk.meltano.com/) based connectors
+
+A software development kit that abstracts away most of the difficulty of building a Singer connector, and provides accelerators for writing a new one:
+
+- Cookiecutter templates to seed a connector repository.
+- Translation of records into spec-compliant Singer messages.
+- Helpers for common API work: parent-child relationships, pagination, retries, post-processing.
+- Helpers for common SQL work.
+- Native support for advanced features such as `BATCH` messaging and the `ACTIVATE_VERSION` sync strategy.
+- Default unit tests, plus testing helpers and config metadata printing.
+
+### [PipelineWise](https://github.com/transferwise/pipelinewise)
+
+An open source tool created in 2019 that configures and runs Singer connectors, similar in spirit to Meltano:
+
+- It maintains its own list of supported connectors, all of which you can also run with Meltano.
+- It documents its patterns well, particularly [metadata columns](https://transferwise.github.io/pipelinewise/user_guide/metadata_columns.html), [replication methods](https://transferwise.github.io/pipelinewise/concept/replication_methods.html) and [schema changes](https://transferwise.github.io/pipelinewise/user_guide/schema_changes.html).
+
+## Evaluating a tap or target
+
+Start on Meltano Hub to find candidates. A connector can be listed without being well maintained, so click through to the repository and look closer if you're unsure. No single signal below is decisive - weigh several of them together.
+
+- **Organisation-backed**: a connector under `meltano`, `meltanolabs`, `transferwise`, `singer-io` and similar namespaces is usually maintained, because an organisation is invested in it. This is less reliable for some older `singer-io` variants.
+- **Hub default variant**: the community does its best to mark the most active variant as the default, though the best option is occasionally unmaintained.
+- **Built on the Meltano Singer SDK**: a good sign that the connector is relatively recent and supports common features. Lots of leftover cookiecutter `TODO`s suggests it was never finished.
+- **Stream coverage**: a useful way to compare two variants. A newer variant sometimes has more features but covers far fewer streams.
+- **Most recent commit**: commits in the last couple of months suggest active maintenance. Many APIs are stable, though, so quiet does not necessarily mean broken.
+- **Total commits**: very few commits may mean the connector is still in development, or - combined with an old last commit - that it was a hobby project.
+- **Open pull requests**: are there pending PRs going unaddressed?
+- **Open issues**: are there many going unanswered? A high count can also just mean high traffic, so read what they actually are.
+- **Forks**: a lot of forks can indicate that people had to fork it to fix bugs or bump dependencies before it worked.
+- **Network insights**: GitHub's [network insights](https://docs.github.com/en/repositories/viewing-activity-and-data-for-your-repository/understanding-connections-between-repositories) show forks and recent commits, and sometimes reveal a fork that is more active than the original - a sign that the fork has become the better variant.
+
+## FAQs
+
+### What does a well-maintained tap or target look like?
+
+There are no hard requirements, but well-maintained connectors tend to follow these guidelines:
+
+- Issues and pull requests are responded to within a week.
+- All settings are documented, with usage examples alongside.
+- Dependencies are updated regularly.
+- Recent Python versions are supported.
+
+The community does its best to mark the best connector as the default variant on the Hub. If you think a different variant should be the default, open an issue.
+
+### How do I add my tap or target to Meltano Hub?
+
+Follow [Listing on the Hub](/connectors/meltano-hub/add-a-plugin).
+
+### How do I port a connector to the Meltano Singer SDK?
+
+See the SDK's [porting guide](https://sdk.meltano.com/en/latest/porting.html).
+
+If you're taking over a tap that hasn't been ported yet, get the existing tap working again before porting it. If you're not ready to port it, open an issue on the repository and mention it in `#contributing` on [Slack](https://meltano.com/slack) - someone may be able to help.
+
+### How do I flag a tap that should be migrated to the SDK?
+
+Open an issue on the [Singer Most Wanted repository](https://github.com/MeltanoLabs/Singer-Most-Wanted/issues) to let the community know it needs porting.
+
+### How do I become a maintainer in MeltanoLabs, or stop being one?
+
+See the [MeltanoLabs Meta repository](https://github.com/MeltanoLabs/Meta).
+
+## Unmaintained taps and targets
+
+Connectors go dormant as maintainers change jobs, companies shift priorities, or people simply run out of time. This is normal, and there is a well-worn path for picking one back up.
+
+### What counts as unmaintained?
+
+Signs that a tap or target has been abandoned:
+
+- Open pull requests with no reviews.
+- Open issues with no response in the last six months.
+- Last commit over a year ago.
+- Many forks, with few merges back upstream.
+
+### How do I report an unmaintained tap?
+
+Open an issue on the [Singer Most Wanted repository](https://github.com/MeltanoLabs/Singer-Most-Wanted/issues). That tells the Meltano team and the community that the connector needs adopting.
+
+### How do I take over maintenance of a tap or target?
+
+The community can usually help work out the best path, but the options are generally:
+
+1. **Fork it** to your personal or organisation's GitHub namespace: create the fork, make your changes, then [add your fork to Meltano Hub](/connectors/meltano-hub/add-a-plugin) and make it the new default.
+2. **Talk to the current owner**: if they'd prefer it, you can become a maintainer on their repository instead.
+3. **Migrate it to MeltanoLabs**: see the [MeltanoLabs README](https://github.com/MeltanoLabs/Meta#adding-a-new-connector) for how to transfer a repository, make your changes, then update the Hub and make it the new default.
+
+### What if I want to update a tap but not maintain it long term?
+
+That's fine. Open an issue on the [Singer Most Wanted repository](https://github.com/MeltanoLabs/Singer-Most-Wanted/issues) to let the community know it needs a maintainer, and we can help find someone.
+
+### Where do I go if I want to pay someone to build a tap or add a feature?
+
+Reach out to one of our [partners](https://meltano.com/partners/) to discuss custom taps and targets.
+
+### How do I escalate an issue that a maintainer isn't responding to?
+
+Join the `#contributing` channel on [Slack](https://meltano.com/slack) and post a link to the issue, and someone from the Meltano team will pick it up.
+
+## Next steps
+
+- [Listing on the Hub](/connectors/meltano-hub/add-a-plugin) - get your connector listed
+- [Install plugins with Meltano Hub](/connectors/meltano-hub) - using the Hub, and the alternatives to it
+- [Create a custom extractor](/tutorials/custom-extractor) - build a tap from scratch
+- [Meltano Singer SDK](https://sdk.meltano.com/) - the recommended way to build a connector
