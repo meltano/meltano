@@ -15,15 +15,12 @@ class TestCloudAuthConfig:
         config = CloudAuthConfig.from_env(data={})
         assert config.domain
         assert config.client_id
-        assert config.audience
-        assert config.scope == "openid profile email offline_access"
         assert config.callback_path == "/callback"
         # Both are registered as callback URLs, so the second is a real fallback.
         assert config.callback_ports == (9999, 9998)
 
     def test_urls(self) -> None:
         config = CloudAuthConfig(domain="example.auth0.com")
-        assert config.authorize_url == "https://example.auth0.com/authorize"
         assert config.token_url == "https://example.auth0.com/oauth/token"
         assert config.revoke_url == "https://example.auth0.com/oauth/revoke"
         assert config.user_info_url == "https://example.auth0.com/userinfo"

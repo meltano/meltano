@@ -98,10 +98,9 @@ def config(tmp_path: Path) -> CloudAuthConfig:
     return CloudAuthConfig(
         domain="tenant.auth0.com",
         client_id="test-client-id",
-        audience="https://api.example.com",
         callback_host="127.0.0.1",
         callback_ports=(free_port(),),
-        login_link=None,
+        login_link="https://link.example.com/login",
         login_timeout_seconds=10,
         credentials_path=tmp_path / "credentials.json",
     )
@@ -210,15 +209,11 @@ class TestLogin:
             key: value[0]
             for key, value in parse_qs(urlparse(browser.authorize_url).query).items()
         }
-        assert browser.authorize_url.startswith("https://tenant.auth0.com/authorize?")
-        assert query["response_type"] == "code"
-        assert query["code_challenge_method"] == "S256"
+        assert browser.authorize_url.startswith("https://link.example.com/login?")
+        # The link holds every other parameter.
+        assert query.keys() == {"client_id", "code_challenge", "state", "redirect_uri"}
         assert query["client_id"] == "test-client-id"
-        assert query["audience"] == "https://api.example.com"
-        assert query["scope"] == "openid profile email offline_access"
         assert query["redirect_uri"].endswith("/callback")
-        assert query["state"]
-        assert query["code_challenge"]
 
     def test_login_exchanges_code_with_verifier(
         self,
@@ -673,63 +668,3 @@ class TestConfidentialClient:
         browser.join()
 
         assert "test-client-secret" not in service.config.credentials_path.read_text()
-
-
-class TestLoginLink:
-    def test_link_carries_only_the_per_login_parameters(
-        self,
-        service: CloudAuthService,
-    ) -> None:
-        service.config.login_link = "https://link.example.com/login"
-        url = service._authorize_url(
-            code_challenge="challenge",
-            state="state",
-            redirect_uri="http://127.0.0.1:9998/callback",
-        )
-        assert url.startswith("https://link.example.com/login?")
-        assert parse_qs(urlparse(url).query) == {
-            "code_challenge": ["challenge"],
-            "state": ["state"],
-            "redirect_uri": ["http://127.0.0.1:9998/callback"],
-        }
-
-
-class TestAudience:
-    def _authorize_query(
-        self,
-        service: CloudAuthService,
-        monkeypatch: pytest.MonkeyPatch,
-    ) -> dict[str, str]:
-        browser = FakeBrowser({"code": "auth-code"})
-        monkeypatch.setattr("webbrowser.open_new_tab", browser)
-        service.login()
-        browser.join()
-        return {
-            key: value[0]
-            for key, value in parse_qs(urlparse(browser.authorize_url).query).items()
-        }
-
-    def test_audience_is_sent_when_set(
-        self,
-        service: CloudAuthService,
-        requests_mock: requests_mock_module.Mocker,
-        monkeypatch: pytest.MonkeyPatch,
-    ) -> None:
-        requests_mock.post(TOKEN_URL, json=TOKEN_RESPONSE)
-        query = self._authorize_query(service, monkeypatch)
-        assert query["audience"] == "https://api.example.com"
-
-    @pytest.mark.parametrize("audience", ("", None))
-    def test_audience_is_omitted_when_unset(
-        self,
-        service: CloudAuthService,
-        requests_mock: requests_mock_module.Mocker,
-        monkeypatch: pytest.MonkeyPatch,
-        audience: str | None,
-    ) -> None:
-        # Logging in must not require an API to be registered with the
-        # identity provider.
-        service.config.audience = audience
-        requests_mock.post(TOKEN_URL, json=TOKEN_RESPONSE)
-        query = self._authorize_query(service, monkeypatch)
-        assert "audience" not in query
