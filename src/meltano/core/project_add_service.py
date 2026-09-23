@@ -9,8 +9,12 @@ import typing as t
 import structlog
 
 from meltano.core.plugin import BasePlugin, Variant
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.project_plugins_service import (
+    PluginAlreadyAddedException,
+    PluginDefinitionNotFoundError,
+)
 from meltano.core.utils.python_compatibility import determine_plugin_python_version
 
 if sys.version_info >= (3, 11):
@@ -80,23 +84,17 @@ class ProjectAddService:
             **attrs,
             default_variant=Variant.DEFAULT_NAME,
         )
-        # The lockfile of an existing plugin would otherwise supply the parent,
-        # and the plugin would be "updated" to the definition it already has.
-        if (
-            update
-            and not plugin.inherit_from
-            and not plugin.is_custom()
-            and plugin
-            in self.project.plugins.get_plugins_of_type(
-                plugin_type,
-                ensure_parent=False,
-            )
-        ):
-            plugin.parent = self.project.hub_service.find_base_plugin(
-                plugin_type,
-                plugin_name,
-                variant=plugin.variant,
-            )
+        # An existing lockfile would otherwise supply the parent, and the plugin
+        # would be "updated" to the definition it already has.
+        if update and not plugin.inherit_from and not plugin.is_custom():
+            try:
+                plugin.parent = self.project.hub_service.find_base_plugin(
+                    plugin_type,
+                    plugin_name,
+                    variant=plugin.variant,
+                )
+            except PluginNotFoundError as err:
+                raise PluginDefinitionNotFoundError(plugin, err) from err
         self.project.plugins.ensure_parent(plugin)
 
         # If we are inheriting from a base plugin definition,

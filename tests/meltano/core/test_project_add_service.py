@@ -238,13 +238,19 @@ class TestProjectAddService:
         assert plugin_dict.items() >= updated_attrs.items()
         assert updated.config_with_extras
 
+    @pytest.mark.parametrize("in_project", (True, False))
     def test_add_update_refreshes_lockfile(
         self,
+        *,
+        in_project: bool,
         target: ProjectPlugin,
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
     ) -> None:
+        if not in_project:
+            project.plugins.remove_from_file(target)
+
         lockfile_path = project.dirs.plugin_lock_path(
             target.type,
             target.name,
