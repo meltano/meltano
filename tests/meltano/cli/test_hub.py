@@ -12,7 +12,8 @@ import requests_mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.hub.client import INDEX_CACHE_DURATION
+from meltano.core.cloud.config import CLOUD_API_ROOT
+from meltano.core.hub.client import INDEX_CACHE_DURATION, MeltanoHubService
 from meltano.core.plugin import PluginType
 
 if t.TYPE_CHECKING:
@@ -143,22 +144,30 @@ class TestCliHubList:
         assert "meltano cloud auth login" in str(result.exception)
         assert hub_api
 
-    @pytest.mark.parametrize("logged_in", (True, False))
-    def test_logged_in_user_is_told_how_to_ask_for_a_plugin(
+    @pytest.mark.parametrize(
+        ("hub_api_url", "told"),
+        (
+            (CLOUD_API_ROOT, True),
+            ("https://hub.meltano.com/meltano/api/v1", False),
+        ),
+    )
+    def test_cloud_index_reader_is_told_how_to_ask_for_a_plugin(
         self,
         project: Project,
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
+        hub_api_url: str,
         *,
-        logged_in: bool,
+        told: bool,
     ) -> None:
-        monkeypatch.setattr(project.hub_service, "cloud_authenticated", logged_in)
+        # The CLI can refresh the project, which builds a new Hub service.
+        monkeypatch.setattr(MeltanoHubService, "hub_api_url", hub_api_url)
         with requests_mock.Mocker(session=project.hub_service.session) as m:
             m.get(requests_mock.ANY, json={})
             result = cli_runner.invoke(cli, ("hub", "list"))
 
         assert_cli_runner(result)
-        assert ("support@meltano.com" in result.stderr) is logged_in
+        assert ("support@meltano.com" in result.stderr) is told
 
     def test_lists_every_discoverable_type(
         self,
