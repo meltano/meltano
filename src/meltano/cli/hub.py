@@ -248,7 +248,7 @@ def list_plugins(
     # that the reader looks for can be missing from it.
     if project.hub_service.hub_api_url == CLOUD_API_ROOT:
         click.secho(
-            "Something missing? Contact the team at support@meltano.com",
+            "Something missing? Contact the team at https://meltano.com/contact",
             fg="bright_yellow",
             err=True,
         )

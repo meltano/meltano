@@ -167,7 +167,7 @@ class TestCliHubList:
             result = cli_runner.invoke(cli, ("hub", "list"))
 
         assert_cli_runner(result)
-        assert ("support@meltano.com" in result.stderr) is told
+        assert ("https://meltano.com/contact" in result.stderr) is told
 
     def test_lists_every_discoverable_type(
         self,
