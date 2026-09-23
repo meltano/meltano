@@ -39,24 +39,18 @@ reach it-
 - Your dbt/analytics runners
 - Meltano
 
-The Meltano platform has multi-cloud resilience within the United
-Kingdom and connects to your store from the following egress IP addresses:
-
-```text
-51.137.148.226
-35.189.66.90
-35.177.0.220
-```
+The Meltano platform connects to your store from a fixed set of static egress IP
+addresses, listed on [Meltano IP Addresses](/meltano-cloud/ip-addresses). Allow
+all of them - a pipeline run can originate from any one.
 
 ### ClickHouse Cloud[​](#clickhouse-cloud "Direct link to ClickHouse Cloud")
 
 In the ClickHouse Cloud console, open your service → **Settings** → **Security** →
-**IP Access List** and add an allowed entry:
+**IP Access List** and add an allowed entry per address, using the CIDR list
+from [Meltano IP Addresses](/meltano-cloud/ip-addresses):
 
 ```text
-51.137.148.226/32   # Meltano
-35.189.66.90/32     # Meltano
-35.177.0.220/32     # Meltano
+<meltano-ip>/32   # Meltano
 ```
 
 Ensure there is no `0.0.0.0/0` (Anywhere) entry in the IP Access List: if one
@@ -65,17 +59,18 @@ that you add explicitly can connect.
 
 ### Self-managed ClickHouse[​](#self-managed-clickhouse "Direct link to Self-managed ClickHouse")
 
-Restrict the service user to Meltano's IP in your users configuration
+Restrict the service user to Meltano's IP addresses in your users configuration
 (`users.xml` or a file under `users.d/`). The `import_runner` user referenced
 below is created in [Authentication](#authentication) - create it first, then
-apply this network restriction:
+apply this network restriction, adding one `<ip>` element per address from
+[Meltano IP Addresses](/meltano-cloud/ip-addresses):
 
 ```xml
 <clickhouse>
   <users>
     <import_runner>
       <networks>
-        <ip>51.137.148.226/32</ip>
+        <ip>MELTANO_IP/32</ip>
       </networks>
     </import_runner>
   </users>
@@ -343,9 +338,10 @@ meltano run <your-extractor> target-clickhouse
   key-level dedup.
 - **Duplicate rows visible between runs** - expected with `ReplacingMergeTree`
   until a merge/`OPTIMIZE` runs; enable `optimize_after` or query with `FINAL`.
-- **Connection refused / timeout** - confirm Meltano's egress IP
-  (`51.137.148.226`) is on your IP allow-list and that you're using the correct
-  port (`8443` secure, `8123` plain HTTP, `9000` native).
+- **Connection refused / timeout** - confirm every one of
+  [Meltano's egress IP addresses](/meltano-cloud/ip-addresses) is on your IP
+  allow-list and that you're using the correct port (`8443` secure, `8123` plain
+  HTTP, `9000` native).
 
 ---
 

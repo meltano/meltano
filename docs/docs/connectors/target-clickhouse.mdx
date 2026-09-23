@@ -82,11 +82,11 @@ Create a dedicated service user for Meltano rather than reusing a default accoun
 
 If you are using ClickHouse as the Meltano state backend as well, the same user and database can be used.
 
-**Restrict network access.** For security, restrict inbound connections to trusted clients. Meltano connects from the following static egress IP: `51.137.148.226`
+**Restrict network access.** For security, restrict inbound connections to trusted clients. Meltano connects from a fixed set of static egress IP addresses, listed on [Meltano IP Addresses](/meltano-cloud/ip-addresses).
 
-- For ClickHouse Cloud, add the following to the service's IP Access List: `51.137.148.226/32`
+- For ClickHouse Cloud, add each address to the service's IP Access List in `/32` CIDR form.
 - Avoid allowing `0.0.0.0/0` unless you have a specific reason to expose the service publicly.
-- For self-managed ClickHouse, restrict the Meltano service user to the same IP in your ClickHouse network configuration.
+- For self-managed ClickHouse, restrict the Meltano service user to the same addresses in your ClickHouse network configuration.
 
 ### In Meltano Cloud
 
@@ -239,7 +239,7 @@ For ClickHouse instances reachable over the public internet:
 - Keep SSL/TLS certificate verification enabled
 - Avoid exposing ClickHouse with an unrestricted `0.0.0.0/0` allow-list entry
 
-For Meltano connections, allow the Meltano egress IP: `51.137.148.226/32`
+For Meltano connections, allow every address listed on [Meltano IP Addresses](/meltano-cloud/ip-addresses), each in `/32` CIDR form.
 
 ## Performance notes
 
@@ -251,7 +251,7 @@ For Meltano connections, allow the Meltano egress IP: `51.137.148.226/32`
 
 ## Troubleshooting
 
-**Connection refused or timeout.** Check that Meltano's egress IP (`51.137.148.226`) is allowed by your ClickHouse IP access list and that you are using the correct port: `8443` (secure HTTP), `8123` (plain HTTP), or `9000` (native).
+**Connection refused or timeout.** Check that every one of [Meltano's egress IP addresses](/meltano-cloud/ip-addresses) is allowed by your ClickHouse IP access list and that you are using the correct port: `8443` (secure HTTP), `8123` (plain HTTP), or `9000` (native).
 
 **Table does not exist / unexpected database.** Check that Database and Default Target Schema are not pointing to different databases. ClickHouse uses the database as the schema, so set Database directly and generally leave Default Target Schema unset.
 
@@ -259,7 +259,7 @@ For Meltano connections, allow the Meltano egress IP: `51.137.148.226/32`
 
 **Duplicate rows visible after an upsert.** `ReplacingMergeTree` deduplication can be eventual. Enable `optimize_after` or query with `FINAL` when you need the collapsed result.
 
-**ClickHouse Cloud connection fails.** Make sure TLS is enabled, the port is set to `8443`, and Meltano's IP (`51.137.148.226/32`) is present in the ClickHouse Cloud IP Access List.
+**ClickHouse Cloud connection fails.** Make sure TLS is enabled, the port is set to `8443`, and all of [Meltano's IP addresses](/meltano-cloud/ip-addresses) are present in the ClickHouse Cloud IP Access List.
 
 ## Need help?
 
