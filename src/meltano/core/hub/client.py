@@ -7,7 +7,7 @@ import json
 import os
 import sys
 import typing as t
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
@@ -212,6 +212,21 @@ class HubPluginVariantNotFoundError(MeltanoError):
         )
 
 
+@contextmanager
+def _cloud_login_hint() -> t.Iterator[None]:
+    """Print the hint after the command output, where a long output cannot bury it.
+
+    A failed command skips the hint, so that the error stays the last line.
+    """
+    yield  # noqa: RUF075
+    click.secho(
+        "Get supported plugins by logging in to Meltano Cloud: "
+        "meltano cloud auth login",
+        fg="bright_yellow",
+        err=True,
+    )
+
+
 class MeltanoHubService(PluginRepository):
     """PluginRepository implementation for the Meltano Hub."""
 
@@ -244,13 +259,12 @@ class MeltanoHubService(PluginRepository):
             self.session.headers.update(credentials.auth_header)
             self.cloud_authenticated = True
 
-        if not self.cloud_authenticated and not self.has_configured_hub:
-            logger.info(
-                "Meltano Cloud offers an alternate Hub of first-party "
-                "supported plugins that are actively maintained and tested. "
-                "Log in or sign up to get access by running 'meltano cloud "
-                "auth login'.",
-            )
+        if (
+            not self.cloud_authenticated
+            and not self.has_configured_hub
+            and (click_context := click.get_current_context(silent=True))
+        ):
+            click_context.with_resource(_cloud_login_hint())
 
         adapter = HTTPAdapter(
             max_retries=Retry(
