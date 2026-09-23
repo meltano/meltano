@@ -23,11 +23,11 @@ class TestCloudAuthConfig:
 
     def test_urls(self) -> None:
         config = CloudAuthConfig(domain="example.auth0.com")
-        assert config.authorize_url == "https://example.auth0.com/authorize"
+        assert config.authorize_url == "https://link.meltano.com/login"
         assert config.token_url == "https://example.auth0.com/oauth/token"
         assert config.revoke_url == "https://example.auth0.com/oauth/revoke"
         assert config.user_info_url == "https://example.auth0.com/userinfo"
-        assert config.logout_url == "https://example.auth0.com/v2/logout"
+        assert config.logout_url == "https://link.meltano.com/logout"
 
     def test_credentials_path_from_env(
         self,
