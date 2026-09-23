@@ -215,7 +215,7 @@ The dataplugin carries the `update dataplugin to latest` link only while it is b
 
 #### Prerequisites
 - Workspace `{workspace-id}` must exist
-- Dataplugin `{dataplugin-id}` must be installed in workspace `{workspace-id}`
+- Dataplugin `{dataplugin-id}` must exist
 
 <Examples path="dataplugins/update-an-installed-dataplugin-to-latest" />
 
