@@ -14,14 +14,18 @@ from meltano.core.user_config import get_user_config_service
 
 # The Meltano Cloud API. It serves an index of the plugins that Meltano
 # supports, maintains and tests, and the login asks Auth0 for a token that this
-# same API accepts.
+# same API accepts, which is why the audience names it.
 CLOUD_API_ROOT = "https://app.meltano.com/api"
 
 # The identity provider is the one Meltano Cloud runs, so none of these are
 # configurable: pointing the CLI elsewhere only makes a login that cannot
 # succeed.
+AUTH_AUDIENCE = CLOUD_API_ROOT
 AUTH_DOMAIN = "identity.matatika.com"
 AUTH_CLIENT_ID = "OxWCH8ianlswOoKQ8i9X1cBg6cZ4NuwG"
+
+# 'offline_access' is required for Auth0 to return a refresh token.
+AUTH_SCOPES = ("openid", "profile", "email", "offline_access")
 
 # Auth0 matches callback URLs exactly, so the login flow uses a fixed port
 # rather than an ephemeral one. Both of these are registered for the Meltano
@@ -30,14 +34,11 @@ CALLBACK_HOST = "localhost"
 CALLBACK_PORTS = (9999, 9998)
 CALLBACK_PATH = "/callback"
 
-# A short link to the authorization endpoint. It holds the authorization
-# parameters that only the login uses. The CLI adds the client ID, which other
-# requests also use, and the ones that can change on each login: the PKCE
-# challenge, the state, and the redirect URI, which names the callback port
-# that is free. The scopes that the link holds must include 'offline_access'
-# for Auth0 to return a refresh token, and its audience must be the Meltano
-# Cloud API. Change the link target when the domain above changes.
+# The user sees these two URLs in the browser, so they are links on a Meltano
+# domain that redirect to the authorization and logout endpoints on the domain
+# above. They carry no parameters.
 LOGIN_LINK = "https://link.meltano.com/login"
+LOGOUT_LINK = "https://link.meltano.com/logout"
 
 # How long to wait for the user to complete the login flow in their browser.
 LOGIN_TIMEOUT_SECONDS = 300.0
@@ -58,10 +59,11 @@ class CloudAuthConfig:
     # Only set for a confidential client. A CLI is normally a public client,
     # which authenticates with PKCE alone and has no secret to keep.
     client_secret: str | None = None
+    audience: str = AUTH_AUDIENCE
+    scopes: tuple[str, ...] = AUTH_SCOPES
     callback_host: str = CALLBACK_HOST
     callback_ports: tuple[int, ...] = CALLBACK_PORTS
     callback_path: str = CALLBACK_PATH
-    login_link: str = LOGIN_LINK
     login_timeout_seconds: float = LOGIN_TIMEOUT_SECONDS
     credentials_path: Path = field(
         default_factory=lambda: (
@@ -99,6 +101,11 @@ class CloudAuthConfig:
         return f"https://{self.domain}/"
 
     @property
+    def authorize_url(self) -> str:
+        """The Auth0 authorization endpoint."""
+        return LOGIN_LINK
+
+    @property
     def token_url(self) -> str:
         """The Auth0 token endpoint."""
         return urljoin(self.base_url, "oauth/token")
@@ -116,4 +123,9 @@ class CloudAuthConfig:
     @property
     def logout_url(self) -> str:
         """The Auth0 logout endpoint."""
-        return urljoin(self.base_url, "v2/logout")
+        return LOGOUT_LINK
+
+    @property
+    def scope(self) -> str:
+        """The requested OAuth scopes, as a space-separated string."""
+        return " ".join(self.scopes)

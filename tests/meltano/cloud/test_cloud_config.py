@@ -15,16 +15,19 @@ class TestCloudAuthConfig:
         config = CloudAuthConfig.from_env(data={})
         assert config.domain
         assert config.client_id
+        assert config.audience
+        assert config.scope == "openid profile email offline_access"
         assert config.callback_path == "/callback"
         # Both are registered as callback URLs, so the second is a real fallback.
         assert config.callback_ports == (9999, 9998)
 
     def test_urls(self) -> None:
         config = CloudAuthConfig(domain="example.auth0.com")
+        assert config.authorize_url == "https://link.meltano.com/login"
         assert config.token_url == "https://example.auth0.com/oauth/token"
         assert config.revoke_url == "https://example.auth0.com/oauth/revoke"
         assert config.user_info_url == "https://example.auth0.com/userinfo"
-        assert config.logout_url == "https://example.auth0.com/v2/logout"
+        assert config.logout_url == "https://link.meltano.com/logout"
 
     def test_credentials_path_from_env(
         self,

@@ -98,9 +98,9 @@ def config(tmp_path: Path) -> CloudAuthConfig:
     return CloudAuthConfig(
         domain="tenant.auth0.com",
         client_id="test-client-id",
+        audience="https://api.example.com",
         callback_host="127.0.0.1",
         callback_ports=(free_port(),),
-        login_link="https://link.example.com/login",
         login_timeout_seconds=10,
         credentials_path=tmp_path / "credentials.json",
     )
@@ -209,11 +209,15 @@ class TestLogin:
             key: value[0]
             for key, value in parse_qs(urlparse(browser.authorize_url).query).items()
         }
-        assert browser.authorize_url.startswith("https://link.example.com/login?")
-        # The link holds every other parameter.
-        assert query.keys() == {"client_id", "code_challenge", "state", "redirect_uri"}
+        assert browser.authorize_url.startswith("https://link.meltano.com/login?")
+        assert query["response_type"] == "code"
+        assert query["code_challenge_method"] == "S256"
         assert query["client_id"] == "test-client-id"
+        assert query["audience"] == "https://api.example.com"
+        assert query["scope"] == "openid profile email offline_access"
         assert query["redirect_uri"].endswith("/callback")
+        assert query["state"]
+        assert query["code_challenge"]
 
     def test_login_exchanges_code_with_verifier(
         self,
@@ -554,7 +558,7 @@ class TestLogout:
 
     def test_browser_logout_url(self, service: CloudAuthService) -> None:
         assert service.browser_logout_url() == (
-            "https://tenant.auth0.com/v2/logout?client_id=test-client-id"
+            "https://link.meltano.com/logout?client_id=test-client-id"
         )
 
 
@@ -668,3 +672,44 @@ class TestConfidentialClient:
         browser.join()
 
         assert "test-client-secret" not in service.config.credentials_path.read_text()
+
+
+class TestAudience:
+    def _authorize_query(
+        self,
+        service: CloudAuthService,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> dict[str, str]:
+        browser = FakeBrowser({"code": "auth-code"})
+        monkeypatch.setattr("webbrowser.open_new_tab", browser)
+        service.login()
+        browser.join()
+        return {
+            key: value[0]
+            for key, value in parse_qs(urlparse(browser.authorize_url).query).items()
+        }
+
+    def test_audience_is_sent_when_set(
+        self,
+        service: CloudAuthService,
+        requests_mock: requests_mock_module.Mocker,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        requests_mock.post(TOKEN_URL, json=TOKEN_RESPONSE)
+        query = self._authorize_query(service, monkeypatch)
+        assert query["audience"] == "https://api.example.com"
+
+    @pytest.mark.parametrize("audience", ("", None))
+    def test_audience_is_omitted_when_unset(
+        self,
+        service: CloudAuthService,
+        requests_mock: requests_mock_module.Mocker,
+        monkeypatch: pytest.MonkeyPatch,
+        audience: str | None,
+    ) -> None:
+        # Logging in must not require an API to be registered with the
+        # identity provider.
+        service.config.audience = audience
+        requests_mock.post(TOKEN_URL, json=TOKEN_RESPONSE)
+        query = self._authorize_query(service, monkeypatch)
+        assert "audience" not in query

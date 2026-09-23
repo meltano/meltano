@@ -399,11 +399,19 @@ class CloudAuthService:
     ) -> str:
         params = {
             "client_id": self.config.client_id,
+            "response_type": "code",
             "code_challenge": code_challenge,
-            "state": state,
+            "code_challenge_method": "S256",
             "redirect_uri": redirect_uri,
+            "scope": self.config.scope,
+            "state": state,
         }
-        return f"{self.config.login_link}?{urlencode(params)}"
+        if self.config.audience:
+            # Without an audience, Auth0 issues an opaque access token for the
+            # /userinfo endpoint only, which is all the login flow itself needs.
+            params["audience"] = self.config.audience
+
+        return f"{self.config.authorize_url}?{urlencode(params)}"
 
     def _redirect_uri(self, port: int) -> str:
         return f"http://{self.config.callback_host}:{port}{self.config.callback_path}"
