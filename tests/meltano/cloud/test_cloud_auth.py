@@ -209,7 +209,7 @@ class TestLogin:
             key: value[0]
             for key, value in parse_qs(urlparse(browser.authorize_url).query).items()
         }
-        assert browser.authorize_url.startswith("https://tenant.auth0.com/authorize?")
+        assert browser.authorize_url.startswith("https://link.meltano.com/login?")
         assert query["response_type"] == "code"
         assert query["code_challenge_method"] == "S256"
         assert query["client_id"] == "test-client-id"
@@ -558,7 +558,7 @@ class TestLogout:
 
     def test_browser_logout_url(self, service: CloudAuthService) -> None:
         assert service.browser_logout_url() == (
-            "https://tenant.auth0.com/v2/logout?client_id=test-client-id"
+            "https://link.meltano.com/logout?client_id=test-client-id"
         )
 
 

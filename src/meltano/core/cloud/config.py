@@ -34,6 +34,12 @@ CALLBACK_HOST = "localhost"
 CALLBACK_PORTS = (9999, 9998)
 CALLBACK_PATH = "/callback"
 
+# The user sees these two URLs in the browser, so they are links on a Meltano
+# domain that redirect to the authorization and logout endpoints on the domain
+# above. They carry no parameters.
+LOGIN_LINK = "https://link.meltano.com/login"
+LOGOUT_LINK = "https://link.meltano.com/logout"
+
 # How long to wait for the user to complete the login flow in their browser.
 LOGIN_TIMEOUT_SECONDS = 300.0
 
@@ -97,7 +103,7 @@ class CloudAuthConfig:
     @property
     def authorize_url(self) -> str:
         """The Auth0 authorization endpoint."""
-        return urljoin(self.base_url, "authorize")
+        return LOGIN_LINK
 
     @property
     def token_url(self) -> str:
@@ -117,7 +123,7 @@ class CloudAuthConfig:
     @property
     def logout_url(self) -> str:
         """The Auth0 logout endpoint."""
-        return urljoin(self.base_url, "v2/logout")
+        return LOGOUT_LINK
 
     @property
     def scope(self) -> str:
