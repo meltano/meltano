@@ -101,6 +101,7 @@ def config(tmp_path: Path) -> CloudAuthConfig:
         audience="https://api.example.com",
         callback_host="127.0.0.1",
         callback_ports=(free_port(),),
+        login_link=None,
         login_timeout_seconds=10,
         credentials_path=tmp_path / "credentials.json",
     )
@@ -672,6 +673,25 @@ class TestConfidentialClient:
         browser.join()
 
         assert "test-client-secret" not in service.config.credentials_path.read_text()
+
+
+class TestLoginLink:
+    def test_link_carries_only_the_per_login_parameters(
+        self,
+        service: CloudAuthService,
+    ) -> None:
+        service.config.login_link = "https://link.example.com/login"
+        url = service._authorize_url(
+            code_challenge="challenge",
+            state="state",
+            redirect_uri="http://127.0.0.1:9998/callback",
+        )
+        assert url.startswith("https://link.example.com/login?")
+        assert parse_qs(urlparse(url).query) == {
+            "code_challenge": ["challenge"],
+            "state": ["state"],
+            "redirect_uri": ["http://127.0.0.1:9998/callback"],
+        }
 
 
 class TestAudience:

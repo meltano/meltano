@@ -34,6 +34,12 @@ CALLBACK_HOST = "localhost"
 CALLBACK_PORTS = (9999, 9998)
 CALLBACK_PATH = "/callback"
 
+# A short link to the authorization endpoint. It holds every authorization
+# parameter except the ones that change on each login: the PKCE challenge, the
+# state, and the redirect URI, which names the callback port that is free.
+# Change the link target when any of the values above change.
+LOGIN_LINK = "https://link.meltano.com/login"
+
 # How long to wait for the user to complete the login flow in their browser.
 LOGIN_TIMEOUT_SECONDS = 300.0
 
@@ -58,6 +64,7 @@ class CloudAuthConfig:
     callback_host: str = CALLBACK_HOST
     callback_ports: tuple[int, ...] = CALLBACK_PORTS
     callback_path: str = CALLBACK_PATH
+    login_link: str | None = LOGIN_LINK
     login_timeout_seconds: float = LOGIN_TIMEOUT_SECONDS
     credentials_path: Path = field(
         default_factory=lambda: (

@@ -397,6 +397,14 @@ class CloudAuthService:
         state: str,
         redirect_uri: str,
     ) -> str:
+        if self.config.login_link:
+            params = {
+                "code_challenge": code_challenge,
+                "state": state,
+                "redirect_uri": redirect_uri,
+            }
+            return f"{self.config.login_link}?{urlencode(params)}"
+
         params = {
             "client_id": self.config.client_id,
             "response_type": "code",
