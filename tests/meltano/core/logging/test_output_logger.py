@@ -338,6 +338,7 @@ class TestOutputLogger:
         assert entry["log_level"] == "info"
         assert entry["name"] == "test_singer"
         assert entry["record_count"] == 100
+        assert entry["stream_name"] == "users"
         assert "plugin_exception" not in entry
 
     def test_writeline_with_singer_sdk_exception(
