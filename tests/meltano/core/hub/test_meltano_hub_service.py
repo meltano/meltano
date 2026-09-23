@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import sys
 import typing as t
 from http import HTTPStatus
@@ -247,26 +246,42 @@ class TestMeltanoHubService:
         self,
         project: Project,
         monkeypatch,
-        caplog,
+        capsys,
     ) -> None:
         project.settings.unset("hub_url_auth")
         _stub_cloud_credentials(monkeypatch, None)
-        with caplog.at_level(logging.INFO):
+        with click.Context(cli):
             MeltanoHubService(project)
-        assert "meltano cloud auth login" in caplog.text
+            assert "meltano cloud auth login" not in capsys.readouterr().err
+        assert "meltano cloud auth login" in capsys.readouterr().err
+
+    @pytest.mark.usefixtures("_restore_hub_session_headers")
+    def test_failed_command_is_not_told_about_cloud(
+        self,
+        project: Project,
+        monkeypatch,
+        capsys,
+    ) -> None:
+        project.settings.unset("hub_url_auth")
+        _stub_cloud_credentials(monkeypatch, None)
+        error = PluginNotFoundError("tap-x")
+        with pytest.raises(PluginNotFoundError), click.Context(cli):  # noqa: PT012
+            MeltanoHubService(project)
+            raise error
+        assert "meltano cloud auth login" not in capsys.readouterr().err
 
     @pytest.mark.usefixtures("_restore_hub_session_headers")
     def test_logged_in_user_is_not_told_about_cloud(
         self,
         project: Project,
         monkeypatch,
-        caplog,
+        capsys,
     ) -> None:
         project.settings.unset("hub_url_auth")
         _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
-        with caplog.at_level(logging.INFO):
+        with click.Context(cli):
             MeltanoHubService(project)
-        assert "meltano cloud auth login" not in caplog.text
+        assert "meltano cloud auth login" not in capsys.readouterr().err
 
     @pytest.mark.usefixtures("_restore_hub_session_headers")
     @pytest.mark.parametrize(
@@ -281,17 +296,17 @@ class TestMeltanoHubService:
         self,
         project: Project,
         monkeypatch,
-        caplog,
+        capsys,
         setting: str,
         value: str,
     ) -> None:
         project.settings.unset("hub_url_auth")
         project.settings.set(setting, value)
         _stub_cloud_credentials(monkeypatch, None)
-        with caplog.at_level(logging.INFO):
+        with click.Context(cli):
             MeltanoHubService(project)
         project.settings.unset(setting)
-        assert "meltano cloud auth login" not in caplog.text
+        assert "meltano cloud auth login" not in capsys.readouterr().err
 
     @pytest.mark.usefixtures("_restore_hub_session_headers")
     def test_hub_api_url_default(self, project: Project, monkeypatch) -> None:
