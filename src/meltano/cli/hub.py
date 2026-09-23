@@ -15,6 +15,7 @@ from structlog.stdlib import get_logger
 
 from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
+from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.error import MeltanoError
 from meltano.core.plugin import PluginType
 
@@ -240,7 +241,14 @@ def list_plugins(
 
     if list_format == "json":
         click.echo(json.dumps([asdict(listing) for listing in listings], indent=2))
-        return
-
-    if listings:
+    elif listings:
         _render_table(listings)
+
+    # The Cloud index lists only the plugins that Meltano supports, so a plugin
+    # that the reader looks for can be missing from it.
+    if project.hub_service.hub_api_url == CLOUD_API_ROOT:
+        click.secho(
+            "Not seeing what you need? Contact the team at support@meltano.com",
+            fg="bright_yellow",
+            err=True,
+        )
