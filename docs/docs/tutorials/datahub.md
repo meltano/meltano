@@ -3,7 +3,6 @@ title: How to use DataHub with Meltano
 description: Learn how to use your DataHub and integrate the ingestion of data into it right into your Meltano pipelines.
 
 layout: doc
-sidebar_position: 11
 ---
 
 Meltano supports multiple [utilities](/concepts/plugins#utilities), one of them is the [DataHub utility](https://hub.meltano.com/utilities/datahub). It provides an integration for the metadata platform called DataHub. You can find the reference at both the [utility-datahub level](https://github.com/z3z1ma/files-datahub/tree/main/bundle/utilities/datahub) as well as the [file-bundle-datahub level](https://github.com/z3z1ma/files-datahub).
