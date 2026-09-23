@@ -99,7 +99,7 @@ def cli(
     ctx: click.Context,
     *,
     log_level: str | None,
-    log_format: str | None,
+    log_format: LogFormat | None,
     log_config: str | None,
     environment: str,
     no_environment: bool,
@@ -112,13 +112,6 @@ def cli(
     Read more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D301, D415
     ctx.ensure_object(dict)
-    logger.info(
-        "Meltano %s, Python %s, %s (%s)",
-        get_meltano_version(),
-        platform.python_version(),
-        platform.system(),
-        platform.machine(),
-    )
 
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
@@ -128,6 +121,15 @@ def cli(
 
     if log_format:
         ProjectSettingsService.config_override["cli.log_format"] = log_format
+
+    setup_logging(log_level=log_level, log_config=log_config, log_format=log_format)
+    logger.info(
+        "Meltano %s, Python %s, %s (%s)",
+        get_meltano_version(),
+        platform.python_version(),
+        platform.system(),
+        platform.machine(),
+    )
 
     ctx.obj["explicit_no_environment"] = no_environment
     no_color = get_no_color_flag()

@@ -126,7 +126,7 @@ class TestCli:
         pushd(incompatible_version_project.root)
         result = cli_runner.invoke(cli, ["config"])
         assert result.exit_code == 3
-        assert re.match(r"You're using .* but this project requires .*", result.output)
+        assert re.search(r"You're using .* but this project requires .*", result.output)
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
