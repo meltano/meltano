@@ -1,0 +1,91 @@
+---
+title: Dianomi
+description: Sync advertiser or publisher performance stats from Dianomi's native advertising platform.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Dianomi
+
+<ConnectorTypeBadge type="extractor" block />
+
+Dianomi is a native advertising platform that distributes sponsored financial content from brands to audiences on financial and business publisher websites. Advertisers connect Dianomi to bring campaign performance into their warehouse alongside their other marketing data, and publishers connect it to report on the revenue and performance of the Dianomi placements on their sites.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+| **Sync type** | Mixed: "by day" stats can sync incrementally on `date` (see [Advanced configuration](#advanced-configuration)), other stats sync in full |
+| **Streams** | Discovered dynamically from your account |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+This connector brings in the performance stats Dianomi makes available to your account, whether you're an advertiser or a publisher:
+
+- Advertiser campaign performance stats (with a Client ID)
+- Publisher placement and revenue performance stats (with a Partner ID)
+- Daily ("by day") breakdowns, where Dianomi provides them
+
+## Prerequisites
+
+- **API key and email address**: the API key and the email address associated with your Dianomi account. Both are needed for every sync, and can be obtained from the [Dianomi self-serve portal](https://my.dianomi.com).
+- **Client ID or Partner ID**: identifies the account whose data will be extracted. Use a **Client ID** if you're an advertiser, or a **Partner ID** if you're a publisher. You need one or the other.
+
+## Setup
+
+### In Dianomi
+
+1. Sign in to the [Dianomi self-serve portal](https://my.dianomi.com) and obtain your API key.
+2. Note the email address associated with your Dianomi account.
+3. Note your Client ID (advertisers) or Partner ID (publishers).
+
+### In Meltano Cloud
+
+1. Enter your **API Key** and **Email**.
+2. Enter your **Client ID** if you're an advertiser, or your **Partner ID** if you're a publisher.
+3. Optionally choose a **Start Date** for extraction. It defaults to the last year.
+
+## Available streams
+
+This tap discovers its streams dynamically from the stats available to the configured account, so the exact set of streams will vary depending on your account and whether you connect as an advertiser or a publisher. Each stream is named after the Dianomi stat's `shortcode`.
+
+Stats with a primary key and replication key registered in the tap sync accordingly. "By day" stats (those that expose a `date` column) can replicate incrementally on `date`; any stream without a registered configuration syncs in full on each run.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `api_key` | string | required | Dianomi API key |
+| `email` | string | required | Dianomi account email address |
+| `client_id` | integer | required for advertisers | Advertiser Client ID to filter results by |
+| `partner_id` | integer | required for publishers | Publisher Partner ID to filter results by |
+| `start_date` | date | last year | The earliest record date to sync (ISO 8601 format) |
+
+## Advanced configuration
+
+- **Primary key and replication key overrides.** If a stream produces duplicate rows when loading into your data warehouse, or isn't behaving incrementally for a "by day" stat (one that exposes a `date` column), you can set a primary key and replication key configuration for it under `metadata` in your `meltano.yml`:
+
+  ```yml
+  plugins:
+    extractors:
+    - name: tap-dianomi
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/tap-dianomi.git@v0.1.0
+      metadata:
+        <stream_name>:  # Dianomi stat `shortcode`
+
+          # primary key configuration
+          key-properties:  # set one or more properties as an array
+
+          # incremental replication for "by date" stats
+          replication-method: INCREMENTAL
+          replication-key: date
+  ```
+
+  Please also register the configuration in the tap (see [Need help?](#need-help)), so that future versions include it and the `metadata` entry above is no longer needed.
+
+## Need help?
+
+If a stream is missing a primary key or replication key configuration, [open an issue on the tap's repository](https://github.com/MeltanoLabs/tap-dianomi/issues/new?title=feat:%20Register%20primary/replication%20key%20configuration%20for%20stream%20`%3Cshortcode%3E`&body=Primary%20key(s):%0A-%20`%3Cid%3E`%0A%0AReplication%20key:%20`date`&labels=enhancement&type=feature) to register it. For anything else, such as a stream or field you need that isn't available, or the connector not working as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

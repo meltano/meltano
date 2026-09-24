@@ -1,0 +1,101 @@
+---
+title: SurveyMonkey (Private App)
+description: Sync your SurveyMonkey surveys, distribution data, and responses into your warehouse using an access token from your own private app, already flattened into relational tables.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# SurveyMonkey (Private App)
+
+<ConnectorTypeBadge type="extractor" block />
+
+SurveyMonkey is an online survey platform for creating and distributing surveys and collecting and analysing responses. Research, CX, HR, and marketing teams use this connector to bring survey definitions, distribution data, and individual responses into their warehouse for reporting and analysis, already flattened into relational tables, so you don't need warehouse-specific SQL to unnest nested survey or response data. This version authenticates with an access token from a private app in your own SurveyMonkey account.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token (access token from a SurveyMonkey private app) |
+| **Sync type** | Mixed: some streams incremental, some full table |
+| **Streams** | Fixed list |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+This connector brings in your full survey program, both as raw nested objects and as pre-flattened relational tables:
+
+- Survey definitions (surveys, pages, questions, headings, answer choices, matrix sub-questions)
+- Distribution data (collectors and their recipients)
+- Responses, down to the individual answer
+- Address-book contacts and account survey categories
+
+## Prerequisites
+
+- **Access Token**: a SurveyMonkey API access token, generated from a private app in your own SurveyMonkey account. It's the only credential needed. SurveyMonkey doesn't issue a separate API key; the API authenticates with this token. The token can only see surveys that the user who created the app can see, so an admin account is recommended.
+  - The token must have the `surveys_read`, `collectors_read`, `responses_read`, `responses_read_detail` and `contacts_read` scopes.
+- **A paid SurveyMonkey plan.** API access in general, and full per-question answer detail (used by the `responses` and `response_answers` streams) in particular, require a paid plan. On Basic plans, response answer detail is limited or unavailable.
+
+## Setup
+
+### In SurveyMonkey
+
+1. Sign in at [developer.surveymonkey.com](https://developer.surveymonkey.com) with a SurveyMonkey account that can access the surveys you want to extract (ideally an admin).
+2. Under **My Apps**, add a new **Private** app. A private app is tied to your own account and needs no SurveyMonkey approval.
+3. On the app's **Settings** page, grant the `surveys_read`, `collectors_read`, `responses_read`, `responses_read_detail` and `contacts_read` scopes.
+4. Copy the **Access Token** shown on the same page.
+
+### In Meltano Cloud
+
+1. Add the SurveyMonkey (Private App) data source.
+2. Paste your token into the **Access Token** setting.
+3. Set a **Start Date**: the incremental bookmark for the `responses` stream (and its flattened `response_pages`/`response_answers` streams), so set it as far back as you need response history.
+4. If your account isn't hosted in the US, set **Region** to Europe (EU) or Canada (CA). Using the wrong region causes authentication or lookup failures; check with your SurveyMonkey account admin if you're not sure.
+
+## Settings
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| `access_token` | string (sensitive) | required | A SurveyMonkey API access token, used directly as a bearer token. Must have the `surveys_read`, `collectors_read`, `responses_read`, `responses_read_detail` and `contacts_read` scopes |
+| `start_date` | string | required | An ISO-8601 date-time (e.g. `2026-01-01T00:00:00Z`). The earliest response date to sync; used as the incremental bookmark for the `responses` stream |
+| `api_url` | string (options) | `https://api.surveymonkey.com/v3` | The SurveyMonkey data-residency region your account belongs to: United States, Europe (EU), or Canada (CA). Selecting the wrong region causes authentication or lookup failures |
+
+## Available streams
+
+| Stream | Description |
+|---|---|
+| `surveys` | All surveys in the account |
+| `survey_details` | Full definition of each survey, including pages and questions |
+| `collectors` | Distribution channels (web links, email invitations) per survey |
+| `recipients` | Recipients of each collector (email-invite collectors only) |
+| `responses` | Individual survey responses, with per-question answers |
+| `survey_pages` | One row per survey page (flattened from `survey_details`) |
+| `questions` | One row per question (flattened from `survey_details`) |
+| `question_headings` | One row per question heading (flattened from `survey_details`) |
+| `question_options` | One row per answer choice (flattened from `survey_details`) |
+| `sub_questions` | One row per matrix subquestion/row (flattened from `survey_details`) |
+| `response_pages` | One row per answered page of a response (flattened from `responses`) |
+| `response_answers` | One row per individual answer (flattened from `responses`) |
+| `contacts` | Address-book contacts (requires the `contacts_read` scope) |
+| `survey_categories` | Survey categories available to the account |
+
+`responses`, `response_pages`, and `response_answers` sync incrementally on `date_modified`, bookmarked against your Start Date. Every other stream is full-table and re-syncs completely on each run.
+
+## Advanced configuration
+
+- **Backfilling response history.** To re-sync historical responses, lower the **Start Date** or reset the connection's sync state; either restarts the `responses`/`response_pages`/`response_answers` streams from that date.
+
+## Token lifetime
+
+How long your access token lasts depends on your SurveyMonkey plan. On **Enterprise**, you can deploy the private app so the token doesn't expire. On lower paid plans, the token expires roughly every 90 days; when it does, regenerate it in the app and update the **Access Token** setting in Meltano Cloud.
+
+## Private app vs. Connect
+
+This token-based connector was introduced as an interim option. The [SurveyMonkey](/connectors/tap-surveymonkey) connector lets you **Connect with SurveyMonkey** instead, signing in directly and managing tokens for you, with the same streams.
+
+## A note on history
+
+These streams always reflect the *current state* of each record; they are not slowly-changing-dimension (SCD type-2) history tables. If you're migrating from a tool that provided full change history (e.g. Fivetran's `_history` tables) and need valid-from/valid-to versioning, that needs to be layered in your warehouse, for example with dbt snapshots. This can't be backfilled from before your first snapshot run, and needs a scheduled job to accrue over time.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).
