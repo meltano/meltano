@@ -1,0 +1,136 @@
+---
+title: Google BigQuery
+description: Load extracted data into Google BigQuery, with support for Storage Write API, batch jobs, GCS staging, streaming inserts, and Arrow BATCH ingestion.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Google BigQuery
+
+<ConnectorTypeBadge type="loader" block />
+
+Google BigQuery is a cloud-based data warehousing and analytics platform. It allows users to store, manage, and analyze large datasets using SQL-like queries, and is designed to handle petabyte-scale datasets with a serverless architecture that only charges for the queries run.
+
+The `target-bigquery` loader writes data extracted by Meltano into BigQuery tables, supporting several ingestion methods and both denormalized (typed columns) and fixed-schema (single `JSON` column) loading patterns.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Type** | Loader (target) |
+| **Authentication** | Google service account key (JSON) |
+| **Ingestion methods** | Storage Write API, Batch Job, GCS Stage, Streaming Insert |
+| **Loading** | Append-only, upsert, or overwrite |
+| **Data model** | Denormalized (typed columns) or fixed schema (`JSON` column) |
+| **BATCH message support** | Yes, including Arrow-encoded BATCH files |
+
+## What you can sync
+
+The BigQuery loader writes data extracted by Meltano into tables in the configured **Dataset**.
+
+- Each stream gets a table by default using the stream name.
+- **Denormalized** loading unpacks nested data into a BigQuery schema derived from the tap's JSON schema, converting arrays to repeated fields and records to structs.
+- Without **Denormalized**, all data is loaded into a single `JSON` column, which is resilient to schema changes at the cost of query convenience.
+- **Method** selects the ingestion path: `storage_write_api`, `batch_job`, `gcs_stage`, or `streaming_insert`.
+- **Upsert** merges incoming data into existing rows using the stream's key properties; **Overwrite** replaces existing rows with the incoming data.
+- **Generate View** can create a BigQuery view that overlays typed access on top of fixed-schema (`JSON` column) tables.
+- **Partition Granularity** and **Cluster On Key Properties** control table partitioning and clustering.
+
+### Arrow BATCH support
+
+`target-bigquery` can ingest `BATCH` messages whose files are Arrow-encoded (`encoding.format: arrow`), in addition to the standard `jsonl` encoding. This lets taps that emit Arrow batches (for example, taps reading directly from columnar sources) load into BigQuery without an intermediate JSON conversion step.
+
+Arrow BATCH ingestion requires:
+
+- **Denormalized** set to `true` — the fixed-schema (`JSON` column) path does not support Arrow BATCH files.
+- The native BigQuery ADBC driver available at runtime, installed separately (it is not pip-installable). See the [ADBC BigQuery driver docs](https://docs.adbc-drivers.org/drivers/bigquery/) for installation instructions.
+
+If an Arrow BATCH message arrives for a sink that isn't denormalized, or the ADBC driver can't be loaded, the load fails with a descriptive error rather than silently falling back.
+
+## Prerequisites
+
+- **A Google Cloud project** with the BigQuery API enabled.
+- **A BigQuery dataset** to load data into. The dataset is not created automatically, so it must already exist before running a pipeline.
+- **A Google service account** with permissions to create and write to tables in the dataset (for example, `roles/bigquery.dataEditor` and `roles/bigquery.jobUser`), and its JSON key.
+- If using `gcs_stage`, a **Google Cloud Storage bucket** the service account can write to.
+
+## Setup
+
+### In Google Cloud
+
+1. Create or choose a BigQuery dataset in the target project and note its **Dataset ID** and **Location**.
+2. Create a service account, or reuse an existing one, and grant it the roles needed to create and write to tables in the dataset.
+3. Create and download a JSON key for the service account.
+4. If you plan to use the `gcs_stage` method, create a Cloud Storage bucket and grant the service account write access to it.
+
+### In Meltano Cloud
+
+1. Add a new Google BigQuery loader.
+2. Enter the connection details for your BigQuery destination:
+   - **Service Account Key (json)**: the full contents of the service account key file
+   - **Project**: the Google Cloud project ID that contains the dataset
+   - **Dataset**: the BigQuery dataset to load into
+   - **Location**: the geographic location of the dataset, if required
+   - **Method**: the ingestion method to use (defaults to `Batch Job`)
+3. Configure denormalization, upsert/overwrite, and partitioning/clustering settings as needed for your use case.
+4. Once connected, Meltano can use the loader as a destination for pipeline data.
+
+## Settings
+
+| Field | Type | Required / Default | Description |
+|---|---|---|---|
+| Service Account Key (json) | string | required | The Google Service Account Key JSON object with access to the BigQuery API. |
+| Project | string | required | The ID of the Google Cloud project that contains the BigQuery dataset to connect to. |
+| Dataset | string | required | The name of the BigQuery dataset to connect to. |
+| Location | string | — | The geographic location of the BigQuery dataset. |
+| Batch Size | integer | `10000` | The number of rows to retrieve per API request. |
+| Fail Fast | boolean | — | Whether to stop processing if an error occurs during data retrieval. |
+| Timeout | integer | — | The maximum amount of time to wait for a response from the API. |
+| Denormalized | boolean | `true` | Whether to unpack nested data into typed columns rather than a single `JSON` column. Required for Arrow BATCH ingestion. |
+| Method | options | `batch_job` | The ingestion method: `storage_write_api`, `batch_job`, `gcs_stage`, or `streaming_insert`. |
+| Generate View | boolean | — | Whether to create a BigQuery view based on the query results. |
+| Bucket | string | — | The Google Cloud Storage bucket to write query results to. Required for the `gcs_stage` method. |
+| Partition Granularity | options | — | The level of granularity to use when partitioning query results: `year`, `month`, `day`, or `hour`. |
+| Cluster On Key Properties | boolean | — | Whether to cluster query results based on key properties. |
+| Column Name Transforms Lower | boolean | — | Whether to convert column names to lowercase. |
+| Column Name Transforms Quote | boolean | — | Whether to quote column names. |
+| Column Name Transforms Add Underscore When Invalid | boolean | — | Whether to add an underscore to column names that are invalid. |
+| Column Name Transforms Snake Case | boolean | `true` | Whether to convert column names to snake case. |
+| Options Storage Write Batch Mode | boolean | — | The batch mode to use when writing query results via the Storage Write API. |
+| Options Process Pool | boolean | — | Whether to use worker processes instead of threads for parallel processing. |
+| Options Max Workers | integer | — | The maximum number of worker processes to use for parallel processing. |
+| Upsert | boolean | `true` | Whether to update existing rows in the destination table if they match the incoming data. |
+| Overwrite | boolean | — | Whether to overwrite existing rows in the destination table with the incoming data. |
+| Dedupe Before Upsert | boolean | — | Whether to remove duplicate rows from the incoming data before performing an upsert. |
+| Stream Maps | object | — | Configuration for Stream Maps. |
+| Stream Map Config | object | — | User-defined configuration values used by map expressions. |
+| Flattening Enabled | boolean | `true` | Whether to flatten nested data structures in the query results. |
+| Flattening Max Depth | integer | `10` | The maximum depth of nested data structures to flatten. |
+
+## Choosing an ingestion method
+
+### Batch Job
+
+Loads data using BigQuery load jobs with in-memory compression. Supports both fixed-schema and denormalized loading. This is the default method.
+
+### Storage Write API
+
+Uses gRPC and protocol buffers, supporting both streaming and batch patterns. Capable of just-in-time compilation of BigQuery schemas to protobuf, so it can support denormalized loads even when the destination structure is only known at runtime.
+
+### GCS Stage
+
+Stages data in a Google Cloud Storage bucket before loading, producing a well-organized data lake alongside the warehouse table. Requires **Bucket** to be configured.
+
+### Streaming Insert
+
+Uses the legacy streaming insert API. Simple and fast to start up and tear down, but generally slower and more costly than the Storage Write API for larger volumes.
+
+## Denormalized vs. fixed schema
+
+**Denormalized** (`denormalized: true`) unpacks incoming records into a BigQuery schema derived from the tap's JSON schema — arrays become repeated fields, and objects become structs. This is more performant to query and is the recommended setting for taps with a consistent, well-formed schema. It is also required for Arrow BATCH ingestion.
+
+Without denormalization, all data is loaded into a single `JSON` column. This is more resilient to schema drift and works well for schemaless or rapidly changing sources, at the cost of needing accessor syntax (for example, `SELECT data.my_column FROM table`) to query individual fields. **Generate View** can be used to overlay a typed view on top of a fixed-schema table.
+
+## Need help?
+
+If you run into an issue not covered here, file it through the usual Meltano support channel with your connection settings (excluding credentials) and the error you're seeing.

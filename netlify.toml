@@ -532,3 +532,51 @@
   to = "/getting-started/which-meltano"
   status = 301
   force = true
+
+[[redirects]]
+  from = "/changelog/cloud"
+  to = "/releases/cloud"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/changelog/cloud/*"
+  to = "/releases/cloud/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/changelog"
+  to = "/releases"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/changelog/*"
+  to = "/releases/:splat"
+  status = 301
+  force = true
+
+# --- Meltano docs page renames ---
+
+[[redirects]]
+  from = "/meltano-ai/building-on-meltano-with-claude"
+  to = "/meltano-ai/agent-melty"
+  status = 301
+  force = true
+
+# --- Search engine indexing ---
+#
+# Only the production deploy (docs.meltano.com) should be indexed. Branch
+# deploys such as staging.docs.meltano.com serve the same content as
+# production and would otherwise compete with it in search results.
+
+[[context.branch-deploy.headers]]
+  for = "/*"
+  [context.branch-deploy.headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[context.deploy-preview.headers]]
+  for = "/*"
+  [context.deploy-preview.headers.values]
+    X-Robots-Tag = "noindex, nofollow"

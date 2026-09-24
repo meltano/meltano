@@ -1,0 +1,22 @@
+---
+slug: 2026-09-03-cloud-changelog
+title: Snowflake Extractor Support & AI-Ready Workspaces
+date: 2026-09-03
+---
+
+Snowflake is now available as a fully Meltano-managed extractor, and every new workspace provisions an AI-ready knowledge base ("Agent Melty") so Claude has all the context it needs without leaving your editor. This release also adds a new Nextdoor connector, up to 24x faster MSSQL loading with Arrow support, and fixes for target-clickhouse, tap-hubspot, and tap-spreadsheets-anywhere.
+
+{/* truncate */}
+
+## Features
+
+- **New Nextdoor connector:** Nextdoor Ads Manager is now available as a data source via the new MeltanoLabs `tap-nextdoor` extractor.
+- **Snowflake is now a fully supported extractor:** Most people know our Snowflake loader (`target-snowflake`), but for those who need to get data out of Snowflake, we now support a Meltano-managed Snowflake extractor, `tap-snowflake`.
+- **Arrow support for MSSQL:** `target-mssql` now supports Arrow, speeding up data loading by an average of ~20x (up to 24x for Postgres sources).
+- **AI-ready knowledge base in every workspace:** New workspaces now provision "Agent Melty," a live-referenced knowledge base, so Claude has all the context it needs to configure taps and build pipelines using your actual workspace context without leaving your editor.
+
+## Fixes
+
+- **Bumped target-clickhouse to v0.4.1:** Fixed a crash when `validate_records: false` was set; pipelines using that setting now run normally instead of failing on the first record.
+- **Bumped tap-hubspot to v0.10.0:** Added support for config-driven associations streams, giving you finer control over how HubSpot association data is synced.
+- **Bumped tap-spreadsheets-anywhere to v0.6.1:** Fixed a logging bug affecting SFTP-sourced streams.

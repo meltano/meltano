@@ -2,26 +2,11 @@ name: Integration Tests
 
 on:
   pull_request:
-    paths:
-      - src/**
-      - integration/**
-      - noxfile.py
-      - pyproject.toml
-      - uv.lock
-      - .github/workflows/integration_tests.yml
-      - .github/workflows/resources/constraints.txt
   push:
     branches:
       - main
       - 'v*'
-    paths:
-      - src/**
-      - integration/**
-      - noxfile.py
-      - pyproject.toml
-      - uv.lock
-      - .github/workflows/integration_tests.yml
-      - .github/workflows/resources/constraints.txt
+  merge_group:
   workflow_dispatch:
     inputs: {}
 
@@ -35,8 +20,35 @@ env:
 permissions: {}
 
 jobs:
+  files-changed:
+    name: Detect file changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      runtime: ${{ steps.changes.outputs.runtime }}
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+      id: changes
+      with:
+        filters: |
+          runtime:
+            - src/**
+            - integration/**
+            - noxfile.py
+            - pyproject.toml
+            - uv.lock
+            - .github/workflows/integration_tests.yml
+            - .github/workflows/resources/constraints.txt
+
   validate:
-    name: Integration Tests
+    name: Integration Tests (${{ matrix.integration_test }})
+    needs: files-changed
+    if: ${{ needs.files-changed.outputs.runtime == 'true' }}
     strategy:
       matrix:
         include:
@@ -67,7 +79,7 @@ jobs:
         python-version-file: .python-version
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
       with:
         cache-suffix: integration-${{ matrix.integration_test }}
 
@@ -96,3 +108,18 @@ jobs:
         INTEGRATION_TEST_NAME: ${{ matrix.integration_test }}
       run: |
         uv run bash integration/validate.sh "$INTEGRATION_TEST_NAME"
+
+  ci:
+    name: CI required checks (integration tests)
+    if: always()
+    needs:
+    - files-changed
+    - validate
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
+      with:
+        jobs: ${{ toJSON(needs) }}
+        allowed-skips: validate

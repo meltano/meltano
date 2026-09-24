@@ -15,7 +15,7 @@ meltano install
 We'll set up a minio [Docker](https://www.docker.com) container to use as our state backend.
 
 ```shell
-docker run -d  --name minio -p 9001:9001 -p 9000:9000 quay.io/minio/minio server /data --console-address ":9001"
+docker run -d  --name minio -p 9001:9001 -p 9000:9000 ghcr.io/coollabsio/minio server /data --console-address ":9001"
 ```
 
 Now we need to create a bucket to store state in.

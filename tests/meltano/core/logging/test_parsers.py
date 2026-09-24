@@ -100,12 +100,12 @@ class TestSingerSDKLogParser:
         assert result.level == logging.INFO
         assert result.message == "Processing records"
         assert result.logger_name == "tap_example.streams"
+        assert result.stream_name == "users"
         assert result.timestamp == "1703097600.123456"
         assert result.extra == {
             "pid": 12345,
             "thread_name": "MainThread",
             "app_name": "tap-example",
-            "stream_name": "users",
             "custom_field": "custom_value",
         }
 
@@ -551,7 +551,6 @@ class TestLogParserIntegration:
             "pid": 12345,
             "thread_name": "MainThread",
             "app_name": "tap-example",
-            "stream_name": None,
             "phase": "discovery",
         }
 

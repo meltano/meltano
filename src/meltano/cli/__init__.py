@@ -15,6 +15,7 @@ import structlog
 
 from meltano.cli import (
     add,
+    cloud,
     config,
     docs,
     dragon,
@@ -27,6 +28,7 @@ from meltano.cli import (
     job,
     lock,
     logs,
+    plugin,
     remove,
     run,
     schedule,
@@ -47,6 +49,7 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 cli.add_command(add.add)
+cli.add_command(cloud.cloud)
 cli.add_command(compile_module.compile_command)
 cli.add_command(config.config)
 cli.add_command(docs.docs)
@@ -60,6 +63,7 @@ cli.add_command(install.install)
 cli.add_command(invoke.invoke)
 cli.add_command(lock.lock)
 cli.add_command(logs.logs)
+cli.add_command(plugin.plugin)
 cli.add_command(remove.remove)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
