@@ -201,16 +201,15 @@ class _LogOutputHandler:
             )
         ):
             # Log with parsed level and structured data
-            extra = {**parsed_record.extra}
-            if parsed_record.logger_name:
-                extra["plugin_logger"] = parsed_record.logger_name
+            extra = {
+                **parsed_record.extra,
+                "plugin_logger": parsed_record.logger_name,
+                "stream_name": parsed_record.stream_name,
+                "plugin_exception": parsed_record.exception,
+            }
+            extra = {k: v for k, v in extra.items() if v is not None}
 
-            self.logger.log(
-                parsed_record.level,
-                parsed_record.message,
-                plugin_exception=parsed_record.exception,
-                **extra,
-            )
+            self.logger.log(parsed_record.level, parsed_record.message, **extra)
         else:
             # Fallback to simple logging
             self.logger.info(line)
