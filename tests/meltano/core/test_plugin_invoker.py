@@ -367,23 +367,23 @@ class TestPluginInvoker:
         assert "meltano install --plugin-type extractor test-tap" in error_msg
 
 
-@pytest.mark.parametrize("update_available", (True, False, None))
+@pytest.mark.parametrize("update", (True, False))
 def test_invoker_factory_warns_of_an_update(
     project: Project,
     tap,
     monkeypatch: pytest.MonkeyPatch,
     *,
-    update_available: bool | None,
+    update: bool,
 ) -> None:
     monkeypatch.setattr(
         PluginLockService,
         "has_update",
-        lambda _self, _plugin: update_available,
+        lambda _self, _plugin: update,
     )
     with patch("meltano.core.plugin_invoker.logger") as logger:
         invoker_factory(project, tap)
 
-    if update_available:
+    if update:
         message, *args = logger.warning.call_args.args
         assert "Run 'meltano add extractor tap-mock'" in message % tuple(args)
     else:

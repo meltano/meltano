@@ -274,7 +274,7 @@ class PluginLockService:
             deprecated=variant_metadata.is_deprecated,
         )
 
-    def has_update(self, plugin: ProjectPlugin) -> bool | None:
+    def has_update(self, plugin: ProjectPlugin) -> bool:
         """Whether Meltano Cloud serves a definition other than the locked one.
 
         The definition is reused from the Hub cache while it is fresh, so a
@@ -284,8 +284,7 @@ class PluginLockService:
             plugin: The plugin to check.
 
         Returns:
-            Whether an update is available, or `None` if the plugin was not
-            checked.
+            Whether an update is available. A plugin that is not checked has none.
         """
         # The login is checked first, because building the Hub service for a
         # user who is logged out prints the login hint.
@@ -295,7 +294,7 @@ class PluginLockService:
             or not MeltanoHubService.cloud_credentials()
             or self.project.hub_service.hub_api_url != CLOUD_API_ROOT
         ):
-            return None
+            return False
 
         # The check only advises, so a Hub that cannot be reached, or that does
         # not serve the plugin, must not stop the plugin being listed or run.
@@ -312,7 +311,7 @@ class PluginLockService:
                 plugin=plugin.name,
                 error=str(err),
             )
-            return None
+            return False
 
         served = StandalonePlugin.from_variant(
             definition.find_variant(plugin.variant),

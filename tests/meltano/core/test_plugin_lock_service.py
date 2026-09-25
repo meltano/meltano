@@ -256,7 +256,7 @@ class TestHasUpdate:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         self.serve(project, monkeypatch, AssertionError("The Hub was called"))
-        assert subject.has_update(locked) is None
+        assert subject.has_update(locked) is False
 
     @pytest.mark.usefixtures("logged_in")
     def test_own_hub_is_not_checked(
@@ -268,7 +268,7 @@ class TestHasUpdate:
     ) -> None:
         monkeypatch.setattr(MeltanoHubService, "hub_api_url", "https://hub.example")
         self.serve(project, monkeypatch, AssertionError("The Hub was called"))
-        assert subject.has_update(locked) is None
+        assert subject.has_update(locked) is False
 
     @pytest.mark.usefixtures("logged_in")
     def test_custom_and_inherited_plugins_are_not_checked(
@@ -286,8 +286,8 @@ class TestHasUpdate:
             pip_url="tap-custom",
         )
 
-        assert subject.has_update(custom) is None
-        assert subject.has_update(plugin) is None
+        assert subject.has_update(custom) is False
+        assert subject.has_update(plugin) is False
 
     @pytest.mark.usefixtures("logged_in")
     @pytest.mark.parametrize(
@@ -306,4 +306,4 @@ class TestHasUpdate:
         error: Exception,
     ) -> None:
         self.serve(project, monkeypatch, error)
-        assert subject.has_update(locked) is None
+        assert subject.has_update(locked) is False

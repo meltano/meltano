@@ -192,11 +192,8 @@ class TestPluginListDeclaredPlugins:
 
 
 class TestPluginListUpdates:
-    @pytest.mark.parametrize(
-        ("update_available", "status"),
-        ((True, "available"), (False, "latest")),
-    )
-    def test_json_reports_the_update_status(
+    @pytest.mark.parametrize("update", (True, False))
+    def test_json_reports_whether_an_update_is_available(
         self,
         project: Project,  # noqa: ARG002
         tap: ProjectPlugin,
@@ -204,24 +201,23 @@ class TestPluginListUpdates:
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
         *,
-        update_available: bool,
-        status: str,
+        update: bool,
     ) -> None:
         monkeypatch.setattr(
             PluginLockService,
             "has_update",
-            lambda _self, plugin: None if plugin.is_custom() else update_available,
+            lambda _self, plugin: False if plugin.is_custom() else update,
         )
         result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
 
         assert_cli_runner(result)
         entries = listed(result)
-        assert entries[tap.name]["update_status"] == status
-        assert entries[custom_tap.name]["update_status"] is None
+        assert entries[tap.name]["update"] is update
+        assert entries[custom_tap.name]["update"] is False
 
     @pytest.mark.parametrize(
-        ("update_available", "marked"),
-        ((True, True), (False, False), (None, False)),
+        "update",
+        (True, False),
     )
     def test_text_output_marks_an_update(
         self,
@@ -230,20 +226,19 @@ class TestPluginListUpdates:
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
         *,
-        update_available: bool | None,
-        marked: bool,
+        update: bool,
     ) -> None:
         monkeypatch.setattr(
             PluginLockService,
             "has_update",
-            lambda _self, _plugin: update_available,
+            lambda _self, _plugin: update,
         )
         result = cli_runner.invoke(cli, ("plugin", "list"))
 
         assert_cli_runner(result)
-        assert ("UPDATE" in result.stdout) is marked
-        assert ("meltano add <type> <name>" in result.stderr) is marked
+        assert ("UPDATE" in result.stdout) is update
+        assert ("meltano add <type> <name>" in result.stderr) is update
         row = next(
             line for line in result.stdout.splitlines() if f" {tap.name} " in line
         )
-        assert row.rstrip().endswith("\u2191 available" if marked else tap.variant)
+        assert row.rstrip().endswith("\u2191 available" if update else tap.variant)

@@ -1366,7 +1366,7 @@ The whole definition is compared, with every list sorted first. A new order of `
 
 A custom plugin, an inheriting plugin, and a plugin that Meltano Cloud does not serve are not checked. No plugin is checked when you are logged out.
 
-The JSON output reports `update_status` as `available` or `latest`. A plugin that is not checked reports `null`.
+The JSON output reports `update` as `true` or `false`. A plugin that is not checked reports `false`.
 
 #### How to use
 
@@ -1404,7 +1404,7 @@ meltano plugin list --format json
     "inherit_from": null,
     "custom": false,
     "pip_url": "meltanolabs-tap-github",
-    "update_status": null
+    "update": false
   },
   {
     "type": "extractor",
@@ -1413,7 +1413,7 @@ meltano plugin list --format json
     "inherit_from": "tap-github",
     "custom": false,
     "pip_url": "meltanolabs-tap-github",
-    "update_status": null
+    "update": false
   },
   {
     "type": "extractor",
@@ -1422,7 +1422,7 @@ meltano plugin list --format json
     "inherit_from": null,
     "custom": true,
     "pip_url": "git+https://github.com/acme/tap-internal.git",
-    "update_status": null
+    "update": false
   },
   {
     "type": "loader",
@@ -1431,7 +1431,7 @@ meltano plugin list --format json
     "inherit_from": null,
     "custom": false,
     "pip_url": "target-jsonl",
-    "update_status": null
+    "update": false
   }
 ]
 ```

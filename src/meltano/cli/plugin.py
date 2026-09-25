@@ -44,29 +44,24 @@ class PluginListing:
     inherit_from: str | None
     custom: bool
     pip_url: str | None
-    update_status: str | None
+    update: bool
 
     @classmethod
     def from_plugin(
         cls,
         plugin: ProjectPlugin,
         *,
-        update_available: bool | None,
+        update: bool,
     ) -> PluginListing:
         """Describe a plugin of the project.
 
         Args:
             plugin: The plugin to describe.
-            update_available: Whether an update is available, or `None` if the
-                plugin was not checked.
+            update: Whether an update is available.
 
         Returns:
             The plugin listing.
         """
-        update_status = None
-        if update_available is not None:
-            update_status = "available" if update_available else "latest"
-
         return cls(
             type=plugin.type.descriptor,
             name=plugin.name,
@@ -74,7 +69,7 @@ class PluginListing:
             inherit_from=plugin.inherit_from,
             custom=plugin.is_custom(),
             pip_url=plugin.pip_url,
-            update_status=update_status,
+            update=update,
         )
 
 
@@ -91,7 +86,7 @@ def _render_table(listings: Sequence[PluginListing]) -> None:
     table.add_column("INHERIT FROM", overflow="fold")
     table.add_column("CUSTOM", justify="center")
 
-    updates = any(listing.update_status == "available" for listing in listings)
+    updates = any(listing.update for listing in listings)
     if updates:
         table.add_column("UPDATE", overflow="fold")
 
@@ -105,7 +100,7 @@ def _render_table(listings: Sequence[PluginListing]) -> None:
             CUSTOM if listing.custom else "",
         ]
         if updates:
-            row.append(UPDATE_AVAILABLE if listing.update_status == "available" else "")
+            row.append(UPDATE_AVAILABLE if listing.update else "")
         table.add_row(*row)
 
     Console().print(table)
@@ -146,7 +141,7 @@ def list_plugins(project: Project, *, list_format: str) -> None:
     listings = [
         PluginListing.from_plugin(
             project_plugin,
-            update_available=lock_service.has_update(project_plugin),
+            update=lock_service.has_update(project_plugin),
         )
         for project_plugin in project.plugins.plugins()
         # A mapping is configuration for its mapper, not a separate
@@ -159,7 +154,7 @@ def list_plugins(project: Project, *, list_format: str) -> None:
 
     if listings:
         _render_table(listings)
-        if any(listing.update_status == "available" for listing in listings):
+        if any(listing.update for listing in listings):
             click.secho(
                 "Run 'meltano add <type> <name>' to update a plugin",
                 fg="bright_yellow",
