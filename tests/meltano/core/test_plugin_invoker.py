@@ -20,6 +20,7 @@ from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
     from meltano.core.project import Project
@@ -44,7 +45,7 @@ class TestPluginInvoker:
         project: Project,
         tap,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[PluginRef], PluginInvoker],
     ) -> None:
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
@@ -76,6 +77,7 @@ class TestPluginInvoker:
         venv = VirtualEnv(project.dirs.venvs(tap.type, tap.name))
         assert env["VIRTUAL_ENV"] == str(venv.root)
         assert env["PATH"].startswith(str(venv.bin_dir))
+        assert env["PYTHONWARNINGS"] == "once"
         assert "PYTHONPATH" not in env
 
         assert (

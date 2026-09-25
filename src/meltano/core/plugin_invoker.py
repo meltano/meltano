@@ -428,6 +428,9 @@ class PluginInvoker:
             **self.tracker.env,
         }
 
+        # https://docs.python.org/3/using/cmdline.html
+        env.setdefault("PYTHONWARNINGS", "once")
+
         # Ensure Meltano venv is not inherited
         env.pop("VIRTUAL_ENV", None)
         env.pop("PYTHONPATH", None)
