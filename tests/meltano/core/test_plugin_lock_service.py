@@ -5,7 +5,11 @@ import typing as t
 
 import pytest
 
+from meltano.core.cloud.config import CLOUD_API_ROOT
+from meltano.core.cloud.credentials import Credentials
+from meltano.core.hub.client import HubConnectionError, MeltanoHubService
 from meltano.core.plugin.base import BasePlugin, PluginDefinition, PluginType
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
@@ -144,3 +148,168 @@ class TestPluginLockService:
         assert standalone_data["pip_url"] == "meltano-tap-locked"
         assert standalone_data["foo"] == "bar"
         assert standalone_data["baz"] == "qux"
+
+
+USER = {"name": "user", "label": "User"}
+TOKEN = {"name": "token", "kind": "string", "sensitive": True}
+
+
+def _definition(**variant: t.Any) -> PluginDefinition:
+    return PluginDefinition(
+        PluginType.EXTRACTORS,
+        name="tap-served",
+        namespace="tap_served",
+        variants=[
+            {
+                "name": "meltano",
+                "pip_url": "tap-served==1.0",
+                "capabilities": ["catalog", "discover", "state"],
+                "settings": [USER, TOKEN],
+                **variant,
+            },
+        ],
+    )
+
+
+class TestHasUpdate:
+    @pytest.fixture
+    def subject(self, project: Project) -> PluginLockService:
+        return PluginLockService(project)
+
+    @pytest.fixture
+    def locked(self, subject: PluginLockService) -> ProjectPlugin:
+        """A plugin whose lock file holds the definition `_definition` gives."""
+        definition = _definition()
+        plugin = ProjectPlugin(PluginType.EXTRACTORS, "tap-served", variant="meltano")
+        plugin.parent = BasePlugin(definition, definition.find_variant("meltano"))
+        subject.save(plugin, exists_ok=True)
+        return plugin
+
+    @pytest.fixture
+    def logged_in(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(
+            MeltanoHubService,
+            "cloud_credentials",
+            staticmethod(lambda: Credentials(access_token="s3cr3t")),
+        )
+        monkeypatch.setattr(MeltanoHubService, "hub_api_url", CLOUD_API_ROOT)
+
+    @staticmethod
+    def serve(
+        project: Project,
+        monkeypatch: pytest.MonkeyPatch,
+        served: PluginDefinition | Exception,
+    ) -> None:
+        def find_definition(*_args: t.Any, **kwargs: t.Any) -> PluginDefinition:
+            # The check must not cost a request each time a plugin is run.
+            assert kwargs["refresh"] is False
+            if isinstance(served, Exception):
+                raise served
+            return served
+
+        monkeypatch.setattr(project.hub_service, "find_definition", find_definition)
+
+    @pytest.mark.usefixtures("logged_in")
+    @pytest.mark.parametrize(
+        ("variant", "expected"),
+        (
+            pytest.param({}, False, id="same"),
+            pytest.param({"pip_url": "tap-served==2.0"}, True, id="new-release"),
+            pytest.param(
+                {"settings": [USER, TOKEN, {"name": "region"}]},
+                True,
+                id="setting-added",
+            ),
+            pytest.param(
+                {"settings": [{**USER, "label": "User name"}, TOKEN]},
+                True,
+                id="label-changed",
+            ),
+            pytest.param(
+                {
+                    "capabilities": ["state", "discover", "catalog"],
+                    "settings": [TOKEN, USER],
+                },
+                False,
+                id="order-changed",
+            ),
+        ),
+    )
+    def test_compares_the_lock_file_with_the_served_definition(
+        self,
+        project: Project,
+        subject: PluginLockService,
+        locked: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+        variant: dict[str, t.Any],
+        *,
+        expected: bool,
+    ) -> None:
+        self.serve(project, monkeypatch, _definition(**variant))
+        assert subject.has_update(locked) is expected
+
+    def test_logged_out_user_is_not_checked(
+        self,
+        project: Project,
+        subject: PluginLockService,
+        locked: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        self.serve(project, monkeypatch, AssertionError("The Hub was called"))
+        assert subject.checks_updates is False
+        assert subject.has_update(locked) is False
+
+    @pytest.mark.usefixtures("logged_in")
+    def test_logged_in_user_is_checked(self, subject: PluginLockService) -> None:
+        assert subject.checks_updates is True
+
+    @pytest.mark.usefixtures("logged_in")
+    def test_own_hub_is_not_checked(
+        self,
+        project: Project,
+        subject: PluginLockService,
+        locked: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(MeltanoHubService, "hub_api_url", "https://hub.example")
+        self.serve(project, monkeypatch, AssertionError("The Hub was called"))
+        assert subject.checks_updates is False
+        assert subject.has_update(locked) is False
+
+    @pytest.mark.usefixtures("logged_in")
+    def test_custom_and_inherited_plugins_are_not_checked(
+        self,
+        project: Project,
+        subject: PluginLockService,
+        plugin: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        self.serve(project, monkeypatch, AssertionError("The Hub was called"))
+        custom = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            "tap-custom",
+            namespace="tap_custom",
+            pip_url="tap-custom",
+        )
+
+        assert subject.has_update(custom) is False
+        assert subject.has_update(plugin) is False
+
+    @pytest.mark.usefixtures("logged_in")
+    @pytest.mark.parametrize(
+        "error",
+        (
+            PluginNotFoundError("tap-served"),
+            HubConnectionError("Could not connect to Meltano Hub"),
+        ),
+    )
+    def test_plugin_the_hub_cannot_serve_is_not_checked(
+        self,
+        project: Project,
+        subject: PluginLockService,
+        locked: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+        error: Exception,
+    ) -> None:
+        self.serve(project, monkeypatch, error)
+        assert subject.has_update(locked) is False

@@ -9,6 +9,7 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.cli.plugin import CUSTOM, INHERITED
 from meltano.core.plugin import PluginType
+from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner, Result
@@ -188,3 +189,63 @@ class TestPluginListDeclaredPlugins:
         # rather than separate installations.
         mappers = [entry for entry in entries if entry["type"] == "mapper"]
         assert [entry["name"] for entry in mappers] == [mapper.name]
+
+
+class TestPluginListUpdates:
+    @pytest.mark.parametrize("update", (True, False))
+    def test_json_reports_whether_an_update_is_available(
+        self,
+        project: Project,  # noqa: ARG002
+        tap: ProjectPlugin,
+        custom_tap: ProjectPlugin,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+        *,
+        update: bool,
+    ) -> None:
+        monkeypatch.setattr(
+            PluginLockService,
+            "has_update",
+            lambda _self, plugin: False if plugin.is_custom() else update,
+        )
+        result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
+
+        assert_cli_runner(result)
+        entries = listed(result)
+        assert entries[tap.name]["update"] is update
+        assert entries[custom_tap.name]["update"] is False
+
+    @pytest.mark.parametrize(
+        ("checked", "update"),
+        ((True, True), (True, False), (False, False)),
+    )
+    def test_text_output_marks_an_update(
+        self,
+        project: Project,  # noqa: ARG002
+        tap: ProjectPlugin,
+        cli_runner: CliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+        *,
+        checked: bool,
+        update: bool,
+    ) -> None:
+        monkeypatch.setattr(
+            PluginLockService,
+            "checks_updates",
+            property(lambda _self: checked),
+        )
+        monkeypatch.setattr(
+            PluginLockService,
+            "has_update",
+            lambda _self, _plugin: update,
+        )
+        result = cli_runner.invoke(cli, ("plugin", "list"))
+
+        assert_cli_runner(result)
+        # The column shows whenever the plugins were checked, even with no update.
+        assert ("UPDATE" in result.stdout) is checked
+        assert ("meltano add [--plugin-type <type>] <name>" in result.stderr) is update
+        row = next(
+            line for line in result.stdout.splitlines() if f" {tap.name} " in line
+        )
+        assert row.rstrip().endswith("\u2191 available" if update else tap.variant)

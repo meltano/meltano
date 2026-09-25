@@ -5,10 +5,15 @@ from __future__ import annotations
 import json
 import typing as t
 from dataclasses import dataclass
+from functools import partial
 
 from structlog.stdlib import get_logger
 
+from meltano.core.cloud.config import CLOUD_API_ROOT
+from meltano.core.error import MeltanoError
+from meltano.core.hub.client import MeltanoHubService
 from meltano.core.plugin.base import PluginDefinition, StandalonePlugin
+from meltano.core.plugin.error import PluginNotFoundError
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -18,6 +23,26 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
+
+
+def _sort_lists(value: t.Any) -> t.Any:  # noqa: ANN401
+    """Sort every list in a value, at any depth.
+
+    No list in a definition has an order that changes how the plugin runs. The
+    settings and their options are in the order that a form shows them, and the
+    other lists are sets.
+
+    Args:
+        value: The value to sort.
+
+    Returns:
+        The value, with every list sorted.
+    """
+    if isinstance(value, dict):
+        return {key: _sort_lists(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return sorted(map(_sort_lists, value), key=partial(json.dumps, sort_keys=True))
+    return value
 
 
 class LockfileAlreadyExistsError(Exception):
@@ -247,4 +272,58 @@ class PluginLockService:
             StandalonePlugin.parse(content),
             is_default_variant=variant_metadata.is_default,
             deprecated=variant_metadata.is_deprecated,
+        )
+
+    @property
+    def checks_updates(self) -> bool:
+        """Whether plugins are checked for an update from Meltano Cloud."""
+        # The login is checked first, because building the Hub service for a
+        # user who is logged out prints the login hint.
+        return bool(
+            MeltanoHubService.cloud_credentials()
+            and self.project.hub_service.hub_api_url == CLOUD_API_ROOT,
+        )
+
+    def has_update(self, plugin: ProjectPlugin) -> bool:
+        """Whether Meltano Cloud serves a definition other than the locked one.
+
+        The definition is reused from the Hub cache while it is fresh, so a
+        check costs a request only once in each `INDEX_CACHE_DURATION`.
+
+        Args:
+            plugin: The plugin to check.
+
+        Returns:
+            Whether an update is available. A plugin that is not checked has none.
+        """
+        if plugin.is_custom() or plugin.inherit_from or not self.checks_updates:
+            return False
+
+        # The check only advises, so a Hub that cannot be reached, or that does
+        # not serve the plugin, must not stop the plugin being listed or run.
+        try:
+            definition = self.project.hub_service.find_definition(
+                plugin.type,
+                plugin.name,
+                variant_name=plugin.variant,
+                refresh=False,
+            )
+        except (PluginNotFoundError, MeltanoError) as err:
+            logger.debug(
+                "Unable to check for a plugin update",
+                plugin=plugin.name,
+                error=str(err),
+            )
+            return False
+
+        served = StandalonePlugin.from_variant(
+            definition.find_variant(plugin.variant),
+            definition,
+        )
+        # Written and read back as JSON, the same as a lock file. Both sides go
+        # through the code that writes a lock file, so a value that Meltano
+        # fills in, such as a default label, is on both.
+        served_data = json.loads(json.dumps(served.canonical()))
+        return _sort_lists(served_data) != _sort_lists(
+            self.get_standalone_data(plugin),
         )
