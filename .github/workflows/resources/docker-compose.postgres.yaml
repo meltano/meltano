@@ -2,7 +2,7 @@ services:
   postgres:
     # NOTE: Support for PostgreSQL 14 ends on Nov 2026
     # https://endoflife.date/postgresql
-    image: postgres:14
+    image: postgres:18
     container_name: postgres
     ports:
       - "5432:5432"
