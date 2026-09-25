@@ -15,7 +15,9 @@ from meltano.core.plugin_invoker import (
     ExecutableNotFoundError,
     PluginInvoker,
     UnknownCommandError,
+    invoker_factory,
 )
+from meltano.core.plugin_lock_service import PluginLockService, PluginUpdate
 from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
@@ -363,3 +365,32 @@ class TestPluginInvoker:
         assert "Executable 'missing-executable' could not be found" in error_msg
         assert "Extractor 'test-tap'" in error_msg
         assert "meltano install --plugin-type extractor test-tap" in error_msg
+
+
+@pytest.mark.parametrize(
+    ("update", "warned"),
+    (
+        (PluginUpdate(("pip_url",), "tap-mock==1.0", "tap-mock==2.0"), True),
+        (PluginUpdate((), "tap-mock", "tap-mock"), False),
+        (None, False),
+    ),
+)
+def test_invoker_factory_warns_of_an_update(
+    project: Project,
+    tap,
+    monkeypatch: pytest.MonkeyPatch,
+    update: PluginUpdate | None,
+    *,
+    warned: bool,
+) -> None:
+    monkeypatch.setattr(
+        PluginLockService, "check_update", lambda _self, _plugin: update
+    )
+    with patch("meltano.core.plugin_invoker.logger") as logger:
+        invoker_factory(project, tap)
+
+    if warned:
+        message, *args = logger.warning.call_args.args
+        assert "Run 'meltano add extractor tap-mock'" in message % tuple(args)
+    else:
+        logger.warning.assert_not_called()
