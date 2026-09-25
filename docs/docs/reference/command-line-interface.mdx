@@ -1360,7 +1360,7 @@ The `INHERIT FROM` column names the plugin that a plugin [inherits from](/concep
 
 An inheriting plugin takes its parent's variant, so the `VARIANT` column shows `(inherited)`. The JSON output reports the resolved variant.
 
-When you are [logged in to Meltano Cloud](#cloud), an `UPDATE` column shows `↑ available` for each plugin whose lock file runs differently from the definition that Meltano Cloud serves. Run `meltano add [--plugin-type <type>] <name>` to update the plugin. Meltano also logs a warning when it runs a plugin that has an update.
+When you are [logged in to Meltano Cloud](#cloud), the table has an `UPDATE` column. It shows `↑ available` for each plugin whose lock file differs from the definition that Meltano Cloud serves. Run `meltano add [--plugin-type <type>] <name>` to update the plugin. Meltano also logs a warning when it runs a plugin that has an update.
 
 The whole definition is compared, with every list sorted first. A new order of `capabilities` or settings is not an update, but a new label, description, or logo is. The definitions are cached for an hour, so a check makes a request at most once an hour for each plugin.
 

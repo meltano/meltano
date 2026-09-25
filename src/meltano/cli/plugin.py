@@ -73,11 +73,12 @@ class PluginListing:
         )
 
 
-def _render_table(listings: Sequence[PluginListing]) -> None:
+def _render_table(listings: Sequence[PluginListing], *, updates: bool) -> None:
     """Print the plugins as a table.
 
     Args:
         listings: The plugins to print.
+        updates: Whether the plugins were checked for an update.
     """
     table = Table(box=SIMPLE_HEAD, pad_edge=False)
     table.add_column("TYPE", style="cyan", no_wrap=True)
@@ -86,7 +87,6 @@ def _render_table(listings: Sequence[PluginListing]) -> None:
     table.add_column("INHERIT FROM", overflow="fold")
     table.add_column("CUSTOM", justify="center")
 
-    updates = any(listing.update for listing in listings)
     if updates:
         table.add_column("UPDATE", overflow="fold")
 
@@ -153,7 +153,7 @@ def list_plugins(project: Project, *, list_format: str) -> None:
         return
 
     if listings:
-        _render_table(listings)
+        _render_table(listings, updates=lock_service.checks_updates)
         if any(listing.update for listing in listings):
             click.secho(
                 "Run 'meltano add [--plugin-type <type>] <name>' to update a plugin",

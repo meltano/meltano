@@ -274,6 +274,16 @@ class PluginLockService:
             deprecated=variant_metadata.is_deprecated,
         )
 
+    @property
+    def checks_updates(self) -> bool:
+        """Whether plugins are checked for an update from Meltano Cloud."""
+        # The login is checked first, because building the Hub service for a
+        # user who is logged out prints the login hint.
+        return bool(
+            MeltanoHubService.cloud_credentials()
+            and self.project.hub_service.hub_api_url == CLOUD_API_ROOT,
+        )
+
     def has_update(self, plugin: ProjectPlugin) -> bool:
         """Whether Meltano Cloud serves a definition other than the locked one.
 
@@ -286,14 +296,7 @@ class PluginLockService:
         Returns:
             Whether an update is available. A plugin that is not checked has none.
         """
-        # The login is checked first, because building the Hub service for a
-        # user who is logged out prints the login hint.
-        if (
-            plugin.is_custom()
-            or plugin.inherit_from
-            or not MeltanoHubService.cloud_credentials()
-            or self.project.hub_service.hub_api_url != CLOUD_API_ROOT
-        ):
+        if plugin.is_custom() or plugin.inherit_from or not self.checks_updates:
             return False
 
         # The check only advises, so a Hub that cannot be reached, or that does

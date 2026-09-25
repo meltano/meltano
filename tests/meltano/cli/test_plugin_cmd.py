@@ -216,8 +216,8 @@ class TestPluginListUpdates:
         assert entries[custom_tap.name]["update"] is False
 
     @pytest.mark.parametrize(
-        "update",
-        (True, False),
+        ("checked", "update"),
+        ((True, True), (True, False), (False, False)),
     )
     def test_text_output_marks_an_update(
         self,
@@ -226,8 +226,14 @@ class TestPluginListUpdates:
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
         *,
+        checked: bool,
         update: bool,
     ) -> None:
+        monkeypatch.setattr(
+            PluginLockService,
+            "checks_updates",
+            property(lambda _self: checked),
+        )
         monkeypatch.setattr(
             PluginLockService,
             "has_update",
@@ -236,7 +242,8 @@ class TestPluginListUpdates:
         result = cli_runner.invoke(cli, ("plugin", "list"))
 
         assert_cli_runner(result)
-        assert ("UPDATE" in result.stdout) is update
+        # The column shows whenever the plugins were checked, even with no update.
+        assert ("UPDATE" in result.stdout) is checked
         assert ("meltano add [--plugin-type <type>] <name>" in result.stderr) is update
         row = next(
             line for line in result.stdout.splitlines() if f" {tap.name} " in line
