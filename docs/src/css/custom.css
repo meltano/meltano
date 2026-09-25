@@ -1451,6 +1451,10 @@ main {
   nav.menu {
     padding-right: 0.5rem;
     padding-top: 0.5rem;
+    /* Force the scrollbar to always render (instead of only on hover/scroll),
+       so a partially cut-off item at the bottom reads as "scroll for more"
+       rather than looking like clipped/broken content. */
+    overflow-y: scroll;
   }
 }
 
@@ -1496,6 +1500,13 @@ main {
 
 .navbar-sidebar__brand {
   box-shadow: none;
+}
+
+/* The close button is absolutely positioned (see Navbar/MobileSidebar/Header)
+   so it no longer occupies flow height. Infima still reserves navbar-height
+   worth of space for it, leaving a gap at the bottom of the menu list. */
+.navbar-sidebar__items {
+  height: 100%;
 }
 
 .lost-melty {

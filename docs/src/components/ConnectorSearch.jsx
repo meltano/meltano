@@ -20,6 +20,10 @@ const CONNECTORS = [
   { label: 'Nextdoor', href: '/connectors/tap-nextdoor', category: 'extractor' },
   { label: 'PostgreSQL', href: '/connectors/tap-postgres', category: 'extractor' },
   { label: 'Snowflake', href: '/connectors/tap-snowflake', category: 'extractor' },
+  { label: 'SurveyMonkey (Private App)', href: '/connectors/tap-surveymonkey-privateapp', category: 'extractor' },
+  { label: 'Google Search Console', href: '/connectors/tap-google-search-console', category: 'extractor' },
+  { label: 'Dianomi', href: '/connectors/tap-dianomi', category: 'extractor' },
+  { label: 'Bing Ads', href: '/connectors/tap-bing-ads', category: 'extractor' },
 ];
 
 function ConnectorCardTitle({ label }) {

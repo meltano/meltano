@@ -1,0 +1,93 @@
+---
+title: Google Search Console
+description: Sync your organic search performance, including clicks, impressions, click-through rate and ranking position, from Google Search Console.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Google Search Console
+
+<ConnectorTypeBadge type="extractor" block />
+
+Google Search Console is Google's free tool for monitoring how a website performs in Google Search. SEO, content and marketing teams connect it to track clicks, impressions, click-through rate and average ranking position over time, see which queries and pages drive organic traffic, and compare search performance by device or country alongside analytics, advertising and revenue data from their other systems.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | OAuth login (Sign in with Google) |
+| **Sync type** | Incremental |
+| **Streams** | Fixed list |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+This connector brings in the daily search performance data behind the Search Console **Performance** report:
+
+- Overall daily search performance for your site
+- Performance by search query
+- Performance by landing page
+- Performance by country and by device
+
+## Prerequisites
+
+- **A Google account with access to the Search Console property you want to sync**: used for the "Sign in with Google" flow in Meltano Cloud. There's no manual credential to retrieve.
+- **Site URL**: the Search Console property to sync, given as its domain name prefixed with `sc-domain:` (e.g. `sc-domain:meltano.com`).
+
+## Setup
+
+### In Google Search Console
+
+1. In [Google Search Console](https://search.google.com/search-console), identify the property you want to extract data for by its domain name (e.g. `meltano.com`).
+
+### In Meltano Cloud
+
+1. Click "Sign in with Google" and authorise read-only access to your Search Console data.
+2. Enter the property domain name, prefixed with `sc-domain:` (e.g. `sc-domain:meltano.com`), as the **Site URL**.
+3. Choose a **Start Date** for extraction.
+4. Optionally adjust **Include Freshest Data** and **Backfill Days** (see [Advanced configuration](#advanced-configuration)).
+
+## Available streams
+
+| Stream | Description |
+|---|---|
+| `performance_report_date` | Search performance aggregated by date |
+| `performance_report_query` | Search performance by search query and date |
+| `performance_report_page` | Search performance by landing page and date |
+| `performance_report_country` | Search performance by country and date |
+| `performance_report_device` | Search performance by device and date |
+| `performance_report_keys` | Search performance with the raw `keys` array returned by the Search Console API |
+
+Every stream shares the same core fields, plus the dimension it is broken down by:
+
+| Field | Type | Description |
+|---|---|---|
+| `site_url` | Dimension | The Search Console property identifier for the site |
+| `date` | Dimension | The reporting date for the row |
+| `query` / `page` / `country` / `device` | Dimension | The breakdown for the stream: the search query, the page URL that appeared in results, the three-letter country code, or the device category (desktop, mobile, tablet) |
+| `keys` | Dimension | `performance_report_keys` only: the raw `keys` array returned by the API |
+| `clicks` | Metric | The number of clicks from Google Search results |
+| `impressions` | Metric | The number of times the site appeared in Google Search results |
+| `ctr` | Metric | The click-through rate for the row |
+| `position` | Metric | The average search result position for the row |
+
+All streams sync incrementally on `date`, one day at a time, from your Start Date (or the previous bookmark) up to today. Each run also re-syncs the last few days before the bookmark, as set by **Backfill Days**, so that late corrections from Google are picked up.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `site_url` | string | required | The site to retrieve metrics for, prefixed with `sc-domain:` (e.g. `sc-domain:meltano.com`) |
+| `start_date` | date | optional | The earliest record date to sync |
+| `include_freshest_data` | boolean | `true` | Include Google's freshest (not yet finalised) data, as detailed [here](https://developers.google.com/search/blog/2019/09/search-performance-fresh-data) |
+| `backfill_days` | integer | `3` | Number of days before the bookmark to re-sync on each run, so corrections to fresh data are applied |
+
+Sign-in and token management (OAuth authorisation, access and refresh tokens) are handled automatically by the "Sign in with Google" flow and don't require manual configuration.
+
+## Advanced configuration
+
+- **Fresh vs. final data.** With **Include Freshest Data** on (the default), the most recent days include data Google hasn't finalised yet, so figures for those days can change. **Backfill Days** controls how many days are re-synced each run to pick up those changes; raise it if you see recent figures drifting from the Search Console UI. Turn **Include Freshest Data** off to sync only finalised data.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).
