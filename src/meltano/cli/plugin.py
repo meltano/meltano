@@ -43,8 +43,9 @@ class PluginListing:
     variant: str | None
     inherit_from: str | None
     custom: bool
-    pip_url: str | None
     update: bool
+    # Last, because the table has no column for it.
+    pip_url: str | None
 
     @classmethod
     def from_plugin(
