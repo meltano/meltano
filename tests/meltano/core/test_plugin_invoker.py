@@ -17,7 +17,7 @@ from meltano.core.plugin_invoker import (
     UnknownCommandError,
     invoker_factory,
 )
-from meltano.core.plugin_lock_service import PluginLockService, PluginUpdate
+from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
@@ -367,29 +367,23 @@ class TestPluginInvoker:
         assert "meltano install --plugin-type extractor test-tap" in error_msg
 
 
-@pytest.mark.parametrize(
-    ("update", "warned"),
-    (
-        (PluginUpdate(("pip_url",), "tap-mock==1.0", "tap-mock==2.0"), True),
-        (PluginUpdate((), "tap-mock", "tap-mock"), False),
-        (None, False),
-    ),
-)
+@pytest.mark.parametrize("update_available", (True, False, None))
 def test_invoker_factory_warns_of_an_update(
     project: Project,
     tap,
     monkeypatch: pytest.MonkeyPatch,
-    update: PluginUpdate | None,
     *,
-    warned: bool,
+    update_available: bool | None,
 ) -> None:
     monkeypatch.setattr(
-        PluginLockService, "check_update", lambda _self, _plugin: update
+        PluginLockService,
+        "has_update",
+        lambda _self, _plugin: update_available,
     )
     with patch("meltano.core.plugin_invoker.logger") as logger:
         invoker_factory(project, tap)
 
-    if warned:
+    if update_available:
         message, *args = logger.warning.call_args.args
         assert "Run 'meltano add extractor tap-mock'" in message % tuple(args)
     else:

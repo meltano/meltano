@@ -22,7 +22,6 @@ if t.TYPE_CHECKING:
     from collections.abc import Sequence
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
-    from meltano.core.plugin_lock_service import PluginUpdate
     from meltano.core.project import Project
 
 # Marks a plugin that carries its own definition in `meltano.yml`.
@@ -46,28 +45,27 @@ class PluginListing:
     custom: bool
     pip_url: str | None
     update_status: str | None
-    update: PluginUpdate | None
 
     @classmethod
     def from_plugin(
         cls,
         plugin: ProjectPlugin,
         *,
-        update: PluginUpdate | None,
+        update_available: bool | None,
     ) -> PluginListing:
         """Describe a plugin of the project.
 
         Args:
             plugin: The plugin to describe.
-            update: How the definition that Meltano Cloud serves differs, or
-                `None` if the plugin was not checked.
+            update_available: Whether an update is available, or `None` if the
+                plugin was not checked.
 
         Returns:
             The plugin listing.
         """
         update_status = None
-        if update:
-            update_status = "available" if update.available else "latest"
+        if update_available is not None:
+            update_status = "available" if update_available else "latest"
 
         return cls(
             type=plugin.type.descriptor,
@@ -77,7 +75,6 @@ class PluginListing:
             custom=plugin.is_custom(),
             pip_url=plugin.pip_url,
             update_status=update_status,
-            update=update,
         )
 
 
@@ -149,7 +146,7 @@ def list_plugins(project: Project, *, list_format: str) -> None:
     listings = [
         PluginListing.from_plugin(
             project_plugin,
-            update=lock_service.check_update(project_plugin),
+            update_available=lock_service.has_update(project_plugin),
         )
         for project_plugin in project.plugins.plugins()
         # A mapping is configuration for its mapper, not a separate

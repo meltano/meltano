@@ -211,61 +211,42 @@ class TestHasUpdate:
 
     @pytest.mark.usefixtures("logged_in")
     @pytest.mark.parametrize(
-        ("variant", "changes"),
+        ("variant", "expected"),
         (
-            pytest.param({}, (), id="same"),
-            pytest.param(
-                {"pip_url": "tap-served==2.0"}, ("pip_url",), id="new-release"
-            ),
+            pytest.param({}, False, id="same"),
+            pytest.param({"pip_url": "tap-served==2.0"}, True, id="new-release"),
             pytest.param(
                 {"settings": [USER, TOKEN, {"name": "region"}]},
-                ("settings",),
+                True,
                 id="setting-added",
             ),
             pytest.param(
-                {"settings": [USER, {**TOKEN, "sensitive": False}]},
-                ("settings",),
-                id="setting-changed",
-            ),
-            pytest.param(
-                {
-                    "logo_url": "/assets/logos/extractors/served.png",
-                    "docs": "https://example.com/tap-served",
-                    "settings": [{**USER, "label": "User name"}, TOKEN],
-                },
-                (),
-                id="presentation-changed",
+                {"settings": [{**USER, "label": "User name"}, TOKEN]},
+                True,
+                id="label-changed",
             ),
             pytest.param(
                 {
                     "capabilities": ["state", "discover", "catalog"],
                     "settings": [TOKEN, USER],
                 },
-                (),
+                False,
                 id="order-changed",
-            ),
-            pytest.param(
-                {"capabilities": ["discover"], "settings": [USER]},
-                ("capabilities", "settings"),
-                id="several-changed",
             ),
         ),
     )
-    def test_compares_how_the_plugin_runs(
+    def test_compares_the_lock_file_with_the_served_definition(
         self,
         project: Project,
         subject: PluginLockService,
         locked: ProjectPlugin,
         monkeypatch: pytest.MonkeyPatch,
         variant: dict[str, t.Any],
-        changes: tuple[str, ...],
+        *,
+        expected: bool,
     ) -> None:
         self.serve(project, monkeypatch, _definition(**variant))
-        update = subject.check_update(locked)
-
-        assert update is not None
-        assert update.changes == changes
-        assert update.available is bool(changes)
+        assert subject.has_update(locked) is expected
 
     def test_logged_out_user_is_not_checked(
         self,
@@ -275,7 +256,7 @@ class TestHasUpdate:
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         self.serve(project, monkeypatch, AssertionError("The Hub was called"))
-        assert subject.check_update(locked) is None
+        assert subject.has_update(locked) is None
 
     @pytest.mark.usefixtures("logged_in")
     def test_own_hub_is_not_checked(
@@ -287,7 +268,7 @@ class TestHasUpdate:
     ) -> None:
         monkeypatch.setattr(MeltanoHubService, "hub_api_url", "https://hub.example")
         self.serve(project, monkeypatch, AssertionError("The Hub was called"))
-        assert subject.check_update(locked) is None
+        assert subject.has_update(locked) is None
 
     @pytest.mark.usefixtures("logged_in")
     def test_custom_and_inherited_plugins_are_not_checked(
@@ -305,8 +286,8 @@ class TestHasUpdate:
             pip_url="tap-custom",
         )
 
-        assert subject.check_update(custom) is None
-        assert subject.check_update(plugin) is None
+        assert subject.has_update(custom) is None
+        assert subject.has_update(plugin) is None
 
     @pytest.mark.usefixtures("logged_in")
     @pytest.mark.parametrize(
@@ -325,4 +306,4 @@ class TestHasUpdate:
         error: Exception,
     ) -> None:
         self.serve(project, monkeypatch, error)
-        assert subject.check_update(locked) is None
+        assert subject.has_update(locked) is None

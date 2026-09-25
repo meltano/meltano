@@ -82,8 +82,7 @@ def invoker_factory(
     Returns:
         A plugin invoker.
     """
-    update = project.plugins.lock_service.check_update(plugin)
-    if update and update.available:
+    if project.plugins.lock_service.has_update(plugin):
         descriptor = plugin.type.descriptor
         logger.warning(
             "An update is available for %s '%s'. Run 'meltano add %s %s' to update it",

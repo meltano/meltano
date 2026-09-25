@@ -24,34 +24,6 @@ if t.TYPE_CHECKING:
 
 logger = get_logger(__name__)
 
-# The properties that change how a plugin runs. These are the ones that Meltano
-# Cloud compares to offer an update, so that both report the same plugins. A
-# change to presentation, such as a label or a description, is not an update.
-UPDATE_PROPERTIES = (
-    "namespace",
-    "pip_url",
-    "executable",
-    "python",
-    "capabilities",
-    "select",
-    "update",
-    "metadata",
-    "commands",
-    "requires",
-    "settings",
-)
-SETTING_UPDATE_PROPERTIES = (
-    "name",
-    "aliases",
-    "value",
-    "kind",
-    "env",
-    "options",
-    "value_processor",
-    "value_post_processor",
-    "sensitive",
-)
-
 
 def _sort_lists(value: t.Any) -> t.Any:  # noqa: ANN401
     """Sort every list in a value, at any depth.
@@ -71,29 +43,6 @@ def _sort_lists(value: t.Any) -> t.Any:  # noqa: ANN401
     if isinstance(value, list):
         return sorted(map(_sort_lists, value), key=partial(json.dumps, sort_keys=True))
     return value
-
-
-def _runtime_definition(data: dict[str, t.Any]) -> dict[str, t.Any]:
-    """Reduce a lock file to the properties that change how the plugin runs.
-
-    An option contributes only its value, because its label is presentation.
-
-    Args:
-        data: The content of a lock file.
-
-    Returns:
-        The reduced definition.
-    """
-    settings = [
-        {
-            **{key: setting.get(key) for key in SETTING_UPDATE_PROPERTIES},
-            "options": [option["value"] for option in setting.get("options") or []],
-        }
-        for setting in data.get("settings") or []
-    ]
-    return _sort_lists(
-        {**{key: data.get(key) for key in UPDATE_PROPERTIES}, "settings": settings},
-    )
 
 
 class LockfileAlreadyExistsError(Exception):
@@ -117,20 +66,6 @@ class VariantMetadata:
 
     is_default: bool | None = None
     is_deprecated: bool | None = None
-
-
-@dataclass(frozen=True)
-class PluginUpdate:
-    """How the definition that Meltano Cloud serves differs from the lock file."""
-
-    changes: tuple[str, ...]
-    locked_pip_url: str | None
-    served_pip_url: str | None
-
-    @property
-    def available(self) -> bool:
-        """Whether the served definition runs differently from the lock file."""
-        return bool(self.changes)
 
 
 class PluginLockService:
@@ -339,8 +274,8 @@ class PluginLockService:
             deprecated=variant_metadata.is_deprecated,
         )
 
-    def check_update(self, plugin: ProjectPlugin) -> PluginUpdate | None:
-        """Compare the lock file with the definition that Meltano Cloud serves.
+    def has_update(self, plugin: ProjectPlugin) -> bool | None:
+        """Whether Meltano Cloud serves a definition other than the locked one.
 
         The definition is reused from the Hub cache while it is fresh, so a
         check costs a request only once in each `INDEX_CACHE_DURATION`.
@@ -349,7 +284,7 @@ class PluginLockService:
             plugin: The plugin to check.
 
         Returns:
-            How the served definition differs, or `None` if the plugin was not
+            Whether an update is available, or `None` if the plugin was not
             checked.
         """
         # The login is checked first, because building the Hub service for a
@@ -383,17 +318,10 @@ class PluginLockService:
             definition.find_variant(plugin.variant),
             definition,
         )
-        # Written and read back as JSON, the same as a lock file.
+        # Written and read back as JSON, the same as a lock file. Both sides go
+        # through the code that writes a lock file, so a value that Meltano
+        # fills in, such as a default label, is on both.
         served_data = json.loads(json.dumps(served.canonical()))
-        locked_data = self.get_standalone_data(plugin)
-        served_runtime = _runtime_definition(served_data)
-        locked_runtime = _runtime_definition(locked_data)
-        return PluginUpdate(
-            changes=tuple(
-                key
-                for key in UPDATE_PROPERTIES
-                if served_runtime[key] != locked_runtime[key]
-            ),
-            locked_pip_url=locked_data.get("pip_url"),
-            served_pip_url=served_data.get("pip_url"),
+        return _sort_lists(served_data) != _sort_lists(
+            self.get_standalone_data(plugin),
         )

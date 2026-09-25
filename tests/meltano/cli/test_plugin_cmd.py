@@ -9,7 +9,7 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.cli.plugin import CUSTOM, INHERITED
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_lock_service import PluginLockService, PluginUpdate
+from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner, Result
@@ -191,69 +191,59 @@ class TestPluginListDeclaredPlugins:
         assert [entry["name"] for entry in mappers] == [mapper.name]
 
 
-RELEASE = PluginUpdate(("pip_url",), "tap-mock==1.0", "tap-mock==2.0")
-DEFINITION = PluginUpdate(("settings",), "tap-mock==1.0", "tap-mock==1.0")
-LATEST = PluginUpdate((), "tap-mock==1.0", "tap-mock==1.0")
-
-
 class TestPluginListUpdates:
     @pytest.mark.parametrize(
-        ("update", "status"),
-        ((RELEASE, "available"), (LATEST, "latest")),
+        ("update_available", "status"),
+        ((True, "available"), (False, "latest")),
     )
-    def test_json_reports_the_update(
+    def test_json_reports_the_update_status(
         self,
         project: Project,  # noqa: ARG002
         tap: ProjectPlugin,
         custom_tap: ProjectPlugin,
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
-        update: PluginUpdate,
+        *,
+        update_available: bool,
         status: str,
     ) -> None:
         monkeypatch.setattr(
             PluginLockService,
-            "check_update",
-            lambda _self, plugin: None if plugin.is_custom() else update,
+            "has_update",
+            lambda _self, plugin: None if plugin.is_custom() else update_available,
         )
         result = cli_runner.invoke(cli, ("plugin", "list", "--format", "json"))
 
         assert_cli_runner(result)
         entries = listed(result)
         assert entries[tap.name]["update_status"] == status
-        assert entries[tap.name]["update"]["served_pip_url"] == update.served_pip_url
         assert entries[custom_tap.name]["update_status"] is None
-        assert entries[custom_tap.name]["update"] is None
 
     @pytest.mark.parametrize(
-        ("update", "mark"),
-        (
-            (RELEASE, "\u2191 available"),
-            (DEFINITION, "\u2191 available"),
-            (LATEST, None),
-            (None, None),
-        ),
+        ("update_available", "marked"),
+        ((True, True), (False, False), (None, False)),
     )
-    def test_text_output_shows_an_update(
+    def test_text_output_marks_an_update(
         self,
         project: Project,  # noqa: ARG002
         tap: ProjectPlugin,
         cli_runner: CliRunner,
         monkeypatch: pytest.MonkeyPatch,
-        update: PluginUpdate | None,
-        mark: str | None,
+        *,
+        update_available: bool | None,
+        marked: bool,
     ) -> None:
         monkeypatch.setattr(
             PluginLockService,
-            "check_update",
-            lambda _self, _plugin: update,
+            "has_update",
+            lambda _self, _plugin: update_available,
         )
         result = cli_runner.invoke(cli, ("plugin", "list"))
 
         assert_cli_runner(result)
-        assert ("UPDATE" in result.stdout) is (mark is not None)
-        assert ("meltano add <type> <name>" in result.stderr) is (mark is not None)
+        assert ("UPDATE" in result.stdout) is marked
+        assert ("meltano add <type> <name>" in result.stderr) is marked
         row = next(
             line for line in result.stdout.splitlines() if f" {tap.name} " in line
         )
-        assert row.rstrip().endswith(mark or tap.variant)
+        assert row.rstrip().endswith("\u2191 available" if marked else tap.variant)

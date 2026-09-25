@@ -1362,11 +1362,11 @@ An inheriting plugin takes its parent's variant, so the `VARIANT` column shows `
 
 When you are [logged in to Meltano Cloud](#cloud), an `UPDATE` column shows `↑ available` for each plugin whose lock file runs differently from the definition that Meltano Cloud serves. Run `meltano add <type> <name>` to update the plugin. Meltano also logs a warning when it runs a plugin that has an update.
 
-Only the properties that change how a plugin runs are compared, such as `pip_url`, `capabilities`, and `settings`, the same as Meltano Cloud compares to offer an update. A change to a label, a description, or the order of settings is not an update. The definitions are cached for an hour, so a check makes a request at most once an hour for each plugin.
+The whole definition is compared, with every list sorted first. A new order of `capabilities` or settings is not an update, but a new label, description, or logo is. The definitions are cached for an hour, so a check makes a request at most once an hour for each plugin.
 
 A custom plugin, an inheriting plugin, and a plugin that Meltano Cloud does not serve are not checked. No plugin is checked when you are logged out.
 
-The JSON output reports `update_status` as `available` or `latest`, and `update` with the properties that change and both values of `pip_url`. A plugin that is not checked reports `null` for both.
+The JSON output reports `update_status` as `available` or `latest`. A plugin that is not checked reports `null`.
 
 #### How to use
 
@@ -1404,8 +1404,7 @@ meltano plugin list --format json
     "inherit_from": null,
     "custom": false,
     "pip_url": "meltanolabs-tap-github",
-    "update_status": null,
-    "update": null
+    "update_status": null
   },
   {
     "type": "extractor",
@@ -1414,8 +1413,7 @@ meltano plugin list --format json
     "inherit_from": "tap-github",
     "custom": false,
     "pip_url": "meltanolabs-tap-github",
-    "update_status": null,
-    "update": null
+    "update_status": null
   },
   {
     "type": "extractor",
@@ -1424,8 +1422,7 @@ meltano plugin list --format json
     "inherit_from": null,
     "custom": true,
     "pip_url": "git+https://github.com/acme/tap-internal.git",
-    "update_status": null,
-    "update": null
+    "update_status": null
   },
   {
     "type": "loader",
@@ -1434,8 +1431,7 @@ meltano plugin list --format json
     "inherit_from": null,
     "custom": false,
     "pip_url": "target-jsonl",
-    "update_status": null,
-    "update": null
+    "update_status": null
   }
 ]
 ```
