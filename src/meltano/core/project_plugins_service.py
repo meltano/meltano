@@ -78,19 +78,39 @@ class PluginAlreadyAddedException(Exception):
 class PluginDefinitionNotFoundError(MeltanoError):
     """Raised when no plugin definition is found."""
 
-    def __init__(self, plugin: ProjectPlugin, error: Exception | None):
+    def __init__(
+        self,
+        plugin: ProjectPlugin,
+        error: Exception | None,
+        existing_variants: list[str] | None = None,
+    ):
         """Initialize a new error.
 
         Args:
             plugin: The plugin that was not found.
             error: The error that was raised, if any.
+            existing_variants: Alternate variants found in existing lockfiles.
         """
-        reason = (
-            str(error)
-            if error
-            else f"No definition found for {plugin.type.descriptor} {plugin.name}"
-        )
-        instruction = "Check https://hub.meltano.com/ for available plugins"
+        descriptor = plugin.type.descriptor.capitalize()
+        if existing_variants and not plugin.is_variant_set:
+            formatted_variants = ", ".join(f"'{v}'" for v in existing_variants)
+            reason = (
+                f"{descriptor} '{plugin.name}' is not known to Meltano, "
+                f"but lockfile{'s exist' if len(existing_variants) > 1 else ' exists'} "
+                f"for variant {formatted_variants}"
+            )
+            instruction = (
+                f"Add 'variant: {existing_variants[0]}' to your plugin definition "
+                "in meltano.yml"
+            )
+        else:
+            reason = (
+                str(error)
+                if error
+                else f"No definition found for {plugin.type.descriptor} {plugin.name}"
+            )
+            instruction = "Check https://hub.meltano.com/ for available plugins"
+
         super().__init__(reason=reason, instruction=instruction)
 
 
@@ -561,7 +581,15 @@ class ProjectPluginsService:  # (too many methods, attributes)
             except PluginNotFoundError as lockfile_exc:
                 error = lockfile_exc
 
-        raise PluginDefinitionNotFoundError(plugin, error) from error
+        existing_variants = self.locked_definition_service.find_locked_variants(
+            plugin.type,
+            plugin.inherit_from or plugin.name,
+        )
+        raise PluginDefinitionNotFoundError(
+            plugin,
+            error,
+            existing_variants=existing_variants,
+        ) from error
 
     def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | BasePlugin:
         """Get plugin's parent plugin.
