@@ -21,7 +21,6 @@ from meltano.core.plugin.singer.catalog import (
     path_property,
     select_filter_metadata_rules,
     select_metadata_rules,
-    visit,
 )
 from meltano.core.plugin.singer.catalog import property_breadcrumb as bc
 
@@ -878,8 +877,8 @@ class TestLegacyCatalogSelectVisitor:
                     field_metadata,
                 ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
-    def test_visit(self, catalog, select_all_executor) -> None:
-        visit(catalog, select_all_executor)
+    def test_visit(self, catalog, select_all_executor: SelectExecutor) -> None:
+        select_all_executor.visit(catalog)
 
         self.assert_catalog_is_selected(catalog)
 
@@ -915,8 +914,8 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_select_all(self, catalog, select_all_executor) -> None:
-        visit(catalog, select_all_executor)
+    def test_select_all(self, catalog, select_all_executor: SelectExecutor) -> None:
+        select_all_executor.visit(catalog)
         self.assert_catalog_is_selected(catalog)
 
         streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
@@ -958,10 +957,10 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 "*.payload.content",
             ],
         )
-        visit(catalog, selector)
+        selector.visit(catalog)
 
         lister = ListSelectedExecutor()
-        visit(catalog, lister)
+        lister.visit(catalog)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
@@ -992,10 +991,10 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 "*.payload.content",
             ],
         )
-        visit(catalog, selector)
+        selector.visit(catalog)
 
         lister = ListSelectedExecutor()
-        visit(catalog, lister)
+        lister.visit(catalog)
 
         assert lister.selected_properties["Unique.Entities.Name"] == attrs
 
@@ -1020,10 +1019,10 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 "!*.*.timestamp",
             ],
         )
-        visit(catalog, selector)
+        selector.visit(catalog)
 
         lister = ListSelectedExecutor()
-        visit(catalog, lister)
+        lister.visit(catalog)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
@@ -1231,10 +1230,10 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             ],
         }
         selector = SelectExecutor(patterns)
-        visit(catalog, selector)
+        selector.visit(catalog)
 
         lister = ListSelectedExecutor()
-        visit(catalog, lister)
+        lister.visit(catalog)
 
         assert lister.selected_properties["MyStream"] == attrs
 
@@ -1572,7 +1571,7 @@ class TestMetadataExecutor:
         )
 
         catalog_copy = deepcopy(catalog)
-        visit(catalog_copy, executor_wildcard_first)
+        executor_wildcard_first.visit(catalog_copy)
 
         stream_node = next(
             s
@@ -1608,7 +1607,7 @@ class TestMetadataExecutor:
         )
 
         catalog_copy2 = deepcopy(catalog)
-        visit(catalog_copy2, executor_wildcard_last)
+        executor_wildcard_last.visit(catalog_copy2)
 
         stream_node2 = next(
             s
@@ -1655,7 +1654,7 @@ class TestMetadataExecutor:
         )
 
         catalog_copy = deepcopy(catalog)
-        visit(catalog_copy, executor_general_then_specific)
+        executor_general_then_specific.visit(catalog_copy)
 
         stream_node = next(
             s
@@ -1700,7 +1699,7 @@ class TestMetadataExecutor:
         )
 
         catalog_copy2 = deepcopy(catalog)
-        visit(catalog_copy2, executor_specific_then_general)
+        executor_specific_then_general.visit(catalog_copy2)
 
         stream_node2 = next(
             s
@@ -1744,7 +1743,7 @@ class TestMetadataExecutor:
                 ),
             ],
         )
-        visit(catalog, executor)
+        executor.visit(catalog)
 
         stream_node = next(
             s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
@@ -1771,6 +1770,32 @@ class TestMetadataExecutor:
         assert (
             hash_property_metadata_node["metadata"]["custom-metadata"] == "custom-value"
         )
+
+    def test_visit_no_breadcrumbs(self) -> None:
+        """Test that metadata entries without breadcrumbs are skipped."""
+        executor = MetadataExecutor(
+            [
+                MetadataRule("*", [], "replication-method", value="INCREMENTAL"),
+            ],
+        )
+        catalog = {
+            "streams": [
+                {
+                    "tap_stream_id": "foo",
+                    "metadata": [{"selected": False}],
+                },
+                {
+                    "tap_stream_id": "bar",
+                    "metadata": [{"breadcrumb": [], "metadata": {}}],
+                },
+            ],
+        }
+        executor.visit(catalog)
+        assert "replication_method" not in catalog["streams"][0]["metadata"][0]
+        assert catalog["streams"][1]["metadata"][0] == {
+            "breadcrumb": [],
+            "metadata": {"replication-method": "INCREMENTAL"},
+        }
 
 
 class TestSchemaExecutor:
@@ -1814,7 +1839,7 @@ class TestSchemaExecutor:
                 ),
             ],
         )
-        visit(catalog, executor)
+        executor.visit(catalog)
 
         stream_node = next(
             s for s in catalog["streams"] if s["tap_stream_id"] == "UniqueEntitiesName"
@@ -1851,7 +1876,7 @@ class TestListExecutor:
 
     def test_visit(self, catalog) -> None:
         executor = ListExecutor()
-        visit(catalog, executor)
+        executor.visit(catalog)
 
         assert dict(executor.properties) == {
             "UniqueEntitiesName": {
