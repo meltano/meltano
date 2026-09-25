@@ -237,7 +237,7 @@ class TestPluginListUpdates:
 
         assert_cli_runner(result)
         assert ("UPDATE" in result.stdout) is update
-        assert ("meltano add <type> <name>" in result.stderr) is update
+        assert ("meltano add [--plugin-type <type>] <name>" in result.stderr) is update
         row = next(
             line for line in result.stdout.splitlines() if f" {tap.name} " in line
         )

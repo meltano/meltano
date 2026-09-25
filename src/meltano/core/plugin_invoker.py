@@ -83,12 +83,12 @@ def invoker_factory(
         A plugin invoker.
     """
     if project.plugins.lock_service.has_update(plugin):
-        descriptor = plugin.type.descriptor
         logger.warning(
-            "An update is available for %s '%s'. Run 'meltano add %s %s' to update it",
-            descriptor,
+            "An update is available for %s '%s'. "
+            "Run 'meltano add --plugin-type %s %s' to update it",
+            plugin.type.descriptor,
             plugin.name,
-            descriptor,
+            plugin.type.singular,
             plugin.name,
         )
 

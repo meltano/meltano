@@ -385,6 +385,8 @@ def test_invoker_factory_warns_of_an_update(
 
     if update:
         message, *args = logger.warning.call_args.args
-        assert "Run 'meltano add extractor tap-mock'" in message % tuple(args)
+        assert "Run 'meltano add --plugin-type extractor tap-mock'" in message % tuple(
+            args
+        )
     else:
         logger.warning.assert_not_called()

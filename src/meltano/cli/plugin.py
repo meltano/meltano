@@ -156,7 +156,7 @@ def list_plugins(project: Project, *, list_format: str) -> None:
         _render_table(listings)
         if any(listing.update for listing in listings):
             click.secho(
-                "Run 'meltano add <type> <name>' to update a plugin",
+                "Run 'meltano add [--plugin-type <type>] <name>' to update a plugin",
                 fg="bright_yellow",
                 err=True,
             )
