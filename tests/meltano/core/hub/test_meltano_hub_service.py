@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import sys
 import typing as t
 from http import HTTPStatus
@@ -69,7 +70,7 @@ def _stub_cloud_credentials(
     """
     monkeypatch.setattr(
         MeltanoHubService,
-        "_cloud_credentials",
+        "cloud_credentials",
         staticmethod(lambda: credentials),
     )
 
@@ -167,6 +168,51 @@ class TestMeltanoHubService:
 
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
+
+    @pytest.mark.parametrize(("refresh", "requests"), ((True, 2), (False, 1)))
+    def test_find_definition_reuses_a_cached_definition(
+        self,
+        project: Project,
+        hub_request_counter: Counter,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        *,
+        refresh: bool,
+        requests: int,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.hub.client.index_cache_dir", lambda: tmp_path)
+        for _ in range(2):
+            project.hub_service.find_definition(
+                PluginType.EXTRACTORS,
+                "tap-mock",
+                refresh=refresh,
+            )
+
+        assert hub_request_counter["/extractors/index"] == requests
+        assert hub_request_counter["/extractors/tap-mock--meltano"] == requests
+
+    @pytest.mark.parametrize(
+        ("refresh", "level"),
+        ((True, logging.INFO), (False, logging.DEBUG)),
+    )
+    def test_a_background_fetch_is_logged_quietly(
+        self,
+        project: Project,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        *,
+        refresh: bool,
+        level: int,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.hub.client.index_cache_dir", lambda: tmp_path)
+        with mock.patch("meltano.core.hub.client.logger") as logger:
+            project.hub_service.find_definition(
+                PluginType.EXTRACTORS,
+                "tap-mock",
+                refresh=refresh,
+            )
+
+        assert logger.log.call_args.args[0] == level
 
     def test_definition_not_found(
         self,
@@ -373,7 +419,7 @@ class TestMeltanoHubService:
                 side_effect=UserConfigReadError(Path("config.yml"), ValueError()),
             ),
         )
-        assert MeltanoHubService._cloud_credentials() is None
+        assert MeltanoHubService.cloud_credentials() is None
 
     def test_unauthenticated_request_points_at_cloud_login(
         self,
