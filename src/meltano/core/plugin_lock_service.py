@@ -322,10 +322,8 @@ class PluginLockService:
             definition.find_variant(plugin.variant),
             definition,
         )
-        # Written and read back as JSON, the same as a lock file. Both sides go
-        # through the code that writes a lock file, so a value that Meltano
-        # fills in, such as a default label, is on both.
-        served_data = json.loads(json.dumps(served.canonical()))
-        return _sort_lists(served_data) != _sort_lists(
+        # Both sides go through the code that writes a lock file, so a value
+        # that Meltano fills in, such as a default label, is on both.
+        return _sort_lists(served.canonical()) != _sort_lists(
             self.get_standalone_data(plugin),
         )
