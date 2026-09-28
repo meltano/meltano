@@ -280,6 +280,7 @@ class PluginLockService:
         # The login is checked first, because building the Hub service for a
         # user who is logged out prints the login hint.
         return bool(
+            # TODO: refactor this leaky call to be handled directly by CloudAuthService
             MeltanoHubService.cloud_credentials()
             and self.project.hub_service.hub_api_url == CLOUD_API_ROOT,
         )
