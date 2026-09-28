@@ -9,7 +9,11 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import UUIDParamType, get_install_options, pass_project
+from meltano.cli.params import (
+    UUIDParamType,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser, validate_block_sets
