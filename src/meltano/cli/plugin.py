@@ -44,7 +44,6 @@ class PluginListing:
     inherit_from: str | None
     custom: bool
     update: bool
-    # Last, because the table has no column for it.
     pip_url: str | None
 
     @classmethod
