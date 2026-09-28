@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import typing as t
 
+import click
 import pytest
 
 from asserts import assert_cli_runner
@@ -242,10 +243,10 @@ class TestPluginListUpdates:
         result = cli_runner.invoke(cli, ("plugin", "list"))
 
         assert_cli_runner(result)
+        # A terminal that forces colour puts escape codes around the plugin name.
+        output = click.unstyle(result.stdout)
         # The column shows whenever the plugins were checked, even with no update.
-        assert ("UPDATE" in result.stdout) is checked
+        assert ("UPDATE" in output) is checked
         assert ("meltano add [--plugin-type <type>] <name>" in result.stderr) is update
-        row = next(
-            line for line in result.stdout.splitlines() if f" {tap.name} " in line
-        )
+        row = next(line for line in output.splitlines() if f" {tap.name} " in line)
         assert row.rstrip().endswith("\u2191 available" if update else tap.variant)
