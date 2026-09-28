@@ -308,6 +308,7 @@ class PluginLockService:
                 variant_name=plugin.variant,
                 refresh=False,
             )
+        # TODO: Make PluginNotFoundError subclass MeltanoError
         except (PluginNotFoundError, MeltanoError) as err:
             logger.debug(
                 "Unable to check for a plugin update",
