@@ -56,4 +56,4 @@ When submitting pull requests to GitHub, use this repo's `.github/pull_request_t
 
 ## Release Process
 
-Releases are prepared by the `Version bump` workflow (commitizen) and published by `build.yml` when a GitHub release is published. Agents may start the release process by running `gh workflow run version_bump.yml`. See [docs/docs/contribute/releasing.md](docs/docs/contribute/releasing.md) for the full process.
+Releases are prepared by the `Version bump` workflow (commitizen) and published by `build.yml` when a GitHub release is published. Agents may start the release process by running `gh workflow run version_bump.yml`, but they may not publish releases. See [docs/docs/contribute/releasing.md](docs/docs/contribute/releasing.md) for the full process.
