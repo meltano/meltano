@@ -19,7 +19,7 @@ from meltano.cli.utils import (
 )
 
 if t.TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterable
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -30,7 +30,7 @@ CUSTOM = "\u2713"
 # Shown in place of a variant that the plugin takes from its parent.
 INHERITED = "[dim](inherited)[/dim]"
 
-# Marks a plugin whose lock file runs differently from what Meltano Cloud serves.
+# Marks a plugin whose lock file differs from what Meltano Cloud serves.
 UPDATE_AVAILABLE = "[yellow]\u2191 available[/yellow]"
 
 
@@ -47,12 +47,7 @@ class PluginListing:
     pip_url: str | None
 
     @classmethod
-    def from_plugin(
-        cls,
-        plugin: ProjectPlugin,
-        *,
-        update: bool,
-    ) -> PluginListing:
+    def from_plugin(cls, plugin: ProjectPlugin, *, update: bool) -> PluginListing:
         """Describe a plugin of the project.
 
         Args:
@@ -73,7 +68,7 @@ class PluginListing:
         )
 
 
-def _render_table(listings: Sequence[PluginListing], *, updates: bool) -> None:
+def _render_table(listings: Iterable[PluginListing], *, updates: bool) -> None:
     """Print the plugins as a table.
 
     Args:
@@ -88,7 +83,7 @@ def _render_table(listings: Sequence[PluginListing], *, updates: bool) -> None:
     table.add_column("CUSTOM", justify="center")
 
     if updates:
-        table.add_column("UPDATE", overflow="fold")
+        table.add_column("UPDATE")
 
     for listing in listings:
         row = [
