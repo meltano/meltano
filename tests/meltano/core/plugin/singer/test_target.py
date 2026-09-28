@@ -4,6 +4,7 @@ import json
 import typing as t
 
 import pytest
+from structlog.testing import capture_logs
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
@@ -41,6 +42,24 @@ class TestBookmarkWriter:
                 Payload.INCOMPLETE_STATE,
                 id="valid_incomplete_state",
             ),
+            pytest.param(
+                "{}",
+                {"singer_state": {"foo": "bar"}},
+                Payload.STATE,
+                id="empty_state",
+            ),
+            pytest.param(
+                "{}",
+                {"singer_state": {"foo": "bar"}},
+                Payload.INCOMPLETE_STATE,
+                id="empty_incomplete_state",
+            ),
+            pytest.param(
+                "null",
+                {"singer_state": {"foo": "bar"}},
+                Payload.STATE,
+                id="null_state",
+            ),
         ),
     )
     @pytest.mark.asyncio
@@ -67,6 +86,34 @@ class TestBookmarkWriter:
         writer.writeline(state_line)
 
         assert state_service.get_state(job.job_name) == expected_state
+
+    @pytest.mark.asyncio
+    async def test_writeline_ignores_empty_state(
+        self,
+        session: Session,
+    ) -> None:
+        existing_state = {"singer_state": {"foo": "bar"}}
+        state_service = StateService(session=session)
+
+        job = Job(job_name="pytest_test_runner", payload=existing_state)
+        job.save(session)
+        state_service.add_state(job, json.dumps(existing_state))
+
+        writer = BookmarkWriter(
+            job,
+            session,
+            state_service=state_service,
+            payload_flag=Payload.STATE,
+        )
+        with capture_logs() as logs:
+            writer.writeline("{}")
+
+        assert any(
+            log["log_level"] == "warning" and "empty state" in log["event"]
+            for log in logs
+        )
+        assert job.payload == existing_state
+        assert state_service.get_state(job.job_name) == existing_state
 
     @pytest.mark.asyncio
     async def test_writeline_raises_on_state_backend_failure(
