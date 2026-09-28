@@ -30,12 +30,6 @@ class PluginNotFoundError(MeltanoError):
             "known to Meltano",
         )
 
-    @override
-    def __str__(self) -> str:
-        # Another error can put this message inside its own, so it ends with no
-        # full stop.
-        return str(self.reason)
-
 
 class PluginNotSupportedError(Exception):
     """Base exception when a plugin is not supported for some operation."""

@@ -317,7 +317,7 @@ class TestCli:
 
         assert exc_info.value.code == 1
         logger.error.assert_called_once_with(
-            "Plugin 'tap-unknown' is not known to Meltano",
+            "Plugin 'tap-unknown' is not known to Meltano.",
             exc_info=None,
         )
 

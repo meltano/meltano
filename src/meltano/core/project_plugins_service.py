@@ -85,8 +85,10 @@ class PluginDefinitionNotFoundError(MeltanoError):
             plugin: The plugin that was not found.
             error: The error that was raised, if any.
         """
+        # This error puts a full stop after the reason, so drop the one that the
+        # message of a MeltanoError already ends with.
         reason = (
-            str(error)
+            str(error).removesuffix(".")
             if error
             else f"No definition found for {plugin.type.descriptor} {plugin.name}"
         )
