@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 import typing as t
+from unittest import mock
 
 import pytest
-from structlog.testing import capture_logs
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.singer import target as target_module
 from meltano.core.plugin.singer.target import BookmarkWriter
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.state_service import StatePersistenceError, StateService
@@ -105,13 +106,13 @@ class TestBookmarkWriter:
             state_service=state_service,
             payload_flag=Payload.STATE,
         )
-        with capture_logs() as logs:
+        # Log capture depends on how logging is configured, which varies between
+        # tests, so assert on the module logger directly.
+        with mock.patch.object(target_module, "logger") as mock_logger:
             writer.writeline("{}")
 
-        assert any(
-            log["log_level"] == "warning" and "empty state" in log["event"]
-            for log in logs
-        )
+        mock_logger.warning.assert_called_once()
+        assert "empty state" in mock_logger.warning.call_args.args[0]
         assert job.payload == existing_state
         assert state_service.get_state(job.job_name) == existing_state
 
