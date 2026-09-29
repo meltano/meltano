@@ -244,6 +244,7 @@ skip_covered = true
 name = "cz_version_bump"
 version = "4.4.0"
 prerelease_offset = 1
+bump_message = "chore: Bump version $current_version → $new_version"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
   "pyproject.toml:^version =",
