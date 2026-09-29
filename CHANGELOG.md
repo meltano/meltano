@@ -8,7 +8,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### ✨ New
 
 - [#10360](https://github.com/meltano/meltano/issues/10360) Show when a plugin has an update from Meltano Cloud
-- [#10237](https://github.com/meltano/meltano/issues/10237) Refactor IP documentation
 
 ### 🐛 Fixes
 
@@ -32,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#10365](https://github.com/meltano/meltano/issues/10365) Add 2026-09-28 Cloud changelog entry
 - [#10357](https://github.com/meltano/meltano/issues/10357) Add 4 new connectors
 - [#10347](https://github.com/meltano/meltano/issues/10347) Add entry for Meltano open release notes for Meltano CLI-4.3.0
+- [#10237](https://github.com/meltano/meltano/issues/10237) Refactor IP documentation
 
 ## v4.3.0 (2026-09-21)
 
