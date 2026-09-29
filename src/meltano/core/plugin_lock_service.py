@@ -13,7 +13,6 @@ from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.error import MeltanoError
 from meltano.core.hub.client import MeltanoHubService
 from meltano.core.plugin.base import PluginDefinition, StandalonePlugin
-from meltano.core.plugin.error import PluginNotFoundError
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -309,8 +308,7 @@ class PluginLockService:
                 variant_name=plugin.variant,
                 refresh=False,
             )
-        # TODO: Make PluginNotFoundError subclass MeltanoError
-        except (PluginNotFoundError, MeltanoError) as err:
+        except MeltanoError as err:
             logger.debug(
                 "Unable to check for a plugin update",
                 plugin=plugin.name,

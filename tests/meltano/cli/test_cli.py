@@ -29,6 +29,7 @@ from meltano.cli.params import UUIDParamType
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import get_meltano_version
@@ -302,6 +303,23 @@ class TestCli:
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
+
+    def test_unknown_plugin_is_reported_without_a_traceback(self) -> None:
+        with (
+            mock.patch(
+                "meltano.cli.cli",
+                side_effect=PluginNotFoundError("tap-unknown"),
+            ),
+            mock.patch("meltano.cli.utils.logger") as logger,
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            meltano.cli._run_cli()
+
+        assert exc_info.value.code == 1
+        logger.error.assert_called_once_with(
+            "Plugin 'tap-unknown' is not known to Meltano.",
+            exc_info=None,
+        )
 
     def test_sigterm_cancellation_exits_143(
         self,

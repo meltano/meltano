@@ -3,6 +3,7 @@ from __future__ import annotations  # noqa: D100
 import inspect
 import sys
 
+from meltano.core.error import MeltanoError
 from meltano.core.plugin.base import PluginDefinition
 
 from . import PluginRef
@@ -13,7 +14,7 @@ else:
     from typing_extensions import override
 
 
-class PluginNotFoundError(Exception):
+class PluginNotFoundError(MeltanoError):
     """Base exception when a plugin could not be found."""
 
     def __init__(self, plugin_or_name: PluginRef | str) -> None:  # noqa: D107
@@ -24,11 +25,9 @@ class PluginNotFoundError(Exception):
             self.plugin_type = "plugin"
             self.plugin_name = plugin_or_name
 
-    @override
-    def __str__(self) -> str:
-        return (
+        super().__init__(
             f"{self.plugin_type.capitalize()} '{self.plugin_name}' is not "
-            "known to Meltano"
+            "known to Meltano",
         )
 
 
