@@ -672,7 +672,7 @@ class TestMeltanoHubServiceWithoutProject:
     ) -> None:
         for name, value in env.items():
             monkeypatch.setenv(name, value)
-        assert MeltanoHubService(None).hub_api_url == hub_api_url
+        assert MeltanoHubService().hub_api_url == hub_api_url
 
     @pytest.mark.parametrize(
         ("env", "hub_api_url"),
@@ -694,14 +694,14 @@ class TestMeltanoHubServiceWithoutProject:
         _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
         for name, value in env.items():
             monkeypatch.setenv(name, value)
-        assert MeltanoHubService(None).hub_api_url == hub_api_url
+        assert MeltanoHubService().hub_api_url == hub_api_url
 
     def test_hub_url_auth_comes_from_the_environment(
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setenv("MELTANO_HUB_URL_AUTH", "Bearer s3cr3t")
-        service = MeltanoHubService(None)
+        service = MeltanoHubService()
 
         assert service.session.headers["Authorization"] == "Bearer s3cr3t"
         assert "X-Project-ID" not in service.session.headers

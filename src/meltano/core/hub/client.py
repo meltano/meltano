@@ -255,7 +255,7 @@ class MeltanoHubService(PluginRepository):
 
     session = requests.Session()
 
-    def __init__(self, project: Project | None) -> None:
+    def __init__(self, project: Project | None = None) -> None:
         """Initialize the service.
 
         Args:
