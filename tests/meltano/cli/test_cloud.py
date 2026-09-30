@@ -75,6 +75,21 @@ class TestCloudAuthLogin:
             result.stdout
         )
         assert login.call_args.kwargs["open_browser"] is True
+        assert "verify your email address" not in result.stdout
+
+    def test_login_with_unverified_email(self, cli_runner: CliRunner) -> None:
+        credentials = Credentials(
+            access_token="at",
+            id_token=id_token({"email": "user@example.com", "email_verified": False}),
+        )
+        with (
+            mock.patch.object(CloudAuthService, "get_credentials", return_value=None),
+            mock.patch.object(CloudAuthService, "login", return_value=credentials),
+        ):
+            result = cli_runner.invoke(cli, ("cloud", "auth", "login"))
+
+        assert result.exit_code == 0, result.output
+        assert "Check your inbox to verify your email address." in result.stdout
 
     def test_login_no_browser(
         self,

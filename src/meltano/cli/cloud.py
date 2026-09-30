@@ -106,6 +106,8 @@ def login(*, no_browser: bool, force: bool) -> None:
         f"Successfully logged in to Meltano Cloud as {_describe(credentials)}.",
         fg="green",
     )
+    if credentials.claims.get("email_verified") is False:
+        click.secho("Check your inbox to verify your email address.", fg="yellow")
 
 
 @auth.command(cls=InstrumentedCmd, short_help="Log out of Meltano Cloud.")
