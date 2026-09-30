@@ -248,6 +248,7 @@ class MeltanoHubService(PluginRepository):
             },
         )
 
+        self.session.headers.pop("X-Project-ID", None)
         if self.project and self.project.settings.get("send_anonymous_usage_stats"):
             project_id = self.project.settings.get("project_id")
 

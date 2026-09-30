@@ -644,9 +644,6 @@ class TestMeltanoHubServiceWithoutProject:
     def _clear_hub_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         for name in ("MELTANO_HUB_URL", "MELTANO_HUB_API_ROOT", "MELTANO_HUB_URL_AUTH"):
             monkeypatch.delenv(name, raising=False)
-        # The session is shared, so a service built for a project in an earlier
-        # test leaves its project ID behind.
-        MeltanoHubService.session.headers.pop("X-Project-ID", None)
 
     @pytest.mark.parametrize(
         ("env", "hub_api_url"),
@@ -705,3 +702,9 @@ class TestMeltanoHubServiceWithoutProject:
 
         assert service.session.headers["Authorization"] == "Bearer s3cr3t"
         assert "X-Project-ID" not in service.session.headers
+
+    def test_project_id_of_an_earlier_service_is_not_sent(self) -> None:
+        # The session is shared, so an earlier service for a project leaves its
+        # project ID on it.
+        MeltanoHubService.session.headers["X-Project-ID"] = "from-a-project"
+        assert "X-Project-ID" not in MeltanoHubService().session.headers
