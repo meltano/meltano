@@ -10,20 +10,18 @@ import sys
 import typing as t
 from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta, timezone
-from functools import cache
 from http import HTTPStatus
 
 import click
 import platformdirs
 import requests
 import requests.exceptions
-import yaml
 from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry
 
-from meltano.core import bundle
 from meltano.core.cloud.config import CLOUD_API_ROOT
+from meltano.core.config_service import builtin_settings
 from meltano.core.error import MeltanoError
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
@@ -31,7 +29,7 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
 from meltano.core.settings_store import SettingValueStore
-from meltano.core.utils import get_meltano_version, to_env_var
+from meltano.core.utils import get_meltano_version
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -101,25 +99,6 @@ def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
     partial = path.with_suffix(f".{os.getpid()}.partial")
     partial.write_text(json.dumps(index))
     os.replace(partial, path)  # noqa: PTH105
-
-
-@cache
-def _default_setting(name: str) -> str | None:
-    """Get the default value of a Meltano setting.
-
-    Args:
-        name: The name of the setting.
-
-    Returns:
-        The default value, or `None` if the setting has none.
-    """
-    with bundle.root.joinpath("settings.yml").open() as settings_yaml:
-        settings = yaml.safe_load(settings_yaml)["settings"]
-
-    return next(
-        (setting.get("value") for setting in settings if setting["name"] == name),
-        None,
-    )
 
 
 def _rejection_detail(response: requests.Response) -> str | None:
@@ -319,10 +298,14 @@ class MeltanoHubService(PluginRepository):
         if self.project:
             return self.project.settings.get_with_source(name)
 
-        if (value := os.environ.get(to_env_var("meltano", name))) is not None:
-            return value, SettingValueStore.ENV
+        definition = next(
+            setting for setting in builtin_settings() if setting.name == name
+        )
+        for env_var in definition.env_vars(["meltano"]):
+            with suppress(KeyError):
+                return env_var.get(os.environ), SettingValueStore.ENV
 
-        return _default_setting(name), SettingValueStore.DEFAULT
+        return definition.value, SettingValueStore.DEFAULT
 
     @property
     def has_configured_hub(self) -> bool:
