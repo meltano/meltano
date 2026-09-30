@@ -10,16 +10,19 @@ import sys
 import typing as t
 from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta, timezone
+from functools import cache
 from http import HTTPStatus
 
 import click
 import platformdirs
 import requests
 import requests.exceptions
+import yaml
 from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry
 
+from meltano.core import bundle
 from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.error import MeltanoError
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
@@ -28,6 +31,7 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
 from meltano.core.settings_store import SettingValueStore
+from meltano.core.utils import get_meltano_version, to_env_var
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -97,6 +101,25 @@ def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
     partial = path.with_suffix(f".{os.getpid()}.partial")
     partial.write_text(json.dumps(index))
     os.replace(partial, path)  # noqa: PTH105
+
+
+@cache
+def _default_setting(name: str) -> str | None:
+    """Get the default value of a Meltano setting.
+
+    Args:
+        name: The name of the setting.
+
+    Returns:
+        The default value, or `None` if the setting has none.
+    """
+    with bundle.root.joinpath("settings.yml").open() as settings_yaml:
+        settings = yaml.safe_load(settings_yaml)["settings"]
+
+    return next(
+        (setting.get("value") for setting in settings if setting["name"] == name),
+        None,
+    )
 
 
 def _rejection_detail(response: requests.Response) -> str | None:
@@ -232,21 +255,21 @@ class MeltanoHubService(PluginRepository):
 
     session = requests.Session()
 
-    def __init__(self, project: Project) -> None:
+    def __init__(self, project: Project | None) -> None:
         """Initialize the service.
 
         Args:
-            project: The Meltano project.
+            project: The Meltano project, or `None` outside a project.
         """
         self.project = project
         self.session.headers.update(
             {
                 "Accept": "application/json",
-                "User-Agent": project.user_agent,
+                "User-Agent": f"Meltano/{get_meltano_version()}",
             },
         )
 
-        if self.project.settings.get("send_anonymous_usage_stats"):
+        if self.project and self.project.settings.get("send_anonymous_usage_stats"):
             project_id = self.project.settings.get("project_id")
 
             self.session.headers["X-Project-ID"] = project_id
@@ -283,19 +306,39 @@ class MeltanoHubService(PluginRepository):
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
 
+    def _setting(self, name: str) -> tuple[t.Any, SettingValueStore]:
+        """Get a setting, and the store that it came from.
+
+        Args:
+            name: The name of the setting.
+
+        Returns:
+            The value and its store. Outside a project, only the environment
+            or the default can set a value.
+        """
+        if self.project:
+            return self.project.settings.get_with_source(name)
+
+        if (value := os.environ.get(to_env_var("meltano", name))) is not None:
+            return value, SettingValueStore.ENV
+
+        return _default_setting(name), SettingValueStore.DEFAULT
+
     @property
     def has_configured_hub(self) -> bool:
         """Whether the project points Meltano at a Hub of its own."""
-        if self.project.settings.get("hub_api_root") or self.hub_url_auth:
+        hub_api_root, _ = self._setting("hub_api_root")
+        if hub_api_root or self.hub_url_auth:
             return True
 
-        _, source = self.project.settings.get_with_source("hub_url")
+        _, source = self._setting("hub_url")
         return source is not SettingValueStore.DEFAULT
 
     @property
     def hub_api_url(self) -> str:
         """The URL of the Hub API."""
-        if hub_api_root := self.project.settings.get("hub_api_root"):
+        hub_api_root, _ = self._setting("hub_api_root")
+        if hub_api_root:
             return hub_api_root
 
         # A logged in user reads the index that Meltano Cloud serves, which
@@ -304,13 +347,14 @@ class MeltanoHubService(PluginRepository):
         if self.cloud_authenticated and not self.has_configured_hub:
             return CLOUD_API_ROOT
 
-        hub_url = self.project.settings.get("hub_url")
+        hub_url, _ = self._setting("hub_url")
         return f"{hub_url}/meltano/api/v1"
 
     @property
     def hub_url_auth(self) -> str | None:
         """The `hub_url_auth` setting."""
-        return self.project.settings.get("hub_url_auth")
+        hub_url_auth, _ = self._setting("hub_url_auth")
+        return hub_url_auth
 
     @staticmethod
     def cloud_credentials() -> Credentials | None:

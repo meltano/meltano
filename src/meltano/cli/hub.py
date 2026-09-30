@@ -17,6 +17,7 @@ from meltano.cli.params import PluginTypeArg, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.error import MeltanoError
+from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin import PluginType
 
 logger = get_logger(__name__)
@@ -44,28 +45,29 @@ def hub() -> None:
     cls=InstrumentedCmd,
     short_help="Ping Meltano Hub.",
 )
-@pass_project()
-def ping(project: Project) -> None:
+@pass_project(required=False)
+def ping(project: Project | None) -> None:
     """Ping Meltano Hub. This can be useful for checking if a custom Hub URL is reachable.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
     """  # noqa: E501, D205, D415
+    hub_service = project.hub_service if project else MeltanoHubService(None)
     try:
         # We want to ensure that we can actually communicate with the Hub.
         # Requesting a list of plugins is a good way to do that, but we don't
         # want to waste bandwidth, so we request the list of orchestrators,
         # which is currently very small.
-        project.hub_service.get_plugins_of_type(PluginType.ORCHESTRATORS)
+        hub_service.get_plugins_of_type(PluginType.ORCHESTRATORS)
     except MeltanoError:
         # A Hub error already names the URL, the cause, and what to do next,
         # so replacing it here would throw that away.
         raise
     except Exception as ex:
         raise click.ClickException(  # noqa: TRY003
-            f"Failed to connect to the Hub at {project.hub_service.hub_api_url!r}",  # noqa: EM102
+            f"Failed to connect to the Hub at {hub_service.hub_api_url!r}",  # noqa: EM102
         ) from ex
     else:
         click.secho(
-            f"Successfully connected to the Hub at {project.hub_service.hub_api_url!r}",
+            f"Successfully connected to the Hub at {hub_service.hub_api_url!r}",
             fg="green",
         )
 
@@ -159,9 +161,9 @@ def _render_table(listings: Sequence[HubPluginListing]) -> None:
     is_flag=True,
     help="Fetch a fresh index rather than a cached one.",
 )
-@pass_project()
+@pass_project(required=False)
 def list_plugins(
-    project: Project,
+    project: Project | None,
     pattern: str | None,
     *,
     plugin_type: PluginType | None,
@@ -173,6 +175,7 @@ def list_plugins(
 
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
     """
+    hub_service = project.hub_service if project else MeltanoHubService(None)
     # The Hub indexes one plugin type at a time, so listing every type costs a
     # request for each of them.
     plugin_types = (
@@ -190,7 +193,7 @@ def list_plugins(
         )
         for candidate in plugin_types
         for plugin in sorted(
-            project.hub_service.get_plugins_of_type(
+            hub_service.get_plugins_of_type(
                 candidate,
                 refresh=refresh,
             ).values(),
@@ -246,7 +249,7 @@ def list_plugins(
 
     # The Cloud index lists only the plugins that Meltano supports, so a plugin
     # that the reader looks for can be missing from it.
-    if project.hub_service.hub_api_url == CLOUD_API_ROOT:
+    if hub_service.hub_api_url == CLOUD_API_ROOT:
         click.secho(
             "Something missing? Contact the team at https://meltano.com/contact",
             fg="bright_yellow",
