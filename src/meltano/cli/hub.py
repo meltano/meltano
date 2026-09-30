@@ -27,7 +27,6 @@ if t.TYPE_CHECKING:
     from collections.abc import Sequence
 
     from meltano.core.hub.schema import IndexedPlugin
-    from meltano.core.project import Project
 
 
 @click.group(
@@ -50,8 +49,7 @@ def ping(ctx: click.Context) -> None:
     """Ping Meltano Hub. This can be useful for checking if a custom Hub URL is reachable.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
     """  # noqa: E501, D205, D415
-    project: Project | None = ctx.obj["project"]
-    hub_service = project.hub_service if project else MeltanoHubService()
+    hub_service = MeltanoHubService(ctx.obj["project"])
     try:
         # We want to ensure that we can actually communicate with the Hub.
         # Requesting a list of plugins is a good way to do that, but we don't
@@ -176,8 +174,7 @@ def list_plugins(
 
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
     """
-    project: Project | None = ctx.obj["project"]
-    hub_service = project.hub_service if project else MeltanoHubService()
+    hub_service = MeltanoHubService(ctx.obj["project"])
     # The Hub indexes one plugin type at a time, so listing every type costs a
     # request for each of them.
     plugin_types = (
