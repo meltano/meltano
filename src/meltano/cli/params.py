@@ -128,16 +128,13 @@ class pass_project:  # noqa: N801
 
     __name__ = "project"
 
-    def __init__(self, *, migrate=False, required=True) -> None:  # noqa: ANN001
+    def __init__(self, *, migrate=False) -> None:  # noqa: ANN001
         """Instantiate decorator.
 
         Args:
             migrate: Flag to perform database migration before passing the project.
-            required: Whether the command fails outside a project, rather than
-                receiving `None` in place of the project.
         """
         self.migrate = migrate
-        self.required = required
 
     def __call__(self, func):  # noqa: ANN001, ANN204
         """Return decorated function.
@@ -151,10 +148,6 @@ class pass_project:  # noqa: N801
             ctx = click.get_current_context()
 
             project = ctx.obj["project"]
-            if not project and not self.required:
-                func(None, *args, **kwargs)
-                return
-
             if not project:
                 msg = (
                     f"`{ctx.command_path}` must be run inside a Meltano project.\n"

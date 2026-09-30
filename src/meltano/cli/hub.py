@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 from structlog.stdlib import get_logger
 
-from meltano.cli.params import PluginTypeArg, pass_project
+from meltano.cli.params import PluginTypeArg
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.error import MeltanoError
@@ -45,11 +45,12 @@ def hub() -> None:
     cls=InstrumentedCmd,
     short_help="Ping Meltano Hub.",
 )
-@pass_project(required=False)
-def ping(project: Project | None) -> None:
+@click.pass_context
+def ping(ctx: click.Context) -> None:
     """Ping Meltano Hub. This can be useful for checking if a custom Hub URL is reachable.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
     """  # noqa: E501, D205, D415
+    project: Project | None = ctx.obj["project"]
     hub_service = project.hub_service if project else MeltanoHubService()
     try:
         # We want to ensure that we can actually communicate with the Hub.
@@ -161,9 +162,9 @@ def _render_table(listings: Sequence[HubPluginListing]) -> None:
     is_flag=True,
     help="Fetch a fresh index rather than a cached one.",
 )
-@pass_project(required=False)
+@click.pass_context
 def list_plugins(
-    project: Project | None,
+    ctx: click.Context,
     pattern: str | None,
     *,
     plugin_type: PluginType | None,
@@ -175,6 +176,7 @@ def list_plugins(
 
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
     """
+    project: Project | None = ctx.obj["project"]
     hub_service = project.hub_service if project else MeltanoHubService()
     # The Hub indexes one plugin type at a time, so listing every type costs a
     # request for each of them.
