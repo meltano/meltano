@@ -906,6 +906,8 @@ Use the `hub` command to interact with the instance of Meltano Hub your Meltano 
 
 Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
 
+The `hub` command also runs outside a Meltano project. There, it reads [`hub_url`](/reference/settings/#hub_url), [`hub_api_root`](/reference/settings/#hub_api_root) and [`hub_url_auth`](/reference/settings/#hub_url_auth) from the environment variables `MELTANO_HUB_URL`, `MELTANO_HUB_API_ROOT` and `MELTANO_HUB_URL_AUTH`, and otherwise uses their defaults.
+
 :::info Meltano Cloud account required
 Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
 

@@ -6,12 +6,14 @@ import time
 import typing as t
 from unittest import mock
 
+import click.testing
 import pytest
 import requests
 import requests_mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.hub import hub
 from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.hub.client import INDEX_CACHE_DURATION, MeltanoHubService
 from meltano.core.plugin import PluginType
@@ -601,3 +603,35 @@ class TestCliHubList:
         assert_cli_runner(self.invoke(project, cli_runner, "--plugin-type", "loader"))
 
         assert len(list(cache_dir.glob("*.json"))) == 2
+
+
+class TestCliHubWithoutProject:
+    def test_list_runs_outside_a_project(
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.hub.client.index_cache_dir", lambda: tmp_path)
+        for name in ("MELTANO_HUB_URL", "MELTANO_HUB_API_ROOT", "MELTANO_HUB_URL_AUTH"):
+            monkeypatch.delenv(name, raising=False)
+
+        index = {
+            "airflow": {
+                "default_variant": "apache",
+                "logo_url": None,
+                "variants": {"apache": {"ref": "https://hub.example.com/airflow"}},
+            },
+        }
+        with requests_mock.Mocker(session=MeltanoHubService.session) as m:
+            m.get(
+                "https://hub.meltano.com/meltano/api/v1/plugins/orchestrators/index",
+                json=index,
+            )
+            result = click.testing.CliRunner().invoke(
+                hub,
+                ("list", "--plugin-type", "orchestrator"),
+                obj={"project": None},
+            )
+
+        assert_cli_runner(result)
+        assert "airflow" in result.stdout
