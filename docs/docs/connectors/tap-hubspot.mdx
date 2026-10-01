@@ -1,0 +1,152 @@
+---
+title: HubSpot
+description: Extract CRM data for marketing, sales and customer service from HubSpot, including custom objects and associations.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# HubSpot
+
+<ConnectorTypeBadge type="extractor" block />
+
+HubSpot is a CRM platform that provides tools for marketing, sales and customer service. This connector syncs your HubSpot CRM records, such as contacts, companies, deals, engagements and support tickets, along with optional custom CRM objects and associations between object types.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | Private App access token |
+| **Sync type** | Mixed: some streams incremental, some full table |
+| **Streams** | Fixed list, plus optional custom object and association streams you configure |
+| **Custom queries** | Not specified in the plugin definition |
+
+## What you can sync
+
+This connector brings in your HubSpot CRM records and the definitions around them:
+
+- Core CRM records: contacts, companies, deals, leads, tickets, quotes, products and line items
+- Engagements: calls, communications, emails, meetings, notes, postal mail and tasks
+- Users, owners and teams
+- Pipelines, property definitions, email subscription types, goals and feedback submissions
+- Custom CRM objects (Enterprise plan) and associations between object types, when configured
+
+## Prerequisites
+
+- **Access Token**: a HubSpot **Private App access token**. Grant the scopes required for the streams you want to sync (see [Required scopes](#required-scopes)).
+  - How to get it:
+    1. In your HubSpot account, go to **Settings → Integrations → Private Apps**.
+    2. Create a new private app and grant the scopes required for the streams you want to sync.
+    3. Copy the generated access token.
+- **A HubSpot Enterprise plan**, only if you want to sync custom CRM objects.
+
+## Setup
+
+### In HubSpot
+
+1. Go to **Settings → Integrations → Private Apps** and create a new private app.
+2. Grant the scopes for the streams you want to sync (see [Required scopes](#required-scopes)).
+3. Copy the generated access token.
+
+### In Meltano
+
+1. Enter your HubSpot **Access Token**.
+2. Set a **Start Date** for the initial extraction.
+3. Optionally set **Custom Object Types** to sync HubSpot custom CRM objects (Enterprise plan required).
+4. Optionally set **Associations** to sync associations between CRM object types.
+
+## Available streams
+
+| Stream | Replication | Description |
+|---|---|---|
+| `contacts` | Incremental | People in your HubSpot CRM |
+| `companies` | Incremental | Company records in your CRM |
+| `deals` | Incremental | Sales opportunities and pipeline deals |
+| `leads` | Incremental | Individual sales leads (`objectTypeId: 0-136`) |
+| `line_items` | Incremental | Products attached to deals |
+| `goal_targets` | Incremental | Sales and activity goal records |
+| `calls` | Incremental | Call engagement records |
+| `communications` | Incremental | Communication engagement records |
+| `emails` | Incremental | Email engagement records |
+| `meetings` | Incremental | Meeting engagement records |
+| `notes` | Incremental | Note engagement records |
+| `postal_mail` | Incremental | Postal mail engagement records |
+| `tasks` | Incremental | Task engagement records |
+| `owners` | Full Table | HubSpot users who own CRM records |
+| `users` | Full Table | Users in your HubSpot account |
+| `teams` | Full Table | HubSpot Teams and their member user IDs |
+| `products` | Full Table | Product library items |
+| `tickets` | Full Table | Customer support tickets |
+| `quotes` | Full Table | Sales quotes |
+| `feedback_submissions` | Full Table | Customer feedback survey responses |
+| `ticket_pipelines` | Full Table | Ticket pipeline and stage definitions |
+| `deal_pipelines` | Full Table | Deal pipeline and stage definitions |
+| `email_subscriptions` | Full Table | Email subscription type definitions |
+| `properties` | Full Table | Property definitions for all CRM object types |
+
+Custom CRM object streams and association streams are only created when configured (see [Advanced configuration](#advanced-configuration)).
+
+### `teams` fields
+
+| Field | Description |
+|---|---|
+| `id` | Unique HubSpot ID for the team |
+| `name` | Display name of the team |
+| `userIds` | Array of HubSpot user IDs who are primary members of the team |
+| `secondaryUserIds` | Array of HubSpot user IDs who are secondary members of the team |
+
+## Required scopes
+
+| Stream | Required scope |
+|---|---|
+| `contacts` | `crm.objects.contacts.read` |
+| `companies` | `crm.objects.companies.read` |
+| `deals` | `crm.objects.deals.read` |
+| `leads` | `crm.objects.leads.read` |
+| `owners` | `crm.objects.owners.read` |
+| `users` | `settings.users.read` |
+| `teams` | `settings.users.teams.read` |
+| `feedback_submissions` | `crm.objects.feedback_submissions.read` |
+| `calls` | `crm.objects.calls.read` |
+| `communications` | `crm.objects.communications.read` |
+| `emails` | `sales-email-read` |
+| `meetings` | `crm.objects.meetings.read` |
+| `notes` | `crm.objects.notes.read` |
+| `postal_mail` | `crm.objects.postal_mail.read` |
+| `tasks` | `crm.objects.tasks.read` |
+| `line_items` | `e-commerce` |
+| `products` | `e-commerce` |
+| `tickets` | `tickets` |
+| `ticket_pipelines` | `tickets` |
+| `deal_pipelines` | `crm.objects.deals.read` |
+| `quotes` | `crm.objects.quotes.read` |
+| `goal_targets` | `crm.objects.goals.read` |
+| `email_subscriptions` | `content` |
+| `properties` | Same scopes as the corresponding object type |
+| Custom objects | `crm.objects.custom.read` and `crm.schemas.custom.read` (Enterprise only) |
+| Associations | The read scope of both object types in each configured pair |
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `access_token` | — (sensitive) | required | HubSpot Private App access token |
+| `start_date` | date | required | Earliest record date to sync |
+| `end_date` | date | optional | Latest record date to sync |
+| `custom_object_types` | array | optional | List of HubSpot custom CRM object type names to sync (e.g. `['p12345_patches']`). Use the `fullyQualifiedName` from HubSpot **Settings → Objects → Custom objects**. Requires a HubSpot Enterprise plan and the `crm.objects.custom.read` and `crm.schemas.custom.read` scopes |
+| `associations` | object | optional | Mapping of a HubSpot object type to the object types to sync associations with (e.g. `{"contact": ["company", "deal"]}`). No association streams are created unless this is set |
+| `flattening_enabled` | boolean | optional | Whether to flatten the response data |
+| `flattening_max_depth` | integer | optional | The maximum depth to flatten the response data |
+
+## Advanced configuration
+
+- **Custom CRM objects.** Each object type listed in **Custom Object Types** becomes its own stream, named after the object's `fullyQualifiedName` (e.g. `p12345_patches`). Schemas are discovered automatically at sync time. Incremental replication uses `hs_lastmodifieddate`, falling back to a full-table refresh if the property is absent.
+- **Associations.** Association streams are opt-in: none exist until you set **Associations**. The value maps a HubSpot object type to the object types you want its associations with, for example `{"contact": ["company", "deal"]}`.
+  - Each from/to pair creates one full-table stream named `<from_object_type>_<to_object_type>_associations` (e.g. `contact_company_associations`).
+  - Records come from the CRM v4 associations `batch/read` endpoint and contain `from_id`, `to_id`, `association_type_id`, `association_type_category` and `association_type_label`.
+  - HubSpot doesn't update `hs_lastmodifieddate` when an association changes, so these streams always do a full resync.
+  - Use HubSpot object type names, not the stream names above: `contact`, `company`, `deal`, `lead`, `line_item`, `product`, `ticket`, `quote`, `call`, `communication`, `email`, `meeting`, `note`, `postal_mail`, `task`, `feedback_submission`, `goal`. Any other standard or custom object type name is also valid, including a custom object's `fullyQualifiedName`.
+- **Flattening.** **Flattening Enabled** controls whether the response data is flattened, and **Flattening Max Depth** sets the maximum depth to flatten it to.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).
