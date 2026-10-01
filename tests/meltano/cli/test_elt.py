@@ -12,7 +12,9 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.elt import _run_job
 from meltano.cli.utils import CliError
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, State
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -227,6 +229,32 @@ class TestWindowsELT:
     reason="ELT is not supported on Windows",
 )
 class TestCliEltScratchpadOne:
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.asyncio
+    async def test_job_heartbeat_interval(
+        self,
+        project,
+        session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_JOB_HEARTBEAT_INTERVAL", "30")
+        job = Job(job_name="configured-heartbeat")
+
+        with (
+            mock.patch.object(job, "run", wraps=job.run) as run_job,
+            mock.patch("meltano.cli.elt._run_elt", new_callable=AsyncMock),
+        ):
+            await _run_job(
+                tracker=mock.Mock(),
+                project=project,
+                job=job,
+                session=session,
+                context_builder=mock.Mock(spec=ELTContextBuilder),
+                install_plugins=AsyncMock(),
+            )
+
+        run_job.assert_called_once_with(session, heartbeat_interval=30)
+
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
