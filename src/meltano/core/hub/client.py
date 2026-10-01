@@ -48,10 +48,10 @@ logger = get_logger(__name__)
 # How long an index of a plugin type is reused before it is fetched again.
 INDEX_CACHE_DURATION = timedelta(hours=1)
 
-# A background check only advises, so it gives up quickly rather than hold up
-# the command that made it. The timeout applies to each attempt that the
-# session retries.
-BACKGROUND_REQUEST_TIMEOUT_SECONDS = 2
+# A background check only advises, so it gives up rather than hold up the
+# command that made it without a limit. The timeout applies to each attempt
+# that the session retries.
+BACKGROUND_REQUEST_TIMEOUT_SECONDS = 10
 
 
 def index_cache_dir() -> Path:
