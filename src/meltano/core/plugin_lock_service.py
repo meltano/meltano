@@ -298,8 +298,8 @@ class PluginLockService:
         if plugin.is_custom() or plugin.inherit_from or not self.checks_updates:
             return False
 
-        # The check only advises, so no failure to fetch, read or cache the
-        # definition may stop the plugin being listed or run.
+        # The check only advises, so no failure to fetch or read the definition
+        # may stop the plugin being listed or run.
         try:
             definition = self.project.hub_service.find_definition(
                 plugin.type,
