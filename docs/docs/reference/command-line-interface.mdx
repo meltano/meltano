@@ -1366,7 +1366,7 @@ When you are [logged in to Meltano Cloud](#cloud), the table has an `UPDATE` col
 
 The whole definition is compared, with every list sorted first. A new order of `capabilities` or settings is not an update, but a new label, description, or logo is. The definitions are cached for an hour, so a check makes a request at most once an hour for each plugin.
 
-A custom plugin, an inheriting plugin, and a plugin that Meltano Cloud does not serve are not checked. No plugin is checked when you are logged out.
+A custom plugin, an inheriting plugin, and a plugin that Meltano Cloud does not serve are not checked. No plugin is checked when you are logged out. A check that fails, for example because Meltano Cloud cannot be reached, reports no update and does not stop the command.
 
 The JSON output reports `update` as `true` or `false`. A plugin that is not checked reports `false`.
 

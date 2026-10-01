@@ -424,6 +424,7 @@ class TestMeltanoHubService:
         _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
         service = MeltanoHubService(project)
         assert service.hub_api_url == "http://localhost:4000/meltano/api/v1"
+        assert "Authorization" not in service.session.headers
         project.settings.unset("hub_url")
 
     @pytest.mark.usefixtures("_restore_hub_session_headers")
@@ -437,6 +438,7 @@ class TestMeltanoHubService:
         _stub_cloud_credentials(monkeypatch, Credentials(access_token="s3cr3t"))
         service = MeltanoHubService(project)
         assert service.hub_api_url == "https://mysite.com/my-plugins"
+        assert "Authorization" not in service.session.headers
         project.settings.unset("hub_api_root")
 
     @pytest.mark.usefixtures("_restore_hub_session_headers")
