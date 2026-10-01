@@ -5,12 +5,11 @@ from __future__ import annotations
 import json
 import typing as t
 from dataclasses import dataclass
-from functools import partial
+from functools import cached_property, partial
 
 from structlog.stdlib import get_logger
 
 from meltano.core.cloud.config import CLOUD_API_ROOT
-from meltano.core.error import MeltanoError
 from meltano.core.hub.client import MeltanoHubService
 from meltano.core.plugin.base import PluginDefinition, StandalonePlugin
 
@@ -273,11 +272,13 @@ class PluginLockService:
             deprecated=variant_metadata.is_deprecated,
         )
 
-    @property
+    @cached_property
     def checks_updates(self) -> bool:
         """Whether plugins are checked for an update from Meltano Cloud."""
-        # The login is checked first, because building the Hub service for a
-        # user who is logged out prints the login hint.
+        # Read once, because looking up the login can renew an expired session
+        # through Auth0, which a check for each plugin must not repeat. The
+        # login is checked first, because building the Hub service for a user
+        # who is logged out prints the login hint.
         return bool(
             # TODO: refactor this leaky call to be handled directly by CloudAuthService
             MeltanoHubService.cloud_credentials()
@@ -299,8 +300,8 @@ class PluginLockService:
         if plugin.is_custom() or plugin.inherit_from or not self.checks_updates:
             return False
 
-        # The check only advises, so a Hub that cannot be reached, or that does
-        # not serve the plugin, must not stop the plugin being listed or run.
+        # The check only advises, so no failure to fetch or read the definition
+        # may stop the plugin being listed or run.
         try:
             definition = self.project.hub_service.find_definition(
                 plugin.type,
@@ -308,11 +309,11 @@ class PluginLockService:
                 variant_name=plugin.variant,
                 refresh=False,
             )
-        except MeltanoError as err:
+        except Exception:
             logger.debug(
                 "Unable to check for a plugin update",
                 plugin=plugin.name,
-                error=str(err),
+                exc_info=True,
             )
             return False
 

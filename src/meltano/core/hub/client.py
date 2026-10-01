@@ -48,6 +48,11 @@ logger = get_logger(__name__)
 # How long an index of a plugin type is reused before it is fetched again.
 INDEX_CACHE_DURATION = timedelta(hours=1)
 
+# How long to wait for the Hub to respond, so that an unreachable Hub fails a
+# request rather than hold up the command without a limit. The timeout applies
+# to each attempt that the session retries.
+REQUEST_TIMEOUT_SECONDS = 10
+
 
 def index_cache_dir() -> Path:
     """Get the directory that caches an index of a plugin type."""
@@ -434,7 +439,11 @@ class MeltanoHubService(PluginRepository):
         )
 
         try:
-            response = self.session.send(prep, **settings)
+            response = self.session.send(
+                prep,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+                **settings,
+            )
         except requests.exceptions.ConnectionError as connection_err:
             reason = f"Could not connect to Meltano Hub at {url}"
             if cause := _connection_cause(connection_err):
