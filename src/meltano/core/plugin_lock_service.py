@@ -7,7 +7,6 @@ import typing as t
 from dataclasses import dataclass
 from functools import partial
 
-import requests
 from structlog.stdlib import get_logger
 
 from meltano.core.cloud.config import CLOUD_API_ROOT
@@ -300,9 +299,8 @@ class PluginLockService:
         if plugin.is_custom() or plugin.inherit_from or not self.checks_updates:
             return False
 
-        # The check only advises, so a Hub that cannot be reached, that does not
-        # serve the plugin, or that answers with a page that is not JSON, must
-        # not stop the plugin being listed or run.
+        # The check only advises, so a Hub that cannot be reached, or that does
+        # not serve the plugin, must not stop the plugin being listed or run.
         try:
             definition = self.project.hub_service.find_definition(
                 plugin.type,
@@ -310,7 +308,7 @@ class PluginLockService:
                 variant_name=plugin.variant,
                 refresh=False,
             )
-        except (MeltanoError, requests.RequestException) as err:
+        except MeltanoError as err:
             logger.debug(
                 "Unable to check for a plugin update",
                 plugin=plugin.name,
