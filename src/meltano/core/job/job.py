@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntEnum
 
-from sqlalchemy import literal
+from sqlalchemy import Index, String, literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column
@@ -128,15 +128,29 @@ class Job(SystemModel):
     __tablename__ = "runs"
 
     id: Mapped[IntPK]
-    job_name: Mapped[str]
+    job_name: Mapped[str] = mapped_column(
+        String().with_variant(String(1024), "mssql"),
+    )
     run_id: Mapped[GUIDType]
-    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP045
+    _state: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP045
+        String().with_variant(String(64), "mssql"),
+        name="state",
+    )
     started_at: Mapped[datetime] = mapped_column(DateTimeUTC)
     last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
     ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
     payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
     trigger: Mapped[t.Optional[str]] = mapped_column(default=current_trigger)  # noqa: UP045
+
+    __table_args__ = (
+        Index(
+            "ix_runs_job_name_state_started_at",
+            job_name,
+            _state,
+            started_at.desc(),
+        ),
+    )
 
     def __init__(self, **kwargs: t.Any) -> None:
         """Construct a Job.
