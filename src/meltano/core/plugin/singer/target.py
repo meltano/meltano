@@ -85,6 +85,15 @@ class BookmarkWriter:
             )
             return
 
+        # Some targets may emit an empty state before receiving any state from the
+        # tap. It carries no bookmarks, and persisting it would replace the
+        # previous state.
+        if not new_state:
+            logger.warning(
+                "Received empty state, incremental state has not been updated"
+            )
+            return
+
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
         job.payload_flags = Payload(max(self.payload_flag, job.payload_flags))

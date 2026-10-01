@@ -270,7 +270,7 @@ def _no_cloud_session() -> t.Iterator[None]:
     """
     with mock.patch.object(
         MeltanoHubService,
-        "_cloud_credentials",
+        "cloud_credentials",
         staticmethod(lambda: None),
     ):
         yield

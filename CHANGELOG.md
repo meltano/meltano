@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.4.0 (2026-09-29)
+
+### ✨ New
+
+- [#10360](https://github.com/meltano/meltano/issues/10360) Show when a plugin has an update from Meltano Cloud
+
+### 🐛 Fixes
+
+- [#10366](https://github.com/meltano/meltano/issues/10366) Avoid overwriting state with an empty payload
+- [#10361](https://github.com/meltano/meltano/issues/10361) Reduce warning spam from plugins
+- [#10111](https://github.com/meltano/meltano/issues/10111) Stop emitting null `plugin_exception` and `stream_name` keys for every single structured JSON log line
+- [#10344](https://github.com/meltano/meltano/issues/10344) Log Meltano version at the INFO level
+- [#10354](https://github.com/meltano/meltano/issues/10354) Show the Meltano Cloud hints at the end of the command output
+- [#10352](https://github.com/meltano/meltano/issues/10352) Update an existing plugin from the Hub when `meltano add` names its variant
+- [#10292](https://github.com/meltano/meltano/issues/10292) Allow Click 8.5
+
+### ⚙️ Under the Hood
+
+- [#10368](https://github.com/meltano/meltano/issues/10368) Make `PluginNotFoundError` a `MeltanoError`
+- [#10350](https://github.com/meltano/meltano/issues/10350) Reduce debug log spam when walking the extractor catalog tree
+- [#10339](https://github.com/meltano/meltano/issues/10339) Fix more flaky Snowplow tests by ensuring a previously-active environment is deactivated when none is selected
+
+### 📚 Documentation Improvements
+
+- [#10367](https://github.com/meltano/meltano/issues/10367) Document our release process
+- [#10365](https://github.com/meltano/meltano/issues/10365) Add 2026-09-28 Cloud changelog entry
+- [#10357](https://github.com/meltano/meltano/issues/10357) Add 4 new connectors
+- [#10347](https://github.com/meltano/meltano/issues/10347) Add entry for Meltano open release notes for Meltano CLI-4.3.0
+- [#10237](https://github.com/meltano/meltano/issues/10237) Refactor IP documentation
+
 ## v4.3.0 (2026-09-21)
 
 ### ✨ New

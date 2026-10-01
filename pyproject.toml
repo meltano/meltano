@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.3.0"
+version = "4.4.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -146,7 +146,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy>=2.1,<2.4",
-  "ty==0.0.81",
+  "ty==0.0.82",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -242,8 +242,9 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.3.0"
+version = "4.4.0"
 prerelease_offset = 1
+bump_message = "chore: Bump version $current_version → $new_version"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
   "pyproject.toml:^version =",
@@ -332,7 +333,7 @@ exclude = [
 ]
 
 [build-system]
-requires = ["hatchling==1.32.0"]
+requires = ["hatchling==1.32.4"]
 build-backend = "hatchling.build"
 
 [tool.ruff]

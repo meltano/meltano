@@ -906,6 +906,8 @@ Use the `hub` command to interact with the instance of Meltano Hub your Meltano 
 
 Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
 
+The `hub` command also runs outside a Meltano project. There, it reads [`hub_url`](/reference/settings/#hub_url), [`hub_api_root`](/reference/settings/#hub_api_root) and [`hub_url_auth`](/reference/settings/#hub_url_auth) from the environment variables `MELTANO_HUB_URL`, `MELTANO_HUB_API_ROOT` and `MELTANO_HUB_URL_AUTH`, and otherwise uses their defaults.
+
 :::info Meltano Cloud account required
 Meltano Hub requires a Meltano Cloud account. Run [`meltano cloud auth login`](#auth) first.
 
@@ -1360,6 +1362,14 @@ The `INHERIT FROM` column names the plugin that a plugin [inherits from](/concep
 
 An inheriting plugin takes its parent's variant, so the `VARIANT` column shows `(inherited)`. The JSON output reports the resolved variant.
 
+When you are [logged in to Meltano Cloud](#cloud), the table has an `UPDATE` column. It shows `↑ available` for each plugin whose lock file differs from the definition that Meltano Cloud serves. Run `meltano add [--plugin-type <type>] <name>` to update the plugin. Meltano also logs a warning when it runs a plugin that has an update.
+
+The whole definition is compared, with every list sorted first. A new order of `capabilities` or settings is not an update, but a new label, description, or logo is. The definitions are cached for an hour, so a check makes a request at most once an hour for each plugin.
+
+A custom plugin, an inheriting plugin, and a plugin that Meltano Cloud does not serve are not checked. No plugin is checked when you are logged out.
+
+The JSON output reports `update` as `true` or `false`. A plugin that is not checked reports `false`.
+
 #### How to use
 
 ```bash
@@ -1395,6 +1405,7 @@ meltano plugin list --format json
     "variant": "meltanolabs",
     "inherit_from": null,
     "custom": false,
+    "update": false,
     "pip_url": "meltanolabs-tap-github"
   },
   {
@@ -1403,6 +1414,7 @@ meltano plugin list --format json
     "variant": "meltanolabs",
     "inherit_from": "tap-github",
     "custom": false,
+    "update": false,
     "pip_url": "meltanolabs-tap-github"
   },
   {
@@ -1411,6 +1423,7 @@ meltano plugin list --format json
     "variant": "default",
     "inherit_from": null,
     "custom": true,
+    "update": false,
     "pip_url": "git+https://github.com/acme/tap-internal.git"
   },
   {
@@ -1419,6 +1432,7 @@ meltano plugin list --format json
     "variant": "andyh1203",
     "inherit_from": null,
     "custom": false,
+    "update": false,
     "pip_url": "target-jsonl"
   }
 ]

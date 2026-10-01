@@ -35,10 +35,10 @@ runs:
       with:
         persist-credentials: false
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@1f40c72289eff860ee54a304f1438e3cff362e0a # v4.3.0
+      uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
     - name: Prepare the tags
       id: prepare-tags
@@ -68,7 +68,7 @@ runs:
         INPUTS_SLIM: ${{ inputs.slim }}
 
     - name: Build the image for all supported architectures
-      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
         file: ${{ steps.dockerfile-path.outputs.path }}
@@ -85,7 +85,7 @@ runs:
         push: false
 
     - name: Load the amd64 image for scanning
-      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
         file: ${{ steps.dockerfile-path.outputs.path }}
@@ -114,7 +114,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+      uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -165,7 +165,7 @@ runs:
 
     - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
-      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
       with:
         context: .
         file: ${{ steps.dockerfile-path.outputs.path }}

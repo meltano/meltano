@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import sys
 import typing as t
@@ -20,6 +21,7 @@ from structlog.stdlib import get_logger
 from urllib3 import Retry
 
 from meltano.core.cloud.config import CLOUD_API_ROOT
+from meltano.core.config_service import builtin_settings
 from meltano.core.error import MeltanoError
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import PluginDefinition, PluginRef, PluginType, Variant
@@ -27,6 +29,7 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
 from meltano.core.settings_store import SettingValueStore
+from meltano.core.utils import get_meltano_version
 
 if sys.version_info >= (3, 12):
     from typing import override  # noqa: ICN003
@@ -231,21 +234,22 @@ class MeltanoHubService(PluginRepository):
 
     session = requests.Session()
 
-    def __init__(self, project: Project) -> None:
+    def __init__(self, project: Project | None = None) -> None:
         """Initialize the service.
 
         Args:
-            project: The Meltano project.
+            project: The Meltano project, or `None` outside a project.
         """
         self.project = project
         self.session.headers.update(
             {
                 "Accept": "application/json",
-                "User-Agent": project.user_agent,
+                "User-Agent": f"Meltano/{get_meltano_version()}",
             },
         )
 
-        if self.project.settings.get("send_anonymous_usage_stats"):
+        self.session.headers.pop("X-Project-ID", None)
+        if self.project and self.project.settings.get("send_anonymous_usage_stats"):
             project_id = self.project.settings.get("project_id")
 
             self.session.headers["X-Project-ID"] = project_id
@@ -254,7 +258,7 @@ class MeltanoHubService(PluginRepository):
         self.cloud_authenticated = False
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
-        elif credentials := self._cloud_credentials():
+        elif credentials := self.cloud_credentials():
             self.session.headers.update(credentials.auth_header)
             self.cloud_authenticated = True
 
@@ -282,19 +286,43 @@ class MeltanoHubService(PluginRepository):
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
 
+    def _setting(self, name: str) -> tuple[t.Any, SettingValueStore]:
+        """Get a setting, and the store that it came from.
+
+        Args:
+            name: The name of the setting.
+
+        Returns:
+            The value and its store. Outside a project, only the environment
+            or the default can set a value.
+        """
+        if self.project:
+            return self.project.settings.get_with_source(name)
+
+        definition = next(
+            setting for setting in builtin_settings() if setting.name == name
+        )
+        for env_var in definition.env_vars(["meltano"]):
+            with suppress(KeyError):
+                return env_var.get(os.environ), SettingValueStore.ENV
+
+        return definition.value, SettingValueStore.DEFAULT
+
     @property
     def has_configured_hub(self) -> bool:
         """Whether the project points Meltano at a Hub of its own."""
-        if self.project.settings.get("hub_api_root") or self.hub_url_auth:
+        hub_api_root, _ = self._setting("hub_api_root")
+        if hub_api_root or self.hub_url_auth:
             return True
 
-        _, source = self.project.settings.get_with_source("hub_url")
+        _, source = self._setting("hub_url")
         return source is not SettingValueStore.DEFAULT
 
     @property
     def hub_api_url(self) -> str:
         """The URL of the Hub API."""
-        if hub_api_root := self.project.settings.get("hub_api_root"):
+        hub_api_root, _ = self._setting("hub_api_root")
+        if hub_api_root:
             return hub_api_root
 
         # A logged in user reads the index that Meltano Cloud serves, which
@@ -303,16 +331,17 @@ class MeltanoHubService(PluginRepository):
         if self.cloud_authenticated and not self.has_configured_hub:
             return CLOUD_API_ROOT
 
-        hub_url = self.project.settings.get("hub_url")
+        hub_url, _ = self._setting("hub_url")
         return f"{hub_url}/meltano/api/v1"
 
     @property
     def hub_url_auth(self) -> str | None:
         """The `hub_url_auth` setting."""
-        return self.project.settings.get("hub_url_auth")
+        hub_url_auth, _ = self._setting("hub_url_auth")
+        return hub_url_auth
 
     @staticmethod
-    def _cloud_credentials() -> Credentials | None:
+    def cloud_credentials() -> Credentials | None:
         """Get the stored Meltano Cloud session, renewing it if it has expired.
 
         Returns:
@@ -423,6 +452,8 @@ class MeltanoHubService(PluginRepository):
         plugin_type: PluginType,
         plugin_name: str,
         variant_name: str | None = None,
+        *,
+        refresh: bool = True,
     ) -> PluginDefinition:
         """Find a locked plugin definition.
 
@@ -430,6 +461,8 @@ class MeltanoHubService(PluginRepository):
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
+            refresh: Whether to fetch the index and the definition rather than
+                reuse ones cached in the last `INDEX_CACHE_DURATION`.
 
         Returns:
             The plugin definition.
@@ -440,7 +473,7 @@ class MeltanoHubService(PluginRepository):
             HubConnectionError: If the Hub API could not be reached.
         """
         try:
-            plugin = self.get_plugins_of_type(plugin_type)[plugin_name]
+            plugin = self.get_plugins_of_type(plugin_type, refresh=refresh)[plugin_name]
         except KeyError as plugins_key_err:
             raise PluginNotFoundError(
                 PluginRef(plugin_type, plugin_name),
@@ -461,18 +494,31 @@ class MeltanoHubService(PluginRepository):
                 variant_name,
             ) from variant_key_err
 
-        logger.info("Fetching plugin definition from Meltano Hub", url=url)
-        response = self._get(url)
+        cache_path = _index_cache_path(url)
+        definition = None if refresh else _read_index_cache(cache_path)
 
-        if response.status_code >= HTTPStatus.BAD_REQUEST:
-            reason = (
-                f"{response.reason or 'Unknown reason'} ({response.status_code}): "
-                "can not retrieve plugin"
+        if definition is None:
+            # A caller that accepts a cached definition is checking in the
+            # background, so its fetch is not news to the reader.
+            logger.log(
+                logging.INFO if refresh else logging.DEBUG,
+                "Fetching plugin definition from Meltano Hub",
+                url=url,
             )
-            raise HubConnectionError(reason)
+            response = self._get(url)
+
+            if response.status_code >= HTTPStatus.BAD_REQUEST:
+                reason = (
+                    f"{response.reason or 'Unknown reason'} ({response.status_code}): "
+                    "can not retrieve plugin"
+                )
+                raise HubConnectionError(reason)
+
+            definition = response.json()
+            _write_index_cache(cache_path, definition)
 
         return PluginDefinition(
-            **response.json(),
+            **definition,
             plugin_type=plugin_type,
             is_default_variant=variant_name == plugin.default_variant,
         )
