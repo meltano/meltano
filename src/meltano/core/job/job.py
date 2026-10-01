@@ -15,7 +15,7 @@ from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column
 
-from meltano.core.error import Error
+from meltano.core.error import Error, MeltanoConfigurationError
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import (
     DateTimeUTC,
@@ -275,25 +275,42 @@ class Job(SystemModel):
         return transition
 
     @asynccontextmanager
-    async def run(self, session: Session) -> AsyncGenerator[None]:
+    async def run(
+        self,
+        session: Session,
+        *,
+        heartbeat_interval: int = 1,
+    ) -> AsyncGenerator[None]:
         """Run wrapped code in context of a job.
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and
-        records heartbeat every second.
+        records heartbeats at the specified interval.
 
         Args:
             session: the session to use for writing to the db
+            heartbeat_interval: seconds between heartbeats, greater than zero
+                and less than the five-minute stale-job threshold
 
         Raises:
+            MeltanoConfigurationError: if the heartbeat interval is outside
+                the valid range
             BaseException: re-raises an exception occurring in the job running
                 in this context
         """
+        if not 0 < heartbeat_interval < HEARTBEAT_VALID_MINUTES * 60:
+            reason = "Invalid job_heartbeat_interval"
+            instruction = (
+                f"Set job_heartbeat_interval to an integer between 1 and "
+                f"{HEARTBEAT_VALID_MINUTES * 60 - 1} seconds"
+            )
+            raise MeltanoConfigurationError(reason, instruction)
+
         try:
             self.start()
             self.save(session)
 
             with self._handling_sigterm(session):
-                async with self._heartbeating(session):
+                async with self._heartbeating(session, heartbeat_interval):
                     yield
 
             self.success()
@@ -376,26 +393,34 @@ class Job(SystemModel):
         """Update last_heartbeat_at for this job in the db."""
         self.last_heartbeat_at = datetime.now(timezone.utc)
 
-    async def _heartbeater(self, session: Session) -> None:
-        """Heartbeat to the db every second.
+    async def _heartbeater(self, session: Session, heartbeat_interval: int) -> None:
+        """Heartbeat to the db at the specified interval.
 
         Args:
             session: the session to use for writing to the db
+            heartbeat_interval: seconds between heartbeats
         """
         while True:
             self._heartbeat()
             self.save(session)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(heartbeat_interval)
 
     @asynccontextmanager
-    async def _heartbeating(self, session: Session) -> AsyncGenerator[None]:
+    async def _heartbeating(
+        self,
+        session: Session,
+        heartbeat_interval: int,
+    ) -> AsyncGenerator[None]:
         """Provide a context for heartbeating jobs.
 
         Args:
             session: the session to use for writing to the db
+            heartbeat_interval: seconds between heartbeats
         """
-        heartbeat_future = asyncio.ensure_future(self._heartbeater(session))
+        heartbeat_future = asyncio.ensure_future(
+            self._heartbeater(session, heartbeat_interval),
+        )
         try:
             yield
         finally:

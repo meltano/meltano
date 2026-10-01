@@ -483,6 +483,37 @@ export MELTANO_DATABASE_RETRY_TIMEOUT=5
   </TabItem>
 </Tabs>
 
+### `job_heartbeat_interval`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_JOB_HEARTBEAT_INTERVAL`
+- Default: `1` (second)
+
+This controls the interval in seconds between job heartbeats written to the system database by `meltano run`, `meltano el`, and `meltano elt`.
+Increasing the interval reduces database writes for long-running jobs. For example, an interval of 30 seconds produces approximately 30 times fewer periodic heartbeat writes than the default.
+
+The interval must be an integer greater than zero and less than 300 seconds.
+Jobs are considered stale after five minutes without a heartbeat, so choose an interval well below that threshold to allow for database delays.
+The initial heartbeat is recorded when the job starts, regardless of the interval.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config set meltano job_heartbeat_interval 30
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_JOB_HEARTBEAT_INTERVAL=30
+```
+
+  </TabItem>
+</Tabs>
+
 ### <a name="project-readonly"></a>`project_readonly`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_READONLY`

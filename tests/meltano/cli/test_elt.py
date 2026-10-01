@@ -5,6 +5,7 @@ import json
 import platform
 import typing as t
 from dataclasses import dataclass
+from datetime import timedelta
 from unittest import mock
 from unittest.mock import AsyncMock
 
@@ -21,6 +22,7 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
+from meltano.core.settings_service import SettingValueStore
 
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
@@ -227,6 +229,77 @@ class TestWindowsELT:
     reason="ELT is not supported on Windows",
 )
 class TestCliEltScratchpadOne:
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.parametrize("command", ("run", "el", "elt"))
+    @pytest.mark.parametrize("config_source", ("env", "meltano_yml"))
+    def test_job_heartbeat_interval(
+        self,
+        cli_runner,
+        project,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        engine_sessionmaker,
+        monkeypatch: pytest.MonkeyPatch,
+        command: str,
+        config_source: str,
+    ) -> None:
+        if config_source == "env":
+            monkeypatch.setenv("MELTANO_JOB_HEARTBEAT_INTERVAL", "30")
+        else:
+            monkeypatch.delenv("MELTANO_JOB_HEARTBEAT_INTERVAL", raising=False)
+            project.settings.set(
+                "job_heartbeat_interval",
+                30,
+                store=SettingValueStore.MELTANO_YML,
+            )
+
+        state_id = f"heartbeat_{command}_{config_source}"
+        if command == "run":
+            args = [
+                "--environment=dev",
+                command,
+                tap.name,
+                target.name,
+                "--state-id-suffix",
+                state_id,
+            ]
+            state_id = f"dev:{tap.name}-to-{target.name}:{state_id}"
+        else:
+            args = [command, "--state-id", state_id, tap.name, target.name]
+
+        async def wait_for_target() -> int:
+            await asyncio.sleep(2)
+            return 0
+
+        target_process.wait.side_effect = wait_for_target
+        try:
+            with (
+                mock.patch.object(SingerTap, "discover_catalog"),
+                mock.patch.object(SingerTap, "apply_catalog_rules"),
+                mock.patch(
+                    "meltano.core.plugin_invoker.asyncio",
+                ) as asyncio_mock,
+            ):
+                asyncio_mock.create_subprocess_exec = AsyncMock(
+                    side_effect=(tap_process, target_process),
+                )
+                result = cli_runner.invoke(cli, args)
+                assert_cli_runner(result)
+
+            _, create_session = engine_sessionmaker
+            with create_session() as session:
+                job = session.query(Job).filter_by(job_name=state_id).one()
+                assert job.state is State.SUCCESS
+                assert job.ended_at - job.last_heartbeat_at >= timedelta(seconds=1)
+        finally:
+            if config_source == "meltano_yml":
+                project.settings.unset(
+                    "job_heartbeat_interval",
+                    store=SettingValueStore.MELTANO_YML,
+                )
+
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])

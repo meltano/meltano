@@ -9,7 +9,9 @@ from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 import pytest
+import time_machine
 
+from meltano.core.error import MeltanoConfigurationError
 from meltano.core.job.job import (
     HEARTBEAT_VALID_MINUTES,
     HEARTBEATLESS_JOB_VALID_HOURS,
@@ -82,6 +84,52 @@ class TestJob:
 
         # Allow one additional second of delay:
         assert subject.ended_at - subject.last_heartbeat_at < timedelta(seconds=2)
+
+    @pytest.mark.asyncio
+    async def test_run_custom_heartbeat_interval(self, session) -> None:
+        subject = self.sample_job()
+        recorded_heartbeats: list[datetime] = []
+        heartbeats_complete = asyncio.Event()
+
+        with time_machine.travel(datetime.now(timezone.utc), tick=False) as clock:
+
+            async def record_heartbeat_and_advance_clock(delay: int) -> None:
+                session.refresh(subject)
+                recorded_heartbeats.append(subject.last_heartbeat_at)
+                if len(recorded_heartbeats) == 3:
+                    heartbeats_complete.set()
+                    await asyncio.Future()
+                clock.shift(timedelta(seconds=delay))
+
+            with mock.patch(
+                "meltano.core.job.job.asyncio.sleep",
+                side_effect=record_heartbeat_and_advance_clock,
+            ):
+                async with subject.run(session, heartbeat_interval=30):
+                    await heartbeats_complete.wait()
+
+        assert recorded_heartbeats == [
+            subject.started_at + timedelta(seconds=seconds) for seconds in (0, 30, 60)
+        ]
+        assert subject.state is State.SUCCESS
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("heartbeat_interval", (-1, 0, 300, 301))
+    async def test_run_invalid_heartbeat_interval(
+        self,
+        session,
+        heartbeat_interval: int,
+    ) -> None:
+        subject = self.sample_job()
+
+        with pytest.raises(MeltanoConfigurationError, match="job_heartbeat_interval"):
+            async with subject.run(session, heartbeat_interval=heartbeat_interval):
+                pytest.fail("A job with an invalid heartbeat interval must not start")
+
+        assert subject.state is State.IDLE
+        assert subject.started_at is None
+        assert subject.last_heartbeat_at is None
+        assert subject.id is None
 
     @pytest.mark.asyncio
     async def test_run_failed(self, session) -> None:

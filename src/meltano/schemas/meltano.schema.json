@@ -219,6 +219,13 @@
       "default": 5,
       "minimum": 0
     },
+    "job_heartbeat_interval": {
+      "type": "integer",
+      "description": "The interval in seconds between job heartbeats.",
+      "default": 1,
+      "minimum": 1,
+      "exclusiveMaximum": 300
+    },
     "project_readonly": {
       "type": "boolean",
       "description": "Whether the project is read-only.",
