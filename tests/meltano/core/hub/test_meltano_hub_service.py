@@ -191,6 +191,27 @@ class TestMeltanoHubService:
         assert hub_request_counter["/extractors/index"] == requests
         assert hub_request_counter["/extractors/tap-mock--meltano"] == requests
 
+    def test_a_cache_that_cannot_be_written_does_not_fail_the_fetch(
+        self,
+        project: Project,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        # A file where the cache folder belongs stops the folder being made.
+        blocker = tmp_path / "blocker"
+        blocker.touch()
+        monkeypatch.setattr(
+            "meltano.core.hub.client.index_cache_dir",
+            lambda: blocker / "hub",
+        )
+
+        definition = project.hub_service.find_definition(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+        )
+
+        assert definition.name == "tap-mock"
+
     @pytest.mark.parametrize(
         ("refresh", "level"),
         ((True, logging.INFO), (False, logging.DEBUG)),

@@ -91,14 +91,20 @@ def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
     The file is renamed into place, so that a run which is interrupted part way
     through writing it leaves no half-written file for the next one to read.
 
+    A cache that cannot be written costs only a request the next time, so the
+    failure is logged rather than raised.
+
     Args:
         path: The path of the cache file.
         index: The index to cache.
     """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    partial = path.with_suffix(f".{os.getpid()}.partial")
-    partial.write_text(json.dumps(index))
-    os.replace(partial, path)  # noqa: PTH105
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        partial = path.with_suffix(f".{os.getpid()}.partial")
+        partial.write_text(json.dumps(index))
+        os.replace(partial, path)  # noqa: PTH105
+    except OSError:
+        logger.debug("Unable to cache the Hub response", path=str(path), exc_info=True)
 
 
 def _rejection_detail(response: requests.Response) -> str | None:
