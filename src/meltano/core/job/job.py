@@ -145,7 +145,7 @@ class Job(SystemModel):
 
     __table_args__ = (
         Index(
-            "ix_runs_job_name_state_started_at",
+            "ix_runs_job_state_started",
             job_name,
             _state,
             started_at.desc(),

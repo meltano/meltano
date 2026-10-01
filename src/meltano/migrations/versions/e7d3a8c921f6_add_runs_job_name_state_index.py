@@ -32,7 +32,7 @@ def upgrade() -> None:
             )
 
     op.create_index(
-        "ix_runs_job_name_state_started_at",
+        "ix_runs_job_state_started",
         "runs",
         ["job_name", "state", sa.column("started_at").desc()],
     )
@@ -40,7 +40,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Remove the index and restore SQL Server's unbounded columns."""
-    op.drop_index("ix_runs_job_name_state_started_at", table_name="runs")
+    op.drop_index("ix_runs_job_state_started", table_name="runs")
 
     if op.get_bind().dialect.name == "mssql":
         for column_name, length in (("job_name", 1024), ("state", 64)):
