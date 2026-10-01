@@ -1,0 +1,107 @@
+---
+title: Jira
+description: Extract project management, issue tracking and bug tracking data from Jira.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Jira
+
+<ConnectorTypeBadge type="extractor" block />
+
+Jira is a software tool developed by Atlassian that is used for project management, issue tracking and bug tracking. Teams use it to plan, track and manage tasks and projects in an agile manner, with customisable workflows, scrum boards and kanban boards, plus reporting and analytics to track progress and identify areas for improvement. It is widely used in software development, but can be used for any type of project management.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token (email + API token) |
+| **Sync type** | Not specified in the source material (see note below) |
+| **Streams** | Not specified in the source material (see note below) |
+| **Custom queries** | Not specified in the plugin definition (the issues stream can be filtered with JQL, see [Advanced configuration](#advanced-configuration)) |
+
+## What you can sync
+
+The plugin definition doesn't list the streams this connector syncs. Its settings cover an issues stream (with optional JQL filtering and field selection) and an optional audit logs stream.
+
+## Prerequisites
+
+- **Email**: the same email address used to log in to Jira.
+- **API Token**: created under **Account Settings → Security → API Tokens**. You can configure a legacy API token or a granular access token.
+  - When using a granular access token, depending on your selected streams, you will need the following scopes:
+
+    ```
+    read:audit-log:jira
+    read:avatar:jira
+    read:board-scope:jira-software
+    read:group:jira
+    read:issue-security-level:jira
+    read:issue-type-screen-scheme:jira
+    read:jira-user
+    read:jira-work
+    read:license:jira
+    read:me
+    read:permission:jira
+    read:project-category:jira
+    read:project-role:jira
+    read:project:jira
+    read:role:jira
+    read:screen-scheme:jira
+    read:screen:jira
+    read:sprint:jira-software
+    read:status:jira
+    read:user:jira
+    read:webhook:jira
+    read:workflow:jira
+    ```
+
+- **Domain**: the URL of the Jira instance you are connecting to, e.g. `mycompany.atlassian.net`. Used with legacy API tokens.
+- **Cloud ID**: the Cloud ID of your tenant. Required for use of OAuth 2.0 and granular access tokens.
+  - How to get it: using your email and API token, it can be obtained from `https://{domain}/_edge/tenant_info`:
+
+    ```
+    curl --user [your email]:[your api token] https://<YOUR_TENANT>.atlassian.net/_edge/tenant_info
+    ```
+
+## Setup
+
+### In Jira
+
+1. Go to **Account Settings → Security → API Tokens**.
+2. Create a legacy API token, or a granular access token with the scopes listed above, and copy it.
+3. Note the domain of your Jira instance (e.g. `mycompany.atlassian.net`).
+4. Obtain your Cloud ID from `https://<YOUR_TENANT>.atlassian.net/_edge/tenant_info`.
+
+### In Meltano Cloud
+
+1. Enter your **Email** and **API Token**.
+2. Enter your **Domain** (e.g. `mycompany.atlassian.net`).
+3. Enter your **Cloud ID**.
+4. Optionally set a **Start Date** to control how much data to backfill.
+
+## Available streams
+
+> **Note:** the list of streams, their field-level schemas, and which streams replicate incrementally vs. in full aren't documented in the plugin definition. The Start Date setting controls how much data to backfill, and the `include_audit_logs` setting adds an audit logs stream.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `email` | — | required | The email used to authenticate with Jira |
+| `api_token` | — (sensitive) | required | The API Token used to authenticate with Jira. Account Settings → Security → API Tokens |
+| `domain` | — | required | The Domain for your Jira account, e.g. `mycompany.atlassian.net` |
+| `cloud_id` | — | required | The Cloud ID for your Jira account. This is required for granular API Tokens |
+| `start_date` | date | optional | The date from which to start retrieving data from Jira |
+
+## Advanced configuration
+
+These settings are hidden from the Meltano Cloud form but can be set in your `meltano.yml`:
+
+- **Issue filtering (JQL).** `stream_options.issues.jql` applies a JQL query to filter issues (e.g. `id != null`).
+- **Issue fields.** `stream_options.issues.fields` is a comma-separated list of fields to include. All fields are included by default (`*all`).
+- **Page size.** `page_size` sets the default page size, and `page_size.issues` the page size for the issues stream (`100`).
+- **Audit logs.** `include_audit_logs` includes the audit logs stream.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

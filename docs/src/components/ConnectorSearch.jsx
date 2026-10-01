@@ -24,6 +24,10 @@ const CONNECTORS = [
   { label: 'Google Search Console', href: '/connectors/tap-google-search-console', category: 'extractor' },
   { label: 'Dianomi', href: '/connectors/tap-dianomi', category: 'extractor' },
   { label: 'Bing Ads', href: '/connectors/tap-bing-ads', category: 'extractor' },
+  { label: 'Amazon Athena', href: '/connectors/target-athena', category: 'loader' },
+  { label: 'Pinterest', href: '/connectors/tap-pinterest', category: 'extractor' },
+  { label: 'HubSpot', href: '/connectors/tap-hubspot', category: 'extractor' },
+  { label: 'Jira', href: '/connectors/tap-jira', category: 'extractor' },
 ];
 
 function ConnectorCardTitle({ label }) {
