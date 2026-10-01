@@ -124,7 +124,9 @@ class TestJob:
 
         with pytest.raises(MeltanoConfigurationError, match="job_heartbeat_interval"):
             async with subject.run(session, heartbeat_interval=heartbeat_interval):
-                pytest.fail("A job with an invalid heartbeat interval must not start")
+                pytest.fail(  # pragma: no cover
+                    "A job with an invalid heartbeat interval must not start",
+                )
 
         assert subject.state is State.IDLE
         assert subject.started_at is None
