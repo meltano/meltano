@@ -258,7 +258,9 @@ class MeltanoHubService(PluginRepository):
         self.cloud_authenticated = False
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
-        elif credentials := self.cloud_credentials():
+        # The token is a Meltano Cloud login, so a Hub that the project points
+        # at, which anyone can run, must never receive it.
+        elif not self.has_configured_hub and (credentials := self.cloud_credentials()):
             self.session.headers.update(credentials.auth_header)
             self.cloud_authenticated = True
 
