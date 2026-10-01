@@ -48,10 +48,10 @@ logger = get_logger(__name__)
 # How long an index of a plugin type is reused before it is fetched again.
 INDEX_CACHE_DURATION = timedelta(hours=1)
 
-# A background check only advises, so it gives up rather than hold up the
-# command that made it without a limit. The timeout applies to each attempt
-# that the session retries.
-BACKGROUND_REQUEST_TIMEOUT_SECONDS = 10
+# How long to wait for the Hub to respond, so that an unreachable Hub fails a
+# request rather than hold up the command without a limit. The timeout applies
+# to each attempt that the session retries.
+REQUEST_TIMEOUT_SECONDS = 10
 
 
 def index_cache_dir() -> Path:
@@ -413,13 +413,11 @@ class MeltanoHubService(PluginRepository):
 
         return self.session.prepare_request(request)
 
-    def _get(self, url: str, *, timeout: float | None = None) -> requests.Response:
+    def _get(self, url: str) -> requests.Response:
         """Make a GET request to the Hub API.
 
         Args:
             url: The URL to request.
-            timeout: How long to wait for the Hub to respond, or `None` to wait
-                as long as it takes.
 
         Returns:
             The response.
@@ -439,7 +437,11 @@ class MeltanoHubService(PluginRepository):
         )
 
         try:
-            response = self.session.send(prep, timeout=timeout, **settings)
+            response = self.session.send(
+                prep,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+                **settings,
+            )
         except requests.exceptions.ConnectionError as connection_err:
             reason = f"Could not connect to Meltano Hub at {url}"
             if cause := _connection_cause(connection_err):
@@ -469,9 +471,7 @@ class MeltanoHubService(PluginRepository):
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
             refresh: Whether to fetch the index and the definition rather than
-                reuse ones cached in the last `INDEX_CACHE_DURATION`. A caller
-                that accepts a cached copy is checking in the background, so a
-                fetch for it waits only `BACKGROUND_REQUEST_TIMEOUT_SECONDS`.
+                reuse ones cached in the last `INDEX_CACHE_DURATION`.
 
         Returns:
             The plugin definition.
@@ -514,10 +514,7 @@ class MeltanoHubService(PluginRepository):
                 "Fetching plugin definition from Meltano Hub",
                 url=url,
             )
-            response = self._get(
-                url,
-                timeout=None if refresh else BACKGROUND_REQUEST_TIMEOUT_SECONDS,
-            )
+            response = self._get(url)
 
             if response.status_code >= HTTPStatus.BAD_REQUEST:
                 reason = (
@@ -593,10 +590,7 @@ class MeltanoHubService(PluginRepository):
         )
 
         if plugins is None:
-            response = self._get(
-                url,
-                timeout=None if refresh else BACKGROUND_REQUEST_TIMEOUT_SECONDS,
-            )
+            response = self._get(url)
 
             if response.status_code == HTTPStatus.NOT_FOUND:
                 raise HubPluginTypeNotFoundError(plugin_type)

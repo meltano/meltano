@@ -19,7 +19,6 @@ from meltano.cli.hub import hub
 from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.cloud.credentials import Credentials
 from meltano.core.hub.client import (
-    BACKGROUND_REQUEST_TIMEOUT_SECONDS,
     HubAuthenticationRequiredError,
     HubConnectionError,
     HubPluginTypeNotFoundError,
@@ -214,35 +213,6 @@ class TestMeltanoHubService:
             )
 
         assert logger.log.call_args.args[0] == level
-
-    @pytest.mark.parametrize(
-        ("refresh", "timeout"),
-        ((True, None), (False, BACKGROUND_REQUEST_TIMEOUT_SECONDS)),
-    )
-    def test_a_background_fetch_gives_up_quickly(
-        self,
-        project: Project,
-        tmp_path: Path,
-        monkeypatch: pytest.MonkeyPatch,
-        *,
-        refresh: bool,
-        timeout: int | None,
-    ) -> None:
-        monkeypatch.setattr("meltano.core.hub.client.index_cache_dir", lambda: tmp_path)
-        adapter = project.hub_service.session.get_adapter(
-            project.hub_service.hub_api_url,
-        )
-        with mock.patch.object(adapter, "send", wraps=adapter.send) as send:
-            project.hub_service.find_definition(
-                PluginType.EXTRACTORS,
-                "tap-mock",
-                refresh=refresh,
-            )
-
-        assert [call.kwargs["timeout"] for call in send.call_args_list] == [
-            timeout,
-            timeout,
-        ]
 
     def test_definition_not_found(
         self,
