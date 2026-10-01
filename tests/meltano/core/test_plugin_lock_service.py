@@ -4,6 +4,7 @@ import json
 import typing as t
 
 import pytest
+import requests
 
 from meltano.core.cloud.config import CLOUD_API_ROOT
 from meltano.core.cloud.credentials import Credentials
@@ -297,6 +298,9 @@ class TestHasUpdate:
         (
             PluginNotFoundError("tap-served"),
             HubConnectionError("Could not connect to Meltano Hub"),
+            requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0),
+            TypeError("PluginDefinition.__init__() missing 2 required arguments"),
+            PermissionError(13, "Permission denied"),
         ),
     )
     def test_plugin_the_hub_cannot_serve_is_not_checked(
