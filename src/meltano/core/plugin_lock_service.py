@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import typing as t
 from dataclasses import dataclass
-from functools import partial
+from functools import cached_property, partial
 
 from structlog.stdlib import get_logger
 
@@ -272,11 +272,13 @@ class PluginLockService:
             deprecated=variant_metadata.is_deprecated,
         )
 
-    @property
+    @cached_property
     def checks_updates(self) -> bool:
         """Whether plugins are checked for an update from Meltano Cloud."""
-        # The login is checked first, because building the Hub service for a
-        # user who is logged out prints the login hint.
+        # Read once, because looking up the login can renew an expired session
+        # through Auth0, which a check for each plugin must not repeat. The
+        # login is checked first, because building the Hub service for a user
+        # who is logged out prints the login hint.
         return bool(
             # TODO: refactor this leaky call to be handled directly by CloudAuthService
             MeltanoHubService.cloud_credentials()

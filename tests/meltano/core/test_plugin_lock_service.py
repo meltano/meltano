@@ -292,6 +292,31 @@ class TestHasUpdate:
         assert subject.has_update(custom) is False
         assert subject.has_update(plugin) is False
 
+    def test_login_is_looked_up_once(
+        self,
+        project: Project,
+        subject: PluginLockService,
+        locked: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        lookups = []
+
+        def cloud_credentials() -> None:
+            # A session that has expired, and that Auth0 cannot renew.
+            lookups.append(None)
+
+        monkeypatch.setattr(
+            MeltanoHubService,
+            "cloud_credentials",
+            staticmethod(cloud_credentials),
+        )
+        self.serve(project, monkeypatch, AssertionError("The Hub was called"))
+
+        for _ in range(3):
+            assert subject.has_update(locked) is False
+
+        assert len(lookups) == 1
+
     @pytest.mark.usefixtures("logged_in")
     @pytest.mark.parametrize(
         "error",
