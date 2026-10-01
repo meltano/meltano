@@ -73,16 +73,21 @@ def _read_index_cache(path: Path) -> dict[str, t.Any] | None:
         path: The path of the cache file.
 
     Returns:
-        The index, or `None` if it was never cached or has expired.
+        The index, or `None` if it was never cached, has expired or cannot be
+        read.
     """
-    if not path.exists():
-        return None
+    try:
+        if not path.exists():
+            return None
 
-    written = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    if datetime.now(tz=timezone.utc) - written > INDEX_CACHE_DURATION:
-        return None
+        written = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+        if datetime.now(tz=timezone.utc) - written > INDEX_CACHE_DURATION:
+            return None
 
-    return json.loads(path.read_text())
+        return json.loads(path.read_text())
+    except OSError as err:
+        logger.warning("Unable to read the Meltano Hub cache: %s", err)
+        return None
 
 
 def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
@@ -92,7 +97,7 @@ def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
     through writing it leaves no half-written file for the next one to read.
 
     A cache that cannot be written costs only a request the next time, so the
-    failure is logged rather than raised.
+    failure is a warning rather than an error.
 
     Args:
         path: The path of the cache file.
@@ -103,8 +108,8 @@ def _write_index_cache(path: Path, index: dict[str, t.Any]) -> None:
         partial = path.with_suffix(f".{os.getpid()}.partial")
         partial.write_text(json.dumps(index))
         os.replace(partial, path)  # noqa: PTH105
-    except OSError:
-        logger.debug("Unable to cache the Hub response", path=str(path), exc_info=True)
+    except OSError as err:
+        logger.warning("Unable to cache the Meltano Hub response: %s", err)
 
 
 def _rejection_detail(response: requests.Response) -> str | None:

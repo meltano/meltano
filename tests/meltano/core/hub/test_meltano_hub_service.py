@@ -25,6 +25,7 @@ from meltano.core.hub.client import (
     HubPluginVariantNotFoundError,
     MeltanoHubService,
     _connection_cause,
+    _index_cache_path,
 )
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -211,6 +212,25 @@ class TestMeltanoHubService:
         )
 
         assert definition.name == "tap-mock"
+
+    def test_a_cache_that_cannot_be_read_does_not_fail_the_listing(
+        self,
+        project: Project,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr("meltano.core.hub.client.index_cache_dir", lambda: tmp_path)
+        # A folder where the cache file belongs exists, but cannot be read.
+        _index_cache_path(
+            project.hub_service.plugin_type_endpoint(PluginType.EXTRACTORS),
+        ).mkdir()
+
+        plugins = project.hub_service.get_plugins_of_type(
+            PluginType.EXTRACTORS,
+            refresh=False,
+        )
+
+        assert "tap-mock" in plugins
 
     @pytest.mark.parametrize(
         ("refresh", "level"),
