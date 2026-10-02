@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin.singer.catalog import CatalogDict
     from meltano.core.project import Project
 
 
@@ -46,7 +47,12 @@ class SelectService:  # noqa: D101
         plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 
-    async def load_catalog(self, session: Session, *, refresh: bool = False) -> dict:
+    async def load_catalog(
+        self,
+        session: Session,
+        *,
+        refresh: bool = False,
+    ) -> CatalogDict:
         """Load the catalog."""
         invoker = invoker_factory(self.project, self.extractor)
 
@@ -75,11 +81,7 @@ class SelectService:  # noqa: D101
             ) from err
 
         list_all = ListSelectedExecutor()
-
-        # TODO: revisit the visit_with decorator when mypy has better support
-        # for class decorators
-        # https://github.com/python/mypy/issues/3135
-        list_all.visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
+        list_all.visit(catalog)
 
         return list_all
 
