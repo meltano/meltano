@@ -1,0 +1,22 @@
+---
+slug: 2026-10-05-cloud-changelog
+title: Private Workspace Repos by Default & QuickBooks OAuth Connector
+date: 2026-10-05
+---
+
+Meltano Cloud Workspace repositories are now private by default, and `tap-quickbooks-privateapp` lets you connect QuickBooks through your own Intuit OAuth app. This release also ships fixes for target-bigquery, target-salesforce, target-snowflake, and tap-googleads.
+
+{/* truncate */}
+
+## Features
+
+- **Meltano Cloud Workspace repositories are now private by default:** Previously on Meltano Cloud, when creating a new Workspace, the auto-generated repository was set to public by default - this will now be private. This ensures your workspace configuration is secure by default and only public if explicitly requested.
+- **Connect QuickBooks with your own Intuit OAuth app:** The new `tap-quickbooks-privateapp` plugin connects through your own Intuit OAuth app and keeps rotated refresh tokens working for you. The docs now list every stream and explain how to backfill.
+
+## Fixes
+
+- **Bumped target-bigquery to v1.1.1:** Fixes Arrow field type errors and mismatches caused by stale table schemas.
+- **BigQuery deduplicates before upsert by default:** `target-bigquery` now removes duplicate records before upserting.
+- **Bumped target-salesforce to v0.1.3:** Loading several streams in parallel no longer fails with `UNABLE_TO_LOCK_ROW` errors.
+- **target-snowflake logs at the right level:** It now supports structured logging, so its logs show up at the correct level.
+- **Bumped tap-googleads to v0.15.0:** Ahead of the Google Ads API v22 sunset, the customer ID list in the Google Ads data source form loads again. It now uses the API version set on your data source (v25 by default) instead of the retired v20, so the form and your pipeline always use the same version.
