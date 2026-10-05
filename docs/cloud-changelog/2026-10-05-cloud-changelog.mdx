@@ -19,4 +19,4 @@ Meltano Cloud Workspace repositories are now private by default and tap-quickboo
 - **BigQuery deduplicates before upsert by default:** `target-bigquery` now removes duplicate records before upserting.
 - **Bumped target-salesforce to v0.1.3:** Loading several streams in parallel no longer fails with `UNABLE_TO_LOCK_ROW` errors.
 - **target-snowflake logs at the right level:** It now supports structured logging, so its logs show up at the correct level.
-- **Bumped tap-googleads to v0.15.0:** Ahead of the Google Ads API v22 sunset, the customer ID list in the Google Ads data source form loads again. It now uses the API version set on your data source (v25 by default) instead of the retired v20, so the form and your pipeline always use the same version.
+- **Bumped `tap-googleads` to `v0.15.0`:** Ahead of the Google Ads API v22 sunset, the customer ID list in the Google Ads data source form loads again. It now uses the API version set on your data source (v25 by default) instead of the retired v20, so the form and your pipeline always use the same version.
