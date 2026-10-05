@@ -15,7 +15,7 @@ Meltano Cloud Workspace repositories are now private by default and tap-quickboo
 
 ## Fixes
 
-- **Bumped target-bigquery to v1.1.1:** Fixes Arrow field type errors and mismatches caused by stale table schemas.
+- **Bumped `target-bigquery` to `v1.1.1`:** Fixes Arrow field type errors and mismatches caused by stale table schemas.
 - **BigQuery deduplicates before upsert by default:** `target-bigquery` now removes duplicate records before upserting.
 - **Bumped `target-salesforce` to `v0.1.3`:** Loading several streams in parallel no longer fails with `UNABLE_TO_LOCK_ROW` errors.
 - **`target-snowflake` logs at the right level:** It now supports structured logging, so its logs show up at the correct level.
