@@ -25,8 +25,9 @@ connects to your store from the following addresses:
 | `51.137.148.226` | `51.137.148.226/32` |
 | `35.189.66.90` | `35.189.66.90/32` |
 | `35.177.0.220` | `35.177.0.220/32` |
+| `34.105.166.9` | `34.105.166.9/32` |
 
-Allow **all three** addresses. We may run a given pipeline from any one
+Allow **all four** addresses. We may run a given pipeline from any one
 of them, so allow-listing only a subset may cause intermittent connection
 failures in the future.
 
@@ -38,6 +39,7 @@ Plain list:
 51.137.148.226
 35.189.66.90
 35.177.0.220
+34.105.166.9
 ```
 
 CIDR notation, for allow-lists that expect a network range (ClickHouse Cloud,
@@ -47,13 +49,14 @@ security groups, `users.xml`):
 51.137.148.226/32
 35.189.66.90/32
 35.177.0.220/32
+34.105.166.9/32
 ```
 
 Quoted and comma-separated, for SQL statements such as a Snowflake
 `VALUE_LIST`:
 
 ```text
-'51.137.148.226', '35.189.66.90', '35.177.0.220'
+'51.137.148.226', '35.189.66.90', '35.177.0.220', '34.105.166.9'
 ```
 
 ## Where these are used
