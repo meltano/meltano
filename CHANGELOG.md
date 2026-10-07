@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v4.4.1 (2026-10-07)
+
+### 🐛 Fixes
+
+- [#10377](https://github.com/meltano/meltano/issues/10377) Stop a Hub cache that cannot be written or read failing the command
+- [#10376](https://github.com/meltano/meltano/issues/10376) Prevent the plugin update check from hanging or failing the command
+- [#10375](https://github.com/meltano/meltano/issues/10375) Stop sending the Meltano Cloud login token to an explicitly configured Hub
+- [#10370](https://github.com/meltano/meltano/issues/10370) Let `meltano hub` run outside a Meltano project
+
+### 📚 Documentation Improvements
+
+- [#10382](https://github.com/meltano/meltano/issues/10382) Add 2026-10-05 Cloud changelog entry
+- [#10374](https://github.com/meltano/meltano/issues/10374) Added 4 new connectors
+
 ## v4.4.0 (2026-09-29)
 
 ### ✨ New
