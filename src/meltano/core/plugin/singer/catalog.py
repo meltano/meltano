@@ -15,11 +15,9 @@ import re
 import sys
 import typing as t
 from enum import Enum, auto
-from functools import partial, singledispatch
+from functools import partial
 
 import structlog
-
-from meltano.core.behavior.visitor import visit_with
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -383,46 +381,6 @@ class SelectionType(StrEnum):
         return SelectionType.SELECTED
 
 
-@singledispatch
-def visit(
-    node: t.Any,  # noqa: ANN401
-    executor: CatalogExecutor,
-    path: str = "",
-) -> None:
-    """Visit a node in the catalog."""
-
-
-@visit.register(dict)
-def _(node: dict, executor, path: str = "") -> None:  # noqa: ANN001
-    node_type = None
-
-    if re.search(r"streams\[\d+\]$", path):
-        node_type = CatalogNode.STREAM
-
-    if re.search(r"schema(\.properties\.\w*)+$", path):
-        node_type = CatalogNode.PROPERTY
-
-    if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
-        node_type = CatalogNode.METADATA
-
-    if node_type:
-        executor(node_type, node, path)
-
-    for child_path, child_node in node.items():
-        if node_type is CatalogNode.PROPERTY and child_path in {"anyOf", "type"}:
-            continue
-
-        # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
-        executor.visit(child_node, path=f"{path}.{child_path}")
-
-
-@visit.register(list)
-def _(node: list, executor, path: str = "") -> None:  # noqa: ANN001
-    for index, child_node in enumerate(node):
-        executor.visit(child_node, path=f"{path}[{index}]")
-
-
-@visit_with(visit)
 class CatalogExecutor:
     """Base executor class for traversing and processing Singer catalog nodes.
 
@@ -436,9 +394,47 @@ class CatalogExecutor:
     - Property nodes: Schema property definitions within streams
     - Metadata nodes: Selection and inclusion metadata for streams and properties
 
+    Rather than sniffing every dict in the tree with regexes to guess what kind
+    of node it is, traversal follows the known shape of a catalog: a stream has
+    a `schema.properties` tree and a `metadata` list, and a property may have
+    its own nested `properties` tree. Each node type is visited by the method
+    that knows what its children mean, so no other keys are ever traversed.
+
     Subclasses should override the specific node processing methods to implement
     their custom catalog manipulation logic.
     """
+
+    def visit(self, catalog: CatalogDict) -> None:
+        """Visit every stream in a catalog."""
+        for index, stream in enumerate(catalog.get("streams", [])):
+            self.visit_stream(stream, path=f"streams[{index}]")
+
+    def visit_stream(self, node: Node, path: str) -> None:
+        """Visit a stream node, then its properties and metadata."""
+        self.execute(CatalogNode.STREAM, node, path)
+
+        schema = node.get(SCHEMA_KEY) or {}
+        self.visit_properties(schema.get(PROPERTIES_KEY) or {}, path=f"{path}.schema")
+        self.visit_metadata(node.get("metadata") or [], path=path)
+
+    def visit_properties(self, properties: Node, path: str) -> None:
+        """Visit each property node, recursing into nested properties."""
+        for name, prop_node in properties.items():
+            prop_path = f"{path}.{PROPERTIES_KEY}.{name}"
+            self.execute(CatalogNode.PROPERTY, prop_node, prop_path)
+
+            nested_properties = prop_node.get(PROPERTIES_KEY)
+            if isinstance(nested_properties, dict):
+                self.visit_properties(nested_properties, path=prop_path)
+
+    def visit_metadata(self, metadata_list: list[Node], path: str) -> None:
+        """Visit each metadata entry in a stream's metadata list."""
+        for index, metadata_node in enumerate(metadata_list):
+            if "breadcrumb" not in metadata_node:
+                continue
+
+            metadata_path = f"{path}.metadata[{index}]"
+            self.execute(CatalogNode.METADATA, metadata_node, metadata_path)
 
     def execute(self, node_type: CatalogNode, node: Node, path: str) -> None:
         """Dispatch all node methods."""
@@ -471,10 +467,6 @@ class CatalogExecutor:
 
     def property_metadata_node(self, node: Node, path: str) -> None:
         """Process property metadata node."""
-
-    def __call__(self, node_type: CatalogNode, node: Node, path: str) -> None:
-        """Call this instance as a function."""
-        return self.execute(node_type, node, path)
 
 
 class MetadataExecutor(CatalogExecutor):

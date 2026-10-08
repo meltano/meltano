@@ -291,7 +291,6 @@ module = [
   "meltano.core.behavior.canonical",
   "meltano.core.behavior.hookable",
   "meltano.core.behavior.name_eq",
-  "meltano.core.behavior.visitor",
   "meltano.core.block.extract_load",
   "meltano.core.block.plugin_command",
   "meltano.core.plugin.base",
