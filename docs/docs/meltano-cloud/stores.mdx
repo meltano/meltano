@@ -41,6 +41,10 @@ Meltano supports the following data stores for powering your workspace:
 - **Snowflake**
 - **BigQuery**
 - **Microsoft SQL Server**
+- [**ClickHouse**](/meltano-cloud/connect-a-store/clickhouse-store/)
+- [**MotherDuck**](/meltano-cloud/connect-a-store/motherduck-store/)
+- [**Databricks**](/meltano-cloud/connect-a-store/databricks-store/)
+
 > **Custom data stores** (those not natively provided by Meltano) support loading data via data import runs, but **do not support querying via datasets**. If a custom store is set as default, data will load normally but all datasets will appear empty.
 
 ---
@@ -49,7 +53,7 @@ Meltano supports the following data stores for powering your workspace:
 
 **Prerequisites:**
 - Owner or admin access to a Meltano workspace.
-- Credentials for a supported database (PostgreSQL, Snowflake, BigQuery, or MS SQL).
+- Credentials for one of the supported data stores above. Each store's guide lists what it needs (for Databricks: the server hostname, HTTP path and either a service principal or a personal access token).
 
 **Steps:**
 
