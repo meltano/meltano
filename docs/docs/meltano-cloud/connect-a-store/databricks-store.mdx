@@ -84,6 +84,11 @@ The identity Meltano connects as needs the following.
   schema for you. Skip it if the schema already exists.
 - **`USE SCHEMA`**, **`CREATE TABLE`**, **`SELECT`** and **`MODIFY`** on the
   target schema.
+- **`CREATE VOLUME`** on the target schema. Meltano stages large batches as
+  Parquet files in a volume named `meltano_staging` that it creates in the
+  target schema, which is much faster than inserting rows individually. See
+  [Batch ingestion](#batch-ingestion). Without this privilege loads still work,
+  but fall back to slower inline inserts.
 
 For example, to prepare a `meltano` schema in the `main` catalog for a service
 principal, run the following as a catalog admin. Use the service principal's
@@ -93,7 +98,15 @@ application ID (its client ID) as the principal:
 CREATE SCHEMA IF NOT EXISTS main.meltano;
 
 GRANT USE CATALOG ON CATALOG main TO `<client-id>`;
-GRANT USE SCHEMA, CREATE TABLE, SELECT, MODIFY ON SCHEMA main.meltano TO `<client-id>`;
+GRANT USE SCHEMA, CREATE TABLE, CREATE VOLUME, SELECT, MODIFY ON SCHEMA main.meltano TO `<client-id>`;
+```
+
+If you would rather create the staging volume yourself than grant `CREATE VOLUME`,
+create it as an admin and grant the identity access to it:
+
+```sql
+CREATE VOLUME IF NOT EXISTS main.meltano.meltano_staging;
+GRANT READ VOLUME, WRITE VOLUME ON VOLUME main.meltano.meltano_staging TO `<client-id>`;
 ```
 
 Tables Meltano creates are owned by the identity it connects as, which is what
@@ -135,7 +148,8 @@ use, and open the **Connection details** tab. Copy:
 | `hard_delete` | No | `false` | On `ACTIVATE_VERSION`, delete stale rows instead of marking them with `_sdc_deleted_at`. |
 | `schema_creation_parameters.retention_days` | No | Catalog default | Recovery period for tables dropped from a schema Meltano creates. See [Dropped table retention](#dropped-table-retention). |
 | `add_record_metadata` | No | `true` | Add `_sdc_*` metadata columns. Required for `ACTIVATE_VERSION` and hard delete. |
-| `batch_size_rows` | No | `10000` | Rows per load batch. |
+| `batch_size_rows` | No | `100000` | Maximum rows per load batch. Each batch is staged and loaded with a fixed cost of a few seconds, so larger batches load faster. Lower it if your records are very wide. |
+| `clean_up_batch_files` | No | `true` | Delete Arrow `BATCH` files once they are loaded. They are consume-once, so this is safe to leave enabled. |
 
 The target schema is created if it does not exist, as long as the identity has
 `CREATE SCHEMA` on the catalog.
@@ -218,6 +232,11 @@ rather than reloading from scratch.
 - **The pipeline fails when the warehouse is stopped** - serverless warehouses
   start on demand, but other warehouse types can take a few minutes to start.
   Increase the warehouse's auto-stop time, or start it before scheduled runs.
+- **`Could not stage batch in volume 'meltano_staging'` warning** - the identity
+  cannot create or write to the staging volume, so the loader fell back to
+  slower inline inserts for the rest of the run. Grant `CREATE VOLUME` on the
+  target schema, or create the volume and grant access to it, as described in
+  [Permissions](#permissions).
 - **Duplicate rows after a load** - key-based deduplication needs the stream's
   key properties. Without them, `upsert` falls back to inserting every record.
   Set `load_method` to `append-only` if duplicates are expected.
@@ -233,8 +252,39 @@ rather than reloading from scratch.
   so reloading overlapping rows updates them instead of duplicating them.
 - **`overwrite`** truncates each table once at the start of a run, then loads.
   It is destructive on a populated table.
-- **Arrow `BATCH` messages** are not supported yet. Extractors that emit them
-  should be configured to emit standard Singer records for Databricks.
+- **Objects and arrays** are stored as JSON strings.
+- **Large batches are staged** in a Unity Catalog volume rather than inserted row
+  by row. See [Batch ingestion](#batch-ingestion).
+
+## Batch ingestion
+
+Databricks loads data fastest when it reads it from files, so the loader writes
+each batch as a Parquet file, uploads it to a Unity Catalog volume named
+`meltano_staging` in the target schema, and loads it with a single `INSERT` (or
+`MERGE` for `upsert`). The staged file is deleted afterwards. The volume is
+created if it does not exist; see [Permissions](#permissions) for the privileges
+needed.
+
+This applies to:
+
+- **Arrow `BATCH` messages.** Extractors that emit Arrow-encoded Singer `BATCH`
+  messages are detected automatically and need no configuration on the store.
+  Table definitions still come from the stream's `SCHEMA` message. The Arrow
+  files are consume-once and are deleted after loading unless you set
+  `clean_up_batch_files` to `false`. See
+  [Arrow BATCH Support](/meltano-cloud/arrow-support) for how to enable Arrow on
+  an extractor.
+- **Record batches of 2,000 rows or more.** Regular Singer records are staged the
+  same way once a batch is large enough. Smaller batches are inserted directly,
+  because staging has a fixed cost of a few seconds.
+
+Inserting rows directly is slow on Databricks - the cost grows with every value
+in the statement - which is why batches are staged and why `batch_size_rows`
+defaults to `100000`.
+
+If the loader cannot stage a batch, for example because the identity lacks
+`CREATE VOLUME`, it logs a warning once and falls back to inline inserts for the
+rest of the run, so the load still succeeds, only more slowly.
 
 ## Dropped table retention
 
