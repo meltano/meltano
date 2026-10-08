@@ -179,15 +179,25 @@ for the full list of settings.
 ### Step 4: Verify
 
 Run a pipeline into your Databricks store from the workspace, then confirm that
-data and state landed:
+data and state landed. Replace `<catalog>` and `<schema>` with the values you
+configured:
 
 ```sql
 -- data
-SELECT count(*) FROM main.meltano.<your_stream>;
+SELECT count(*) FROM <catalog>.<schema>.<your_stream>;
 
 -- state (written automatically by the state backend)
-SELECT * FROM main.meltano.meltano_state;
+SELECT * FROM <catalog>.<schema>.meltano_state;
 ```
+
+If you left a setting unset:
+
+- **`catalog`** - use the warehouse's default catalog. Run
+  `SELECT current_catalog();` in the SQL editor to see its name.
+- **`default_target_schema`** - data is loaded into the schema named in each
+  stream's `<schema>-<table>` name, so the table is in that schema instead. State
+  is written to the `default` schema, as described in
+  [Step 3](#step-3-state-backend-handled-automatically).
 
 A second run of the same pipeline should resume from saved state (incremental)
 rather than reloading from scratch.
