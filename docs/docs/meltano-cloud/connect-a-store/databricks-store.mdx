@@ -10,8 +10,11 @@ sidebar_position: 20
 This guide covers how to prepare Databricks for use as a store with Meltano -
 network access, authentication and permissions - and then walks through
 connecting it. Once connected, Databricks works as a **full data store**: the
-loader writes your extracted data into Delta tables, and pipeline state is saved
-alongside it.
+loader writes your extracted data into Delta tables, pipeline state is saved
+alongside it, and datasets can query it like any other supported store. If you
+make it your workspace's default store, imports load into Databricks and datasets
+read from it. See
+[Setting a Data Store as Default](/meltano-cloud/connect-a-store#setting-a-data-store-as-default).
 
 If you just want to get connected, jump to
 [Connect the Databricks store](#connect-the-databricks-store).
