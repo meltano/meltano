@@ -92,6 +92,7 @@ const sidebars = {
             { type: 'doc', id: 'meltano-cloud/connect-a-store/microsoft-sql-server-guides' },
             { type: 'doc', id: 'meltano-cloud/connect-a-store/clickhouse-store' },
             { type: 'doc', id: 'meltano-cloud/connect-a-store/motherduck-store' },
+            { type: 'doc', id: 'meltano-cloud/connect-a-store/databricks-store' },
             //{ type: 'doc', id: 'meltano-cloud/stores/bigquery' },
           ],
         },
