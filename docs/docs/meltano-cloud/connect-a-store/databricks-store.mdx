@@ -1,0 +1,246 @@
+---
+title: Databricks Store
+description: Allow Meltano to reach your SQL warehouse, set up authentication and permissions, and connect Databricks as a full data store
+layout: doc
+sidebar_position: 20
+---
+
+# Databricks Store
+
+This guide covers how to prepare Databricks for use as a store with Meltano -
+network access, authentication and permissions - and then walks through
+connecting it. Once connected, Databricks works as a **full data store**: the
+loader writes your extracted data into Delta tables, and pipeline state is saved
+alongside it.
+
+If you just want to get connected, jump to
+[Connect the Databricks store](#connect-the-databricks-store).
+
+## Supported setup
+
+- **Unity Catalog** is required. Data is loaded into Delta tables addressed as
+  `catalog.schema.table`.
+- Meltano connects through a **SQL warehouse** (serverless or pro). All-purpose
+  clusters are not supported.
+- Meltano connects over HTTPS (port `443`) to your workspace hostname.
+
+## Allow Meltano to reach your workspace
+
+If your workspace restricts inbound traffic with
+[IP access lists](https://docs.databricks.com/aws/en/security/network/front-end/ip-access-list),
+add Meltano's static egress IP addresses to the allow list. They are listed on
+[Meltano IP Addresses](/meltano-cloud/ip-addresses). Allow all of them - a
+pipeline run can originate from any one.
+
+If you don't use IP access lists, there is nothing to do here.
+
+---
+
+## Authentication
+
+Meltano supports two ways to authenticate. Create a dedicated identity for
+Meltano rather than reusing a personal one, so you can scope its permissions and
+rotate its credential independently.
+
+### Service principal (recommended)
+
+Use OAuth machine-to-machine (M2M) authentication for pipelines that run
+unattended.
+
+1. In your workspace, create a **service principal** (or use an existing one).
+1. Generate an **OAuth secret** for it, and copy the **client ID** and the
+   secret. The secret is only shown once.
+1. Grant the service principal access to the SQL warehouse and the data it
+   needs, as described in [Permissions](#permissions).
+
+### Personal access token
+
+1. In your workspace, open your user settings and go to **Developer** →
+   **Access tokens**.
+1. Click **Generate new token**, give it a comment and a lifetime, and copy the
+   token.
+
+Tokens act as the user who created them and expire, so a pipeline stops working
+when its token does. Prefer a service principal for anything long-lived.
+
+---
+
+## Permissions
+
+The identity Meltano connects as needs the following.
+
+- **`CAN USE`** on the SQL warehouse. Grant it from the warehouse's
+  **Permissions** dialog.
+- **`USE CATALOG`** on the catalog.
+- **`CREATE SCHEMA`** on the catalog, if you want Meltano to create the target
+  schema for you. Skip it if the schema already exists.
+- **`USE SCHEMA`**, **`CREATE TABLE`**, **`SELECT`** and **`MODIFY`** on the
+  target schema.
+
+For example, to prepare a `meltano` schema in the `main` catalog for a service
+principal, run the following as a catalog admin. Use the service principal's
+application ID (its client ID) as the principal:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS main.meltano;
+
+GRANT USE CATALOG ON CATALOG main TO `<client-id>`;
+GRANT USE SCHEMA, CREATE TABLE, SELECT, MODIFY ON SCHEMA main.meltano TO `<client-id>`;
+```
+
+Tables Meltano creates are owned by the identity it connects as, which is what
+allows it to add columns to them later when your source schema changes.
+
+---
+
+## Connect the Databricks store
+
+### Step 1: Find your connection details
+
+In your workspace, open **SQL Warehouses**, select the warehouse Meltano should
+use, and open the **Connection details** tab. Copy:
+
+- **Server hostname**, e.g. `dbc-1234.cloud.databricks.com`
+- **HTTP path**, e.g. `/sql/1.0/warehouses/abc123`
+
+### Step 2: Add the store
+
+1. Go to **Workspace → Stores** and click **Add**.
+1. Select **Databricks**, click **Install**, then click **Add**.
+1. Enter the connection settings below, using the credentials from
+   [Authentication](#authentication).
+1. Click **Save**.
+
+### Configuration
+
+| Option | Required | Default | Description |
+|---|---|---|---|
+| `server_hostname` | Yes | - | Workspace hostname, e.g. `dbc-1234.cloud.databricks.com`. |
+| `http_path` | Yes | - | SQL warehouse HTTP path, e.g. `/sql/1.0/warehouses/abc123`. |
+| `auth_type` | No | `pat` | `pat` for a personal access token, `oauth_m2m` for a service principal. |
+| `access_token` | When `auth_type` is `pat` | - | Personal access token. |
+| `client_id` | When `auth_type` is `oauth_m2m` | - | Service principal client ID. |
+| `client_secret` | When `auth_type` is `oauth_m2m` | - | Service principal OAuth secret. |
+| `catalog` | No | Warehouse default | Unity Catalog to load into. |
+| `default_target_schema` | No | - | Schema to load into. If unset, it is taken from `<schema>-<table>` stream names. |
+| `load_method` | No | `upsert` | `upsert` merges on the stream's key properties, `append-only` always inserts, `overwrite` truncates each table once per run and then loads. |
+| `hard_delete` | No | `false` | On `ACTIVATE_VERSION`, delete stale rows instead of marking them with `_sdc_deleted_at`. |
+| `schema_creation_parameters.retention_days` | No | Catalog default | Recovery period for tables dropped from a schema Meltano creates. See [Dropped table retention](#dropped-table-retention). |
+| `add_record_metadata` | No | `true` | Add `_sdc_*` metadata columns. Required for `ACTIVATE_VERSION` and hard delete. |
+| `batch_size_rows` | No | `10000` | Rows per load batch. |
+
+The target schema is created if it does not exist, as long as the identity has
+`CREATE SCHEMA` on the catalog.
+
+### Step 3: State backend (handled automatically)
+
+On the platform you don't configure the state backend. When you connect a
+Databricks store, Meltano derives it from the same connection details, so there
+is no separate URI or credential to manage. State is written to two Delta tables
+that Meltano creates in the store's catalog and target schema:
+
+- `meltano_state` - the pipeline state itself
+- `meltano_state_locks` - locks that stop two runs from writing the same state at
+  once
+
+If you haven't set a catalog, they are created in the warehouse's default catalog
+and its `default` schema instead.
+
+<details>
+  <summary>Running open-source Meltano yourself?</summary>
+
+Install the add-on in the same environment as Meltano:
+
+```bash
+pip install "meltano-state-backend-databricks @ git+https://github.com/meltano/meltano-state-backend-databricks.git"
+```
+
+Then point Meltano at a `databricks://` URI:
+
+```yaml
+state_backend:
+  uri: databricks://token:<access_token>@<server_hostname>/<catalog>/<schema>?http_path=<http_path>
+```
+
+Credentials with special characters must be URL-encoded. For a service
+principal, use `client_id:client_secret` as the user and password and add
+`&auth_type=oauth_m2m`. The backend creates the schema and the two tables if they
+are missing. See the
+[state backend README](https://github.com/meltano/meltano-state-backend-databricks)
+for the full list of settings.
+
+</details>
+
+### Step 4: Verify
+
+Run a pipeline into your Databricks store from the workspace, then confirm that
+data and state landed:
+
+```sql
+-- data
+SELECT count(*) FROM main.meltano.<your_stream>;
+
+-- state (written automatically by the state backend)
+SELECT * FROM main.meltano.meltano_state;
+```
+
+A second run of the same pipeline should resume from saved state (incremental)
+rather than reloading from scratch.
+
+### Troubleshooting
+
+- **Connection timeout or `403`** - confirm every one of
+  [Meltano's egress IP addresses](/meltano-cloud/ip-addresses) is on your
+  workspace's IP access list.
+- **`PERMISSION_DENIED` or `INSUFFICIENT_PERMISSIONS`** - the identity is missing
+  one of the privileges in [Permissions](#permissions). The error names the
+  object it could not access.
+- **`Catalog ... does not exist`** - check the `catalog` setting. Leave it unset to
+  use the warehouse's default catalog.
+- **The pipeline fails when the warehouse is stopped** - serverless warehouses
+  start on demand, but other warehouse types can take a few minutes to start.
+  Increase the warehouse's auto-stop time, or start it before scheduled runs.
+- **Duplicate rows after a load** - key-based deduplication needs the stream's
+  key properties. Without them, `upsert` falls back to inserting every record.
+  Set `load_method` to `append-only` if duplicates are expected.
+
+---
+
+## Loading behavior
+
+- **One table per stream**, created as a Delta table in the target schema. Table
+  and column names are lower-cased. New columns in your source are added to the
+  existing table automatically.
+- **`upsert`** uses Delta Lake's native `MERGE` on the stream's key properties,
+  so reloading overlapping rows updates them instead of duplicating them.
+- **`overwrite`** truncates each table once at the start of a run, then loads.
+  It is destructive on a populated table.
+- **Arrow `BATCH` messages** are not supported yet. Extractors that emit them
+  should be configured to emit standard Singer records for Databricks.
+
+## Dropped table retention
+
+Unity Catalog does not delete a dropped managed table right away. It is kept for
+a recovery period, 7 days by default, during which you can restore it with
+`UNDROP TABLE`. Dropped tables still count toward your catalog's table limit
+during that period.
+
+When Meltano creates the target schema, you can set the period with
+`schema_creation_parameters.retention_days`: `0` to disable recovery and remove
+dropped tables immediately, or a value from `7` to `30` days. It applies only to
+schemas Meltano creates, so it has no effect on a schema that already exists.
+
+---
+
+## Interested in Security?
+
+Following this guide mitigates the most common threats to an internet-reachable
+analytics store:
+
+- **Unauthorized network access** - closed by the IP access list.
+- **Credential compromise** - limited by a dedicated, least-privilege service
+  principal scoped to a single schema, with an OAuth secret you can rotate.
+- **Traffic interception** - Meltano connects to your workspace over HTTPS only.
+
+At Meltano, we take security seriously and are always happy to discuss ways to
+improve the security posture of your data platform.
