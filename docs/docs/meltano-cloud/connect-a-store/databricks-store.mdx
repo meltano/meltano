@@ -26,11 +26,16 @@ If you just want to get connected, jump to
 
 ## Allow Meltano to reach your workspace
 
-If your workspace restricts inbound traffic with
-[IP access lists](https://docs.databricks.com/aws/en/security/network/front-end/ip-access-list),
-add Meltano's static egress IP addresses to the allow list. They are listed on
-[Meltano IP Addresses](/meltano-cloud/ip-addresses). Allow all of them - a
-pipeline run can originate from any one.
+If your workspace restricts inbound traffic with IP access lists, add Meltano's
+static egress IP addresses to the allow list. See the Databricks documentation
+for your cloud:
+[AWS](https://docs.databricks.com/aws/en/security/network/front-end/ip-access-list),
+[Azure](https://learn.microsoft.com/en-us/azure/databricks/security/network/front-end/ip-access-list)
+or
+[GCP](https://docs.databricks.com/gcp/en/security/network/front-end/ip-access-list).
+
+Meltano's addresses are listed on [Meltano IP Addresses](/meltano-cloud/ip-addresses).
+Allow all of them - a pipeline run can originate from any one.
 
 If you don't use IP access lists, there is nothing to do here.
 
