@@ -1666,6 +1666,7 @@ dependencies = [
     { name = "backports-strenum", marker = "python_full_version < '3.11'" },
     { name = "click" },
     { name = "click-default-group" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "dateparser" },
     { name = "fasteners" },
     { name = "importlib-metadata", marker = "python_full_version < '3.12'" },
@@ -1728,7 +1729,6 @@ coverage = [
 dev = [
     { name = "backports-strenum" },
     { name = "boto3-stubs", extra = ["essential"] },
-    { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
     { name = "faker" },
     { name = "importlib-metadata" },
@@ -1755,7 +1755,6 @@ pre-commit = [
     { name = "prek" },
 ]
 testing = [
-    { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
     { name = "faker" },
     { name = "moto" },
@@ -1774,7 +1773,6 @@ testing = [
 typing = [
     { name = "backports-strenum" },
     { name = "boto3-stubs", extra = ["essential"] },
-    { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
     { name = "faker" },
     { name = "importlib-metadata" },
@@ -1811,6 +1809,7 @@ requires-dist = [
     { name = "boto3", marker = "extra == 's3'", specifier = ">=1.35,<2" },
     { name = "click", specifier = ">=8.3,<8.6" },
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
+    { name = "colorama", marker = "sys_platform == 'win32'", specifier = ">=0.4.4,<0.5" },
     { name = "dateparser", specifier = ">=1.2.1" },
     { name = "fasteners", specifier = ">=0.19,<0.21" },
     { name = "google-cloud-storage", marker = "extra == 'gcs'", specifier = ">=3" },
@@ -1847,7 +1846,6 @@ coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.10" }]
 dev = [
     { name = "backports-strenum" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35" },
-    { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "faker", specifier = ">=37.4.2" },
     { name = "importlib-metadata" },
@@ -1872,7 +1870,6 @@ dev = [
 ]
 pre-commit = [{ name = "prek", specifier = "~=0.3" }]
 testing = [
-    { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "faker", specifier = ">=37.4.2" },
     { name = "moto", specifier = ">=5.1.0,!=5.2.0" },
@@ -1891,7 +1888,6 @@ testing = [
 typing = [
     { name = "backports-strenum" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35" },
-    { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
     { name = "faker", specifier = ">=37.4.2" },
     { name = "importlib-metadata" },
