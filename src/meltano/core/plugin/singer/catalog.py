@@ -490,6 +490,11 @@ class MetadataExecutor(CatalogExecutor):
     available for nested properties).
     """
 
+    __slots__ = (
+        "_rules",
+        "_stream",
+    )
+
     def __init__(self, rules: list[MetadataRule]):
         """Initialize the MetadataExecutor with a list of metadata rules."""
         self._stream: Node | None = None
@@ -616,6 +621,11 @@ class SchemaExecutor(CatalogExecutor):
     wildcard matching in breadcrumb patterns for bulk schema operations.
     """
 
+    __slots__ = (
+        "_rules",
+        "_stream",
+    )
+
     def __init__(self, rules: list[SchemaRule]):
         """Initialize the SchemaExecutor with a list of schema rules.
 
@@ -691,6 +701,8 @@ class ListExecutor(CatalogExecutor):
     Useful for discovery operations and catalog introspection tasks.
     """
 
+    __slots__ = ("properties",)
+
     def __init__(self) -> None:
         """Initialize the ListExecutor."""
         # properties per stream
@@ -741,6 +753,11 @@ class ListSelectedExecutor(CatalogExecutor):
     allowing consumers to query the current selection state and filter
     catalogs based on selection criteria.
     """
+
+    __slots__ = (
+        "properties",
+        "streams",
+    )
 
     def __init__(self) -> None:
         """Initialize the ListSelectedExecutor."""
