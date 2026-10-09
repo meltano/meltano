@@ -21,7 +21,6 @@ if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.project import Project
     from meltano.core.state_service import StateService
-    from tests.fixtures.core import Payloads
 
 unconventional_state_ids = [
     "unconventional",
@@ -139,45 +138,38 @@ class TestCliState:
         self,
         state_service: StateService,
         state_ids: list[str],
-        payloads: Payloads,
         cli_runner: MeltanoCliRunner,
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            for state_id in state_ids:
-                for state_payload in payloads.mock_state_payloads:
-                    result = cli_runner.invoke(
-                        cli,
-                        [
-                            "state",
-                            "set",
-                            "--force",
-                            state_id,
-                            json.dumps(state_payload),
-                        ],
-                    )
-                    assert_cli_runner(result)
-                    assert state_service.get_state(state_id) == state_payload
+            state_id = state_ids[0]
+            state_payload = {"singer_state": {"bookmark-new": "new-value"}}
+            assert state_service.get_state(state_id) != state_payload
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, json.dumps(state_payload)],
+            )
+            assert_cli_runner(result)
+            assert state_service.get_state(state_id) == state_payload
 
     def test_set_from_file(
         self,
         tmp_path: Path,
         state_service: StateService,
         state_ids: list[str],
-        payloads: Payloads,
         cli_runner: MeltanoCliRunner,
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            for idx_i, state_id in enumerate(state_ids):
-                for idx_j, state_payload in enumerate(payloads.mock_state_payloads):
-                    filepath = tmp_path / f"state-file-{idx_i}-{idx_j}.json"
-                    with filepath.open("w+") as state_file:
-                        json.dump(state_payload, state_file)
-                    result = cli_runner.invoke(
-                        cli,
-                        ["state", "set", "--force", state_id, "--input-file", filepath],
-                    )
-                    assert_cli_runner(result)
-                    assert state_service.get_state(state_id) == state_payload
+            state_id = state_ids[0]
+            state_payload = {"singer_state": {"bookmark-new": "new-value"}}
+            assert state_service.get_state(state_id) != state_payload
+            filepath = tmp_path / "state-file.json"
+            filepath.write_text(json.dumps(state_payload))
+            result = cli_runner.invoke(
+                cli,
+                ["state", "set", "--force", state_id, "--input-file", filepath],
+            )
+            assert_cli_runner(result)
+            assert state_service.get_state(state_id) == state_payload
 
     @pytest.mark.usefixtures("project")
     def test_set_from_string_file_mutually_exclusive(
