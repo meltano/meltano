@@ -1693,7 +1693,7 @@ def discovery():
                 "namespace": "dbt",
                 "docs": "https://docs.meltano.com/guide/transformation",
                 "repo": "https://github.com/dbt-labs/dbt-core",
-                "pip_url": "dbt-core~=1.9.0 dbt-postgres~=1.9.0 dbt-duckdb~=1.9.0 dbt-redshift~=1.9.0 dbt-snowflake~=1.9.0 dbt-bigquery~=1.9.0",  # noqa: E501
+                "pip_url": "dbt-core~=1.12.0 dbt-postgres~=1.12.0 dbt-duckdb~=1.12.0 dbt-redshift~=1.12.0 dbt-snowflake~=1.12.0 dbt-bigquery~=1.12.0",  # noqa: E501
                 "variant": "dbt-labs",
                 "requires": {"files": [{"name": "dbt", "variant": "meltano"}]},
                 "settings": [
