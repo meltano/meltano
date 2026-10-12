@@ -209,8 +209,8 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
       uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
-  typing:
-    name: "Static type checking"
+  static:
+    name: "Static Analysis"
     runs-on: ubuntu-latest
     needs: files-changed
     if: ${{ needs.files-changed.outputs.runtime == 'true' }}
@@ -229,7 +229,7 @@ jobs:
     - name: Setup uv
       uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
-        cache-suffix: typing
+        cache-suffix: static
 
     - name: Install Nox
       env:
@@ -237,9 +237,11 @@ jobs:
       run: |
         uv tool install nox
 
-    - name: Run typing
+    - name: Run
+      env:
+        SKIP: no-commit-to-branch
       run: |
-        nox -rs typing
+        nox -t lint
 
   ci:
     name: CI required checks (unit tests)
@@ -248,7 +250,7 @@ jobs:
     - files-changed
     - tests
     - coverage
-    - typing
+    - static
     runs-on: ubuntu-latest
     permissions: {}
     steps:
@@ -256,4 +258,4 @@ jobs:
       uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
       with:
         jobs: ${{ toJSON(needs) }}
-        allowed-skips: tests,coverage,typing
+        allowed-skips: tests,coverage,static

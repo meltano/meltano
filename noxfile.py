@@ -222,5 +222,15 @@ def typing(session: nox.Session) -> None:
     session.run("mypy", *session.posargs)
 
 
+@nox.session(name="deps", tags=["lint"])
+def dependencies(session: nox.Session) -> None:
+    """Check issues with dependencies."""
+    extras = ["azure", "gcs", "s3", "containers"]
+
+    session.install("deptry")
+    _uv_sync(session, "--inexact", *(f"--extra={extra}" for extra in extras))
+    session.run("deptry", "src/", *session.posargs)
+
+
 if __name__ == "__main__":
     nox.main()

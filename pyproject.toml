@@ -470,3 +470,23 @@ override-dependencies = [
 ]
 prerelease = "if-necessary"
 required-version = ">=0.9.17"
+
+[tool.deptry]
+known_first_party = ["meltano"]
+
+[tool.deptry.package_module_name_map]
+backports-strenum = "backports"
+# psycopg2-binary = "psycopg2"
+
+[tool.deptry.per_rule_ignores]
+DEP002 = [
+  # OS-specific
+  "colorama",
+  # System Database Backends
+  "psycopg",
+  "psycopg2-binary",
+  "pymssql",
+  # Misc.
+  "pip",
+  "virtualenv",
+]
