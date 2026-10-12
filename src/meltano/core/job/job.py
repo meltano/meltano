@@ -85,7 +85,7 @@ class State(Enum):
         return self.name
 
 
-class StateComparator(Comparator[State]):
+class StateComparator(Comparator[str | None]):
     """Compare Job._state to State enums."""
 
     def __eq__(self, other: State) -> t.Any:  # type: ignore[override] # noqa: ANN401
@@ -181,8 +181,9 @@ class Job(SystemModel):
         """
         self._state = str(value)
 
-    @state.comparator  # type: ignore[no-redef]
-    def state(cls) -> StateComparator:  # noqa: N805
+    @state.inplace.comparator  # type: ignore[no-redef]
+    @classmethod
+    def state(cls) -> StateComparator:
         """Use this comparison to compare Job.state to State.
 
         See:

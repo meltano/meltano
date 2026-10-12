@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
 
 
 class TestJob:
-    def sample_job(self, payload=None):
+    def sample_job(self, payload=None) -> Job:
         return Job(
             job_name="meltano:sample-elt",
             state=State.IDLE,
