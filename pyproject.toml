@@ -50,7 +50,8 @@ dependencies = [
   "ruamel.yaml>=0.18.6,<0.20",
   "smart-open>=7.0.5,<9",
   "snowplow-tracker>=1.0.4,<2",
-  "sqlalchemy>=2.0.35,<2.1",
+  "sqlalchemy>=2.0.54,<2.1 ; python_version < '3.11'",
+  "sqlalchemy>=2.0.54,<2.2 ; python_version >= '3.11'",
   "structlog>=25.5.0,<27",
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
@@ -149,7 +150,7 @@ typing = [
   "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
-  "mypy>=2.1,<2.4",
+  "mypy~=2.4.0",
   "ty==0.0.84",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
@@ -465,12 +466,8 @@ ignore = [
 ]
 
 [tool.uv]
-override-dependencies = [
-  "sqlalchemy>=2.0.35,<2.1 ; python_version < '3.11'",
-  "sqlalchemy>=2.1.0rc1,<2.2 ; python_version >= '3.11'",
-]
 prerelease = "if-necessary"
-required-version = ">=0.9.17"
+required-version = ">=0.12"
 
 [tool.deptry]
 known_first_party = ["meltano"]
