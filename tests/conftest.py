@@ -76,11 +76,10 @@ def pytest_configure(config: pytest.Config):
     if sys.version_info < (3, 11):
         config.addinivalue_line(
             "filterwarnings",
-            r"once:You are using a Python version \(3\.10\.\d+\) past its end of life. "
-            "Google will update google.api_core with critical bug fixes on a "
-            "best-effort basis, but not with any other fixes or features. Please "
-            "upgrade to the latest Python version, or at least Python 3.11, and then "
-            "update google.api_core.:FutureWarning",
+            r"once:You are using a non-supported Python version \(3\.10\.\d+\). Google "
+            "will not post any further updates to google.api_core supporting this "
+            "Python version. Please upgrade to the latest Python version, or at least "
+            "Python 3.11, and then update google.api_core.:FutureWarning",
         )
     elif sys.version_info < (3, 12):
         config.addinivalue_line(
