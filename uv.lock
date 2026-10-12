@@ -8,12 +8,6 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
-[manifest]
-overrides = [
-    { name = "sqlalchemy", marker = "python_full_version < '3.11'", specifier = ">=2.0.35,<2.1" },
-    { name = "sqlalchemy", marker = "python_full_version >= '3.11'", specifier = ">=2.1.0rc1,<2.2" },
-]
-
 [[package]]
 name = "aiodocker"
 version = "0.27.0"
@@ -1963,7 +1957,8 @@ requires-dist = [
     { name = "ruamel-yaml", specifier = ">=0.18.6,<0.20" },
     { name = "smart-open", specifier = ">=7.0.5,<9" },
     { name = "snowplow-tracker", specifier = ">=1.0.4,<2" },
-    { name = "sqlalchemy", specifier = ">=2.0.35,<2.1" },
+    { name = "sqlalchemy", marker = "python_full_version < '3.11'", specifier = ">=2.0.54,<2.1" },
+    { name = "sqlalchemy", marker = "python_full_version >= '3.11'", specifier = ">=2.0.54,<2.2" },
     { name = "structlog", specifier = ">=25.5.0,<27" },
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
     { name = "tzlocal", specifier = "~=5.3" },
