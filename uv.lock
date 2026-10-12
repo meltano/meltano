@@ -1830,6 +1830,7 @@ psycopg2 = [
 ]
 s3 = [
     { name = "boto3" },
+    { name = "botocore" },
 ]
 
 [package.dev-dependencies]
@@ -1920,6 +1921,7 @@ requires-dist = [
     { name = "azure-storage-blob", marker = "extra == 'azure'", specifier = ">=12.24.0,<13" },
     { name = "backports-strenum", marker = "python_full_version < '3.11'", specifier = ">=1.3.1,<2" },
     { name = "boto3", marker = "extra == 's3'", specifier = ">=1.35,<2" },
+    { name = "botocore", marker = "extra == 's3'", specifier = ">=1.35,<2" },
     { name = "click", specifier = ">=8.3,<8.6" },
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
     { name = "colorama", marker = "sys_platform == 'win32'", specifier = ">=0.4.4,<0.5" },
