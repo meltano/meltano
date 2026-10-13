@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import typing as t
 from unittest import mock
 
@@ -236,6 +237,40 @@ class TestProjectAddService:
         assert isinstance(plugin_dict, dict)
         assert plugin_dict.items() >= updated_attrs.items()
         assert updated.config_with_extras
+
+    @pytest.mark.parametrize("in_project", (True, False))
+    def test_add_update_refreshes_lockfile(
+        self,
+        *,
+        in_project: bool,
+        target: ProjectPlugin,
+        subject: ProjectAddService,
+        project: Project,
+        hub_request_counter: Counter,
+    ) -> None:
+        if not in_project:
+            project.plugins.remove_from_file(target)
+
+        lockfile_path = project.dirs.plugin_lock_path(
+            target.type,
+            target.name,
+            variant_name=target.variant,
+        )
+        locked = json.loads(lockfile_path.read_text())
+        pip_url = locked["pip_url"]
+        locked["pip_url"] = "target-mock==0.0.1"
+        lockfile_path.write_text(json.dumps(locked))
+
+        updated = subject.add(
+            target.type,
+            target.name,
+            variant=target.variant,
+            update=True,
+        )
+
+        assert hub_request_counter["/loaders/target-mock--original"] == 1
+        assert updated.pip_url == pip_url
+        assert json.loads(lockfile_path.read_text())["pip_url"] == pip_url
 
     @mock.patch("meltano.core.plugin_lock_service.PluginLockService.save")
     def test_add_update_custom(

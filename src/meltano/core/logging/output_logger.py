@@ -302,19 +302,17 @@ class Out:
             )
         ):
             # Use the parsed record's level and extra fields
-            extra = {"name": self.name, **parsed_record.extra}
-
-            # If we have a logger name from the parsed record, include it
-            if parsed_record.logger_name:
-                extra["plugin_logger"] = parsed_record.logger_name
+            extra = {
+                **parsed_record.extra,
+                "name": self.name,
+                "plugin_logger": parsed_record.logger_name,
+                "stream_name": parsed_record.stream_name,
+                "plugin_exception": parsed_record.exception,
+            }
+            extra = {k: v for k, v in extra.items() if v is not None}
 
             # Log with the parsed level and structured data
-            self.logger.log(
-                parsed_record.level,
-                parsed_record.message,
-                plugin_exception=parsed_record.exception,
-                **extra,
-            )
+            self.logger.log(parsed_record.level, parsed_record.message, **extra)
             return
 
         # Fallback to original behavior for unparsable lines

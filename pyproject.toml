@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "4.2.2"
+version = "4.4.1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.10"
@@ -17,6 +17,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Operating System :: OS Independent",
 ]
 keywords = [
@@ -30,8 +31,9 @@ dependencies = [
   "alembic>=1.14.0,<2",
   "anyio>=4.4.0,<5",
   "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
-  "click>=8.2,<8.5,!=8.2.2",
+  "click>=8.3,<8.6",
   "click-default-group>=1.2.4,<2",
+  "colorama>=0.4.4,<0.5; platform_system == 'Windows'",
   "dateparser>=1.2.1",
   "fasteners>=0.19,<0.21",
   "importlib-metadata>=5 ; python_version < '3.12'",
@@ -48,7 +50,8 @@ dependencies = [
   "ruamel.yaml>=0.18.6,<0.20",
   "smart-open>=7.0.5,<9",
   "snowplow-tracker>=1.0.4,<2",
-  "sqlalchemy>=2.0.35,<2.1",
+  "sqlalchemy>=2.0.54,<2.1 ; python_version < '3.11'",
+  "sqlalchemy>=2.0.54,<2.2 ; python_version >= '3.11'",
   "structlog>=25.5.0,<27",
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
@@ -71,14 +74,18 @@ gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
-s3 = ["boto3>=1.35,<2"]
+s3 = [
+  "botocore>=1.35,<2",
+  "boto3>=1.35,<2",
+]
 
 [project.urls]
-Homepage = "https://meltano.com"
-Repository = "https://github.com/meltano/meltano"
-Documentation = "https://docs.meltano.com"
 Changelog = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
+Documentation = "https://docs.meltano.com"
+Homepage = "https://meltano.com"
 "Issue Tracker" = "https://github.com/meltano/meltano/issues"
+Repository = "https://github.com/meltano/meltano"
+Security = "https://github.com/meltano/.github/blob/main/SECURITY.md"
 Slack = "https://meltano.com/slack"
 Twitter = "https://twitter.com/meltanodata/"
 Youtube = "https://www.youtube.com/meltano"
@@ -124,7 +131,6 @@ pre-commit = [
 ]
 testing = [
   { include-group = "coverage" },
-  "colorama>=0.4.4,<0.5",
   "faker>=37.4.2",
   "moto>=5.1.0,!=5.2.0",
   "pytest>=9",
@@ -132,12 +138,11 @@ testing = [
   "pytest-codspeed>=4.2.0",
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
-  "pytest-randomly>=3.16,<5.0",
+  "pytest-randomly>=5,<5.1",
   "pytest-structlog~=1.1",
   "pytest-timeout>=2.4.0",
   "pytest-xdist~=3.6",
   "requests-mock>=1.12.1,<2",
-  "setproctitle~=1.3", # Used by pytest-xdist to aid with handling resource intensive processes.
   "time-machine>=3",
 ]
 typing = [
@@ -145,8 +150,8 @@ typing = [
   "backports-strenum",  # TODO: Drop once the runtime dependency is dropped
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
-  "mypy>=2.1,<2.4",
-  "ty==0.0.73",
+  "mypy~=2.4.0",
+  "ty==0.0.84",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -178,6 +183,7 @@ filterwarnings = [
   '''once:The 'version' field in meltano.yml is deprecated.*:DeprecationWarning''',
   'once::meltano.core._compat.MeltanoInternalDeprecationWarning',
   # Third-party warnings
+  'once::ResourceWarning',
 ]
 log_level = "INFO"
 markers = [
@@ -241,8 +247,9 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "4.2.2"
+version = "4.4.1"
 prerelease_offset = 1
+bump_message = "chore: Bump version $current_version → $new_version"
 tag_format = "v$major.$minor.$patch$prerelease"
 version_files = [
   "pyproject.toml:^version =",
@@ -331,7 +338,7 @@ exclude = [
 ]
 
 [build-system]
-requires = ["hatchling==1.32.0"]
+requires = ["hatchling==1.32.4"]
 build-backend = "hatchling.build"
 
 [tool.ruff]
@@ -410,6 +417,8 @@ unfixable = [
   "ANN",
   "D1",
   "assert",    # Allow 'assert' in tests
+  "hardcoded-password-func-arg",  # Allow dummy credentials in test fixtures
+  "hardcoded-password-string",    # Allow dummy credentials in test fixtures
   "INP",     # Don't require __init__.py files in tests directories
   "root-logger-call",  # Allow `logging.<level>` in tests
   "fallible-context-manager",
@@ -457,8 +466,25 @@ ignore = [
 ]
 
 [tool.uv]
-override-dependencies = [
-  "sqlalchemy>=2.1.0.dev0,<2.2",
-]
 prerelease = "if-necessary"
-required-version = ">=0.9.17"
+required-version = ">=0.12"
+
+[tool.deptry]
+known_first_party = ["meltano"]
+
+[tool.deptry.package_module_name_map]
+backports-strenum = "backports"
+# psycopg2-binary = "psycopg2"
+
+[tool.deptry.per_rule_ignores]
+DEP002 = [
+  # OS-specific
+  "colorama",
+  # System Database Backends
+  "psycopg",
+  "psycopg2-binary",
+  "pymssql",
+  # Misc.
+  "pip",
+  "virtualenv",
+]

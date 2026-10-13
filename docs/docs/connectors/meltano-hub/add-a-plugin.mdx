@@ -1,0 +1,86 @@
+---
+title: Listing on the Hub
+description: How to get a Singer tap or target listed on Meltano Hub, either by requesting it or by contributing the plugin definition yourself.
+---
+
+# Listing on the Hub
+
+Listing a connector on [Meltano Hub](https://hub.meltano.com) is what makes it installable by name. Once a plugin definition exists on the Hub, anyone can run `meltano add tap-yourthing` and get a working plugin with its settings and capabilities already described, instead of writing that metadata themselves.
+
+Getting listed is free, and you don't have to be the author of the connector to request it.
+
+:::tip
+**Listing is optional.** A connector that isn't on the Hub is still perfectly usable - add it with [`--from-ref`, `--custom`, or a definition in `meltano.yml`](/connectors/meltano-hub#installing-plugins-without-meltano-hub). Listing it on the Hub is about discoverability for other people, not about whether it works for you.
+:::
+
+## Option 1 - Request it
+
+The quickest route, and the right one if you'd rather not work with the Hub repository directly.
+
+Open a [new plugin request](https://github.com/meltano/hub/issues/new?assignees=&labels=&projects=&template=new_plugin.yml&title=Add+Plugin%3A+%3Cinsert+plugin+name%3E) on the [`meltano/hub`](https://github.com/meltano/hub) repository. The issue template asks for the details needed to build the definition - chiefly the repository URL of the tap or target.
+
+A member of the Meltano team, or a community contributor, will pick it up and add it for you.
+
+## Option 2 - Contribute it yourself
+
+Plugin definitions live in the [`meltano/hub`](https://github.com/meltano/hub) repository as YAML files under `_data/meltano/<plugin_type>/<plugin_name>/<variant>.yml` - for example `_data/meltano/extractors/tap-slack/meltanolabs.yml`. Adding a plugin means adding one of those files and opening a pull request.
+
+The repository ships a `hub-utils` CLI that generates the file for you, prompting for anything it can't work out on its own. For a connector built with the [Meltano Singer SDK](https://sdk.meltano.com/), it installs the package into a temporary environment, runs `--about`, and populates the settings, capabilities and keywords from the output, so there's usually very little left to fill in by hand.
+
+### Walkthrough
+
+```bash
+# 1. Clone the Hub repository and branch
+git clone https://github.com/meltano/hub.git
+cd hub
+git checkout -b add-tap-slack
+
+# 2. Add the plugin, answering the prompts
+uv run hub-utils add
+```
+
+`hub-utils add` prompts for the plugin name, type, `pip_url`, `namespace` and `executable`, defaulting each from the repository URL you give it, then writes the definition and prints its path:
+
+```
+_data/meltano/extractors/tap-slack/meltanolabs.yml
+Adds extractors tap-slack (meltanolabs)
+```
+
+Review that file, then tidy up the formatting and open a pull request:
+
+```bash
+# 3. Fix any YAML lint violations
+uv run hub-utils yamllint fix _data/meltano/extractors/tap-slack/meltanolabs.yml
+
+# 4. Commit and open a PR against meltano/hub
+git add _data/meltano/extractors/tap-slack/meltanolabs.yml
+git commit -m "Add tap-slack (meltanolabs)"
+git push --set-upstream origin add-tap-slack
+```
+
+To update a definition that already exists rather than add a new one, use `uv run hub-utils update-definition` instead.
+
+See [CONTRIBUTING.md](https://github.com/meltano/hub/blob/main/CONTRIBUTING.md) in the Hub repository for the complete reference, including command options, how non-SDK connectors are handled, and how to preview the Hub site locally before opening the PR.
+
+## Adding a variant of an existing plugin
+
+A [variant](/concepts/plugins#variants) is an independent implementation of the same connector. If a plugin with your connector's name already exists on the Hub, your submission becomes a new variant of it rather than a new plugin, and the process is the same - `hub-utils add` will prompt for the variant name, which is conventionally the GitHub owner of the repository.
+
+Before adding one, it's worth reading [Avoid creating a new variant when possible](/connectors/meltano-hub/maintaining-plugins#avoid-creating-a-new-variant-when-possible). Contributing your change back to the existing variant is usually better for everyone, yourself included.
+
+## Making a submission that will be useful
+
+The Hub renders whatever your definition declares, so the quality of the listing follows from the quality of the connector's own metadata:
+
+- **Document every setting.** Descriptions and labels are what appear on the Hub's plugin page, and configuration is the single most common thing people get stuck on.
+- **Mark sensitive settings** with `sensitive: true` so they're handled as credentials.
+- **Declare accurate capabilities**, such as `state` for incremental replication and `catalog` for stream selection.
+- **Keep `--about` output current** if the connector is SDK-based, since that's where the definition is derived from.
+
+The [plugin definition syntax reference](/reference/plugin-definition-syntax) documents every property a definition can set.
+
+## Next steps
+
+- [Maintaining Taps & Targets](/connectors/meltano-hub/maintaining-plugins) - best practices, evaluating connectors, and taking over an unmaintained one
+- [Install plugins with Meltano Hub](/connectors/meltano-hub) - using the Hub, and the alternatives to it
+- [Create a custom extractor](/tutorials/custom-extractor) - build a tap before you list it

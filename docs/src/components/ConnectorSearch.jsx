@@ -20,6 +20,18 @@ const CONNECTORS = [
   { label: 'Nextdoor', href: '/connectors/tap-nextdoor', category: 'extractor' },
   { label: 'PostgreSQL', href: '/connectors/tap-postgres', category: 'extractor' },
   { label: 'Snowflake', href: '/connectors/tap-snowflake', category: 'extractor' },
+  { label: 'SurveyMonkey (Private App)', href: '/connectors/tap-surveymonkey-privateapp', category: 'extractor' },
+  { label: 'Google Search Console', href: '/connectors/tap-google-search-console', category: 'extractor' },
+  { label: 'Dianomi', href: '/connectors/tap-dianomi', category: 'extractor' },
+  { label: 'Bing Ads', href: '/connectors/tap-bing-ads', category: 'extractor' },
+  { label: 'Amazon Athena', href: '/connectors/target-athena', category: 'loader' },
+  { label: 'Pinterest', href: '/connectors/tap-pinterest', category: 'extractor' },
+  { label: 'HubSpot', href: '/connectors/tap-hubspot', category: 'extractor' },
+  { label: 'Jira', href: '/connectors/tap-jira', category: 'extractor' },
+  { label: 'Chromadb', href: '/connectors/target-chromadb', category: 'loader' },
+  { label: 'Solarvista Live', href: '/connectors/tap-solarvista', category: 'extractor' },
+  { label: 'GitLab', href: '/connectors/tap-gitlab', category: 'extractor' },
+  { label: 'CloudWatch', href: '/connectors/tap-cloudwatch', category: 'extractor' },
 ];
 
 function ConnectorCardTitle({ label }) {

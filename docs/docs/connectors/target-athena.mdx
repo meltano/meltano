@@ -1,0 +1,96 @@
+---
+title: Amazon Athena
+description: Load your Meltano pipeline data into Amazon S3 so you can analyse it with standard SQL in Amazon Athena.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Amazon Athena
+
+<ConnectorTypeBadge type="loader" block />
+
+Amazon Athena is a serverless interactive query service that lets you analyse data stored in Amazon S3 using standard SQL, with no infrastructure or servers to manage: you point Athena at your data in S3 and run SQL queries to extract insights. It is designed to handle large datasets, scales automatically as data volumes grow, and integrates with other AWS services such as Amazon QuickSight for data visualisation. This connector stores data from any of your Meltano data sources in an S3 bucket for use with Athena.
+
+> **Note:** Amazon Athena is a loader, not a data source: it doesn't have its own streams, sync type or custom queries to sync from. The facts below reflect that.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Type** | Loader (target) |
+| **Authentication** | AWS access keys (with optional session token), or an AWS profile |
+| **Loads via** | Objects stored in an S3 bucket, in a configurable object format |
+| **Target database** | The Amazon Athena database you name in **Athena Database** |
+
+## What it loads
+
+Whatever streams your connected data sources send it, stored in the configured S3 bucket for querying in the configured Athena database.
+
+## Prerequisites
+
+- **An AWS S3 bucket** used for storing data.
+- **An Amazon Athena database** to connect to.
+- **AWS region**: the region where the Amazon Athena API is located.
+- **AWS credentials** for the S3 bucket. Either:
+  - an **access key ID** and **secret access key**, plus a **session token** if applicable, or
+  - an **AWS profile** name to use for authentication.
+
+## Setup
+
+### In AWS
+
+1. Create or choose the S3 bucket to store data in.
+2. Choose the Athena database to load into, and note the AWS region where the Athena API is located.
+3. Obtain an access key ID and secret access key (and session token, if applicable), or set up an AWS profile.
+
+### In Meltano Cloud
+
+1. Add a new Amazon Athena loader.
+2. Enter the required connection details:
+   - **Bucket**: the S3 bucket used for storing data
+   - **Athena Database**: the Athena database to connect to
+   - **AWS Region**: the region where the Amazon Athena API is located
+3. Enter your **AWS S3 Access Key ID** and **AWS S3 Secret Access Key** (and **AWS S3 Session Token**, if applicable), or an **AWS profile name**.
+4. Optionally set an **S3 Staging Directory**, and configure the object format, compression, key prefix and encryption settings (see [Advanced configuration](#advanced-configuration)).
+
+## Available streams
+
+This target doesn't discover streams itself: it loads whatever streams the connected extractor(s) send it.
+
+## Advanced configuration
+
+- **Object format**: Object Format sets the format of the objects stored in the S3 bucket. For delimited data, **Delimiter** and **Quote Character** set the field delimiter and quote character.
+- **Compression**: Compression sets the compression format used for data stored in the S3 bucket.
+- **Key prefix and naming**: S3 Key Prefix sets the prefix for S3 keys when storing data, and Naming Convention sets the naming convention used for temporary files created during query execution.
+- **Encryption**: Encryption Type and Encryption Key set the type of encryption and the encryption key used for data stored in the S3 bucket.
+- **Flattening**: Flatten Records controls whether nested records are flattened.
+- **Metadata**: Add Record Metadata controls whether metadata is added to the records.
+- **Temporary files**: S3 Staging Directory sets the S3 directory for temporary files when querying data, and Temp Directory the local directory for temporary files during query execution.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `s3_bucket` | — | required | The name of the AWS S3 bucket used for storing data |
+| `athena_database` | — | required | The name of the database in Amazon Athena to connect to |
+| `aws_region` | — | required | The AWS region where the Amazon Athena API is located |
+| `aws_access_key_id` | — (sensitive) | — | The access key ID for the AWS S3 bucket used for storing data |
+| `aws_secret_access_key` | — (sensitive) | — | The secret access key for the AWS S3 bucket used for storing data |
+| `aws_session_token` | — (sensitive) | — | The session token for the AWS S3 bucket used for storing data |
+| `aws_profile` | — | — | The name of the AWS profile to use for authentication |
+| `s3_key_prefix` | — | — | The prefix to use for S3 keys when storing data |
+| `s3_staging_dir` | — | — | The S3 directory to use for temporary files when querying data |
+| `delimiter` | — | — | The delimiter used in the data being queried |
+| `quotechar` | — | — | The character used to quote fields in the data being queried |
+| `add_record_metadata` | boolean | — | Whether or not to add metadata to the records returned by the query |
+| `encryption_type` | — | — | The type of encryption used for data stored in the S3 bucket |
+| `encryption_key` | — | — | The encryption key used for data stored in the S3 bucket |
+| `compression` | — | — | The compression format used for data stored in the S3 bucket |
+| `naming_convention` | — | — | The naming convention used for temporary files created during query execution |
+| `temp_dir` | — | — | The local directory to use for temporary files during query execution |
+| `object_format` | — | — | The format of the objects stored in the S3 bucket |
+| `flatten_records` | boolean | — | Whether or not to flatten nested records in the data being queried |
+
+## Need help?
+
+If you run into an issue not covered here, file it through the [usual Meltano support channel](https://meltano.com/contact) with your connection settings (excluding credentials) and the error you're seeing.

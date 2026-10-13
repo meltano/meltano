@@ -40,9 +40,9 @@ const config = {
       /** @type {import('@docusaurus/plugin-content-blog').PluginOptions} */
       ({
         id: 'cloudChangelog',
-        routeBasePath: 'changelog/cloud',
+        routeBasePath: 'releases/cloud',
         path: './cloud-changelog',
-        blogTitle: 'Changelog',
+        blogTitle: 'Releases',
         blogSidebarTitle: 'All Releases',
         blogDescription: '',
         postsPerPage: 20,
@@ -65,8 +65,8 @@ const config = {
           editUrl: 'https://github.com/meltano/meltano/blob/main/docs',
         },
         blog: {
-          routeBasePath: '/changelog',
-          blogTitle: 'Changelog',
+          routeBasePath: '/releases',
+          blogTitle: 'Releases',
           blogSidebarTitle: 'All Releases',
           blogDescription: '',
           postsPerPage: 20,
@@ -130,12 +130,12 @@ const config = {
             activeBasePath: '/connectors',
           },
           {
-            to: '/changelog/cloud',
-            label: 'Changelog',
+            to: '/releases/cloud',
+            label: 'Releases',
             position: 'left',
             className: 'header-changelog-link',
-            'aria-label': 'Changelog',
-            activeBasePath: '/changelog',
+            'aria-label': 'Releases',
+            activeBasePath: '/releases',
           },
           {
             href: 'https://github.com/meltano/meltano',

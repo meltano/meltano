@@ -176,6 +176,32 @@ class TestELBContextBuilder:
 
 
 class TestExtractLoadBlocks:
+    @pytest.mark.asyncio
+    async def test_job_heartbeat_interval(
+        self,
+        project,
+        session,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setenv("MELTANO_JOB_HEARTBEAT_INTERVAL", "30")
+        project.refresh(environment=Environment(name="test"))
+        job = Job(job_name="configured-heartbeat")
+        context = ELBContext(
+            project=project,
+            session=session,
+            job=job,
+            update_state=False,
+        )
+        blocks = ExtractLoadBlocks(context, ())
+
+        with (
+            mock.patch.object(job, "run", wraps=job.run) as run_job,
+            mock.patch.object(blocks, "execute", new_callable=AsyncMock),
+        ):
+            await blocks.run_with_job()
+
+        run_job.assert_called_once_with(session, heartbeat_interval=30)
+
     @pytest.fixture
     def log_level_debug(self):
         # Set the intermediate logger rather than root: pytest's catching_logs

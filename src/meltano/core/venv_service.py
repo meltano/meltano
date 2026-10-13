@@ -76,9 +76,6 @@ def find_uv() -> str:
 
     Returns:
         A string representing the path to the `uv` executable.
-
-    Raises:
-        MeltanoError: The `uv` executable could not be found.
     """
     from uv import find_uv_bin
 
@@ -100,9 +97,6 @@ class VirtualEnv:
             root: The root directory of the virtual environment.
             python: The path to the Python executable to use, or name to find on the
                 $PATH. Defaults to the Python executable running Meltano.
-
-        Raises:
-            MeltanoError: The current system is not supported.
         """
         self._system = platform.system()
         self.root = root.resolve()
@@ -111,11 +105,7 @@ class VirtualEnv:
 
     @cached_property
     def lib_dir(self) -> Path:
-        """The lib directory of the virtual environment.
-
-        Raises:
-            MeltanoError: The current system is not supported.
-        """
+        """The lib directory of the virtual environment."""
         if self._system == "Windows":
             return self.root / "Lib"
 
@@ -123,11 +113,7 @@ class VirtualEnv:
 
     @cached_property
     def bin_dir(self) -> Path:
-        """The bin directory of the virtual environment.
-
-        Raises:
-            MeltanoError: The current system is not supported.
-        """
+        """The bin directory of the virtual environment."""
         if self._system == "Windows":
             return self.root / "Scripts"
 
@@ -135,11 +121,7 @@ class VirtualEnv:
 
     @cached_property
     def site_packages_dir(self) -> Path:
-        """The site-packages directory of the virtual environment.
-
-        Raises:
-            MeltanoError: The current system is not supported.
-        """
+        """The site-packages directory of the virtual environment."""
         if self._system == "Windows":
             return self.lib_dir / "site-packages"
 
@@ -597,9 +579,6 @@ class VirtualEnvService:
 
         Returns:
             The process running `pip install` with the provided args.
-
-        Raises:
-            AsyncSubprocessError: The command failed.
         """
         if clean:
             await self.create()
@@ -819,9 +798,6 @@ class VirtualenvBackend(VenvBackend):
 
         Returns:
             The process running `pip install --upgrade ...`.
-
-        Raises:
-            AsyncSubprocessError: Failed to upgrade pip to the latest version.
         """
         return await self.install_pip_args(("--upgrade", "pip"), env=env)
 

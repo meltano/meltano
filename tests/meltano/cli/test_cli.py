@@ -29,6 +29,7 @@ from meltano.cli.params import UUIDParamType
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
+from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import get_meltano_version
@@ -126,7 +127,7 @@ class TestCli:
         pushd(incompatible_version_project.root)
         result = cli_runner.invoke(cli, ["config"])
         assert result.exit_code == 3
-        assert re.match(r"You're using .* but this project requires .*", result.output)
+        assert re.search(r"You're using .* but this project requires .*", result.output)
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
@@ -303,6 +304,23 @@ class TestCli:
         with pytest.raises(CliError, match=r"This failed. Try again."):
             handle_meltano_error(exception)
 
+    def test_unknown_plugin_is_reported_without_a_traceback(self) -> None:
+        with (
+            mock.patch(
+                "meltano.cli.cli",
+                side_effect=PluginNotFoundError("tap-unknown"),
+            ),
+            mock.patch("meltano.cli.utils.logger") as logger,
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            meltano.cli._run_cli()
+
+        assert exc_info.value.code == 1
+        logger.error.assert_called_once_with(
+            "Plugin 'tap-unknown' is not known to Meltano.",
+            exc_info=None,
+        )
+
     def test_sigterm_cancellation_exits_143(
         self,
         monkeypatch: pytest.MonkeyPatch,
@@ -366,7 +384,7 @@ class TestCli:
     @pytest.mark.usefixtures("pushd")
     def test_cwd_option(
         self,
-        cli_runner,
+        cli_runner: MeltanoCliRunner,
         test_cli_project: Project,
         tmp_path: Path,
     ) -> t.NoReturn:
@@ -384,19 +402,15 @@ class TestCli:
         with cd(project.dirs.root):
             filepath = tmp_path / "file.txt"
             filepath.touch()
-            with pytest.raises(click.BadParameter, match="is a file"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(filepath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(filepath), "dragon"))
+            assert result.exit_code == 2
+            assert "is a file" in result.stderr
 
         with cd(project.dirs.root):
             dirpath = tmp_path / "subdir"
-            with pytest.raises(click.BadParameter, match="does not exist"):
-                raise cli_runner.invoke(
-                    cli,
-                    ("--cwd", str(dirpath), "dragon"),
-                ).exception.__context__
+            result = cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon"))
+            assert result.exit_code == 2
+            assert "does not exist" in result.stderr
 
         with cd(project.dirs.root):
             dirpath.mkdir()

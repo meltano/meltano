@@ -1,0 +1,21 @@
+---
+slug: 2026-09-28-cloud-changelog
+title: Lower cost Snowpipe Streaming & CLI Plugin Management
+date: 2026-09-28
+---
+
+`target-snowflake` adds a Snowpipe Streaming load method for lower-cost, warehouse-free loading, and the CLI gains first-class plugin management with `meltano plugin list` and Meltano Cloud-authenticated Hub access. This release also adds an Update button for plugins in the Meltano Cloud UI, plus fixes for tap-bing-ads, tap-aptem, and target-salesforce.
+
+{/* truncate */}
+
+## Features
+
+- **Snowflake gets a new streaming load option:** `target-snowflake` now supports Snowpipe Streaming, loading data straight through the Snowflake API instead of staging files through a warehouse. Lower cost since you're billed by data moved, not compute time.
+- **Manage plugins via the CLI:** `meltano plugin list` shows every plugin in your project, as per the `meltano.yml`. When you log in with `meltano cloud auth login`, commands such as `meltano add` and `meltano hub list` now reference Meltano Cloud maintained plugins. Nothing changes if you're logged out or have your own Hub settings.
+- **Update plugins from Meltano Cloud:** Workspace admins can now update any installed plugin to its latest version using the new Update button in the Meltano Cloud UI. The button only appears when an update is available, so there's no need to edit lock files or remove and re-add the plugin.
+
+## Fixes
+
+- **Bumped tap-bing-ads to v0.5.0:** Adds support for a new campaign negative sites stream.
+- **Bumped tap-aptem to v0.3.0:** Corrected the replication key on two streams for more reliable incremental syncs.
+- **Bumped target-salesforce to v0.1.1:** A single carriage return no longer fails an entire batch and failed records no longer flood the log with a runaway CSV.

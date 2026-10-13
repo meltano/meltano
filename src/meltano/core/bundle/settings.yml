@@ -27,6 +27,10 @@ settings:
   kind: integer
   value: 5
   description: Retry interval in seconds for initial database connection attempts.
+- name: job_heartbeat_interval
+  kind: integer
+  value: 1
+  description: Interval in seconds between job heartbeats. Must be greater than zero and less than 300 seconds, when a job is considered stale.
 - name: project_readonly
   kind: boolean
   value: false

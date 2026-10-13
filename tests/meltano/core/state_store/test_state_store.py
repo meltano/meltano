@@ -486,9 +486,7 @@ class TestS3StateBackend:
         )
         assert isinstance(s3_state_store_direct_creds, S3StateStoreManager)
         assert s3_state_store_direct_creds.aws_access_key_id == "a_different_id"
-        assert (
-            s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
-        )
+        assert s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"
 
     @pytest.mark.parametrize(
         "endpoint_url",

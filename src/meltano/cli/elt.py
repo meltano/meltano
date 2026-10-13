@@ -482,7 +482,10 @@ async def _run_job(
             "the '--force' option.",
         )
 
-    async with job.run(session):
+    async with job.run(
+        session,
+        heartbeat_interval=project.settings.get("job_heartbeat_interval"),
+    ):
         job_logging_service = JobLoggingService(project)
         log_file = job_logging_service.generate_log_name(job.job_name, job.run_id)
 

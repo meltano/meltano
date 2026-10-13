@@ -1,0 +1,96 @@
+---
+title: Pinterest
+description: Sync Pinterest Ads campaigns, ad groups, ads, pins and performance analytics.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Pinterest
+
+<ConnectorTypeBadge type="extractor" block />
+
+Pinterest is a visual discovery platform where people find inspiration and ideas for their interests and projects. Pinterest offers an API that gives businesses access to their advertising and analytics data. This connector uses the Pinterest API v5 to extract data about your Pinterest Ads account, including campaigns, ad groups, ads, pins and detailed analytics.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | OAuth login (Connect with Pinterest) |
+| **Sync type** | Mixed: campaigns, ad groups, ads and pins incremental; not specified for other streams (see note below) |
+| **Streams** | Fixed list |
+| **Custom queries** | Not specified in the plugin definition |
+
+## What you can sync
+
+This connector brings in your Pinterest Ads account structure and performance:
+
+- Ad accounts, campaigns, ad groups and ads, with budgets, bidding, targeting and status
+- Pins created by the authenticated user
+- Daily or aggregated performance metrics by campaign and by ad
+- Daily organic engagement metrics by pin
+
+## Prerequisites
+
+- **A Pinterest account with access to the ad accounts you want to sync**: you authenticate using OAuth2 with the **Connect with Pinterest** button, which goes through the Matatika OAuth proxy and handles token management automatically. There's no manual credential to retrieve.
+
+## Setup
+
+### In Pinterest
+
+1. Have a Pinterest account with access to the ad accounts you want to extract data for.
+
+### In Meltano Cloud
+
+1. Click **Connect with Pinterest** to authenticate.
+2. Optionally set a **Start Date** for the analytics streams.
+3. Optionally set **Analytics Columns** and **Analytics Granularity** (see [Advanced configuration](#advanced-configuration)).
+
+## Available streams
+
+| Stream | Description |
+|---|---|
+| `ad_accounts` | All ad accounts accessible to the authenticated user. Parent stream for campaigns, ad groups, ads and analytics |
+| `campaigns` | Campaigns in each ad account, with objective, status and budget caps |
+| `ad_groups` | Ad groups in each ad account, with budget, bidding and targeting settings |
+| `ads` | Ads in each ad account, with creative, destination and review status |
+| `pins` | Pins created by the authenticated user |
+| `campaign_analytics` | Daily or aggregated performance metrics for each campaign, keyed by campaign and date |
+| `ad_analytics` | Daily or aggregated performance metrics for each individual ad, keyed by ad and date |
+| `pin_analytics` | Daily organic engagement metrics per pin, broken down by app type (e.g. `TOTAL`, `MOBILE`, `WEB`) |
+
+`campaigns`, `ad_groups` and `ads` sync incrementally on `updated_time`, and `pins` on `created_at`. The three analytics streams require a Start Date, and Pinterest limits analytics requests to a 90-day window.
+
+> **Note:** the replication method for `ad_accounts` and the three analytics streams isn't documented in the plugin definition.
+
+### Analytics stream fields
+
+Each analytics row keeps its identifying fields at the top level and nests the metric values under a `metrics` object.
+
+| Stream | Fields |
+|---|---|
+| `campaign_analytics` | `CAMPAIGN_ID`, `DATE`, `metrics` |
+| `ad_analytics` | `AD_ID`, `DATE`, `metrics` |
+| `pin_analytics` | `pin_id`, `app_type`, `date`, `metrics` (`IMPRESSION`, `OUTBOUND_CLICK`, `PIN_CLICK`, `SAVE`, `SAVE_RATE`) |
+
+By default, the `metrics` object for campaign and ad analytics contains: `SPEND_IN_DOLLAR`, `PAID_IMPRESSION`, `TOTAL_IMPRESSION`, `TOTAL_CLICKTHROUGH`, `TOTAL_ENGAGEMENT`, `CTR`, `ECTR`, `CPC_IN_MICRO_DOLLAR`, `ECPC_IN_DOLLAR`, `CAMPAIGN_ID`, `AD_GROUP_ID`, `AD_ID`, `PIN_ID`, `AD_ACCOUNT_ID`, `CAMPAIGN_NAME`, `AD_GROUP_NAME`, `AD_NAME`.
+
+`budget_in_micro_currency` is in micro-currency: divide by 1,000,000 for the actual value. Bid amounts and campaign spend caps are also given in micro-currency.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `start_date` | date | 30 days ago | Start date for analytics streams, in `YYYY-MM-DD` format. Pinterest limits analytics to 90 days per request |
+| `analytics_columns` | array | standard set | Metric columns to fetch for the analytics streams. Defaults to a standard set of spend, impression, click and engagement metrics |
+| `analytics_granularity` | options | `DAY` | Granularity for the analytics streams: `TOTAL`, `DAY`, `HOUR`, `WEEK` or `MONTH` |
+
+The OAuth credential and End Date settings are hidden and aren't shown in the Meltano Cloud form. The **Connect with Pinterest** button authenticates through the Matatika OAuth proxy, which handles token management automatically.
+
+## Advanced configuration
+
+- **Analytics metrics.** **Analytics Columns** sets the list of metric columns to fetch for the analytics streams, returned in the `metrics` object.
+- **Analytics granularity.** **Analytics Granularity** sets the granularity for the analytics streams: `TOTAL`, `DAY` (the default), `HOUR`, `WEEK` or `MONTH`.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

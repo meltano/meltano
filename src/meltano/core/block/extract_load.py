@@ -538,7 +538,12 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             raise RunnerError(msg)
 
         with closing(self.context.session) as session:
-            async with job.run(session):
+            async with job.run(
+                session,
+                heartbeat_interval=self.context.project.settings.get(
+                    "job_heartbeat_interval",
+                ),
+            ):
                 await self.execute()
 
     async def terminate(self, *, graceful: bool = False) -> None:

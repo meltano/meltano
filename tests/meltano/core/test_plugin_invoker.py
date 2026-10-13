@@ -15,11 +15,14 @@ from meltano.core.plugin_invoker import (
     ExecutableNotFoundError,
     PluginInvoker,
     UnknownCommandError,
+    invoker_factory,
 )
+from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.tracking.contexts import environment_context
 from meltano.core.venv_service import VirtualEnv
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
     from meltano.core.project import Project
@@ -44,7 +47,7 @@ class TestPluginInvoker:
         project: Project,
         tap,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[PluginRef], PluginInvoker],
     ) -> None:
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
@@ -76,6 +79,7 @@ class TestPluginInvoker:
         venv = VirtualEnv(project.dirs.venvs(tap.type, tap.name))
         assert env["VIRTUAL_ENV"] == str(venv.root)
         assert env["PATH"].startswith(str(venv.bin_dir))
+        assert env["PYTHONWARNINGS"] == "once"
         assert "PYTHONPATH" not in env
 
         assert (
@@ -363,3 +367,28 @@ class TestPluginInvoker:
         assert "Executable 'missing-executable' could not be found" in error_msg
         assert "Extractor 'test-tap'" in error_msg
         assert "meltano install --plugin-type extractor test-tap" in error_msg
+
+
+@pytest.mark.parametrize("update", (True, False))
+def test_invoker_factory_warns_of_an_update(
+    project: Project,
+    tap,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    update: bool,
+) -> None:
+    monkeypatch.setattr(
+        PluginLockService,
+        "has_update",
+        lambda _self, _plugin: update,
+    )
+    with patch("meltano.core.plugin_invoker.logger") as logger:
+        invoker_factory(project, tap)
+
+    if update:
+        message, *args = logger.warning.call_args.args
+        assert "Run 'meltano add --plugin-type extractor tap-mock'" in message % tuple(
+            args
+        )
+    else:
+        logger.warning.assert_not_called()

@@ -2,30 +2,11 @@ name: Tests
 
 on:
   pull_request:
-    paths:
-      - src/**
-      - tests/**
-      - noxfile.py
-      - pyproject.toml
-      - uv.lock
-      - .github/workflows/test.yml
-      - .github/workflows/resources/constraints.txt
-      - .github/workflows/resources/docker-compose.mssql.yaml
-      - .github/workflows/resources/docker-compose.postgres.yaml
   push:
     branches:
       - main
       - 'v*'
-    paths:
-      - src/**
-      - tests/**
-      - noxfile.py
-      - pyproject.toml
-      - uv.lock
-      - .github/workflows/test.yml
-      - .github/workflows/resources/constraints.txt
-      - .github/workflows/resources/docker-compose.mssql.yaml
-      - .github/workflows/resources/docker-compose.postgres.yaml
+  merge_group:
   workflow_dispatch:
     inputs: {}
 
@@ -40,39 +21,68 @@ env:
 permissions: {}
 
 jobs:
+  files-changed:
+    name: Detect file changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      runtime: ${{ steps.changes.outputs.runtime }}
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+      id: changes
+      with:
+        filters: |
+          runtime:
+            - src/**
+            - tests/**
+            - noxfile.py
+            - pyproject.toml
+            - uv.lock
+            - .github/workflows/test.yml
+            - .github/workflows/resources/constraints.txt
+            - .github/workflows/resources/docker-compose.mssql.yaml
+            - .github/workflows/resources/docker-compose.postgres.yaml
+
   tests:
+    name: ${{ matrix.id }}
+    needs: files-changed
+    if: ${{ needs.files-changed.outputs.runtime == 'true' }}
     strategy:
       matrix:
         include:
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py310-ubuntu-sqlite-lowest-requirements' }
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py310-ubuntu-sqlite' }
-        - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py311-ubuntu-sqlite' }
-        - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py312-ubuntu-sqlite' }
-        - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py313-ubuntu-sqlite' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py314-ubuntu-sqlite' }
-        - { python-version: '3.15', os: ubuntu-24.04-arm, backend-db: sqlite, id: 'py315-ubuntu-sqlite' }
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg3-lowest-requirements' }
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg3' }
-        - { python-version: '3.11', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py311-ubuntu-psycopg3' }
-        - { python-version: '3.12', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py312-ubuntu-psycopg3' }
-        - { python-version: '3.13', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py313-ubuntu-psycopg3' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql, id: 'py314-ubuntu-psycopg3' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
-        - { python-version: '3.14', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
+        - { python-version: '3.10', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py310-ubuntu-sqlite-lowest-requirements' }
+        - { python-version: '3.10', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py310-ubuntu-sqlite' }
+        - { python-version: '3.11', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py311-ubuntu-sqlite' }
+        - { python-version: '3.12', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py312-ubuntu-sqlite' }
+        - { python-version: '3.13', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py313-ubuntu-sqlite' }
+        - { python-version: '3.14', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py314-ubuntu-sqlite' }
+        - { python-version: '3.15', os: ubuntu-26.04-arm, backend-db: sqlite, id: 'py315-ubuntu-sqlite' }
+        - { python-version: '3.10', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg3-lowest-requirements' }
+        - { python-version: '3.10', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py310-ubuntu-psycopg3' }
+        - { python-version: '3.11', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py311-ubuntu-psycopg3' }
+        - { python-version: '3.12', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py312-ubuntu-psycopg3' }
+        - { python-version: '3.13', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py313-ubuntu-psycopg3' }
+        - { python-version: '3.14', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py314-ubuntu-psycopg3' }
+        - { python-version: '3.15', os: ubuntu-26.04-arm, backend-db: postgresql, id: 'py315-ubuntu-psycopg3' }
+        - { python-version: '3.15', os: ubuntu-26.04-arm, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
+        - { python-version: '3.15', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
         # Additional tests for supported platforms and backends
-        - { python-version: '3.10', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py310-ubuntu-psycopg2' }
-        - { python-version: '3.14', os: ubuntu-24.04-arm, backend-db: postgresql_psycopg2, id: 'py314-ubuntu-psycopg2' }
+        - { python-version: '3.10', os: ubuntu-26.04-arm, backend-db: postgresql_psycopg2, id: 'py310-ubuntu-psycopg2' }
+        - { python-version: '3.15', os: ubuntu-26.04-arm, backend-db: postgresql_psycopg2, id: 'py315-ubuntu-psycopg2' }
         - { python-version: '3.10', os: ubuntu-latest, backend-db: mssql, id: 'py310-ubuntu-mssql' }
-        - { python-version: '3.14', os: ubuntu-latest, backend-db: mssql, id: 'py314-ubuntu-mssql' }
+        - { python-version: '3.15', os: ubuntu-latest, backend-db: mssql, id: 'py315-ubuntu-mssql' }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         - { python-version: '3.10', os: windows-2025,  backend-db: sqlite, id: 'py310-windows-sqlite' }
-        - { python-version: '3.14', os: windows-2025,  backend-db: sqlite, id: 'py314-windows-sqlite' }
+        - { python-version: '3.15', os: windows-2025,  backend-db: sqlite, id: 'py315-windows-sqlite' }
 
       fail-fast: false
 
-    name: ${{ matrix.id }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     timeout-minutes: 20
     env:
       PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
@@ -107,7 +117,7 @@ jobs:
         docker ps -a
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
         cache-suffix: ${{ matrix.id }}
 
@@ -154,6 +164,7 @@ jobs:
     name: Code coverage
     runs-on: ubuntu-latest
     needs: tests
+    if: ${{ !cancelled() && needs.tests.result != 'skipped' }}
     steps:
     - name: Check out the repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -172,7 +183,7 @@ jobs:
         merge-multiple: true
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
         cache-suffix: coverage
 
@@ -196,11 +207,13 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
 
-  typing:
-    name: "Static type checking"
+  static:
+    name: "Static Analysis"
     runs-on: ubuntu-latest
+    needs: files-changed
+    if: ${{ needs.files-changed.outputs.runtime == 'true' }}
 
     steps:
     - name: Check out the repository
@@ -214,9 +227,9 @@ jobs:
         python-version-file: .python-version
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
-        cache-suffix: typing
+        cache-suffix: static
 
     - name: Install Nox
       env:
@@ -224,6 +237,25 @@ jobs:
       run: |
         uv tool install nox
 
-    - name: Run typing
+    - name: Run
+      env:
+        SKIP: no-commit-to-branch
       run: |
-        nox -rs typing
+        nox -t lint
+
+  ci:
+    name: CI required checks (unit tests)
+    if: always()
+    needs:
+    - files-changed
+    - tests
+    - coverage
+    - static
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
+      with:
+        jobs: ${{ toJSON(needs) }}
+        allowed-skips: tests,coverage,static

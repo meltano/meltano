@@ -11,7 +11,7 @@ The following guide covers breaking changes and migration steps for Meltano vers
 
 ### Python 3.9 support dropped
 
-Meltano 4.0 requires Python 3.10 or later. If you are still using Python 3.9, upgrade to Python 3.10, 3.11, 3.12, 3.13, or 3.14 before upgrading Meltano.
+Meltano 4.0 requires Python 3.10 or later. If you are still using Python 3.9, upgrade to Python 3.10+ before upgrading Meltano.
 
 ### Docker image changes
 

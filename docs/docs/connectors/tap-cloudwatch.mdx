@@ -1,0 +1,76 @@
+---
+title: CloudWatch
+description: Sync log data from AWS CloudWatch.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# CloudWatch
+
+<ConnectorTypeBadge type="extractor" block />
+
+Amazon CloudWatch is a monitoring and observability service provided by Amazon Web Services (AWS). It lets users monitor and collect data on AWS resources and applications, including EC2 instances, RDS databases and Lambda functions, with real-time metrics, logs and alarms to help troubleshoot issues, optimize performance and check the health of their AWS environment. Connect it to bring your CloudWatch log data into your own systems.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+| **Custom queries** | Supported: the Query setting filters the log data |
+
+## What you can sync
+
+- Log data from the log group you choose
+- Log data filtered by a query
+- Log data between a start and end date and time
+
+## Prerequisites
+
+- **AWS Access Key ID**: the unique identifier for an AWS account used to access the CloudWatch API.
+- **AWS Secret Access Key**: the secret key associated with the AWS Access Key ID.
+- **AWS Region Name**: the region where the CloudWatch logs are stored.
+- **Log Group Name**, **Query** and **Start Date**: validated together as a group.
+- **AWS Session Token** *(optional)*: an optional token that can authenticate the session.
+
+## Setup
+
+### In AWS
+
+1. Find your AWS Access Key ID and AWS Secret Access Key, and note the region where your CloudWatch logs are stored.
+2. If you use a session token, note that as well.
+
+### In Meltano Cloud
+
+1. Enter your AWS Access Key ID, AWS Secret Access Key and AWS Region Name.
+2. Enter the Log Group Name, Query and Start Date.
+3. Optionally set End Date, Batch Increment S, the flattening options, AWS Endpoint URL or AWS Profile.
+
+## Advanced configuration
+
+- **Flattening**: Flattening Enabled sets whether JSON data in log events is flattened; Flattening Max Depth sets the maximum depth.
+- **Batch Increment S**: the number of seconds to wait between each batch of log events (default `3600`).
+- **Stream Maps / Stream Map Config**: a list of stream maps to use for retrieving log data, and configuration settings for those stream maps.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `aws_access_key_id` | string | The unique identifier for an AWS account used to access the CloudWatch API. Sensitive. |
+| `aws_secret_access_key` | string | The secret key associated with the AWS Access Key ID. Sensitive. |
+| `aws_session_token` | string | An optional token that can be used to authenticate the session. Sensitive. |
+| `aws_profile` | string | The name of the AWS profile to use for authentication. |
+| `aws_region_name` | string | The name of the AWS region where the CloudWatch logs are stored. |
+| `aws_endpoint_url` | string | The URL of the CloudWatch API endpoint to connect to. |
+| `log_group_name` | string | The name of the log group to retrieve data from. |
+| `query` | string | A query to filter the log data. |
+| `start_date` | date | The start date and time for the log data to retrieve. |
+| `end_date` | date | The end date and time for the log data to retrieve. |
+| `batch_increment_s` | integer | The number of seconds to wait between each batch of log events. Default: `3600`. |
+| `flattening_enabled` | boolean | Whether or not to flatten the JSON data in the log events. |
+| `flattening_max_depth` | integer | The maximum depth to which the JSON data in the log events should be flattened. |
+| `stream_maps` | object | A list of stream maps to use for retrieving log data. |
+| `stream_map_config` | object | Configuration settings for the stream maps. |
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

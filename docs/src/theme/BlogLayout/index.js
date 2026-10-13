@@ -8,17 +8,17 @@ import Melty from '@site/static/img/melty.png';
 import styles from './index.module.scss';
 
 const CHANGELOG_TABS = [
-  { label: 'Meltano Cloud', to: '/changelog/cloud' },
-  { label: 'Meltano Open', to: '/changelog' },
+  { label: 'Meltano Cloud', to: '/releases/cloud' },
+  { label: 'Meltano Open', to: '/releases' },
 ];
 
 function ChangelogSwitcher() {
   const { pathname } = useLocation();
-  const isCloud = pathname.startsWith('/changelog/cloud');
+  const isCloud = pathname.startsWith('/releases/cloud');
   return (
     <div className={styles.changelogTabs}>
       {CHANGELOG_TABS.map((tab) => {
-        const active = tab.to === '/changelog/cloud' ? isCloud : !isCloud;
+        const active = tab.to === '/releases/cloud' ? isCloud : !isCloud;
         return (
           <Link
             key={tab.to}
@@ -38,10 +38,10 @@ function ChangelogSwitcher() {
 
 function BackToChangelogsLink() {
   const { pathname } = useLocation();
-  const backTo = pathname.startsWith('/changelog/cloud') ? '/changelog/cloud' : '/changelog';
+  const backTo = pathname.startsWith('/releases/cloud') ? '/releases/cloud' : '/releases';
   return (
     <Link to={backTo} className={clsx('changelog-back-link', styles.backLink)}>
-      &larr; Back to Changelog
+      &larr; Back to Releases
     </Link>
   );
 }
@@ -70,7 +70,7 @@ export default function BlogLayout(props) {
             className={clsx(styles.melty, '-mb-16 hidden lg:block')}
           />
           <h1 className="text-4xl md:text-6xl font-bold mb-6 lg:mt-10">
-            Changelog
+            Releases
           </h1>
           <ChangelogSwitcher />
         </div>

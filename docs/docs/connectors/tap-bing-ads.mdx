@@ -1,0 +1,106 @@
+---
+title: Bing Ads
+description: Sync campaign structure and daily performance data from your Microsoft Advertising (Bing Ads) accounts.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Bing Ads
+
+<ConnectorTypeBadge type="extractor" block />
+
+Bing Ads, now Microsoft Advertising, is a pay-per-click advertising platform for search and native ads across Bing and the Microsoft Advertising network. Marketing and analytics teams connect it to pull campaign structure and daily ad performance into their warehouse, so it can be blended with other advertising and revenue data and reported on outside the Microsoft Advertising UI.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | OAuth login (Sign in with Microsoft) |
+| **Sync type** | Mixed: entity and performance report streams incremental, `accounts` full table |
+| **Streams** | Fixed list |
+| **Custom queries** | Not supported |
+
+## What you can sync
+
+This connector brings in the data behind your Microsoft Advertising reporting hierarchy:
+
+- Account settings, currency, time zone, and billing and address details
+- Campaign, ad group, ad and keyword structure and settings, including budgets, bid strategies and quality scores
+- Campaign-level website exclusions
+- Daily performance statistics by ad group, ad, keyword, asset and publisher website
+
+## Prerequisites
+
+- **A Microsoft account with access to the Microsoft Advertising accounts you want to sync**: used for the "Sign in with Microsoft" flow in Meltano Cloud.
+- **Customer ID**: the Microsoft Advertising customer to sync, shown as `cid=` in the Microsoft Advertising URL.
+- **Account ID(s)** (optional): one or more accounts to restrict the sync to, shown as `aid=` in the Microsoft Advertising URL.
+
+## Setup
+
+### In Microsoft Advertising
+
+1. Sign in to [Microsoft Advertising](https://ads.microsoft.com) and note your customer ID, shown as `cid=` in the URL.
+2. Optionally note the account IDs you want to sync, shown as `aid=` in the URL when viewing each account.
+
+### In Meltano Cloud
+
+1. Click "Sign in with Microsoft" and authorise access to your Microsoft Advertising accounts.
+2. Enter your **Customer ID**.
+3. Optionally enter the **Account ID(s)** to extract data for. Leave this empty to extract data for every account under the customer.
+4. Choose a **Start Date** for extraction.
+
+## Available streams
+
+### Entity streams
+
+Extracted through the Bing Ads Bulk service. Each stream syncs incrementally on the `Sync Time` column.
+
+| Stream | Description |
+|---|---|
+| `campaigns` | Campaigns in each account, including budget, bid strategy and targeting settings |
+| `ad_groups` | Ad groups in each account |
+| `ads` | Ads of every type in each account |
+| `keywords` | Keywords in each account, including quality and relevance scores |
+| `campaign_negative_sites` | Website exclusions set at campaign level |
+
+A campaign negative site has no ID of its own, so `campaign_negative_sites` is keyed on the campaign (`Parent Id`) and `Website` pair rather than on `Id`.
+
+The `accounts` stream comes from the Customer Management service instead, and carries account settings, currency, time zone, and billing and address details. It syncs in full on each run.
+
+### Daily performance report streams
+
+Requested from the Bing Ads Reporting service with `Daily` aggregation, from your Start Date (or the previous bookmark) up to today. Each stream syncs incrementally on the `TimePeriod` column.
+
+| Stream | Description |
+|---|---|
+| `ad_group_daily_performance` | Daily performance statistics by ad group |
+| `ad_daily_performance` | Daily performance statistics by ad |
+| `keyword_daily_performance` | Daily performance statistics by keyword |
+| `asset_daily_performance` | Daily performance statistics by asset |
+| `publisher_usage_daily_performance` | Daily performance statistics by publisher website |
+
+Reports are requested in the GMT time zone, so a row's date reflects GMT rather than the account's own time zone.
+
+## Settings
+
+| Setting | Type | Required / Default | Description |
+|---|---|---|---|
+| `customer_id` | string | required | ID of the Microsoft Advertising customer to extract data for, shown as `cid=` in the Microsoft Advertising URL |
+| `account_ids` | string | optional | IDs of the Microsoft Advertising accounts to extract data for, shown as `aid=` in the Microsoft Advertising URL. Leave empty to extract data for every account under the customer |
+| `start_date` | date | required | The earliest record date to sync |
+| `client_id` | string | optional | OAuth client ID for client credentials token creation. Only used if an OAuth refresh proxy URL is not supplied |
+| `client_secret` | string (sensitive) | optional | OAuth client secret for client credentials token creation. Only used if an OAuth refresh proxy URL is not supplied |
+
+Sign-in and token management (OAuth authorisation, access and refresh tokens, and the Bing Ads developer token) are handled automatically by the "Sign in with Microsoft" flow and don't require manual configuration.
+
+## Advanced configuration
+
+- **Column selection in performance reports.** A performance report stream requests only the columns you select, and derives its primary key from the attribute columns that stay selected. Deselecting an attribute column therefore coarsens the grain of the stream, and the rows the API returns are aggregated over the columns that remain.
+
+## Known limitations
+
+- **Incompatible column combinations.** Bing Ads rejects some column combinations. In `ad_group_daily_performance`, the `BidMatchType`, `DeviceOS`, `Goal`, `GoalType` and `TopVsOther` attributes can't be combined with the impression share statistics. Where you select both, the tap keeps the attributes and drops the impression share statistics.
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

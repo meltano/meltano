@@ -174,6 +174,18 @@ class TestUserConfigService:
         ):
             _ = UserConfigService(config_path).yaml
 
+    def test_cloud_settings(self):
+        """Test that a `cloud` section is exposed via the `cloud` property."""
+        content = "cloud:\n  auth:\n    credentials_path: ~/creds.json\n"
+        with self._config_file(content) as config_path:
+            service = UserConfigService(config_path)
+            assert service.cloud == {"auth": {"credentials_path": "~/creds.json"}}
+
+    def test_cloud_settings_empty(self):
+        """Test that a missing `cloud` section defaults to an empty mapping."""
+        with self._config_file("yaml:\n  indent: 4\n") as config_path:
+            assert UserConfigService(config_path).cloud == {}
+
     def test_platformdirs_integration(self):
         """Test that UserConfigService uses platformdirs correctly."""
         from pathlib import Path

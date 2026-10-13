@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import typing as t
+from unittest import mock
 
 import pytest
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.singer import target as target_module
 from meltano.core.plugin.singer.target import BookmarkWriter
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.state_service import StatePersistenceError, StateService
@@ -41,6 +43,24 @@ class TestBookmarkWriter:
                 Payload.INCOMPLETE_STATE,
                 id="valid_incomplete_state",
             ),
+            pytest.param(
+                "{}",
+                {"singer_state": {"foo": "bar"}},
+                Payload.STATE,
+                id="empty_state",
+            ),
+            pytest.param(
+                "{}",
+                {"singer_state": {"foo": "bar"}},
+                Payload.INCOMPLETE_STATE,
+                id="empty_incomplete_state",
+            ),
+            pytest.param(
+                "null",
+                {"singer_state": {"foo": "bar"}},
+                Payload.STATE,
+                id="null_state",
+            ),
         ),
     )
     @pytest.mark.asyncio
@@ -67,6 +87,34 @@ class TestBookmarkWriter:
         writer.writeline(state_line)
 
         assert state_service.get_state(job.job_name) == expected_state
+
+    @pytest.mark.asyncio
+    async def test_writeline_ignores_empty_state(
+        self,
+        session: Session,
+    ) -> None:
+        existing_state = {"singer_state": {"foo": "bar"}}
+        state_service = StateService(session=session)
+
+        job = Job(job_name="pytest_test_runner", payload=existing_state)
+        job.save(session)
+        state_service.add_state(job, json.dumps(existing_state))
+
+        writer = BookmarkWriter(
+            job,
+            session,
+            state_service=state_service,
+            payload_flag=Payload.STATE,
+        )
+        # Log capture depends on how logging is configured, which varies between
+        # tests, so assert on the module logger directly.
+        with mock.patch.object(target_module, "logger") as mock_logger:
+            writer.writeline("{}")
+
+        mock_logger.warning.assert_called_once()
+        assert "empty state" in mock_logger.warning.call_args.args[0]
+        assert job.payload == existing_state
+        assert state_service.get_state(job.job_name) == existing_state
 
     @pytest.mark.asyncio
     async def test_writeline_raises_on_state_backend_failure(

@@ -757,7 +757,7 @@ def _expand_env_vars(
 ) -> Expandable:
     if isinstance(raw_value, Mapping):
         if flat:
-            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type]
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}  # type: ignore[arg-type] # ty: ignore[no-matching-overload]
         return {
             k: _expand_env_vars(v, replacer, flat=flat)
             if isinstance(v, str | Mapping | list)  # type: ignore[redundant-expr]

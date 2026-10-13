@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typing as t
 from contextlib import contextmanager
-from functools import cached_property
+from functools import cache, cached_property
 
 import structlog
 import yaml
@@ -28,6 +28,19 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
+@cache
+def builtin_settings() -> list[SettingDefinition]:
+    """Get the settings that Meltano defines itself.
+
+    Returns:
+        The setting definitions.
+    """
+    with bundle.root.joinpath("settings.yml").open() as settings_yaml:
+        content = yaml.safe_load(settings_yaml)
+
+    return [SettingDefinition.parse(setting) for setting in content["settings"]]
+
+
 class ConfigService:
     """Service to manage meltano.yml."""
 
@@ -44,12 +57,7 @@ class ConfigService:
     @cached_property
     def settings(self) -> list[SettingDefinition]:
         """Project settings."""
-        with bundle.root.joinpath("settings.yml").open() as settings_yaml:
-            content = yaml.safe_load(settings_yaml)
-
-        builtin = [SettingDefinition.parse(x) for x in content["settings"]]
-        addons = list(self.addon.get_all())
-        return builtin + addons
+        return builtin_settings() + list(self.addon.get_all())
 
     @cached_property
     def current_meltano_yml(self) -> MeltanoFile:

@@ -1,0 +1,68 @@
+---
+title: GitLab
+description: Sync source code management and project data from GitLab.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# GitLab
+
+<ConnectorTypeBadge type="extractor" block />
+
+GitLab is a web-based Git repository manager that provides source code management, continuous integration and deployment, and collaboration tools in a single application. Developers use it to manage their code repositories, track changes to their code and collaborate with other developers on projects. It also includes features for continuous integration and deployment, plus project management tools such as issue tracking, project boards and time tracking. Connect it to bring that data into your own systems.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+
+## What you can sync
+
+Data from the GitLab groups or projects you choose.
+
+## Prerequisites
+
+- **GitLab Instance**: the URL of the GitLab instance to connect to (defaults to `https://gitlab.com`).
+- **Access Token**: a token used for authentication and authorization to access the GitLab API.
+- **Groups** or **Projects**: the group(s) or project(s) to retrieve data from.
+- **Start Date**: the date to start retrieving data from.
+
+You need either Groups or Projects, together with the GitLab Instance and Start Date.
+
+## Setup
+
+### In GitLab
+
+1. Have your GitLab access token ready, along with the group(s) or project(s) you want to retrieve data from.
+
+### In Meltano Cloud
+
+1. Enter the GitLab Instance URL (default: `https://gitlab.com`).
+2. Enter your Access Token.
+3. Enter the Groups (for example `my-organization`) or the Projects (for example `my-organization/project-1`).
+4. Enter a Start Date.
+5. Optionally turn on Ultimate License, Fetch Merge Request Commits or Fetch Pipelines Extended.
+
+## Advanced configuration
+
+- **Ultimate License**: whether the GitLab instance has an ultimate license (default: off).
+- **Fetch Merge Request Commits**: whether to fetch the commits associated with merge requests (default: off).
+- **Fetch Pipelines Extended**: whether to fetch extended information about pipelines (default: off).
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `api_url` | string | The URL of the GitLab instance to connect to. Default: `https://gitlab.com`. |
+| `private_token` | string | A token used for authentication and authorization to access the GitLab API. Sensitive. |
+| `groups` | string | The group(s) to retrieve data from. |
+| `projects` | string | The project(s) to retrieve data from. |
+| `start_date` | date | The date to start retrieving data from. |
+| `ultimate_license` | boolean | Whether the GitLab instance has an ultimate license. Default: `false`. |
+| `fetch_merge_request_commits` | boolean | Whether to fetch the commits associated with merge requests. Default: `false`. |
+| `fetch_pipelines_extended` | boolean | Whether to fetch extended information about pipelines. Default: `false`. |
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

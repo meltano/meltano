@@ -1,0 +1,58 @@
+---
+title: Solarvista Live
+description: Sync field service management data from Solarvista Live.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Solarvista Live
+
+<ConnectorTypeBadge type="extractor" block />
+
+Solarvista Live is a cloud-based software platform for field service management. It provides tools to schedule and dispatch technicians, track work orders and manage inventory, helping businesses streamline field service operations, reduce costs and improve customer satisfaction. Connect it to bring that data into your own systems.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Authentication** | API key / token |
+
+## What you can sync
+
+Data from the Solarvista Live datasources you configure. Solarvista Live covers technician scheduling and dispatch, work orders and inventory.
+
+## Prerequisites
+
+All four values are specific to your organization or user and must be provided by your Solarvista Live administrator or IT department.
+
+- **Datasources**: specific to your organization.
+- **Account**: specific to you.
+- **Client ID**: specific to your organization.
+- **Code**: specific to you.
+
+## Setup
+
+### In Solarvista Live
+
+1. Ask your Solarvista Live administrator or IT department for your Datasources, Account, Client ID and Code.
+
+### In Meltano Cloud
+
+1. Enter the Datasources, Account, Client ID and Code.
+2. Optionally set a Start Date.
+3. Optionally set Force Start Date.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `datasources` | string | The data sources to connect to in Solarvista Live. Required. |
+| `account` | string | The account name to use for authentication. Required. |
+| `clientId` | string | The client ID to use for authentication. Required. |
+| `code` | string | The code to use for authentication. Required, sensitive. |
+| `start_date` | date | The date to start retrieving data from. |
+| `force_start_date` | date | A flag indicating whether to force the start date even if data already exists for that date. |
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).

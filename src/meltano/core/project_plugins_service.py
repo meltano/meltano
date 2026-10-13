@@ -81,7 +81,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
     def __init__(
         self,
         plugin: ProjectPlugin,
-        error: Exception | None,
+        error: PluginNotFoundError | None,
         existing_variants: list[str] | None = None,
     ):
         """Initialize a new error.
@@ -105,7 +105,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
             )
         else:
             reason = (
-                str(error)
+                error.reason
                 if error
                 else f"No definition found for {plugin.type.descriptor} {plugin.name}"
             )
@@ -552,7 +552,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         Raises:
             PluginDefinitionNotFoundError: If the parent plugin is not found.
         """
-        error: Exception | None = None
+        error: PluginNotFoundError | None = None
         if (
             plugin.inherit_from
             and not plugin.is_variant_set

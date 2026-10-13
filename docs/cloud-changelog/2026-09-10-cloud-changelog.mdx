@@ -1,0 +1,23 @@
+---
+slug: 2026-09-10-cloud-changelog
+title: Faster Spreadsheet Ingestion & New Salesforce Connector
+date: 2026-09-10
+---
+
+Every spreadsheet-based connector now parses directly into Arrow tables, cutting extraction time across pipelines, and `target-salesforce` joins as a new fully supported destination. This release also adds an "Unstable" chip and new filters for tracking pipeline health at a glance, Arrow-powered speedups for Snowflake and BigQuery, and fixes for target-snowflake, target-bigquery, and tap-aptem.
+
+{/* truncate */}
+
+## Features
+
+- **Faster spreadsheet ingestion, across the board:** Every spreadsheet-based connector, including `tap-spreadsheets-anywhere` and its Google Sheets, SharePoint, S3, Azure, GCS, IMAP, Outlook, and SFTP variants, now parses data directly into Arrow tables instead of row-by-row, cutting extraction time for spreadsheet-based pipelines.
+- **Pipeline stability at a glance:** An "Unstable" chip now flags any pipeline with failures in its previous five runs, so it's immediately clear which pipelines need your attention. New filters for Health, Last Run Status, Trigger, and Plugin also make it easier to navigate a large number of pipelines.
+- **New Salesforce connector:** `target-salesforce` is now available as a fully supported destination with configurable stream-name mapping, plus docs covering field mapping, upsert behavior, and date formatting.
+- **Snowflake gets faster and more flexible:** `tap-snowflake` now supports Arrow BATCH mode for faster extraction, and `target-snowflake` now supports the append-only load method.
+- **Arrow support for BigQuery:** `target-bigquery` (v1.1.0) now supports Arrow BATCH messages, speeding up ingestion into BigQuery.
+
+## Fixes
+
+- **Bumped target-snowflake:** Fixed an issue where existing columns with names requiring quoting were incorrectly re-added.
+- **Fixed BigQuery Arrow driver:** Resolved a missing driver dependency that was blocking Arrow functionality in `target-bigquery`.
+- **Bumped tap-aptem to v0.2.0:** Added support for Aptem's new v2 API.
