@@ -92,6 +92,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
             existing_variants: Alternate variants found in existing lockfiles.
         """
         descriptor = plugin.type.descriptor.capitalize()
+        reason: str | Exception | None
         if existing_variants and not plugin.is_variant_set:
             formatted_variants = ", ".join(f"'{v}'" for v in existing_variants)
             reason = (
