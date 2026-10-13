@@ -99,7 +99,7 @@ jobs:
       packages: write # write the packages to the repo
       security-events: write # create security reports for the repo
     env:
-      DEFAULT_PYTHON: "3.10"  # will be used in 'latest' images
+      DEFAULT_PYTHON: "3.14"  # will be used in 'latest' images
 
     strategy:
       fail-fast: false
