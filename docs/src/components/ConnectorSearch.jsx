@@ -28,6 +28,10 @@ const CONNECTORS = [
   { label: 'Pinterest', href: '/connectors/tap-pinterest', category: 'extractor' },
   { label: 'HubSpot', href: '/connectors/tap-hubspot', category: 'extractor' },
   { label: 'Jira', href: '/connectors/tap-jira', category: 'extractor' },
+  { label: 'Chromadb', href: '/connectors/target-chromadb', category: 'loader' },
+  { label: 'Solarvista Live', href: '/connectors/tap-solarvista', category: 'extractor' },
+  { label: 'GitLab', href: '/connectors/tap-gitlab', category: 'extractor' },
+  { label: 'CloudWatch', href: '/connectors/tap-cloudwatch', category: 'extractor' },
 ];
 
 function ConnectorCardTitle({ label }) {

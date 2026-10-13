@@ -1,0 +1,73 @@
+---
+title: Chromadb
+description: Load your data into Chromadb.
+---
+
+import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
+
+# Chromadb
+
+<ConnectorTypeBadge type="loader" block />
+
+Chromadb is an open-source embedding (vector) database. It lets you store documents alongside their embeddings and metadata, and query them by similarity, which makes it a common destination for retrieval-augmented generation (RAG) and other AI workflows. Connect it as a destination to load your data into a Chromadb collection.
+
+> **Note:** Chromadb is a loader, not a data source: it doesn't have its own streams, sync type or custom queries to sync from. The facts below reflect that.
+
+## At a glance
+
+| Property | Value |
+|---|---|
+| **Type** | Loader (target) |
+| **Authentication** | None listed |
+
+## What it loads
+
+Whatever streams your connected data sources send it, written as documents into the Chromadb collection you configure.
+
+## Prerequisites
+
+No credentials are listed for this connector. The following settings are validated together:
+
+- **Collection Name**: the name of the collection to connect to in the Chromadb API (defaults to `vector-db`).
+- **Database Directory**: the directory where the database files are stored (defaults to `output`).
+- **Document Text Property**: the name of the property in the document that contains the text to be indexed (defaults to `page_content`).
+
+## Setup
+
+### In Chromadb
+
+1. No credentials or account details are listed for this connector.
+
+### In Meltano Cloud
+
+1. Enter the Collection Name (default: `vector-db`).
+2. Enter the Database Directory (default: `output`).
+3. Enter the Document Text Property (default: `page_content`).
+4. Optionally set the Embeddings Property (default: `embeddings`) and the Metadata Property (default: `metadata`).
+
+## Available streams
+
+This target doesn't discover streams itself: it loads whatever streams the connected extractor(s) send it, writing each record as a document in the configured collection.
+
+## Advanced configuration
+
+- **Flattening**: Flattening Enabled sets whether nested objects in the document are flattened; Flattening Max Depth sets the maximum depth to which nested objects are flattened.
+- **Stream Maps / Stream Map Config**: the list of stream maps to be used for indexing and querying, and the configuration for the stream map.
+
+## Settings
+
+| Setting | Type | Description |
+|---|---|---|
+| `collection_name` | string | The name of the collection to connect to in the Chromadb API. Default: `vector-db`. |
+| `db_directory` | string | The directory where the database files are stored. Default: `output`. |
+| `document_text_property` | string | The name of the property in the document that contains the text to be indexed. Default: `page_content`. |
+| `embeddings_property` | string | The name of the property in the document that contains the precomputed embeddings. Default: `embeddings`. |
+| `metadata_property` | string | The name of the property in the document that contains metadata. Default: `metadata`. |
+| `flattening_enabled` | boolean | Whether or not to flatten nested objects in the document. |
+| `flattening_max_depth` | integer | The maximum depth to which nested objects should be flattened. |
+| `stream_maps` | object | The list of stream maps to be used for indexing and querying. |
+| `stream_map_config` | object | The configuration for the stream map. |
+
+## Need help?
+
+If a stream or field you need isn't listed here or the connector doesn't work as expected, file it through the [usual Meltano support channel](https://meltano.com/contact).
