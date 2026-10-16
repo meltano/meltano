@@ -582,11 +582,11 @@ class SingerTap(SingerPlugin):
                 catalog = json.load(catalog_file)
 
             if schema_rules:
-                SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
+                SchemaExecutor(schema_rules).visit(catalog)
 
             if metadata_rules:
                 self.warn_property_not_found(metadata_rules, catalog)
-                MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]  # ty:ignore[unresolved-attribute]
+                MetadataExecutor(metadata_rules).visit(catalog)
 
             with catalog_path.open("w") as catalog_f:
                 catalog_f.write(json_dumps(catalog, indent=2))
