@@ -334,7 +334,6 @@ async def _run_blocks(
             set_number=idx,
             block_type=blk_name,
             success=True,
-            err=None,
             duration_seconds=round(block_duration, 3),
         )
         with tracker.with_contexts(tracking_ctx):

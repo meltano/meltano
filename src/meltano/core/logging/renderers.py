@@ -230,6 +230,11 @@ class MeltanoConsoleRenderer(structlog.dev.ConsoleRenderer):  # noqa: TID251
         "stack",
         "exception",
         "exc_info",
+        # `meltano run` report
+        # TODO: Replace these in favor of a more structured per-block event
+        "err",
+        "exit_codes",
+        "status",
         # Internal structured logging
         "install_state",
         # Plugin subprocess
