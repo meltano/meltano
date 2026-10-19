@@ -2,6 +2,20 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "collections",
+    "collections.abc",
+    "json",
+    "meltano.core.cloud.config",
+    "meltano.core.error",
+    "meltano.core.hub",
+    "meltano.core.hub.schema",
+    "meltano.core.plugin",
+    "rich.box",
+    "rich.console",
+    "rich.table",
+}
+
 import json
 import typing as t
 from collections import Counter

@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "json",
+    "meltano.core.environment",
+    "meltano.core.environment_service",
+    "meltano.core.manifest",
+    "meltano.core.project",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+}
+
 import json
 import typing as t
 from pathlib import Path

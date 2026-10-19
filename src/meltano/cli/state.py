@@ -2,6 +2,19 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "datetime",
+    "json",
+    "json.decoder",
+    "meltano.core.block.block_parser",
+    "meltano.core.db",
+    "meltano.core.job",
+    "meltano.core.project",
+    "meltano.core.state_service",
+    "operator",
+    "re",
+}
+
 import json
 import json.decoder
 import re

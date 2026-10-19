@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "contextlib",
+    "json",
+    "meltano.core.db",
+    "meltano.core.plugin.error",
+    "meltano.core.plugin.singer.catalog",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "meltano.core.select_service",
+}
+
 import json
 import typing as t
 from contextlib import closing

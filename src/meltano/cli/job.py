@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "json",
+    "meltano.core.block.block_parser",
+    "meltano.core.project",
+    "meltano.core.task_sets",
+    "meltano.core.task_sets_service",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+}
+
 import json
 import typing as t
 

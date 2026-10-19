@@ -4,6 +4,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "asyncio",
+    "logging",
+    "meltano.cli.utils",
+    "meltano.core._compat",
+    "meltano.core.error",
+    "meltano.core.tracking.tracker",
+    "warnings",
+}
+
 import asyncio
 import logging
 import os

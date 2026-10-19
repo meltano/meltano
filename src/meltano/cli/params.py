@@ -2,6 +2,19 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "functools",
+    "meltano.cli.utils",
+    "meltano.core.db",
+    "meltano.core.migration_service",
+    "meltano.core.plugin",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "meltano.core.project_settings_service",
+    "meltano.core.utils",
+    "uuid",
+}
+
 import functools
 import sys
 import typing as t

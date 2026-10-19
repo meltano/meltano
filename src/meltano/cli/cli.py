@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.error",
+    "meltano.core.project",
+    "meltano.core.project_settings_service",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+    "meltano.core.utils",
+    "platform",
+}
+
 import os
 import platform
 import sys

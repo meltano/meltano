@@ -2,6 +2,20 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "json",
+    "meltano.core.db",
+    "meltano.core.job",
+    "meltano.core.logging.job_logging_service",
+    "meltano.core.project",
+    "meltano.core.tracking.contexts",
+    "meltano.core.tracking.tracker",
+    "rich.box",
+    "rich.console",
+    "rich.table",
+    "sqlalchemy.orm",
+}
+
 import json
 import typing as t
 

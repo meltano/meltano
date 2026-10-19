@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__lazy_modules__ = {"click.exceptions", "click.utils", "difflib"}
+
 import difflib
 import sys
 
