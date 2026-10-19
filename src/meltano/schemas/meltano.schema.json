@@ -655,6 +655,7 @@
                     "test",
                     "log-based",
                     "schema-flattening",
+                    "start-date",
                     "structured-logging"
                   ]
                 }

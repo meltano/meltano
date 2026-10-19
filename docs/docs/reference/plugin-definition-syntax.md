@@ -108,6 +108,7 @@ The capabilities vary by plugin type. Below are the capabilities organized by ty
 - [`test`](#test-capability)
 - [`log-based`](#log-based-capability)
 - [`schema-flattening`](#schema-flattening-capability)
+- [`start-date`](#start-date-capability)
 - [`structured-logging`](#structured-logging-capability)
 
 ### Loader capabilities
@@ -177,6 +178,10 @@ For extractors only. Declares that the plugin supports log-based replication (e.
 ### `schema-flattening` capability
 
 Declares that the plugin supports schema flattening, which can flatten nested objects into separate columns.
+
+### `start-date` capability
+
+For extractors only. Declares that the plugin supports a `start_date` setting, which sets the earliest date from which incremental streams replicate records.
 
 ### `structured-logging` capability
 
