@@ -55,6 +55,8 @@ class TestCliState:
         project: Project,
         state_id: str,
     ) -> None:
+        # Resolve the lazy import first so that `autospec` sees the real class
+        state.BlockParser  # noqa: B018
         with mock.patch(
             "meltano.cli.state.BlockParser",
             autospec=True,

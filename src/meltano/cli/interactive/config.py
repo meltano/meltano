@@ -13,7 +13,6 @@ __lazy_modules__ = {
     "meltano.core.tracking.contexts",
     "meltano.core.tracking.tracker",
     "meltano.core.utils",
-    "readline",
     "rich.console",
     "rich.markdown",
     "rich.panel",
