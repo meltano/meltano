@@ -16,10 +16,12 @@ import sys
 import typing as t
 from enum import Enum, auto
 from functools import partial, singledispatch
+from glob import has_magic
 
 import structlog
 
 from meltano.core.behavior.visitor import visit_with
+from meltano.core.error import MeltanoError
 
 if sys.version_info >= (3, 11):
     from enum import StrEnum
@@ -54,6 +56,10 @@ class CatalogDict(t.TypedDict):
     """A catalog dictionary."""
 
     streams: list[dict[str, t.Any]]
+
+
+class UnknownStreamError(MeltanoError):
+    """Raised when a stream is not found in the catalog."""
 
 
 class _CatalogRuleProtocol(t.Protocol):
@@ -210,12 +216,24 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     Returns:
         A list of corresponding metadata rule objects.
     """
+    return metadata_rules_from_parsed_patterns(map(SelectPattern.parse, patterns))
+
+
+def metadata_rules_from_parsed_patterns(
+    parsed_patterns: Iterable[SelectPattern],
+) -> list[MetadataRule]:
+    """Create metadata rules from already-parsed `select` patterns.
+
+    Args:
+        parsed_patterns: Iterable of parsed `SelectPattern` instances.
+
+    Returns:
+        A list of corresponding metadata rule objects.
+    """
     include_rules: list[MetadataRule] = []
     exclude_rules: list[MetadataRule] = []
 
-    for pattern in patterns:
-        parsed_pattern = SelectPattern.parse(pattern)
-
+    for parsed_pattern in parsed_patterns:
         prop_pattern = parsed_pattern.property_pattern
         selected = not parsed_pattern.negated
         select = partial(MetadataRule.select, value=selected)
@@ -276,6 +294,39 @@ def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
         rules.append(exclude_rule)
 
     return rules
+
+
+def validate_selections(patterns: list[SelectPattern], catalog: CatalogDict) -> None:
+    """Raise when an explicitly selected stream is missing from the catalog.
+
+    Args:
+        patterns: Parsed stream and property selection patterns.
+        catalog: Discovered source catalog.
+
+    Raises:
+        UnknownStreamError: If a full-stream selection names a missing stream.
+    """
+    stream_ids = {
+        stream.get("tap_stream_id")
+        for stream in catalog.get("streams", [])
+        if isinstance(stream, dict)  # type: ignore[redundant-expr]
+    }
+
+    for pattern in patterns:
+        selects_full_stream = pattern.property_pattern in {None, "*"}
+        if (
+            pattern.negated
+            or has_magic(pattern.stream_pattern)
+            or not selects_full_stream
+            or pattern.stream_pattern in stream_ids
+        ):
+            continue
+
+        msg = (
+            f"Selection rule `{pattern.raw}` requires stream "
+            f"`{pattern.stream_pattern}`, but it was not found in the catalog"
+        )
+        raise UnknownStreamError(msg)
 
 
 def path_property(path: str) -> str:
