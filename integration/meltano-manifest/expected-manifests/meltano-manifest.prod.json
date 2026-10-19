@@ -259,7 +259,7 @@
             "name": "batch_config.encoding.compression",
             "options": [
               {
-                "label": "Gzip",
+                "label": "GZIP",
                 "value": "gzip"
               },
               {
@@ -275,7 +275,7 @@
             "name": "batch_config.encoding.format",
             "options": [
               {
-                "label": "Jsonl",
+                "label": "JSONL",
                 "value": "jsonl"
               },
               {
@@ -308,6 +308,18 @@
             "kind": "date_iso8601",
             "label": "End Date",
             "name": "end_date"
+          },
+          {
+            "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization",
+            "kind": "array",
+            "label": "Faker Config Locale",
+            "name": "faker_config.locale"
+          },
+          {
+            "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator",
+            "kind": "string",
+            "label": "Faker Config Seed",
+            "name": "faker_config.seed"
           },
           {
             "description": "'True' to enable schema flattening and automatically expand nested properties.",
@@ -358,6 +370,13 @@
             "query",
             "start_date"
           ]
+        ],
+        "supported_python_versions": [
+          "3.8",
+          "3.9",
+          "3.10",
+          "3.11",
+          "3.12"
         ],
         "variant": "meltanolabs"
       },
@@ -509,7 +528,7 @@
         "repo": "https://github.com/ets/tap-spreadsheets-anywhere",
         "settings": [
           {
-            "description": "An array holding json objects that each describe a set of targeted source files.\n\nEach object in the 'tables' array describes one or more CSV or Excel spreadsheet files that adhere to the same schema and are meant to be tapped as the source for a Singer-based data flow.\nThe available keys are:\n\n- path: A string describing the transport and bucket/root directory holding the targeted source files.\n- name: A string describing the \"table\" (aka Singer stream) into which the source data should be loaded.\n- search_prefix: (optional) This is an optional prefix to apply after the bucket that will be used to filter files in the listing request from the targeted system. This prefix potentially reduces the number of files returned from the listing request.\n- pattern: This is an escaped regular expression that the tap will use to filter the listing result set returned from the listing request. This pattern potentially reduces the number of listed files that are considered as sources for the declared table. It's a bit strange, since this is an escaped string inside of an escaped string, any backslashes in the RegEx will need to be double-escaped.\n- start_date: This is the datetime that the tap will use to filter files, based on the modified timestamp of the file.\n- key_properties: These are the \"primary keys\" of the CSV files, to be used by the target for deduplication and primary key definitions downstream in the destination.\n- format: Must be either 'csv', 'json', 'excel', or 'detect'. Note that csv can be further customized with delimiter and quotechar variables below.\n- invalid_format_action: (optional) By default, the tap will raise an exception if a source file can not be read . Set this key to \"ignore\" to skip such source files and continue the run.\n- field_names: (optional) An array holding the names of the columns in the targeted files. If not supplied, the first row of each file must hold the desired values.\n- universal_newlines: (optional) Should the source file parsers honor universal newlines). Setting this to false will instruct the parser to only consider '\\n' as a valid newline identifier.\n- sample_rate: (optional) The sampling rate to apply when reading a source file for sampling in discovery mode. A sampling rate of 1 will sample every line. A sampling rate of 10 (the default) will sample every 10th line.\n- max_sampling_read: (optional) How many lines of the source file should be sampled when in discovery mode attempting to infer a schema. The default is 1000 samples.\n- max_sampled_files: (optional) The maximum number of files in the targeted set that will be sampled. The default is 5.\n- max_records_per_run: (optional) The maximum number of records that should be written to this stream in a single sync run. The default is unlimited.\n- prefer_number_vs_integer: (optional) If the discovery mode sampling process sees only integer values for a field, should number be used anyway so that floats are not considered errors? The default is false but true can help in situations where floats only appear rarely in sources and may not be detected through discovery sampling.\n- selected: (optional) Should this table be synced. Defaults to true. Setting to false will skip this table on a sync run.\n- worksheet_name: (optional) the worksheet name to pull from in the targeted xls file(s). Only required when format is excel\n- delimiter: (optional) the delimiter to use when format is 'csv'. Defaults to a comma ',' but you can set delimiter to 'detect' to leverage the csv \"Sniffer\" for auto-detecting delimiter.\n- quotechar: (optional) the character used to surround values that may contain delimiters - defaults to a double quote '\"'\n- json_path: (optional) the JSON key under which the list of objets to use is located. Defaults to None, corresponding to an array at the top level of the JSON tree.\n\nFor example:\n\n```yaml\nconfig:\n  tables:\n  - path: s3://my-s3-bucket\n    name: target_table_name\n    pattern: subfolder/common_prefix.*\n    start_date: 2017-05-01T00:00:00Z\n    key_properties: []\n    format: csv\n    delimiter: \"|\"\n    quotechar: '\"'\n    universal_newlines: false\n    sample_rate: 10\n    max_sampling_read: 2000\n    max_sampled_files: 3\n    prefer_number_vs_integer: true\n    selected: true\n```\n\nSee the `Common Config Examples` section below for more examples or see the [repo README](https://github.com/ets/tap-spreadsheets-anywhere) for more details.\n",
+            "description": "An array holding json objects that each describe a set of targeted source files.\n\nEach object in the 'tables' array describes one or more CSV or Excel spreadsheet files that adhere to the same schema and are meant to be tapped as the source for a Singer-based data flow.\nThe available keys are:\n\n- path: A string describing the transport and bucket/root directory holding the targeted source files.\n- name: A string describing the \"table\" (aka Singer stream) into which the source data should be loaded.\n- search_prefix: (optional) This is an optional prefix to apply after the bucket that will be used to filter files in the listing request from the targeted system. This prefix potentially reduces the number of files returned from the listing request.\n- pattern: This is an escaped regular expression that the tap will use to filter the listing result set returned from the listing request. This pattern potentially reduces the number of listed files that are considered as sources for the declared table. It's a bit strange, since this is an escaped string inside of an escaped string, any backslashes in the RegEx will need to be double-escaped.\n- start_date: This is the datetime that the tap will use to filter files, based on the modified timestamp of the file.\n- key_properties: These are the \"primary keys\" of the CSV files, to be used by the target for deduplication and primary key definitions downstream in the destination.\n- format: Must be either 'csv', 'json', 'excel', or 'detect'. Note that csv can be further customized with delimiter and quotechar variables below.\n- invalid_format_action: (optional) By default, the tap will raise an exception if a source file can not be read . Set this key to \"ignore\" to skip such source files and continue the run.\n- field_names: (optional) An array holding the names of the columns in the targeted files. If not supplied, the first row of each file must hold the desired values.\n- universal_newlines: (optional) Should the source file parsers honor universal newlines). Setting this to false will instruct the parser to only consider '\\n' as a valid newline identifier.\n- sample_rate: (optional) The sampling rate to apply when reading a source file for sampling in discovery mode. A sampling rate of 1 will sample every line. A sampling rate of 10 (the default) will sample every 10th line.\n- max_sampling_read: (optional) How many lines of the source file should be sampled when in discovery mode attempting to infer a schema. The default is 1000 samples.\n- max_sampled_files: (optional) The maximum number of files in the targeted set that will be sampled. The default is 5.\n- max_records_per_run: (optional) The maximum number of records that should be written to this stream in a single sync run. The default is unlimited.\n- prefer_number_vs_integer: (optional) If the discovery mode sampling process sees only integer values for a field, should number be used anyway so that floats are not considered errors? The default is false but true can help in situations where floats only appear rarely in sources and may not be detected through discovery sampling.\n- selected: (optional) Should this table be synced. Defaults to true. Setting to false will skip this table on a sync run.\n- worksheet_name: (optional) the worksheet name to pull from in the targeted xls file(s). Only required when format is excel\n- delimiter: (optional) the delimiter to use when format is 'csv', for example ','. You can leave delimiter blank or set it to 'detect' to leverage the csv \"Sniffer\" for auto-detecting delimiter.\n- quotechar: (optional) the character used to surround values that may contain delimiters - defaults to a double quote '\"' when not using the auto detecting feature. That is, delimiter is defined and not equal to `detect`.\n- json_path: (optional) the JSON key under which the list of objets to use is located. Defaults to None, corresponding to an array at the top level of the JSON tree.\n\nFor example:\n\n```yaml\nconfig:\n  tables:\n  - path: s3://my-s3-bucket\n    name: target_table_name\n    pattern: subfolder/common_prefix.*\n    start_date: 2017-05-01T00:00:00Z\n    key_properties: []\n    format: csv\n    delimiter: \"|\"\n    quotechar: '\"'\n    universal_newlines: false\n    sample_rate: 10\n    max_sampling_read: 2000\n    max_sampled_files: 3\n    prefer_number_vs_integer: true\n    selected: true\n```\n\nSee the `Common Config Examples` section below for more examples or see the [repo README](https://github.com/ets/tap-spreadsheets-anywhere) for more details.\n",
             "kind": "array",
             "label": "Tables",
             "name": "tables"
@@ -525,12 +544,14 @@
       {
         "capabilities": [
           "about",
+          "activate-version",
           "batch",
           "catalog",
           "discover",
           "schema-flattening",
           "state",
-          "stream-maps"
+          "stream-maps",
+          "structured-logging"
         ],
         "config": {
           "auto_join_channels": false,
@@ -602,11 +623,11 @@
           {
             "description": "Compression format to use for batch files.",
             "kind": "options",
-            "label": "Batch Config Encoding Compression",
+            "label": "Batch Compression Format",
             "name": "batch_config.encoding.compression",
             "options": [
               {
-                "label": "Gzip",
+                "label": "GZIP",
                 "value": "gzip"
               },
               {
@@ -618,11 +639,11 @@
           {
             "description": "Format to use for batch files.",
             "kind": "options",
-            "label": "Batch Config Encoding Format",
+            "label": "Batch Encoding Format",
             "name": "batch_config.encoding.format",
             "options": [
               {
-                "label": "Jsonl",
+                "label": "JSONL",
                 "value": "jsonl"
               },
               {
@@ -634,13 +655,13 @@
           {
             "description": "Prefix to use when writing batch files.",
             "kind": "string",
-            "label": "Batch Config Storage Prefix",
+            "label": "Batch Storage Prefix",
             "name": "batch_config.storage.prefix"
           },
           {
             "description": "Root path to use when writing batch files.",
             "kind": "string",
-            "label": "Batch Config Storage Root",
+            "label": "Batch Storage Root",
             "name": "batch_config.storage.root"
           },
           {
@@ -659,16 +680,40 @@
             "name": "excluded_channels"
           },
           {
+            "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization",
+            "kind": "array",
+            "label": "Faker Locale",
+            "name": "faker_config.locale"
+          },
+          {
+            "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator",
+            "kind": "string",
+            "label": "Faker Seed",
+            "name": "faker_config.seed"
+          },
+          {
             "description": "'True' to enable schema flattening and automatically expand nested properties.",
             "kind": "boolean",
-            "label": "Flattening Enabled",
+            "label": "Enable Schema Flattening",
             "name": "flattening_enabled"
           },
           {
             "description": "The max depth to flatten schemas.",
             "kind": "integer",
-            "label": "Flattening Max Depth",
+            "label": "Max Flattening Depth",
             "name": "flattening_max_depth"
+          },
+          {
+            "description": "The maximum length of a flattened key.",
+            "kind": "integer",
+            "label": "Max Key Length",
+            "name": "flattening_max_key_length"
+          },
+          {
+            "description": "The separator to use when flattening keys.",
+            "kind": "string",
+            "label": "Flattening Separator",
+            "name": "flattening_separator"
           },
           {
             "description": "Whether to include streams that require admin privileges or not. If the user does not have the proper scopes then the tap will throw and exception.",
@@ -692,7 +737,7 @@
           {
             "description": "User-defined config values to be used within map expressions.",
             "kind": "object",
-            "label": "Stream Map Config",
+            "label": "User Stream Map Configuration",
             "name": "stream_map_config"
           },
           {
@@ -713,6 +758,13 @@
           [
             "api_key"
           ]
+        ],
+        "supported_python_versions": [
+          "3.10",
+          "3.11",
+          "3.12",
+          "3.13",
+          "3.14"
         ],
         "variant": "meltanolabs"
       },
@@ -855,13 +907,6 @@
             "sensitive": true
           },
           {
-            "description": "Google Analytics Access Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "string",
-            "label": "OAuth Credentials Access Token",
-            "name": "oauth_credentials.access_token",
-            "sensitive": true
-          },
-          {
             "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
             "kind": "string",
             "label": "OAuth Credentials Client ID",
@@ -888,6 +933,12 @@
             "label": "Reports",
             "name": "reports",
             "placeholder": "Ex. my_report_definition.json"
+          },
+          {
+            "description": "List of Google Analytics Reports Definitions",
+            "kind": "array",
+            "label": "Reports List",
+            "name": "reports_list"
           },
           {
             "description": "This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
@@ -1073,12 +1124,14 @@
       {
         "capabilities": [
           "about",
+          "activate-version",
           "batch",
           "catalog",
           "discover",
           "schema-flattening",
           "state",
-          "stream-maps"
+          "stream-maps",
+          "structured-logging"
         ],
         "config": {
           "start_date": "2020-01-01"
@@ -1086,7 +1139,10 @@
         "description": "Code hosting platform",
         "docs": "https://hub.meltano.com/extractors/tap-github--meltanolabs",
         "env": {
+          "MELTANO_EXTRACT_BACKOFF_MAX_TRIES": "5",
           "MELTANO_EXTRACT_START_DATE": "2020-01-01",
+          "MELTANO_EXTRACT_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "MELTANO_EXTRACT_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github",
           "MELTANO_EXTRACT__LOG_PARSER": "singer-sdk",
           "MELTANO_EXTRACT__METADATA": "{}",
@@ -1094,7 +1150,10 @@
           "MELTANO_EXTRACT__SELECT": "[\"*.*\", \"!traffic_*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
+          "TAP_GITHUB_BACKOFF_MAX_TRIES": "5",
           "TAP_GITHUB_START_DATE": "2020-01-01",
+          "TAP_GITHUB_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "TAP_GITHUB_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "TAP_GITHUB__LOAD_SCHEMA": "tap_github",
           "TAP_GITHUB__LOG_PARSER": "singer-sdk",
           "TAP_GITHUB__METADATA": "{}",
@@ -1107,7 +1166,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/github.png",
         "name": "tap-github",
         "namespace": "tap_github",
-        "pip_url": "git+https://github.com/MeltanoLabs/tap-github.git",
+        "pip_url": "meltanolabs-tap-github",
         "plugin_type": "extractors",
         "repo": "https://github.com/MeltanoLabs/tap-github",
         "select": [
@@ -1122,6 +1181,12 @@
             "name": "additional_auth_tokens"
           },
           {
+            "description": "List of GitHub App credentials to authenticate with. These are organization-agnostic and will be used as fallback for all organizations. Each credential should be formatted as `:app_id:;;-----BEGIN RSA PRIVATE KEY-----\\n_YOUR_P_KEY_\\n-----END RSA PRIVATE KEY-----`.",
+            "kind": "array",
+            "label": "Auth App Keys",
+            "name": "auth_app_keys"
+          },
+          {
             "description": "GitHub token to authenticate with.",
             "kind": "string",
             "label": "Auth Token",
@@ -1129,13 +1194,20 @@
             "sensitive": true
           },
           {
+            "description": "Maximum number of retry attempts for failed API requests that are retriable. Defaults to 5.",
+            "kind": "integer",
+            "label": "Backoff Max Tries",
+            "name": "backoff_max_tries",
+            "value": 5
+          },
+          {
             "description": "Compression format to use for batch files.",
             "kind": "options",
-            "label": "Batch Config Encoding Compression",
+            "label": "Batch Compression Format",
             "name": "batch_config.encoding.compression",
             "options": [
               {
-                "label": "Gzip",
+                "label": "GZIP",
                 "value": "gzip"
               },
               {
@@ -1147,44 +1219,84 @@
           {
             "description": "Format to use for batch files.",
             "kind": "options",
-            "label": "Batch Config Encoding Format",
+            "label": "Batch Encoding Format",
             "name": "batch_config.encoding.format",
             "options": [
               {
-                "label": "Jsonl",
+                "label": "JSONL",
                 "value": "jsonl"
+              },
+              {
+                "label": "Parquet",
+                "value": "parquet"
               }
             ]
           },
           {
             "description": "Prefix to use when writing batch files.",
             "kind": "string",
-            "label": "Batch Config Storage Prefix",
+            "label": "Batch Storage Prefix",
             "name": "batch_config.storage.prefix"
           },
           {
             "description": "Root path to use when writing batch files.",
             "kind": "string",
-            "label": "Batch Config Storage Root",
+            "label": "Batch Storage Root",
             "name": "batch_config.storage.root"
+          },
+          {
+            "description": "When authenticating as a GitHub App, this buffer controls how many minutes before expiry the GitHub app tokens will be refreshed. Defaults to 10 minutes.",
+            "kind": "integer",
+            "label": "Expiry Time Buffer",
+            "name": "expiry_time_buffer"
+          },
+          {
+            "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization",
+            "kind": "array",
+            "label": "Faker Locale",
+            "name": "faker_config.locale"
+          },
+          {
+            "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator",
+            "kind": "string",
+            "label": "Faker Seed",
+            "name": "faker_config.seed"
           },
           {
             "description": "'True' to enable schema flattening and automatically expand nested properties.",
             "kind": "boolean",
-            "label": "Flattening Enabled",
+            "label": "Enable Schema Flattening",
             "name": "flattening_enabled"
           },
           {
             "description": "The max depth to flatten schemas.",
             "kind": "integer",
-            "label": "Flattening Max Depth",
+            "label": "Max Flattening Depth",
             "name": "flattening_max_depth"
+          },
+          {
+            "description": "The maximum length of a flattened key.",
+            "kind": "integer",
+            "label": "Max Key Length",
+            "name": "flattening_max_key_length"
+          },
+          {
+            "description": "The separator to use when flattening keys.",
+            "kind": "string",
+            "label": "Flattening Separator",
+            "name": "flattening_separator"
           },
           {
             "description": "The log level of the API response metrics.",
             "kind": "string",
             "label": "Metrics Log Level",
             "name": "metrics_log_level"
+          },
+          {
+            "description": "Organization-specific GitHub App credentials. Maps organization names to lists of app credentials. When processing repositories from a specific organization, the tap will prefer tokens configured for that organization. Each credential should be formatted as `:app_id:;;-----BEGIN RSA PRIVATE KEY-----\\n_YOUR_P_KEY_\\n-----END RSA PRIVATE KEY-----`.",
+            "kind": "object",
+            "label": "Org Auth App Keys",
+            "name": "org_auth_app_keys"
           },
           {
             "description": "An array of strings containing the github organizations to be included",
@@ -1205,7 +1317,7 @@
             "name": "repositories"
           },
           {
-            "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)",
+            "description": "An array of search descriptor objects with the following properties: \"name\" - a human readable name for the search query. \"query\" - a github search string (generally the same as would come after ?q= in the URL)\"",
             "kind": "array",
             "label": "Searches",
             "name": "searches"
@@ -1217,6 +1329,7 @@
             "name": "skip_parent_streams"
           },
           {
+            "description": "Start date for incremental sync.",
             "kind": "date_iso8601",
             "label": "Start Date",
             "name": "start_date"
@@ -1232,6 +1345,35 @@
             "name": "stream_maps"
           },
           {
+            "description": "Configures which states are of interest. Must be one of [open, closed, all], defaults to open.",
+            "kind": "options",
+            "label": "Stream Options Milestones State",
+            "name": "stream_options.milestones.state",
+            "options": [
+              {
+                "label": "Open",
+                "value": "open"
+              },
+              {
+                "label": "Closed",
+                "value": "closed"
+              },
+              {
+                "label": "All",
+                "value": "all"
+              }
+            ],
+            "value": "open"
+          },
+          {
+            "description": "Number of ProjectV2 items to request per GraphQL page. Defaults to 100, GitHub's maximum. Lower values can reduce GraphQL query complexity for projects with many custom fields.",
+            "kind": "integer",
+            "label": "Stream Options Project Items Page Size",
+            "name": "stream_options.project_items.page_size",
+            "value": 100
+          },
+          {
+            "description": "User agent to use for API requests.",
             "kind": "string",
             "label": "User Agent",
             "name": "user_agent"
@@ -1266,6 +1408,13 @@
             "user_ids"
           ]
         ],
+        "supported_python_versions": [
+          "3.10",
+          "3.11",
+          "3.12",
+          "3.13",
+          "3.14"
+        ],
         "variant": "meltanolabs"
       },
       {
@@ -1281,10 +1430,13 @@
           }
         },
         "env": {
+          "MELTANO_EXTRACT_BACKOFF_MAX_TRIES": "5",
           "MELTANO_EXTRACT_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
           "MELTANO_EXTRACT_START_DATE": "2020-01-01",
           "MELTANO_EXTRACT_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "MELTANO_EXTRACT_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "MELTANO_EXTRACT_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "MELTANO_EXTRACT_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github_meltano",
           "MELTANO_EXTRACT__LOG_PARSER": "singer-sdk",
           "MELTANO_EXTRACT__METADATA": "{}",
@@ -1292,10 +1444,14 @@
           "MELTANO_EXTRACT__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
+          "TAP_GITHUB_BACKOFF_MAX_TRIES": "5",
+          "TAP_GITHUB_MELTANO_BACKOFF_MAX_TRIES": "5",
           "TAP_GITHUB_MELTANO_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
           "TAP_GITHUB_MELTANO_START_DATE": "2020-01-01",
           "TAP_GITHUB_MELTANO_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "TAP_GITHUB_MELTANO_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "TAP_GITHUB_MELTANO_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "TAP_GITHUB_MELTANO_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "TAP_GITHUB_MELTANO__LOAD_SCHEMA": "tap_github_meltano",
           "TAP_GITHUB_MELTANO__LOG_PARSER": "singer-sdk",
           "TAP_GITHUB_MELTANO__METADATA": "{}",
@@ -1307,6 +1463,8 @@
           "TAP_GITHUB_START_DATE": "2020-01-01",
           "TAP_GITHUB_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "TAP_GITHUB_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "TAP_GITHUB_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "TAP_GITHUB_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "TAP_GITHUB__LOAD_SCHEMA": "tap_github_meltano",
           "TAP_GITHUB__LOG_PARSER": "singer-sdk",
           "TAP_GITHUB__METADATA": "{}",
@@ -1351,12 +1509,15 @@
           }
         },
         "env": {
+          "MELTANO_EXTRACT_BACKOFF_MAX_TRIES": "5",
           "MELTANO_EXTRACT_METRICS_LOG_LEVEL": "DEBUG",
           "MELTANO_EXTRACT_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
           "MELTANO_EXTRACT_START_DATE": "2022-02-13",
           "MELTANO_EXTRACT_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "MELTANO_EXTRACT_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
           "MELTANO_EXTRACT_STREAM_MAPS_REPOSITORIES___FILTER__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n",
+          "MELTANO_EXTRACT_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "MELTANO_EXTRACT_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github_search",
           "MELTANO_EXTRACT__LOG_PARSER": "singer-sdk",
           "MELTANO_EXTRACT__METADATA": "{}",
@@ -1364,14 +1525,18 @@
           "MELTANO_EXTRACT__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
+          "TAP_GITHUB_BACKOFF_MAX_TRIES": "5",
           "TAP_GITHUB_METRICS_LOG_LEVEL": "DEBUG",
           "TAP_GITHUB_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
+          "TAP_GITHUB_SEARCH_BACKOFF_MAX_TRIES": "5",
           "TAP_GITHUB_SEARCH_METRICS_LOG_LEVEL": "DEBUG",
           "TAP_GITHUB_SEARCH_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
           "TAP_GITHUB_SEARCH_START_DATE": "2022-02-13",
           "TAP_GITHUB_SEARCH_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "TAP_GITHUB_SEARCH_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
           "TAP_GITHUB_SEARCH_STREAM_MAPS_REPOSITORIES___FILTER__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n",
+          "TAP_GITHUB_SEARCH_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "TAP_GITHUB_SEARCH_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "TAP_GITHUB_SEARCH__LOAD_SCHEMA": "tap_github_search",
           "TAP_GITHUB_SEARCH__LOG_PARSER": "singer-sdk",
           "TAP_GITHUB_SEARCH__METADATA": "{}",
@@ -1383,6 +1548,8 @@
           "TAP_GITHUB_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "TAP_GITHUB_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
           "TAP_GITHUB_STREAM_MAPS_REPOSITORIES___FILTER__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n",
+          "TAP_GITHUB_STREAM_OPTIONS_MILESTONES_STATE": "open",
+          "TAP_GITHUB_STREAM_OPTIONS_PROJECT_ITEMS_PAGE_SIZE": "100",
           "TAP_GITHUB__LOAD_SCHEMA": "tap_github_search",
           "TAP_GITHUB__LOG_PARSER": "singer-sdk",
           "TAP_GITHUB__METADATA": "{}",
@@ -2052,9 +2219,9 @@
         "logo_url": "https://hub.meltano.com/assets/logos/loaders/snowflake.png",
         "name": "target-snowflake",
         "namespace": "target_snowflake",
-        "pip_url": "pipelinewise-target-snowflake",
+        "pip_url": "git+https://github.com/transferwise/pipelinewise.git#subdirectory=singer-connectors/target-snowflake",
         "plugin_type": "loaders",
-        "repo": "https://github.com/transferwise/pipelinewise-target-snowflake",
+        "repo": "https://github.com/transferwise/pipelinewise",
         "settings": [
           {
             "description": "Snowflake account name (i.e. `rtXXXXX.eu-central-1`)",
@@ -2318,7 +2485,8 @@
         "capabilities": [
           "about",
           "schema-flattening",
-          "stream-maps"
+          "stream-maps",
+          "validate-records"
         ],
         "config": {
           "stream_maps": {
@@ -2333,14 +2501,20 @@
         "description": "Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS, Gotify, etc",
         "docs": "https://hub.meltano.com/loaders/target-apprise--autoidm",
         "env": {
+          "MELTANO_LOAD_LOAD_METHOD": "append-only",
           "MELTANO_LOAD_STREAM_MAPS": "{\"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.TITLE\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.title\": \"TITLE\", \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.BODY\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.body\": \"BODY\"}",
           "MELTANO_LOAD_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_BODY": "BODY",
           "MELTANO_LOAD_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_TITLE": "TITLE",
+          "MELTANO_LOAD_URI_REPLACEMENT": "false",
+          "MELTANO_LOAD_VALIDATE_RECORDS": "true",
           "MELTANO_LOAD__DIALECT": "target_apprise",
           "MELTANO_LOAD__LOG_PARSER": "singer-sdk",
+          "TARGET_APPRISE_LOAD_METHOD": "append-only",
           "TARGET_APPRISE_STREAM_MAPS": "{\"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.TITLE\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.title\": \"TITLE\", \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.BODY\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.body\": \"BODY\"}",
           "TARGET_APPRISE_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_BODY": "BODY",
           "TARGET_APPRISE_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_TITLE": "TITLE",
+          "TARGET_APPRISE_URI_REPLACEMENT": "false",
+          "TARGET_APPRISE_VALIDATE_RECORDS": "true",
           "TARGET_APPRISE__DIALECT": "target_apprise",
           "TARGET_APPRISE__LOG_PARSER": "singer-sdk"
         },
@@ -2352,6 +2526,30 @@
         "plugin_type": "loaders",
         "repo": "https://github.com/AutoIDM/target-apprise",
         "settings": [
+          {
+            "description": "Add metadata to records.",
+            "kind": "boolean",
+            "label": "Add Record Metadata",
+            "name": "add_record_metadata"
+          },
+          {
+            "description": "Maximum number of rows in each batch.",
+            "kind": "integer",
+            "label": "Batch Size Rows",
+            "name": "batch_size_rows"
+          },
+          {
+            "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization",
+            "kind": "array",
+            "label": "Faker Config Locale",
+            "name": "faker_config.locale"
+          },
+          {
+            "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator",
+            "kind": "string",
+            "label": "Faker Config Seed",
+            "name": "faker_config.seed"
+          },
           {
             "description": "'True' to enable schema flattening and automatically expand nested properties.",
             "kind": "boolean",
@@ -2365,28 +2563,70 @@
             "name": "flattening_max_depth"
           },
           {
+            "description": "The method to use when loading data into the destination. `append-only` will always write all input records whether that records already exists or not. `upsert` will update existing records and insert new records. `overwrite` will delete all existing records and insert all input records.",
+            "kind": "options",
+            "label": "Load Method",
+            "name": "load_method",
+            "options": [
+              {
+                "label": "Append Only",
+                "value": "append-only"
+              },
+              {
+                "label": "Upsert",
+                "value": "upsert"
+              },
+              {
+                "label": "Overwrite",
+                "value": "overwrite"
+              }
+            ],
+            "value": "append-only"
+          },
+          {
             "description": "User-defined config values to be used within map expressions.",
             "kind": "object",
             "label": "Stream Map Config",
             "name": "stream_map_config"
           },
           {
-            "description": "Config object for stream maps capability.",
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
             "kind": "object",
             "label": "Stream Maps",
             "name": "stream_maps"
+          },
+          {
+            "description": "If enabled, allows for uris to be dynamically configured. Any fields in the record that have a name beginning with `_sdc_replace_`, will have their value substituted in for a matching string in the URI. See an example [here](#dynamically-providing-target-emails).",
+            "kind": "boolean",
+            "label": "Uri Replacement",
+            "name": "uri_replacement",
+            "value": false
           },
           {
             "description": "Array of apprise URIs,checkout https://github.com/caronc/apprise",
             "kind": "array",
             "label": "Uris",
             "name": "uris"
+          },
+          {
+            "description": "Whether to validate the schema of the incoming streams.",
+            "kind": "boolean",
+            "label": "Validate Records",
+            "name": "validate_records",
+            "value": true
           }
         ],
         "settings_group_validation": [
           [
+            "uri_replacement",
             "uris"
           ]
+        ],
+        "supported_python_versions": [
+          "3.8",
+          "3.9",
+          "3.10",
+          "3.11"
         ],
         "variant": "autoidm"
       }
@@ -2394,7 +2634,10 @@
     "mappers": [
       {
         "capabilities": [
-          "stream-maps"
+          "about",
+          "stream-maps",
+          "schema-flattening",
+          "structured-logging"
         ],
         "description": "A map transformer which implements the Stream Maps capability from Meltano's tap and target SDK.",
         "docs": "https://hub.meltano.com/mappers/meltano-map-transformer--meltano",
@@ -2446,6 +2689,42 @@
             "kind": "object",
             "label": "Stream Maps",
             "name": "stream_maps"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "User Stream Map Configuration",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Enable Schema Flattening",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Max Flattening Depth",
+            "name": "flattening_max_depth"
+          },
+          {
+            "description": "The maximum length of a flattened key.",
+            "kind": "integer",
+            "label": "Max Key Length",
+            "name": "flattening_max_key_length"
+          },
+          {
+            "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization",
+            "kind": "array",
+            "label": "Faker Locale",
+            "name": "faker_config.locale"
+          },
+          {
+            "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator",
+            "kind": "string",
+            "label": "Faker Seed",
+            "name": "faker_config.seed"
           }
         ],
         "settings_group_validation": [
@@ -2529,7 +2808,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
         "name": "airflow",
         "namespace": "airflow",
-        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==3.3.0 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.3.0/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
         "plugin_type": "utilities",
         "repo": "https://github.com/apache/airflow",
         "settings": [
@@ -2750,7 +3029,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
         "name": "dbt-snowflake",
         "namespace": "dbt_snowflake",
-        "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.4.0",
+        "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.5.0",
         "plugin_type": "utilities",
         "repo": "https://github.com/dbt-labs/dbt-snowflake",
         "settings": [
@@ -2771,6 +3050,20 @@
             "kind": "string",
             "label": "Password",
             "name": "password",
+            "sensitive": true
+          },
+          {
+            "description": "Path to file containing private key.",
+            "kind": "string",
+            "label": "Private Key Path",
+            "name": "private_key_path",
+            "sensitive": true
+          },
+          {
+            "description": "Passphrase to decrypt private key if encrypted.",
+            "kind": "string",
+            "label": "Private Key Passphrase",
+            "name": "private_key_passphrase",
             "sensitive": true
           },
           {
@@ -2830,6 +3123,13 @@
             "label": "Warehouse",
             "name": "warehouse"
           }
+        ],
+        "supported_python_versions": [
+          "3.10",
+          "3.11",
+          "3.12",
+          "3.13",
+          "3.14"
         ],
         "variant": "dbt-labs"
       },

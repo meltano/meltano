@@ -6,14 +6,16 @@
   "label": "Comma Separated Values (CSV)",
   "docs": "https://hub.meltano.com/loaders/target-csv--meltanolabs",
   "repo": "https://github.com/MeltanoLabs/target-csv",
-  "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
+  "pip_url": "meltanolabs-target-csv",
   "executable": "target-csv",
   "description": "CSV loader",
   "logo_url": "https://hub.meltano.com/assets/logos/loaders/csv.png",
   "capabilities": [
     "about",
     "schema-flattening",
-    "stream-maps"
+    "stream-maps",
+    "structured-logging",
+    "validate-records"
   ],
   "settings_group_validation": [
     []
@@ -43,6 +45,13 @@
       "kind": "string",
       "label": "Destination Path",
       "description": "Filesystem path where to store output files. Alias for `output_path` to be compatible with the `hotgluexyz` variant."
+    },
+    {
+      "name": "encoding",
+      "kind": "string",
+      "value": "utf-8",
+      "label": "Encoding",
+      "description": "The character encoding to use when writing CSV files. Defaults to 'utf-8'. For a list of possible values, see: https://docs.python.org/3/library/codecs.html#standard-encodings"
     },
     {
       "name": "escape_character",
@@ -80,6 +89,18 @@
       "kind": "integer",
       "label": "Max Flattening Depth",
       "description": "The max depth to flatten schemas."
+    },
+    {
+      "name": "flattening_max_key_length",
+      "kind": "integer",
+      "label": "Max Key Length",
+      "description": "The maximum length of a flattened key."
+    },
+    {
+      "name": "flattening_separator",
+      "kind": "string",
+      "label": "Flattening Separator",
+      "description": "The separator to use when flattening keys."
     },
     {
       "name": "load_method",
@@ -160,5 +181,13 @@
       "label": "Validate Records",
       "description": "Whether to validate the schema of the incoming streams."
     }
+  ],
+  "supported_python_versions": [
+    "3.10",
+    "3.11",
+    "3.12",
+    "3.13",
+    "3.14",
+    "3.15"
   ]
 }

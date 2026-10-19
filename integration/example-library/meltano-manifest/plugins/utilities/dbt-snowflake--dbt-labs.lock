@@ -6,7 +6,7 @@
   "label": "dbt Snowflake",
   "docs": "https://hub.meltano.com/utilities/dbt-snowflake--dbt-labs",
   "repo": "https://github.com/dbt-labs/dbt-snowflake",
-  "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.4.0",
+  "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.5.0",
   "executable": "dbt_invoker",
   "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
   "settings": [
@@ -27,6 +27,20 @@
       "kind": "string",
       "label": "Password",
       "description": "The user password to authenticate with.",
+      "sensitive": true
+    },
+    {
+      "name": "private_key_path",
+      "kind": "string",
+      "label": "Private Key Path",
+      "description": "Path to file containing private key.",
+      "sensitive": true
+    },
+    {
+      "name": "private_key_passphrase",
+      "kind": "string",
+      "label": "Private Key Passphrase",
+      "description": "Passphrase to decrypt private key if encrypted.",
       "sensitive": true
     },
     {
@@ -147,5 +161,12 @@
       "description": "Runs tests on data in deployed models."
     }
   },
+  "supported_python_versions": [
+    "3.10",
+    "3.11",
+    "3.12",
+    "3.13",
+    "3.14"
+  ],
   "ext_repo": "https://github.com/meltano/dbt-ext"
 }

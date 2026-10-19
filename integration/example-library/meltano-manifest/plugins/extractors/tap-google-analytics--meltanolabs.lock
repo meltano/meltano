@@ -72,13 +72,6 @@
       "sensitive": true
     },
     {
-      "name": "oauth_credentials.access_token",
-      "kind": "string",
-      "label": "OAuth Credentials Access Token",
-      "description": "Google Analytics Access Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-      "sensitive": true
-    },
-    {
       "name": "oauth_credentials.client_id",
       "kind": "string",
       "label": "OAuth Credentials Client ID",
@@ -105,6 +98,12 @@
       "label": "Reports",
       "description": "Project-relative path to JSON file with the definition of the reports to be generated.\n\nSee <https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/> for valid dimensions and metrics.\n\nThe JSON structure expected is as follows:\n\n```json\n[\n  { \"name\" : \"name of stream to be used\",\n    \"dimensions\" :\n    [\n      \"Google Analytics Dimension\",\n      \"Another Google Analytics Dimension\",\n      // ... up to 7 dimensions per stream ...\n    ],\n    \"metrics\" :\n    [\n      \"Google Analytics Metric\",\n      \"Another Google Analytics Metric\",\n      // ... up to 10 metrics per stream ...\n    ]\n  },\n  // ... as many streams / reports as the user wants ...\n]\n```\n\nFor example, if you want to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:\n\n```json\n[\n  { \"name\" : \"users_per_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:users\",\n      \"ga:newUsers\"\n    ]\n  },\n  { \"name\" : \"sessions_per_country_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\",\n      \"ga:country\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:sessions\",\n      \"ga:sessionsPerUser\",\n      \"ga:avgSessionDuration\"\n    ]\n  }\n]\n```\n",
       "placeholder": "Ex. my_report_definition.json"
+    },
+    {
+      "name": "reports_list",
+      "kind": "array",
+      "label": "Reports List",
+      "description": "List of Google Analytics Reports Definitions"
     },
     {
       "name": "start_date",

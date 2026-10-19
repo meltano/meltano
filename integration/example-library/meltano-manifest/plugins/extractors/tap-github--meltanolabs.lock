@@ -6,17 +6,19 @@
   "label": "GitHub",
   "docs": "https://hub.meltano.com/extractors/tap-github--meltanolabs",
   "repo": "https://github.com/MeltanoLabs/tap-github",
-  "pip_url": "git+https://github.com/MeltanoLabs/tap-github.git",
+  "pip_url": "meltanolabs-tap-github",
   "description": "Code hosting platform",
   "logo_url": "https://hub.meltano.com/assets/logos/extractors/github.png",
   "capabilities": [
     "about",
+    "activate-version",
     "batch",
     "catalog",
     "discover",
     "schema-flattening",
     "state",
-    "stream-maps"
+    "stream-maps",
+    "structured-logging"
   ],
   "settings_group_validation": [
     [
@@ -43,6 +45,12 @@
       "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits."
     },
     {
+      "name": "auth_app_keys",
+      "kind": "array",
+      "label": "Auth App Keys",
+      "description": "List of GitHub App credentials to authenticate with. These are organization-agnostic and will be used as fallback for all organizations. Each credential should be formatted as `:app_id:;;-----BEGIN RSA PRIVATE KEY-----\\n_YOUR_P_KEY_\\n-----END RSA PRIVATE KEY-----`."
+    },
+    {
       "name": "auth_token",
       "kind": "string",
       "label": "Auth Token",
@@ -50,13 +58,20 @@
       "sensitive": true
     },
     {
+      "name": "backoff_max_tries",
+      "kind": "integer",
+      "value": 5,
+      "label": "Backoff Max Tries",
+      "description": "Maximum number of retry attempts for failed API requests that are retriable. Defaults to 5."
+    },
+    {
       "name": "batch_config.encoding.compression",
       "kind": "options",
-      "label": "Batch Config Encoding Compression",
+      "label": "Batch Compression Format",
       "description": "Compression format to use for batch files.",
       "options": [
         {
-          "label": "Gzip",
+          "label": "GZIP",
           "value": "gzip"
         },
         {
@@ -68,44 +83,84 @@
     {
       "name": "batch_config.encoding.format",
       "kind": "options",
-      "label": "Batch Config Encoding Format",
+      "label": "Batch Encoding Format",
       "description": "Format to use for batch files.",
       "options": [
         {
-          "label": "Jsonl",
+          "label": "JSONL",
           "value": "jsonl"
+        },
+        {
+          "label": "Parquet",
+          "value": "parquet"
         }
       ]
     },
     {
       "name": "batch_config.storage.prefix",
       "kind": "string",
-      "label": "Batch Config Storage Prefix",
+      "label": "Batch Storage Prefix",
       "description": "Prefix to use when writing batch files."
     },
     {
       "name": "batch_config.storage.root",
       "kind": "string",
-      "label": "Batch Config Storage Root",
+      "label": "Batch Storage Root",
       "description": "Root path to use when writing batch files."
+    },
+    {
+      "name": "expiry_time_buffer",
+      "kind": "integer",
+      "label": "Expiry Time Buffer",
+      "description": "When authenticating as a GitHub App, this buffer controls how many minutes before expiry the GitHub app tokens will be refreshed. Defaults to 10 minutes."
+    },
+    {
+      "name": "faker_config.locale",
+      "kind": "array",
+      "label": "Faker Locale",
+      "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization"
+    },
+    {
+      "name": "faker_config.seed",
+      "kind": "string",
+      "label": "Faker Seed",
+      "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator"
     },
     {
       "name": "flattening_enabled",
       "kind": "boolean",
-      "label": "Flattening Enabled",
+      "label": "Enable Schema Flattening",
       "description": "'True' to enable schema flattening and automatically expand nested properties."
     },
     {
       "name": "flattening_max_depth",
       "kind": "integer",
-      "label": "Flattening Max Depth",
+      "label": "Max Flattening Depth",
       "description": "The max depth to flatten schemas."
+    },
+    {
+      "name": "flattening_max_key_length",
+      "kind": "integer",
+      "label": "Max Key Length",
+      "description": "The maximum length of a flattened key."
+    },
+    {
+      "name": "flattening_separator",
+      "kind": "string",
+      "label": "Flattening Separator",
+      "description": "The separator to use when flattening keys."
     },
     {
       "name": "metrics_log_level",
       "kind": "string",
       "label": "Metrics Log Level",
       "description": "The log level of the API response metrics."
+    },
+    {
+      "name": "org_auth_app_keys",
+      "kind": "object",
+      "label": "Org Auth App Keys",
+      "description": "Organization-specific GitHub App credentials. Maps organization names to lists of app credentials. When processing repositories from a specific organization, the tap will prefer tokens configured for that organization. Each credential should be formatted as `:app_id:;;-----BEGIN RSA PRIVATE KEY-----\\n_YOUR_P_KEY_\\n-----END RSA PRIVATE KEY-----`."
     },
     {
       "name": "organizations",
@@ -129,7 +184,7 @@
       "name": "searches",
       "kind": "array",
       "label": "Searches",
-      "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)"
+      "description": "An array of search descriptor objects with the following properties: \"name\" - a human readable name for the search query. \"query\" - a github search string (generally the same as would come after ?q= in the URL)\""
     },
     {
       "name": "skip_parent_streams",
@@ -140,7 +195,8 @@
     {
       "name": "start_date",
       "kind": "date_iso8601",
-      "label": "Start Date"
+      "label": "Start Date",
+      "description": "Start date for incremental sync."
     },
     {
       "name": "stream_map_config",
@@ -153,9 +209,38 @@
       "label": "Stream Maps"
     },
     {
+      "name": "stream_options.milestones.state",
+      "kind": "options",
+      "value": "open",
+      "label": "Stream Options Milestones State",
+      "description": "Configures which states are of interest. Must be one of [open, closed, all], defaults to open.",
+      "options": [
+        {
+          "label": "Open",
+          "value": "open"
+        },
+        {
+          "label": "Closed",
+          "value": "closed"
+        },
+        {
+          "label": "All",
+          "value": "all"
+        }
+      ]
+    },
+    {
+      "name": "stream_options.project_items.page_size",
+      "kind": "integer",
+      "value": 100,
+      "label": "Stream Options Project Items Page Size",
+      "description": "Number of ProjectV2 items to request per GraphQL page. Defaults to 100, GitHub's maximum. Lower values can reduce GraphQL query complexity for projects with many custom fields."
+    },
+    {
       "name": "user_agent",
       "kind": "string",
-      "label": "User Agent"
+      "label": "User Agent",
+      "description": "User agent to use for API requests."
     },
     {
       "name": "user_ids",
@@ -169,6 +254,13 @@
       "label": "User Usernames",
       "description": "A list of GithHub usernames."
     }
+  ],
+  "supported_python_versions": [
+    "3.10",
+    "3.11",
+    "3.12",
+    "3.13",
+    "3.14"
   ],
   "select": [
     "*.*",

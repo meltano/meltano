@@ -73,7 +73,7 @@
       "description": "Compression format to use for batch files.",
       "options": [
         {
-          "label": "Gzip",
+          "label": "GZIP",
           "value": "gzip"
         },
         {
@@ -89,7 +89,7 @@
       "description": "Format to use for batch files.",
       "options": [
         {
-          "label": "Jsonl",
+          "label": "JSONL",
           "value": "jsonl"
         },
         {
@@ -122,6 +122,18 @@
       "kind": "date_iso8601",
       "label": "End Date",
       "description": "The last record date to sync. This tap uses a 5 minute buffer to allow Cloudwatch logs to arrive in full. If you request data from current time it will automatically adjust your end_date to now - 5 mins."
+    },
+    {
+      "name": "faker_config.locale",
+      "kind": "array",
+      "label": "Faker Config Locale",
+      "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization"
+    },
+    {
+      "name": "faker_config.seed",
+      "kind": "string",
+      "label": "Faker Config Seed",
+      "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator"
     },
     {
       "name": "flattening_enabled",
@@ -165,5 +177,12 @@
       "label": "Stream Maps",
       "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html)."
     }
+  ],
+  "supported_python_versions": [
+    "3.8",
+    "3.9",
+    "3.10",
+    "3.11",
+    "3.12"
   ]
 }

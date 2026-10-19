@@ -18,6 +18,7 @@ on:
       - tests/benchmarks/**
       - uv.lock
       - .github/workflows/benchmark.yml
+      - .python-version
   workflow_dispatch:
     inputs: {}
 
@@ -48,6 +49,8 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       id: setup-python
+      with:
+        python-version-file: .python-version
 
     - name: Setup uv
       uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0

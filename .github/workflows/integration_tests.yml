@@ -44,6 +44,7 @@ jobs:
             - uv.lock
             - .github/workflows/integration_tests.yml
             - .github/workflows/resources/constraints.txt
+            - .python-version
 
   validate:
     name: Integration Tests (${{ matrix.integration_test }})
@@ -101,7 +102,7 @@ jobs:
         --health-interval 10s
         --health-timeout 5s
         --health-retries 5
-        postgres:13
+        postgres:14
 
     - name: Run integration tests
       env:

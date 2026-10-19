@@ -15,7 +15,9 @@
     "activate-version",
     "hard-delete",
     "schema-flattening",
-    "stream-maps"
+    "stream-maps",
+    "structured-logging",
+    "validate-records"
   ],
   "settings_group_validation": [
     []
@@ -45,7 +47,7 @@
       "name": "database",
       "kind": "string",
       "label": "Database",
-      "description": "Database name."
+      "description": "Database name. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "default_target_schema",
@@ -86,17 +88,29 @@
       "description": "The max depth to flatten schemas."
     },
     {
+      "name": "flattening_max_key_length",
+      "kind": "integer",
+      "label": "Max Key Length",
+      "description": "The maximum length of a flattened key."
+    },
+    {
+      "name": "flattening_separator",
+      "kind": "string",
+      "label": "Flattening Separator",
+      "description": "The separator to use when flattening keys."
+    },
+    {
       "name": "hard_delete",
       "kind": "boolean",
       "value": false,
       "label": "Hard Delete",
-      "description": "When activate version is sent from a tap this specefies if we should delete the records that don't match, or mark them with a date in the `_sdc_deleted_at` column. This config option is ignored if `activate_version` is set to false."
+      "description": "When activate version is sent from a tap this specifies if we should delete the records that don't match, or mark them with a date in the `_sdc_deleted_at` column. This config option is ignored if `activate_version` is set to false."
     },
     {
       "name": "host",
       "kind": "string",
       "label": "Host",
-      "description": "Hostname for postgres instance."
+      "description": "Hostname for postgres instance. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "interpret_content_encoding",
@@ -130,7 +144,7 @@
       "name": "password",
       "kind": "string",
       "label": "Password",
-      "description": "Password used to authenticate.",
+      "description": "Password used to authenticate. Note if sqlalchemy_url is set this will be ignored.",
       "sensitive": true
     },
     {
@@ -138,7 +152,7 @@
       "kind": "integer",
       "value": 5432,
       "label": "Port",
-      "description": "The port on which postgres is awaiting connections."
+      "description": "The port on which postgres is awaiting connection. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "process_activate_version_messages",
@@ -158,7 +172,7 @@
       "name": "sqlalchemy_url",
       "kind": "string",
       "label": "SQLAlchemy URL",
-      "description": "DEPRECATED. SQLAlchemy connection string. This will override using host, user, password, port, dialect, and all ssl settings. Note that you must escape password special characters properly. See https://docs.sqlalchemy.org/en/20/core/engines.html#escaping-special-characters-such-as-signs-in-passwords"
+      "description": "SQLAlchemy connection string. This will override using host, user, password, port, dialect, and all ssl settings. It is strongly recommended the driver is compatible with psycopg3. Note that you must escape password special characters properly. See https://docs.sqlalchemy.org/en/20/core/engines.html#escaping-special-characters-such-as-signs-in-passwords"
     },
     {
       "name": "ssh_tunnel.enable",
@@ -205,28 +219,28 @@
       "kind": "string",
       "value": "~/.postgresql/root.crl",
       "label": "SSL Certificate Authority",
-      "description": "The certificate authority that should be used to verify the server's identity. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate."
+      "description": "The certificate authority that should be used to verify the server's identity. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "ssl_client_certificate",
       "kind": "string",
       "value": "~/.postgresql/postgresql.crt",
       "label": "SSL Client Certificate",
-      "description": "The certificate that should be used to verify your identity to the server. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate."
+      "description": "The certificate that should be used to verify your identity to the server. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "ssl_client_certificate_enable",
       "kind": "boolean",
       "value": false,
       "label": "SSL Client Certificate Enable",
-      "description": "Whether or not to provide client-side certificates as a method of authentication to the server. Use ssl_client_certificate and ssl_client_private_key for further customization. To use SSL to verify the server's identity, use ssl_enable instead."
+      "description": "Whether or not to provide client-side certificates as a method of authentication to the server. Use ssl_client_certificate and ssl_client_private_key for further customization. To use SSL to verify the server's identity, use ssl_enable instead. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "ssl_client_private_key",
       "kind": "string",
       "value": "~/.postgresql/postgresql.key",
       "label": "SSL Client Private Key",
-      "description": "The private key for the certificate you provided. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate.",
+      "description": "The private key for the certificate you provided. Can be provided either as the certificate itself (in .env) or as a filepath to the certificate. Note if sqlalchemy_url is set this will be ignored.",
       "sensitive": true
     },
     {
@@ -234,14 +248,14 @@
       "kind": "boolean",
       "value": false,
       "label": "SSL Enable",
-      "description": "Whether or not to use ssl to verify the server's identity. Use ssl_certificate_authority and ssl_mode for further customization. To use a client certificate to authenticate yourself to the server, use ssl_client_certificate_enable instead."
+      "description": "Whether or not to use ssl to verify the server's identity. Use ssl_certificate_authority and ssl_mode for further customization. To use a client certificate to authenticate yourself to the server, use ssl_client_certificate_enable instead. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "ssl_mode",
       "kind": "string",
       "value": "verify-full",
       "label": "SSL Mode",
-      "description": "SSL Protection method, see [postgres documentation](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) for more information. Must be one of disable, allow, prefer, require, verify-ca, or verify-full."
+      "description": "SSL Protection method, see [postgres documentation](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) for more information. Must be one of disable, allow, prefer, require, verify-ca, or verify-full. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "ssl_storage_directory",
@@ -273,7 +287,7 @@
       "name": "user",
       "kind": "string",
       "label": "User",
-      "description": "User name used to authenticate."
+      "description": "User name used to authenticate. Note if sqlalchemy_url is set this will be ignored."
     },
     {
       "name": "validate_records",
@@ -282,6 +296,13 @@
       "label": "Validate Records",
       "description": "Whether to validate the schema of the incoming streams."
     }
+  ],
+  "supported_python_versions": [
+    "3.10",
+    "3.11",
+    "3.12",
+    "3.13",
+    "3.14"
   ],
   "dialect": "postgres",
   "target_schema": "$TARGET_POSTGRES_SCHEMA"
