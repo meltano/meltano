@@ -2,6 +2,18 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.block.block_parser",
+    "meltano.core.plugin",
+    "meltano.core.plugin.project_plugin",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "meltano.core.schedule",
+    "meltano.core.schedule_service",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+}
+
 import typing as t
 
 import click

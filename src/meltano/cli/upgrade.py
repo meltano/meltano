@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.meltano_invoker",
+    "meltano.core.project",
+    "meltano.core.upgrade_service",
+}
+
 import os
 import typing as t
 

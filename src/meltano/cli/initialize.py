@@ -2,6 +2,14 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.project_init_service",
+    "meltano.core.project_settings_service",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+    "typing",
+}
+
 import typing as t
 from pathlib import Path
 

@@ -2,6 +2,30 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "collections.abc",
+    "datetime",
+    "logging",
+    "meltano.core.db",
+    "meltano.core.elt_context",
+    "meltano.core.job",
+    "meltano.core.job.stale_job_failer",
+    "meltano.core.logging",
+    "meltano.core.plugin.base",
+    "meltano.core.plugin.error",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "meltano.core.runner",
+    "meltano.core.runner.dbt",
+    "meltano.core.runner.singer",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+    "platform",
+    "sqlalchemy.orm",
+    "typing_extensions",
+    "uuid",
+}
+
 import logging
 import platform
 import typing as t

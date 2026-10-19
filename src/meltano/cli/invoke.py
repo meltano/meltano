@@ -2,6 +2,21 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "asyncio",
+    "meltano.core.db",
+    "meltano.core.error",
+    "meltano.core.logging.utils",
+    "meltano.core.plugin",
+    "meltano.core.plugin.error",
+    "meltano.core.plugin_install_service",
+    "meltano.core.plugin_invoker",
+    "meltano.core.project",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+    "sqlalchemy.orm",
+}
+
 import asyncio
 import sys
 import typing as t

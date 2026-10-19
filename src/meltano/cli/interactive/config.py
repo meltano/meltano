@@ -2,6 +2,26 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "click",
+    "jinja2",
+    "meltano.cli.interactive.utils",
+    "meltano.core.environment_service",
+    "meltano.core.project",
+    "meltano.core.settings_service",
+    "meltano.core.settings_store",
+    "meltano.core.tracking.contexts",
+    "meltano.core.tracking.tracker",
+    "meltano.core.utils",
+    "readline",
+    "rich.console",
+    "rich.markdown",
+    "rich.panel",
+    "rich.table",
+    "rich.text",
+    "sqlalchemy.orm",
+}
+
 import typing as t
 from contextlib import suppress
 

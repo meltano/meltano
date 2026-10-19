@@ -2,6 +2,15 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "collections",
+    "meltano.core.db",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "shutil",
+    "sqlalchemy.orm.session",
+}
+
 import shutil
 import sys
 import typing as t
