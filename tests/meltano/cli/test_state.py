@@ -61,9 +61,16 @@ class TestCliState:
             "meltano.cli.state.BlockParser",
             autospec=True,
         ) as mock_block_parser:
-            state.state_service_from_state_id(project, state_id)
+            expected = mock.Mock(name="state_service")
+            mock_block_parser.return_value.find_blocks.return_value = iter(
+                [mock.Mock(state_service=expected)],
+            )
+
+            result = state.state_service_from_state_id(project, state_id)
+
             args = state_id.split(":")[1].split("-to-")
             assert args in mock_block_parser.call_args.args
+            assert result is expected
 
     @staticmethod
     def get_result_set(result: Result) -> set[str]:
