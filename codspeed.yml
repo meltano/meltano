@@ -1,0 +1,8 @@
+---
+$schema: https://raw.githubusercontent.com/CodSpeedHQ/codspeed/refs/heads/main/schemas/codspeed.schema.json
+
+benchmarks:
+  - name: import meltano.cli
+    exec: python -I -c "import meltano.cli"
+  - name: meltano --version
+    exec: meltano --version
