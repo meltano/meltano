@@ -294,6 +294,11 @@ class TestVersionCheckService:
         version_service: VersionCheckService,
     ):
         """Test that version check uses cached data when available."""
+
+        def _pypi_calls() -> int:
+            # Ignore unrelated requests (e.g. telemetry from background threads)
+            return sum(call.request.url == PYPI_URL for call in responses.calls)
+
         # First check - should hit PyPI
         pypi_response = {
             "info": {
@@ -311,7 +316,7 @@ class TestVersionCheckService:
 
         assert result1 is not None
         assert result1.latest_version == "3.9.0"
-        calls_after_first = len(responses.calls)
+        calls_after_first = _pypi_calls()
         assert calls_after_first == 1
 
         # Second check - should use cache
@@ -323,4 +328,4 @@ class TestVersionCheckService:
 
         assert result2 is not None
         assert result2.latest_version == "3.9.0"
-        assert len(responses.calls) == calls_after_first  # No additional API call
+        assert _pypi_calls() == calls_after_first  # No additional API call

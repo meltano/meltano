@@ -77,7 +77,12 @@ class TestCliUpgrade:
 
     @pytest.mark.usefixtures("project")
     def test_upgrade_skip_package(self, cli_runner: CliRunner) -> None:
-        result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
+        # Avoid fetching file bundles from remote git hosts, which can be flaky
+        with mock.patch(
+            "meltano.core.upgrade_service.install_plugins",
+            new=mock.AsyncMock(return_value=True),
+        ):
+            result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
 
         assert "Your Meltano project has been upgraded!" in result.stdout
