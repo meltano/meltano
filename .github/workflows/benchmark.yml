@@ -2,23 +2,11 @@ name: Benchmarks
 
 on:
   pull_request:
-    paths:
-      - src/**
-      - tests/conftest.py
-      - tests/benchmarks/**
-      - uv.lock
-      - .github/workflows/benchmark.yml
   push:
     branches:
       - main
       - 'v*'
-    paths:
-      - src/**
-      - tests/conftest.py
-      - tests/benchmarks/**
-      - uv.lock
-      - .github/workflows/benchmark.yml
-      - .python-version
+  merge_group:
   workflow_dispatch:
     inputs: {}
 
@@ -31,13 +19,43 @@ env:
   PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
   UV_PYTHON_DOWNLOADS: "never"
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
+  files-changed:
+    name: Detect file changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      codspeed: ${{ steps.changes.outputs.codspeed }}
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+      id: changes
+      with:
+        filters: |
+          codspeed:
+            - src/**
+            - tests/conftest.py
+            - tests/benchmarks/**
+            - codspeed.yml
+            - pyproject.toml
+            - uv.lock
+            - .github/workflows/benchmark.yml
+            - .python-version
+
   benchmark:
     name: "Run benchmarks with CodSpeed"
+    needs: files-changed
+    # CodSpeed doesn't support `merge_group` events
+    if: ${{ github.event_name != 'merge_group' && ( github.event_name == 'workflow_dispatch' || needs.files-changed.outputs.codspeed == 'true' ) }}
     runs-on: codspeed-macro
+    permissions:
+      contents: read
     timeout-minutes: 10
 
     steps:
@@ -69,3 +87,58 @@ jobs:
       with:
         mode: walltime
         run: uv run python -m pytest tests/benchmarks/ --codspeed -p no:randomly --basetemp=/dev/shm/pytest
+
+  imports:
+    name: "Measure import times with CodSpeed"
+    needs: files-changed
+    # CodSpeed doesn't support `merge_group` events
+    if: ${{ github.event_name != 'merge_group' && ( github.event_name == 'workflow_dispatch' || needs.files-changed.outputs.codspeed == 'true' ) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Setup Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      with:
+        python-version-file: .python-version
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+      with:
+        cache-suffix: imports
+
+    - name: Install Meltano
+      run: |
+        uv export --frozen --no-dev --no-hashes --no-emit-project --output-file "$RUNNER_TEMP/requirements.txt"
+        uv pip install --system --compile-bytecode -r "$RUNNER_TEMP/requirements.txt"
+        uv pip install --system --compile-bytecode --no-deps .
+
+    # Runs the exec benchmarks from codspeed.yml. Walltime needs CodSpeed's
+    # macro runners, so we measure simulated CPU work on a regular runner.
+    - name: Run import benchmarks
+      uses: CodSpeedHQ/action@f842b9a3ffe213dbb81768fd7f7eeb4dfcf1c369 # v5.4.2
+      with:
+        mode: simulation
+
+  ci:
+    name: CI required checks (benchmarks)
+    if: always()
+    needs:
+    - files-changed
+    - benchmark
+    - imports
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
+      with:
+        jobs: ${{ toJSON(needs) }}
+        allowed-skips: benchmark,imports
