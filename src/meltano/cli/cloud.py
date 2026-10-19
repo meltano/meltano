@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.cloud.auth",
+    "meltano.core.cloud.credentials",
+    "webbrowser",
+}
+
 import typing as t
 import webbrowser
 

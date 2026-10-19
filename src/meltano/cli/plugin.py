@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "collections.abc",
+    "json",
+    "meltano.core.plugin.project_plugin",
+    "meltano.core.project",
+    "rich.box",
+    "rich.console",
+    "rich.table",
+}
+
 import json
 import typing as t
 from dataclasses import asdict, dataclass

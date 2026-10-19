@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {"meltano.core.cli_messages", "random"}
+
 import random
 
 import click

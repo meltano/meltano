@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "json",
+    "meltano.core.db",
+    "meltano.core.job.stale_job_failer",
+    "meltano.core.project",
+    "meltano.core.schedule_service",
+    "meltano.core.task_sets",
+    "meltano.core.task_sets_service",
+    "sqlalchemy.orm",
+}
+
 import json
 import sys
 import typing as t

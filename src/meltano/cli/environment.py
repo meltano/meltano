@@ -2,6 +2,12 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.environment_service",
+    "meltano.core.project",
+    "meltano.core.tracking.contexts",
+}
+
 import typing as t
 
 import click

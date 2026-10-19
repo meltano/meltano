@@ -2,6 +2,31 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "collections",
+    "dotenv",
+    "functools",
+    "json",
+    "meltano.cli.interactive",
+    "meltano.core.db",
+    "meltano.core.plugin",
+    "meltano.core.plugin.error",
+    "meltano.core.plugin.project_plugin",
+    "meltano.core.plugin.settings_service",
+    "meltano.core.plugin_install_service",
+    "meltano.core.plugin_invoker",
+    "meltano.core.plugin_test_service",
+    "meltano.core.project",
+    "meltano.core.project_settings_service",
+    "meltano.core.setting_definition",
+    "meltano.core.settings_store",
+    "meltano.core.tracking.contexts",
+    "meltano.core.tracking.tracker",
+    "operator",
+    "pathlib",
+    "tempfile",
+}
+
 import enum
 import json
 import operator

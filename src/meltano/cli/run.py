@@ -2,6 +2,22 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "asyncio",
+    "meltano.core.block.block_parser",
+    "meltano.core.block.extract_load",
+    "meltano.core.block.plugin_command",
+    "meltano.core.logging.utils",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "meltano.core.project_settings_service",
+    "meltano.core.runner",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+    "meltano.core.tracking.contexts.plugins",
+    "uuid",
+}
+
 import asyncio
 import time
 import typing as t

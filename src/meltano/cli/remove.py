@@ -2,6 +2,16 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "collections.abc",
+    "logging",
+    "meltano.core.plugin",
+    "meltano.core.plugin.project_plugin",
+    "meltano.core.plugin_location_remove",
+    "meltano.core.plugin_remove_service",
+    "meltano.core.project",
+}
+
 import logging
 import typing as t
 

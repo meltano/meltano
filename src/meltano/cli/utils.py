@@ -2,6 +2,18 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.error",
+    "meltano.core.plugin.base",
+    "meltano.core.plugin.error",
+    "meltano.core.plugin.project_plugin",
+    "meltano.core.project",
+    "meltano.core.setting_definition",
+    "meltano.core.tracking.contexts",
+    "meltano.core.version_check",
+    "signal",
+}
+
 import os
 import signal
 import sys

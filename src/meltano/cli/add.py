@@ -2,6 +2,20 @@
 
 from __future__ import annotations
 
+__lazy_modules__ = {
+    "meltano.core.hub.client",
+    "meltano.core.plugin",
+    "meltano.core.plugin_install_service",
+    "meltano.core.project",
+    "meltano.core.project_add_service",
+    "meltano.core.tracking",
+    "meltano.core.tracking.contexts",
+    "meltano.core.yaml",
+    "pathlib",
+    "requests",
+    "urllib.parse",
+}
+
 import typing as t
 from pathlib import Path
 from urllib.parse import urlparse
