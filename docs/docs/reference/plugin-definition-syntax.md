@@ -203,7 +203,7 @@ For loaders only. Declares that the plugin has failsafe handling for data type m
 
 ### `target-schema` capability
 
-For loaders only. Declares that the plugin supports a `default_target_schema` setting, which sets the default destination schema for streams, prior to any applied mappings (e.g. informal Singer `<schema>-<table>` stream naming convention, `stream_maps` or plugin-specific mapping config).
+For loaders only. Declares that the plugin supports a `default_target_schema` setting, which sets the default destination schema for streams, prior to any applied mappings (e.g. informal Singer `<schema>-<table>` stream naming convention, `stream_maps` or target-specific mapping config).
 
 ### `validate-records` capability
 
