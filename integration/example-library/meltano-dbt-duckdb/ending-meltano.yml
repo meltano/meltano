@@ -1,0 +1,139 @@
+venv:
+  backend: uv
+default_environment: dev
+project_id: 6c0ad4f2-3b52-4d0e-9a4d-7c1f2a8e5b10
+send_anonymous_usage_stats: false
+python: python3.14
+plugins:
+  extractors:
+  - name: tap-smoke-test
+    variant: meltano
+    pip_url: git+https://github.com/meltano/tap-smoke-test.git
+    config:
+      schema_inference_record_count: 5
+      streams:
+      - stream_name: animals
+        input_filename: animals-data.ndjson
+  loaders:
+  - name: target-duckdb
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-duckdb.git
+    config:
+      path: output/warehouse.duckdb
+      default_target_schema: raw
+  utilities:
+  - name: dbt-duckdb
+    namespace: dbt_duckdb
+    label: dbt DuckDB
+    variant: dbt-labs
+    docs: https://docs.meltano.com/guide/transformation
+    repo: https://github.com/dbt-labs/dbt
+    pip_url: dbt meltano-dbt-ext~=0.5.0
+    executable: dbt_invoker
+    logo_url: /assets/logos/utilities/dbt.png
+    settings:
+    - name: path
+      kind: string
+      value: ${MELTANO_PROJECT_ROOT}/output/warehouse.duckdb
+      label: Path
+      description: The path on your local filesystem where you would like the DuckDB database file and it's associated write-ahead log to be written.
+    - name: profiles_dir
+      env: DBT_PROFILES_DIR
+      value: $MELTANO_PROJECT_ROOT/transform/profiles/duckdb
+      label: Profiles Directory
+    - name: project_dir
+      env: DBT_PROJECT_DIR
+      value: $MELTANO_PROJECT_ROOT/transform
+      label: Projects Directory
+    - name: schema
+      kind: string
+      value: main
+      label: Schema
+      description: Specify the schema to write into.
+    - name: skip_pre_invoke
+      env: DBT_EXT_SKIP_PRE_INVOKE
+      kind: boolean
+      value: false
+      label: Skip Pre-invoke
+      description: Whether to skip pre-invoke hooks which automatically run dbt clean and deps
+    - name: target_path
+      env: DBT_TARGET_PATH
+      kind: string
+      value: $MELTANO_PROJECT_ROOT/.meltano/transformers/dbt/target
+      label: Target Path
+    - name: type
+      env: DBT_EXT_TYPE
+      value: duckdb
+      label: dbt Profile type
+    supported_python_versions:
+    - '3.10'
+    - '3.11'
+    - '3.12'
+    - '3.13'
+    - '3.14'
+    - '3.15'
+    commands:
+      build:
+        args: build
+        description: Will run your models, tests, snapshots and seeds in DAG order.
+      clean:
+        args: clean
+        description: Delete all folders in the clean-targets list (usually the dbt_modules and target directories.)
+      compile:
+        args: compile
+        description: Generates executable SQL from source model, test, and analysis files. Compiled SQL files are written to the target/ directory.
+      debug:
+        args: debug
+        description: Debug your DBT project and warehouse connection.
+      deps:
+        args: deps
+        description: Pull the most recent version of the dependencies listed in packages.yml
+      describe:
+        args: describe
+        description: Describe the
+        executable: dbt_extension
+      docs-generate:
+        args: docs generate
+        description: Generate documentation for your project.
+      docs-serve:
+        args: docs serve
+        description: Serve documentation for your project. Make sure you ran `docs-generate` first.
+      freshness:
+        args: source freshness
+        description: Check the freshness of your source data.
+      initialize:
+        args: initialize
+        description: |
+          Initialize a new dbt project. This will create a dbt_project.yml file, a profiles.yml file, and models directory.
+        executable: dbt_extension
+      run:
+        args: run
+        description: Compile SQL and execute against the current target database.
+      seed:
+        args: seed
+        description: Load data from csv files into your data warehouse.
+      snapshot:
+        args: snapshot
+        description: Execute snapshots defined in your project.
+      test:
+        args: test
+        description: Runs tests on data in deployed models.
+  mappers:
+  - name: meltano-map-transformer
+    variant: meltano
+    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
+    mappings:
+    - name: animals-subset
+      config:
+        stream_maps:
+          animals:
+            id: id
+            description: description
+            views: views
+            verified: verified
+            __key_properties__: [id]
+            __else__: __NULL__
+environments:
+- name: dev
+- name: staging
+- name: prod
