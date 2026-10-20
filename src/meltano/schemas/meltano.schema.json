@@ -561,6 +561,23 @@
               ">=3.6,<3.7"
             ]
           },
+          "supported_python_versions": {
+            "type": "array",
+            "description": "An array of Python versions that this plugin supports. This is used by Meltano to automatically select a compatible Python version when the plugin is not compatible with Meltano's own Python version.",
+            "examples": [
+              [
+                "3.10",
+                "3.11",
+                "3.12"
+              ]
+            ],
+            "items": {
+              "type": "string",
+              "description": "A python version",
+              "examples": "3.15",
+              "pattern": "^3\\.\\d+$"
+            }
+          },
           "env": {
             "$ref": "#/$defs/env"
           }
