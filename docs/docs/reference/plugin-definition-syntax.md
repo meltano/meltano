@@ -120,6 +120,8 @@ The capabilities vary by plugin type. Below are the capabilities organized by ty
 - [`soft-delete`](#soft-delete-capability)
 - [`hard-delete`](#hard-delete-capability)
 - [`datatype-failsafe`](#datatype-failsafe-capability)
+- [`target-schema`](#target-schema-capability)
+- [`validate-records`](#validate-records-capability)
 - [`schema-flattening`](#schema-flattening-capability)
 - [`structured-logging`](#structured-logging-capability)
 
@@ -198,6 +200,14 @@ For loaders only. Declares that the plugin supports hard deletion of records (ph
 ### `datatype-failsafe` capability
 
 For loaders only. Declares that the plugin has failsafe handling for data type mismatches, allowing ingestion to continue even when encountering unexpected data types.
+
+### `target-schema` capability
+
+For loaders only. Declares that the plugin supports a `default_target_schema` setting, which sets the default destination schema for streams, prior to any applied mappings (e.g. informal Singer `<schema>-<table>` stream naming convention, `stream_maps` or target-specific mapping config).
+
+### `validate-records` capability
+
+For loaders only. Declares that the plugin supports a `validate_records` setting, which controls whether incoming records are validated against their stream schema.
 
 ## `pip_url`
 

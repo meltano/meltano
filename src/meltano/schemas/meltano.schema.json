@@ -686,6 +686,8 @@
                     "soft-delete",
                     "hard-delete",
                     "datatype-failsafe",
+                    "target-schema",
+                    "validate-records",
                     "schema-flattening",
                     "structured-logging"
                   ]
