@@ -230,49 +230,74 @@ class TestProjectPluginsService:
 
 def test_plugin_definition_not_found_suggests_variant(
     project: Project,
+    tap: ProjectPlugin,
+    monkeypatch: pytest.MonkeyPatch,
 ):
-    from meltano.core.plugin.base import PluginType
-    from meltano.core.plugin.project_plugin import ProjectPlugin
+    plugin = ProjectPlugin(PluginType.EXTRACTORS, name=tap.name)
 
-    plugin_dir = project.dirs.root_plugins(PluginType.EXTRACTORS)
-    plugin_dir.mkdir(parents=True, exist_ok=True)
-    lock_file = plugin_dir / "tap-fleetio--fleetio.lock"
-    lock_file.write_text("{}")
+    project.plugins.lock_service.save(tap, exists_ok=True)
 
-    plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-fleetio")
+    def raise_not_found(*_args, **_kwargs):
+        raise PluginNotFoundError(plugin)
+
+    monkeypatch.setattr(
+        project.hub_service,
+        "find_definition",
+        raise_not_found,
+    )
+
+    plugin.variant = None
 
     with pytest.raises(PluginDefinitionNotFoundError) as exc_info:
         project.plugins.find_parent(plugin)
 
-    assert (
-        "Extractor 'tap-fleetio' is not known to Meltano, "
-        "but lockfile exists for variant 'fleetio'" in str(exc_info.value)
-    )
-    assert (
-        "Add 'variant: fleetio' to your plugin definition in meltano.yml"
-        in exc_info.value.instruction
+    assert "lockfile exists for variant 'meltano'" in str(exc_info.value)
+    assert "Add 'variant: meltano' to your plugin definition in meltano.yml" in (
+        exc_info.value.instruction
     )
 
+    for variant in ("meltano",):
+        plugin.variant = variant
+        parent, source = project.plugins.find_parent(plugin)
 
-def test_plugin_definition_not_found_multiple_variants(project: Project):
-    from meltano.core.plugin.base import PluginType
-    from meltano.core.plugin.project_plugin import ProjectPlugin
+        assert source == DefinitionSource.LOCKFILE
+        assert parent.variant == variant
 
-    plugin_dir = project.dirs.root_plugins(PluginType.EXTRACTORS)
-    plugin_dir.mkdir(parents=True, exist_ok=True)
-    (plugin_dir / "tap-multi--variant1.lock").write_text("{}")
-    (plugin_dir / "tap-multi--variant2.lock").write_text("{}")
 
-    plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-multi")
+def test_plugin_definition_not_found_multiple_variants(
+    project: Project,
+    tap: ProjectPlugin,
+    alternative_tap: ProjectPlugin,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    project.plugins.lock_service.save(tap, exists_ok=True)
+    project.plugins.lock_service.save(alternative_tap, exists_ok=True)
+
+    plugin = ProjectPlugin(PluginType.EXTRACTORS, name=tap.name)
+
+    def raise_not_found(*_args, **_kwargs):
+        raise PluginNotFoundError(plugin)
+
+    monkeypatch.setattr(
+        project.hub_service,
+        "find_definition",
+        raise_not_found,
+    )
 
     with pytest.raises(PluginDefinitionNotFoundError) as exc_info:
         project.plugins.find_parent(plugin)
 
-    assert "lockfiles exist for variant 'variant1', 'variant2'" in str(exc_info.value)
-    assert (
-        "Add 'variant: variant1' to your plugin definition in meltano.yml"
-        in exc_info.value.instruction
+    assert "lockfiles exist for variant 'meltano', 'singer-io'" in str(exc_info.value)
+    assert "Add 'variant: meltano' to your plugin definition in meltano.yml" in (
+        exc_info.value.instruction
     )
+
+    for variant in ("meltano", "singer-io"):
+        plugin.variant = variant
+        parent, source = project.plugins.find_parent(plugin)
+
+        assert source == DefinitionSource.LOCKFILE
+        assert parent.variant == variant
 
 
 def test_find_locked_variants_no_dir(project: Project):
