@@ -469,6 +469,16 @@ ignore = [
 prerelease = "if-necessary"
 required-version = ">=0.12"
 
+[tool.uv.audit]
+ignore = [
+  "GHSA-9vhv-jxww-xfm5",  # Fixed in filelock 4.2.1 (Python 3.11+)
+  "GHSA-2g95-wg33-c5x2",  # Fixed in filelock 4.2.1 (Python 3.11+)
+  "GHSA-567q-5qvw-pf92",  # Fixed in filelock 4.2.1 (Python 3.11+)
+  "GHSA-jqc4-5cvw-7w85",  # Fixed in filelock 4.2.1 (Python 3.11+)
+  "GHSA-v4x8-3wr5-3wq8",  # Fixed in filelock 4.2.1 (Python 3.11+)
+  "GHSA-crv4-6mhj-j5jh",  # Fixed in filelock 4.2.1 (Python 3.11+)
+]
+
 [tool.deptry]
 known_first_party = ["meltano"]
 
