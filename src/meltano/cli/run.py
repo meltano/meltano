@@ -218,6 +218,7 @@ async def run(
             state_strategy=state_strategy_,
             run_id=run_id,
         )
+        ctx.call_on_close(parser.close_sessions)
         parsed_blocks = list(parser.find_blocks(0))
         if not parsed_blocks:
             tracker.track_command_event(CliEvent.aborted)

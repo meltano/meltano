@@ -297,7 +297,7 @@ class SingerTap(SingerPlugin):
         # the `state.json` is stored in a state backend
         if state := self.get_singer_state(
             project=elt_context.project,
-            session=elt_context.session,  # type: ignore[arg-type]  # ty:ignore[invalid-argument-type]
+            session=elt_context.session,  # ty:ignore[invalid-argument-type]
             job_name=elt_context.job.job_name,
         ):
             with state_path.open("w") as state_file:

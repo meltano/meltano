@@ -71,13 +71,12 @@ def output_logger() -> OutputLogger:
 
 @pytest.fixture
 def elb_context(project, session, test_job, output_logger) -> ELBContext:
-    ctx = ELBContext(
+    return ELBContext(
         project=project,
+        session=session,
         job=test_job,
         base_output_logger=output_logger,
     )
-    ctx.session = session
-    return ctx
 
 
 class TestELBContextBuilder:
