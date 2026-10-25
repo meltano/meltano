@@ -23,6 +23,7 @@ if t.TYPE_CHECKING:
     import uuid
 
     import structlog
+    from sqlalchemy.orm import Session
 
     from meltano.core.block.plugin_command import InvokerCommand
     from meltano.core.block.singer import SingerBlock
@@ -122,6 +123,7 @@ class BlockParser:  # noqa: D101
         self._mappings_ref: dict[int, str] = {}
         self._state_strategy = state_strategy
         self._run_id = run_id
+        self._sessions: list[Session] = []
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
 
@@ -222,17 +224,31 @@ class BlockParser:  # noqa: D101
                     offset=cur,
                     plugin_type=plugin.type,
                 )
-                yield plugin_command_invoker(
+                invoker = plugin_command_invoker(
                     self._plugins[cur],
                     self.project,
                     command=self._commands.get(cur),
                 )
+                if invoker.context.session is not None:
+                    self._sessions.append(invoker.context.session)
+                yield invoker
                 cur += 1
             else:
                 raise BlockSetValidationError(  # noqa: TRY003
                     "Unknown command type or bad block sequence at index "  # noqa: EM102
                     f"{cur + 1}, starting block '{plugin.name}'",
                 )
+
+    def close_sessions(self) -> None:
+        """Close the system database sessions opened while parsing blocks.
+
+        Blocks only close their session once run, so the sessions of blocks that
+        never run (e.g. `--dry-run`, `--only-install` or a parsing error) must be
+        closed explicitly.
+        """
+        for session in self._sessions:
+            session.close()
+        self._sessions.clear()
 
     def _find_next_elb_set(
         self,
@@ -261,6 +277,8 @@ class BlockParser:  # noqa: D101
             .with_state_strategy(state_strategy=self._state_strategy)
             .with_run_id(self._run_id)
         )
+        if builder.session is not None:
+            self._sessions.append(builder.session)
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:
             self.log.debug(

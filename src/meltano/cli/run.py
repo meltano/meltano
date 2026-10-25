@@ -218,6 +218,7 @@ async def run(
             state_strategy=state_strategy_,
             run_id=run_id,
         )
+        ctx.call_on_close(parser.close_sessions)
         parsed_blocks = list(parser.find_blocks(0))
         if not parsed_blocks:
             tracker.track_command_event(CliEvent.aborted)
@@ -226,12 +227,6 @@ async def run(
     except Exception as parser_err:
         tracker.track_command_event(CliEvent.aborted)
         raise parser_err  # noqa: TRY201
-
-    # Blocks only close their session once run, so also close them when the run is
-    # skipped or aborted early (e.g. `--dry-run`, `--only-install`).
-    for blk in parsed_blocks:
-        if (session := blk.context.session) is not None:
-            ctx.call_on_close(session.close)
 
     if validate_block_sets(logger, parsed_blocks):
         logger.debug("All ExtractLoadBlocks validated, starting execution.")

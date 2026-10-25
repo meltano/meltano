@@ -8,8 +8,10 @@ from unittest import mock
 from unittest.mock import AsyncMock
 
 import pytest
+from sqlalchemy.orm import Session
 
 from meltano.cli import cli
+from meltano.core.block.block_parser import BlockParser
 from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
@@ -1323,6 +1325,35 @@ class TestCliRunScratchpadOne:
             assert not matcher.find_by_event("Block run completed")
             assert create_subprocess_exec.call_count == 0
             assert asyncio_mock.call_count == 0
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("project", "mapper")
+    def test_run_dry_run_closes_block_sessions(
+        self,
+        cli_runner,
+        tap,
+        target,
+    ) -> None:
+        with (
+            mock.patch.object(
+                BlockParser,
+                "close_sessions",
+                autospec=True,
+                side_effect=BlockParser.close_sessions,
+            ) as close_sessions,
+            mock.patch.object(Session, "close", autospec=True) as session_close,
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["run", "--dry-run", tap.name, target.name],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        close_sessions.assert_called_once()
+        assert session_close.called
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
