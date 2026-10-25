@@ -40,6 +40,11 @@ if t.TYPE_CHECKING:
 
     from .ioblock import IOBlock
 
+    if sys.version_info >= (3, 11):
+        from typing import Self  # noqa: ICN003
+    else:
+        from typing_extensions import Self
+
     if sys.version_info >= (3, 13):
         from collections.abc import AsyncGenerator
     else:
@@ -135,7 +140,7 @@ class ELBContextBuilder:
 
         self._base_output_logger = None
 
-    def with_job(self, job: Job):  # noqa: ANN201
+    def with_job(self, job: Job) -> Self:
         """Set the associated job for the context.
 
         Args:
@@ -147,7 +152,7 @@ class ELBContextBuilder:
         self._job = job
         return self
 
-    def with_state_strategy(self, *, state_strategy: StateStrategy):  # noqa: ANN201
+    def with_state_strategy(self, *, state_strategy: StateStrategy) -> Self:
         """Set whether the state is to be merged or overwritten.
 
         Args:
@@ -160,7 +165,7 @@ class ELBContextBuilder:
         self._state_strategy = state_strategy
         return self
 
-    def with_full_refresh(self, *, full_refresh: bool):  # noqa: ANN201
+    def with_full_refresh(self, *, full_refresh: bool | None) -> Self:
         """Set whether this is a full refresh.
 
         Args:
@@ -172,7 +177,7 @@ class ELBContextBuilder:
         self._full_refresh = full_refresh
         return self
 
-    def with_refresh_catalog(self, *, refresh_catalog: bool):  # noqa: ANN201
+    def with_refresh_catalog(self, *, refresh_catalog: bool | None) -> Self:
         """Set whether cached catalog should be ignored.
 
         Args:
@@ -184,7 +189,7 @@ class ELBContextBuilder:
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_no_state_update(self, *, no_state_update: bool):  # noqa: ANN201
+    def with_no_state_update(self, *, no_state_update: bool | None) -> Self:
         """Set whether this run should not update state.
 
         By default we typically attempt to track state. This allows avoiding
@@ -199,7 +204,7 @@ class ELBContextBuilder:
         self._state_update = not no_state_update
         return self
 
-    def with_force(self, *, force: bool):  # noqa: ANN201
+    def with_force(self, *, force: bool | None) -> Self:
         """Set whether the execution of the job should be forced if it is stale.
 
         Args:
@@ -211,7 +216,7 @@ class ELBContextBuilder:
         self._force = force
         return self
 
-    def with_state_id_suffix(self, state_id_suffix: str):  # noqa: ANN201
+    def with_state_id_suffix(self, state_id_suffix: str | None) -> Self:
         """Set a state ID suffix for this run.
 
         Args:
@@ -223,7 +228,7 @@ class ELBContextBuilder:
         self._state_id_suffix = state_id_suffix
         return self
 
-    def with_run_id(self, run_id: uuid.UUID | None):  # noqa: ANN201
+    def with_run_id(self, run_id: uuid.UUID | None) -> Self:
         """Set a run ID for this run.
 
         Args:
