@@ -230,7 +230,8 @@ async def run(
     # Blocks only close their session once run, so also close them when the run is
     # skipped or aborted early (e.g. `--dry-run`, `--only-install`).
     for blk in parsed_blocks:
-        ctx.call_on_close(blk.context.session.close)
+        if (session := blk.context.session) is not None:
+            ctx.call_on_close(session.close)
 
     if validate_block_sets(logger, parsed_blocks):
         logger.debug("All ExtractLoadBlocks validated, starting execution.")
