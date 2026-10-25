@@ -65,7 +65,7 @@ class ELBContext(ELContextProtocol):
         self,
         *,
         project: Project,
-        session: Session | None = None,
+        session: Session,
         job: Job | None = None,
         full_refresh: bool | None = False,
         refresh_catalog: bool | None = False,

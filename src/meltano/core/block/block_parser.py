@@ -229,8 +229,7 @@ class BlockParser:  # noqa: D101
                     self.project,
                     command=self._commands.get(cur),
                 )
-                if invoker.context.session is not None:
-                    self._sessions.append(invoker.context.session)
+                self._sessions.append(invoker.context.session)
                 yield invoker
                 cur += 1
             else:
@@ -277,8 +276,7 @@ class BlockParser:  # noqa: D101
             .with_state_strategy(state_strategy=self._state_strategy)
             .with_run_id(self._run_id)
         )
-        if builder.session is not None:
-            self._sessions.append(builder.session)
+        self._sessions.append(builder.session)
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:
             self.log.debug(
