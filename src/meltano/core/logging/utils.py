@@ -300,8 +300,8 @@ def _showwarning(
     category: type[Warning],
     filename: str,
     lineno: int,
-    file: t.TextIO | None = None,  # noqa: ARG001
-    line: str | None = None,  # noqa: ARG001
+    file: t.TextIO | None = None,
+    line: str | None = None,
 ) -> None:
     """Log a Python warning as a structured `warning` event.
 
@@ -310,9 +310,13 @@ def _showwarning(
         category: The warning category.
         filename: The file that triggered the warning.
         lineno: The line number that triggered the warning.
-        file: Unused, required by the `warnings.showwarning` signature.
-        line: Unused, required by the `warnings.showwarning` signature.
+        file: An explicit stream to write the warning to, if any.
+        line: The source line that triggered the warning, if known.
     """
+    if file is not None:
+        file.write(warnings.formatwarning(message, category, filename, lineno, line))
+        return
+
     structlog.getLogger("py.warnings").warning(
         str(message),
         category=category.__name__,

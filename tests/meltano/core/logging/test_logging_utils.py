@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import asyncio
 import datetime
+import io
 import logging
 import typing as t
 import zoneinfo
 
 import pytest
+import structlog.testing
 import time_machine
 
 from meltano.core.logging.utils import (
     LEVELS,
     LogFormat,
     SafeStreamHandler,
+    _showwarning,
     capture_subprocess_output,
     default_config,
     parse_log_level,
@@ -346,3 +349,27 @@ class TestSafeStreamHandler:
         handler.emit(record)
 
         handler.handleError.assert_called_once_with(record)
+
+
+def test_showwarning_logs_structured_event() -> None:
+    with structlog.testing.capture_logs() as logs:
+        _showwarning(UserWarning("careful"), UserWarning, "foo.py", 7)
+
+    assert logs == [
+        {
+            "event": "careful",
+            "log_level": "warning",
+            "category": "UserWarning",
+            "filename": "foo.py",
+            "lineno": 7,
+        },
+    ]
+
+
+def test_showwarning_writes_to_explicit_stream() -> None:
+    stream = io.StringIO()
+    with structlog.testing.capture_logs() as logs:
+        _showwarning(UserWarning("careful"), UserWarning, "foo.py", 7, file=stream)
+
+    assert not logs
+    assert "UserWarning: careful" in stream.getvalue()
