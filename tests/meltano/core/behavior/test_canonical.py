@@ -174,3 +174,42 @@ class TestCanonical:
             assert obj.annotations
         assert obj.z == -1
         assert obj.canonical() == original
+
+    def test_preserve_anchors_and_aliases(self) -> None:
+        contents = """\
+        config:
+          values: &values
+            a: 1
+            b: 2
+          first: *values
+          second: *values
+          items: &items
+          - x
+          - y
+          more_items: *items
+        """
+        contents = dedent(contents)
+        mapping = yaml.load(io.StringIO(contents))
+        subject = Canonical.parse(mapping)
+
+        obj = subject.canonical()
+        # Every alias still refers to the one copy of its anchored value
+        assert obj["config"]["first"] is obj["config"]["values"]
+        assert obj["config"]["second"] is obj["config"]["values"]
+        assert obj["config"]["more_items"] is obj["config"]["items"]
+
+        out_stream = io.StringIO()
+        yaml.dump(obj, out_stream)
+        assert out_stream.getvalue() == contents
+
+    def test_canonical_without_anchors_has_independent_copies(self) -> None:
+        shared = {"a": 1}
+        subject = Canonical(first=shared, second=shared)
+
+        obj = subject.canonical()
+        assert obj["first"] == obj["second"] == shared
+        assert obj["first"] is not obj["second"]
+
+        out_stream = io.StringIO()
+        yaml.dump(obj, out_stream)
+        assert out_stream.getvalue() == "first:\n  a: 1\nsecond:\n  a: 1\n"
