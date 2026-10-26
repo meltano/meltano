@@ -1,8 +1,15 @@
 """Main entry point for the meltano CLI."""
 
-# ruff: file-ignore[non-empty-init-module]
+# ruff: file-ignore[non-empty-init-module, module-import-not-at-top-of-file]
 
 from __future__ import annotations
+
+# Install the warning hook (and a configured logger for it to use) before importing
+# anything else, so warnings raised while importing the CLI are structured too.
+from meltano.core.logging import capture_warnings, setup_logging
+
+capture_warnings()
+setup_logging()
 
 __lazy_modules__ = {
     "asyncio",
@@ -53,7 +60,6 @@ from meltano.cli.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core._compat import MeltanoInternalDeprecationWarning
 from meltano.core.error import MeltanoError, ProjectReadonly
-from meltano.core.logging import capture_warnings, setup_logging
 
 if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
@@ -151,7 +157,6 @@ def _run_cli() -> None:
 def main() -> None:
     """Entry point for the meltano CLI."""
     # Mark the current process as executed via the CLI
-    capture_warnings()
     warnings.filterwarnings("once", category=DeprecationWarning)
     warnings.filterwarnings("ignore", category=MeltanoInternalDeprecationWarning)
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
