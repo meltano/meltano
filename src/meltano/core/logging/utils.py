@@ -327,7 +327,7 @@ def _showwarning(
 
 def capture_warnings() -> None:
     """Route Python warnings to structlog instead of the stdlib text format."""
-    warnings.showwarning = _showwarning
+    warnings.showwarning = _showwarning  # ty: ignore[invalid-assignment]
 
 
 def change_console_log_level(log_level: int = logging.DEBUG) -> None:
