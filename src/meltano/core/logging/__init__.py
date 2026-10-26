@@ -19,6 +19,7 @@ from .utils import (
     LEVELS,
     LogFormat,
     capture_subprocess_output,
+    capture_warnings,
     setup_logging,
 )
 
@@ -31,6 +32,7 @@ __all__ = [
     "OutputLogger",
     "SizeThresholdJobLogException",
     "capture_subprocess_output",
+    "capture_warnings",
     "console_log_formatter",
     "json_formatter",
     "key_value_formatter",

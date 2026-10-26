@@ -369,8 +369,6 @@ class TestCli:
             mock.Mock(side_effect=raised),
         )
         monkeypatch.setattr(meltano.cli, "exit_event_tracker", None)
-        # keep `main`'s global logging/warnings tweaks out of the test session
-        monkeypatch.setattr("logging.captureWarnings", mock.Mock())
 
         with warnings.catch_warnings():
             if raised is None:
