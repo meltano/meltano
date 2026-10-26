@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 import typing as t
+import warnings
 from logging import config as logging_config
 from pathlib import Path
 
@@ -292,6 +293,37 @@ def setup_logging(
 
     if which_config:
         logger.info(which_config)
+
+
+def _showwarning(
+    message: Warning | str,
+    category: type[Warning],
+    filename: str,
+    lineno: int,
+    file: t.TextIO | None = None,  # noqa: ARG001
+    line: str | None = None,  # noqa: ARG001
+) -> None:
+    """Log a Python warning as a structured `warning` event.
+
+    Args:
+        message: The warning message.
+        category: The warning category.
+        filename: The file that triggered the warning.
+        lineno: The line number that triggered the warning.
+        file: Unused, required by the `warnings.showwarning` signature.
+        line: Unused, required by the `warnings.showwarning` signature.
+    """
+    structlog.getLogger("py.warnings").warning(
+        str(message),
+        category=category.__name__,
+        filename=filename,
+        lineno=lineno,
+    )
+
+
+def capture_warnings() -> None:
+    """Route Python warnings to structlog instead of the stdlib text format."""
+    warnings.showwarning = _showwarning
 
 
 def change_console_log_level(log_level: int = logging.DEBUG) -> None:
