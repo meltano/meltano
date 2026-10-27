@@ -16,6 +16,7 @@ const CONNECTORS = [
   { label: 'Google BigQuery', href: '/connectors/target-bigquery', category: 'loader' },
   { label: 'Google Analytics', href: '/connectors/tap-google-analytics', category: 'extractor' },
   { label: 'Google Ads', href: '/connectors/tap-googleads', category: 'extractor' },
+  { label: 'MongoDB', href: '/connectors/tap-mongodb', category: 'extractor' },
   { label: 'MotherDuck', href: '/connectors/target-motherduck', category: 'loader' },
   { label: 'Nextdoor', href: '/connectors/tap-nextdoor', category: 'extractor' },
   { label: 'PostgreSQL', href: '/connectors/tap-postgres', category: 'extractor' },

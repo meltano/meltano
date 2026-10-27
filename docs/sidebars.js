@@ -46,6 +46,7 @@ const sidebars = {
         { type: 'doc', id: 'connectors/tap-google-search-console', label: 'Google Search Console' },
         { type: 'doc', id: 'connectors/tap-hubspot', label: 'HubSpot' },
         { type: 'doc', id: 'connectors/tap-jira', label: 'Jira' },
+        { type: 'doc', id: 'connectors/tap-mongodb', label: 'MongoDB' },
         { type: 'doc', id: 'connectors/target-motherduck', label: 'MotherDuck' },
         { type: 'doc', id: 'connectors/tap-nextdoor', label: 'Nextdoor' },
         { type: 'doc', id: 'connectors/tap-pinterest', label: 'Pinterest' },
