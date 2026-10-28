@@ -1,0 +1,30 @@
+---
+slug: 2026-10-28-cloud-changelog
+title: Ingest in Minutes, Backfill in Parallel, Load into Databricks & Extract MongoDB Faster with Arrow
+date: 2026-10-28
+---
+
+New users can now sign up and ingest data in minutes. Ingestion is a first-class pipeline type with concurrent backfills and a new Streams tab, and Databricks is now a fully supported data store. This release also adds the `tap-onspd` UK postcode connector, Arrow batches for faster `tap-mongodb` extraction, and fixes for `target-bigquery`, `tap-googleads`, `tap-instagram`, `target-snowflake`, and more.
+
+{/* truncate */}
+
+## Features
+
+- **From new account to ingested data, in minutes:** We've streamlined the process for new users to create an account, set up the essentials in a workspace and move data from source to warehouse. Head to [Meltano.com](https://meltano.com), hit **TRY MELTANO** and start ingesting your data.
+- **Ingestion as a first-class action:** Ingestion is the simplest form of a pipeline and does what it says on the tin: it moves data from tap to target, fast. Stream selection is also improved, so it's easier to discover streams and use them to populate dbt sources.
+- **Backfill improvements:** Reloading history for an ingestion pipeline without affecting its incremental sync is now much simpler. An ingestion can have multiple backfills running at the same time, each listed in a new Backfills tab, and each backfill can be configured by stream and start date.
+- **New Streams tab:** Each pipeline now has its own Streams tab, so you can review discovered streams and export them in the format you need.
+- **Databricks data store support:** Databricks is now a fully supported data store, alongside Postgres, Snowflake and BigQuery. Run full-load and incremental pipelines with `target-databricks`, including Apache Arrow bulk loading for much faster loads on big tables, plus dbt transforms with `dbt-databricks` and pipeline state kept in Databricks.
+- **New `tap-onspd` connector:** Add the Office for National Statistics (ONS) Postcode Directory (ONSPD) as an extractor for comprehensive UK postcode data, including latitude, longitude, geographic classifications, and code-to-name lookups for those geographies.
+- **Faster MongoDB extraction with Arrow:** `tap-mongodb` `v0.4.0` can now send incremental streams as Arrow batches for faster extraction. It also adds `document_layout`, which can load each top-level field as its own column, and `change_stream_pipeline` for change stream syncs.
+
+## Fixes
+
+- **Bumped `target-bigquery` to `v1.1.3`:** Fixes a failed dedupe before upsert on a table with a float key. Timestamps with an offset like `+0000` and fields with a period in their name now load.
+- **Bumped `tap-googleads` to `v0.15.1`:** Stops duplicate records when a custom query replaces a default stream, and corrects the setting docs.
+- **Bumped `dbt-tap-googleads` to `v0.6.1`:** The campaign performance by location model now builds on BigQuery.
+- **Bumped `tap-instagram` to `v0.5.4`:** Custom user insight reports no longer fail, and syncs over a long history are much faster because daily and time-series insights are requested in 30-day windows. A new sync writes one demographics snapshot per breakdown, not a copy for every past day.
+- **Bumped `target-snowflake` to `v0.20.4`:** Loaded data can be queried as soon as a run finishes, because the target now waits for its commit before closing. It also no longer pins `certifi`, which drops the distrusted eMudhra intermediate CAs.
+- **Bumped `tap-spreadsheets-anywhere` to `v0.7.2`:** `skip_empty_rows` now works for Excel files, and an Azure container is listed once per run instead of repeatedly.
+- **Bumped `tap-tiktok` to `v1.2.0`:** Now installs on Python 3.10.
+- **Elementary fixes:** Adding `app-elementary` now gives you its Data Quality Dashboard instead of opening Explore, and no longer resets your default data store to Warehouse. Elementary reports also run on Snowflake (`files-dbt` `v1.6.2`, `app-elementary` `v0.4.2`). Upgrade your `files-dbt` bundle to pick this up, and if your default data store was reset to Warehouse, set it back.
