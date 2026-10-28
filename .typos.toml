@@ -16,6 +16,7 @@ StaleJobFailer = "StaleJobFailer"
 HDA = "HDA"  # Hyper Dimensional Aggregates
 
 [default.extend-words]
+certifi = "certifi"  # https://pypi.org/project/certifi/
 failer = "failer"
 invokable = "invokable"
 writables = "writables"
