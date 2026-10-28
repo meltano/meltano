@@ -1,6 +1,6 @@
 ---
 title: MongoDB
-description: Sync MongoDB and AWS DocumentDB collections via incremental or change stream (CDC) replication, with optional Arrow batch output.
+description: Sync MongoDB and AWS DocumentDB collections via incremental or change stream (CDC) replication.
 ---
 
 import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
@@ -9,7 +9,7 @@ import ConnectorTypeBadge from '@site/src/components/ConnectorTypeBadge';
 
 <ConnectorTypeBadge type="extractor" block />
 
-MongoDB is a popular document database that stores data as flexible, JSON-like documents grouped into collections. This connector extracts documents from a MongoDB or [AWS DocumentDB](https://aws.amazon.com/documentdb/) database, either by incrementally reading each collection or by capturing inserts, updates, replaces and deletes as they happen through MongoDB change streams. For large collections it can also write [Apache Arrow](https://arrow.apache.org/) batch files instead of one message per document, which is considerably faster to load into a [supported target](/meltano-cloud/arrow-support#loaders-targets).
+MongoDB is a popular document database that stores data as flexible, JSON-like documents grouped into collections. This connector extracts documents from a MongoDB or [AWS DocumentDB](https://aws.amazon.com/documentdb/) database, either by incrementally reading each collection or by capturing inserts, updates, replaces and deletes as they happen through MongoDB change streams.
 
 ## At a glance
 
@@ -23,22 +23,18 @@ MongoDB is a popular document database that stores data as flexible, JSON-like d
 
 ## What you can sync
 
-Every collection in the database you configure becomes a stream. By default each record wraps the whole source document in a single `document` object alongside some record metadata (such as `object_id`, `namespace` and `replication_key`). If you'd rather have typed columns, see [Flat document layout](#flat-document-layout).
+Every collection in the database you configure becomes a stream. Each record wraps the source document in a single `document` object alongside some record metadata (such as `object_id`, `namespace` and `replication_key`).
 
 ## Choosing a sync type
 
-- **Incremental** (default). Reads documents directly from each collection and uses the `_id` field as the replication key. It needs no special infrastructure, works against any MongoDB deployment, and is the only mode that can emit [Arrow batches](#arrow-batch-output). Deletes on the source aren't seen.
-- **Log-based (CDC).** Opens a [change stream](https://www.mongodb.com/docs/manual/changeStreams/) on each collection and emits insert, update, replace and delete events, including the cluster timestamp and the full document state (deletes carry only the `_id`). It requires a replica set or sharded cluster.
-
-Log-based streams always emit one `RECORD` message per event, even if you configure Arrow output.
+- **Incremental** (default). Reads documents directly from each collection and uses the `_id` field as the replication key. It needs no special infrastructure and works against any MongoDB deployment. Because `_id` is the key, it picks up new documents but not edits to existing ones, and deletes on the source aren't seen. A document inserted during a sync, or with an `_id` lower than the last one synced, isn't guaranteed to appear on the next run; use log-based replication, or a periodic full refresh, if you need that.
+- **Log-based (CDC).** Opens a [change stream](https://www.mongodb.com/docs/manual/changeStreams/) on each collection and emits insert, update, replace and delete events with the full document (deletes carry only the `_id`). It requires a replica set or sharded cluster.
 
 ## Prerequisites
 
 - **A MongoDB connection string** (or DocumentDB credentials) for the database you want to sync. The username and password inside the connection string must be URL-encoded; the connector doesn't encode them for you.
-- **Read access** to the collections you're syncing:
-  - For incremental replication, the `read` role on the database (for example `read@my_database`) or `readAnyDatabase@admin`.
-  - For log-based replication on MongoDB, the credential also needs the `changeStream` action in addition to `find`. The built-in `read` and `readAnyDatabase` roles include both.
-- **For log-based replication only:** a replica set (three or more nodes recommended) or sharded cluster. On AWS DocumentDB, change streams must be enabled per collection (see [AWS DocumentDB](#aws-documentdb)).
+- **Read access** to the collections you're syncing: the `read` role on the database (for example `read@my_database`) or `readAnyDatabase@admin`. Both also include the `changeStream` action that log-based replication needs.
+- **For log-based replication only:** a replica set or sharded cluster. On AWS DocumentDB, change streams must be enabled per collection (see [AWS DocumentDB](#aws-documentdb)).
 - **Network access** from where your pipeline runs to your database. If your database restricts inbound connections, allow the address your pipeline runs from.
 
 ## Setup
@@ -56,12 +52,11 @@ Log-based streams always emit one `RECORD` message per event, even if you config
    })
    ```
 
-   Collection-level privileges (for example `find` on a single collection) should also work, but haven't been tested.
-2. For log-based replication, confirm the deployment is a replica set and that the user's connection string includes the replica set name, for example `mongodb://host:27017/?replicaSet=rs0`.
+2. For log-based replication, make sure the connection string includes the replica set name, for example `mongodb://host:27017/?replicaSet=rs0`.
 
 ### AWS DocumentDB
 
-DocumentDB requires TLS and the cluster's CA bundle, and requires change streams to be enabled on each collection you want to read log-based:
+DocumentDB requires TLS with the cluster's CA bundle, and change streams must be enabled on each collection you want to read log-based:
 
 ```javascript
 db.adminCommand({
@@ -72,7 +67,7 @@ db.adminCommand({
 })
 ```
 
-Alternatively, set `allow_modify_change_streams` to `true` and the connector runs that command for you when it first hits a collection without change streams. Doing so may incur new costs in DocumentDB.
+Alternatively, set `allow_modify_change_streams` to `true` and the connector runs that command for you. Doing so may incur new costs in DocumentDB.
 
 Provide either a connection string such as:
 
@@ -80,15 +75,13 @@ Provide either a connection string such as:
 mongodb://<user>:<password>@<cluster>.<region>.docdb.amazonaws.com:27017/?replicaSet=rs0&tls=true&tlsCAFile=rds-combined-ca-bundle.pem
 ```
 
-or a `documentdb_credential_json_string` (the JSON format used by AWS Secrets Manager for DocumentDB secrets). The password in that JSON is URL-encoded by the connector, and you can add extra connection options through `documentdb_credential_json_extra_options`, for example `{"tls":"true","tlsCAFile":"my-ca-bundle.pem"}`.
+or a `documentdb_credential_json_string` (the JSON format used by AWS Secrets Manager for DocumentDB secrets).
 
 ### In Meltano Cloud
 
 1. Add a MongoDB source and set `database` plus either `mongodb_connection_string` or `documentdb_credential_json_string`.
-2. Optionally set `filter_collections` to limit discovery to specific collections. This also speeds up catalog discovery on databases with many collections.
-3. Select the streams you want and set their replication method. As plain Meltano project config in `meltano.yml`:
-
-   Incremental (the default):
+2. Optionally set `filter_collections` to limit discovery to specific collections.
+3. Select the streams you want and set their replication method. As plain Meltano project config in `meltano.yml`, incremental is the default:
 
    ```yaml
    plugins:
@@ -98,7 +91,7 @@ or a `documentdb_credential_json_string` (the JSON format used by AWS Secrets Ma
            database: my_database
    ```
 
-   Log-based (CDC), using a plugin that inherits from the base tap:
+   For log-based (CDC), use a plugin that inherits from the base tap:
 
    ```yaml
    plugins:
@@ -118,11 +111,9 @@ or a `documentdb_credential_json_string` (the JSON format used by AWS Secrets Ma
 
 ## Available streams
 
-Streams are discovered at runtime: each collection in the configured database becomes a stream. Use `prefix` to add a common prefix to every stream name, and `filter_collections` (case-insensitive) to restrict discovery.
+Each collection in the configured database becomes a stream. Use `prefix` to add a common prefix to every stream name, and `filter_collections` to restrict discovery.
 
-## Log-based (CDC) behavior
-
-### Output format
+## Log-based (CDC) output
 
 Each log-based record includes the operation, when it happened, where it came from, and the document:
 
@@ -143,136 +134,37 @@ Each log-based record includes the operation, when it happened, where it came fr
 }
 ```
 
-| `operation_type` | Meaning |
-|---|---|
-| `insert` | A new document was created. Includes the full document. |
-| `update` | A document was modified. Includes the full document via `updateLookup`. |
-| `replace` | A document was replaced entirely. Includes the full document. |
-| `delete` | A document was removed. Includes only the `_id`. |
+`operation_type` is one of `insert`, `update`, `replace` or `delete`. Use `operation_types` to limit which are emitted.
 
-Use `operation_types` to limit which operations are emitted.
+## Faster loading with Arrow
 
-### State and resuming
-
-The tap stores a change stream resume token in state, so each run continues where the previous one left off. The tap exits on its own after 10 seconds without new events, so it's safe to run on a schedule with no manual intervention.
-
-Change streams only capture events that occur after the stream is opened. Run an initial sync first to establish a position, then subsequent runs capture changes made since.
-
-### Reducing event size
-
-MongoDB limits change events to 16 MB of BSON. If large documents hit that limit, use `change_stream_pipeline` to trim events on the server, for example to drop a field the tap never reads:
-
-```yaml
-config:
-  change_stream_pipeline:
-    - $unset: updateDescription
-```
-
-You can also use a `$match` stage for server-side filtering. The pipeline isn't validated, so don't remove `_id`, `operationType`, `clusterTime`, `ns`, or both `fullDocument` and `documentKey`, or the tap will fail.
-
-### Switching between modes
-
-Switching a stream between incremental and log-based replication changes the shape of its state, so start from a clean state when you do:
-
-1. For incremental to log-based, make sure the deployment is a replica set and the connection string includes `replicaSet=<name>`, then set the stream's `replication-method` to `LOG_BASED`.
-2. For log-based to incremental, set `replication-method` back to `INCREMENTAL`; the replica set parameters can be removed from the connection string.
-3. In both cases, clear the existing state for the stream before the next run.
-
-## Arrow batch output
-
-For large collections, set `batch_config` to have incremental streams write Apache Arrow IPC files and emit Singer `BATCH` messages instead of one `RECORD` per document. Documents are decoded straight from raw BSON with [PyMongoArrow](https://www.mongodb.com/docs/languages/python/pymongo-arrow-driver/current/), so most values never become Python objects. See [Arrow BATCH Support](/meltano-cloud/arrow-support) for which targets can load these batches and why they are faster.
-
-```yaml
-config:
-  batch_config:
-    encoding:
-      format: arrow
-    batch_size: 100000
-```
-
-- `batch_size` is the number of rows per file and defaults to 100,000. `storage.root` defaults to a `singer-sdk` folder in the OS temp directory.
-- Log-based streams are unaffected and keep emitting `RECORD` messages.
-- Targets built with the Meltano Singer SDK (0.55.0b7 or later) decode the JSON-typed values described below, so they receive the same documents as in `RECORD` mode.
-
-Before extracting, the tap scans the BSON types of each top-level field of the documents, and converts each one as follows:
-
-| Top-level field | In the `document` struct |
-|---|---|
-| One of double, string, bool, int/long, date, ObjectId | The matching Arrow type: double, string, bool, int64, UTC timestamp, hex string |
-| Another scalar type (decimal, binary, ...) | The string `RECORD` mode emits, for example `"1.5"` |
-| Sub-documents and arrays | JSON |
-| Values of more than one BSON type | JSON, with a warning naming the field |
-
-Some behavior differs from `RECORD` mode:
-
-- **Missing and `null` fields look the same.** The `document` struct has a fixed set of fields, so a field absent from a document and a field set to `null` both come through as null. In `RECORD` mode, a missing field is omitted from the `document` object.
-- **A sync reads a snapshot.** It extracts the documents that existed when it started; documents inserted during the sync are picked up by the next one. If a document is updated mid-sync so that a field no longer matches its scanned type, the sync fails with an error asking you to run it again.
-- **Numeric values are never silently coerced.** A numeric value that Arrow couldn't represent faithfully fails the sync instead.
-
-## Flat document layout
-
-By default each record carries the whole document in one `document` object. With `document_layout: flat`, each document field you declare becomes its own typed column instead, in `RECORD` and Arrow batch mode alike. Declare the fields as properties of the stream's schema, for example with Meltano's `schema` extra:
-
-```yaml
-plugins:
-  extractors:
-    - name: tap-mongodb
-      config:
-        document_layout: flat
-      schema:
-        users:
-          name: {type: [string, "null"]}
-          age: {type: [integer, "null"]}
-          joined_at: {type: [string, "null"], format: date-time}
-          manager_id: {type: [string, "null"]}
-          address: {type: [object, "null"]}
-```
-
-Property names are the documents' top-level field names. The record envelope (`replication_key`, `object_id`, `namespace`, and so on) stays, and the `document` property is left out.
-
-| Declared type | Accepted BSON values | Column |
-|---|---|---|
-| `integer` | int, long | integer |
-| `number` | int, long, double | number (NaN and infinities become null) |
-| `boolean` | bool | boolean |
-| `string` with `format: date-time` | date | timestamp |
-| `string` | string, and types JSON has no equivalent for (ObjectId, Decimal128, binary, ...) | string: an ObjectId becomes its hex string, a Decimal128 like `"1.5"` |
-| `object`, `array` | sub-document, array | JSON |
-| any other declaration, for example `[integer, string]` | any | JSON |
-
-- **Type mismatches fail the sync**, naming the field and a document, such as a double in an `integer` field. With Arrow batches, the tap checks the declared fields' types before writing any file, so nothing is written for a failing sync.
-- **Undeclared fields are dropped**, with a warning naming them.
-- **Missing fields are null**, like explicit `null` values.
-- **Deselected fields** aren't extracted or checked.
-- Field names containing `.` or starting with `$` aren't supported yet.
+For large collections, incremental streams can write [Apache Arrow](https://arrow.apache.org/) batch files instead of one message per document by setting `batch_config.encoding.format` to `arrow`. Log-based streams always emit one message per event. See [Arrow BATCH Support](/meltano-cloud/arrow-support) for details and compatible targets.
 
 ## Settings
 
 | Setting | Type | Description |
 |---|---|---|
 | `database` | string | Database to extract records from. Required. |
-| `mongodb_connection_string` | string | MongoDB connection string. The username and password in it must be URL-encoded; the tap doesn't encode them. |
-| `documentdb_credential_json_string` | string | JSON string with keys `username`, `password`, `engine`, `host`, `port`, `dbClusterIdentifier` or `dbName`, and `ssl`, as used by AWS Secrets Manager for DocumentDB. The password is URL-encoded by the tap. |
+| `mongodb_connection_string` | string | MongoDB connection string. The username and password in it must be URL-encoded. |
+| `documentdb_credential_json_string` | string | JSON credential in the AWS Secrets Manager format for DocumentDB. |
 | `documentdb_credential_json_extra_options` | string | JSON key-value pairs added to the connection string options when using `documentdb_credential_json_string`, for example `{"tls":"true","tlsCAFile":"my-ca-bundle.pem"}`. |
-| `datetime_conversion` | string | Passed to the MongoDB client's `datetime_conversion` parameter. Default `datetime`, which fails on dates outside years 1 to 9999. See the [PyMongo docs](https://pymongo.readthedocs.io/en/stable/examples/datetimes.html#handling-out-of-range-datetimes) for alternatives. |
+| `datetime_conversion` | string | How to handle dates outside years 1 to 9999. Default `datetime`, which fails on such dates. See the [PyMongo docs](https://pymongo.readthedocs.io/en/stable/examples/datetimes.html#handling-out-of-range-datetimes) for alternatives. |
 | `prefix` | string | Prefix added to the name of each stream. |
-| `filter_collections` | array | Collections to discover (default all). Case-insensitive. Improves catalog discovery performance. |
+| `filter_collections` | array | Collections to discover (default all). Case-insensitive. |
 | `start_date` | date | Start date for incremental replication. Default `1970-01-01`. Ignored in log-based mode. |
 | `add_record_metadata` | boolean | Add `_sdc` metadata fields to records. Default `false`. |
-| `allow_modify_change_streams` | boolean | On DocumentDB, run the admin command that enables change streams when a collection doesn't have them yet, then retry. Default `false`. May incur new DocumentDB costs. |
-| `operation_types` | array | Change stream operation types to include. Default `create`, `delete`, `insert`, `replace`, `update`. Some allowed values aren't available on all MongoDB versions; see the [MongoDB docs](https://www.mongodb.com/docs/manual/reference/change-events/#operation-types). |
-| `change_stream_pipeline` | array | Aggregation pipeline stages appended to the change stream. Log-based mode only. See [Reducing event size](#reducing-event-size). |
-| `batch_config` | object | Opts into Singer `BATCH` messages. With `encoding.format: arrow`, incremental streams write Arrow IPC files. See [Arrow batch output](#arrow-batch-output). |
-| `document_layout` | string | `object` (default) emits each document as a single `document` object. `flat` emits each declared field as its own column. See [Flat document layout](#flat-document-layout). |
+| `allow_modify_change_streams` | boolean | On DocumentDB, enable change streams on collections that don't have them yet. Default `false`. May incur new costs. |
+| `operation_types` | array | Change stream operation types to include. Default `create`, `delete`, `insert`, `replace`, `update`. |
+| `change_stream_pipeline` | array | Aggregation pipeline stages appended to the change stream, for example to shrink large events server-side. Log-based mode only. |
+| `batch_config` | object | Set `encoding.format: arrow` to write Arrow batch files from incremental streams. |
+| `document_layout` | string | `object` (default) emits each document as a single `document` object. `flat` emits each field declared in the stream's schema as its own column. |
 
 ## Troubleshooting
 
 - **"Change streams not available"**: log-based replication needs a replica set or sharded cluster. Check that the connection string includes `replicaSet=<name>`. On DocumentDB, verify change streams are enabled on the collection, or set `allow_modify_change_streams`.
-- **"Resume point no longer in oplog"**: too much time passed between syncs and the oplog rolled over the saved position. Clear the stream's state to start fresh, and consider syncing more frequently.
-- **No events captured**: change streams only see events that happen after they open. Run an initial sync to establish a position, then make changes and sync again.
+- **"Resume point no longer in oplog"**: too much time passed between syncs. Clear the stream's state to start fresh, and consider syncing more frequently.
+- **No events captured**: change streams only see events that happen after they open. Run an initial sync first, then make changes and sync again.
 - **`bson.errors.InvalidBson` on dates**: a document contains a date outside years 1 to 9999. Set `datetime_conversion` to a value that handles out-of-range dates.
-- **Arrow sync fails asking to run it again**: a document was updated during the sync so that a field no longer matches the type found when scanning. Re-run the sync.
-- **Flat layout sync fails on a type mismatch**: the error names the field and a document. Widen the declared type (for example `[integer, number]`, or `string`) or fix the source data.
 
 ## Need help?
 
