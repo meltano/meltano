@@ -154,7 +154,7 @@ Use `operation_types` to limit which operations are emitted.
 
 ### State and resuming
 
-The tap stores a change stream resume token in state after each sync, so the next run continues from the exact position, including after a crash or restart. The tap exits on its own after 10 seconds without new events, so it's safe to run on a schedule with no manual intervention.
+The tap stores a change stream resume token in state, so each run continues where the previous one left off. The tap exits on its own after 10 seconds without new events, so it's safe to run on a schedule with no manual intervention.
 
 Change streams only capture events that occur after the stream is opened. Run an initial sync first to establish a position, then subsequent runs capture changes made since.
 
@@ -191,7 +191,6 @@ config:
 ```
 
 - `batch_size` is the number of rows per file and defaults to 100,000. `storage.root` defaults to a `singer-sdk` folder in the OS temp directory.
-- A `STATE` message follows each file, so an interrupted sync resumes after the last file written.
 - Log-based streams are unaffected and keep emitting `RECORD` messages.
 - Targets built with the Meltano Singer SDK (0.55.0b7 or later) decode the JSON-typed values described below, so they receive the same documents as in `RECORD` mode.
 
