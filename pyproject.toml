@@ -133,7 +133,7 @@ testing = [
   { include-group = "coverage" },
   "faker>=37.4.2",
   "moto>=5.1.0,!=5.2.0",
-  "pytest>=9",
+  "pytest~=9.1.1",
   "pytest-asyncio>=1.4.0",
   "pytest-codspeed>=4.2.0",
   "pytest-docker~=3.1",
