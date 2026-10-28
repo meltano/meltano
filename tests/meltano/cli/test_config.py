@@ -6,6 +6,7 @@ import typing as t
 import warnings
 from contextlib import contextmanager
 from signal import SIGTERM
+from textwrap import dedent
 from unittest import mock
 from unittest.mock import AsyncMock
 
@@ -876,6 +877,52 @@ class TestCliConfigSet:
         assert (
             f"Extractor '{tap.name}' setting 'secure' was set in `.env`: '{value}'"
         ) in result.stdout
+
+    def test_config_set_preserves_yaml_anchors(self, cli_runner, project) -> None:
+        original = project.meltanofile.read_text()
+        project.meltanofile.write_text(
+            dedent(
+                """\
+                plugins:
+                  extractors:
+                  - name: tap-anchors
+                    namespace: tap_anchors
+                    executable: tap-anchors
+                    pip_url: tap-anchors
+                    settings:
+                    - name: other
+                    config:
+                      stream_maps:
+                        first: &values
+                          a: '"x"'
+                          b: '"y"'
+                        second: *values
+                      lists: &items
+                      - one
+                      - two
+                      more: *items
+                """,
+            ),
+        )
+        project.refresh()
+
+        try:
+            result = cli_runner.invoke(
+                cli,
+                ["config", "set", "tap-anchors", "other", "value"],
+            )
+            assert_cli_runner(result)
+
+            contents = project.meltanofile.read_text()
+        finally:
+            project.meltanofile.write_text(original)
+            project.refresh()
+
+        assert "first: &values" in contents
+        assert "second: *values" in contents
+        assert "lists: &items" in contents
+        assert "more: *items" in contents
+        assert "other: value" in contents
 
     @pytest.mark.usefixtures("project")
     @pytest.mark.filterwarnings("ignore:Unknown setting 'private_key':RuntimeWarning")
