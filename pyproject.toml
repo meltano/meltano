@@ -50,7 +50,7 @@ dependencies = [
   "ruamel.yaml>=0.18.6,<0.20",
   "smart-open>=7.0.5,<9",
   "snowplow-tracker>=1.0.4,<2",
-  "sqlalchemy>=2.0.54,<2.1 ; python_version < '3.11'",
+  "sqlalchemy>=2.1.6,<2.2; python_version < '3.11'",
   "sqlalchemy>=2.0.54,<2.2 ; python_version >= '3.11'",
   "structlog>=25.5.0,<27",
   "typing-extensions>=4.12.2,<5",
@@ -151,7 +151,7 @@ typing = [
   "boto3-stubs[essential]>=1.35",
   "importlib-metadata",  # TODO: Drop once the runtime dependency is dropped
   "mypy~=2.4.0",
-  "ty==0.0.84",
+  "ty==0.0.91",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
