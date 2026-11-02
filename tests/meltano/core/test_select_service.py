@@ -153,6 +153,7 @@ async def test_select_service_needs_an_input_catalog(
     # Either capability is enough
     monkeypatch.setattr(service.extractor, "capabilities", ["properties", "discover"])
     service.update("posts", "*", exclude=False)
+    assert service.current_select == ["posts.*"]
     service.clear()
 
 

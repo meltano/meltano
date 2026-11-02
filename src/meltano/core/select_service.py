@@ -27,7 +27,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class SelectionNotSupportedError(MeltanoError):
     """The extractor can't be given a catalog, so select patterns have no effect."""
 
-    def __init__(self, extractor: str):
+    def __init__(self, extractor: str) -> None:
         """Initialize the exception.
 
         Args:
