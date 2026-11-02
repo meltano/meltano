@@ -172,6 +172,8 @@ by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a catalog file is typically provided using [`meltano el`](/reference/command-line-interface#el)'s `--catalog` option.
 
+When this extra is set, the [schema](#schema-extra), [selection](#select-extra) and [metadata](#metadata-extra) rules are not applied, and Meltano logs a warning naming the ones that are set.
+
 If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/guide/integration#validate-tap-capabilities).
 
 ##### How to use
