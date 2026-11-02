@@ -1,0 +1,19 @@
+---
+slug: 2026-11-02-cloud-changelog
+title: New Apollo.io Connector, Pause Schedules Outside Production & Fix Custom Commands and GitHub Deployments
+date: 2026-11-02
+---
+
+Sync your sales data from Apollo.io with the new `tap-apollo` connector, and pause scheduled runs in non-production environments to cut warehouse costs. This release also fixes custom commands defined in split project files and duplicate deployments from GitHub webhooks.
+
+{/* truncate */}
+
+## Features
+
+- **New `tap-apollo` connector:** Add Apollo.io as an extractor to sync your contacts, accounts, deals, tasks, calls, sequences and outreach emails, along with workspace reference data. Sequence rate fields that Apollo is still calculating load as null instead of failing the sync.
+- **Pause scheduled runs per environment:** Add `disable_pipeline_schedules: true` to an environment's workspace file, such as `workspace-staging.yml`, to stop its scheduled runs and cut warehouse costs outside production. Manual runs and retries still work, and removing the line turns schedules back on.
+
+## Fixes
+
+- **Custom commands in split project files:** If your Meltano configuration is split across multiple files in the repository, custom commands defined in those files, such as a custom dbt run, now work in Meltano Cloud pipelines. Previously, these pipelines could fail with a "command could not be found" error.
+- **One deployment per GitHub merge:** GitHub webhooks no longer trigger multiple workspace deployments. A merge into the target branch now deploys the workspace once.
