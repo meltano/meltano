@@ -139,6 +139,13 @@ class SingerTap(SingerPlugin):
 
     __plugin_type__ = PluginType.EXTRACTORS
 
+    #: The extras that make catalog rules, which the `catalog` extra overrides.
+    CATALOG_RULE_EXTRAS: t.ClassVar[tuple[str, ...]] = (
+        "_select",
+        "_metadata",
+        "_schema",
+    )
+
     EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         *SingerPlugin.EXTRA_SETTINGS,
         SettingDefinition(name="_catalog"),
@@ -556,6 +563,8 @@ class SingerTap(SingerPlugin):
             )
 
         config = plugin_invoker.plugin_config_extras
+        if warning := self.catalog_override_warning(config):
+            logger.warning(warning)
 
         schema_rules = []
         metadata_rules = []
@@ -603,6 +612,36 @@ class SingerTap(SingerPlugin):
             catalog_path.unlink()
             msg = f"Applying catalog rules failed: catalog file is invalid: {err}"
             raise PluginExecutionError(msg) from err
+
+    @classmethod
+    def catalog_override_warning(cls, extras: t.Mapping[str, t.Any]) -> str | None:
+        """Say which catalog rule extras the `catalog` extra makes Meltano ignore.
+
+        Args:
+            extras: the extractor's extras, by setting name (`_catalog`, `_select`...)
+
+        Returns:
+            a warning naming the rule extras set to anything but their default while
+            the `catalog` extra is set, or None if there are none
+        """
+        if not (catalog := extras.get("_catalog")):
+            return None
+        defaults = {setting.name: setting.value for setting in cls.EXTRA_SETTINGS}
+        ignored = [
+            f"`{name.removeprefix('_')}`"
+            for name in cls.CATALOG_RULE_EXTRAS
+            if extras.get(name, defaults[name]) != defaults[name]
+        ]
+        if not ignored:
+            return None
+        extra_names = " and ".join(ignored)
+        noun = "extra is" if len(ignored) == 1 else "extras are"
+        return (
+            f"The {extra_names} {noun} ignored: the `catalog` extra ({catalog}) "
+            "replaces the whole catalog, so selection, metadata and schema rules "
+            "aren't applied. Remove the `catalog` extra to use them, or make the "
+            "changes in that catalog file"
+        )
 
     def catalog_cache_key(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Get a cache key for the catalog.

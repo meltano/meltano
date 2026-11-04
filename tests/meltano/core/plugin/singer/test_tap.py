@@ -732,6 +732,59 @@ class TestSingerTap:
             assert cache_key is None
 
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("rules", "message"),
+        (
+            pytest.param(
+                {"_select": ["users.*"], "_metadata": {"users": {"key": "value"}}},
+                "The `select` and `metadata` extras are ignored: the `catalog` extra "
+                "(custom_catalog.json) replaces the whole catalog",
+                id="select-and-metadata",
+            ),
+            pytest.param(
+                {"_schema": {"users": {"id": {"type": "string"}}}},
+                "The `schema` extra is ignored",
+                id="schema",
+            ),
+            pytest.param(
+                {"_select": ["*.*"], "_metadata": {}, "_schema": {}},
+                None,
+                id="defaults",
+            ),
+        ),
+    )
+    async def test_apply_catalog_rules_warns_when_the_catalog_extra_overrides_rules(
+        self,
+        session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+        subject: SingerTap,
+        monkeypatch: pytest.MonkeyPatch,
+        rules: dict[str, t.Any],
+        message: str | None,
+    ) -> None:
+        invoker = plugin_invoker_factory(subject)
+        config_override = invoker.settings_service.config_override
+        monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
+        for name in SingerTap.CATALOG_RULE_EXTRAS:
+            monkeypatch.setitem(config_override, name, rules.get(name, {}))
+        if "_select" not in rules:
+            monkeypatch.setitem(config_override, "_select", ["*.*"])
+
+        # The module's logger, not captured logs: its output goes wherever an earlier
+        # test configured logging
+        logger = mock.Mock()
+        monkeypatch.setattr("meltano.core.plugin.singer.tap.logger", logger)
+        async with invoker.prepared(session):
+            await subject.apply_catalog_rules(invoker)
+
+        warnings = [call.args[0] for call in logger.warning.call_args_list]
+        if message is None:
+            assert warnings == []
+        else:
+            assert len(warnings) == 1
+            assert warnings[0].startswith(message)
+
+    @pytest.mark.asyncio
     async def test_apply_catalog_rules_select_filter(
         self,
         session,

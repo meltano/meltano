@@ -3,10 +3,14 @@ from __future__ import annotations  # noqa: D100
 import json
 import typing as t
 
+import structlog
+
+from meltano.core.error import MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
+from meltano.core.plugin.singer.tap import SingerTap
 from meltano.core.plugin_invoker import invoker_factory
 
 if t.TYPE_CHECKING:
@@ -15,6 +19,30 @@ if t.TYPE_CHECKING:
     from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+
+
+logger = structlog.stdlib.get_logger(__name__)
+
+
+class SelectionNotSupportedError(MeltanoError):
+    """The extractor can't be given a catalog, so select patterns have no effect."""
+
+    def __init__(self, extractor: str) -> None:
+        """Initialize the exception.
+
+        Args:
+            extractor: The name of the extractor.
+        """
+        super().__init__(
+            reason=(
+                f"Extractor '{extractor}' doesn't advertise the `catalog` or "
+                "`properties` capability, so select patterns would have no effect"
+            ),
+            instruction=(
+                "Add the one the extractor supports to its `capabilities` in "
+                "`meltano.yml`"
+            ),
+        )
 
 
 class SelectService:  # noqa: D101
@@ -46,6 +74,17 @@ class SelectService:  # noqa: D101
         plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 
+    def ensure_selection_supported(self) -> None:
+        """Check that the extractor takes a catalog, where selection is applied.
+
+        Raises:
+            SelectionNotSupportedError: if it advertises neither the `catalog` nor
+                the `properties` capability.
+        """
+        capabilities = self.extractor.capabilities
+        if "catalog" not in capabilities and "properties" not in capabilities:
+            raise SelectionNotSupportedError(self.extractor.name)
+
     async def load_catalog(self, session: Session, *, refresh: bool = False) -> dict:
         """Load the catalog."""
         invoker = invoker_factory(self.project, self.extractor)
@@ -65,6 +104,7 @@ class SelectService:  # noqa: D101
         refresh: bool = False,
     ) -> ListSelectedExecutor:
         """List all select."""
+        self.ensure_selection_supported()
         try:
             catalog = await self.load_catalog(session, refresh=refresh)
         except FileNotFoundError as err:
@@ -108,7 +148,13 @@ class SelectService:  # noqa: D101
         *,
         remove: bool = False,
     ) -> None:
-        """Update plugins' select patterns."""
+        """Update plugins' select patterns.
+
+        Adding a pattern needs an extractor that takes a catalog, and warns if the
+        `catalog` extra overrides the patterns. Removing one always works.
+        """
+        if not remove:
+            self.ensure_selection_supported()
         this_pattern = self._get_pattern_string(
             streams_filter,
             properties_filter,
@@ -127,6 +173,15 @@ class SelectService:  # noqa: D101
             )
             self._update_plugin_select(plugin, this_pattern, remove=remove)
             self.project.plugins.update_environment_plugin(plugin)
+
+        if not remove:
+            settings = PluginSettingsService(self.project, self.extractor)
+            extras = {
+                name: settings.get(name)
+                for name in ("_catalog", *SingerTap.CATALOG_RULE_EXTRAS)
+            }
+            if warning := SingerTap.catalog_override_warning(extras):
+                logger.warning(warning)
 
     def _update_plugin_select(
         self,
