@@ -84,7 +84,6 @@ class ScheduleService:
         """Add a scheduled legacy elt task.
 
         Args:
-            session: The active sqlalchemy session.
             name: The name of the schedule.
             extractor:  The name of the extractor.
             loader: The name of the loader.
