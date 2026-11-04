@@ -81,3 +81,14 @@ class LockedDefinitionService(PluginRepository):
         )
 
         return base_plugin_factory(plugin, plugin.variants[0])
+
+    def find_locked_variants(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+    ) -> list[str]:
+        """Find existing locked variant names for a given plugin."""
+        return self.lock_service.find_locked_variants(
+            plugin_type=plugin_type,
+            plugin_name=plugin_name,
+        )
