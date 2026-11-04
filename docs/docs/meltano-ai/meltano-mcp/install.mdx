@@ -1,0 +1,102 @@
+---
+title: Installing Meltano MCP
+description: Add Meltano MCP to Claude as a custom connector - for your whole Claude organization or just for yourself - and sign in with your Meltano Cloud account.
+sidebar_label: Installing Meltano MCP
+layout: doc
+sidebar_position: 1
+---
+
+# Installing Meltano MCP
+
+## Before you start
+
+You'll need:
+
+* A **Meltano Cloud account** with access to at least one workspace.
+* **Claude**, on the web or the desktop app. On a Claude Team or Enterprise plan, an Owner of your Claude organization adds the connector once for everyone - see [Connect it](#connect-it).
+
+That's it. There's nothing to install in your workspace, no API key to generate and no feature to switch on.
+
+:::tip Your permissions come with you
+Meltano MCP signs you in as *you*. If you can only read a workspace in the Meltano Cloud app, that's all Claude will be able to do with it either. If you're an administrator, it can make changes. Nothing you can't already do becomes possible because you connected it. See [Security and permissions](/meltano-ai/meltano-mcp/security) for the details.
+:::
+
+## Connect it
+
+Meltano MCP is a **Claude custom connector**. It's added to Claude once, and from then on it's available in any chat.
+
+You'll need these two values:
+
+| Setting | Value |
+|---|---|
+| **Remote MCP server URL** | `https://app.meltano.com/api/mcp` |
+| **OAuth Client ID** | `VYSIY0tEm2Zg81nuJ6qXo8ZFzCR06Jr8` |
+
+There's no client secret. Leave that field empty.
+
+:::info Claude connector directory
+Meltano MCP is coming to Claude's connector directory. Until it's listed there, add it as a custom connector using the steps below.
+:::
+
+### Claude Team and Enterprise: add it for your organization
+
+On a Team or Enterprise plan, custom connectors are added at the organization level by a Claude **Owner** or **Primary Owner**. On Enterprise, a custom role with permission to manage Libraries can also add them. Each member then connects with their own Meltano Cloud login.
+
+**For the Claude Owner (once per organization):**
+
+1. In Claude, open **Organization settings > Connectors**.
+2. Click **Add**, hover over **Custom**, then select **Web**.
+3. Enter **Meltano** as the name. This is what members see in their connectors list.
+4. Enter the remote MCP server URL, `https://app.meltano.com/api/mcp`, and click **Continue**.
+5. Review the detected authentication settings and click **Continue**.
+6. Under **Authentication**, choose **Sign in when needed**, so each member signs in to Meltano Cloud as themselves.
+7. Under **OAuth client**, choose **Use your own OAuth client**. Enter the OAuth Client ID `VYSIY0tEm2Zg81nuJ6qXo8ZFzCR06Jr8` and leave the client secret empty.
+8. Leave **Request headers** empty.
+9. Click **Add**.
+
+**For each member:**
+
+1. In Claude, open **Customize > Connectors**.
+2. Find **Meltano**. It usually has a **Custom** label.
+3. Click **Connect**. A browser window opens asking you to sign in to Meltano Cloud.
+4. Sign in with your usual Meltano Cloud account and approve access.
+
+### Claude Free, Pro and Max: add it for yourself
+
+1. In Claude, open **Customize > Connectors**.
+2. Click **+ Add**, then **Add custom connector**.
+3. Enter **Meltano** as the name.
+4. Enter the remote MCP server URL, `https://app.meltano.com/api/mcp`, and click **Continue**.
+5. Review the detected authentication settings and click **Continue**.
+6. Under **OAuth client**, choose **Use your own OAuth client**. Enter the OAuth Client ID `VYSIY0tEm2Zg81nuJ6qXo8ZFzCR06Jr8` and leave the client secret empty.
+7. Leave **Request headers** empty, then click **Add**.
+8. Click **Connect** on the new connector, then sign in with your usual Meltano Cloud account and approve access.
+
+The Claude Free plan allows one custom connector.
+
+### Turn it on in a chat
+
+Meltano then appears in your connectors list with its tools available. To use it in a conversation, click **+** at the lower left of the chat, choose **Connectors**, and switch **Meltano** on.
+
+See Anthropic's [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) if Claude's screens look different from these steps.
+
+## Your first conversation
+
+Start simple, so you can see it working:
+
+> What Meltano workspaces do I have?
+
+Then something more useful:
+
+> How has my production workspace been doing this week? Any pipelines I should worry about?
+
+And when something's wrong:
+
+> The Salesforce pipeline failed last night. What happened, and what do I need to change?
+
+Claude will fetch the failure, read the logs and the configuration, and come back with an explanation and a suggested fix - not a generic answer about Salesforce, but one based on what actually happened in your run.
+
+## Next steps
+
+* [Getting the most out of Meltano MCP](/meltano-ai/meltano-mcp/tips)
+* [Troubleshooting](/meltano-ai/meltano-mcp/troubleshooting) if something doesn't work.

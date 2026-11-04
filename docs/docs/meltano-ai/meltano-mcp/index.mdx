@@ -1,0 +1,83 @@
+---
+title: Meltano MCP
+description: Connect Meltano Cloud to Claude and manage your pipelines by just asking - check what ran, find out why something broke, and build new pipelines in plain language.
+sidebar_label: Meltano MCP
+layout: doc
+sidebar_position: 11.4
+---
+
+# Meltano MCP
+
+Meltano MCP connects your Meltano Cloud workspaces to Claude, so you can ask about your data pipelines in plain language instead of clicking through the app.
+
+Once it's connected you can ask things like *"did last night's Salesforce load work?"*, *"why does the HubSpot pipeline keep failing?"* or *"build me a pipeline that pulls GitHub issues into the warehouse"* - and Claude can go and look, rather than guess.
+
+It's a one-time setup, it uses your normal Meltano Cloud login, and it respects exactly the same permissions you already have.
+
+---
+
+## What MCP actually is
+
+MCP stands for **Model Context Protocol**. It's an open standard that lets an AI assistant safely talk to a real system - in this case, Meltano Cloud.
+
+The short version: without it, Claude can only talk *about* Meltano. With it, Claude can look at *your* workspaces, *your* pipelines and *your* run history, and act on them when you ask.
+
+You don't need to understand the protocol to use it. You connect it once, and from then on Claude just knows about your Meltano Cloud.
+
+:::tip Melty AI vs Meltano MCP
+**Melty AI** is the assistant built into Meltano Cloud - the one behind the **Diagnose** button and your [failure alert emails](/meltano-ai/ai-diagnostics#method-2-diagnose-and-act-email-alerts). **Meltano MCP** is the same knowledge and the same abilities, brought *to you* in Claude, so you can work with Meltano from wherever you already are.
+:::
+
+## What you can ask it to do
+
+Everything below is something you can ask for in your own words. You never need to name a command.
+
+### See what you've got
+
+* List your workspaces, and what's in them
+* List the pipelines in a workspace, with their schedules and status
+* See which connectors are set up, and how they're configured (passwords and keys are always hidden)
+* Find the git repository behind a workspace
+
+### Check how things are going
+
+* See recent runs for a workspace or a single pipeline, and whether they succeeded
+* Get a straight answer on whether a pipeline is **reliable** - a pipeline counts as unstable if any of its last five attempts failed
+* See how many rows each recent run actually loaded into your destination
+* Read the logs for a specific run
+
+### Work out why something broke
+
+* Ask why a pipeline failed, and get a plain-language explanation with suggested fixes
+* This is the same diagnosis engine as the **Diagnose** button in the app, so you get the same grounded answer - just in your chat
+
+### Build something new
+
+* Search the Meltano connector catalogue for a source or destination
+* Check what settings a connector actually needs, before anything is configured
+* Create a workspace
+* Create a pipeline, including installing the connectors it needs along the way
+* Trigger a pipeline run
+* Publish changes you've pushed to your workspace's git repository
+
+### Look things up
+
+* Search the Meltano knowledge base and read the docs behind the answer, so replies are grounded in how Meltano really works rather than invented
+
+## Get started
+
+Meltano MCP is a Claude custom connector. Setting it up takes a few minutes, and on Claude Team and Enterprise plans an Owner adds it once for the whole organization. See [Installing Meltano MCP](/meltano-ai/meltano-mcp/install).
+
+## In this section
+
+* [Installing Meltano MCP](/meltano-ai/meltano-mcp/install) - add the connector to Claude, for your organization or just for yourself, and have your first conversation.
+* [Getting the most out of Meltano MCP](/meltano-ai/meltano-mcp/tips) - habits that get you better answers.
+* [Security and permissions](/meltano-ai/meltano-mcp/security) - what it can see, what it can change, and what it never sees.
+* [Troubleshooting](/meltano-ai/meltano-mcp/troubleshooting) - what common messages mean and how to fix them.
+
+## Where to go next
+
+* [Agent Melty](/meltano-ai/agent-melty) - developing pipelines in your workspace's git repository with a coding agent.
+* [AI Diagnostics](/meltano-ai/ai-diagnostics) - the same diagnosis, either from the Diagnose button in the Meltano Cloud app, or before you've even logged in via your failure alert email.
+
+Questions, or something in a reply that looks wrong? Email [support@meltano.com](mailto:support@meltano.com) or reach out through your usual support channel.
