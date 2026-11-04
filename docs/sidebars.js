@@ -123,7 +123,7 @@ const sidebars = {
       link: { type: 'doc', id: 'meltano-ai/index' },
       collapsed: true,
       items: [
-        { type: 'doc', id: 'meltano-ai/melty-mcp' },
+        { type: 'doc', id: 'meltano-ai/meltano-mcp' },
         { type: 'doc', id: 'meltano-ai/agent-melty' },
         { type: 'doc', id: 'meltano-ai/ai-diagnostics' },
       ],
