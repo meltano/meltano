@@ -1,0 +1,23 @@
+---
+slug: 2026-11-09-cloud-changelog
+title: Official Support for AWS Cost Explorer & HubSpot Connectors, Plus QuickBooks Now Captures Inactive & Deleted Records
+date: 2026-11-09
+---
+
+{/* truncate */}
+
+## Features
+
+- **Official support for tap-aws-cost-explorer (v0.1.0):** The MeltanoLabs variant pulls total cost plus costs by account, service, usage type and region, lists your AWS organization’s accounts, and supports custom reports by any two dimensions, cost allocation tags or cost categories. Run it against your management account to cover every member account.
+- **Official support for target-hubspot (v0.2.0):** The MeltanoLabs variant loads your records into HubSpot CRM objects through HubSpot’s CRM Imports API.
+- **Updated tap-quickbooks to v0.2.0:** adds two optional settings: include_inactive loads records that were made inactive, such as deleted customers, vendors, items and accounts, and capture_deletes loads deleted records with the time they were deleted. Existing pipelines behave as before until you turn one on.
+
+## Fixes
+
+- **Incremental syncs of job history:** The pipeline and workspace jobs API no longer ignores since. It now returns only jobs that changed after that date-time, in a stable order, so tools like tap-meltano-cloud can sync just what’s new instead of re-reading the full history.
+- **Download logs mid-run:** You can now download a pipeline’s logs while the run is still in progress, not just once it finishes. Queued runs don’t have a log yet, so their Download option is greyed out with a note that logs will be available once the run starts.
+- **Updated tap-veeqo to v0.3.2:** fixes record validation errors on the orders stream.
+- **Updated tap-aptem to v0.4.2:** OData v1 incremental syncs no longer skip records that share a replication key value across a page end.
+- **Safer plugin deletion:** Deleting a plugin now warns you that the pipelines using it will be deleted too, so you can cancel before losing them.
+- **Connecting to ‘localhost’ via SSH Tunnel:** Using an SSH tunnel to connect to ‘127.0.0.1’ would fail due to some unexpected behaviour with our SSH method. This is now fixed, so if your database is running on the same host as the bastion (or you are port forwarding on there) this is now supported.
+- **Pipeline search and filters remembered:** Going Back from a pipeline to the pipelines list now keeps your search and filters in place, so you don’t have to set them up again.
