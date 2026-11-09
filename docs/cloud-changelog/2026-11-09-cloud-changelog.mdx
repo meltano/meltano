@@ -19,5 +19,5 @@ date: 2026-11-09
 - **Updated tap-veeqo to [`v0.3.2`](https://github.com/Matatika/tap-veeqo/releases/tag/v0.3.2):** fixes record validation errors on the orders stream.
 - **Updated tap-aptem to [`v0.4.2`](https://github.com/Matatika/tap-aptem/releases/tag/v0.4.2):** OData v1 incremental syncs no longer skip records that share a replication key value across a page end.
 - **Safer plugin deletion:** Deleting a plugin now warns you that the pipelines using it will be deleted too, so you can cancel before losing them.
-- **Connecting to ‘localhost’ via SSH Tunnel:** Using an SSH tunnel to connect to ‘127.0.0.1’ would fail due to some unexpected behaviour with our SSH method. This is now fixed, so if your database is running on the same host as the bastion (or you are port forwarding on there) this is now supported.
+- **Connecting to `localhost` via SSH Tunnel:** Using an SSH tunnel to connect to `127.0.0.1` would fail due to some unexpected behaviour with our SSH method. This is now fixed, so if your database is running on the same host as the bastion (or you are port forwarding on there) this is now supported.
 - **Pipeline search and filters remembered:** Navigating away from the pipelines list view and then back in history now keeps your search and filters in place, so you don’t have to set them up again.
