@@ -1,0 +1,42 @@
+venv:
+  backend: uv
+default_environment: dev
+project_id: 6c0ad4f2-3b52-4d0e-9a4d-7c1f2a8e5b10
+send_anonymous_usage_stats: false
+python: python3.14
+plugins:
+  extractors:
+  - name: tap-smoke-test
+    variant: meltano
+    pip_url: git+https://github.com/meltano/tap-smoke-test.git
+    config:
+      schema_inference_record_count: 5
+      streams:
+      - stream_name: animals
+        input_filename: animals-data.ndjson
+  mappers:
+  - name: meltano-map-transformer
+    variant: meltano
+    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
+    mappings:
+    - name: animals-subset
+      config:
+        stream_maps:
+          animals:
+            id: id
+            description: description
+            views: views
+            verified: verified
+            __key_properties__: [id]
+            __else__: __NULL__
+  loaders:
+  - name: target-duckdb
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-duckdb.git
+    config:
+      path: output/warehouse.duckdb
+      default_target_schema: raw
+environments:
+- name: dev
+- name: staging
+- name: prod
