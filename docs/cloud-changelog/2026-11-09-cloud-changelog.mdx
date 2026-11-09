@@ -14,7 +14,7 @@ date: 2026-11-09
 
 ## Fixes
 
-- **Incremental syncs of job history:** The pipeline and workspace jobs API now supports the `since` query parameter, which returns only jobs that changed after a given date-time. With this change, `tap-meltano-cloud` can now sync job data incrementally, instead of the full history.```
+- **Incremental syncs of job history:** The pipeline and workspace jobs API now supports the `since` query parameter, which returns only jobs that changed after a given date-time. With this change, `tap-meltano-cloud` can now sync job data incrementally, instead of the full history.
 - **Download logs mid-run:** You can now download a pipeline’s logs while the run is still in progress, not just once it finishes. Queued runs don’t have a log yet, so their Download option is greyed out with a note that logs will be available once the run starts.
 - **Updated tap-veeqo to v0.3.2:** fixes record validation errors on the orders stream. See the [v0.3.2 release](https://github.com/Matatika/tap-veeqo/releases/tag/v0.3.2).
 - **Updated tap-aptem to v0.4.2:** OData v1 incremental syncs no longer skip records that share a replication key value across a page end. See the [v0.4.2 release](https://github.com/Matatika/tap-aptem/releases/tag/v0.4.2).
