@@ -684,7 +684,7 @@ settings:
 
 ### `settings[*].env_specific`
 
-Optional. When `true`, `meltano config set` prefers storing the value in `.env` or the system database instead of `meltano.yml`, so environment-specific secrets are less likely to be committed. Prefer Meltano [environments](/concepts/environments) for most configuration that varies by deploy target; keep `env_specific: true` for credentials and similar values that should stay out of YAML.
+Optional. When `true`, `meltano config set` prefers storing the value in `.env` or the system database instead of `meltano.yml`, so environment-specific secrets are less likely to be committed. This is a store preference, not a guarantee: if `.env` storage is unavailable and `meltano.yml` is allowed, the value can still land in YAML. Mark credentials `sensitive: true`, keep secrets in `.env` or a secret backend, and avoid committing those files. Prefer Meltano [environments](/concepts/environments) for most configuration that varies by deploy target; use `env_specific: true` as an extra hint for credentials.
 
 ```yaml
 settings:
