@@ -278,6 +278,8 @@ rules that are applied to the extractor's [discovered catalog file](https://hub.
 when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano el`](/reference/command-line-interface#el).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
+Common stream-level keys include `replication-method` (`FULL_TABLE`, `INCREMENTAL`, or `LOG_BASED`), `replication-key`, and `table-key-properties` (the primary key field names destinations should use for upserts). Property-level keys include `inclusion` / `selected` and `is-replication-key`. Setting `_metadata` is how you override discovery defaults—for example forcing a custom primary key for a MySQL stream—without hand-editing a catalog file.
+
 Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
 These [nested properties](/reference/command-line-interface#nested-properties) can also be thought of and interacted with as settings named `_metadata.<entity>.<key>`.
 
