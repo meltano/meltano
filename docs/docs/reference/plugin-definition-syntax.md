@@ -27,9 +27,11 @@ variant: apache
 
 Required. A short identifier that groups plugins which are meant to work together on the same logical data source or destination.
 
-Think of it as the shared “family name” for a pipeline: extractors, loaders, and transforms that integrate the same system usually share one namespace (often a Python-safe form of the tap name, like `tap_gitlab` or `airflow`). Meltano expands that value into defaults such as `$MELTANO_EXTRACTOR_NAMESPACE` / `$MELTANO_LOADER_NAMESPACE` for extras like `load_schema` and related settings, so related plugins land in the same schema or package without repeating the name everywhere.
+Think of it as the shared “family name” for a plugin and its close companions: extractors for the same API often share one namespace (a Python-safe form of the tap name, like `tap_gitlab`), and transforms that package that source follow it. Meltano expands the value into defaults such as `$MELTANO_EXTRACTOR_NAMESPACE` for extras like `load_schema`.
 
-Custom plugins must set `namespace` explicitly. Discoverable Hub plugins already define one; when you shadow or inherit a definition, keep the namespace aligned with the plugins you intend to pair.
+Loaders are different: `$MELTANO_LOADER_NAMESPACE` is commonly the destination *dialect* (for example `postgres` or `snowflake`), and Meltano may use that dialect as the default dbt target. Do not set a loader’s namespace to the extractor’s `tap_*` name unless you intentionally want that string as the loader dialect/target.
+
+Custom plugins must set `namespace` explicitly. Discoverable Hub plugins already define one; when you shadow or inherit a definition, keep each plugin’s namespace aligned with how Meltano and Hub expect that plugin type to be used.
 
 ```yaml
 namespace: airflow
