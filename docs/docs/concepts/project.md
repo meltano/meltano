@@ -393,10 +393,13 @@ Meltano does **not** ship an automatic data migration from the default SQLite fi
 
 Recommended approach for a project that already has history in SQLite:
 
-1. Create an empty Postgres database and set [`database_uri`](/reference/settings#database-uri) / `MELTANO_DATABASE_URI` to it.
-2. Run `meltano install` (and any `meltano upgrade` / migration commands your version documents) so Meltano creates the schema on the new backend.
-3. Re-add plugins and recreate schedules/jobs as needed, **or** dump/restore only the tables you understand with a SQL dump tool—schema and row formats are not guaranteed stable across Meltano versions.
-4. Keep a backup of `.meltano/meltano.db` until you have verified production runs on the new backend.
+1. Stop schedulers and other Meltano processes so nothing keeps writing to SQLite during cutover.
+2. Back up the **active** SQLite file (`.meltano/meltano.db` by default, or the path under `MELTANO_SYS_DIR_ROOT` / your current `database_uri` if customized).
+3. Install the optional backend driver for the target database (for example the [`postgres`](/guide/advanced-topics#installing-optional-components) or [`mssql`](/guide/advanced-topics#installing-optional-components) extra) before pointing Meltano at the new URI.
+4. Create an empty target database and set [`database_uri`](/reference/settings#database-uri) / `MELTANO_DATABASE_URI` to it.
+5. Run `meltano install` (and any `meltano upgrade` / migration commands your version documents) so Meltano creates the schema on the new backend.
+6. Re-add plugins and recreate schedules/jobs as needed, **or** dump/restore only the tables you understand with a SQL dump tool—schema and row formats are not guaranteed stable across Meltano versions. Recreating plugins does **not** restore prior `runs` / incremental state or `plugin_settings` rows from SQLite; reconfigure settings and expect pipelines to need fresh bookmarks unless you migrate those tables deliberately.
+7. Keep the SQLite backup until you have verified production runs on the new backend.
 
 If you are starting a new environment, prefer configuring Postgres via `database_uri` from day one so you never need a SQLite dump.
 :::
