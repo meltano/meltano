@@ -86,8 +86,9 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
    # For example:
    meltano init my-meltano-project
 
-   # If you're using Docker, don't forget to mount the current working directory:
-   docker run -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
+   # If you're using Docker, mount the current working directory and match your host user
+   # so project files are not owned by root:
+   docker run -u $(id -u):$(id -g) -v $(pwd):/projects -w /projects meltano/meltano init my-meltano-project
    ```
 
    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file):
