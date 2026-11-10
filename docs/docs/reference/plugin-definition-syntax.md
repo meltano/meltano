@@ -413,7 +413,7 @@ Optionally, override the plugin's default `executable` when running this command
 
 The container specification to use for the command.
 
-When you run a command with [`meltano invoke --containers`](/reference/command-line-interface#containerized-commands), Meltano builds a `docker run` from this block (image, optional entrypoint/command, `-e` from `env`, `-v` from `volumes`, `-p` from `ports`). Treat Hub/`docker run` examples the same way: map image → `image`, flags → `env`/`volumes`/`ports`, and the trailing command → `command` (or leave the image entrypoint and put args on the Meltano command's `args`).
+When you run a command with [`meltano invoke --containers`](/reference/command-line-interface#containerized-commands), Meltano builds a `docker run` from this block (image, optional entrypoint/command, `-e` from `env`, `-v` from `volumes`, `-p` from `ports`). Treat Hub/`docker run` examples the same way: map image → `image`, flags → `env`/`volumes`/`ports`, and the trailing command → `command` (or leave the image entrypoint and put args on the Meltano command's `args`). Meltano also forwards its process environment into the container; values listed under `env` are not the only variables present at runtime. Pull the image first (`docker pull …`)—`meltano invoke --containers` does not pull by default. Containers are left on the host after exit (there is no implicit `--rm`).
 
 For example, this definition:
 
@@ -433,16 +433,19 @@ commands:
         - "$MELTANO_PROJECT_ROOT/.meltano/utilities/postgres/data/:/var/lib/postgresql/data"
 ```
 
-is the Meltano equivalent of roughly:
+is roughly equivalent to the following once `MELTANO_PROJECT_ROOT` is set to your project directory (Meltano sets it during `invoke`; export it yourself if you paste the `docker run` outside Meltano) and `postgres:15` is already local:
 
 ```bash
-docker run --rm \
+export MELTANO_PROJECT_ROOT=/path/to/project
+docker pull postgres:15
+docker run \
   -e POSTGRES_DB=warehouse \
   -e POSTGRES_PASSWORD=warehouse \
   -e POSTGRES_USER=warehouse \
   -p 5432:5432/tcp \
   -v "$MELTANO_PROJECT_ROOT/.meltano/utilities/postgres/data/:/var/lib/postgresql/data" \
-  postgres:15
+  postgres:15 \
+  start
 ```
 
 Example:
