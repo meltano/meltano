@@ -283,6 +283,7 @@ Most deployments only need to set `database_uri` (for example to PostgreSQL in p
 
 Set [`state_backend.uri`](#state-backend-uri) only when you want ELT/state stored **outside** the system database—for example on S3, GCS, or Azure Blob—so multiple Meltano processes can share incremental replication state without sharing the full system DB, or so state survives independently of the system database lifecycle.
 When `state_backend.uri` is left at its default (`systemdb`), state lives in the same database as `database_uri` and you do not need a separate state backend.
+For filesystem or object-store backends, still serialize writers per state ID (or rely on backend-native locking); concurrent updates to the same state ID can otherwise lose bookmarks.
 :::
 
 The database URI should be a valid [SQLAlchemy database URL](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls), and can be used to connect to [a variety of database backends](/concepts/project/#support-for-other-database-types).
