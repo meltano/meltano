@@ -1,0 +1,21 @@
+---
+title: Security and permissions
+description: What Meltano MCP can see and change in Meltano Cloud, and how your secrets and permissions are protected.
+sidebar_label: Security and permissions
+layout: doc
+sidebar_position: 3
+---
+
+# Security and permissions
+
+Worth knowing before you connect it to a production workspace.
+
+**It sees what you see.** Every request runs as your Meltano Cloud user, against the same permission rules as the app. Other people's workspaces and other accounts aren't visible to it.
+
+**It never sees your secrets.** Connector settings come back with the *names* of settings and their non-sensitive values only. Passwords, tokens and keys are redacted, and logs are scrubbed before they're returned. There's no setting to turn that off.
+
+**Most of what it does only reads.** Of the tools it has, the large majority just look things up. Five can change something: creating a workspace, adding a connector, creating a pipeline, running a pipeline, and publishing changes.
+
+**The ones that change things are flagged as such,** so your AI tool can warn you or ask before they run. Two are worth particular care: **running a pipeline** can overwrite data in your destination, and **publishing changes** reconciles your platform configuration to whatever is in the repository. Read those confirmations rather than waving them through.
+
+**Creating a workspace is real.** It provisions infrastructure and uses up your account's workspace allowance, in whichever account you're currently working in. Deleting one afterwards is permanent. Claude will confirm with you first - and it can only create workspaces in the account selected in the Meltano Cloud app, never another one.

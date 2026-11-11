@@ -565,6 +565,12 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/meltano-ai/melty-mcp"
+  to = "/meltano-ai/meltano-mcp"
+  status = 301
+  force = true
+
 # --- Search engine indexing ---
 #
 # Only the production deploy (docs.meltano.com) should be indexed. Branch

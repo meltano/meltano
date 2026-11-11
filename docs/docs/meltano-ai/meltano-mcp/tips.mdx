@@ -1,0 +1,45 @@
+---
+title: Getting the most out of Meltano MCP
+description: Habits that get you faster, better-grounded answers from Meltano MCP in Claude.
+sidebar_label: Tips
+layout: doc
+sidebar_position: 2
+---
+
+# Getting the most out of Meltano MCP
+
+A few habits make a big difference.
+
+## Say which workspace you mean
+
+If you have more than one workspace, say which one - *"in the production workspace"* - or ask it to list them first. Otherwise it has to guess or ask, and you'll spend a turn finding out.
+
+## Ask about reliability in those words
+
+If you want to know whether something can be trusted, ask *"is this pipeline reliable?"* or *"which pipelines are failing?"* rather than *"show me the runs"*. It changes what gets fetched: you get a verdict and a summary of the whole workspace, instead of a list of rows you then have to read yourself.
+
+## Ask for numbers when you want numbers
+
+*"How many rows did the last five runs load?"* gets you row counts straight from the destination. *"Show me the logs"* gets you raw log lines, which answer the same question far less well. Ask for the thing you actually want.
+
+## Let it diagnose before it fixes
+
+When a pipeline fails, ask it to diagnose first. It pulls the failure, the recent history, the configuration and the transform files into one grounded explanation. Jumping straight to *"fix it"* skips the part that tells you what's actually wrong.
+
+## You still enter secrets yourself
+
+Passwords, API keys and tokens never travel through the assistant - not in either direction. When a new source or destination needs one, Claude will hand you a direct link into the Meltano Cloud app and ask you to enter it there. That's by design, and it's the one step that always stays in the browser.
+
+## Expect some waiting
+
+Some things don't happen instantly. Creating a workspace provisions real infrastructure and can take a few minutes; publishing changes runs a job. Claude knows to keep checking, but if it says *"still provisioning"*, that's normal - give it a moment and ask again.
+
+## Two ways to build a pipeline
+
+You can build entirely in the chat, or you can ask Claude for the **clone command** for your workspace's git repository, edit the configuration locally with a coding agent, push, and then ask it to publish your changes.
+
+Conversation is faster for something small. The repository route is better for real development work, because your workspace repo comes pre-loaded with a Meltano knowledge base that grounds your agent - see [Agent Melty](/meltano-ai/agent-melty). The two mix freely: a pipeline you create in chat shows up in the repo afterwards.
+
+## Ask it to check the docs
+
+If you're unsure how something in Meltano works - incremental replication, a connector's settings, how state is handled - ask. It can search the Meltano knowledge base and answer from the real documentation rather than from memory.

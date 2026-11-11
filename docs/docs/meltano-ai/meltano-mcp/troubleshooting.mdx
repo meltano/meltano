@@ -1,0 +1,25 @@
+---
+title: Troubleshooting Meltano MCP
+description: What common Meltano MCP messages mean and how to fix them.
+sidebar_label: Troubleshooting
+layout: doc
+sidebar_position: 4
+---
+
+# Troubleshooting Meltano MCP
+
+| What you see | What it usually means |
+|---|---|
+| **"Access denied"** | You don't have the rights for that action on that workspace - typically a change to a workspace you can only read. Ask an administrator, or check you're working in the right account. |
+| **"Not found"** | The workspace or pipeline ID isn't one you have access to. Ask Claude to list your workspaces and try again. |
+| **A pipeline "isn't ready"** | A new or just-changed pipeline finishes saving its configuration before it can run. Wait a moment and ask again. |
+| **A pipeline is a "draft"** | It's missing something - almost always a secret. Ask Claude for the link to the pipeline and finish it in the app. |
+| **The workspace is "provisioning"** | A new workspace is still being set up. This can take several minutes. Wait for it to be ready before adding pipelines or handing out the clone command. |
+| **It's asking you to sign in again** | Sign-ins expire. Reconnect Meltano from Claude's connector settings and sign in again. |
+| **Claude says it can't see Meltano at all** | Check Meltano is switched on for that chat (**+ > Connectors**), and that it's still connected under **Customize > Connectors**. |
+| **Meltano isn't in your connectors list** | On a Team or Enterprise plan, a Claude Owner has to add it for the organization first - see [Installing Meltano MCP](/meltano-ai/meltano-mcp/install#connect-it). |
+| **Sign-in fails straight after you click Connect** | Check the connector's OAuth Client ID is exactly `VYSIY0tEm2Zg81nuJ6qXo8ZFzCR06Jr8`, with no client secret, and the server URL is `https://app.meltano.com/api/mcp`. |
+
+If a message mentions an internal error with a reference code, pass that code to Meltano support - it lets us find the exact failure in our logs.
+
+Questions, or something in a reply that looks wrong? Email [support@meltano.com](mailto:support@meltano.com) or reach out through your usual support channel.
