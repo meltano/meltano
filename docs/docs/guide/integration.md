@@ -302,6 +302,12 @@ Meltano stores this pipeline state in its [state backend](/concepts/state_backen
 
 If you'd like to manually inspect a job's state for debugging purposes, or so that you can store it somewhere other than the system database you can use the [`meltano state`](/reference/command-line-interface#state) command to do things like list all states, get state by name, set state, etc.
 
+### Why incremental runs can send the same rows again
+
+Incremental replication is usually *at-least-once*, not exactly-once. Bookmarks commonly advance to the latest successful watermark (often an inclusive `replication-key` timestamp or id). The next run therefore re-emits rows at that watermark so nothing is skipped if the previous run failed after emitting them. Destinations are expected to upsert or otherwise deduplicate on primary keys. Seeing overlap between runs is normal; it is not proof that state is ignored.
+
+If you need a true full reload of history, use `--full-refresh` (or clear/edit state with [`meltano state`](/reference/command-line-interface#state)) rather than lowering `start_date` alone—see below. `--full-refresh` still respects the configured `start_date`: move `start_date` earlier (or remove it when the tap allows) if you need rows older than that bound. If the extractor uses a custom `_state` file instead of the Meltano state backend, `meltano state` does not change that file—edit or clear the configured `_state` path, or use `--full-refresh`.
+
 ### Start date and incremental replication
 
 When using incremental replication, it's important to understand that the bookmark dates stored in the state take precedence over the `start_date` configuration setting. This means that if you change the `start_date` to an earlier date hoping to pull more historical data, the extractor will still start from where it left off according to the saved state.
