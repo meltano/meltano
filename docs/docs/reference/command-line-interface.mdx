@@ -1808,6 +1808,10 @@ meltano schedule set gitlab-to-jsonl --loader target-csv
 
 Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
+:::note Catalog cache
+Singer-based extractors cache a discovered [catalog](https://hub.meltano.com/singer/spec#catalog-files) after discovery so later `meltano select --list` / `--all` (and pipeline runs) can reuse it. If the list of streams or properties looks stale relative to the source, force a refresh with [`meltano invoke --refresh-catalog <extractor>`](#invoke), [`meltano run --refresh-catalog`](#run), or reinstall the extractor plugin. See also [extractor catalog generation](/guide/integration#extractor-catalog-generation).
+:::
+
 - `meltano select [--list] [--all] [--clear] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 
 Selection rules will be stored in the extractor's [`select` extra](/concepts/plugins#select-extra), which defines the streams and properties within each stream that should be included during data extraction. Note that this is different from the [`select_filter` extra](/concepts/plugins#select-filter-extra), which is primarily used for further filtering of stream selections.
