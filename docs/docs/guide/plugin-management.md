@@ -267,6 +267,10 @@ Note that the `variant` and `pip_url` properties were populated automatically by
 
 ##### Multiple variants
 
+:::tip Side-by-side variants (e.g. two `target-snowflake` implementations)
+You cannot add the same plugin `name` twice. To run two variants of one discoverable plugin in one project, give each install its own name with `--as` while still inheriting from the discoverable plugin (and choosing `--variant`). Example: `target-snowflake--transferwise` and `target-snowflake--meltanolabs`. Pipelines then reference those distinct names.
+:::
+
 If you'd like to use multiple [variants](#variants) of the same discoverable plugin in your project at the same time, this feature will also come in handy.
 
 Since plugins in your project need to have unique names, a discoverable plugin can only be shadowed once,
