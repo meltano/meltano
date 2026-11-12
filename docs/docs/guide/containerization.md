@@ -107,7 +107,8 @@ The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/
 will be [the `meltano` command](/reference/command-line-interface),
 meaning that you can provide `meltano` subcommands and arguments like `run ...` and `invoke airflow ...` directly to
 [`docker run <image-name> ...`](https://docs.docker.com/engine/reference/commandline/run/)
-as trailing arguments:
+as trailing arguments.
+When the container writes into a bind-mounted project directory, pass `-u $(id -u):$(id -g)` so new files are owned by your host user instead of root:
 
 ```bash
 # View Meltano version
