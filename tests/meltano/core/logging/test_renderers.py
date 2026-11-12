@@ -551,3 +551,20 @@ class TestMeltanoConsoleRenderer:
         name_pos = result.find("tap-mock")
         event_pos = result.find("Something happened")
         assert name_pos < event_pos, "Plugin name should appear before event"
+
+    def test_run_report_fields_are_preserved_without_all_keys(self):
+        renderer = MeltanoConsoleRenderer(colors=False, all_keys=False)
+
+        event_dict = {
+            "event": "Block run completed",
+            "err": "Our extractor failed :(",
+            "exit_codes": {
+                PluginType.EXTRACTORS: 1,
+            },
+            "status": "failure",
+        }
+        result = renderer(None, "info", event_dict)
+
+        assert "err='Our extractor failed :('" in result
+        assert "exit_codes=" in result
+        assert "status=failure" in result
