@@ -277,6 +277,15 @@ that takes the shape of a SQLite database stored inside the [`.meltano` director
 You can choose to use a different system database backend or configuration using the `--database-uri`
 option of [`meltano` subcommands](/reference/command-line-interface), or the `MELTANO_DATABASE_URI` environment variable.
 
+:::tip `database_uri` vs `state_backend.uri`
+`database_uri` configures Meltano's **system database** (project metadata, plugin installation records, schedules, and—by default—ELT state).
+Most deployments only need to set `database_uri` (for example to PostgreSQL in production).
+
+Set [`state_backend.uri`](#state-backend-uri) only when you want ELT/state stored **outside** the system database—for example on S3, GCS, or Azure Blob—so multiple Meltano processes can share incremental replication state without sharing the full system DB, or so state survives independently of the system database lifecycle.
+When `state_backend.uri` is left at its default (`systemdb`), state lives in the same database as `database_uri` and you do not need a separate state backend.
+For filesystem or object-store backends, still serialize writers per state ID (or rely on backend-native locking); concurrent updates to the same state ID can otherwise lose bookmarks.
+:::
+
 The database URI should be a valid [SQLAlchemy database URL](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls), and can be used to connect to [a variety of database backends](/concepts/project/#support-for-other-database-types).
 
 :::caution
@@ -891,7 +900,7 @@ export MELTANO_ELT_BUFFER_SIZE=52428800
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_URI`
 - Default: `systemdb`
 
-URI for the [state backend](/concepts/state_backends) where you'd like Meltano to store state.
+URI for the [state backend](/concepts/state_backends) where you'd like Meltano to store state. Leave this at the default (`systemdb`) unless you intentionally want state outside the [system database](#database-uri)—see the tip under [`database_uri`](#database-uri).
 
 #### How to use
 
