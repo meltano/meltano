@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import sys
 import typing as t
+from contextvars import ContextVar
 from functools import lru_cache
 
 from ruamel import yaml
@@ -17,6 +18,20 @@ else:
 
 if t.TYPE_CHECKING:
     from ruamel.yaml import Representer
+
+
+def _has_anchor(target: t.Any) -> bool:  # noqa: ANN401
+    """Check whether a YAML node has an anchor that an alias can refer to.
+
+    Parameters:
+        target: The object to check.
+
+    Returns:
+        Whether the object is a YAML mapping or sequence with an anchor.
+    """
+    return isinstance(target, CommentedMap | CommentedSeq) and (
+        target.anchor.value is not None
+    )
 
 
 class IdHashBox:
@@ -52,6 +67,15 @@ class IdHashBox:
 
 
 CANONICAL_PARSE_CACHE_SIZE = 4096
+
+# Canonical copies of the YAML nodes that have an anchor, keyed by the ID of the
+# original node. Reusing one copy for every alias of an anchor keeps the anchors and
+# aliases of a YAML file intact when it is written back, instead of expanding each
+# alias.
+_anchored_copies: ContextVar[dict[int, t.Any] | None] = ContextVar(
+    "_anchored_copies",
+    default=None,
+)
 
 
 class Annotations(t.NamedTuple):
@@ -138,6 +162,38 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
     @classmethod
     def as_canonical(
+        cls,
+        target: t.Any,  # noqa: ANN401
+    ) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
+        """Return a canonical representation of the given instance.
+
+        Args:
+            target: An instance to convert.
+
+        Returns:
+            A canonical representation of the given instance.
+        """
+        token = None
+        copies = _anchored_copies.get()
+        if copies is None:
+            copies = {}
+            token = _anchored_copies.set(copies)
+
+        try:
+            anchored = _has_anchor(target)
+            if anchored and id(target) in copies:
+                return copies[id(target)]
+
+            result = cls._as_canonical(target)
+            if anchored:
+                copies[id(target)] = result
+            return result
+        finally:
+            if token is not None:
+                _anchored_copies.reset(token)
+
+    @classmethod
+    def _as_canonical(
         cls,
         target: t.Any,  # noqa: ANN401
     ) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
