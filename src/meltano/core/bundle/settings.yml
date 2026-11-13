@@ -73,6 +73,8 @@ settings:
   description: Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is locked
 
 # CLI
+- name: cli
+  kind: object
 - name: cli.log_level
   kind: options
   options:
