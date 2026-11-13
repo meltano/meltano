@@ -1815,6 +1815,8 @@ Selection rules will be stored in the extractor's [`select` extra](/concepts/plu
 :::caution
 
   <p>Not all taps support this feature. In addition, taps needs to support the <code>--discover</code> switch. You can use <code>meltano invoke tap-... --discover</code> to see if the tap supports it.</p>
+  <p>Adding or listing select patterns fails for an extractor that advertises neither the <code>catalog</code> nor the <code>properties</code> <a href="/reference/plugin-definition-syntax#capabilities">capability</a>, since it is never given the catalog the patterns would apply to. Removing and clearing patterns still work.</p>
+  <p>If the <a href="/concepts/plugins#catalog-extra"><code>catalog</code> extra</a> is set, the patterns are saved but not applied, and Meltano warns about it.</p>
 :::
 
 ### How to use
