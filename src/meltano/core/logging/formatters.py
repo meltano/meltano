@@ -374,7 +374,6 @@ def plain_formatter(
         datefmt: The date format string.
         style: The format style.
         validate: Whether to validate the format string.
-        features: Logging features to enable.
 
     Returns:
         A configured simple formatter.

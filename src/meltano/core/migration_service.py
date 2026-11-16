@@ -77,8 +77,6 @@ class MigrationService:
 
         Args:
             silent: If true, don't print anything.
-            lock_path: The path to the database migration lock file.
-            migration_directory: The path to the database migration root directory.
 
         Raises:
             MigrationError: If the upgrade fails.

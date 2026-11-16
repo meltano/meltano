@@ -51,7 +51,6 @@ def _list_single_job(  # noqa: D417
     """List a single job.
 
     Args:
-        project: The project to use.
         task_sets_service: The task sets service to use.
         list_format: The format to use.
         job_name: The job name to list.
@@ -81,7 +80,6 @@ def _list_all_jobs(  # noqa: D417
     """List all jobs.
 
     Args:
-        project: The project to use.
         task_sets_service: The task sets service to use.
         list_format: The format to use.
     """

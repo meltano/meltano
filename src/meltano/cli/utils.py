@@ -429,15 +429,15 @@ def propagate_stop_signals(proc):  # noqa: ANN001, ANN201
         signal.signal(signal.SIGTERM, original_termination_handler)
 
 
-def check_dependencies_met(  # noqa: D417
+def check_dependencies_met(
     plugin_refs: list[PluginRef],
     plugins_service: ProjectPluginsService,
 ) -> tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
     Args:
-        plugins: List of plugins to be added.
-        plugin_service: Plugin service to use when checking for dependencies.
+        plugin_refs: List of plugins to be added.
+        plugins_service: Plugin service to use when checking for dependencies.
 
     Returns:
         A tuple with dependency check outcome (True/False), and a string

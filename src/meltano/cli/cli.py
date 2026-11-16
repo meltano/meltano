@@ -191,7 +191,7 @@ def cli(
         sys.exit(3)
 
 
-def detect_selected_environment(  # noqa: D417
+def detect_selected_environment(
     *,
     cli_environment: str | None,
     cli_no_environment: bool,
@@ -208,9 +208,8 @@ def detect_selected_environment(  # noqa: D417
 
     Args:
         cli_environment: The `--environment` option value from the CLI.
-        no_environment: The `--no-environment` option value from the CLI.
+        cli_no_environment: The `--no-environment` option value from the CLI.
         project: The Meltano project.
-        project_setting_service: A project settings service for the project.
 
     Returns:
         The selected environment, and whether it is the default environment.

@@ -306,7 +306,6 @@ class PackageManager(abc.ABC):
         Args:
             args: Arguments to pass to the install command.
             python: Path to the Python executable to install into.
-            log_path: Optional path to write install logs.
             extract_stderr: Async function that returns error string or ``None``.
             force: Whether to ignore Python version requirements.
             env: Environment variables to pass to the subprocess.
@@ -460,8 +459,6 @@ class VirtualEnvService:
 
         Args:
             project: The Meltano project.
-            python: The path to the Python executable to use, or name to find on $PATH.
-                Defaults to the Python executable running Meltano.
             namespace: The namespace for the venv, e.g. a Plugin type.
             name: The name of the venv, e.g. a Plugin name.
             backend: The virtualenv-managing backend to use.

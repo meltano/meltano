@@ -52,7 +52,6 @@ class LockfileAlreadyExistsError(Exception):
         Args:
             message: The error message.
             path: The path to the existing lockfile.
-            plugin: The plugin that was locked.
         """
         self.path = path
         super().__init__(message)
