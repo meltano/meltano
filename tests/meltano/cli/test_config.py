@@ -159,6 +159,21 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
+    def test_config_meltano_set_object(self, cli_runner) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["config", "set", "meltano", "cli", '{"log_level": "debug"}'],
+        )
+        assert_cli_runner(result)
+        assert (
+            "Meltano setting 'cli' was set in `meltano.yml`: "
+            "{'log_level': 'debug'}"
+        ) in result.stdout
+
+        cleanup = cli_runner.invoke(cli, ["config", "unset", "meltano", "cli"])
+        assert_cli_runner(cleanup)
+
+    @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("message_type", ("RECORD", "BATCH"))
     def test_config_test(self, cli_runner, tap, message_type: str) -> None:
         mock_invoke = mock.Mock()
