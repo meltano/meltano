@@ -45,12 +45,16 @@ If you'd like to manually inspect the generated catalog for debugging purposes, 
 
 Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano el`](/reference/command-line-interface#elt)'s `--catalog` option or the [`catalog` extractor extra](/concepts/plugins#catalog-extra).
 
-For a custom tap, check the tap's `--help` output or argument parser to see
-which flag it accepts in sync mode: a parser that reads `args.catalog` expects
-`--catalog`, while one that reads `args.properties` expects `--properties`.
-Set the corresponding `catalog` or `properties` capability in the extractor
-definition. These capabilities control which flag Meltano passes to the tap;
-they are not the same as the `--catalog` option on the Meltano command above.
+For a custom tap, check its `--help` output or argument parser to see which
+flag it accepts in sync mode. Set the `catalog` capability for `--catalog`
+or the `properties` capability for `--properties`.
+
+Use the flag declared in the parser, not the attribute where the parser stores
+its value. For example, `add_argument("--properties", dest="catalog")` requires
+the `properties` capability even though the tap reads `args.catalog`.
+
+These capabilities control which flag Meltano passes to the tap. They are
+separate from the `--catalog` option on the Meltano command above.
 If both capabilities are set, Meltano passes `--catalog`.
 
 In some cases, like when a tap has extra command line options like `--about` or `--version` that don't need a catalog, or when you only need to dump the tap configuration with `--dump=config`, Meltano avoids running discovery to save the overhead and to not require the tap to be configured with valid credentials.
