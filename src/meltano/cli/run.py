@@ -53,6 +53,59 @@ if t.TYPE_CHECKING:
 
 logger = structlog.getLogger(__name__)
 
+
+def _split_entity_filters(
+    ctx: click.Context,  # noqa: ARG001
+    param: click.Parameter,
+    values: tuple[str, ...],
+) -> list[tuple[str, str]]:
+    """Split each `EXTRACTOR:ENTITY` value of `--select` or `--exclude`.
+
+    Args:
+        ctx: The click context.
+        param: The option being parsed.
+        values: The option's values.
+
+    Returns:
+        A list of (extractor name, entity pattern) pairs, in the order given.
+
+    Raises:
+        BadParameter: If a value has no extractor name or no entity pattern.
+    """
+    pairs = []
+    for value in values:
+        extractor, _, entity = value.partition(":")
+        if not extractor or not entity:
+            msg = (
+                f"'{value}' must name the extractor and the entity as "
+                "EXTRACTOR:ENTITY, for example tap-gitlab:commits"
+            )
+            raise click.BadParameter(msg, param=param)
+        pairs.append((extractor, entity))
+    return pairs
+
+
+def _select_filters(
+    select: list[tuple[str, str]],
+    exclude: list[tuple[str, str]],
+) -> dict[str, list[str]]:
+    """Build each extractor's select filter, as `meltano el` does for one.
+
+    Args:
+        select: (extractor name, entity pattern) pairs to select.
+        exclude: (extractor name, entity pattern) pairs to exclude.
+
+    Returns:
+        The select filter for each extractor named, selections first.
+    """
+    filters: dict[str, list[str]] = {}
+    for extractor, entity in select:
+        filters.setdefault(extractor, []).append(entity)
+    for extractor, entity in exclude:
+        filters.setdefault(extractor, []).append(f"!{entity}")
+    return filters
+
+
 install, no_install, only_install = get_install_options(include_only_install=True)
 
 
@@ -131,6 +184,28 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     help="Use a custom run ID.",
 )
 @click.option(
+    "--select",
+    "-s",
+    metavar="EXTRACTOR:ENTITY",
+    multiple=True,
+    callback=_split_entity_filters,
+    help=(
+        "Select only these entities for extraction by the named extractor, "
+        "e.g. tap-gitlab:commits. Can be repeated."
+    ),
+)
+@click.option(
+    "--exclude",
+    "-e",
+    metavar="EXTRACTOR:ENTITY",
+    multiple=True,
+    callback=_split_entity_filters,
+    help=(
+        "Exclude these entities from extraction by the named extractor, "
+        "e.g. tap-gitlab:issues. Can be repeated."
+    ),
+)
+@click.option(
     "--timeout",
     type=click.IntRange(min=1),
     show_envvar=True,
@@ -163,6 +238,8 @@ async def run(
     merge_state: bool,
     state_strategy: str,
     run_id: uuid.UUID | None,
+    select: list[tuple[str, str]],
+    exclude: list[tuple[str, str]],
     timeout: int | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
@@ -186,6 +263,10 @@ async def run(
         `meltano --environment=prod run tap-gitlab target-postgres tap-salesforce target-mysql`\n
 
     The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
+
+    `--select` and `--exclude` name the extractor they apply to, and replace its `select_filter` extra for this run:
+
+        `meltano run --select tap-gitlab:commits --exclude tap-salesforce:Account tap-gitlab target-postgres tap-salesforce target-mysql`\n
 
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#run
@@ -217,6 +298,7 @@ async def run(
             state_id_suffix=state_id_suffix,
             state_strategy=state_strategy_,
             run_id=run_id,
+            select_filters=_select_filters(select, exclude),
         )
         ctx.call_on_close(parser.close_sessions)
         parsed_blocks = list(parser.find_blocks(0))

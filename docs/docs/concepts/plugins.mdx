@@ -532,7 +532,7 @@ export TAP_SMOKE_TEST__SELECT='["animals\\.data.id","animals\\.data.verified"]'
 
 - Setting: `_select_filter`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
-- Equivalent to using [`meltano el`](/reference/command-line-interface#el) CLI options: `--select` and `--exclude`
+- Equivalent to using [`meltano el`](/reference/command-line-interface#el) CLI options: `--select` and `--exclude`, or [`meltano run`](/reference/command-line-interface#run) CLI options: `--select <extractor>:<entity>` and `--exclude <extractor>:<entity>`
 - Default: `[]`
 
 An extractor's `select_filter` [extra](/guide/configuration#plugin-extras) holds an array of stream-level filter rules
@@ -555,7 +555,7 @@ The `select_filter` extra operates at the **stream level** and determines which 
 - **Parallelization**: Run an instance of Meltano for a specific stream with other different configuration options
 - **Testing/debugging**: Temporarily include/exclude streams without changing your base configuration
 - **Conditional processing**: Different runs need different subsets of your configured streams
-- **CLI operations**: Via [`meltano el --select`](#el) or [`meltano el --exclude`](#el)
+- **CLI operations**: Via [`meltano el --select`](#el) or [`meltano el --exclude`](#el), and [`meltano run --select`](/reference/command-line-interface#run) or [`meltano run --exclude`](/reference/command-line-interface#run)
 
 Selection filter rules use stream identifiers that correspond to Singer stream `tap_stream_id` values. Rules indicating that a stream should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in stream identifiers to match multiple streams at once.
 

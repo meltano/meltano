@@ -46,6 +46,8 @@ def test_options_present_in_correct_groups(runner):
     # Run options
     assert "--dry-run" in run_section
     assert "--full-refresh" in run_section
+    assert "--select" in run_section
+    assert "--exclude" in run_section
 
     # State options
     assert "--no-state-update" in state_section

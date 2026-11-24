@@ -30,6 +30,7 @@ from .singer import SingerBlock
 if t.TYPE_CHECKING:
     import sys
     import uuid
+    from collections.abc import Mapping, Sequence
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -137,6 +138,7 @@ class ELBContextBuilder:
         self._blocks = []
         self._state_strategy = StateStrategy.auto
         self._run_id: uuid.UUID | None = None
+        self._select_filters: dict[str, list[str]] = {}
 
         self._base_output_logger = None
 
@@ -240,6 +242,26 @@ class ELBContextBuilder:
         self._run_id = run_id
         return self
 
+    def with_select_filters(
+        self,
+        select_filters: Mapping[str, Sequence[str]] | None,
+    ) -> Self:
+        """Set the select filters to apply to extractors, by extractor name.
+
+        Each extractor named here runs with its `_select_filter` extra set to the
+        given filters, as `meltano el --select/--exclude` does.
+
+        Args:
+            select_filters: Select filters keyed by extractor name.
+
+        Returns:
+            self
+        """
+        self._select_filters = {
+            name: list(filters) for name, filters in (select_filters or {}).items()
+        }
+        return self
+
     def make_block(
         self,
         plugin: ProjectPlugin,
@@ -280,12 +302,19 @@ class ELBContextBuilder:
         Returns:
             A new `PluginContext` object.
         """
+        config: dict[str, t.Any] = {}
+        if plugin.type == PluginType.EXTRACTORS and (
+            select_filter := self._select_filters.get(plugin.name)
+        ):
+            config["_select_filter"] = select_filter
+
         return PluginContext(
             plugin=plugin,
             settings_service=PluginSettingsService(
                 self.project,
                 plugin,
                 env_override=env,
+                config_override=config,
             ),
             session=self.session,
         )
