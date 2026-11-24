@@ -7,6 +7,7 @@ which refers to a given job run's status, e.g. 'RUNNING' or 'FAILED'.
 
 from __future__ import annotations
 
+import copy
 import datetime
 import json
 import sys
@@ -26,7 +27,6 @@ from meltano.core.state_store import (
     MeltanoState,
     state_store_manager_from_project_settings,
 )
-from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
@@ -37,6 +37,21 @@ if t.TYPE_CHECKING:
     from meltano.core.state_store.base import StateStoreManager
 
 logger = structlog.getLogger(__name__)
+
+
+def _overlay(src: dict[str, t.Any], dest: dict[str, t.Any]) -> dict[str, t.Any]:
+    """Merge ``src`` onto ``dest`` at depth, with ``src`` winning every clash.
+
+    Objects present in both are merged key by key; anything else from ``src``
+    (a plain value, a list, or an object where ``dest`` has a plain value)
+    replaces what ``dest`` holds. ``dest`` is modified in place and returned.
+    """
+    for key, value in src.items():
+        if isinstance(value, dict) and isinstance(dest.get(key), dict):
+            _overlay(value, dest[key])
+        else:
+            dest[key] = copy.deepcopy(value)
+    return dest
 
 
 class InvalidJobStateError(Exception):
@@ -256,7 +271,8 @@ class StateService:
     def merge_states(self, state_ids_src: Sequence[str], state_id_dst: str) -> None:
         """Merge state from each of state_ids_src, in order, into state_id_dst.
 
-        Where two sources set the same key, the later one wins. Every source is
+        Where two sources set the same key, the later one wins, also when one
+        holds an object and the other a plain value. Every source is
         read and checked before anything is written, and the result is written
         to state_id_dst in one update.
 
@@ -282,8 +298,12 @@ class StateService:
             if not state_src:
                 msg = f"No state found for state ID '{state_id_src}'"
                 raise InvalidJobStateError(msg)
-            self.validate_state(state_src)
-            merge(state_src, merged)
+            try:
+                self.validate_state(state_src)
+            except InvalidJobStateError as err:
+                msg = f"Invalid state for state ID '{state_id_src}': {err}"
+                raise InvalidJobStateError(msg) from err
+            _overlay(state_src, merged)
 
         self.add_state(
             state_id_dst,
