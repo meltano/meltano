@@ -26,8 +26,10 @@ from meltano.core.state_store import (
     MeltanoState,
     state_store_manager_from_project_settings,
 )
+from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Sequence
     from types import TracebackType
 
     from sqlalchemy.orm import Session
@@ -249,9 +251,43 @@ class StateService:
             state_id_src: the state_id to get state from
             state_id_dst: the state_id_to merge state onto
         """
+        self.merge_states([state_id_src], state_id_dst)
+
+    def merge_states(self, state_ids_src: Sequence[str], state_id_dst: str) -> None:
+        """Merge state from each of state_ids_src, in order, into state_id_dst.
+
+        Where two sources set the same key, the later one wins. Every source is
+        read and checked before anything is written, and the result is written
+        to state_id_dst in one update.
+
+        Args:
+            state_ids_src: the state_ids to get state from, in merge order
+            state_id_dst: the state_id to merge state onto
+
+        Raises:
+            TypeError: if state_ids_src is a single string
+            ValueError: if no source state_id is given
+            InvalidJobStateError: if a source has no state or invalid state
+        """
+        if isinstance(state_ids_src, str):
+            msg = "state_ids_src must be a sequence of state IDs, not a string"
+            raise TypeError(msg)
+        if not state_ids_src:
+            msg = "At least one source state ID is required"
+            raise ValueError(msg)
+
+        merged: dict[str, t.Any] = {}
+        for state_id_src in state_ids_src:
+            state_src = self.get_state(state_id_src)
+            if not state_src:
+                msg = f"No state found for state ID '{state_id_src}'"
+                raise InvalidJobStateError(msg)
+            self.validate_state(state_src)
+            merge(state_src, merged)
+
         self.add_state(
             state_id_dst,
-            json.dumps(self.get_state(state_id_src)),
+            json.dumps(merged),
             payload_flags=Payload.INCOMPLETE_STATE,
         )
 

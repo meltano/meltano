@@ -2111,12 +2111,15 @@ meltano state merge <state_id> <RAW STATE JSON>
 
 # Merge state onto other state
 meltano state merge <state_id> --from-state-id <src_state_id>
+
+# Merge state from several state IDs onto other state
+meltano state merge <state_id> --from-state-id <src_state_id> --from-state-id <other_src_state_id>
 ```
 
 #### Parameters
 
 - The `--input-file` option specifies a file to read the state from.
-- The `--from-state-id` option specifies an existing state ID to read the state from.
+- The `--from-state-id` option specifies an existing state ID to read the state from. Repeat it to merge state from several state IDs. They are merged in the order given: nested objects are combined, and where two of them set the same value (a bookmark, for example), the later one wins. Every source also wins over the value already stored for the target state ID. Every source must have state, or nothing is merged.
 
 State must be provided in exactly one of these ways: via `--input-file`, via `--from-state-id`, or via a command line argument.
 
@@ -2136,6 +2139,12 @@ meltano state merge dev:tap-gitlab-to-target-jsonl --input-file gitlab_state.jso
 
 # Provide state via existing state.
 meltano state merge dev:tap-gitlab-to-target-jsonl --from-state-id prod:tap-gitlab-to-target-jsonl
+
+# Provide state via several existing states.
+# Where both set the same bookmark, the value from staging (given last) is kept.
+meltano state merge dev:tap-gitlab-to-target-jsonl \
+  --from-state-id prod:tap-gitlab-to-target-jsonl \
+  --from-state-id staging:tap-gitlab-to-target-jsonl
 ```
 
 ### copy
