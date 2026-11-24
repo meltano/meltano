@@ -113,6 +113,80 @@ class TestStateService:
             state_service.merge_state(job_src.job_name, job_dst.job_name)
             assert merged_dst == state_service.get_state(job_dst.job_name)
 
+    def test_merge_states_in_order(self, state_service: StateService) -> None:
+        state_service.set_state(
+            "first",
+            json.dumps({"singer_state": {"bookmarks": {"one": 1, "both": "first"}}}),
+        )
+        state_service.set_state(
+            "second",
+            json.dumps({"singer_state": {"bookmarks": {"two": 2, "both": "second"}}}),
+        )
+
+        state_service.merge_states(["first", "second"], "dst")
+
+        assert state_service.get_state("dst") == {
+            "singer_state": {"bookmarks": {"one": 1, "two": 2, "both": "second"}},
+        }
+
+    def test_merge_states_checks_every_source_first(
+        self,
+        state_service: StateService,
+    ) -> None:
+        state_service.set_state(
+            "valid",
+            json.dumps({"singer_state": {"bookmarks": {"one": 1}}}),
+        )
+        state_service.set_state(
+            "invalid",
+            json.dumps({"no": "singer state"}),
+            validate=False,
+        )
+
+        with pytest.raises(InvalidJobStateError, match="'missing'"):
+            state_service.merge_states(["valid", "missing"], "dst")
+        with pytest.raises(InvalidJobStateError, match=r"'invalid'.*singer_state"):
+            state_service.merge_states(["valid", "invalid"], "dst")
+        with pytest.raises(ValueError, match="At least one"):
+            state_service.merge_states([], "dst")
+        with pytest.raises(TypeError, match="not a string"):
+            state_service.merge_states("valid", "dst")
+
+        assert state_service.get_state("dst") == {}
+
+    @pytest.mark.parametrize(
+        ("order", "expected"),
+        (
+            pytest.param(
+                ("flat", "nested"), {"stream": "2024-02-01"}, id="object-last"
+            ),
+            pytest.param(("nested", "flat"), "2024-01-01", id="value-last"),
+            pytest.param(("flat", "empty"), {}, id="empty-object-last"),
+        ),
+    )
+    def test_merge_states_later_wins_across_shapes(
+        self,
+        state_service: StateService,
+        order: tuple[str, str],
+        expected: t.Any,
+    ) -> None:
+        states = {
+            "flat": {"bookmarks": "2024-01-01"},
+            "nested": {"bookmarks": {"stream": "2024-02-01"}},
+            "empty": {"bookmarks": {}},
+        }
+        for state_id in order:
+            state_service.set_state(
+                state_id,
+                json.dumps({"singer_state": states[state_id]}),
+            )
+
+        state_service.merge_states(list(order), "dst")
+
+        assert state_service.get_state("dst") == {
+            "singer_state": {"bookmarks": expected},
+        }
+
     def test_copy(self, state_ids, state_service) -> None:
         state_id_pairs = [
             (state_ids[idx], state_ids[idx + 1])

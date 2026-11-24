@@ -463,6 +463,59 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == merged_state
 
+    @pytest.mark.parametrize(
+        ("sources", "winner"),
+        (
+            pytest.param(("src-a", "src-b"), "b", id="b-last"),
+            pytest.param(("src-b", "src-a"), "a", id="a-last"),
+        ),
+    )
+    def test_merge_from_several_jobs(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+        sources: tuple[str, str],
+        winner: str,
+    ) -> None:
+        def bookmarks(**streams: str) -> str:
+            return json.dumps({"singer_state": {"bookmarks": streams}})
+
+        state_service.set_state("src-a", bookmarks(stream_a="a", shared="a"))
+        state_service.set_state("src-b", bookmarks(stream_b="b", shared="b"))
+        state_service.set_state("dst", bookmarks(stream_dst="dst", shared="dst"))
+
+        args = ["state", "merge"]
+        for source in sources:
+            args += ["--from-state-id", source]
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(cli, [*args, "dst"])
+
+        assert_cli_runner(result)
+        assert state_service.get_state("dst") == json.loads(
+            bookmarks(stream_dst="dst", stream_a="a", stream_b="b", shared=winner),
+        )
+
+    def test_merge_from_several_jobs_one_missing(
+        self,
+        state_service: StateService,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        src_state = {"singer_state": {"bookmarks": {"other": "x"}}}
+        dst_state = {"singer_state": {"bookmarks": {"stream": "value"}}}
+        state_service.set_state("src", json.dumps(src_state))
+        state_service.set_state("dst", json.dumps(dst_state))
+        before = state_service.get_state("dst")
+
+        args = ["state", "merge", "--from-state-id", "src"]
+        args += ["--from-state-id", "missing", "dst"]
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            result = cli_runner.invoke(cli, args)
+
+        assert result.exit_code == 1
+        assert isinstance(result.exception, InvalidJobStateError)
+        assert "missing" in str(result.exception)
+        assert state_service.get_state("dst") == before
+
     def test_copy_over_existing(
         self,
         state_service: StateService,

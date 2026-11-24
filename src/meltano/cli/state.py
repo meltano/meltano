@@ -228,7 +228,11 @@ def move_state(
 @click.option(
     "--from-state-id",
     type=str,
-    help="Merge state from an existing state ID.",
+    multiple=True,
+    help=(
+        "Merge state from an existing state ID. Repeat to merge several, in the "
+        "order given; a later state ID wins where two set the same key."
+    ),
 )
 @click.option(
     "--input-file",
@@ -245,7 +249,7 @@ def merge_state(
     state_id: str,
     state: str | None,
     input_file: Path | None,
-    from_state_id: str | None,
+    from_state_id: tuple[str, ...],
 ) -> None:
     """Add bookmarks to existing state."""
     state_service: StateService = (
@@ -268,7 +272,7 @@ def merge_state(
     elif state:
         state_service.add_state(state_id, state, payload_flags=Payload.INCOMPLETE_STATE)
     elif from_state_id:
-        state_service.merge_state(from_state_id, state_id)
+        state_service.merge_states(from_state_id, state_id)
     logger.info(
         f"State for {state_id} was successfully "  # noqa: G004
         f"merged at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
