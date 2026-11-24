@@ -1356,6 +1356,73 @@ class TestCliRunScratchpadOne:
         assert session_close.called
 
     @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("project")
+    def test_run_select_and_exclude(self, cli_runner, tap, target) -> None:
+        with (
+            mock.patch.object(
+                BlockParser,
+                "__init__",
+                autospec=True,
+                side_effect=BlockParser.__init__,
+            ) as init,
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "run",
+                    "--dry-run",
+                    "--exclude",
+                    f"{tap.name}:tags.*",
+                    "-s",
+                    f"{tap.name}:tags",
+                    "--select",
+                    f"{tap.name}:commits",
+                    "--select",
+                    f"{tap.name}:namespace:stream",
+                    tap.name,
+                    target.name,
+                ],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert init.call_args.kwargs["select_filters"] == {
+            # Only the first `:` separates the extractor from the entity
+            tap.name: ["tags", "commits", "namespace:stream", "!tags.*"],
+        }
+
+    @pytest.mark.parametrize("value", ("tags", ":tags", "tap-mock:"))
+    def test_run_select_needs_extractor_and_entity(
+        self,
+        cli_runner,
+        tap,
+        target,
+        value: str,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["run", "--select", value, tap.name, target.name],
+        )
+        assert result.exit_code == 2
+        assert "EXTRACTOR:ENTITY" in result.stderr
+
+    @pytest.mark.usefixtures("project")
+    def test_run_select_for_a_plugin_not_in_the_run(
+        self,
+        cli_runner,
+        tap,
+        target,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["run", "--exclude", f"{target.name}:tags", tap.name, target.name],
+        )
+        assert result.exit_code == 1
+        assert "not an extractor in this run" in result.stderr
+
+    @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
         "use_test_log_config",
         "project",

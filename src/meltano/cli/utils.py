@@ -690,6 +690,8 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
             "refresh_catalog": "Run options",
             "run_id": "Run options",
             "timeout": "Run options",
+            "select": "Run options",
+            "exclude": "Run options",
             # State options
             "no_state_update": "State options",
             "force": "State options",

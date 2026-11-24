@@ -21,6 +21,7 @@ from meltano.core.task_sets_service import TaskSetsService
 if t.TYPE_CHECKING:
     import sys
     import uuid
+    from collections.abc import Mapping, Sequence
 
     import structlog
     from sqlalchemy.orm import Session
@@ -90,6 +91,7 @@ class BlockParser:  # noqa: D101
         state_id_suffix: str | None = None,
         state_strategy: StateStrategy = StateStrategy.auto,
         run_id: uuid.UUID | None = None,
+        select_filters: Mapping[str, Sequence[str]] | None = None,
     ):
         """Parse a meltano run command invocation into a list of blocks.
 
@@ -106,9 +108,12 @@ class BlockParser:  # noqa: D101
             state_id_suffix: State ID suffix to use.
             state_strategy: Strategy to use for state evolution.
             run_id: Custom run ID to use.
+            select_filters: Select filters keyed by extractor name, each list
+                as `meltano el` builds it from `--select` and `--exclude`.
 
         Raises:
-            ClickException: If a block name is not found.
+            ClickException: If a block name is not found, or select filters
+                name a plugin that is not an extractor in this run.
         """
         self.log = log
         self.project = project
@@ -123,6 +128,7 @@ class BlockParser:  # noqa: D101
         self._mappings_ref: dict[int, str] = {}
         self._state_strategy = state_strategy
         self._run_id = run_id
+        self._select_filters = dict(select_filters or {})
         self._sessions: list[Session] = []
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
@@ -161,6 +167,18 @@ class BlockParser:  # noqa: D101
                 )
 
             self.log.debug("found plugin in cli invocation", plugin_name=plugin.name)
+
+        extractors = {
+            plugin.name
+            for plugin in self._plugins
+            if plugin.type == PluginType.EXTRACTORS
+        }
+        if unknown := sorted(set(self._select_filters) - extractors):
+            names = ", ".join(map(repr, unknown))
+            what = "is not an extractor" if len(unknown) == 1 else "are not extractors"
+            raise click.ClickException(  # noqa: TRY003
+                f"--select/--exclude name {names}, which {what} in this run",  # noqa: EM102
+            )
 
     @property
     def plugins(self) -> list[ProjectPlugin]:
@@ -275,6 +293,7 @@ class BlockParser:  # noqa: D101
             .with_state_id_suffix(self._state_id_suffix)
             .with_state_strategy(state_strategy=self._state_strategy)
             .with_run_id(self._run_id)
+            .with_select_filters(self._select_filters)
         )
         self._sessions.append(builder.session)
 

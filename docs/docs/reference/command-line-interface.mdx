@@ -1506,6 +1506,7 @@ meltano run tap-gitlab target-postgres simple-job
 meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 meltano run --refresh-catalog tap-salesforce target-postgres
 meltano run --timeout 3600 tap-gitlab target-postgres
+meltano run --select tap-gitlab:commits tap-gitlab target-postgres
 ```
 
 #### Parameters
@@ -1523,6 +1524,7 @@ meltano run --timeout 3600 tap-gitlab target-postgres
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano. Can also be set via `MELTANO_RUN_ID` environment variable.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs. Can also be set via `MELTANO_RUN_REFRESH_CATALOG` environment variable.
 - `--timeout` will set a maximum duration (in seconds) for the pipeline run. After this time, the pipeline will be gracefully terminated. The `MELTANO_RUN_TIMEOUT` environment variable can be used to set this behavior. This is useful for preventing pipelines from running indefinitely and allows for preview runs or limiting resource usage.
+- One or more `--select <extractor>:<entity>` options only extract records for matching streams of that extractor, and `--exclude <extractor>:<entity>` extracts all its configured streams _except_ those. They work as the [`--select` and `--exclude` options of `meltano el`](#el) (wildcards, and exclusion taking precedence), except that each value names the extractor it applies to, since a run can have several. For the extractors named, they replace the [`select_filter` extra](/concepts/plugins#select-filter-extra) for this run; an extractor that appears twice in the run uses them both times. Naming a plugin that is not an extractor in the run is an error.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
 Examples:
@@ -1548,6 +1550,10 @@ meltano --environment=dev run --state-strategy=merge tap-gitlab target-postgres
 
 # run a pipeline with a timeout of 3600 seconds (1 hour)
 meltano --environment=dev run --timeout 3600 tap-gitlab target-postgres
+
+# extract only the commits and tags streams from tap-gitlab,
+# and all of tap-salesforce's configured streams except Account
+meltano --environment=dev run --select tap-gitlab:commits --select tap-gitlab:tags --exclude tap-salesforce:Account tap-gitlab target-postgres tap-salesforce target-mysql
 
 # run a pipeline with timeout set via environment variable
 MELTANO_RUN_TIMEOUT=1800 meltano --environment=dev run tap-gitlab target-postgres
