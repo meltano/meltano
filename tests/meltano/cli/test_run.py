@@ -25,6 +25,7 @@ from meltano.core.project_plugins_service import (
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.logging.job_logging_service import JobLoggingService
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 
@@ -1357,7 +1358,12 @@ class TestCliRunScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("project")
-    def test_run_select_and_exclude(self, cli_runner, tap, target) -> None:
+    def test_run_select_and_exclude(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
+    ) -> None:
         with (
             mock.patch.object(
                 BlockParser,
@@ -1396,9 +1402,9 @@ class TestCliRunScratchpadOne:
     @pytest.mark.parametrize("value", ("tags", ":tags", "tap-mock:"))
     def test_run_select_needs_extractor_and_entity(
         self,
-        cli_runner,
-        tap,
-        target,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
         value: str,
     ) -> None:
         result = cli_runner.invoke(
@@ -1411,9 +1417,9 @@ class TestCliRunScratchpadOne:
     @pytest.mark.usefixtures("project")
     def test_run_select_for_a_plugin_not_in_the_run(
         self,
-        cli_runner,
-        tap,
-        target,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
     ) -> None:
         result = cli_runner.invoke(
             cli,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing as t
 from unittest import mock
 
 import click
@@ -10,6 +11,11 @@ from sqlalchemy.orm import Session
 from meltano.core.block.block_parser import BlockParser, is_command_block
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.task_sets import TaskSets
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+    from meltano.core.task_sets_service import TaskSetsService
 
 
 class TestParserUtils:
@@ -78,10 +84,10 @@ class TestBlockParserSelectFilters:
 
     def test_select_filter_applies_to_the_named_extractor(
         self,
-        project,
-        logger,
-        tap,
-        target,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
     ) -> None:
         parser = BlockParser(
             logger,
@@ -105,10 +111,10 @@ class TestBlockParserSelectFilters:
 
     def test_no_select_filter_leaves_the_extra_alone(
         self,
-        project,
-        logger,
-        tap,
-        target,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
     ) -> None:
         parser = BlockParser(logger, project, [tap.name, target.name])
         try:
@@ -120,10 +126,10 @@ class TestBlockParserSelectFilters:
 
     def test_select_filter_replaces_the_configured_extra(
         self,
-        project,
-        logger,
-        tap,
-        target,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.setenv("TAP_MOCK__SELECT_FILTER", '["configured"]')
@@ -146,10 +152,10 @@ class TestBlockParserSelectFilters:
 
     def test_select_filter_applies_each_time_the_extractor_runs(
         self,
-        project,
-        logger,
-        tap,
-        target,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
     ) -> None:
         parser = BlockParser(
             logger,
@@ -168,11 +174,11 @@ class TestBlockParserSelectFilters:
 
     def test_select_filter_for_an_extractor_in_a_job(
         self,
-        project,
-        logger,
-        tap,
-        target,
-        task_sets_service,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
+        task_sets_service: TaskSetsService,
     ) -> None:
         task_sets_service.add(
             TaskSets("select-filter-job", [f"{tap.name} {target.name}"])
@@ -195,10 +201,10 @@ class TestBlockParserSelectFilters:
 
     def test_select_filter_names_every_unknown_plugin(
         self,
-        project,
-        logger,
-        tap,
-        target,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
     ) -> None:
         with pytest.raises(
             click.ClickException,
@@ -214,10 +220,10 @@ class TestBlockParserSelectFilters:
     @pytest.mark.parametrize("named", ("target", "tap-elsewhere"))
     def test_select_filter_must_name_an_extractor_in_the_run(
         self,
-        project,
-        logger,
-        tap,
-        target,
+        project: Project,
+        logger: structlog.BoundLogger,
+        tap: ProjectPlugin,
+        target: ProjectPlugin,
         named: str,
     ) -> None:
         name = target.name if named == "target" else named
