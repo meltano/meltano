@@ -1,0 +1,52 @@
+---
+title: Backfills
+description: Load an ingestion's data again for a period you choose, without affecting its regular runs.
+sidebar_label: Backfills
+sidebar_position: 5
+---
+
+# Backfills
+
+A **backfill** loads an ingestion's data again, from a start date you choose. It runs as its own copy of the ingestion, with its own values and its own progress, so the ingestion and its schedule carry on as they are and its incremental sync is not reset.
+
+An ingestion can have several backfills, and they can run at the same time.
+
+---
+
+## When to use one
+
+- The ingestion started later than the history you need.
+- You selected a stream or field after the ingestion had already run, and want its history.
+- Data in the warehouse is missing or wrong for a period.
+- You changed where the ingestion lands (for example its target schema), and the new place needs the rows loaded before.
+
+---
+
+## Start a backfill
+
+You need to be an administrator of the workspace.
+
+1. On the **Ingestion** list or the ingestion's own page, open the **⋮** menu and choose **New Backfill**.
+2. In the dialog:
+   - Set the source's **start date** (and **end date**, where the source has one). Leave the start date empty to load all of the data.
+   - Choose the warehouse's **load method**, where the warehouse has one. **Overwrite** replaces the data already loaded, so it asks you to type the ingestion's name to confirm.
+   - Choose the **Streams** to load: all of them, or some.
+   - **Timeout (seconds)** (24 hours by default) and **Max retries** (3 by default).
+3. Click **Run Backfill**.
+
+A draft ingestion can't be backfilled: save it first.
+
+---
+
+## Follow a backfill
+
+The ingestion's **Backfills** tab lists each backfill run with its status, its **Period** (such as `1 Jan 2026 → now`, or `All time → now` when no start date was set) and its **Streams**. Open a run's log as you would for any run: see [Run History, Logs and Watching](/meltano-cloud/run-history).
+
+Each backfill has these actions:
+
+| Action | What it does |
+|---|---|
+| **Stop** | Stops the backfill while it runs. |
+| **Rerun** | Runs it again, continuing from where it stopped. |
+| **Restart** | Starts it over, clearing its progress and run history. It opens the dialog with the backfill's values, so you can change them first. |
+| **Watch** | Emails you about the backfill's runs, as for an ingestion. |

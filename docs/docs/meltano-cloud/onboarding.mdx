@@ -1,0 +1,65 @@
+---
+title: Onboarding
+description: Sign up for Meltano Cloud and set up your first workspace, warehouse and data sources with the setup wizard.
+sidebar_label: Onboarding
+sidebar_position: 2
+---
+
+# Onboarding
+
+The first time you sign in, a setup wizard creates your workspace and gets data moving: **Workspace**, **Industry**, **Warehouse**, **Sources**, **Configure**, **Done**. It takes a few minutes.
+
+---
+
+## Sign up
+
+Go to [meltano.com](https://meltano.com) and click **TRY MELTANO**. Sign up with your **work email** address: personal addresses such as Gmail can't be used to create an account.
+
+---
+
+## 1. Workspace
+
+Give the workspace a name. A workspace holds your warehouse connection, your data sources and the ingestions that move data between them.
+
+- **Repository**: Meltano creates a Git repository for the workspace. Choose **Private** (the default) or **Public**. For a private repository you can name a **GitHub Administrator (Optional)**, who is invited to administer it.
+- **Additional Options**: to deploy an existing workspace or Meltano project from Git instead, enter its **URL**, **Branch** and the other details. See [Creating a Workspace](/meltano-cloud/creating-workspace#from-an-existing-repository). The wizard then goes straight to **Done**, because the warehouse and sources come from that repository.
+
+Meltano then sets up the workspace: your private warehouse, the Git repository and the Meltano project. This usually takes under a minute.
+
+## 2. Industry
+
+Optionally, pick your industry, and Meltano tailors the workspace to it. **Skip for Now** if you prefer; you can set it later.
+
+## 3. Warehouse
+
+Choose where your data loads:
+
+- **Meltano-managed PostgreSQL**: ready now, no credentials needed. Recommended to get started.
+- **Your own warehouse**: Snowflake, BigQuery, Microsoft SQL Server, ClickHouse, MotherDuck, Databricks or PostgreSQL. Fill in its settings; the guide beside the form explains them, and the [warehouse guides](/meltano-cloud/warehouses#supported-warehouses) say what to prepare first. The connection is tested when you continue.
+
+You can add or change warehouses later in [Warehouses](/meltano-cloud/warehouses).
+
+## 4. Sources
+
+Pick up to three data sources from **Our most common sources**, or search the catalog. **Skip for Now** if you want to add them later.
+
+## 5. Configure
+
+Fill in each source's settings. Sources that sign in with a provider, such as Google, show a **Connect** button; after you sign in, some offer a list to pick from (a spreadsheet, an ad account, an organisation). Once a source is saved, Meltano finds its streams.
+
+Configuring is optional: a source you don't configure is saved as a draft ingestion, and won't run until you add its settings. Click **Finish Setup** when you are done.
+
+## 6. Done
+
+**You're all set** lists what was set up: the workspace, its repository, your industry, the warehouse and each data source with its status. Click **Go to Workspace**.
+
+If you leave the wizard before the end, it opens at the step you were on the next time you sign in.
+
+---
+
+## What next
+
+- Open [Ingestion](/meltano-cloud/ingestion): each source you configured is an ingestion. Run it, or wait for its schedule.
+- Follow the run in its [Run History](/meltano-cloud/run-history), and **Watch** it to get an email if it fails.
+- [Tasks](/meltano-cloud/tasks-notifications) lists what is left to do, such as **Import Data** and **Invite Your Team**.
+- Invite your colleagues from [Team](/meltano-cloud/team).

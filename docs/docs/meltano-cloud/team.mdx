@@ -1,0 +1,58 @@
+---
+title: Team
+description: See who is in your workspace, invite people, and choose who administers it.
+sidebar_label: Team
+sidebar_position: 10
+---
+
+# Team
+
+Open **Team** in the sidebar to see everyone in the workspace and the invitations waiting to be accepted.
+
+---
+
+## Roles
+
+| Role | Can |
+|---|---|
+| **Administrator** | Change the workspace's settings, add its ingestions, workflows, warehouses and plugins, and choose who else administers it. |
+| **Member** | See everything in the workspace, but not change its settings or add ingestions, workflows, warehouses or plugins. |
+
+The owners of the account the workspace belongs to can manage every workspace in it, whatever their role in the workspace.
+
+---
+
+## Invite someone
+
+Anyone in the workspace can invite someone.
+
+1. Click **Invite** at the top right. The **Invite Member** drawer opens.
+2. Enter their **Email**.
+3. Click **Send Invitation**.
+
+They get an email with a link to join the workspace as a **Member**. An administrator can make them an administrator once they have joined.
+
+If the workspace has **Approved domains** (in [Settings → General](/meltano-cloud/workspace-settings#general)), only addresses in those domains can be invited.
+
+---
+
+## Pending invitations
+
+Invitations not yet accepted are listed under **Pending Invitations**. From an invitation's **⋮** menu:
+
+| Action | When to use it |
+|---|---|
+| **Resend** | They didn't get the email. Inviting the same address again also sends it again. |
+| **Revoke** | You want to cancel it. The link stops working. Whoever sent it, or an administrator, can revoke it. |
+
+---
+
+## Manage members
+
+Administrators can use a member's **⋮** menu:
+
+| Action | What it does |
+|---|---|
+| **Make Administrator** | Gives the member an administrator's rights. |
+| **Revoke Administrator** | Takes them back; they stay a member. |
+| **Remove from Workspace** | They lose access to the workspace and any administrator rights in it. They can be invited again. |

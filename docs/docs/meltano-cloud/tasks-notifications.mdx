@@ -1,0 +1,38 @@
+---
+title: Tasks and Notifications
+description: See what is left to set up in a workspace, and the notifications from the ingestions and workflows you watch.
+sidebar_label: Tasks and Notifications
+sidebar_position: 11
+---
+
+# Tasks and Notifications
+
+---
+
+## Tasks
+
+**Tasks** are the steps left to take in a workspace, and the work Meltano is doing for it. Only the workspace's administrators see them, and every administrator sees the same ones.
+
+Find them in two places:
+
+- **Tasks** in the sidebar: the full list, with each task's status and when it was added.
+- **Workspace Tasks** at the top of the page: the latest few, with a count, and **See All**.
+
+| Task | Added | Done |
+|---|---|---|
+| **Import Data** | With a new workspace. | Once its first ingestion is created. |
+| **Invite Your Team** | With a new workspace. | Once anyone invites someone to it, from [Team](/meltano-cloud/team). |
+| **Complete the Configuration** | When an ingestion, workflow or warehouse from the workspace's repository couldn't be set up in full, so it was saved as a draft. | Once it is saved with every setting it needs. |
+| **In Progress** | While Meltano sets the workspace up, saves changes to it, or prepares an ingestion. | When that work ends. It can't be cleared. |
+
+A to-do goes by itself once it is done. Choose **Open** to go where it is done, or **Clear** to remove it if you don't need it. **Clear All** removes every to-do. Runs and deployments are not listed here: see [Run History](/meltano-cloud/run-history) and [Deployment History](/meltano-cloud/workspace-settings#deployment-history).
+
+---
+
+## Notifications
+
+The **bell** at the top of the page shows your notifications, with a count of the unread ones. They are yours, across all your workspaces: for example the runs of the ingestions and workflows you [watch](/meltano-cloud/run-history#watch-an-ingestion-or-workflow).
+
+- Click a notification to open the ingestion or workflow it is about. That marks it read.
+- **Mark All as Read** marks every one read.
+- **Clear All** removes them.

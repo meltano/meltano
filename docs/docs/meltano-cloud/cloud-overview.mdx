@@ -12,28 +12,27 @@ import Link from '@docusaurus/Link';
 
 ## Why teams use Meltano Cloud
 
-Meltano Cloud is the fastest way to run production ELT pipelines without managing infrastructure. Sign up, connect a Git repo, define your pipelines, and Meltano handles the rest: deployments, scheduling, credentials, and monitoring are all managed for you.
+Meltano Cloud is the fastest way to run production ELT pipelines without managing infrastructure. Sign up, choose a warehouse and your sources, and Meltano handles the rest: deployments, scheduling, credentials and monitoring are all managed for you.
 
 ## Why companies choose Meltano Cloud
 
-- **No infrastructure to manage**: workspaces, deployments, and scheduling are handled for you; you connect a repo and Meltano runs it.
-- **Git-backed by design**: every workspace is backed by a GitHub repository, so your pipeline config stays version-controlled and auditable.
-- **Isolated by team or project**: each workspace has its own pipelines, data store connection, members, and credentials.
-- **Credentials handled safely**: deployment keys and credentials live in Settings inside your workspace.
+- **No infrastructure to manage**: workspaces, deployments and scheduling are handled for you.
+- **Git-backed by design**: every workspace is backed by a Git repository, so your pipeline configuration stays version-controlled and auditable.
+- **Isolated by team or project**: each workspace has its own ingestions, workflows, warehouses, members and credentials.
+- **Credentials handled safely**: secrets are entered in the app, stored encrypted, and never written to the repository.
 
-## Get started in 6 steps
+## Get started
 
-1. **Get in touch**: Create your Meltano Cloud account at [meltano.com/contact](https://meltano.com/contact). You can sign in with GitHub or Google.
+1. **Sign up** at [meltano.com](https://meltano.com) with your work email (**TRY MELTANO**).
+2. **Set up your workspace** with the setup wizard: name it, choose a warehouse (Meltano-managed PostgreSQL needs no credentials) and pick your sources. See [Onboarding](/meltano-cloud/onboarding).
+3. **Run an ingestion**: open **Ingestion**, where each source is an [ingestion](/meltano-cloud/ingestion). Click **Run**, or let it run on its schedule.
+4. **Follow it**: watch the run and its log in [Run History](/meltano-cloud/run-history), and **Watch** the ingestion to get an email if it fails.
+5. **Invite your team** from [Team](/meltano-cloud/team).
+6. **Go further**: reload history with [Backfills](/meltano-cloud/backfills), run dbt and more with [Workflows](/meltano-cloud/workflows), connect your own [warehouse](/meltano-cloud/warehouses), and let [Meltano AI](/meltano-cloud/diagnose-with-meltano-ai) explain failures.
 
-2. **Create a workspace**: A workspace is an isolated environment for your team. Name it after your organization or project, then invite teammates from the Members tab.
-
-3. **Connect a Git repository**: Link the GitHub repo that contains (or will contain) your `meltano.yml`. Meltano Cloud reads your pipeline definitions directly from your repo on every run.
-
-4. **Add credentials**: Set your deployment keys and credentials in Settings.
-
-5. **Install a plugin and create a pipeline**: In the Lab, find and install the extractor for your data source, then click **+ Pipeline** next to it. Fill in the required connection settings and set a schedule (or leave it manual for now).
-
-6. **Trigger a pipeline run**: Save your pipeline and wait for the config job to finish (1-2 minutes). This commits your pipeline to the workspace repo. Once it completes, trigger a run from the Cloud UI or with `meltano cloud run`, and watch live logs stream directly in the interface. Don't trigger a run while the config job is still in progress - wait for it to finish first. Once your first run succeeds, you can set a recurring schedule, stream logs to DataDog, and add alerting, all from the Cloud UI.
+:::note The Classic UI
+**Classic UI**, at the bottom of the sidebar, opens Meltano Cloud's previous interface. It still has Datasets and the Lab's other apps.
+:::
 
 ## Getting help
 

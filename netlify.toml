@@ -571,6 +571,74 @@
   status = 301
   force = true
 
+# --- Meltano Cloud pages renamed for the new UI (MEL-798) ---
+# Old URLs are linked from the product (failure emails, plugin settings help) and other sites.
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store/snowflake-guides"
+  to = "/meltano-cloud/warehouses/snowflake-warehouse"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store/microsoft-sql-server-guides"
+  to = "/meltano-cloud/warehouses/microsoft-sql-server-warehouse"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store/clickhouse-store"
+  to = "/meltano-cloud/warehouses/clickhouse-warehouse"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store/bigquery-store"
+  to = "/meltano-cloud/warehouses/bigquery-warehouse"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store/motherduck-store"
+  to = "/meltano-cloud/warehouses/motherduck-warehouse"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store/databricks-store"
+  to = "/meltano-cloud/warehouses/databricks-warehouse"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/connect-a-store"
+  to = "/meltano-cloud/warehouses"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/stores"
+  to = "/meltano-cloud/warehouses"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/importing-data"
+  to = "/meltano-cloud/ingestion"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/automate-actions"
+  to = "/meltano-cloud/workflows"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/invite"
+  to = "/meltano-cloud/team"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/profile-security"
+  to = "/meltano-cloud/personal-settings"
+  status = 301
+
+[[redirects]]
+  from = "/meltano-cloud/pipeline-diagnosis"
+  to = "/meltano-cloud/diagnose-with-meltano-ai"
+  status = 301
+
 # --- Search engine indexing ---
 #
 # Only the production deploy (docs.meltano.com) should be indexed. Branch

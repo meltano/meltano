@@ -206,7 +206,7 @@ psycopg2.errors.UndefinedColumn: column "discount_code" of relation "raw_orders"
 
 The agent traces this to `orders.csv` having a column `discount_code` doesn't, and can propose either an `ALTER TABLE` or a narrower `tap-csv` column selection, your call which fits.
 
-For runs that already executed on Cloud, open the pipeline in the **Pipelines** view and read its logs directly, or use **Diagnose** for the same plain-language read the agent gives you locally, see [AI Diagnostics](./ai-diagnostics.mdx).
+For runs that already executed on Cloud, open the ingestion or workflow and read its logs in **Run History**, or use **Diagnose with Meltano AI** for the same plain-language read the agent gives you locally, see [Diagnose with Meltano AI](/meltano-cloud/diagnose-with-meltano-ai).
 
 Once you have a fix, re-run locally to confirm, then commit and push (see [Commit your lockfiles](#commit-your-lockfiles) and [Deploy: push to run](#deploy-push-to-run)).
 
@@ -229,6 +229,6 @@ Run down this list before you call a change done and push it. It catches the ste
 2. **Lockfiles committed.** `plugins/*.lock` staged alongside `meltano.yml`, the #1 silent deploy failure.
 3. **Config validated.** `meltano config <plugin> list` resolves cleanly; a local `meltano run` succeeds.
 4. **Secrets kept out of git.** Real values in `.env` (local) or the Environment tab (Cloud); only `.env.example` committed.
-5. **Deploy confirmed.** Check the Pipelines view, don't assume the push is live.
+5. **Deploy confirmed.** Check **Settings → Deployment History**, then the **Ingestion** or **Workflows** list; don't assume the push is live.
 6. **Failure reproduced, not guessed.** Reproduce locally with `meltano run` (or read the Cloud logs/Diagnose) before changing config.
 7. **Learnings captured.** Non-obvious fixes written into `.claude/workspace_knowledge_base/` and committed.

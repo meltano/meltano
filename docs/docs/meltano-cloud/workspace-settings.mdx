@@ -1,55 +1,54 @@
 ---
 title: Workspace Settings
-description: Configure your workspace identity, repository connections, security credentials, and external logging services.
-layout: doc
-sidebar_position: 11
+description: Name your workspace, connect its repository, add integrations such as Claude and Datadog, and deploy it.
+sidebar_position: 12
 ---
 
-Navigate to **Workspace → Settings** from the left navigation bar to manage your workspace configuration - from basic identity settings to repository connections, security credentials, and external log streaming.
+# Workspace Settings
+
+Open **Settings** in the sidebar. The page has four tabs, and a **Deploy** button at the top right of each. Only the workspace's administrators can change settings; a member sees them read-only.
 
 ---
 
-#### General
+## General
 
-#### Name
+- **Name**: the name members see everywhere. Renaming the workspace also renames its repository, which may break automation that uses the old name.
+- **Approved domains**: only people with an email address in these domains can be invited. Leave it empty to allow any domain.
+- **Active environment**: the [Meltano environment](/concepts/environments) whose configuration the workspace uses. It must exist in `meltano.yml`. See [Managing a Workspace](/meltano-cloud/managing-a-workspace#managing-config-with-environments).
+- **Meltano version**: the version of Meltano the workspace runs on.
+- **Logo**: an image (cropped when you add it) that helps members see they are in the right workspace. **Remove Logo** takes it away.
+- **Danger Zone → Delete Workspace**: removes the workspace for everyone in it. You type the workspace's name to confirm. This can't be undone.
 
-- Give your workspace a name that your users will instantly recognise.
-- **Note:** Renaming the workspace also renames the associated repository. This may break any automation you have already configured that references the old name.
-#### Approved Domains
-
-- Control who can be invited to your workspace by specifying a list of approved email domains.
-- Users can only send invitations to people whose email addresses belong to the listed domains.
-- Leave this field **empty** to allow invitations to any domain.
-#### Image
-
-- Upload a workspace image to help members quickly confirm they are in the right workspace.
-- A recognisable logo or avatar is especially useful in workspaces shared across multiple teams.
-#### Active Environment
-
-- Set the name of the environment whose configuration your workspace should use.
-- The environment must already exist in your `meltano.yml` file under the `environments` section.
-- See the [Environments documentation](https://docs.meltano.com/concepts/environments) for more information.
----
-
-#### Repository & Credentials
-
-These fields connect your workspace to its underlying Git repository and control secure access.
-
-- **Repo URL** : The URL of the repository linked to this workspace.
-- **Repository Branch** : The branch your workspace is currently tracking. Click the **copy icon** to copy the branch name.
-- **Repository Directory** : The root directory within the repository used by this workspace. Click the **copy icon** to copy the path.
-- **SSH Private Key** : The private key used for repository authentication. Click the **copy icon** to copy the key value.
-- **GitHub Installation ID** : The ID associated with your GitHub App installation for this workspace.
-- **Deployment Secret** : A secret token used to authenticate deployments.
-  - Click the **copy icon** to copy the current secret.
-  - Click **Regenerate** to generate a new secret. Use this when rotating credentials or if a secret is compromised.
----
-
-#### Delete Workspace
-
-- Click the **Delete** button to permanently remove this workspace.
-- A confirmation modal will appear with the message **"This action cannot be undone."**
-- Click **Delete** in the modal to confirm, or **Close** to cancel and return to settings.
-> ⚠️ Deletion is irreversible. Ensure you have backed up any important data or configuration before proceeding.
+Click **Save** to keep your changes. Changing the active environment or the Meltano version asks you to type the workspace's name first, because the next runs of every ingestion and workflow use the new one.
 
 ---
+
+## Repository
+
+Where the workspace's Meltano project lives, and how changes reach Meltano Cloud.
+
+- **Repository URL**, **Branch** and **Directory** (the folder in the repository that holds the project; empty for the repository's root). Copy them from here to clone the repository.
+- **GitHub installation ID**: the Meltano Cloud GitHub App installation that gives access to the repository.
+- **SSH private key**: for a private repository reached by an SSH URL. A saved key is never shown again: type a new one to replace it, then Save.
+- **Deployment secret**: the secret GitHub signs its webhook calls with, so that a push to the repository deploys the workspace. Copy it, or **Regenerate Secret** to replace it; the old one stops working, so update the webhook in GitHub too. See [Managing a Workspace](/meltano-cloud/managing-a-workspace#managing-config-from-github).
+
+---
+
+## Integrations
+
+Services the workspace connects to. Only administrators see this tab. A credential is tested before it is kept, and kept when you click **Save**.
+
+- **Claude**: an Anthropic API key, so that Meltano AI can diagnose failed runs. Click **Add Credential** and paste the key. It is saved masked and can't be seen again. **Remove** takes it away at once, and AI diagnosis stops until a new key is added. See [Diagnose with Meltano AI](/meltano-cloud/diagnose-with-meltano-ai).
+- **Datadog**: an API key and site, so that the logs of your ingestions and workflows are sent to Datadog. Pause it to stop sending without removing the credential. See [Log Routing and Monitoring](/meltano-cloud/logging-monitoring).
+
+---
+
+## Deployment History
+
+Every deployment of the workspace, with its status, when it started, how long it took, the **Commit** it deployed (linked to the repository) and who or what **Triggered By** it. For each one you can **View Log** or delete it from the history. A failed deployment also has **Diagnose with Meltano AI** and **Copy Diagnosis Prompt**.
+
+---
+
+## Deploy
+
+**Deploy**, at the top right of every Settings tab, applies what is in the repository to the workspace now, without waiting for a push. Follow it in **Deployment History**.

@@ -1,0 +1,177 @@
+---
+title: Ingestion
+description: Move data from one source into one warehouse, on a schedule or on demand, and manage each ingestion from its own page.
+sidebar_label: Ingestion
+sidebar_position: 4
+---
+
+# Ingestion
+
+An **ingestion** moves data from one source into one warehouse. It runs on a schedule, after another ingestion or workflow, or when you start it. Each ingestion has its own page with its run history, streams, backfills and environment.
+
+To run several components in order, such as a source, then dbt, then a notebook, use a [Workflow](/meltano-cloud/workflows) instead.
+
+---
+
+## Add an ingestion
+
+You need to be an administrator of the workspace to add an ingestion.
+
+1. Open **Ingestion** in the sidebar and click **+ Ingestion**.
+2. **Warehouse** (only when the workspace has two or more warehouses): choose where the data loads. **Workspace default** is marked. A warehouse whose set-up is not finished shows as **Draft** and can't be chosen until you finish it in [Warehouses](/meltano-cloud/warehouses).
+3. **Source**: choose from **Our most common sources**, or search the catalog.
+4. **Settings**:
+   - **Name**.
+   - **Schedule**: **Manual**, **Hourly**, **Daily** or **Custom**. Custom lets you build one (**Every few hours**, **Daily**, **Weekly**, **Monthly**) or type a cron expression (**Advanced (Cron)**); a sentence and the next run times appear under it. Schedules run in UTC.
+   - The source's settings. Required settings are marked; optional ones are under **Optional settings**. The **Setup Guide** beside the form explains each one. Sources that sign in with a provider, such as Google, show a **Connect to** button.
+   - **Mapper (optional)**: shown when the workspace has mapper mappings. It runs between the source and the warehouse.
+   - **Run After (optional)**: start this ingestion when any of the chosen ingestions or workflows finishes.
+   - **Advanced**: **Timeout (seconds)** and **Max retries** (how often a failed run is tried again).
+5. Save it one of three ways:
+   - **Save as Draft** keeps the name and schedule only. A draft doesn't run.
+   - **Save and Run** saves the ingestion and starts its first run straight away.
+   - **Save** saves it and goes on to **Streams**.
+6. **Streams**: Meltano tests the connection and discovers the source's streams. This can take a couple of minutes; you can stop it, or leave with **Finish** and choose streams later. Choose the streams and fields to load, then **Finish**. If you choose none, the ingestion loads nothing.
+
+Nothing is saved until you choose how to save it.
+
+:::tip Starting from a plugin
+If the source is already installed in the workspace, you can find it under [Plugins](/meltano-cloud/plugins).
+:::
+
+---
+
+## The Ingestion list
+
+The list shows every ingestion with its **Status**, **Health**, **Last Run**, **Last Run Time** and **Trigger** (Scheduled, Manual, after another ingestion or workflow, or after a workspace deploy). Search it, and filter it by **Health** (Stable or Unstable), **Last Run Status**, **Trigger** and **Plugin**. The list keeps your search and filters when you come back to it.
+
+**Health** looks at the latest runs: an ingestion is **Unstable** when one or more of them failed.
+
+Each row has a **Run** (or **Stop**) button, **Edit**, **Watch** (see [Run History, Logs and Watching](/meltano-cloud/run-history#watch-an-ingestion-or-workflow)) and a **⋮** menu:
+
+| Item | What it does |
+|---|---|
+| **Run** / **Stop** | Starts a run now, or stops the one in progress. |
+| **Edit** | Opens the ingestion's settings. |
+| **Verify Connection** | Tests that the source and warehouse can be reached with the saved settings. |
+| **Discover Streams** | Reads the source's streams again, for example after the source added a table. |
+| **New Backfill** | Loads the data again for a period you choose. See [Backfills](/meltano-cloud/backfills). |
+| **Diagnose with Meltano AI** | Explains why the latest run failed. See [Diagnose with Meltano AI](/meltano-cloud/diagnose-with-meltano-ai). |
+| **Copy Environment** | Copies the ingestion's environment variables, to run it on your own machine. |
+| **Delete** | Removes the ingestion and its run history, after you type its name. |
+
+An item you can't use is greyed out and says why, for example **Still being set up**, **Not while a run or check is in progress**, or that only an administrator can do it.
+
+---
+
+## The ingestion's page
+
+Click an ingestion to open its page.
+
+**At a Glance** shows **Last Run**, **Rows Loaded**, **Run Time**, **Data Freshness**, **Success Rate**, **Typical Duration** and **Average Rows/s**, next to a chart of the rows loaded by each run. Below it are four tabs:
+
+- **Run History**: every run, its log and its diagnosis. See [Run History, Logs and Watching](/meltano-cloud/run-history).
+- **Streams**: each stream with its **Source**, **Fields Selected** and **Selection** (**Selected**, **Automatic** or **Excluded**). Open a stream to see its fields. Search and filter the list, **Copy As** or **Download As** the streams in another format, and **Edit Streams** to change the selection.
+- **Backfills**: the ingestion's backfills. See [Backfills](/meltano-cloud/backfills).
+- **Environment**: the environment variables a run uses. Secret values show as `***` on the page.
+
+---
+
+## Edit an ingestion
+
+**Edit** opens the ingestion's settings in tabs:
+
+- **General**: name, schedule, mapper, Run After, timeout and retries.
+- **Source Settings**: the source's settings.
+- **Warehouse Settings**: this ingestion's own values for the warehouse's settings. Each starts as the warehouse's value; a value you set here applies to this ingestion only.
+- **Streams**: the selected streams, and **Discover Streams** to read them again.
+
+On an ingestion that has already run, changing a warehouse setting that decides where its data lands (such as the target schema) shows a warning. Incremental streams only load what changed since the last run, so the new place won't have the rows loaded before. Use a [backfill](/meltano-cloud/backfills) to load them there.
+
+The source and warehouse of a saved ingestion can't be changed. To load the same source somewhere else, add another ingestion.
+
+---
+
+## Run an ingestion on your own machine
+
+**Time required: 15 minutes**
+
+Every workspace is backed by a Git repository holding a Meltano project, so you can run any ingestion locally, for example to debug it.
+
+You need [Git](https://git-scm.com/downloads), Python 3.10 or later, and [Meltano](/meltano-open/installation) (a virtual environment is recommended).
+
+1. Copy the repository URL from **Settings → Repository**, and clone it:
+
+   ```bash
+   git clone https://github.com/YourOrg/your-workspace
+   cd your-workspace
+   ```
+
+2. Open the ingestion's page, go to the **Environment** tab and click **Copy .env**. Paste the values into a new `.env` file in the cloned directory. It looks something like this:
+
+   ```bash
+   TAP_EXAMPLE_CLIENT_ID=your-client-id
+   TAP_EXAMPLE_CLIENT_SECRET=your-client-secret
+   TAP_EXAMPLE_START_DATE=2022-01-01T00:00
+   TARGET_EXAMPLE_HOST=example.host.com
+   TARGET_EXAMPLE_PORT=1234
+   TARGET_EXAMPLE_DB=your-database
+   TARGET_EXAMPLE_USERNAME=your-username
+   TARGET_EXAMPLE_PASSWORD=your-password
+   ```
+
+   :::caution
+   **Copy .env** copies the real secret values, even though the page shows them as `***`. Treat the file like a password, and never commit it.
+   :::
+
+3. Install the plugins and run the ingestion:
+
+   ```bash
+   meltano install
+   meltano run tap-example target-example
+   ```
+
+   Replace `tap-example` and `target-example` with the plugin names in your `meltano.yml`.
+
+---
+
+## Add a custom source
+
+**Time required: 15 minutes**
+
+If the source you need isn't in the catalog, add it as a custom plugin from a Meltano plugin definition file, then add an ingestion for it.
+
+1. Write the plugin definition. For example, a copy of `tap-spreadsheets-anywhere` named `tap-example-custom-data-source`:
+
+   ```yaml
+   extractors:
+     - name: tap-example-custom-data-source
+       variant: matatika
+       namespace: tap_example_custom_data_source
+       pip_url: git+https://github.com/ets/tap-spreadsheets-anywhere.git
+       executable: tap-spreadsheets-anywhere
+       capabilities:
+         - catalog
+         - discover
+         - state
+       settings:
+         - name: tables
+           kind: array
+   ```
+
+2. Open **Plugins**, click **+ Plugin**, choose **Custom Plugin**, and choose the file (or paste the YAML into the **discovery.yml** box). See [Plugins](/meltano-cloud/plugins#add-a-custom-plugin).
+3. Open **Ingestion**, click **+ Ingestion** and choose the new source.
+4. In **Settings**, fill in **Tables**. To try it with a sample CSV file:
+
+   ```json
+   [{
+     "path": "https://raw.githubusercontent.com/Matatika/matatika-examples/master/example_adding_a_custom_data_source",
+     "name": "imdb_top_20_films",
+     "pattern": "imdb_top_20_films.csv",
+     "start_date": "2021-01-01T00:00:00Z",
+     "key_properties": ["rank"],
+     "format": "csv"
+   }]
+   ```
+
+5. Click **Save and Run**, and follow the run in **Run History**.

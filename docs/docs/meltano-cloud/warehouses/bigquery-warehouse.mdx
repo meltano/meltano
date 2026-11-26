@@ -1,11 +1,11 @@
 ---
-title: BigQuery Store
-description: Set up a Google BigQuery data store for use with Meltano Cloud
+title: BigQuery Warehouse
+description: Set up Google BigQuery as a warehouse for Meltano Cloud
 layout: doc
-sidebar_position: 19
+sidebar_position: 3
 ---
 
-# BigQuery Store
+# BigQuery Warehouse
 
 ## Create a dataset
 
@@ -30,13 +30,13 @@ If you plan to use the `gcs_stage` ingestion method, also grant the service acco
 
 To configure your Meltano Workspace to use your BigQuery dataset, follow these steps:
 
-1. Add a new store to your Meltano Workspace using the `bigquery` store type.
+1. In **Warehouses**, click **+ Warehouse** and choose **BigQuery**.
 2. Paste in the JSON contents of the service account key you downloaded.
 3. Enter the **Project** ID and **Dataset** ID you created, and the dataset's **Location** if it isn't in the default region.
 4. Choose a **Method** (defaults to `Batch Job`) and save.
 
 ## Arrow BATCH ingestion
 
-Taps that emit Arrow-encoded Singer `BATCH` messages are loaded natively by `target-bigquery`, with no configuration required, as long as the store's **Denormalized** setting is enabled — Arrow BATCH files can't be loaded into the fixed-schema (`JSON` column) path.
+Taps that emit Arrow-encoded Singer `BATCH` messages are loaded natively by `target-bigquery`, with no configuration required, as long as the warehouse's **Denormalized** setting is enabled — Arrow BATCH files can't be loaded into the fixed-schema (`JSON` column) path.
 
 See [Arrow BATCH Support](/meltano-cloud/arrow-support/) for supported extractors and how to enable Arrow output on the tap.

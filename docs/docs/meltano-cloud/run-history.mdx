@@ -1,0 +1,61 @@
+---
+title: Run History, Logs and Watching
+description: Follow an ingestion's or workflow's runs, read and download their logs, and get emails when they fail.
+sidebar_label: Run History, Logs and Watching
+sidebar_position: 7
+---
+
+# Run History, Logs and Watching
+
+Every ingestion and workflow keeps a history of its runs, with the log of each one. You can also **watch** one to get an email and a notification when its runs fail, or for every run.
+
+---
+
+## The Ingestion and Workflows lists
+
+Each row shows:
+
+- **Status**: what the ingestion or workflow is doing now.
+- **Health**: **Stable**, or **Unstable** when one or more of its latest runs failed.
+- **Last Run** and **Last Run Time** (in GMT).
+- **Trigger**: **Scheduled** (with its cron expression), **Manual**, after another ingestion or workflow, or after a workspace deploy.
+
+Filter the list by **Health**, **Last Run Status** (Success, Error, Stopped, Running), **Trigger** and **Plugin**.
+
+---
+
+## Run History
+
+Open an ingestion or workflow and go to its **Run History** tab. Each run shows its **Status**, **Started**, **Duration**, **Rows** (where the run reported them) and **Triggered By**; sort by any of the middle three. An ingestion's page also charts the **Rows Loaded** by each run.
+
+For each run you can:
+
+- **View Log**: opens the run's log beside the page. While the run is going, the log follows it as it is written.
+- **Download** the whole log as a text file. This works while the run is still going; a queued run has no log yet, so Download is greyed out until it starts.
+- **Delete** the run from the history (not while it runs).
+- On a failed run, **Diagnose with Meltano AI**, or **Copy Diagnosis Prompt** to use with any AI assistant. See [Diagnose with Meltano AI](/meltano-cloud/diagnose-with-meltano-ai).
+
+Logs are kept for 7 days. An older run says its log is no longer available; if the workspace sends its logs to Datadog, it says the log may still be there. See [Log Routing and Monitoring](/meltano-cloud/logging-monitoring).
+
+### Retries
+
+When a run fails and its ingestion or workflow has **Max retries** set, Meltano tries it again. An attempt that failed but will be retried ends as **Warning**, not Error. The run is reported as failed only when its last attempt fails.
+
+---
+
+## Watch an ingestion or workflow
+
+Click the **eye** on its row or its page (it is also in the **⋮** menu), and choose:
+
+| Option | You are told about |
+|---|---|
+| **Errors** | A run that fails, is skipped or is stopped. |
+| **All activity** | Every run, and every change to the ingestion or workflow. |
+
+Use **Errors** for ingestions in production, and **All activity** while you set up a new one. A filled eye shows you are watching; click it again to stop.
+
+You get an email and a notification in the app. **Errors** is not told about an attempt that will be retried, only about the final failure; **All activity** gets each attempt, with `[WARNING]` in the subject of a retried one.
+
+Each email links straight to the ingestion or workflow in Meltano Cloud. When the workspace has a Claude API key, a failure email also carries a diagnosis of what went wrong: see [Diagnose with Meltano AI](/meltano-cloud/diagnose-with-meltano-ai#in-failure-emails).
+
+Notifications are listed under the **bell** at the top of the app. See [Tasks and Notifications](/meltano-cloud/tasks-notifications).

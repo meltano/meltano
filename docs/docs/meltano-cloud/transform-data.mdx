@@ -2,7 +2,7 @@
 title: Transform Data
 description: Learn how to use dbt to write and run data transforms in your Meltano workspace, including creating sources, models, and running them locally.
 sidebar_label: Transform Data
-sidebar_position: 10
+sidebar_position: 17
 ---
 
 # Transform Data
@@ -81,7 +81,7 @@ final as (
 select * from final
 ```
 
-The `{{ config(materialized='table') }}` block at the top tells dbt to create a physical table in your data store each time the model runs. The `{{ source(...) }}` references connect the model to the source tables defined in the previous step.
+The `{{ config(materialized='table') }}` block at the top tells dbt to create a physical table in your warehouse each time the model runs. The `{{ source(...) }}` references connect the model to the source tables defined in the previous step.
 
 For a full reference of dbt Jinja functions available in models, see the [dbt Jinja functions docs](https://docs.getdbt.com/reference/dbt-jinja-functions).
 
@@ -89,7 +89,7 @@ For a full reference of dbt Jinja functions available in models, see the [dbt Ji
 
 #### Step 3 - Run your models
 
-dbt models require the source tables to exist before they can run. If the raw data is not yet in your data store, you will need to [run your data import locally](/meltano-cloud/importing-data#running-your-data-import-locally) first.
+dbt models require the source tables to exist before they can run. If the raw data is not yet in your warehouse, [run the ingestion](/meltano-cloud/ingestion) first, in Meltano Cloud or [on your own machine](/meltano-cloud/ingestion#run-an-ingestion-on-your-own-machine).
 
 Once the source data is in place, install and run dbt from your workspace directory:
 
@@ -103,6 +103,6 @@ meltano invoke dbt run
 
 For the full set of `dbt run` options, see the [dbt run reference](https://docs.getdbt.com/reference/commands/run).
 
-:::tip Running transforms in a pipeline
-When a pipeline that includes dbt is run in the Meltano platform, all models in the project are executed automatically as part of that pipeline run. You do not need to trigger dbt separately.
+:::tip Running transforms in Meltano Cloud
+To run your models in Meltano Cloud, add a [workflow](/meltano-cloud/workflows#run-dbt-after-your-ingestions) with the **dbt** component. Its **Default** action runs `dbt:deps` and `dbt:run`, so every model in the project runs. Set it to run after your ingestions with **Triggered By**.
 :::
