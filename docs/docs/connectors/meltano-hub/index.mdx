@@ -342,42 +342,31 @@ A build set up this way needs no Meltano Cloud session, because it never calls t
 
 ## Plugins in Meltano Cloud
 
-[Meltano Cloud](/meltano-cloud/cloud-overview) is the hosted platform. Plugin installation works the same way conceptually - the same Hub catalog sits behind it - but you do it from the UI rather than the CLI, and there's no local `meltano.yml` to edit by hand.
+[Meltano Cloud](/meltano-cloud/cloud-overview) is the hosted platform. Plugin installation works the same way conceptually - the same catalog sits behind it - but you do it from the app rather than the CLI, and there's no local `meltano.yml` to edit by hand.
 
 ### Register for an account
 
-A Meltano Cloud account is what unlocks both the hosted platform and Hub access from the CLI - the same account serves both. If you don't have one, [book a call with the team at meltano.com](https://meltano.com) to get set up.
+A Meltano Cloud account is what unlocks both the hosted platform and Hub access from the CLI - the same account serves both. Sign up at [meltano.com](https://meltano.com) (**TRY MELTANO**) with your work email. The first time you sign in, a setup wizard creates your first **workspace** - your isolated environment for ingestions, workflows and warehouses, backed by its own Git repository. See [Onboarding](/meltano-cloud/onboarding).
 
-Once you have an account:
-
-1. Sign in. The first time you do, you'll be prompted to create your first **workspace** - your isolated environment for pipelines, connectors and store connections, backed by its own Git repository.
-2. Give the workspace a **Name**.
-3. Optionally add **Approved Domains** to restrict membership to email addresses at your company's domain.
-4. Click **Continue**.
-
-If you already have a Meltano project in a GitHub repository, expand **Advanced** on the new workspace screen and paste the repository URL to scaffold the workspace from it. See [Creating a Workspace](/meltano-cloud/creating-workspace) for the full walkthrough, and [Invite & Manage Members](/meltano-cloud/invite) for adding colleagues.
+If you already have a Meltano project in a Git repository, you can deploy it as a workspace instead: see [Creating a Workspace](/meltano-cloud/creating-workspace#from-an-existing-repository). To add colleagues, see [Team](/meltano-cloud/team).
 
 With the account in place, run [`meltano cloud auth login`](#sign-in-to-meltano-cloud) on your machine to use the Hub from the CLI.
 
 ### Install a plugin from the catalog
 
-In the workspace, go to [**Workspace → Plugins**](/meltano-cloud/plugins) in the left navigation bar. The page has three tabs:
+In the workspace, open [**Plugins**](/meltano-cloud/plugins), click **+ Plugin**, choose **Official Plugin**, search the catalog and click **Install**. This is the Cloud equivalent of `meltano add tap-github`.
 
-- **Installed** - everything currently installed in the workspace. Each card shows the plugin name, type and variant. Use **Add to Pipeline** to wire a plugin into a pipeline without leaving the page, or the three-dot menu (**⋮**) to delete it.
-- **Available** - the full catalog of 550+ plugins. Search for the one you want and click **Install**; it then appears under **Installed**.
-- **Custom** - your own connectors. See below.
-
-This is the Cloud equivalent of `meltano add tap-github`: pick it from **Available**, click **Install**.
+You often don't need to install first: adding an [ingestion](/meltano-cloud/ingestion), a [warehouse](/meltano-cloud/warehouses) or a [workflow](/meltano-cloud/workflows) installs the plugins it uses.
 
 ### Register a custom plugin
 
-For a connector that isn't in the catalog, open the **Custom** tab and click **Add**. In the modal you can either upload a `discovery.yml` file describing your Singer taps, dbt transforms and Matatika datasets, or paste the YAML directly into the editor. **Reset** clears the editor; **Cancel** closes without saving.
+For a connector that isn't in the catalog, click **+ Plugin** and choose **Custom Plugin**. Choose a `discovery.yml` file describing your plugins, or paste its YAML.
 
 This is the Cloud counterpart to [Option 1](#add-from-a-plugin-definition-file) above - the same metadata, registered against the workspace instead of a local project.
 
 ### Working locally against a Cloud workspace
 
-Every workspace is backed by a GitHub repository, so you can clone it and use the CLI workflow from the first half of this guide. Copy the repository URL from **Settings** in your profile menu, then follow [Setup your Dev Environment](/meltano-cloud/setup-development-environment).
+Every workspace is backed by a Git repository, so you can clone it and use the CLI workflow from the first half of this guide. Copy the repository URL from **Settings → Repository**, then follow [Setup your Dev Environment](/meltano-cloud/setup-development-environment).
 
 ## Next steps
 

@@ -1,0 +1,108 @@
+---
+title: Diagnose with Meltano AI
+description: Get a plain-language explanation of why a run or deployment failed, and what to do about it, in the app or in your failure email.
+sidebar_label: Diagnose with Meltano AI
+sidebar_position: 13
+---
+
+# Diagnose with Meltano AI
+
+When a run fails, Meltano AI reads the failure and explains what went wrong in plain language, with steps to fix it. You get a diagnosis two ways:
+
+- **In the app**, from **Diagnose with Meltano AI** on a failed run or deployment.
+- **In the failure email**, which carries the diagnosis and a next step matched to the failure.
+
+Both use the same diagnosis, made the same way.
+
+---
+
+## Before you start
+
+Meltano AI runs on your own Claude API key. An administrator adds it once:
+
+1. Get a key from the [Anthropic Console](https://console.anthropic.com).
+2. Open **Settings → Integrations**, and under **Claude** click **Add Credential**.
+3. Paste the key. It is tested, then kept when you click **Save**.
+
+Without a key you can still use **Copy Diagnosis Prompt**: it copies the same context Meltano AI would use, to paste into any AI assistant.
+
+---
+
+## Diagnose in the app
+
+**Diagnose with Meltano AI** is on:
+
+- the **⋮** menu of an ingestion or workflow whose latest run failed;
+- a failed run in **Run History**, and its log;
+- a failed deployment in **Settings → Deployment History**, and its log.
+
+The diagnosis appears in a dialog as it is written: a short title, what went wrong, and the steps to fix it. It is saved, so opening the same failure again shows it without asking Claude again. **Run Again** makes a new one; **Copy Diagnosis Prompt** copies the context it was made from.
+
+If the workspace has no Claude key, the dialog says so, links to Settings, and still lets you copy the diagnosis prompt.
+
+---
+
+## In failure emails
+
+When a run fails and the workspace has a Claude key, the failure email to the people [watching](/meltano-cloud/run-history#watch-an-ingestion-or-workflow) it includes the diagnosis, so you can act without opening Meltano first. Only a final failure is diagnosed, not an attempt that will be retried.
+
+Under the diagnosis, the email offers a next step chosen for that failure:
+
+| Action | When it appears |
+|---|---|
+| **Edit** *(file name)* | The fix is a change to a named file in your workspace's repository. Opens that file. |
+| **Change the pipeline configuration** | The diagnosis names a change to the configuration. Opens the ingestion or workflow. |
+| **Check the pipeline's settings** | The cause isn't conclusive from the logs. Opens the ingestion or workflow, to check its credentials and connection settings. |
+| **Send this to support** | The failure is in the platform, not your configuration. Opens an email to support. |
+
+Every failure email also offers **Stop this pipeline running**. It opens the ingestion or workflow and saves it as a draft, so it stops running, on its schedule too, while someone investigates. Its configuration is kept; saving it again starts it back up. You need to be signed in, and allowed to change it.
+
+A slow or failed diagnosis never holds up the failure email: it is sent either way. Without a Claude key, the email is sent without a diagnosis, and says what one would contain and what data it would use.
+
+---
+
+## Data handling and privacy
+
+Because Meltano AI sends pipeline logs and code to Claude to make a diagnosis, this section explains what is sent, what is protected, and where it goes. It applies the same way to the app and to failure emails.
+
+### What Meltano AI looks at
+
+Four things, and only these:
+
+- **Failure logs** for the run that is diagnosed.
+- **Recent run history** for that ingestion or workflow, so Claude can tell a new failure from a recurring one.
+- **Pipeline code**: the configuration in your workspace's repository.
+- **Pipeline metadata**, such as which plugins and triggers are configured.
+
+It does not look at other ingestions, other workspaces, or anything outside what is needed for the failure being diagnosed.
+
+### What is removed before anything is sent
+
+Before any of it leaves Meltano, it passes through automatic redaction. URL and key-pattern scrubbing, together with Meltano's secret-setting flags, strip out:
+
+- credentials, tokens and API keys in logs or configuration;
+- connection strings and secrets referenced in pipeline code;
+- any other values Meltano's redaction is set to treat as sensitive.
+
+This always happens and can't be turned off. In failure emails, the same redaction also strips credentials from every link in the email.
+
+### What Meltano stores, and what it doesn't
+
+Meltano stores the diagnosis in your workspace, so opening a failure again doesn't spend tokens again. It also records token usage for accounting. It does not keep the logs, code or configuration sent to Claude: that data exists only for the request.
+
+### Where the request goes
+
+Each request is made with your own Claude API key, under your Anthropic account, and the redacted context is sent straight to Claude through Anthropic's API. Anthropic's handling of it is governed by [Anthropic's privacy and data usage policies](https://www.anthropic.com/legal/privacy), not Meltano's.
+
+### Your control over this
+
+- In the app, a diagnosis runs only when you ask for one.
+- In failure emails, a diagnosis is made only when the workspace has a Claude key.
+- Without a key, nothing is sent to Claude.
+- Remove the key at any time in **Settings → Integrations**. That turns off diagnosis in the app and in emails until a key is added again.
+
+---
+
+## Questions
+
+If you have questions about this feature, or a diagnosis looks wrong, contact Meltano support through your usual channel.

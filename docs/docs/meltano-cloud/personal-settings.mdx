@@ -1,0 +1,51 @@
+---
+title: Personal Settings
+description: Change your name, email and password, get API keys, and choose your working account.
+sidebar_label: Personal Settings
+sidebar_position: 18
+---
+
+# Personal Settings
+
+Click your name at the bottom of the sidebar, then **Personal Settings**. These settings are yours, not a workspace's, and apply in every workspace. **‹ Back** returns to the page you came from.
+
+The same menu has **Logout**.
+
+---
+
+## Profile
+
+- **Name**: shown to your workspaces' members, and used in the emails Meltano sends you.
+- **Email**: where Meltano writes to you. If you sign in with a Meltano password, it is also how you sign in, so changing it asks you to confirm first. If you sign in with Google or another provider, the email comes from there and can't be changed here.
+
+Click **Save** to keep a change.
+
+---
+
+## Password
+
+If you sign in with a Meltano password, click **Send reset email**. We email you a link to choose a new password; until you use it, your current password keeps working. The link can be used once and expires after a short time.
+
+If you sign in with Google or another provider, your password belongs to that provider: change it there.
+
+---
+
+## API Keys
+
+Ways for scripts, apps and other services to use the [Meltano Cloud API](/reference/cloud/api) as you.
+
+- **Developer Token**: a short-lived token for trying the API by hand. It isn't shown: copy it. It expires, so use an API client for anything that runs on its own.
+- **API clients**: long-lived credentials for an app or a third party.
+  - **New API Client** (top right): give it a **Name**. Copy the client secret straight away: it is shown only once.
+  - **Rename** a client, or **Delete** it. Anything using a deleted client stops working at once.
+  - An account can have a limited number of clients; when it has reached it, New API Client is greyed out and says so.
+
+Keep tokens and client secrets private. Treat them like passwords, and never commit them to version control.
+
+---
+
+## Account
+
+Shown only if you own or help run two or more accounts. Your **Working Account** is the account Meltano uses when you make something that belongs to an account: **New Workspace** in the workspace menu, workspaces created through the API, and new API clients. It doesn't change which workspaces you can open: the workspace menu lists your working account's first, then the rest under **Other accounts**.
+
+You can choose only accounts you own or administer.

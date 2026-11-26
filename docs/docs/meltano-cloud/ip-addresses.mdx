@@ -1,24 +1,24 @@
 ---
 title: Meltano IP Addresses
-description: The static egress IP addresses the Meltano platform connects from, for allow-listing on your data stores.
+description: The static egress IP addresses the Meltano platform connects from, for allow-listing on your warehouses.
 layout: doc
-sidebar_position: 6
+sidebar_position: 19
 ---
 
 # Meltano IP Addresses
 
-Meltano connects to your data stores from a fixed set of static egress IP
+Meltano connects to your warehouses from a fixed set of static egress IP
 addresses. Allow-listing them lets you block all other inbound internet traffic
 to your database while still letting your pipelines run.
 
-This page is the single source of truth for those addresses. The store setup
+This page is the single source of truth for those addresses. The warehouse setup
 guides link here instead of repeating them, so use this page whenever you
 configure a firewall rule, network policy or IP access list.
 
 ## Egress IP addresses
 
 The Meltano platform has multi-cloud resilience within the United Kingdom and
-connects to your store from the following addresses:
+connects to your warehouse from the following addresses:
 
 | IP address | CIDR |
 | --- | --- |
@@ -64,13 +64,13 @@ Quoted and comma-separated, for SQL statements such as a Snowflake
 The following guides use these addresses. Each shows the syntax for its
 platform; substitute the values above where the snippets use a placeholder.
 
-- [Snowflake Store](/meltano-cloud/connect-a-store/snowflake-guides) - network
+- [Snowflake Warehouse](/meltano-cloud/warehouses/snowflake-warehouse) - network
   rules and network policies
-- [Microsoft SQL Server Store](/meltano-cloud/connect-a-store/microsoft-sql-server-guides) -
+- [Microsoft SQL Server Warehouse](/meltano-cloud/warehouses/microsoft-sql-server-warehouse) -
   Azure SQL Database server-level firewall rules
-- [ClickHouse Store](/meltano-cloud/connect-a-store/clickhouse-store) -
+- [ClickHouse Warehouse](/meltano-cloud/warehouses/clickhouse-warehouse) -
   ClickHouse Cloud IP access lists and self-managed `users.xml`
-- [Databricks Store](/meltano-cloud/connect-a-store/databricks-store) -
+- [Databricks Warehouse](/meltano-cloud/warehouses/databricks-warehouse) -
   workspace IP access lists
 
 ## If a connection stops working

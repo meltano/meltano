@@ -1,34 +1,36 @@
 ---
 title: Log Routing and Monitoring
-description: Configure your workspace identity, repository connections, security credentials, and external logging services.
-layout: doc
-sidebar_position: 12
+description: Send the logs of your ingestions and workflows to Datadog for monitoring, alerting and longer retention.
+sidebar_position: 14
 ---
 
-Stream your workspace pipeline logs to external monitoring platforms for real-time visibility and alerting.
+# Log Routing and Monitoring
+
+Meltano Cloud keeps run logs for 7 days (see [Run History, Logs and Watching](/meltano-cloud/run-history)). To keep them longer, search them, or alert on them, send them to Datadog.
 
 ---
 
-#### Datadog Log Streaming
+## Send logs to Datadog
 
-Send workspace logs directly to Datadog for monitoring, alerting, and observability across your pipelines.
+You need a Datadog account and API key, and to be an administrator of the workspace.
 
-**Requirements:** A Datadog API key and an active Datadog account.
+1. Open **Settings → Integrations**.
+2. Under **Datadog**, click **Add Credential**.
+3. Fill in:
+   - **API key**: your Datadog API key.
+   - **Datadog site**: the site your account is on, so logs reach the right data centre.
+   - **Service name (optional)**: the name the Meltano logs arrive under in Datadog. Use it to filter them and build dashboards.
+4. The credential is tested. Click **Save** to keep it.
 
-##### Setting Up Datadog
+The logs of your ingestions and workflows are then sent to Datadog.
 
-1. Open **Workspace Settings** and scroll to the **External Logging Services** section.
-2. Click **Add Credential** under the Datadog section.
-3. Fill in the following details:
-   - **API Key** : Your Datadog API key.
-   - **Region** : Select the Datadog region that matches your account to ensure logs reach the correct data centre.
-   - **Service Name** *(optional)* : Tag logs with a service name to filter them and build focused dashboards in Datadog.
-4. Click **Save** : logs will begin streaming to Datadog immediately.
-##### Managing Your Datadog Credentials
+---
 
-- **Pause streaming** : Click the **Active** toggle on your Datadog credentials card to switch it to **Paused**. Logs will stop streaming without removing your credentials.
-- **Resume streaming** : Click the **Paused** toggle to switch back to **Active**. Log streaming resumes immediately.
-- **Delete credentials** : Remove your Datadog credentials at any time, for example when rotating API keys or switching regions. Re-add them to resume streaming.
-##### How It Works
+## Manage the credential
 
-Logs are shipped from the **Logback layer** directly to Datadog - no extra infrastructure required. Settings take effect at runtime, so you can adjust configuration without redeploying your workspace.
+From the Datadog credential's **⋮** menu:
+
+- **Pause** stops sending logs without removing the credential; the credential shows **Paused**. **Resume** starts again.
+- **Remove** deletes the credential, for example to rotate the API key or change site. Logs stop being sent to Datadog; Meltano's own log store is unaffected.
+
+When a run's log is older than 7 days, its log in Meltano Cloud says it may still be in Datadog.

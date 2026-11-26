@@ -1,0 +1,91 @@
+---
+title: Workflows
+description: Run any components of your workspace in order, on a schedule or after other ingestions, and schedule Jupyter Notebooks.
+sidebar_label: Workflows
+sidebar_position: 6
+---
+
+# Workflows
+
+A **workflow** runs any components of your workspace in the order you choose: for example dbt after your ingestions, a test suite, a report, or a Jupyter Notebook. To move data from one source into one warehouse, an [Ingestion](/meltano-cloud/ingestion) is simpler.
+
+---
+
+## Add a workflow
+
+**Time required: 5 minutes**
+
+You need to be an administrator of the workspace.
+
+1. Open **Workflows** in the sidebar and click **+ Workflow**.
+2. **Components**: pick what the workflow runs. Search **In this workspace** and **From our catalog**; a catalog plugin is installed when you save. You can pick several. They run in the order shown; **Replace** swaps one for another component of the same type, and **Remove** takes it out.
+3. **Settings**: each component's settings, with its **Setup Guide** beside them.
+4. **Actions**: give the workflow a **Name**, and choose what it runs:
+   - **Default**: moves the data the usual way: each source into the warehouse after it, then dbt's `deps` and `run` when dbt is one of the components. The guide beside it shows the exact commands for this workflow. Right for most workflows.
+   - **Custom commands**: choose the commands yourself, from each component and the commands it offers (for example `dbt:test`). They run in the order you choose them.
+   - **Script**: a bash script you write, for full control. It starts from the command Default would run.
+5. Save it with **Save as Draft**, **Save and Run** (saves it and starts a run straight away) or **Save**.
+
+A new workflow is saved to run manually, with no triggers, a one-hour timeout and no retries. Set its schedule and the rest from **Edit**.
+
+---
+
+## Edit a workflow
+
+Open **Edit** from the workflow's row or its page. It has three tabs:
+
+- **General**: **Name**, **Schedule** (**Manual**, **Hourly**, **Daily** or **Custom** with a cron expression; schedules run in UTC), **Triggered By** (run this workflow after the ingestions or tasks you choose), **Timeout (seconds)** and **Max retries**.
+- **Components**: the components in run order, **Add Component**, **Replace** and **Remove**, and each component's settings.
+- **Actions**: Default, Custom commands or Script.
+
+The Workflows list, its row menu and a workflow's own page (with **Run History** and **Environment**) work as they do for ingestions. See [Ingestion](/meltano-cloud/ingestion#the-ingestion-list) and [Run History, Logs and Watching](/meltano-cloud/run-history).
+
+---
+
+## Run dbt after your ingestions
+
+1. Add a workflow with the **dbt** component.
+2. Leave **Actions** on **Default**, which runs `dbt:deps` and `dbt:run`. Choose **Custom commands** to add others, such as `dbt:test`.
+3. After saving, open **Edit → General** and, under **Triggered By**, choose the ingestions whose data the models use. The workflow then runs each time one of them finishes.
+
+See [Transform Data](/meltano-cloud/transform-data) for writing the models.
+
+---
+
+## Run a Jupyter Notebook on a schedule
+
+**Time required: 10 minutes**
+
+Meltano can run a Jupyter Notebook as part of a workflow, on whatever schedule you set. Use it for recurring reports, data processing, or model runs that live in a notebook.
+
+### Add the notebook to the repository
+
+1. Copy the repository URL from **Settings → Repository**, and clone it:
+
+   ```bash
+   git clone https://github.com/YourOrg/your-workspace
+   ```
+
+2. Put the notebook in the `notebook/` directory of the clone.
+3. Commit and push it:
+
+   ```bash
+   git add notebook/your_notebook.ipynb
+   git commit -m "Add scheduled notebook"
+   git push
+   ```
+
+### Create the workflow
+
+1. Open **Workflows** and click **+ Workflow**.
+2. In **Components**, search for **notebook** and pick it.
+3. In **Settings**, set **Path** to the notebook, for example `notebook/your_notebook.ipynb`.
+4. In **Actions**, name the workflow, choose **Custom commands**, and pick `notebook:run`. Other commands convert the notebook to another format (`notebook:convert`, `notebook:run-convert`).
+5. Click **Save**, then set the schedule in **Edit → General**.
+
+When it runs in Meltano Cloud, no cell outputs or files are committed back to the repository. The notebook's effects are visible only through what it does, such as sending an email.
+
+### Extend the workflow
+
+- **Send an email**: add the **SendGrid** component after the notebook, and set its recipient, subject, body and attachments. Use the notebook's conversion to PDF to attach a report.
+- **Chain notebooks**: add several notebook steps. They run in order.

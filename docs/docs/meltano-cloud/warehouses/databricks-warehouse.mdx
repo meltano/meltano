@@ -1,23 +1,23 @@
 ---
-title: Databricks Store
-description: Allow Meltano to reach your SQL warehouse, set up authentication and permissions, and connect Databricks as a full data store
+title: Databricks Warehouse
+description: Allow Meltano to reach your SQL warehouse, set up authentication and permissions, and connect Databricks as a full warehouse
 layout: doc
-sidebar_position: 20
+sidebar_position: 5
 ---
 
-# Databricks Store
+# Databricks Warehouse
 
-This guide covers how to prepare Databricks for use as a store with Meltano -
+This guide covers how to prepare Databricks for use as a warehouse with Meltano -
 network access, authentication and permissions - and then walks through
-connecting it. Once connected, Databricks works as a **full data store**: the
+connecting it. Once connected, Databricks works as a **full warehouse**: the
 loader writes your extracted data into Delta tables, pipeline state is saved
-alongside it, and datasets can query it like any other supported store. If you
-make it your workspace's default store, imports load into Databricks and datasets
+alongside it, and datasets can query it like any other supported warehouse. If you
+make it your workspace's default warehouse, new ingestions load into Databricks and datasets
 read from it. See
-[Setting a Data Store as Default](/meltano-cloud/connect-a-store#setting-a-data-store-as-default).
+[Make a warehouse the default](/meltano-cloud/warehouses#make-a-warehouse-the-default).
 
 If you just want to get connected, jump to
-[Connect the Databricks store](#connect-the-databricks-store).
+[Connect the Databricks warehouse](#connect-the-databricks-warehouse).
 
 ## Supported setup
 
@@ -114,7 +114,7 @@ allows it to add columns to them later when your source schema changes.
 
 ---
 
-## Connect the Databricks store
+## Connect the Databricks warehouse
 
 ### Step 1: Find your connection details
 
@@ -124,10 +124,10 @@ use, and open the **Connection details** tab. Copy:
 - **Server hostname**, e.g. `dbc-1234.cloud.databricks.com`
 - **HTTP path**, e.g. `/sql/1.0/warehouses/abc123`
 
-### Step 2: Add the store
+### Step 2: Add the warehouse
 
-1. Go to **Workspace → Stores** and click **Add**.
-1. Select **Databricks**, click **Install**, then click **Add**.
+1. Go to **Warehouses** and click **+ Warehouse**.
+1. Choose **Databricks**.
 1. Enter the connection settings below, using the credentials from
    [Authentication](#authentication).
 1. Click **Save**.
@@ -157,9 +157,9 @@ The target schema is created if it does not exist, as long as the identity has
 ### Step 3: State backend (handled automatically)
 
 On the platform you don't configure the state backend. When you connect a
-Databricks store, Meltano derives it from the same connection details, so there
+Databricks warehouse, Meltano derives it from the same connection details, so there
 is no separate URI or credential to manage. State is written to two Delta tables
-that Meltano creates in the store's catalog and target schema:
+that Meltano creates in the warehouse's catalog and target schema:
 
 - `meltano_state` - the pipeline state itself
 - `meltano_state_locks` - locks that stop two runs from writing the same state at
@@ -195,7 +195,7 @@ for the full list of settings.
 
 ### Step 4: Verify
 
-Run a pipeline into your Databricks store from the workspace, then confirm that
+Run an ingestion into your Databricks warehouse from the workspace, then confirm that
 data and state landed. Replace `<catalog>` and `<schema>` with the values you
 configured:
 
@@ -268,7 +268,7 @@ needed.
 This applies to:
 
 - **Arrow `BATCH` messages.** Extractors that emit Arrow-encoded Singer `BATCH`
-  messages are detected automatically and need no configuration on the store.
+  messages are detected automatically and need no configuration on the warehouse.
   Table definitions still come from the stream's `SCHEMA` message. The Arrow
   files are consume-once and are deleted after loading unless you set
   `clean_up_batch_files` to `false`. See

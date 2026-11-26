@@ -1,21 +1,21 @@
 ---
-title: ClickHouse Store
-description: Whitelist IP ranges, set up authentication, and connect ClickHouse as a full data store
+title: ClickHouse Warehouse
+description: Whitelist IP ranges, set up authentication, and connect ClickHouse as a full warehouse
 layout: doc
-sidebar_position: 17
+sidebar_position: 4
 ---
 
-# ClickHouse Store
+# ClickHouse Warehouse
 
 Our team at Meltano regularly shares best practices for secure and efficient
 analytics engineering. This guide covers the security best practices and
-connection settings for using ClickHouse as a store with Meltano - whitelisting,
+connection settings for using ClickHouse as a warehouse with Meltano - whitelisting,
 authentication, connection settings and tuning the loader for OLAP workloads -
-and then walks through connecting ClickHouse as a **full data store** (loader,
+and then walks through connecting ClickHouse as a **full warehouse** (loader,
 state backend and dbt transforms together).
 
 If you just want to get connected, jump to
-[Set up ClickHouse as a full data store](#set-up-clickhouse-as-a-full-data-store)
+[Set up ClickHouse as a full warehouse](#set-up-clickhouse-as-a-full-warehouse)
 
 The sections before it are the security and settings reference that the
 walkthrough links back to.
@@ -39,7 +39,7 @@ reach it-
 - Your dbt/analytics runners
 - Meltano
 
-The Meltano platform connects to your store from a fixed set of static egress IP
+The Meltano platform connects to your warehouse from a fixed set of static egress IP
 addresses, listed on [Meltano IP Addresses](/meltano-cloud/ip-addresses). Allow
 all of them - a pipeline run can originate from any one.
 
@@ -110,13 +110,13 @@ GRANT SELECT, INSERT, ALTER, CREATE TABLE, DROP TABLE, OPTIMIZE
 ```
 
 If you also use ClickHouse as your **state backend** (recommended - see
-[Set up ClickHouse as a full data store](#set-up-clickhouse-as-a-full-data-store)
+[Set up ClickHouse as a full warehouse](#set-up-clickhouse-as-a-full-warehouse)
 below), the same user and grant already cover it, since the state table lives
 in `meltano.state`.
 
 ### Step 3: Use TLS in production[​](#step-3-use-tls-in-production "Direct link to Step 3: Use TLS in production")
 
-For any store reachable over the public internet, connect over HTTPS/TLS. Set
+For any warehouse reachable over the public internet, connect over HTTPS/TLS. Set
 `secure: true` and use the TLS port `8443` (ClickHouse Cloud terminates TLS on
 `8443` by default). Keep `verify: true` so the server certificate is validated.
 
@@ -127,9 +127,9 @@ For full details on ClickHouse authentication options, see the
 
 ## Configuration
 
-Connect the store with the following settings - you'll enter them when creating
-the store in the platform (see [Step 2 of the
-walkthrough](#step-2-connect-the-clickhouse-store) below). The minimum required
+Connect the warehouse with the following settings - you'll enter them when creating
+the warehouse in the platform (see [Step 2 of the
+walkthrough](#step-2-add-the-clickhouse-warehouse) below). The minimum required
 fields are `host`, `database`, and a password.
 
 ```json
@@ -171,10 +171,10 @@ your ClickHouse instance is not directly reachable.
 
 ---
 
-## Set up ClickHouse as a full data store
+## Set up ClickHouse as a full warehouse
 <br />
 
-ClickHouse is supported as a **full data store** in Meltano - meaning all
+ClickHouse is supported as a **full warehouse** in Meltano - meaning all
 pieces work together:
 
 1. **Loader** - `target-clickhouse` writes your extracted data into ClickHouse.
@@ -209,9 +209,9 @@ GRANT SELECT, INSERT, ALTER, CREATE TABLE, DROP TABLE, OPTIMIZE
 The same user and database are reused for the loader, the state backend, and
 dbt.
 
-### Step 2: Connect the ClickHouse store[​](#step-2-connect-the-clickhouse-store "Direct link to Step 2: Connect the ClickHouse store")
+### Step 2: Add the ClickHouse warehouse
 
-In the platform, create a new **store** and select **ClickHouse**. Fill in the
+In **Warehouses**, click **+ Warehouse** and choose **ClickHouse**. Fill in the
 connection settings for the instance from Step 1. Remember that on ClickHouse
 **the database is the schema**, so set `database` directly.
 
@@ -234,7 +234,7 @@ See [Configuration](#configuration) above for the full settings reference
   `OPTIMIZE`. Recommended default.
 - **Upsert** (default) - deduplicates by primary key using `ReplacingMergeTree` +
   `optimize_after`. Use only when you deliberately re-load overlapping keys. Set
-  the store's `engine_type` to `ReplacingMergeTree`, `load_method` to `upsert`,
+  the warehouse's `engine_type` to `ReplacingMergeTree`, `load_method` to `upsert`,
   and enable `optimize_after`.
 
 <details>
@@ -262,13 +262,13 @@ For upsert, add `engine_type: ReplacingMergeTree`, `load_method: upsert`, and
 
 ### Step 3: State backend (handled automatically)[​](#step-3-state-backend-handled-automatically "Direct link to Step 3: State backend (handled automatically)")
 
-This is what makes ClickHouse a *full* data store: pipeline state - the
+This is what makes ClickHouse a *full* warehouse: pipeline state - the
 incremental bookmarks and full-table markers that let a sync resume instead of
 restarting - lives in ClickHouse itself, at parity with Postgres, Snowflake,
 BigQuery, and MSSQL.
 
 **On the platform you don't configure this.** When you connect a ClickHouse
-store, the platform automatically derives the state backend from the same
+warehouse, the platform automatically derives the state backend from the same
 connection details and points Meltano at it - there's no separate URI, add-on,
 or credential to manage. State is written to `meltano.state` (a
 `ReplacingMergeTree(updated_at)` keyed by `state_id`, read with `FINAL` so the
@@ -296,15 +296,15 @@ overrides: `state_backend.clickhouse.{host,port,database,user,password,secure,sc
 
 ### Step 4: (Optional) Add dbt transforms[​](#step-4-optional-add-dbt-transforms "Direct link to Step 4: (Optional) Add dbt transforms")
 
-To transform data in place, add **dbt** to your ClickHouse workspace. It uses
-`dbt-clickhouse` and pre-fills its connection from the store you connected in
+To transform data in place, add a [workflow](/meltano-cloud/workflows#run-dbt-after-your-ingestions) with the **dbt** component. It uses
+`dbt-clickhouse` and pre-fills its connection from the warehouse you connected in
 Step 2, so there's no separate profile to manage. (Standalone Meltano users add
 the `dbt-clickhouse` transformer and a profile pointing at the same instance and
 database.)
 
 ### Step 5: Verify[​](#step-5-verify "Direct link to Step 5: Verify")
 
-Run a pipeline into your ClickHouse store from the workspace, then confirm data
+Run an ingestion into your ClickHouse warehouse from the workspace, then confirm data
 and state landed:
 
 ```sql

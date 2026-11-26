@@ -1,11 +1,11 @@
 ---
 title: Managing a Workspace
 description: How-to guides for managing workspace configuration, environments, DataOps workflows, and custom pipeline images in Meltano.
-sidebar_position: 4
+sidebar_position: 15
 ---
 # Manage Workspaces
 
-This section covers how to manage your Meltano workspace configuration across five key areas: syncing config from GitHub, using environments to separate settings by stage, promoting changes through a DataOps workflow, speeding up pipelines with a custom Docker image, and controlling the Lab landing page.
+This section covers how to manage your Meltano workspace configuration across five key areas: syncing config from GitHub, using environments to separate settings by stage, promoting changes through a DataOps workflow, speeding up pipelines with a custom Docker image, and controlling the Classic UI's Lab landing page.
 
 ---
 
@@ -17,8 +17,8 @@ This section covers how to manage your Meltano workspace configuration across fi
 
 You must have:
 
-- Admin or owner access to the workspace you want to configure
-- Admin rights to the workspace GitHub repository (available on Meltano premium plans)
+- Administrator access to the workspace you want to configure
+- Admin rights to the workspace's GitHub repository (for a private repository Meltano creates, name a GitHub Administrator when you create the workspace)
 
 ### Overview
 
@@ -29,7 +29,7 @@ Think of it like a direct line from your code editor to your running workspace. 
 There are two ways to trigger a deployment:
 
 - **GitHub Webhook** (covered in this guide): every push to the repository automatically deploys your workspace
-- **Manual deployment**: use the Meltano API or Postman collection to trigger a deployment on demand
+- **Manual deployment**: click **Deploy** in **Settings**, or use the Meltano API
 
 ### Setting up a GitHub Webhook
 
@@ -38,13 +38,13 @@ A webhook is a notification that GitHub sends to Meltano the moment you push new
 ##### Step 1 - Find your workspace ID
 
 1. Open your workspace in Meltano.
-2. Look at the URL in your browser. It will contain a UUID that looks like this: `https://app.meltano.com/workspaces/e8e23b01-1eca-4021-a054-dc653756b4cd`
+2. Look at the URL in your browser. It will contain a UUID that looks like this: `https://app.meltano.com/nextui/w/e8e23b01-1eca-4021-a054-dc653756b4cd/ingestion`
 3. Copy that UUID. This is your `workspace_id`.
 
 ##### Step 2 - Find your deployment secret
 
-1. In your workspace, open **Settings** from the left navigation bar
-2. Locate the **Deployment Secret** field and copy its value.
+1. In your workspace, open **Settings** in the sidebar, then the **Repository** tab.
+2. Copy the **Deployment secret**.
 
 ##### Step 3 - Add the webhook in GitHub
 
@@ -64,7 +64,7 @@ From this point on, every push to your workspace repository will automatically t
 
 ### Triggering a manual deployment
 
-If you prefer to deploy on demand rather than on every push, you can use the Meltano API. The Deployments API reference and the Postman collection both support this.
+To deploy on demand rather than on every push, click **Deploy** at the top right of any **Settings** tab. It applies what is in the repository now. Follow it, and read its log, in **Settings → Deployment History**. You can also deploy through the Meltano API.
 
 :::tip When to use this
 This setup is most useful when your workspace configuration is managed by a team and you want every approved merge to automatically roll out to your workspace, reducing the chance of config drift between what is in GitHub and what is actually running.
@@ -111,36 +111,36 @@ environments:
         extractors:
           - name: tap-auth0
             config:
-              client_id: 39Pu9tTomnTv594VAFYnmRvkEpSlI7a6
+              client_id: dev-client-id
   - name: staging
     config:
       plugins:
         extractors:
           - name: tap-auth0
             config:
-              client_id: 4Zd5QXqHKNoKq4ySx8CP1UBm5eIUgh7t
+              client_id: staging-client-id
   - name: prod
     config:
       plugins:
         extractors:
           - name: tap-auth0
             config:
-              client_id: u4kcVHKUD9lkbUbXA3eXCt88scStaqHM
-              domain: matatika.eu.auth0.com
+              client_id: prod-client-id
+              domain: example.eu.auth0.com
 plugins:
   extractors:
     - name: tap-auth0
       config:
-        domain: matatika-staging.eu.auth0.com
+        domain: example-staging.eu.auth0.com
 ```
 
 Here is what gets loaded depending on which environment is active:
 
 | Active environment | `client_id` | `domain` |
 |---|---|---|
-| `dev` | `39Pu9tTomnTv594VAFYnmRvkEpSlI7a6` | `matatika-staging.eu.auth0.com` (from base) |
-| `staging` | `4Zd5QXqHKNoKq4ySx8CP1UBm5eIUgh7t` | `matatika-staging.eu.auth0.com` (from base) |
-| `prod` | `u4kcVHKUD9lkbUbXA3eXCt88scStaqHM` | `matatika.eu.auth0.com` (from `prod` override) |
+| `dev` | `dev-client-id` | `example-staging.eu.auth0.com` (from base) |
+| `staging` | `staging-client-id` | `example-staging.eu.auth0.com` (from base) |
+| `prod` | `prod-client-id` | `example.eu.auth0.com` (from `prod` override) |
 
 Notice that `prod` is the only environment with its own `domain` value. For `dev` and `staging`, the domain falls back to what is defined in the base `tap-auth0` block.
 
@@ -148,12 +148,11 @@ Notice that `prod` is the only environment with its own `domain` value. For `dev
 
 The active environment is initially set by the `default_environment` property in your `meltano.yml`. You can change it at any time from the workspace UI:
 
-1. Open the workspace drop-down menu.
-2. Select **Settings**.
-3. Update the **Active environment** field to the environment you want.
-4. Click **Save**.
+1. Open **Settings** in the sidebar (the **General** tab).
+2. Choose the environment in **Active environment**.
+3. Click **Save**, and type the workspace's name to confirm.
 
-Once saved, all pipelines in the workspace will load configuration from the newly selected environment. To verify what values a pipeline will use at runtime, open the pipeline and check the **Environment** tab.
+Once saved, all pipelines in the workspace will load configuration from the newly selected environment. To verify what values an ingestion or workflow will use at runtime, open it and check its **Environment** tab.
 
 :::note
 Switching environments changes the configuration loaded for every pipeline in the workspace. If you are running a shared workspace, make sure your team is aware before making this change.
@@ -184,19 +183,18 @@ In Meltano, you implement this by creating separate workspaces for each stage of
 Create three separate workspaces to represent each stage:
 
 **Development workspace** (e.g. `My Workspace (dev)`):
-1. Open the workspace drop-down menu.
-2. Select **New workspace**.
-3. Enter a name in the **Name** field.
-4. Click **Save**.
+1. Open the workspace menu at the top of the page.
+2. Click **New Workspace**.
+3. Name the workspace and finish the setup wizard. See [Creating a Workspace](/meltano-cloud/creating-workspace).
 
 **Staging workspace** (e.g. `My Workspace (staging)`):
 
 Repeat the steps above with a staging-appropriate name.
 
 Then set the active environment to `staging`:
-1. Open the drop-down menu and select **Settings**.
+1. Open **Settings** in the sidebar.
 2. Set **Active environment** to `staging`.
-3. Click **Save**.
+3. Click **Save**, and type the workspace's name to confirm.
 
 **Production workspace** (e.g. `My Workspace`):
 
@@ -204,7 +202,7 @@ Repeat the workspace creation steps, then set the active environment to `prod` f
 
 ##### Step 2 - Develop and test in dev
 
-Make all changes and run your pipelines in the development workspace. The repository URL for each workspace can be found in its **Settings** page.
+Make all changes and run your pipelines in the development workspace. The repository URL for each workspace is in its **Settings → Repository** tab.
 
 ##### Step 3 - Promote dev changes to staging
 
@@ -337,13 +335,13 @@ For teams running frequent deployments, consider adding a CI step (such as an Az
 
 ---
 
-## Controlling the Lab Landing Page {#controlling-the-lab-landing-page}
+## Controlling the Lab Landing Page (Classic UI) {#controlling-the-lab-landing-page}
 
 **Time required: 2 minutes**
 
 #### Overview
 
-`HOME_PAGE` is an `app_properties` key in `workspace.yml` that forces every member landing in the Lab to a specific app (e.g. `dashboard`) instead of the first item in the app's menu.
+This applies to the Classic UI only. `HOME_PAGE` is an `app_properties` key in `workspace.yml` that forces every member landing in the Lab to a specific app (e.g. `dashboard`) instead of the first item in the app's menu.
 
 ```yaml
 app_properties:

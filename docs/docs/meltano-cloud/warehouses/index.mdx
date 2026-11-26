@@ -1,0 +1,90 @@
+---
+title: Warehouses
+description: Add the warehouses your ingestions load into, choose the default, and manage them.
+sidebar_position: 8
+---
+
+# Warehouses
+
+A **warehouse** is the database your ingestions load data into. Open **Warehouses** in the sidebar to see the workspace's warehouses, add one, and choose the default.
+
+Every new workspace can start on **Meltano-managed PostgreSQL**, which needs no credentials. You can add your own warehouse at any time.
+
+---
+
+## What the labels mean
+
+| Label | Meaning |
+|---|---|
+| **Default** | New ingestions load into it, unless you choose another warehouse when you add one. |
+| **State** | It holds the workspace's saved state: the bookmarks that let incremental runs carry on from where they stopped. The default warehouse holds it. |
+| **Managed** | Meltano's own PostgreSQL. It can't be edited or deleted. |
+| **Draft** | Its set-up isn't finished, for example because its connection test failed when it was deployed from the repository. Finish setting it up before an ingestion can use it. |
+
+---
+
+## Supported warehouses
+
+- **PostgreSQL** (Meltano-managed, or your own)
+- [Snowflake](/meltano-cloud/warehouses/snowflake-warehouse)
+- [BigQuery](/meltano-cloud/warehouses/bigquery-warehouse)
+- [Microsoft SQL Server](/meltano-cloud/warehouses/microsoft-sql-server-warehouse)
+- [ClickHouse](/meltano-cloud/warehouses/clickhouse-warehouse)
+- [MotherDuck](/meltano-cloud/warehouses/motherduck-warehouse)
+- [Databricks](/meltano-cloud/warehouses/databricks-warehouse)
+
+Each guide says what to prepare in the warehouse first, such as allow-listing [Meltano's IP addresses](/meltano-cloud/ip-addresses) and creating a user. See [Arrow BATCH Support](/meltano-cloud/arrow-support) for which warehouses load Arrow batches.
+
+---
+
+## Add a warehouse
+
+You need to be an administrator of the workspace.
+
+1. Open **Warehouses** and click **+ Warehouse**.
+2. Under **Choose your data warehouse**, pick one.
+3. Fill in its settings. The guide beside the form explains each one.
+4. Click **Save**. Saving tests the connection first; if the test fails, nothing is saved and the error says why.
+
+If the schema you named doesn't exist yet, PostgreSQL and Snowflake show the SQL to create it and grant access.
+
+---
+
+## Make a warehouse the default
+
+1. Open the warehouse's **⋮** menu (on its row or its page) and choose **Make Default**.
+2. Confirm. The connection is tested first.
+
+New ingestions then load into it, and the workspace keeps its saved state in it from then on: it takes both the **Default** and the **State** labels. Ingestions you already have keep loading into the warehouse they were set up with.
+
+:::caution Saved state does not move with it
+The saved state already in the old warehouse is not copied to the new one. After the switch, incremental streams of your existing ingestions have no bookmark to carry on from, so their next run loads from their start date again. If that would be a large load, plan the switch for a quiet time, or check with support first.
+:::
+
+The old warehouse and its data are not changed, and you can make it the default again later.
+
+---
+
+## Edit or delete a warehouse
+
+Use **Edit** and **Delete** from the warehouse's **⋮** menu or its page.
+
+- Saving an edit tests the connection again.
+- A **Managed** warehouse can't be edited or deleted.
+- The **Default** warehouse can't be deleted: make another warehouse the default first.
+- A warehouse that an ingestion loads into can’t be deleted while that ingestion exists.
+- Delete asks you to type the warehouse's name.
+
+An action you can't use is greyed out and says why.
+
+---
+
+## A warehouse's own page
+
+Click a warehouse to open its page. It shows its **Type** and **Connection** (with **Copy connection**), and the **Ingestions and Workflows** that load into it.
+
+---
+
+## Datasets
+
+Datasets, in the Classic UI, query the default warehouse. Warehouses that Meltano doesn't provide natively can be loaded into, but don't serve datasets: if one is the default, datasets appear empty.
