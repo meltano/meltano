@@ -1,16 +1,87 @@
 ---
 title: Meltano AI
-description: Start here for AI-assisted workflows on Meltano Cloud, including agent-based pipeline development and diagnosis.
+description: Start here for AI-assisted workflows on Meltano Cloud, including agent-based pipeline development, business context for your LLMs, and pipeline diagnosis.
 ---
 
 # Meltano AI
 
-Use this section for documentation on building and troubleshooting pipelines with the help of AI, on Meltano Cloud.
+When you talk to Meltano Cloud with conversational AI, you're talking to **Melty**, Meltano's AI. Melty isn't one single feature: it's a few distinct, related capabilities that show up in different places depending on what you're trying to do.
 
-## Index
+<div className="row">
+
+<div className="col col--6 margin-bottom--lg">
+<div className="card">
+<div className="card__header">
+
+### [MCP](/meltano-ai/meltano-mcp)
+
+</div>
+<div className="card__body">
+
+The technology that connects AI chatbots, Claude, Gemini, ChatGPT, or any other [MCP](https://modelcontextprotocol.io)-compatible assistant, to your Meltano Cloud workspaces. It's what gives those assistants the ability to gather data (check pipelines and runs), help model it, and support analysis, grounded in your real workspace rather than invented.
+
+</div>
+</div>
+</div>
+
+<div className="col col--6 margin-bottom--lg">
+<div className="card">
+<div className="card__header">
+
+### [Agent Melty](/meltano-ai/agent-melty)
+
+</div>
+<div className="card__body">
+
+Coding agents like Claude Code, Cursor, Codex, and Antigravity write better Meltano config once they have Meltano-specific knowledge to work from. Agent Melty, Meltano's dragon, packages that expert knowledge as a plugin your coding agent reads directly from your workspace's git repository, so it knows how to code and configure Meltano before it starts.
+
+</div>
+</div>
+</div>
+
+<div className="col col--6 margin-bottom--lg">
+<div className="card">
+<div className="card__header">
+
+### [Context Kits](/meltano-ai/context-kits)
+
+</div>
+<div className="card__body">
+
+Upgradable plugins that package industry and business knowledge into your project as YAML. Paired with Meltano MCP, a Context Kit becomes a searchable knowledge graph your LLM can use, so it builds data models that match how your business actually thinks, and gives more accurate answers to analytics questions.
+
+</div>
+</div>
+</div>
+
+<div className="col col--6 margin-bottom--lg">
+<div className="card">
+<div className="card__header">
+
+### [Diagnostics](/meltano-ai/ai-diagnostics)
+
+</div>
+<div className="card__body">
+
+When a pipeline run fails, Melty already has the context to investigate: the recent changes, the runtime logs, and the pipeline code. Diagnostics packages that up for you as a plain-language explanation of what went wrong, either on demand from the **Diagnose** button, or automatically in your failure alert email.
+
+</div>
+</div>
+</div>
+
+</div>
+
+## How they fit together
+
+* **Meltano MCP** is the connection point, it's how an AI assistant reaches into your Meltano Cloud workspace at all.
+* **Agent Melty** and **Meltano Context Kits** are both knowledge, packaged as plugins, that make what comes back through that connection better: Agent Skills teach an agent *how to build with Meltano*, Context Kits teach it *what your business data means*.
+* **Meltano Diagnostics** is a specific, focused application of all of the above: diagnosing a failed pipeline run.
+
+## In this section
 
 <ul>
 <li><a href="/meltano-ai/meltano-mcp">Meltano MCP</a></li>
-<li><a href="/meltano-ai/agent-melty">Agent Melty</a></li>
-<li><a href="/meltano-ai/ai-diagnostics">AI Diagnostics</a></li>
+<li><a href="/meltano-ai/agent-melty">Meltano Agent Skills (Agent Melty)</a></li>
+<li><a href="/meltano-ai/context-kits">Meltano Context Kits</a></li>
+<li><a href="/meltano-ai/ai-diagnostics">Meltano Diagnostics</a></li>
 </ul>

@@ -125,7 +125,7 @@ const sidebars = {
       items: [
         {
           type: 'category',
-          label: 'Meltano MCP',
+          label: 'MCP',
           link: { type: 'doc', id: 'meltano-ai/meltano-mcp/index' },
           items: [
             { type: 'doc', id: 'meltano-ai/meltano-mcp/install' },
@@ -134,8 +134,9 @@ const sidebars = {
             { type: 'doc', id: 'meltano-ai/meltano-mcp/troubleshooting' },
           ],
         },
-        { type: 'doc', id: 'meltano-ai/agent-melty' },
-        { type: 'doc', id: 'meltano-ai/ai-diagnostics' },
+        { type: 'doc', id: 'meltano-ai/agent-melty', label: 'Agent Melty' },
+        { type: 'doc', id: 'meltano-ai/context-kits', label: 'Context Kits' },
+        { type: 'doc', id: 'meltano-ai/ai-diagnostics', label: 'Diagnostics' },
       ],
     },
 

@@ -8,7 +8,9 @@ sidebar_position: 11.4
 
 # Meltano MCP
 
-Meltano MCP connects your Meltano Cloud workspaces to Claude, so you can ask about your data pipelines in plain language instead of clicking through the app.
+Meltano MCP is the technology that gives AI chatbots, Claude, Gemini, ChatGPT, or any other [MCP](https://modelcontextprotocol.io)-compatible assistant, the ability to work with your Meltano Cloud workspaces: gathering data (what data teams usually call ingestion, or extract and load), helping model it, and supporting analysis, all grounded in your real workspace instead of guessed at. The documented setup path today is Claude; see [Installing Meltano MCP](/meltano-ai/meltano-mcp/install).
+
+Connect it, and you can ask about your data pipelines in plain language instead of clicking through the app.
 
 Once it's connected you can ask things like *"did last night's Salesforce load work?"*, *"why does the HubSpot pipeline keep failing?"* or *"build me a pipeline that pulls GitHub issues into the warehouse"* - and Claude can go and look, rather than guess.
 
@@ -24,8 +26,8 @@ The short version: without it, Claude can only talk *about* Meltano. With it, Cl
 
 You don't need to understand the protocol to use it. You connect it once, and from then on Claude just knows about your Meltano Cloud.
 
-:::tip Melty AI vs Meltano MCP
-**Melty AI** is the assistant built into Meltano Cloud - the one behind the **Diagnose** button and your [failure alert emails](/meltano-ai/ai-diagnostics#method-2-diagnose-and-act-email-alerts). **Meltano MCP** is the same knowledge and the same abilities, brought *to you* in Claude, so you can work with Meltano from wherever you already are.
+:::tip Melty vs Meltano MCP
+**Melty** is Meltano's conversational AI wherever it shows up, including the one behind the **Diagnose** button and your [failure alert emails](/meltano-ai/ai-diagnostics#method-2-diagnose-and-act-email-alerts) in [Meltano Diagnostics](/meltano-ai/ai-diagnostics). **Meltano MCP** is how that same knowledge and those same abilities reach you in Claude (or another MCP-compatible assistant), so you can work with Meltano from wherever you already are.
 :::
 
 ## What you can ask it to do
@@ -64,6 +66,10 @@ Everything below is something you can ask for in your own words. You never need 
 
 * Search the Meltano knowledge base and read the docs behind the answer, so replies are grounded in how Meltano really works rather than invented
 
+### Model and analyze your data
+
+* Pair MCP with a [Meltano Context Kit](/meltano-ai/context-kits) for your industry or business theme, and the assistant has business definitions to check its work against, not just column names, when it proposes a data model or answers a descriptive or diagnostic analytics question.
+
 ## Get started
 
 Meltano MCP is a Claude custom connector. Setting it up takes a few minutes, and on Claude Team and Enterprise plans an Owner adds it once for the whole organization. See [Installing Meltano MCP](/meltano-ai/meltano-mcp/install).
@@ -77,7 +83,8 @@ Meltano MCP is a Claude custom connector. Setting it up takes a few minutes, and
 
 ## Where to go next
 
-* [Agent Melty](/meltano-ai/agent-melty) - developing pipelines in your workspace's git repository with a coding agent.
-* [AI Diagnostics](/meltano-ai/ai-diagnostics) - the same diagnosis, either from the Diagnose button in the Meltano Cloud app, or before you've even logged in via your failure alert email.
+* [Meltano Agent Skills (Agent Melty)](/meltano-ai/agent-melty) - developing pipelines in your workspace's git repository with a coding agent.
+* [Meltano Context Kits](/meltano-ai/context-kits) - packaged business and industry knowledge that makes modeling and analysis answers more accurate.
+* [Meltano Diagnostics](/meltano-ai/ai-diagnostics) - the same diagnosis, either from the Diagnose button in the Meltano Cloud app, or before you've even logged in via your failure alert email.
 
 Questions, or something in a reply that looks wrong? Email [support@meltano.com](mailto:support@meltano.com) or reach out through your usual support channel.

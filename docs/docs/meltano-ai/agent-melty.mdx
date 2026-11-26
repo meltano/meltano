@@ -1,13 +1,15 @@
 ---
 title: Agent Melty
-description: Your go-to reference for developing pipelines on Meltano Cloud from inside your workspace's git repository.
+description: Your go-to reference for developing pipelines on Meltano Cloud from inside your workspace's git repository, using Agent Melty, Meltano's Agent Skills plugin.
 sidebar_label: Agent Melty
 sidebar_position: 11.6
 ---
 
 # Agent Melty
 
-At the core of any Meltano Cloud workspace is a git repository. With Agent Melty, we can help you to build in that source of truth with your agent, push it to Meltano Cloud, and the platform reconciles it. The UI's job shrinks to one thing it should own: secrets, which never pass through the agent or into git.
+Coding agents like Claude Code, Cursor, Codex, and Antigravity perform significantly better at Meltano-specific tasks once they have Meltano's own expert knowledge to draw on. That knowledge is **Agent Melty**, Meltano's dragon: packaged as a plugin and delivered into your workspace's git repository, so any agent that reads `AGENTS.md` can use it without extra setup.
+
+At the core of any Meltano Cloud workspace is that same git repository. With Agent Melty's knowledge in it, you build in that source of truth with your agent, push it to Meltano Cloud, and the platform reconciles it. The UI's job shrinks to one thing it should own: secrets, which never pass through the agent or into git.
 
 Work through it once end to end, then keep the pre-flight checklist for every change after that.
 
@@ -23,7 +25,7 @@ When your Meltano Cloud workspace was created, the platform provisioned a git re
 The AI knowledge kit is seeded when the workspace is created, so it's already in the repo the moment you clone it, with nothing for you to install or enable. Just open the repo in your agent and go.
 
 
-If your workspace pre-dates Agent Melty, you can install it as a plugin - it's called "Agent Melty (the AI Knowledge Kit)"
+If your workspace pre-dates Agent Melty, you can install it as a plugin - it's `files-melty-ai`, listed on MeltanoHub as "Agent Melty (the AI Knowledge Kit)".
 :::
 
 ## How the knowledge base works
