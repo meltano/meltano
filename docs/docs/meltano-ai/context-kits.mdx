@@ -1,0 +1,35 @@
+---
+title: Meltano Context Kits
+description: Packaged industry and business knowledge, delivered as Meltano plugins, that turn Meltano MCP into a knowledge graph your LLM can use to build better data models and give more accurate analytics answers.
+sidebar_label: Meltano Context Kits
+sidebar_position: 11.55
+---
+
+# Meltano Context Kits
+
+A data warehouse on its own doesn't know what "customer churn" or "order-to-shipping time" means for your business, an LLM working against it has to guess, or ask you every time. Context Kits are how Meltano fixes that: packaged industry and business knowledge that gives your AI the same grounding a new hire gets from onboarding.
+
+## What a Context Kit is
+
+A Context Kit is an upgradable **Meltano plugin**, like an extractor or loader, except what it delivers is a set of YAML files describing a business theme or industry domain: the entities involved, the metrics that matter, the relationships between them, and the common questions people ask.
+
+Add one to your project the way you'd add any other plugin, and it becomes part of your workspace's git repository alongside your pipeline config.
+
+## How it's used
+
+On its own, a Context Kit is just documentation your team (and your agent) can read. Its real value shows up once [Meltano MCP](/meltano-ai/meltano-mcp) is connected: MCP turns the kit's YAML into a searchable knowledge graph that your LLM can query as context, the same way it already queries your pipelines and run history.
+
+With that context available, an AI assistant working in Meltano Cloud can:
+
+* Build data models that follow conventions your team already uses, rather than inventing its own shape for "revenue by month" or "time to first response."
+* Answer descriptive and diagnostic analytics questions (the KPIs you track, and why a number moved) with definitions it can check against, instead of guessing from column names alone.
+* Explain *why* a model is structured a certain way, by pointing at the business concept the kit defines, not just the SQL.
+
+This is what distinguishes Context Kits from [Meltano Agent Skills](/meltano-ai/agent-melty): Agent Skills teach a coding agent *how to build with Meltano*; Context Kits teach it *what your business data means*.
+
+## Where to go next
+
+* [Meltano MCP](/meltano-ai/meltano-mcp) - the connector that turns an installed Context Kit into usable context for your LLM.
+* [Agent Melty](/meltano-ai/agent-melty) - the companion plugin that teaches a coding agent how to build and troubleshoot in Meltano.
+
+Questions, or want to request a Context Kit for your industry? Email [support@meltano.com](mailto:support@meltano.com) or reach out through your usual support channel.
